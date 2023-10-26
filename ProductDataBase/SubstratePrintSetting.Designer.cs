@@ -46,13 +46,12 @@
             BarcodeHeightTextBox = new TextBox();
             Label31 = new Label();
             HeaderStringTextBox = new TextBox();
-            CancelButton = new Button();
             Label22 = new Label();
             Label11 = new Label();
             Label10 = new Label();
-            textBox2 = new TextBox();
+            PageOffsetXTextBox = new TextBox();
             WhiteSpaceGroupBox = new GroupBox();
-            textBox1 = new TextBox();
+            PageOffsetYTextBox = new TextBox();
             Label9 = new Label();
             Label8 = new Label();
             QuantityGroupBox = new GroupBox();
@@ -81,11 +80,12 @@
             Label16 = new Label();
             Label15 = new Label();
             Label14 = new Label();
-            textBox3 = new TextBox();
-            textBox4 = new TextBox();
+            LabelIntervalYTextBox = new TextBox();
+            LabelIntervalXTextBox = new TextBox();
             Label13 = new Label();
             HeaderFooterGroupBox = new GroupBox();
             LabelIntervalGroupBox = new GroupBox();
+            CloseButton = new Button();
             BarcodeGroupBox.SuspendLayout();
             WhiteSpaceGroupBox.SuspendLayout();
             QuantityGroupBox.SuspendLayout();
@@ -312,15 +312,6 @@
             HeaderStringTextBox.Size = new Size(185, 23);
             HeaderStringTextBox.TabIndex = 12;
             // 
-            // CancelButton
-            // 
-            CancelButton.Location = new Point(552, 524);
-            CancelButton.Name = "CancelButton";
-            CancelButton.Size = new Size(75, 25);
-            CancelButton.TabIndex = 17;
-            CancelButton.Text = "Cancel";
-            CancelButton.UseVisualStyleBackColor = true;
-            // 
             // Label22
             // 
             Label22.AutoSize = true;
@@ -348,20 +339,20 @@
             Label10.TabIndex = 4;
             Label10.Text = "mm";
             // 
-            // textBox2
+            // PageOffsetXTextBox
             // 
-            textBox2.Location = new Point(20, 36);
-            textBox2.MaxLength = 5;
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(100, 23);
-            textBox2.TabIndex = 1;
+            PageOffsetXTextBox.Location = new Point(20, 36);
+            PageOffsetXTextBox.MaxLength = 5;
+            PageOffsetXTextBox.Name = "PageOffsetXTextBox";
+            PageOffsetXTextBox.Size = new Size(100, 23);
+            PageOffsetXTextBox.TabIndex = 1;
             // 
             // WhiteSpaceGroupBox
             // 
             WhiteSpaceGroupBox.Controls.Add(Label11);
             WhiteSpaceGroupBox.Controls.Add(Label10);
-            WhiteSpaceGroupBox.Controls.Add(textBox1);
-            WhiteSpaceGroupBox.Controls.Add(textBox2);
+            WhiteSpaceGroupBox.Controls.Add(PageOffsetYTextBox);
+            WhiteSpaceGroupBox.Controls.Add(PageOffsetXTextBox);
             WhiteSpaceGroupBox.Controls.Add(Label9);
             WhiteSpaceGroupBox.Controls.Add(Label8);
             WhiteSpaceGroupBox.Location = new Point(27, 158);
@@ -371,13 +362,13 @@
             WhiteSpaceGroupBox.TabStop = false;
             WhiteSpaceGroupBox.Text = "用紙余白";
             // 
-            // textBox1
+            // PageOffsetYTextBox
             // 
-            textBox1.Location = new Point(158, 36);
-            textBox1.MaxLength = 5;
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(100, 23);
-            textBox1.TabIndex = 3;
+            PageOffsetYTextBox.Location = new Point(158, 36);
+            PageOffsetYTextBox.MaxLength = 5;
+            PageOffsetYTextBox.Name = "PageOffsetYTextBox";
+            PageOffsetYTextBox.Size = new Size(100, 23);
+            PageOffsetYTextBox.TabIndex = 3;
             // 
             // Label9
             // 
@@ -635,21 +626,21 @@
             Label14.TabIndex = 4;
             Label14.Text = "mm";
             // 
-            // textBox3
+            // LabelIntervalYTextBox
             // 
-            textBox3.Location = new Point(158, 36);
-            textBox3.MaxLength = 5;
-            textBox3.Name = "textBox3";
-            textBox3.Size = new Size(100, 23);
-            textBox3.TabIndex = 3;
+            LabelIntervalYTextBox.Location = new Point(158, 36);
+            LabelIntervalYTextBox.MaxLength = 5;
+            LabelIntervalYTextBox.Name = "LabelIntervalYTextBox";
+            LabelIntervalYTextBox.Size = new Size(100, 23);
+            LabelIntervalYTextBox.TabIndex = 3;
             // 
-            // textBox4
+            // LabelIntervalXTextBox
             // 
-            textBox4.Location = new Point(20, 36);
-            textBox4.MaxLength = 5;
-            textBox4.Name = "textBox4";
-            textBox4.Size = new Size(100, 23);
-            textBox4.TabIndex = 1;
+            LabelIntervalXTextBox.Location = new Point(20, 36);
+            LabelIntervalXTextBox.MaxLength = 5;
+            LabelIntervalXTextBox.Name = "LabelIntervalXTextBox";
+            LabelIntervalXTextBox.Size = new Size(100, 23);
+            LabelIntervalXTextBox.TabIndex = 1;
             // 
             // Label13
             // 
@@ -687,8 +678,8 @@
             // 
             LabelIntervalGroupBox.Controls.Add(Label15);
             LabelIntervalGroupBox.Controls.Add(Label14);
-            LabelIntervalGroupBox.Controls.Add(textBox3);
-            LabelIntervalGroupBox.Controls.Add(textBox4);
+            LabelIntervalGroupBox.Controls.Add(LabelIntervalYTextBox);
+            LabelIntervalGroupBox.Controls.Add(LabelIntervalXTextBox);
             LabelIntervalGroupBox.Controls.Add(Label13);
             LabelIntervalGroupBox.Controls.Add(Label12);
             LabelIntervalGroupBox.Location = new Point(27, 231);
@@ -698,14 +689,23 @@
             LabelIntervalGroupBox.TabStop = false;
             LabelIntervalGroupBox.Text = "ラベル間隔";
             // 
+            // CloseButton
+            // 
+            CloseButton.Location = new Point(552, 524);
+            CloseButton.Name = "CloseButton";
+            CloseButton.Size = new Size(75, 25);
+            CloseButton.TabIndex = 17;
+            CloseButton.Text = "Close";
+            CloseButton.UseVisualStyleBackColor = true;
+            // 
             // SubstratePrintSetting
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(654, 561);
+            Controls.Add(CloseButton);
             Controls.Add(OKButton);
             Controls.Add(BarcodeGroupBox);
-            Controls.Add(CancelButton);
             Controls.Add(WhiteSpaceGroupBox);
             Controls.Add(QuantityGroupBox);
             Controls.Add(LabelSizeGroupBox);
@@ -759,13 +759,12 @@
         private TextBox BarcodeHeightTextBox;
         private Label Label31;
         private TextBox HeaderStringTextBox;
-        private Button CancelButton;
         private Label Label22;
         private Label Label11;
         private Label Label10;
-        private TextBox textBox2;
+        private TextBox PageOffsetXTextBox;
         private GroupBox WhiteSpaceGroupBox;
-        private TextBox textBox1;
+        private TextBox PageOffsetYTextBox;
         private Label Label9;
         private Label Label8;
         private GroupBox QuantityGroupBox;
@@ -794,10 +793,11 @@
         private Label Label16;
         private Label Label15;
         private Label Label14;
-        private TextBox textBox3;
-        private TextBox textBox4;
+        private TextBox LabelIntervalYTextBox;
+        private TextBox LabelIntervalXTextBox;
         private Label Label13;
         private GroupBox HeaderFooterGroupBox;
         private GroupBox LabelIntervalGroupBox;
+        private Button CloseButton;
     }
 }

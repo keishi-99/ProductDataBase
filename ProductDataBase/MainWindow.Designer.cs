@@ -42,9 +42,9 @@
             FontSize9RadioButton = new RadioButton();
             FontSizeLabel = new Label();
             QRCodePanel = new Panel();
+            QRCodeButton = new Button();
             QRCodeTextBox = new TextBox();
             QRCodeCheckBox = new CheckBox();
-            QRCodeButton = new Button();
             MainWindowMenuStrip.SuspendLayout();
             FontSizePanel.SuspendLayout();
             QRCodePanel.SuspendLayout();
@@ -71,6 +71,7 @@
             終了ToolStripMenuItem.Name = "終了ToolStripMenuItem";
             終了ToolStripMenuItem.Size = new Size(98, 22);
             終了ToolStripMenuItem.Text = "終了";
+            終了ToolStripMenuItem.Click += 終了ToolStripMenuItem_Click;
             // 
             // CategoryRadioButton1
             // 
@@ -82,6 +83,7 @@
             CategoryRadioButton1.Text = "基盤登録";
             CategoryRadioButton1.TextAlign = ContentAlignment.MiddleCenter;
             CategoryRadioButton1.UseVisualStyleBackColor = true;
+            CategoryRadioButton1.CheckedChanged += CategoryRadioButton_CheckedChanged;
             // 
             // CategoryRadioButton2
             // 
@@ -93,6 +95,7 @@
             CategoryRadioButton2.Text = "製品登録";
             CategoryRadioButton2.TextAlign = ContentAlignment.MiddleCenter;
             CategoryRadioButton2.UseVisualStyleBackColor = true;
+            CategoryRadioButton2.CheckedChanged += CategoryRadioButton_CheckedChanged;
             // 
             // CategoryRadioButton3
             // 
@@ -104,6 +107,7 @@
             CategoryRadioButton3.Text = "再印刷";
             CategoryRadioButton3.TextAlign = ContentAlignment.MiddleCenter;
             CategoryRadioButton3.UseVisualStyleBackColor = true;
+            CategoryRadioButton3.CheckedChanged += CategoryRadioButton_CheckedChanged;
             // 
             // CategoryRadioButton4
             // 
@@ -115,6 +119,7 @@
             CategoryRadioButton4.Text = "基盤変更";
             CategoryRadioButton4.TextAlign = ContentAlignment.MiddleCenter;
             CategoryRadioButton4.UseVisualStyleBackColor = true;
+            CategoryRadioButton4.CheckedChanged += CategoryRadioButton_CheckedChanged;
             // 
             // CategoryListBox1
             // 
@@ -126,6 +131,7 @@
             CategoryListBox1.Name = "CategoryListBox1";
             CategoryListBox1.Size = new Size(60, 214);
             CategoryListBox1.TabIndex = 5;
+            CategoryListBox1.SelectedIndexChanged += CategoryListBox1_SelectedIndexChanged;
             // 
             // CategoryListBox2
             // 
@@ -137,6 +143,7 @@
             CategoryListBox2.Name = "CategoryListBox2";
             CategoryListBox2.Size = new Size(210, 214);
             CategoryListBox2.TabIndex = 6;
+            CategoryListBox2.SelectedIndexChanged += CategoryListBox2_SelectedIndexChanged;
             // 
             // CategoryListBox3
             // 
@@ -148,6 +155,7 @@
             CategoryListBox3.Name = "CategoryListBox3";
             CategoryListBox3.Size = new Size(250, 214);
             CategoryListBox3.TabIndex = 7;
+            CategoryListBox3.SelectedIndexChanged += CategoryListBox3_SelectedIndexChanged;
             // 
             // HistoryButton
             // 
@@ -158,6 +166,7 @@
             HistoryButton.TabIndex = 8;
             HistoryButton.Text = "履歴";
             HistoryButton.UseVisualStyleBackColor = true;
+            HistoryButton.Click += HistoryButton_Click;
             // 
             // RegisterButton
             // 
@@ -168,6 +177,7 @@
             RegisterButton.TabIndex = 9;
             RegisterButton.Text = "登録";
             RegisterButton.UseVisualStyleBackColor = true;
+            RegisterButton.Click += RegisterButton_Click;
             // 
             // FontSizePanel
             // 
@@ -191,6 +201,7 @@
             FontSize16RadioButton.Text = "16";
             FontSize16RadioButton.TextAlign = ContentAlignment.MiddleCenter;
             FontSize16RadioButton.UseVisualStyleBackColor = true;
+            FontSize16RadioButton.CheckedChanged += FontSize_CheckedChanged;
             // 
             // FontSize12RadioButton
             // 
@@ -202,6 +213,7 @@
             FontSize12RadioButton.Text = "12";
             FontSize12RadioButton.TextAlign = ContentAlignment.MiddleCenter;
             FontSize12RadioButton.UseVisualStyleBackColor = true;
+            FontSize12RadioButton.CheckedChanged += FontSize_CheckedChanged;
             // 
             // FontSize9RadioButton
             // 
@@ -215,6 +227,7 @@
             FontSize9RadioButton.Text = "9";
             FontSize9RadioButton.TextAlign = ContentAlignment.MiddleCenter;
             FontSize9RadioButton.UseVisualStyleBackColor = true;
+            FontSize9RadioButton.CheckedChanged += FontSize_CheckedChanged;
             // 
             // FontSizeLabel
             // 
@@ -236,6 +249,16 @@
             QRCodePanel.Size = new Size(218, 46);
             QRCodePanel.TabIndex = 500;
             // 
+            // QRCodeButton
+            // 
+            QRCodeButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            QRCodeButton.Location = new Point(124, 16);
+            QRCodeButton.Name = "QRCodeButton";
+            QRCodeButton.Size = new Size(75, 23);
+            QRCodeButton.TabIndex = 602;
+            QRCodeButton.Text = "OK";
+            QRCodeButton.UseVisualStyleBackColor = true;
+            // 
             // QRCodeTextBox
             // 
             QRCodeTextBox.Location = new Point(18, 16);
@@ -243,6 +266,7 @@
             QRCodeTextBox.Name = "QRCodeTextBox";
             QRCodeTextBox.Size = new Size(100, 23);
             QRCodeTextBox.TabIndex = 601;
+            QRCodeTextBox.KeyDown += QRCodeTextBox_KeyDown;
             // 
             // QRCodeCheckBox
             // 
@@ -255,16 +279,6 @@
             QRCodeCheckBox.TabIndex = 501;
             QRCodeCheckBox.Text = "QRコード";
             QRCodeCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // QRCodeButton
-            // 
-            QRCodeButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            QRCodeButton.Location = new Point(124, 16);
-            QRCodeButton.Name = "QRCodeButton";
-            QRCodeButton.Size = new Size(75, 23);
-            QRCodeButton.TabIndex = 602;
-            QRCodeButton.Text = "OK";
-            QRCodeButton.UseVisualStyleBackColor = true;
             // 
             // MainWindow
             // 
@@ -291,6 +305,7 @@
             MaximizeBox = false;
             Name = "MainWindow";
             Text = "ProductDataBase";
+            Load += MainWindow_Load;
             MainWindowMenuStrip.ResumeLayout(false);
             MainWindowMenuStrip.PerformLayout();
             FontSizePanel.ResumeLayout(false);
