@@ -1,0 +1,103 @@
+﻿namespace ProductDataBase {
+    partial class History {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent() {
+            DataBaseDataGridView = new DataGridView();
+            CategoryComboBox = new ComboBox();
+            FilterStringTextBox = new TextBox();
+            ExportButton = new Button();
+            ((System.ComponentModel.ISupportInitialize)DataBaseDataGridView).BeginInit();
+            SuspendLayout();
+            // 
+            // DataBaseDataGridView
+            // 
+            DataBaseDataGridView.AllowUserToAddRows = false;
+            DataBaseDataGridView.AllowUserToDeleteRows = false;
+            DataBaseDataGridView.AllowUserToResizeRows = false;
+            DataBaseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            DataBaseDataGridView.Location = new Point(0, 0);
+            DataBaseDataGridView.Name = "DataBaseDataGridView";
+            DataBaseDataGridView.ReadOnly = true;
+            DataBaseDataGridView.RowHeadersVisible = false;
+            DataBaseDataGridView.RowTemplate.Height = 21;
+            DataBaseDataGridView.Size = new Size(1184, 476);
+            DataBaseDataGridView.TabIndex = 0;
+            // 
+            // CategoryComboBox
+            // 
+            CategoryComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            CategoryComboBox.FormattingEnabled = true;
+            CategoryComboBox.Location = new Point(12, 482);
+            CategoryComboBox.Name = "CategoryComboBox";
+            CategoryComboBox.Size = new Size(121, 23);
+            CategoryComboBox.TabIndex = 1;
+            // 
+            // FilterStringTextBox
+            // 
+            FilterStringTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            FilterStringTextBox.Location = new Point(139, 483);
+            FilterStringTextBox.MaxLength = 50;
+            FilterStringTextBox.Name = "FilterStringTextBox";
+            FilterStringTextBox.Size = new Size(100, 23);
+            FilterStringTextBox.TabIndex = 2;
+            // 
+            // ExportButton
+            // 
+            ExportButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            ExportButton.Location = new Point(1097, 483);
+            ExportButton.Name = "ExportButton";
+            ExportButton.Size = new Size(75, 23);
+            ExportButton.TabIndex = 3;
+            ExportButton.Text = "CSV出力";
+            ExportButton.UseVisualStyleBackColor = true;
+            // 
+            // History
+            // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(1184, 511);
+            Controls.Add(ExportButton);
+            Controls.Add(FilterStringTextBox);
+            Controls.Add(CategoryComboBox);
+            Controls.Add(DataBaseDataGridView);
+            Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "History";
+            ShowIcon = false;
+            ShowInTaskbar = false;
+            Text = "データベース";
+            ((System.ComponentModel.ISupportInitialize)DataBaseDataGridView).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
+        }
+
+        #endregion
+
+        private DataGridView DataBaseDataGridView;
+        private ComboBox CategoryComboBox;
+        private TextBox FilterStringTextBox;
+        private Button ExportButton;
+    }
+}
