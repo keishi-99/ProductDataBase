@@ -101,19 +101,21 @@
             // 印刷ToolStripMenuItem
             // 
             印刷ToolStripMenuItem.Name = "印刷ToolStripMenuItem";
-            印刷ToolStripMenuItem.Size = new Size(142, 22);
+            印刷ToolStripMenuItem.Size = new Size(180, 22);
             印刷ToolStripMenuItem.Text = "印刷";
+            印刷ToolStripMenuItem.Click += 印刷ToolStripMenuItem_Click;
             // 
             // 印刷プレビューToolStripMenuItem
             // 
             印刷プレビューToolStripMenuItem.Name = "印刷プレビューToolStripMenuItem";
-            印刷プレビューToolStripMenuItem.Size = new Size(142, 22);
+            印刷プレビューToolStripMenuItem.Size = new Size(180, 22);
             印刷プレビューToolStripMenuItem.Text = "印刷プレビュー";
+            印刷プレビューToolStripMenuItem.Click += 印刷プレビューToolStripMenuItem_Click;
             // 
             // 終了ToolStripMenuItem
             // 
             終了ToolStripMenuItem.Name = "終了ToolStripMenuItem";
-            終了ToolStripMenuItem.Size = new Size(142, 22);
+            終了ToolStripMenuItem.Size = new Size(180, 22);
             終了ToolStripMenuItem.Text = "終了";
             // 
             // 設定ToolStripMenuItem
@@ -128,6 +130,7 @@
             印刷設定ToolStripMenuItem.Name = "印刷設定ToolStripMenuItem";
             印刷設定ToolStripMenuItem.Size = new Size(122, 22);
             印刷設定ToolStripMenuItem.Text = "印刷設定";
+            印刷設定ToolStripMenuItem.Click += 印刷設定ToolStripMenuItem_Click;
             // 
             // ヘルプToolStripMenuItem
             // 
@@ -139,8 +142,9 @@
             // 取得情報ToolStripMenuItem
             // 
             取得情報ToolStripMenuItem.Name = "取得情報ToolStripMenuItem";
-            取得情報ToolStripMenuItem.Size = new Size(122, 22);
+            取得情報ToolStripMenuItem.Size = new Size(180, 22);
             取得情報ToolStripMenuItem.Text = "取得情報";
+            取得情報ToolStripMenuItem.Click += 取得情報ToolStripMenuItem_Click;
             // 
             // ProductNameLabel1
             // 
@@ -221,6 +225,7 @@
             OrderNumberCheckBox.TabStop = false;
             OrderNumberCheckBox.Text = "注文番号";
             OrderNumberCheckBox.UseVisualStyleBackColor = true;
+            OrderNumberCheckBox.CheckedChanged += NumberCheckBox_CheckedChanged;
             // 
             // OrderNumberTextBox
             // 
@@ -244,6 +249,7 @@
             ManufacturingNumberCheckBox.TabStop = false;
             ManufacturingNumberCheckBox.Text = "製造番号";
             ManufacturingNumberCheckBox.UseVisualStyleBackColor = true;
+            ManufacturingNumberCheckBox.CheckedChanged += CheckBoxChecked;
             // 
             // ManufacturingNumberMaskedTextBox
             // 
@@ -267,6 +273,7 @@
             QuantityTextBox.Size = new Size(120, 23);
             QuantityTextBox.TabIndex = 12;
             QuantityTextBox.TextAlign = HorizontalAlignment.Right;
+            QuantityTextBox.KeyPress += QuantityTextBox_KeyPress;
             // 
             // QuantityCheckBox
             // 
@@ -278,6 +285,7 @@
             QuantityCheckBox.TabStop = false;
             QuantityCheckBox.Text = "数量";
             QuantityCheckBox.UseVisualStyleBackColor = true;
+            QuantityCheckBox.CheckedChanged += CheckBoxChecked;
             // 
             // DefectNumberTextBox
             // 
@@ -290,6 +298,7 @@
             DefectNumberTextBox.Size = new Size(120, 23);
             DefectNumberTextBox.TabIndex = 14;
             DefectNumberTextBox.TextAlign = HorizontalAlignment.Right;
+            DefectNumberTextBox.KeyPress += DefectNumberTextBox_KeyPress;
             // 
             // DefectNumberCheckBox
             // 
@@ -301,6 +310,7 @@
             DefectNumberCheckBox.TabStop = false;
             DefectNumberCheckBox.Text = "不良量";
             DefectNumberCheckBox.UseVisualStyleBackColor = true;
+            DefectNumberCheckBox.CheckedChanged += CheckBoxChecked;
             // 
             // RevisionTextBox
             // 
@@ -324,6 +334,7 @@
             RevisionCheckBox.TabStop = false;
             RevisionCheckBox.Text = "レビジョン";
             RevisionCheckBox.UseVisualStyleBackColor = true;
+            RevisionCheckBox.CheckedChanged += CheckBoxChecked;
             // 
             // ExtraTextBox1
             // 
@@ -347,6 +358,7 @@
             ExtraCheckBox1.TabStop = false;
             ExtraCheckBox1.Text = "予備";
             ExtraCheckBox1.UseVisualStyleBackColor = true;
+            ExtraCheckBox1.CheckedChanged += CheckBoxChecked;
             // 
             // ExtraTextBox2
             // 
@@ -370,6 +382,7 @@
             ExtraCheckBox2.TabStop = false;
             ExtraCheckBox2.Text = "予備";
             ExtraCheckBox2.UseVisualStyleBackColor = true;
+            ExtraCheckBox2.CheckedChanged += CheckBoxChecked;
             // 
             // ExtraTextBox3
             // 
@@ -393,6 +406,7 @@
             ExtraCheckBox3.TabStop = false;
             ExtraCheckBox3.Text = "予備";
             ExtraCheckBox3.UseVisualStyleBackColor = true;
+            ExtraCheckBox3.CheckedChanged += CheckBoxChecked;
             // 
             // RegistrationDateCheckBox
             // 
@@ -404,6 +418,7 @@
             RegistrationDateCheckBox.TabStop = false;
             RegistrationDateCheckBox.Text = "登録日";
             RegistrationDateCheckBox.UseVisualStyleBackColor = true;
+            RegistrationDateCheckBox.CheckedChanged += CheckBoxChecked;
             // 
             // RegistrationDateMaskedTextBox
             // 
@@ -414,6 +429,7 @@
             RegistrationDateMaskedTextBox.Size = new Size(120, 23);
             RegistrationDateMaskedTextBox.TabIndex = 24;
             RegistrationDateMaskedTextBox.TextAlign = HorizontalAlignment.Right;
+            RegistrationDateMaskedTextBox.TypeValidationCompleted += RegistrationDateMaskedTextBox_TypeValidationCompleted;
             // 
             // PersonCheckBox
             // 
@@ -425,6 +441,7 @@
             PersonCheckBox.TabStop = false;
             PersonCheckBox.Text = "担当者";
             PersonCheckBox.UseVisualStyleBackColor = true;
+            PersonCheckBox.CheckedChanged += CheckBoxChecked;
             // 
             // PersonComboBox
             // 
@@ -458,6 +475,7 @@
             ExtraCheckBox4.TabStop = false;
             ExtraCheckBox4.Text = "予備";
             ExtraCheckBox4.UseVisualStyleBackColor = true;
+            ExtraCheckBox4.CheckedChanged += CheckBoxChecked;
             // 
             // ExtraTextBox5
             // 
@@ -481,6 +499,7 @@
             ExtraCheckBox5.TabStop = false;
             ExtraCheckBox5.Text = "予備";
             ExtraCheckBox5.UseVisualStyleBackColor = true;
+            ExtraCheckBox5.CheckedChanged += CheckBoxChecked;
             // 
             // ExtraTextBox6
             // 
@@ -504,6 +523,7 @@
             ExtraCheckBox6.TabStop = false;
             ExtraCheckBox6.Text = "予備";
             ExtraCheckBox6.UseVisualStyleBackColor = true;
+            ExtraCheckBox6.CheckedChanged += CheckBoxChecked;
             // 
             // CommentCheckBox
             // 
@@ -515,6 +535,7 @@
             CommentCheckBox.TabStop = false;
             CommentCheckBox.Text = "コメント";
             CommentCheckBox.UseVisualStyleBackColor = true;
+            CommentCheckBox.CheckedChanged += CheckBoxChecked;
             // 
             // CommentTtextBox
             // 
@@ -549,6 +570,7 @@
             TemplateButton.TabIndex = 36;
             TemplateButton.Text = "定型文";
             TemplateButton.UseVisualStyleBackColor = true;
+            TemplateButton.Click += TemplateButton_Click;
             // 
             // PrintRowLabel
             // 
@@ -580,6 +602,7 @@
             RegisterButton.TabIndex = 39;
             RegisterButton.Text = "OK";
             RegisterButton.UseVisualStyleBackColor = true;
+            RegisterButton.Click += RegisterButton_Click;
             // 
             // PrintOnlyCheckBox
             // 
@@ -590,6 +613,7 @@
             PrintOnlyCheckBox.TabStop = false;
             PrintOnlyCheckBox.Text = "印刷のみ";
             PrintOnlyCheckBox.UseVisualStyleBackColor = true;
+            PrintOnlyCheckBox.CheckedChanged += CheckBoxChecked;
             // 
             // PrintButton
             // 
@@ -601,10 +625,15 @@
             PrintButton.TabIndex = 41;
             PrintButton.Text = "印刷";
             PrintButton.UseVisualStyleBackColor = true;
+            PrintButton.Click += PrintButton_Click;
             // 
             // SubstrateRegistrationPrintDialog
             // 
             SubstrateRegistrationPrintDialog.UseEXDialog = true;
+            // 
+            // SubstrateRegistrationPrintDocument
+            // 
+            SubstrateRegistrationPrintDocument.PrintPage += SubstrateRegistrationPrintDocument_PrintPage;
             // 
             // SubstrateRegistrationPrintPreviewDialog
             // 
@@ -615,8 +644,9 @@
             SubstrateRegistrationPrintPreviewDialog.Icon = (Icon)resources.GetObject("SubstrateRegistrationPrintPreviewDialog.Icon");
             SubstrateRegistrationPrintPreviewDialog.Name = "SubstrateRegistrationPrintPreviewDialog";
             SubstrateRegistrationPrintPreviewDialog.Visible = false;
+            SubstrateRegistrationPrintPreviewDialog.Load += SubstrateRegistrationPrintPreviewDialog_Load;
             // 
-            // SubstrateRegistration
+            // SubstrateRegistrationWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -668,10 +698,12 @@
             MainMenuStrip = SubstrateRegistrationMenuStrip;
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "SubstrateRegistration";
+            Name = "SubstrateRegistrationWindow";
             ShowIcon = false;
             ShowInTaskbar = false;
             Text = "基盤登録";
+            FormClosing += SubstrateRegistrationWindow_FormClosing;
+            Load += SubstrateRegistrationWindow_Load;
             SubstrateRegistrationMenuStrip.ResumeLayout(false);
             SubstrateRegistrationMenuStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)PrintPostionNumericUpDown).EndInit();
