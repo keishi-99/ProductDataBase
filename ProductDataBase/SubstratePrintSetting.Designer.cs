@@ -25,7 +25,7 @@
         private void InitializeComponent() {
             Label41 = new Label();
             Label40 = new Label();
-            BarcodeStringTextBox = new TextBox();
+            BarcodeFormatTextBox = new TextBox();
             Label39 = new Label();
             BarcodeFontButton = new Button();
             BarcodeFontTextBox = new TextBox();
@@ -86,6 +86,8 @@
             HeaderFooterGroupBox = new GroupBox();
             LabelIntervalGroupBox = new GroupBox();
             CloseButton = new Button();
+            SubstratePrintFontDialog = new FontDialog();
+            SubstrateBarcodeFontDialog = new FontDialog();
             BarcodeGroupBox.SuspendLayout();
             WhiteSpaceGroupBox.SuspendLayout();
             QuantityGroupBox.SuspendLayout();
@@ -112,13 +114,13 @@
             Label40.TabIndex = 24;
             Label40.Text = "%T: 型式 %R: リビジョン %S: 製造番号";
             // 
-            // BarcodeStringTextBox
+            // BarcodeFormatTextBox
             // 
-            BarcodeStringTextBox.Location = new Point(379, 74);
-            BarcodeStringTextBox.MaxLength = 50;
-            BarcodeStringTextBox.Name = "BarcodeStringTextBox";
-            BarcodeStringTextBox.Size = new Size(180, 23);
-            BarcodeStringTextBox.TabIndex = 24;
+            BarcodeFormatTextBox.Location = new Point(379, 74);
+            BarcodeFormatTextBox.MaxLength = 50;
+            BarcodeFormatTextBox.Name = "BarcodeFormatTextBox";
+            BarcodeFormatTextBox.Size = new Size(180, 23);
+            BarcodeFormatTextBox.TabIndex = 24;
             // 
             // Label39
             // 
@@ -247,7 +249,7 @@
             // 
             BarcodeGroupBox.Controls.Add(Label41);
             BarcodeGroupBox.Controls.Add(Label40);
-            BarcodeGroupBox.Controls.Add(BarcodeStringTextBox);
+            BarcodeGroupBox.Controls.Add(BarcodeFormatTextBox);
             BarcodeGroupBox.Controls.Add(Label39);
             BarcodeGroupBox.Controls.Add(BarcodeFontButton);
             BarcodeGroupBox.Controls.Add(BarcodeFontTextBox);
@@ -719,6 +721,7 @@
             ShowIcon = false;
             ShowInTaskbar = false;
             Text = "基板ラベル設定";
+            Load += SubstratePrintSetting_Load;
             BarcodeGroupBox.ResumeLayout(false);
             BarcodeGroupBox.PerformLayout();
             WhiteSpaceGroupBox.ResumeLayout(false);
@@ -738,7 +741,7 @@
 
         private Label Label41;
         private Label Label40;
-        private TextBox BarcodeStringTextBox;
+        private TextBox BarcodeFormatTextBox;
         private Label Label39;
         private Button BarcodeFontButton;
         private TextBox BarcodeFontTextBox;
@@ -799,5 +802,7 @@
         private GroupBox HeaderFooterGroupBox;
         private GroupBox LabelIntervalGroupBox;
         private Button CloseButton;
+        private FontDialog SubstratePrintFontDialog;
+        private FontDialog SubstrateBarcodeFontDialog;
     }
 }
