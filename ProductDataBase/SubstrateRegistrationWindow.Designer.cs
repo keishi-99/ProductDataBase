@@ -66,7 +66,7 @@
             ExtraTextBox6 = new TextBox();
             ExtraCheckBox6 = new CheckBox();
             CommentCheckBox = new CheckBox();
-            CommentTtextBox = new TextBox();
+            CommentTextBox = new TextBox();
             CommentComboBox = new ComboBox();
             TemplateButton = new Button();
             PrintRowLabel = new Label();
@@ -101,21 +101,21 @@
             // 印刷ToolStripMenuItem
             // 
             印刷ToolStripMenuItem.Name = "印刷ToolStripMenuItem";
-            印刷ToolStripMenuItem.Size = new Size(180, 22);
+            印刷ToolStripMenuItem.Size = new Size(142, 22);
             印刷ToolStripMenuItem.Text = "印刷";
             印刷ToolStripMenuItem.Click += 印刷ToolStripMenuItem_Click;
             // 
             // 印刷プレビューToolStripMenuItem
             // 
             印刷プレビューToolStripMenuItem.Name = "印刷プレビューToolStripMenuItem";
-            印刷プレビューToolStripMenuItem.Size = new Size(180, 22);
+            印刷プレビューToolStripMenuItem.Size = new Size(142, 22);
             印刷プレビューToolStripMenuItem.Text = "印刷プレビュー";
             印刷プレビューToolStripMenuItem.Click += 印刷プレビューToolStripMenuItem_Click;
             // 
             // 終了ToolStripMenuItem
             // 
             終了ToolStripMenuItem.Name = "終了ToolStripMenuItem";
-            終了ToolStripMenuItem.Size = new Size(180, 22);
+            終了ToolStripMenuItem.Size = new Size(142, 22);
             終了ToolStripMenuItem.Text = "終了";
             // 
             // 設定ToolStripMenuItem
@@ -142,7 +142,7 @@
             // 取得情報ToolStripMenuItem
             // 
             取得情報ToolStripMenuItem.Name = "取得情報ToolStripMenuItem";
-            取得情報ToolStripMenuItem.Size = new Size(180, 22);
+            取得情報ToolStripMenuItem.Size = new Size(122, 22);
             取得情報ToolStripMenuItem.Text = "取得情報";
             取得情報ToolStripMenuItem.Click += 取得情報ToolStripMenuItem_Click;
             // 
@@ -253,6 +253,7 @@
             // 
             // ManufacturingNumberMaskedTextBox
             // 
+            ManufacturingNumberMaskedTextBox.Enabled = false;
             ManufacturingNumberMaskedTextBox.Location = new Point(19, 191);
             ManufacturingNumberMaskedTextBox.Mask = "LA00L00000-0000";
             ManufacturingNumberMaskedTextBox.Name = "ManufacturingNumberMaskedTextBox";
@@ -422,6 +423,7 @@
             // 
             // RegistrationDateMaskedTextBox
             // 
+            RegistrationDateMaskedTextBox.Enabled = false;
             RegistrationDateMaskedTextBox.Location = new Point(166, 291);
             RegistrationDateMaskedTextBox.Mask = "0000/00/00";
             RegistrationDateMaskedTextBox.Name = "RegistrationDateMaskedTextBox";
@@ -537,18 +539,18 @@
             CommentCheckBox.UseVisualStyleBackColor = true;
             CommentCheckBox.CheckedChanged += CheckBoxChecked;
             // 
-            // CommentTtextBox
+            // CommentTextBox
             // 
-            CommentTtextBox.Enabled = false;
-            CommentTtextBox.Location = new Point(464, 141);
-            CommentTtextBox.Margin = new Padding(0);
-            CommentTtextBox.MaxLength = 500;
-            CommentTtextBox.Multiline = true;
-            CommentTtextBox.Name = "CommentTtextBox";
-            CommentTtextBox.ScrollBars = ScrollBars.Vertical;
-            CommentTtextBox.ShortcutsEnabled = false;
-            CommentTtextBox.Size = new Size(150, 175);
-            CommentTtextBox.TabIndex = 34;
+            CommentTextBox.Enabled = false;
+            CommentTextBox.Location = new Point(464, 141);
+            CommentTextBox.Margin = new Padding(0);
+            CommentTextBox.MaxLength = 500;
+            CommentTextBox.Multiline = true;
+            CommentTextBox.Name = "CommentTextBox";
+            CommentTextBox.ScrollBars = ScrollBars.Vertical;
+            CommentTextBox.ShortcutsEnabled = false;
+            CommentTextBox.Size = new Size(150, 175);
+            CommentTextBox.TabIndex = 34;
             // 
             // CommentComboBox
             // 
@@ -658,7 +660,7 @@
             Controls.Add(PrintRowLabel);
             Controls.Add(TemplateButton);
             Controls.Add(CommentComboBox);
-            Controls.Add(CommentTtextBox);
+            Controls.Add(CommentTextBox);
             Controls.Add(CommentCheckBox);
             Controls.Add(ExtraTextBox6);
             Controls.Add(ExtraCheckBox6);
@@ -755,7 +757,7 @@
         private TextBox ExtraTextBox6;
         private CheckBox ExtraCheckBox6;
         private CheckBox CommentCheckBox;
-        private TextBox CommentTtextBox;
+        private TextBox CommentTextBox;
         private ComboBox CommentComboBox;
         private Button TemplateButton;
         private Label PrintRowLabel;

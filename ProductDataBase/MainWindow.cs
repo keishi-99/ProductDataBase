@@ -79,15 +79,16 @@ namespace ProductDataBase {
                         DataRow[] ret1 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
 
                         if (ret1.Length > 0) {
-                            StrProductName = ret1[0]["col_Product_Name"].ToString();
-                            StrStockName = ret1[0]["col_Stock_Name"].ToString();
-                            StrSubstrateName = ret1[0]["col_Substrate_Name"].ToString();
-                            StrSubstrateModel = ret1[0]["col_Substrate_Model"].ToString();
-                            IntRegType = Convert.ToInt32(ret1[0]["col_Reg_Type"]);
-                            IntPrintType = Convert.ToInt32(ret1[0]["col_Print_Type"]);
-                            IntCheckBin = Convert.ToInt32(ret1[0]["col_Checkbox"].ToString(), 2);
+                            SubstrateRegistrationWindow substrateRegistrationWindow = new() {
+                                StrProductName = ret1[0]["col_Product_Name"].ToString(),
+                                StrStockName = ret1[0]["col_Stock_Name"].ToString(),
+                                StrSubstrateName = ret1[0]["col_Substrate_Name"].ToString(),
+                                StrSubstrateModel = ret1[0]["col_Substrate_Model"].ToString(),
+                                IntRegType = Convert.ToInt32(ret1[0]["col_Reg_Type"]),
+                                IntPrintType = Convert.ToInt32(ret1[0]["col_Print_Type"]),
+                                IntCheckBin = Convert.ToInt32(ret1[0]["col_Checkbox"].ToString(), 2)
+                            };
 
-                            SubstrateRegistrationWindow substrateRegistrationWindow = new();
                             substrateRegistrationWindow.ShowDialog(this);
                         }
                         break;
@@ -331,16 +332,18 @@ namespace ProductDataBase {
 
                         DataRow[] substrateRet = Dt.Select($"col_Product_Name = '{StrCategory13}' and col_Substrate_Name = '{StrCategory12}'");
 
-                        StrProductName = substrateRet[0]["col_Product_Name"].ToString();
-                        StrStockName = substrateRet[0]["col_Stock_Name"].ToString();
-                        StrSubstrateName = substrateRet[0]["col_Substrate_Name"].ToString();
-                        StrSubstrateModel = substrateRet[0]["col_Substrate_Model"].ToString();
-                        IntRegType = (int)substrateRet[0]["col_Reg_Type"];
-                        IntPrintType = (int)substrateRet[0]["col_Print_Type"];
-                        IntCheckBin = Convert.ToInt32(substrateRet[0]["col_Checkbox"].ToString(), 2);
-                        StrInitial = string.Empty;
+                        SubstrateRegistrationWindow substrateRegistrationWindow = new() {
 
-                        SubstrateRegistrationWindow substrateRegistrationWindow = new();
+                            StrProductName = substrateRet[0]["col_Product_Name"].ToString(),
+                            StrStockName = substrateRet[0]["col_Stock_Name"].ToString(),
+                            StrSubstrateName = substrateRet[0]["col_Substrate_Name"].ToString(),
+                            StrSubstrateModel = substrateRet[0]["col_Substrate_Model"].ToString(),
+                            IntRegType = (int)substrateRet[0]["col_Reg_Type"],
+                            IntPrintType = (int)substrateRet[0]["col_Print_Type"],
+                            IntCheckBin = Convert.ToInt32(substrateRet[0]["col_Checkbox"].ToString(), 2),
+                            StrInitial = string.Empty,
+                        };
+
                         substrateRegistrationWindow.ShowDialog(this);
                         break;
 
