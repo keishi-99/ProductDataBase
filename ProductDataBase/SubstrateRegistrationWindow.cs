@@ -359,98 +359,102 @@ namespace ProductDataBase {
             }
         }
         private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
+            try {
+                if (SettingsLabelSub == null || e.Graphics == null) { return; }
+                int TxtNumPublish = 0;
+                int MaxX = SettingsLabelSub.LabelSubPageSettings.NumLabelsX;
+                int MaxY = SettingsLabelSub.LabelSubPageSettings.NumLabelsY;
+                float SizeX = (float)SettingsLabelSub.LabelSubPageSettings.SizeX;
+                float SizeY = (float)SettingsLabelSub.LabelSubPageSettings.SizeY;
+                double OffsetX = SettingsLabelSub.LabelSubPageSettings.OffsetX;
+                double OffsetY = SettingsLabelSub.LabelSubPageSettings.OffsetY;
+                double IntervalX = SettingsLabelSub.LabelSubPageSettings.IntervalX;
+                double IntervalY = SettingsLabelSub.LabelSubPageSettings.IntervalY;
+                float PosX, PosY;
+                e.Graphics.PageUnit = GraphicsUnit.Millimeter;
+                Point Offset;
+                int StartLine = (int)PrintPostionNumericUpDown.Value - 1;
 
-            if (SettingsLabelSub == null || e.Graphics == null) { return; }
-            int TxtNumPublish = 0;
-            int MaxX = SettingsLabelSub.LabelSubPageSettings.NumLabelsX;
-            int MaxY = SettingsLabelSub.LabelSubPageSettings.NumLabelsY;
-            float SizeX = (float)SettingsLabelSub.LabelSubPageSettings.SizeX;
-            float SizeY = (float)SettingsLabelSub.LabelSubPageSettings.SizeY;
-            double OffsetX = SettingsLabelSub.LabelSubPageSettings.OffsetX;
-            double OffsetY = SettingsLabelSub.LabelSubPageSettings.OffsetY;
-            double IntervalX = SettingsLabelSub.LabelSubPageSettings.IntervalX;
-            double IntervalY = SettingsLabelSub.LabelSubPageSettings.IntervalY;
-            float PosX, PosY;
-            e.Graphics.PageUnit = GraphicsUnit.Millimeter;
-            Point Offset;
-            int StartLine = (int)PrintPostionNumericUpDown.Value - 1;
-
-            if (!SubstrateRegistrationPrintDocument.PrintController.IsPreview) {
-                OffsetX -= e.PageSettings.HardMarginX * 0.254;
-                OffsetY -= e.PageSettings.HardMarginY * 0.254;
-                if (LabelSubPageNum == 0) {
-                    Offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (StartLine * (IntervalY + SizeY))));
+                if (!SubstrateRegistrationPrintDocument.PrintController.IsPreview) {
+                    OffsetX -= e.PageSettings.HardMarginX * 0.254;
+                    OffsetY -= e.PageSettings.HardMarginY * 0.254;
+                    if (LabelSubPageNum == 0) {
+                        Offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (StartLine * (IntervalY + SizeY))));
+                    }
+                    else {
+                        Offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (IntervalY + SizeY))));
+                    }
                 }
                 else {
-                    Offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (IntervalY + SizeY))));
+                    Offset = new Point(0, 0);
                 }
-            }
-            else {
-                Offset = new Point(0, 0);
-            }
 
-            e.PageSettings.Margins.Left = 0;
-            e.PageSettings.Margins.Top = 0;
+                e.PageSettings.Margins.Left = 0;
+                e.PageSettings.Margins.Top = 0;
 
-            string HeaderString = ConvertHeaderFooterString(SettingsLabelSub.LabelSubPageSettings.HeaderString);
-            Point HeaderPos = SettingsLabelSub.LabelSubPageSettings.HeaderPos;
-            HeaderPos.Offset(Offset);
-            e.Graphics.DrawString(HeaderString, SettingsLabelSub.LabelSubPageSettings.HeaderFooterFont, Brushes.Black, HeaderPos);
+                string HeaderString = ConvertHeaderFooterString(SettingsLabelSub.LabelSubPageSettings.HeaderString);
+                Point HeaderPos = SettingsLabelSub.LabelSubPageSettings.HeaderPos;
+                HeaderPos.Offset(Offset);
+                e.Graphics.DrawString(HeaderString, SettingsLabelSub.LabelSubPageSettings.HeaderFooterFont, Brushes.Black, HeaderPos);
 
-            int x, y;
-            string s;
+                int x, y;
+                string s;
 
-            LabelSubNSerial = ManufacturingNumberMaskedTextBox.Text;
+                LabelSubNSerial = ManufacturingNumberMaskedTextBox.Text;
 
-            if (LabelSubPageNum >= 1) {
-                StartLine = 0;
-            }
+                if (LabelSubPageNum >= 1) {
+                    StartLine = 0;
+                }
 
-            int IntNumLabels = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
+                int IntNumLabels = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
 
-            for (y = StartLine; y < MaxY; y++) {
-                for (x = 0; x < MaxX; x++) {
-                    s = GenerateCode(LabelSubNSerial);
-                    PosX = (float)(OffsetX + (x * (IntervalX + SizeX)));
-                    PosY = (float)(OffsetY + (y * (IntervalY + SizeY)));
-                    e.Graphics.DrawImage(MakeLabelImage(s, (int)e.Graphics.DpiX, 1), PosX, PosY, SizeX, SizeY);
+                for (y = StartLine; y < MaxY; y++) {
+                    for (x = 0; x < MaxX; x++) {
+                        s = GenerateCode(LabelSubNSerial);
+                        PosX = (float)(OffsetX + (x * (IntervalX + SizeX)));
+                        PosY = (float)(OffsetY + (y * (IntervalY + SizeY)));
+                        e.Graphics.DrawImage(MakeLabelImage(s, (int)e.Graphics.DpiX, 1), PosX, PosY, SizeX, SizeY);
 
-                    LabelSubNLabel = 0;
-                    LabelSubNumLabelsToPrint--;
+                        LabelSubNLabel = 0;
+                        LabelSubNumLabelsToPrint--;
 
-                    if (LabelSubNumLabelsToPrint <= 0) {
-                        IntNumLabels--;
-                        if (IntNumLabels <= 0) {
-                            e.HasMorePages = false;
-                            LabelSubPageNum = 0;
-                            LabelSubNumLabelsToPrint = TxtNumPublish;
-                            return;
+                        if (LabelSubNumLabelsToPrint <= 0) {
+                            IntNumLabels--;
+                            if (IntNumLabels <= 0) {
+                                e.HasMorePages = false;
+                                LabelSubPageNum = 0;
+                                LabelSubNumLabelsToPrint = TxtNumPublish;
+                                return;
+                            }
+                            else {
+                                LabelSubNumLabelsToPrint += x + 1;
+                                break;
+                            }
                         }
-                        else {
-                            LabelSubNumLabelsToPrint += x + 1;
-                            break;
-                        }
-                    }
 
-                    if (x >= MaxX - 1) {
-                        IntNumLabels--;
-                        if (IntNumLabels <= 0) {
-                            IntNumLabels = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
-                        }
-                        else if (IntNumLabels > 0) {
-                            LabelSubNumLabelsToPrint += x + 1;
-                            break;
+                        if (x >= MaxX - 1) {
+                            IntNumLabels--;
+                            if (IntNumLabels <= 0) {
+                                IntNumLabels = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
+                            }
+                            else if (IntNumLabels > 0) {
+                                LabelSubNumLabelsToPrint += x + 1;
+                                break;
+                            }
                         }
                     }
                 }
-            }
 
-            if (LabelSubNumLabelsToPrint > 0) {
-                LabelSubPageNum++;
-                IntPageCnt++;
-                e.HasMorePages = true;
-            }
+                if (LabelSubNumLabelsToPrint > 0) {
+                    LabelSubPageNum++;
+                    IntPageCnt++;
+                    e.HasMorePages = true;
+                }
 
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            } finally {
+            }
         }
         private string ConvertHeaderFooterString(string s) {
             s = s.Replace("%P", StrSubstrateName)
@@ -465,7 +469,7 @@ namespace ProductDataBase {
         private string GenerateCode(string Serial) {
             string SerialCode = Serial.Substring(5, 5);
             string OutputCode = string.Empty;
-            string MonthCode = DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yyMM");
+            string MonthCode = DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM");
 
             MonthCode = MonthCode switch {
                 "10" => "X",
@@ -474,14 +478,15 @@ namespace ProductDataBase {
                 _ => string.Empty
             };
 
-            if (SettingsLabelSub != null) { OutputCode = SettingsLabelSub.LabelSubLabelSettings.Format; }
-            OutputCode = OutputCode.Replace("%T", StrInitial);
-            OutputCode = OutputCode.Replace("%R", RevisionTextBox.Text);
-            OutputCode = OutputCode.Replace("%Y", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yy"));
-            OutputCode = OutputCode.Replace("%MM", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM"));
-            OutputCode = OutputCode.Replace("%M", MonthCode[1..]);
-            OutputCode = OutputCode.Replace("%S", SerialCode);
-
+            if (SettingsLabelSub != null) {
+                OutputCode = SettingsLabelSub.LabelSubLabelSettings.Format;
+                OutputCode = OutputCode.Replace("%T", StrInitial);
+                OutputCode = OutputCode.Replace("%R", RevisionTextBox.Text);
+                OutputCode = OutputCode.Replace("%Y", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yy"));
+                OutputCode = OutputCode.Replace("%MM", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM"));
+                OutputCode = OutputCode.Replace("%M", MonthCode[^1..]);
+                OutputCode = OutputCode.Replace("%S", SerialCode);
+            }
             return OutputCode;
         }
         private Bitmap MakeLabelImage(string Text, int Resolution, int Magnitude) {
