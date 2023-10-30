@@ -11,13 +11,13 @@ namespace ProductDataBase {
         public string? StrFontName { get; set; }
         public int IntFontSize { get; set; }
 
-        public string? StrProductName { get; }
-        public string? StrStockName { get; }
-        public string? StrSubstrateName { get; }
-        public string? StrSubstrateModel { get; }
-        public string? StrInitial { get; }
-        public int IntRegType { get; }
-        public int IntPrintType { get; }
+        public string? StrProductName { get; set; }
+        public string? StrStockName { get; set; }
+        public string? StrSubstrateName { get; set; }
+        public string? StrSubstrateModel { get; set; }
+        public string? StrInitial { get; set; }
+        public int IntRegType { get; set; }
+        public int IntPrintType { get; set; }
         public int IntCheckBin { get; set; }
 
         public Bitmap? LabelSubBmp { get; }
@@ -73,7 +73,7 @@ namespace ProductDataBase {
 
                 RegisterButton.Enabled = true;
 
-                // TextBox8へ今日の年月日を入力
+                // TextBoxへ今日の年月日を入力
                 DateTime dtNow = DateTime.Now;
                 RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
 
@@ -81,7 +81,7 @@ namespace ProductDataBase {
                 using (SQLiteConnection? con = new(MainWindow.GetConnectionString1())) {
                     con.Open();
                     using SQLiteCommand cmd = con.CreateCommand();
-                    // テーブル検索SQL - 担当者をCombobox10へ追加
+                    // テーブル検索SQL - 担当者をComboboxへ追加
                     cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
                     using SQLiteDataReader dr = cmd.ExecuteReader();
                     while (dr.Read()) {
@@ -96,22 +96,25 @@ namespace ProductDataBase {
                     con.Open();
                     using SQLiteCommand cmd = con.CreateCommand();
                     // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Stock]の合計を取得
-                    cmd.CommandText = $"SELECT total(col_stock) FROM \"Stock_{StrStockName}\" WHERE col_Substrate_Model = \"{StrSubstrateModel}\"";
+                    cmd.CommandText = $"SELECT total(col_stock) FROM 'Stock_{StrStockName}' WHERE col_Substrate_Model = '{StrSubstrateModel}'";
                     StockLabel2.Text = cmd.ExecuteScalar().ToString();
 
-                    // テーブル検索SQL - [[Product_Name]_stock]テーブルの最新の[col_Revison]を取得
-                    cmd.CommandText = $"SELECT col_Revision FROM \"Substrate_Reg_{StrStockName} \" WHERE col_Substrate_Model = \" {StrSubstrateModel}\" and col_Revision IS NOT NULL ORDER BY _rowid_ DESC";
-                    RevisionTextBox.Text = cmd.ExecuteScalar()?.ToString() ?? string.Empty;
+                    // テーブル検索SQL - [Substrate_Reg_[Product_Name]]テーブルの最新の[col_Revison]を取得
+                    cmd.CommandText = $"SELECT col_Revision FROM 'Substrate_Reg_{StrStockName}' WHERE col_Substrate_Model = '{StrSubstrateModel}' and col_Revision IS NOT NULL ORDER BY _rowid_ DESC";
+                    object result = cmd.ExecuteScalar();
+                    RevisionTextBox.Text = result?.ToString() ?? "";
                 }
                 else { StockLabel2.Text = "---"; }
 
                 // 変数[check_bin]の値に応じてCheckboxにチェックを入れる
-                CheckBox? checkBox;
-                for (int i = 1; i <= 14; i++) {
-                    checkBox = Controls[$"CheckBox{i}"] as CheckBox;
-                    if (checkBox != null) {
-                        checkBox.Checked = false;
-                        if ((IntCheckBin & 0x1) != 0) checkBox.Checked = true;
+                List<string> checkBoxNames = new() {
+                    "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectNumberCheckBox",
+                    "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
+                    "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" };
+
+                foreach (string checkBoxName in checkBoxNames) {
+                    if (Controls[checkBoxName] is CheckBox checkBox) {
+                        checkBox.Checked = (IntCheckBin & 0x1) == 1;
                         IntCheckBin >>= 1;
                     }
                 }
@@ -124,7 +127,6 @@ namespace ProductDataBase {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
             }
-
         }
         private void LoadSettings(string StrSettingFilePath) {
             System.Xml.Serialization.XmlSerializer serializer = new(typeof(CSettingsLabelSub));
@@ -159,23 +161,21 @@ namespace ProductDataBase {
                 // 印刷のみにチェックがある場合処理をしない
                 if (PrintOnlyCheckBox.Checked) { return; }
 
-                // 入力フォームのエラーチェック
-                CheckBox? checkBox;
-                Control? textBox;
-                int CbFlg = 0;
+                // 入力フォームのチェック
+                bool anyTextBoxEnabled = false;
+                bool allTextBoxesFilled = true;
 
-                for (int i = 1; i <= 14; i++) {
-                    checkBox = Controls[$"CheckBox{i}"] as CheckBox;
-                    textBox = Controls[$"TextBox{i}"];
-                    if (checkBox != null && textBox != null) {
-                        if (checkBox.Checked) {
-                            CbFlg = 1;
-                            if (string.IsNullOrWhiteSpace(textBox.Text)) { throw new Exception("空欄があります。"); }
+                foreach (Control control in Controls) {
+                    if (control is TextBoxBase textBox && textBox.Enabled) {
+                        anyTextBoxEnabled = true;
+                        if (string.IsNullOrWhiteSpace(textBox.Text)) {
+                            allTextBoxesFilled = false;
+                            break;
                         }
                     }
                 }
-
-                if (CbFlg != 1) { throw new Exception("何も入力されていません。"); }
+                if (!anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
+                if (!allTextBoxesFilled) { throw new Exception("空欄があります。"); }
 
                 if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
 
@@ -212,6 +212,8 @@ namespace ProductDataBase {
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            } finally {
+                RegisterButton.Enabled = true;
             }
         }
         private bool Registration() {
@@ -220,21 +222,23 @@ namespace ProductDataBase {
                 con.Open();
 
                 // 製番が新規かチェック
-                string Substrate_Name = string.Empty;
-                using (SQLiteCommand cmd = con.CreateCommand()) {
-                    cmd.CommandText = $"SELECT * FROM \"Stock_{StrStockName}\" WHERE col_Substrate_Num = \"{ManufacturingNumberMaskedTextBox.Text}\" ORDER BY _rowid_ DESC LIMIT 1";
-                    using SQLiteDataReader dr = cmd.ExecuteReader();
-                    while (dr.Read()) {
-                        Substrate_Name = $"{dr["col_Substrate_Name"]}";
+                if (IntRegType != 0) {
+                    string Substrate_Name = string.Empty;
+                    using (SQLiteCommand cmd = con.CreateCommand()) {
+                        cmd.CommandText = $"SELECT * FROM 'Stock_{StrStockName}' WHERE col_Substrate_Num = '{ManufacturingNumberMaskedTextBox.Text}' ORDER BY _rowid_ DESC LIMIT 1";
+                        using SQLiteDataReader dr = cmd.ExecuteReader();
+                        while (dr.Read()) {
+                            Substrate_Name = $"{dr["col_Substrate_Name"]}";
+                        }
                     }
-                }
 
-                if (Substrate_Name != null) {
-                    if (StrSubstrateName == Substrate_Name) {
-                        DialogResult dr = MessageBox.Show($"[{ManufacturingNumberMaskedTextBox.Text}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
-                        if (dr == DialogResult.No) { return false; }
+                    if (Substrate_Name != string.Empty) {
+                        if (StrSubstrateName == Substrate_Name) {
+                            DialogResult dr = MessageBox.Show($"[{ManufacturingNumberMaskedTextBox.Text}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
+                            if (dr == DialogResult.No) { return false; }
+                        }
+                        else { throw new Exception($"[{ManufacturingNumberMaskedTextBox.Text}]は[{Substrate_Name}]として在庫があります。確認してください。"); }
                     }
-                    else { throw new Exception("$\"[{ManufacturingNumberMaskedTextBox.Text}]は[{Substrate_Name}]として在庫があります。確認してください。"); }
                 }
 
                 // 在庫管理する基盤のみ
@@ -244,14 +248,13 @@ namespace ProductDataBase {
                         // 基板在庫テーブルへ追加_製番が一致した行を更新する、製番がない場合は新規追加
                         using SQLiteCommand cmd = con.CreateCommand();
                         cmd.CommandText =
-                            $"INSERT INTO 'Stock_{StrStockName}'(" +
-                            $"col_Flg, col_Substrate_Name, col_Substrate_Model, col_Substrate_Num, col_Order_Num, col_Stock)" +
-                            $"VALUES(" +
-                            $"@col_Flg, @col_Substrate_Name, @col_Substrate_Model, @col_Substrate_Num, @col_Order_Num, @col_Stock)" +
-                            $"on conflict(col_Substrate_Num)" +
-                            $"do update" +
-                            $"set col_Flg = 1, col_Stock = col_Stock + excluded.col_Stock";
-
+                            $"INSERT INTO 'Stock_{StrStockName}'" +
+                            $"(col_Flg, col_Substrate_Name, col_Substrate_Model, col_Substrate_Num, col_Order_Num, col_Stock)" +
+                            $" VALUES" +
+                            $"(@col_Flg, @col_Substrate_Name, @col_Substrate_Model, @col_Substrate_Num, @col_Order_Num, @col_Stock)" +
+                            $" on conflict(col_Substrate_Num)" +
+                            $" do update" +
+                            $" set col_Flg = 1, col_Stock = col_Stock + excluded.col_Stock";
 
                         cmd.Parameters.Add("@col_Flg", DbType.AnsiString).Value = 1;
                         cmd.Parameters.Add("@col_Substrate_Name", DbType.AnsiString).Value = StrSubstrateName;
@@ -268,7 +271,7 @@ namespace ProductDataBase {
                         int intStock;
 
                         using SQLiteCommand cmd = con.CreateCommand();
-                        cmd.CommandText = $"SELECT col_Stock FROM \"Stock_{StrStockName}\" WHERE col_Substrate_Num = \"{ManufacturingNumberMaskedTextBox.Text}\"";
+                        cmd.CommandText = $"SELECT col_Stock FROM 'Stock_{StrStockName}' WHERE col_Substrate_Num = '{ManufacturingNumberMaskedTextBox.Text}'";
                         intStock = Convert.ToInt32(cmd.ExecuteScalar());
 
                         if (intStock == 0) { throw new Exception("該当する製番の在庫がありません。"); }
@@ -278,7 +281,7 @@ namespace ProductDataBase {
                         else { throw new Exception("不良数が在庫より多く入力されています。"); }
 
                         cmd.CommandText =
-                            $"UPDATE  'Stock_{StrStockName}'SET" +
+                            $"UPDATE 'Stock_{StrStockName}'SET" +
                             $" col_Flg = @col_Flg," +
                             $"col_Stock = @col_Stock," +
                             $"col_History = ifnull(col_History, '') || @col_History" +
@@ -297,10 +300,10 @@ namespace ProductDataBase {
                 // 基板登録テーブルへ追加
                 using (SQLiteCommand cmd = con.CreateCommand()) {
                     cmd.CommandText =
-                        $"INSERT INTO 'Substrate_Reg_{StrProductName}'(" +
-                        $"col_Substrate_Name, col_Substrate_Model, col_Substrate_Num, col_Order_Num, col_Increase, col_Defect, col_Person, col_RegDate, col_Revision, col_Comment)" +
-                        $"VALUES(" +
-                        $"@col_Substrate_Name, @col_Substrate_Model, @col_Substrate_Num, @col_Order_Num, @col_Increase, @col_Defect, @col_Person, @col_RegDate, @col_Revision, @col_Comment)";
+                        $"INSERT INTO 'Substrate_Reg_{StrProductName}'" +
+                        $"(col_Substrate_Name, col_Substrate_Model, col_Substrate_Num, col_Order_Num, col_Increase, col_Defect, col_Person, col_RegDate, col_Revision, col_Comment)" +
+                        $"VALUES" +
+                        $"(@col_Substrate_Name, @col_Substrate_Model, @col_Substrate_Num, @col_Order_Num, @col_Increase, @col_Defect, @col_Person, @col_RegDate, @col_Revision, @col_Comment)";
 
                     // チェックボックスにチェックがない場合はNullを
                     cmd.Parameters.Add("@col_Substrate_Name", DbType.AnsiString).Value = StrSubstrateName;
@@ -308,11 +311,11 @@ namespace ProductDataBase {
                     cmd.Parameters.Add("@col_Substrate_Num", DbType.AnsiString).Value = ManufacturingNumberMaskedTextBox.Text;
                     cmd.Parameters.Add("@col_Order_Num", DbType.AnsiString).Value = OrderNumberTextBox.Text;
                     cmd.Parameters.Add("@col_Increase", DbType.AnsiString).Value = QuantityCheckBox.Checked ? QuantityTextBox.Text : DBNull.Value;
-                    cmd.Parameters.Add("@col_Defect", DbType.AnsiString).Value = ManufacturingNumberCheckBox.Checked ? -Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text) : DBNull.Value;
+                    cmd.Parameters.Add("@col_Defect", DbType.AnsiString).Value = DefectNumberCheckBox.Checked ? DefectNumberTextBox.Text : DBNull.Value;
                     cmd.Parameters.Add("@col_RegDate", DbType.AnsiString).Value = RegistrationDateMaskedTextBox.Text;
                     cmd.Parameters.Add("@col_Person", DbType.AnsiString).Value = PersonComboBox.Text;
                     cmd.Parameters.Add("@col_Revision", DbType.AnsiString).Value = RevisionTextBox.Text;
-                    cmd.Parameters.Add("@col_Comment", DbType.AnsiString).Value = CommentTtextBox.Text;
+                    cmd.Parameters.Add("@col_Comment", DbType.AnsiString).Value = CommentTextBox.Text;
 
                     cmd.ExecuteNonQuery();
                 }
@@ -323,7 +326,7 @@ namespace ProductDataBase {
             }
         }
         // 印刷処理
-        private void PrintBarcode(int print_flg) {
+        private void PrintBarcode(int PrintFlg) {
             // PrintDocumentオブジェクトの作成
             System.Drawing.Printing.PrintDocument pd = new();
 
@@ -333,7 +336,7 @@ namespace ProductDataBase {
             LabelSubNumLabelsToPrint = int.Parse(QuantityTextBox.Text);
             LabelSubPageNum = 0;
 
-            switch (print_flg) {
+            switch (PrintFlg) {
                 case 1:
                     SubstrateRegistrationPrintDialog.Document = pd;
                     DialogResult r = SubstrateRegistrationPrintDialog.ShowDialog();
@@ -350,8 +353,8 @@ namespace ProductDataBase {
                     }
                     break;
                 case 2:
-                    SubstrateRegistrationPrintDialog.Document = pd;
-                    SubstrateRegistrationPrintDialog.ShowDialog();
+                    SubstrateRegistrationPrintPreviewDialog.Document = pd;
+                    SubstrateRegistrationPrintPreviewDialog.ShowDialog();
                     break;
             }
         }
@@ -504,68 +507,67 @@ namespace ProductDataBase {
             return LabelImage;
         }
 
-
         private void TemplateComment() {
             string templateWord = CommentComboBox.SelectedIndex switch {
                 1 => "[Rev.UP]変更点番号:",
                 _ => string.Empty
             };
-            CommentTtextBox.Text = $"{CommentTtextBox.Text}{templateWord}";
+            CommentTextBox.Text = $"{CommentTextBox.Text}{templateWord}";
         }
 
         private void CheckBoxChecked(object sender, EventArgs e) {
             CheckBox checkBox = (CheckBox)sender;
 
             switch (checkBox.Name) {
-                case "CheckBox1":
-                    OrderNumberCheckBox.Enabled = checkBox.Checked;
+                case "OrderNumberCheckBox":
+                    OrderNumberTextBox.Enabled = checkBox.Checked;
                     break;
-                case "CheckBox2":
-                    ManufacturingNumberCheckBox.Enabled = checkBox.Checked;
+                case "ManufacturingNumberCheckBox":
+                    ManufacturingNumberMaskedTextBox.Enabled = checkBox.Checked;
                     break;
-                case "CheckBox3":
-                    QuantityCheckBox.Enabled = checkBox.Checked;
+                case "QuantityCheckBox":
+                    QuantityTextBox.Enabled = checkBox.Checked;
                     if (checkBox.Checked) DefectNumberCheckBox.Checked = false;
                     break;
-                case "CheckBox4":
-                    DefectNumberCheckBox.Enabled = checkBox.Checked;
+                case "DefectNumberCheckBox":
+                    DefectNumberTextBox.Enabled = checkBox.Checked;
                     if (checkBox.Checked) QuantityCheckBox.Checked = false;
                     break;
-                case "CheckBox5":
-                    RevisionCheckBox.Enabled = checkBox.Checked;
+                case "RevisionCheckBox":
+                    RevisionTextBox.Enabled = checkBox.Checked;
                     if (checkBox.Checked) MessageBox.Show("変更する場合は理由を記載して下さい。");
                     break;
-                case "CheckBox6":
-                    ExtraCheckBox1.Enabled = checkBox.Checked;
+                case "ExtraCheckBox1":
+                    ExtraTextBox1.Enabled = checkBox.Checked;
                     break;
-                case "CheckBox7":
-                    ExtraCheckBox2.Enabled = checkBox.Checked;
+                case "ExtraCheckBox2":
+                    ExtraTextBox2.Enabled = checkBox.Checked;
                     break;
-                case "CheckBox8":
-                    ExtraCheckBox3.Enabled = checkBox.Checked;
+                case "ExtraCheckBox3":
+                    ExtraTextBox3.Enabled = checkBox.Checked;
                     break;
-                case "CheckBox9":
-                    RegistrationDateCheckBox.Enabled = checkBox.Checked;
+                case "RegistrationDateCheckBox":
+                    RegistrationDateMaskedTextBox.Enabled = checkBox.Checked;
                     break;
-                case "CheckBox10":
-                    PersonCheckBox.Enabled = checkBox.Checked;
+                case "PersonCheckBox":
+                    PersonComboBox.Enabled = checkBox.Checked;
                     break;
-                case "CheckBox11":
-                    ExtraCheckBox4.Enabled = checkBox.Checked;
+                case "ExtraCheckBox4":
+                    ExtraTextBox4.Enabled = checkBox.Checked;
                     break;
-                case "CheckBox12":
-                    ExtraCheckBox5.Enabled = checkBox.Checked;
+                case "ExtraCheckBox5":
+                    ExtraTextBox5.Enabled = checkBox.Checked;
                     break;
-                case "CheckBox13":
-                    ExtraCheckBox6.Enabled = checkBox.Checked;
+                case "ExtraCheckBox6":
+                    ExtraTextBox6.Enabled = checkBox.Checked;
                     break;
-                case "CheckBox14":
-                    CommentTtextBox.Enabled = checkBox.Checked;
+                case "CommentCheckBox":
+                    CommentTextBox.Enabled = checkBox.Checked;
                     CommentComboBox.Enabled = checkBox.Checked;
                     TemplateButton.Enabled = checkBox.Checked;
                     break;
-                case "CheckBox15":
-                    PrintOnlyCheckBox.Enabled = checkBox.Checked;
+                case "PrintOnlyCheckBox":
+                    PrintButton.Enabled = checkBox.Checked;
                     break;
             }
         }
@@ -583,7 +585,6 @@ namespace ProductDataBase {
                 RegistrationDateMaskedTextBox.Focus();
             }
         }
-
 
         private void SubstrateRegistrationWindow_Load(object sender, EventArgs e) { LoadEvents(); }
 
