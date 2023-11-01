@@ -1,5 +1,5 @@
 ﻿namespace ProductDataBase {
-    partial class BarcodePrintSettingsWindow {
+    partial class ProductBarcodePrintSettingsWindow {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -32,7 +32,7 @@
             Label28 = new Label();
             Label41 = new Label();
             Label40 = new Label();
-            BarcodeStringTextBox = new TextBox();
+            BarcodeFormatTextBox = new TextBox();
             Label39 = new Label();
             BarcodeFontButton = new Button();
             BarcodeFontTextBox = new TextBox();
@@ -51,58 +51,60 @@
             WhiteSpaceGroupBox = new GroupBox();
             Label11 = new Label();
             Label10 = new Label();
-            PageOffsetYTextBox = new TextBox();
-            PageOffsetXTextBox = new TextBox();
+            BarcodePageOffsetYTextBox = new TextBox();
+            BarcodePageOffsetXTextBox = new TextBox();
             Label9 = new Label();
             Label8 = new Label();
             QuantityGroupBox = new GroupBox();
             Label7 = new Label();
-            QuantityYTextBox = new TextBox();
-            QuantityXTextBox = new TextBox();
+            BarcodeQuantityYTextBox = new TextBox();
+            BarcodeQuantityXTextBox = new TextBox();
             Label6 = new Label();
             Label5 = new Label();
-            LabelSizeGroupBox = new GroupBox();
+            BarcodeSizeGroupBox = new GroupBox();
             Label4 = new Label();
             Label3 = new Label();
-            LabelHeightTextBox = new TextBox();
-            LabelWidthTextBox = new TextBox();
+            BarcodeLabelHeightTextBox = new TextBox();
+            BarcodeLabelWidthTextBox = new TextBox();
             Label2 = new Label();
             Label1 = new Label();
             HeaderFooterGroupBox = new GroupBox();
-            FooterStringTextBox = new TextBox();
+            BarcodeFooterStringTextBox = new TextBox();
             Label23 = new Label();
             Label24 = new Label();
-            FooterPostionYTextBox = new TextBox();
-            FooterPostionXTextBox = new TextBox();
+            BarcodeFooterPostionYTextBox = new TextBox();
+            BarcodeFooterPostionXTextBox = new TextBox();
             Label25 = new Label();
             Label26 = new Label();
             Label27 = new Label();
             Label30 = new Label();
             Label29 = new Label();
-            HeaderStringTextBox = new TextBox();
+            BarcodeHeaderStringTextBox = new TextBox();
             Label22 = new Label();
             Label21 = new Label();
             Label20 = new Label();
-            HeaderPostionYTextBox = new TextBox();
-            HeaderPostionXTextBox = new TextBox();
+            BarcodeHeaderPostionYTextBox = new TextBox();
+            BarcodeHeaderPostionXTextBox = new TextBox();
             Label19 = new Label();
             Label18 = new Label();
             Label17 = new Label();
-            HeaderFooterFontButton = new Button();
-            HeaderFooterFontTextBox = new TextBox();
+            BarcodeHeaderFooterFontButton = new Button();
+            BarcodeHeaderFooterFontTextBox = new TextBox();
             Label16 = new Label();
             LabelIntervalGroupBox = new GroupBox();
             Label15 = new Label();
             Label14 = new Label();
-            LabelIntervalYTextBox = new TextBox();
-            LabelIntervalXTextBox = new TextBox();
+            BarcodeLabelIntervalYTextBox = new TextBox();
+            BarcodeLabelIntervalXTextBox = new TextBox();
             Label13 = new Label();
             Label12 = new Label();
             CloseButton = new Button();
+            BarcodeHeaderFontDialog = new FontDialog();
+            BarcodeFontDialog = new FontDialog();
             BarcodeGroupBox.SuspendLayout();
             WhiteSpaceGroupBox.SuspendLayout();
             QuantityGroupBox.SuspendLayout();
-            LabelSizeGroupBox.SuspendLayout();
+            BarcodeSizeGroupBox.SuspendLayout();
             HeaderFooterGroupBox.SuspendLayout();
             LabelIntervalGroupBox.SuspendLayout();
             SuspendLayout();
@@ -115,6 +117,7 @@
             OKButton.TabIndex = 32;
             OKButton.Text = "OK";
             OKButton.UseVisualStyleBackColor = true;
+            OKButton.Click += BtnOK_Click;
             // 
             // BarcodeGroupBox
             // 
@@ -125,7 +128,7 @@
             BarcodeGroupBox.Controls.Add(Label28);
             BarcodeGroupBox.Controls.Add(Label41);
             BarcodeGroupBox.Controls.Add(Label40);
-            BarcodeGroupBox.Controls.Add(BarcodeStringTextBox);
+            BarcodeGroupBox.Controls.Add(BarcodeFormatTextBox);
             BarcodeGroupBox.Controls.Add(Label39);
             BarcodeGroupBox.Controls.Add(BarcodeFontButton);
             BarcodeGroupBox.Controls.Add(BarcodeFontTextBox);
@@ -157,6 +160,7 @@
             FontCenterCheckBox.TabIndex = 35;
             FontCenterCheckBox.Text = "横位置を中心に合わせる";
             FontCenterCheckBox.UseVisualStyleBackColor = true;
+            FontCenterCheckBox.CheckedChanged += BarcodeCenterCheckBox_CheckedChanged;
             // 
             // FontPostionYTextBox
             // 
@@ -210,13 +214,13 @@
             Label40.TabIndex = 24;
             Label40.Text = "%T: 型式 %R: リビジョン %S: シリアル";
             // 
-            // BarcodeStringTextBox
+            // BarcodeFormatTextBox
             // 
-            BarcodeStringTextBox.Location = new Point(379, 137);
-            BarcodeStringTextBox.MaxLength = 50;
-            BarcodeStringTextBox.Name = "BarcodeStringTextBox";
-            BarcodeStringTextBox.Size = new Size(180, 23);
-            BarcodeStringTextBox.TabIndex = 24;
+            BarcodeFormatTextBox.Location = new Point(379, 137);
+            BarcodeFormatTextBox.MaxLength = 50;
+            BarcodeFormatTextBox.Name = "BarcodeFormatTextBox";
+            BarcodeFormatTextBox.Size = new Size(180, 23);
+            BarcodeFormatTextBox.TabIndex = 24;
             // 
             // Label39
             // 
@@ -235,6 +239,7 @@
             BarcodeFontButton.TabIndex = 24;
             BarcodeFontButton.Text = "フォント選択";
             BarcodeFontButton.UseVisualStyleBackColor = true;
+            BarcodeFontButton.Click += BtnBarcodeFont_Click;
             // 
             // BarcodeFontTextBox
             // 
@@ -352,8 +357,8 @@
             // 
             WhiteSpaceGroupBox.Controls.Add(Label11);
             WhiteSpaceGroupBox.Controls.Add(Label10);
-            WhiteSpaceGroupBox.Controls.Add(PageOffsetYTextBox);
-            WhiteSpaceGroupBox.Controls.Add(PageOffsetXTextBox);
+            WhiteSpaceGroupBox.Controls.Add(BarcodePageOffsetYTextBox);
+            WhiteSpaceGroupBox.Controls.Add(BarcodePageOffsetXTextBox);
             WhiteSpaceGroupBox.Controls.Add(Label9);
             WhiteSpaceGroupBox.Controls.Add(Label8);
             WhiteSpaceGroupBox.Location = new Point(27, 158);
@@ -381,21 +386,21 @@
             Label10.TabIndex = 4;
             Label10.Text = "mm";
             // 
-            // PageOffsetYTextBox
+            // BarcodePageOffsetYTextBox
             // 
-            PageOffsetYTextBox.Location = new Point(158, 36);
-            PageOffsetYTextBox.MaxLength = 5;
-            PageOffsetYTextBox.Name = "PageOffsetYTextBox";
-            PageOffsetYTextBox.Size = new Size(100, 23);
-            PageOffsetYTextBox.TabIndex = 3;
+            BarcodePageOffsetYTextBox.Location = new Point(158, 36);
+            BarcodePageOffsetYTextBox.MaxLength = 5;
+            BarcodePageOffsetYTextBox.Name = "BarcodePageOffsetYTextBox";
+            BarcodePageOffsetYTextBox.Size = new Size(100, 23);
+            BarcodePageOffsetYTextBox.TabIndex = 3;
             // 
-            // PageOffsetXTextBox
+            // BarcodePageOffsetXTextBox
             // 
-            PageOffsetXTextBox.Location = new Point(20, 36);
-            PageOffsetXTextBox.MaxLength = 5;
-            PageOffsetXTextBox.Name = "PageOffsetXTextBox";
-            PageOffsetXTextBox.Size = new Size(100, 23);
-            PageOffsetXTextBox.TabIndex = 1;
+            BarcodePageOffsetXTextBox.Location = new Point(20, 36);
+            BarcodePageOffsetXTextBox.MaxLength = 5;
+            BarcodePageOffsetXTextBox.Name = "BarcodePageOffsetXTextBox";
+            BarcodePageOffsetXTextBox.Size = new Size(100, 23);
+            BarcodePageOffsetXTextBox.TabIndex = 1;
             // 
             // Label9
             // 
@@ -418,8 +423,8 @@
             // QuantityGroupBox
             // 
             QuantityGroupBox.Controls.Add(Label7);
-            QuantityGroupBox.Controls.Add(QuantityYTextBox);
-            QuantityGroupBox.Controls.Add(QuantityXTextBox);
+            QuantityGroupBox.Controls.Add(BarcodeQuantityYTextBox);
+            QuantityGroupBox.Controls.Add(BarcodeQuantityXTextBox);
             QuantityGroupBox.Controls.Add(Label6);
             QuantityGroupBox.Controls.Add(Label5);
             QuantityGroupBox.Location = new Point(27, 85);
@@ -438,21 +443,21 @@
             Label7.TabIndex = 4;
             Label7.Text = "×";
             // 
-            // QuantityYTextBox
+            // BarcodeQuantityYTextBox
             // 
-            QuantityYTextBox.Location = new Point(158, 36);
-            QuantityYTextBox.MaxLength = 5;
-            QuantityYTextBox.Name = "QuantityYTextBox";
-            QuantityYTextBox.Size = new Size(100, 23);
-            QuantityYTextBox.TabIndex = 3;
+            BarcodeQuantityYTextBox.Location = new Point(158, 36);
+            BarcodeQuantityYTextBox.MaxLength = 5;
+            BarcodeQuantityYTextBox.Name = "BarcodeQuantityYTextBox";
+            BarcodeQuantityYTextBox.Size = new Size(100, 23);
+            BarcodeQuantityYTextBox.TabIndex = 3;
             // 
-            // QuantityXTextBox
+            // BarcodeQuantityXTextBox
             // 
-            QuantityXTextBox.Location = new Point(20, 36);
-            QuantityXTextBox.MaxLength = 5;
-            QuantityXTextBox.Name = "QuantityXTextBox";
-            QuantityXTextBox.Size = new Size(100, 23);
-            QuantityXTextBox.TabIndex = 1;
+            BarcodeQuantityXTextBox.Location = new Point(20, 36);
+            BarcodeQuantityXTextBox.MaxLength = 5;
+            BarcodeQuantityXTextBox.Name = "BarcodeQuantityXTextBox";
+            BarcodeQuantityXTextBox.Size = new Size(100, 23);
+            BarcodeQuantityXTextBox.TabIndex = 1;
             // 
             // Label6
             // 
@@ -472,20 +477,20 @@
             Label5.TabIndex = 1;
             Label5.Text = "横";
             // 
-            // LabelSizeGroupBox
+            // BarcodeSizeGroupBox
             // 
-            LabelSizeGroupBox.Controls.Add(Label4);
-            LabelSizeGroupBox.Controls.Add(Label3);
-            LabelSizeGroupBox.Controls.Add(LabelHeightTextBox);
-            LabelSizeGroupBox.Controls.Add(LabelWidthTextBox);
-            LabelSizeGroupBox.Controls.Add(Label2);
-            LabelSizeGroupBox.Controls.Add(Label1);
-            LabelSizeGroupBox.Location = new Point(27, 12);
-            LabelSizeGroupBox.Name = "LabelSizeGroupBox";
-            LabelSizeGroupBox.Size = new Size(311, 67);
-            LabelSizeGroupBox.TabIndex = 26;
-            LabelSizeGroupBox.TabStop = false;
-            LabelSizeGroupBox.Text = "ラベルサイズ";
+            BarcodeSizeGroupBox.Controls.Add(Label4);
+            BarcodeSizeGroupBox.Controls.Add(Label3);
+            BarcodeSizeGroupBox.Controls.Add(BarcodeLabelHeightTextBox);
+            BarcodeSizeGroupBox.Controls.Add(BarcodeLabelWidthTextBox);
+            BarcodeSizeGroupBox.Controls.Add(Label2);
+            BarcodeSizeGroupBox.Controls.Add(Label1);
+            BarcodeSizeGroupBox.Location = new Point(27, 12);
+            BarcodeSizeGroupBox.Name = "BarcodeSizeGroupBox";
+            BarcodeSizeGroupBox.Size = new Size(311, 67);
+            BarcodeSizeGroupBox.TabIndex = 26;
+            BarcodeSizeGroupBox.TabStop = false;
+            BarcodeSizeGroupBox.Text = "ラベルサイズ";
             // 
             // Label4
             // 
@@ -505,21 +510,21 @@
             Label3.TabIndex = 4;
             Label3.Text = "mm";
             // 
-            // LabelHeightTextBox
+            // BarcodeLabelHeightTextBox
             // 
-            LabelHeightTextBox.Location = new Point(158, 36);
-            LabelHeightTextBox.MaxLength = 5;
-            LabelHeightTextBox.Name = "LabelHeightTextBox";
-            LabelHeightTextBox.Size = new Size(100, 23);
-            LabelHeightTextBox.TabIndex = 3;
+            BarcodeLabelHeightTextBox.Location = new Point(158, 36);
+            BarcodeLabelHeightTextBox.MaxLength = 5;
+            BarcodeLabelHeightTextBox.Name = "BarcodeLabelHeightTextBox";
+            BarcodeLabelHeightTextBox.Size = new Size(100, 23);
+            BarcodeLabelHeightTextBox.TabIndex = 3;
             // 
-            // LabelWidthTextBox
+            // BarcodeLabelWidthTextBox
             // 
-            LabelWidthTextBox.Location = new Point(20, 36);
-            LabelWidthTextBox.MaxLength = 5;
-            LabelWidthTextBox.Name = "LabelWidthTextBox";
-            LabelWidthTextBox.Size = new Size(100, 23);
-            LabelWidthTextBox.TabIndex = 1;
+            BarcodeLabelWidthTextBox.Location = new Point(20, 36);
+            BarcodeLabelWidthTextBox.MaxLength = 5;
+            BarcodeLabelWidthTextBox.Name = "BarcodeLabelWidthTextBox";
+            BarcodeLabelWidthTextBox.Size = new Size(100, 23);
+            BarcodeLabelWidthTextBox.TabIndex = 1;
             // 
             // Label2
             // 
@@ -541,27 +546,27 @@
             // 
             // HeaderFooterGroupBox
             // 
-            HeaderFooterGroupBox.Controls.Add(FooterStringTextBox);
+            HeaderFooterGroupBox.Controls.Add(BarcodeFooterStringTextBox);
             HeaderFooterGroupBox.Controls.Add(Label23);
             HeaderFooterGroupBox.Controls.Add(Label24);
-            HeaderFooterGroupBox.Controls.Add(FooterPostionYTextBox);
-            HeaderFooterGroupBox.Controls.Add(FooterPostionXTextBox);
+            HeaderFooterGroupBox.Controls.Add(BarcodeFooterPostionYTextBox);
+            HeaderFooterGroupBox.Controls.Add(BarcodeFooterPostionXTextBox);
             HeaderFooterGroupBox.Controls.Add(Label25);
             HeaderFooterGroupBox.Controls.Add(Label26);
             HeaderFooterGroupBox.Controls.Add(Label27);
             HeaderFooterGroupBox.Controls.Add(Label30);
             HeaderFooterGroupBox.Controls.Add(Label29);
-            HeaderFooterGroupBox.Controls.Add(HeaderStringTextBox);
+            HeaderFooterGroupBox.Controls.Add(BarcodeHeaderStringTextBox);
             HeaderFooterGroupBox.Controls.Add(Label22);
             HeaderFooterGroupBox.Controls.Add(Label21);
             HeaderFooterGroupBox.Controls.Add(Label20);
-            HeaderFooterGroupBox.Controls.Add(HeaderPostionYTextBox);
-            HeaderFooterGroupBox.Controls.Add(HeaderPostionXTextBox);
+            HeaderFooterGroupBox.Controls.Add(BarcodeHeaderPostionYTextBox);
+            HeaderFooterGroupBox.Controls.Add(BarcodeHeaderPostionXTextBox);
             HeaderFooterGroupBox.Controls.Add(Label19);
             HeaderFooterGroupBox.Controls.Add(Label18);
             HeaderFooterGroupBox.Controls.Add(Label17);
-            HeaderFooterGroupBox.Controls.Add(HeaderFooterFontButton);
-            HeaderFooterGroupBox.Controls.Add(HeaderFooterFontTextBox);
+            HeaderFooterGroupBox.Controls.Add(BarcodeHeaderFooterFontButton);
+            HeaderFooterGroupBox.Controls.Add(BarcodeHeaderFooterFontTextBox);
             HeaderFooterGroupBox.Controls.Add(Label16);
             HeaderFooterGroupBox.Location = new Point(357, 12);
             HeaderFooterGroupBox.Name = "HeaderFooterGroupBox";
@@ -570,13 +575,13 @@
             HeaderFooterGroupBox.TabStop = false;
             HeaderFooterGroupBox.Text = "ヘッダ・フッタ";
             // 
-            // FooterStringTextBox
+            // BarcodeFooterStringTextBox
             // 
-            FooterStringTextBox.Location = new Point(79, 215);
-            FooterStringTextBox.MaxLength = 50;
-            FooterStringTextBox.Name = "FooterStringTextBox";
-            FooterStringTextBox.Size = new Size(185, 23);
-            FooterStringTextBox.TabIndex = 31;
+            BarcodeFooterStringTextBox.Location = new Point(79, 215);
+            BarcodeFooterStringTextBox.MaxLength = 50;
+            BarcodeFooterStringTextBox.Name = "BarcodeFooterStringTextBox";
+            BarcodeFooterStringTextBox.Size = new Size(185, 23);
+            BarcodeFooterStringTextBox.TabIndex = 31;
             // 
             // Label23
             // 
@@ -596,21 +601,21 @@
             Label24.TabIndex = 29;
             Label24.Text = "mm";
             // 
-            // FooterPostionYTextBox
+            // BarcodeFooterPostionYTextBox
             // 
-            FooterPostionYTextBox.Location = new Point(168, 189);
-            FooterPostionYTextBox.MaxLength = 50;
-            FooterPostionYTextBox.Name = "FooterPostionYTextBox";
-            FooterPostionYTextBox.Size = new Size(64, 23);
-            FooterPostionYTextBox.TabIndex = 28;
+            BarcodeFooterPostionYTextBox.Location = new Point(168, 189);
+            BarcodeFooterPostionYTextBox.MaxLength = 50;
+            BarcodeFooterPostionYTextBox.Name = "BarcodeFooterPostionYTextBox";
+            BarcodeFooterPostionYTextBox.Size = new Size(64, 23);
+            BarcodeFooterPostionYTextBox.TabIndex = 28;
             // 
-            // FooterPostionXTextBox
+            // BarcodeFooterPostionXTextBox
             // 
-            FooterPostionXTextBox.Location = new Point(36, 189);
-            FooterPostionXTextBox.MaxLength = 50;
-            FooterPostionXTextBox.Name = "FooterPostionXTextBox";
-            FooterPostionXTextBox.Size = new Size(64, 23);
-            FooterPostionXTextBox.TabIndex = 27;
+            BarcodeFooterPostionXTextBox.Location = new Point(36, 189);
+            BarcodeFooterPostionXTextBox.MaxLength = 50;
+            BarcodeFooterPostionXTextBox.Name = "BarcodeFooterPostionXTextBox";
+            BarcodeFooterPostionXTextBox.Size = new Size(64, 23);
+            BarcodeFooterPostionXTextBox.TabIndex = 27;
             // 
             // Label25
             // 
@@ -657,13 +662,13 @@
             Label29.TabIndex = 22;
             Label29.Text = "%D 印刷日 %M 製番 %O 注番 %T 型式";
             // 
-            // HeaderStringTextBox
+            // BarcodeHeaderStringTextBox
             // 
-            HeaderStringTextBox.Location = new Point(79, 125);
-            HeaderStringTextBox.MaxLength = 50;
-            HeaderStringTextBox.Name = "HeaderStringTextBox";
-            HeaderStringTextBox.Size = new Size(185, 23);
-            HeaderStringTextBox.TabIndex = 12;
+            BarcodeHeaderStringTextBox.Location = new Point(79, 125);
+            BarcodeHeaderStringTextBox.MaxLength = 50;
+            BarcodeHeaderStringTextBox.Name = "BarcodeHeaderStringTextBox";
+            BarcodeHeaderStringTextBox.Size = new Size(185, 23);
+            BarcodeHeaderStringTextBox.TabIndex = 12;
             // 
             // Label22
             // 
@@ -692,21 +697,21 @@
             Label20.TabIndex = 9;
             Label20.Text = "mm";
             // 
-            // HeaderPostionYTextBox
+            // BarcodeHeaderPostionYTextBox
             // 
-            HeaderPostionYTextBox.Location = new Point(168, 99);
-            HeaderPostionYTextBox.MaxLength = 50;
-            HeaderPostionYTextBox.Name = "HeaderPostionYTextBox";
-            HeaderPostionYTextBox.Size = new Size(64, 23);
-            HeaderPostionYTextBox.TabIndex = 8;
+            BarcodeHeaderPostionYTextBox.Location = new Point(168, 99);
+            BarcodeHeaderPostionYTextBox.MaxLength = 50;
+            BarcodeHeaderPostionYTextBox.Name = "BarcodeHeaderPostionYTextBox";
+            BarcodeHeaderPostionYTextBox.Size = new Size(64, 23);
+            BarcodeHeaderPostionYTextBox.TabIndex = 8;
             // 
-            // HeaderPostionXTextBox
+            // BarcodeHeaderPostionXTextBox
             // 
-            HeaderPostionXTextBox.Location = new Point(36, 99);
-            HeaderPostionXTextBox.MaxLength = 50;
-            HeaderPostionXTextBox.Name = "HeaderPostionXTextBox";
-            HeaderPostionXTextBox.Size = new Size(64, 23);
-            HeaderPostionXTextBox.TabIndex = 7;
+            BarcodeHeaderPostionXTextBox.Location = new Point(36, 99);
+            BarcodeHeaderPostionXTextBox.MaxLength = 50;
+            BarcodeHeaderPostionXTextBox.Name = "BarcodeHeaderPostionXTextBox";
+            BarcodeHeaderPostionXTextBox.Size = new Size(64, 23);
+            BarcodeHeaderPostionXTextBox.TabIndex = 7;
             // 
             // Label19
             // 
@@ -735,22 +740,23 @@
             Label17.TabIndex = 4;
             Label17.Text = "ヘッダ位置";
             // 
-            // HeaderFooterFontButton
+            // BarcodeHeaderFooterFontButton
             // 
-            HeaderFooterFontButton.Location = new Point(168, 35);
-            HeaderFooterFontButton.Name = "HeaderFooterFontButton";
-            HeaderFooterFontButton.Size = new Size(96, 25);
-            HeaderFooterFontButton.TabIndex = 3;
-            HeaderFooterFontButton.Text = "フォント選択";
-            HeaderFooterFontButton.UseVisualStyleBackColor = true;
+            BarcodeHeaderFooterFontButton.Location = new Point(168, 35);
+            BarcodeHeaderFooterFontButton.Name = "BarcodeHeaderFooterFontButton";
+            BarcodeHeaderFooterFontButton.Size = new Size(96, 25);
+            BarcodeHeaderFooterFontButton.TabIndex = 3;
+            BarcodeHeaderFooterFontButton.Text = "フォント選択";
+            BarcodeHeaderFooterFontButton.UseVisualStyleBackColor = true;
+            BarcodeHeaderFooterFontButton.Click += BtnHeaderFooterFont_Click;
             // 
-            // HeaderFooterFontTextBox
+            // BarcodeHeaderFooterFontTextBox
             // 
-            HeaderFooterFontTextBox.Location = new Point(27, 36);
-            HeaderFooterFontTextBox.MaxLength = 50;
-            HeaderFooterFontTextBox.Name = "HeaderFooterFontTextBox";
-            HeaderFooterFontTextBox.Size = new Size(135, 23);
-            HeaderFooterFontTextBox.TabIndex = 2;
+            BarcodeHeaderFooterFontTextBox.Location = new Point(27, 36);
+            BarcodeHeaderFooterFontTextBox.MaxLength = 50;
+            BarcodeHeaderFooterFontTextBox.Name = "BarcodeHeaderFooterFontTextBox";
+            BarcodeHeaderFooterFontTextBox.Size = new Size(135, 23);
+            BarcodeHeaderFooterFontTextBox.TabIndex = 2;
             // 
             // Label16
             // 
@@ -765,8 +771,8 @@
             // 
             LabelIntervalGroupBox.Controls.Add(Label15);
             LabelIntervalGroupBox.Controls.Add(Label14);
-            LabelIntervalGroupBox.Controls.Add(LabelIntervalYTextBox);
-            LabelIntervalGroupBox.Controls.Add(LabelIntervalXTextBox);
+            LabelIntervalGroupBox.Controls.Add(BarcodeLabelIntervalYTextBox);
+            LabelIntervalGroupBox.Controls.Add(BarcodeLabelIntervalXTextBox);
             LabelIntervalGroupBox.Controls.Add(Label13);
             LabelIntervalGroupBox.Controls.Add(Label12);
             LabelIntervalGroupBox.Location = new Point(27, 231);
@@ -794,21 +800,21 @@
             Label14.TabIndex = 4;
             Label14.Text = "mm";
             // 
-            // LabelIntervalYTextBox
+            // BarcodeLabelIntervalYTextBox
             // 
-            LabelIntervalYTextBox.Location = new Point(158, 36);
-            LabelIntervalYTextBox.MaxLength = 5;
-            LabelIntervalYTextBox.Name = "LabelIntervalYTextBox";
-            LabelIntervalYTextBox.Size = new Size(100, 23);
-            LabelIntervalYTextBox.TabIndex = 3;
+            BarcodeLabelIntervalYTextBox.Location = new Point(158, 36);
+            BarcodeLabelIntervalYTextBox.MaxLength = 5;
+            BarcodeLabelIntervalYTextBox.Name = "BarcodeLabelIntervalYTextBox";
+            BarcodeLabelIntervalYTextBox.Size = new Size(100, 23);
+            BarcodeLabelIntervalYTextBox.TabIndex = 3;
             // 
-            // LabelIntervalXTextBox
+            // BarcodeLabelIntervalXTextBox
             // 
-            LabelIntervalXTextBox.Location = new Point(20, 36);
-            LabelIntervalXTextBox.MaxLength = 5;
-            LabelIntervalXTextBox.Name = "LabelIntervalXTextBox";
-            LabelIntervalXTextBox.Size = new Size(100, 23);
-            LabelIntervalXTextBox.TabIndex = 1;
+            BarcodeLabelIntervalXTextBox.Location = new Point(20, 36);
+            BarcodeLabelIntervalXTextBox.MaxLength = 5;
+            BarcodeLabelIntervalXTextBox.Name = "BarcodeLabelIntervalXTextBox";
+            BarcodeLabelIntervalXTextBox.Size = new Size(100, 23);
+            BarcodeLabelIntervalXTextBox.TabIndex = 1;
             // 
             // Label13
             // 
@@ -836,8 +842,9 @@
             CloseButton.TabIndex = 33;
             CloseButton.Text = "Close";
             CloseButton.UseVisualStyleBackColor = true;
+            CloseButton.Click += CloseButton_Click;
             // 
-            // BarcodePrintSettingsWindow
+            // ProductBarcodePrintSettingsWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -847,23 +854,24 @@
             Controls.Add(CloseButton);
             Controls.Add(WhiteSpaceGroupBox);
             Controls.Add(QuantityGroupBox);
-            Controls.Add(LabelSizeGroupBox);
+            Controls.Add(BarcodeSizeGroupBox);
             Controls.Add(HeaderFooterGroupBox);
             Controls.Add(LabelIntervalGroupBox);
             Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "BarcodePrintSettingsWindow";
+            Name = "ProductBarcodePrintSettingsWindow";
             Text = "製品バーコード設定";
+            Load += ProductBarcodePrintSetting_Load;
             BarcodeGroupBox.ResumeLayout(false);
             BarcodeGroupBox.PerformLayout();
             WhiteSpaceGroupBox.ResumeLayout(false);
             WhiteSpaceGroupBox.PerformLayout();
             QuantityGroupBox.ResumeLayout(false);
             QuantityGroupBox.PerformLayout();
-            LabelSizeGroupBox.ResumeLayout(false);
-            LabelSizeGroupBox.PerformLayout();
+            BarcodeSizeGroupBox.ResumeLayout(false);
+            BarcodeSizeGroupBox.PerformLayout();
             HeaderFooterGroupBox.ResumeLayout(false);
             HeaderFooterGroupBox.PerformLayout();
             LabelIntervalGroupBox.ResumeLayout(false);
@@ -877,7 +885,7 @@
         private GroupBox BarcodeGroupBox;
         private Label Label41;
         private Label Label40;
-        private TextBox BarcodeStringTextBox;
+        private TextBox BarcodeFormatTextBox;
         private Label Label39;
         private Button BarcodeFontButton;
         private TextBox BarcodeFontTextBox;
@@ -896,50 +904,50 @@
         private GroupBox WhiteSpaceGroupBox;
         private Label Label11;
         private Label Label10;
-        private TextBox PageOffsetYTextBox;
-        private TextBox PageOffsetXTextBox;
+        private TextBox BarcodePageOffsetYTextBox;
+        private TextBox BarcodePageOffsetXTextBox;
         private Label Label9;
         private Label Label8;
         private GroupBox QuantityGroupBox;
         private Label Label7;
-        private TextBox QuantityYTextBox;
-        private TextBox QuantityXTextBox;
+        private TextBox BarcodeQuantityYTextBox;
+        private TextBox BarcodeQuantityXTextBox;
         private Label Label6;
         private Label Label5;
-        private GroupBox LabelSizeGroupBox;
+        private GroupBox BarcodeSizeGroupBox;
         private Label Label4;
         private Label Label3;
-        private TextBox LabelHeightTextBox;
-        private TextBox LabelWidthTextBox;
+        private TextBox BarcodeLabelHeightTextBox;
+        private TextBox BarcodeLabelWidthTextBox;
         private Label Label2;
         private Label Label1;
         private GroupBox HeaderFooterGroupBox;
         private Label Label30;
         private Label Label29;
-        private TextBox HeaderStringTextBox;
+        private TextBox BarcodeHeaderStringTextBox;
         private Label Label22;
         private Label Label21;
         private Label Label20;
-        private TextBox HeaderPostionYTextBox;
-        private TextBox HeaderPostionXTextBox;
+        private TextBox BarcodeHeaderPostionYTextBox;
+        private TextBox BarcodeHeaderPostionXTextBox;
         private Label Label19;
         private Label Label18;
         private Label Label17;
-        private Button HeaderFooterFontButton;
-        private TextBox HeaderFooterFontTextBox;
+        private Button BarcodeHeaderFooterFontButton;
+        private TextBox BarcodeHeaderFooterFontTextBox;
         private Label Label16;
         private GroupBox LabelIntervalGroupBox;
         private Label Label15;
         private Label Label14;
-        private TextBox LabelIntervalYTextBox;
-        private TextBox LabelIntervalXTextBox;
+        private TextBox BarcodeLabelIntervalYTextBox;
+        private TextBox BarcodeLabelIntervalXTextBox;
         private Label Label13;
         private Label Label12;
-        private TextBox FooterStringTextBox;
+        private TextBox BarcodeFooterStringTextBox;
         private Label Label23;
         private Label Label24;
-        private TextBox FooterPostionYTextBox;
-        private TextBox FooterPostionXTextBox;
+        private TextBox BarcodeFooterPostionYTextBox;
+        private TextBox BarcodeFooterPostionXTextBox;
         private Label Label25;
         private Label Label26;
         private Label Label27;
@@ -949,5 +957,7 @@
         private Label Label37;
         private Label Label28;
         private Button CloseButton;
+        private FontDialog BarcodeHeaderFontDialog;
+        private FontDialog BarcodeFontDialog;
     }
 }

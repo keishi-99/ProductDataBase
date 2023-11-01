@@ -6,7 +6,7 @@ namespace ProductDataBase {
     public partial class SubstrateRegistrationWindow : Form {
 
         public CSettingsLabelSub? SettingsLabelSub { get; set; }
-        public string? StrSettingFilePath { get; set; } = string.Empty;
+        public string? StrSettingFilePath { get; set; }
 
         public string? StrFontName { get; set; }
         public int IntFontSize { get; set; }
@@ -26,8 +26,8 @@ namespace ProductDataBase {
         public int LabelSubNLabel { get; set; }
         public int LabelSubNumLabelsToPrint { get; set; }
 
-        public decimal LabelSubDisplayResolution { get; } = 96.0m;
-        public int LabelSubDisplayMagnitude { get; } = 3;
+        public decimal DisplayResolution { get; } = 96.0m;
+        public int DisplayMagnitude { get; } = 3;
         public int IntPageCnt { get; set; } = 1;
 
         public string? StrProness1 { get; }
@@ -35,6 +35,11 @@ namespace ProductDataBase {
         public string? StrProness3 { get; }
         public int StrProness4 { get; }
         public string? StrProness5 { get; }
+
+        readonly List<string> checkBoxNames = new() {
+                    "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectNumberCheckBox",
+                    "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
+                    "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" };
 
         public SubstrateRegistrationWindow(MainWindow mainWindow) {
             StrFontName = mainWindow.StrFontName;
@@ -58,7 +63,7 @@ namespace ProductDataBase {
         public SubstrateRegistrationWindow() {
             InitializeComponent();
         }
-
+        // ロードイベント
         private void LoadEvents() {
             try {
                 if (StrFontName != null) { Font = new Font(StrFontName, IntFontSize); }
@@ -107,11 +112,6 @@ namespace ProductDataBase {
                 else { StockLabel2.Text = "---"; }
 
                 // 変数[check_bin]の値に応じてCheckboxにチェックを入れる
-                List<string> checkBoxNames = new() {
-                    "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectNumberCheckBox",
-                    "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
-                    "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" };
-
                 foreach (string checkBoxName in checkBoxNames) {
                     if (Controls[checkBoxName] is CheckBox checkBox) {
                         checkBox.Checked = (IntCheckBin & 0x1) == 1;
@@ -140,6 +140,7 @@ namespace ProductDataBase {
             } finally {
             }
         }
+        // クロージングイベント
         private void ClosingEvents() {
             try {
                 System.Xml.Serialization.XmlSerializer serializer = new(typeof(CSettingsLabelSub));
@@ -462,7 +463,7 @@ namespace ProductDataBase {
                  .Replace("%D", DateTime.Today.ToShortDateString())
                  .Replace("%M", ManufacturingNumberMaskedTextBox.Text)
                  .Replace("%O", OrderNumberTextBox.Text)
-                 .Replace("%N", PersonComboBox.Text)
+                 .Replace("%N", QuantityTextBox.Text)
                  .Replace("%U", PersonComboBox.Text);
             return s;
         }
@@ -480,12 +481,12 @@ namespace ProductDataBase {
 
             if (SettingsLabelSub != null) {
                 OutputCode = SettingsLabelSub.LabelSubLabelSettings.Format;
-                OutputCode = OutputCode.Replace("%T", StrInitial);
-                OutputCode = OutputCode.Replace("%R", RevisionTextBox.Text);
-                OutputCode = OutputCode.Replace("%Y", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yy"));
-                OutputCode = OutputCode.Replace("%MM", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM"));
-                OutputCode = OutputCode.Replace("%M", MonthCode[^1..]);
-                OutputCode = OutputCode.Replace("%S", SerialCode);
+                OutputCode = OutputCode.Replace("%T", StrInitial)
+                                        .Replace("%R", RevisionTextBox.Text)
+                                        .Replace("%Y", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yy"))
+                                        .Replace("%MM", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM"))
+                                        .Replace("%M", MonthCode[^1..])
+                                        .Replace("%S", SerialCode);
             }
             return OutputCode;
         }
@@ -511,7 +512,7 @@ namespace ProductDataBase {
 
             return LabelImage;
         }
-
+        // コメント用テンプレート
         private void TemplateComment() {
             string templateWord = CommentComboBox.SelectedIndex switch {
                 1 => "[Rev.UP]変更点番号:",
@@ -519,7 +520,7 @@ namespace ProductDataBase {
             };
             CommentTextBox.Text = $"{CommentTextBox.Text}{templateWord}";
         }
-
+        // チェックボックスイベント
         private void CheckBoxChecked(object sender, EventArgs e) {
             CheckBox checkBox = (CheckBox)sender;
 
@@ -576,14 +577,14 @@ namespace ProductDataBase {
                     break;
             }
         }
-
+        // 入力数値のみ
         private void NumericOnly(object sender, KeyPressEventArgs e) {
             // 0～9と、バックスペース以外の時は、イベントをキャンセルする
             if ((e.KeyChar < '0' || '9' < e.KeyChar) && e.KeyChar != '\b') {
                 e.Handled = true;
             }
         }
-
+        // 日付チェック
         private void RegistrationDateCheck(object sender, TypeValidationEventArgs e) {
             if (!e.IsValidInput) {
                 MessageBox.Show("日付が正しくありません。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -592,34 +593,21 @@ namespace ProductDataBase {
         }
 
         private void SubstrateRegistrationWindow_Load(object sender, EventArgs e) { LoadEvents(); }
-
         private void SubstrateRegistrationWindow_FormClosing(object sender, FormClosingEventArgs e) { ClosingEvents(); }
-
         private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
-
         private void PrintButton_Click(object sender, EventArgs e) { PrintBarcode(1); }
-
         private void SubstrateRegistrationPrintDocument_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) { PrintDocumentPrintPage(sender, e); }
-
         private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
-
         private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
-
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
-
         private void DefectNumberTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
-
         private void RegistrationDateMaskedTextBox_TypeValidationCompleted(object sender, TypeValidationEventArgs e) { RegistrationDateCheck(sender, e); }
-
         private void 印刷ToolStripMenuItem_Click(object sender, EventArgs e) { PrintBarcode(1); }
-
         private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { PrintBarcode(2); }
-
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             SubstratePrintSetting ls = new();
             ls.ShowDialog(this);
         }
-
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
             MessageBox.Show($"" +
                 $"StrProness1\t\t[{StrProness1}]\r\n" +
@@ -636,7 +624,6 @@ namespace ProductDataBase {
                 $"IntPrintType\t\t[{IntPrintType}]\r\n" +
                 $"", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-
         private void SubstrateRegistrationPrintPreviewDialog_Load(object sender, EventArgs e) {
             ToolStrip tool = (ToolStrip)SubstrateRegistrationPrintPreviewDialog.Controls[1];
             tool.Items[0].Visible = false;

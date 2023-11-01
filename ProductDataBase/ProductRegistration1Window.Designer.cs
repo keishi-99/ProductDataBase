@@ -26,7 +26,7 @@
             RegisterButton = new Button();
             TemplateButton = new Button();
             CommentComboBox = new ComboBox();
-            CommentTtextBox = new TextBox();
+            CommentTextBox = new TextBox();
             CommentCheckBox = new CheckBox();
             ExtraTextBox6 = new TextBox();
             ExtraCheckBox6 = new CheckBox();
@@ -40,14 +40,14 @@
             RegistrationDateCheckBox = new CheckBox();
             FirstSerialNumberTextBox = new TextBox();
             FirstSerialNumberCheckBox = new CheckBox();
+            ExtraTextBox3 = new TextBox();
+            ExtraCheckBox3 = new CheckBox();
             ExtraTextBox2 = new TextBox();
             ExtraCheckBox2 = new CheckBox();
-            ExtraTextBox1 = new TextBox();
-            ExtraCheckBox1 = new CheckBox();
             RevisionTextBox = new TextBox();
             RevisionCheckBox = new CheckBox();
-            DefectNumberTextBox = new TextBox();
-            DefectNumberCheckBox = new CheckBox();
+            ExtraTextBox1 = new TextBox();
+            ExtraCheckBox1 = new CheckBox();
             QuantityTextBox = new TextBox();
             QuantityCheckBox = new CheckBox();
             ManufacturingNumberMaskedTextBox = new MaskedTextBox();
@@ -75,6 +75,7 @@
             RegisterButton.TabIndex = 81;
             RegisterButton.Text = "OK";
             RegisterButton.UseVisualStyleBackColor = true;
+            RegisterButton.Click += RegisterButton_Click;
             // 
             // TemplateButton
             // 
@@ -85,6 +86,7 @@
             TemplateButton.TabIndex = 78;
             TemplateButton.Text = "定型文";
             TemplateButton.UseVisualStyleBackColor = true;
+            TemplateButton.Click += TemplateButton_Click;
             // 
             // CommentComboBox
             // 
@@ -97,18 +99,18 @@
             CommentComboBox.Size = new Size(150, 23);
             CommentComboBox.TabIndex = 77;
             // 
-            // CommentTtextBox
+            // CommentTextBox
             // 
-            CommentTtextBox.Enabled = false;
-            CommentTtextBox.Location = new Point(464, 141);
-            CommentTtextBox.Margin = new Padding(0);
-            CommentTtextBox.MaxLength = 500;
-            CommentTtextBox.Multiline = true;
-            CommentTtextBox.Name = "CommentTtextBox";
-            CommentTtextBox.ScrollBars = ScrollBars.Vertical;
-            CommentTtextBox.ShortcutsEnabled = false;
-            CommentTtextBox.Size = new Size(150, 175);
-            CommentTtextBox.TabIndex = 76;
+            CommentTextBox.Enabled = false;
+            CommentTextBox.Location = new Point(464, 141);
+            CommentTextBox.Margin = new Padding(0);
+            CommentTextBox.MaxLength = 500;
+            CommentTextBox.Multiline = true;
+            CommentTextBox.Name = "CommentTextBox";
+            CommentTextBox.ScrollBars = ScrollBars.Vertical;
+            CommentTextBox.ShortcutsEnabled = false;
+            CommentTextBox.Size = new Size(150, 175);
+            CommentTextBox.TabIndex = 76;
             // 
             // CommentCheckBox
             // 
@@ -120,6 +122,7 @@
             CommentCheckBox.TabStop = false;
             CommentCheckBox.Text = "コメント";
             CommentCheckBox.UseVisualStyleBackColor = true;
+            CommentCheckBox.CheckedChanged += NumberCheckBox_CheckedChanged;
             // 
             // ExtraTextBox6
             // 
@@ -143,6 +146,7 @@
             ExtraCheckBox6.TabStop = false;
             ExtraCheckBox6.Text = "予備";
             ExtraCheckBox6.UseVisualStyleBackColor = true;
+            ExtraCheckBox6.CheckedChanged += NumberCheckBox_CheckedChanged;
             // 
             // ExtraTextBox5
             // 
@@ -166,6 +170,7 @@
             ExtraCheckBox5.TabStop = false;
             ExtraCheckBox5.Text = "予備";
             ExtraCheckBox5.UseVisualStyleBackColor = true;
+            ExtraCheckBox5.CheckedChanged += NumberCheckBox_CheckedChanged;
             // 
             // ExtraTextBox4
             // 
@@ -189,6 +194,7 @@
             ExtraCheckBox4.TabStop = false;
             ExtraCheckBox4.Text = "予備";
             ExtraCheckBox4.UseVisualStyleBackColor = true;
+            ExtraCheckBox4.CheckedChanged += NumberCheckBox_CheckedChanged;
             // 
             // PersonComboBox
             // 
@@ -210,9 +216,11 @@
             PersonCheckBox.TabStop = false;
             PersonCheckBox.Text = "担当者";
             PersonCheckBox.UseVisualStyleBackColor = true;
+            PersonCheckBox.CheckedChanged += NumberCheckBox_CheckedChanged;
             // 
             // RegistrationDateMaskedTextBox
             // 
+            RegistrationDateMaskedTextBox.Enabled = false;
             RegistrationDateMaskedTextBox.Location = new Point(166, 291);
             RegistrationDateMaskedTextBox.Mask = "0000/00/00";
             RegistrationDateMaskedTextBox.Name = "RegistrationDateMaskedTextBox";
@@ -220,6 +228,7 @@
             RegistrationDateMaskedTextBox.Size = new Size(120, 23);
             RegistrationDateMaskedTextBox.TabIndex = 66;
             RegistrationDateMaskedTextBox.TextAlign = HorizontalAlignment.Right;
+            RegistrationDateMaskedTextBox.TypeValidationCompleted += RegistrationDateMaskedTextBox_TypeValidationCompleted;
             // 
             // RegistrationDateCheckBox
             // 
@@ -231,6 +240,7 @@
             RegistrationDateCheckBox.TabStop = false;
             RegistrationDateCheckBox.Text = "登録日";
             RegistrationDateCheckBox.UseVisualStyleBackColor = true;
+            RegistrationDateCheckBox.CheckedChanged += NumberCheckBox_CheckedChanged;
             // 
             // FirstSerialNumberTextBox
             // 
@@ -254,52 +264,55 @@
             FirstSerialNumberCheckBox.TabStop = false;
             FirstSerialNumberCheckBox.Text = "先頭シリアル番号";
             FirstSerialNumberCheckBox.UseVisualStyleBackColor = true;
+            FirstSerialNumberCheckBox.CheckedChanged += CheckBoxChecked;
+            // 
+            // ExtraTextBox3
+            // 
+            ExtraTextBox3.Enabled = false;
+            ExtraTextBox3.Location = new Point(166, 191);
+            ExtraTextBox3.Margin = new Padding(0);
+            ExtraTextBox3.MaxLength = 20;
+            ExtraTextBox3.Name = "ExtraTextBox3";
+            ExtraTextBox3.ShortcutsEnabled = false;
+            ExtraTextBox3.Size = new Size(120, 23);
+            ExtraTextBox3.TabIndex = 62;
+            ExtraTextBox3.TextAlign = HorizontalAlignment.Right;
+            // 
+            // ExtraCheckBox3
+            // 
+            ExtraCheckBox3.Location = new Point(166, 168);
+            ExtraCheckBox3.Margin = new Padding(0);
+            ExtraCheckBox3.Name = "ExtraCheckBox3";
+            ExtraCheckBox3.Size = new Size(50, 19);
+            ExtraCheckBox3.TabIndex = 61;
+            ExtraCheckBox3.TabStop = false;
+            ExtraCheckBox3.Text = "予備";
+            ExtraCheckBox3.UseVisualStyleBackColor = true;
+            ExtraCheckBox3.CheckedChanged += CheckBoxChecked;
             // 
             // ExtraTextBox2
             // 
             ExtraTextBox2.Enabled = false;
-            ExtraTextBox2.Location = new Point(166, 191);
+            ExtraTextBox2.Location = new Point(166, 141);
             ExtraTextBox2.Margin = new Padding(0);
             ExtraTextBox2.MaxLength = 20;
             ExtraTextBox2.Name = "ExtraTextBox2";
             ExtraTextBox2.ShortcutsEnabled = false;
             ExtraTextBox2.Size = new Size(120, 23);
-            ExtraTextBox2.TabIndex = 62;
+            ExtraTextBox2.TabIndex = 60;
             ExtraTextBox2.TextAlign = HorizontalAlignment.Right;
             // 
             // ExtraCheckBox2
             // 
-            ExtraCheckBox2.Location = new Point(166, 168);
+            ExtraCheckBox2.Location = new Point(166, 118);
             ExtraCheckBox2.Margin = new Padding(0);
             ExtraCheckBox2.Name = "ExtraCheckBox2";
             ExtraCheckBox2.Size = new Size(50, 19);
-            ExtraCheckBox2.TabIndex = 61;
+            ExtraCheckBox2.TabIndex = 59;
             ExtraCheckBox2.TabStop = false;
             ExtraCheckBox2.Text = "予備";
             ExtraCheckBox2.UseVisualStyleBackColor = true;
-            // 
-            // ExtraTextBox1
-            // 
-            ExtraTextBox1.Enabled = false;
-            ExtraTextBox1.Location = new Point(166, 141);
-            ExtraTextBox1.Margin = new Padding(0);
-            ExtraTextBox1.MaxLength = 20;
-            ExtraTextBox1.Name = "ExtraTextBox1";
-            ExtraTextBox1.ShortcutsEnabled = false;
-            ExtraTextBox1.Size = new Size(120, 23);
-            ExtraTextBox1.TabIndex = 60;
-            ExtraTextBox1.TextAlign = HorizontalAlignment.Right;
-            // 
-            // ExtraCheckBox1
-            // 
-            ExtraCheckBox1.Location = new Point(166, 118);
-            ExtraCheckBox1.Margin = new Padding(0);
-            ExtraCheckBox1.Name = "ExtraCheckBox1";
-            ExtraCheckBox1.Size = new Size(50, 19);
-            ExtraCheckBox1.TabIndex = 59;
-            ExtraCheckBox1.TabStop = false;
-            ExtraCheckBox1.Text = "予備";
-            ExtraCheckBox1.UseVisualStyleBackColor = true;
+            ExtraCheckBox2.CheckedChanged += CheckBoxChecked;
             // 
             // RevisionTextBox
             // 
@@ -323,29 +336,31 @@
             RevisionCheckBox.TabStop = false;
             RevisionCheckBox.Text = "レビジョン";
             RevisionCheckBox.UseVisualStyleBackColor = true;
+            RevisionCheckBox.CheckedChanged += CheckBoxChecked;
             // 
-            // DefectNumberTextBox
+            // ExtraTextBox1
             // 
-            DefectNumberTextBox.Enabled = false;
-            DefectNumberTextBox.Location = new Point(19, 291);
-            DefectNumberTextBox.Margin = new Padding(0);
-            DefectNumberTextBox.MaxLength = 4;
-            DefectNumberTextBox.Name = "DefectNumberTextBox";
-            DefectNumberTextBox.ShortcutsEnabled = false;
-            DefectNumberTextBox.Size = new Size(120, 23);
-            DefectNumberTextBox.TabIndex = 56;
-            DefectNumberTextBox.TextAlign = HorizontalAlignment.Right;
+            ExtraTextBox1.Enabled = false;
+            ExtraTextBox1.Location = new Point(19, 291);
+            ExtraTextBox1.Margin = new Padding(0);
+            ExtraTextBox1.MaxLength = 4;
+            ExtraTextBox1.Name = "ExtraTextBox1";
+            ExtraTextBox1.ShortcutsEnabled = false;
+            ExtraTextBox1.Size = new Size(120, 23);
+            ExtraTextBox1.TabIndex = 56;
+            ExtraTextBox1.TextAlign = HorizontalAlignment.Right;
             // 
-            // DefectNumberCheckBox
+            // ExtraCheckBox1
             // 
-            DefectNumberCheckBox.Location = new Point(19, 268);
-            DefectNumberCheckBox.Margin = new Padding(0);
-            DefectNumberCheckBox.Name = "DefectNumberCheckBox";
-            DefectNumberCheckBox.Size = new Size(62, 19);
-            DefectNumberCheckBox.TabIndex = 55;
-            DefectNumberCheckBox.TabStop = false;
-            DefectNumberCheckBox.Text = "不良量";
-            DefectNumberCheckBox.UseVisualStyleBackColor = true;
+            ExtraCheckBox1.Location = new Point(19, 268);
+            ExtraCheckBox1.Margin = new Padding(0);
+            ExtraCheckBox1.Name = "ExtraCheckBox1";
+            ExtraCheckBox1.Size = new Size(62, 19);
+            ExtraCheckBox1.TabIndex = 55;
+            ExtraCheckBox1.TabStop = false;
+            ExtraCheckBox1.Text = "予備";
+            ExtraCheckBox1.UseVisualStyleBackColor = true;
+            ExtraCheckBox1.CheckedChanged += CheckBoxChecked;
             // 
             // QuantityTextBox
             // 
@@ -358,6 +373,7 @@
             QuantityTextBox.Size = new Size(120, 23);
             QuantityTextBox.TabIndex = 54;
             QuantityTextBox.TextAlign = HorizontalAlignment.Right;
+            QuantityTextBox.KeyPress += QuantityTextBox_KeyPress;
             // 
             // QuantityCheckBox
             // 
@@ -369,9 +385,11 @@
             QuantityCheckBox.TabStop = false;
             QuantityCheckBox.Text = "数量";
             QuantityCheckBox.UseVisualStyleBackColor = true;
+            QuantityCheckBox.CheckedChanged += CheckBoxChecked;
             // 
             // ManufacturingNumberMaskedTextBox
             // 
+            ManufacturingNumberMaskedTextBox.Enabled = false;
             ManufacturingNumberMaskedTextBox.Location = new Point(19, 191);
             ManufacturingNumberMaskedTextBox.Mask = "LA00L00000-0000";
             ManufacturingNumberMaskedTextBox.Name = "ManufacturingNumberMaskedTextBox";
@@ -391,6 +409,7 @@
             ManufacturingNumberCheckBox.TabStop = false;
             ManufacturingNumberCheckBox.Text = "製造番号";
             ManufacturingNumberCheckBox.UseVisualStyleBackColor = true;
+            ManufacturingNumberCheckBox.CheckedChanged += CheckBoxChecked;
             // 
             // OrderNumberTextBox
             // 
@@ -414,6 +433,7 @@
             OrderNumberCheckBox.TabStop = false;
             OrderNumberCheckBox.Text = "注文番号";
             OrderNumberCheckBox.UseVisualStyleBackColor = true;
+            OrderNumberCheckBox.CheckedChanged += CheckBoxChecked;
             // 
             // SubstrateModelLabel2
             // 
@@ -475,6 +495,7 @@
             取得情報ToolStripMenuItem.Name = "取得情報ToolStripMenuItem";
             取得情報ToolStripMenuItem.Size = new Size(122, 22);
             取得情報ToolStripMenuItem.Text = "取得情報";
+            取得情報ToolStripMenuItem.Click += 取得情報ToolStripMenuItem_Click;
             // 
             // ProductNameLabel1
             // 
@@ -497,7 +518,7 @@
             ProductRegistration1MenuStrip.TabIndex = 42;
             ProductRegistration1MenuStrip.Text = "menuStrip";
             // 
-            // ProductRegistration1
+            // ProductRegistration1Window
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -505,7 +526,7 @@
             Controls.Add(RegisterButton);
             Controls.Add(TemplateButton);
             Controls.Add(CommentComboBox);
-            Controls.Add(CommentTtextBox);
+            Controls.Add(CommentTextBox);
             Controls.Add(CommentCheckBox);
             Controls.Add(ExtraTextBox6);
             Controls.Add(ExtraCheckBox6);
@@ -519,14 +540,14 @@
             Controls.Add(RegistrationDateCheckBox);
             Controls.Add(FirstSerialNumberTextBox);
             Controls.Add(FirstSerialNumberCheckBox);
+            Controls.Add(ExtraTextBox3);
+            Controls.Add(ExtraCheckBox3);
             Controls.Add(ExtraTextBox2);
             Controls.Add(ExtraCheckBox2);
-            Controls.Add(ExtraTextBox1);
-            Controls.Add(ExtraCheckBox1);
             Controls.Add(RevisionTextBox);
             Controls.Add(RevisionCheckBox);
-            Controls.Add(DefectNumberTextBox);
-            Controls.Add(DefectNumberCheckBox);
+            Controls.Add(ExtraTextBox1);
+            Controls.Add(ExtraCheckBox1);
             Controls.Add(QuantityTextBox);
             Controls.Add(QuantityCheckBox);
             Controls.Add(ManufacturingNumberMaskedTextBox);
@@ -543,10 +564,12 @@
             MainMenuStrip = ProductRegistration1MenuStrip;
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "ProductRegistration1";
+            Name = "ProductRegistration1Window";
             ShowIcon = false;
             ShowInTaskbar = false;
             Text = "製品登録";
+            FormClosing += ProductRegistration1Window_FormClosing;
+            Load += ProductRegistration1Window_Load;
             ProductRegistration1MenuStrip.ResumeLayout(false);
             ProductRegistration1MenuStrip.PerformLayout();
             ResumeLayout(false);
@@ -558,7 +581,7 @@
         private Button RegisterButton;
         private Button TemplateButton;
         private ComboBox CommentComboBox;
-        private TextBox CommentTtextBox;
+        private TextBox CommentTextBox;
         private CheckBox CommentCheckBox;
         private TextBox ExtraTextBox6;
         private CheckBox ExtraCheckBox6;
@@ -572,14 +595,14 @@
         private CheckBox RegistrationDateCheckBox;
         private TextBox FirstSerialNumberTextBox;
         private CheckBox FirstSerialNumberCheckBox;
+        private TextBox ExtraTextBox3;
+        private CheckBox ExtraCheckBox3;
         private TextBox ExtraTextBox2;
         private CheckBox ExtraCheckBox2;
-        private TextBox ExtraTextBox1;
-        private CheckBox ExtraCheckBox1;
         private TextBox RevisionTextBox;
         private CheckBox RevisionCheckBox;
-        private TextBox DefectNumberTextBox;
-        private CheckBox DefectNumberCheckBox;
+        private TextBox ExtraTextBox1;
+        private CheckBox ExtraCheckBox1;
         private TextBox QuantityTextBox;
         private CheckBox QuantityCheckBox;
         private MaskedTextBox ManufacturingNumberMaskedTextBox;
