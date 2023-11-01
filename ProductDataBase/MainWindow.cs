@@ -8,29 +8,29 @@ namespace ProductDataBase {
         public DataTable Dt { get; } = new();
         public string StrFontName { get; set; } = "Meiryo UI";
         public int IntFontSize { get; set; } = 9;
-        public int IntRadioBtnFlg { get; set; } = 0;
-        public int IntRegType { get; set; } = 0;
-        public int IntPrintType { get; set; } = 0;
-        public int IntSerialDigit { get; set; } = 0;
-        public string? StrProductName { get; set; } = string.Empty;
-        public string? StrStockName { get; set; } = string.Empty;
-        public string? StrProductType { get; set; } = string.Empty;
-        public string? StrProductModel { get; set; } = string.Empty;
-        public string? StrSubstrateName { get; set; } = string.Empty;
-        public string? StrSubstrateModel { get; set; } = string.Empty;
-        public string? StrUseSubstrate { get; set; } = string.Empty;
-        public string? StrInitial { get; set; } = string.Empty;
-        public int IntCheckBin { get; set; } = 0;
-        public string? StrProness1 { get; set; } = string.Empty;
-        public string? StrProness2 { get; set; } = string.Empty;
-        public string? StrProness3 { get; set; } = string.Empty;
-        public int StrProness4 { get; set; } = 0;
-        public string? StrProness5 { get; set; } = string.Empty;
-        private int ListIndex { get; set; } = 0;
-        public string StrCategory11 { get; set; } = string.Empty;
-        public string StrCategory12 { get; set; } = string.Empty;
-        public string StrCategory13 { get; set; } = string.Empty;
-        public string StrCategory14 { get; set; } = string.Empty;
+        public int IntRadioBtnFlg { get; set; }
+        public int IntRegType { get; set; }
+        public int IntPrintType { get; set; }
+        public int IntSerialDigit { get; set; }
+        public string? StrProductName { get; set; }
+        public string? StrStockName { get; set; }
+        public string? StrProductType { get; set; }
+        public string? StrProductModel { get; set; }
+        public string? StrSubstrateName { get; set; }
+        public string? StrSubstrateModel { get; set; }
+        public string? StrUseSubstrate { get; set; }
+        public string? StrInitial { get; set; }
+        public int IntCheckBin { get; set; }
+        public string? StrProness1 { get; set; }
+        public string? StrProness2 { get; set; }
+        public string? StrProness3 { get; set; }
+        public int StrProness4 { get; set; }
+        public string? StrProness5 { get; set; }
+        private int ListIndex { get; set; }
+        public string? StrCategory11 { get; set; }
+        public string? StrCategory12 { get; set; }
+        public string? StrCategory13 { get; set; }
+        public string? StrCategory14 { get; set; }
         public List<string> ListCategory11 { get; } = new();
         public List<string> ListCategory12 { get; } = new();
         public List<string> ListCategory13 { get; } = new();
@@ -46,7 +46,7 @@ namespace ProductDataBase {
         public static string GetConnectionString2() {
             return new SQLiteConnectionStringBuilder() { DataSource = "./db/registration.db" }.ToString();
         }
-
+        // ロードイベント
         private void LoadEvents() {
             try {
                 // その日のbakファイルがない場合バックアップ作成
@@ -70,6 +70,7 @@ namespace ProductDataBase {
             StrProness1 = StrProness2 = StrProness3 = StrProness5 = string.Empty;
             StrProness4 = 0;
         }
+        // 登録ボタン処理
         private void Registration() {
             try {
                 ResetFields();
@@ -98,20 +99,21 @@ namespace ProductDataBase {
                         DataRow[] ret2 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
 
                         if (ret2.Length > 0) {
-                            StrProductName = ret2[0]["col_Product_Name"].ToString();
-                            StrStockName = ret2[0]["col_Stock_Name"].ToString();
-                            StrProductType = ret2[0]["col_Product_Type"].ToString();
-                            IntRegType = Convert.ToInt32(ret2[0]["col_Reg_Type"]);
-                            IntPrintType = Convert.ToInt32(ret2[0]["col_Print_Type"]);
-                            IntSerialDigit = Convert.ToInt32(ret2[0]["col_Serial_Digit"]);
-                            StrProductModel = ret2[0]["col_Product_Model"].ToString();
-                            IntCheckBin = Convert.ToInt32(ret2[0]["col_Checkbox"].ToString(), 2);
-                            StrUseSubstrate = ret2[0]["col_Use_Substrate"].ToString();
-                            StrInitial = ret2[0]["col_Initial"].ToString();
 
                             switch (IntRadioBtnFlg) {
                                 case 2:
-                                    ProductRegistration1Window productRegistration1Window = new();
+                                    ProductRegistration1Window productRegistration1Window = new() {
+                                        StrProductName = ret2[0]["col_Product_Name"].ToString(),
+                                        StrStockName = ret2[0]["col_Stock_Name"].ToString(),
+                                        StrProductType = ret2[0]["col_Product_Type"].ToString(),
+                                        IntRegType = Convert.ToInt32(ret2[0]["col_Reg_Type"]),
+                                        IntPrintType = Convert.ToInt32(ret2[0]["col_Print_Type"]),
+                                        IntSerialDigit = Convert.ToInt32(ret2[0]["col_Serial_Digit"]),
+                                        StrProductModel = ret2[0]["col_Product_Model"].ToString(),
+                                        IntCheckBin = Convert.ToInt32(ret2[0]["col_Checkbox"].ToString(), 2),
+                                        StrUseSubstrate = ret2[0]["col_Use_Substrate"].ToString(),
+                                        StrInitial = ret2[0]["col_Initial"].ToString()
+                                    };
                                     productRegistration1Window.ShowDialog(this);
                                     break;
                                 case 3:
@@ -131,6 +133,7 @@ namespace ProductDataBase {
             } finally {
             }
         }
+        // 履歴ボタン処理
         private void History() {
             ResetFields();
             try {
@@ -159,6 +162,56 @@ namespace ProductDataBase {
             }
 
         }
+        // 処理カテゴリセレクト
+        private void CategorySelect(object sender) {
+            try {
+                RegisterButton.Enabled = false;
+                HistoryButton.Enabled = false;
+                IntRadioBtnFlg = 0;
+                CategoryListBox1.Items.Clear();
+                CategoryListBox2.Items.Clear();
+                CategoryListBox3.Items.Clear();
+                Dt.Clear();
+
+                var radioButton = (RadioButton)sender;
+                string strSqlQuery = string.Empty;
+
+                switch (radioButton.Name) {
+                    case "CategoryRadioButton1":
+                        IntRadioBtnFlg = 1;
+                        strSqlQuery = "SELECT * FROM Substrate;";
+                        break;
+
+                    case "CategoryRadioButton2":
+                        IntRadioBtnFlg = 2;
+                        strSqlQuery = "SELECT * FROM Product;";
+                        break;
+
+                    case "CategoryRadioButton3":
+                        IntRadioBtnFlg = 3;
+                        strSqlQuery = "SELECT * FROM Product;";
+                        break;
+
+                    case "CategoryRadioButton4":
+                        IntRadioBtnFlg = 4;
+                        strSqlQuery = "SELECT * FROM Product WHERE col_Print_Type = '5';";
+                        break;
+                }
+
+                using SQLiteConnection con = new(GetConnectionString1());
+                using SQLiteDataAdapter adapter = new(strSqlQuery, con);
+                adapter.Fill(Dt);
+
+                SortedSet<string> class001 = new(Dt.AsEnumerable().Select(x => x.Field<string?>("class001")).Where(x => x != null).Select(x => x!));
+
+                foreach (string b in class001) {
+                    CategoryListBox1.Items.Add(b);
+                }
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        // 製品カテゴリセレクト
         private void CategoryListBox1Select() {
             try {
                 RegisterButton.Enabled = false;
@@ -243,6 +296,7 @@ namespace ProductDataBase {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        // QRコード読み取り
         private void CodeScan() {
             try {
                 IntRadioBtnFlg = 0;
@@ -380,54 +434,7 @@ namespace ProductDataBase {
                 QRCodeTextBox.Focus();
             }
         }
-        private void CategorySelect(object sender) {
-            try {
-                RegisterButton.Enabled = false;
-                HistoryButton.Enabled = false;
-                IntRadioBtnFlg = 0;
-                CategoryListBox1.Items.Clear();
-                CategoryListBox2.Items.Clear();
-                CategoryListBox3.Items.Clear();
-                Dt.Clear();
-
-                var radioButton = (RadioButton)sender;
-                string strSqlQuery = string.Empty;
-
-                switch (radioButton.Name) {
-                    case "CategoryRadioButton1":
-                        IntRadioBtnFlg = 1;
-                        strSqlQuery = "SELECT * FROM Substrate;";
-                        break;
-
-                    case "CategoryRadioButton2":
-                        IntRadioBtnFlg = 2;
-                        strSqlQuery = "SELECT * FROM Product;";
-                        break;
-
-                    case "CategoryRadioButton3":
-                        IntRadioBtnFlg = 3;
-                        strSqlQuery = "SELECT * FROM Product;";
-                        break;
-
-                    case "CategoryRadioButton4":
-                        IntRadioBtnFlg = 4;
-                        strSqlQuery = "SELECT * FROM Product WHERE col_Print_Type = '5';";
-                        break;
-                }
-
-                using SQLiteConnection con = new(GetConnectionString1());
-                using SQLiteDataAdapter adapter = new(strSqlQuery, con);
-                adapter.Fill(Dt);
-
-                SortedSet<string> class001 = new(Dt.AsEnumerable().Select(x => x.Field<string?>("class001")).Where(x => x != null).Select(x => x!));
-
-                foreach (string b in class001) {
-                    CategoryListBox1.Items.Add(b);
-                }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
+        // フォント変更
         private void FontChange(object sender) {
             var radioButton = (RadioButton)sender;
             switch (radioButton.Name) {
@@ -445,23 +452,14 @@ namespace ProductDataBase {
         }
 
         private void MainWindow_Load(object sender, EventArgs e) { LoadEvents(); }
-
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { Close(); }
-
         private void RegisterButton_Click(object sender, EventArgs e) { Registration(); }
-
         private void HistoryButton_Click(object sender, EventArgs e) { History(); }
-
         private void CategoryListBox1_SelectedIndexChanged(object sender, EventArgs e) { CategoryListBox1Select(); }
-
         private void CategoryListBox2_SelectedIndexChanged(object sender, EventArgs e) { CategoryListBox2Select(); }
-
         private void CategoryListBox3_SelectedIndexChanged(object sender, EventArgs e) { CategoryListBox3Select(); }
-
         private void CategoryRadioButton_CheckedChanged(object sender, EventArgs e) { CategorySelect(sender); }
-
         private void FontSize_CheckedChanged(object sender, EventArgs e) { FontChange(sender); }
-
         private void QRCodeTextBox_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode != Keys.Enter) { return; }
             if (string.IsNullOrWhiteSpace(QRCodeTextBox.Text)) { return; }

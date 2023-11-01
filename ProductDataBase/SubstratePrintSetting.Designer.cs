@@ -25,25 +25,25 @@
         private void InitializeComponent() {
             Label41 = new Label();
             Label40 = new Label();
-            BarcodeFormatTextBox = new TextBox();
+            PrintTextFormatTextBox = new TextBox();
             Label39 = new Label();
-            BarcodeFontButton = new Button();
-            BarcodeFontTextBox = new TextBox();
+            PrintTextFontButton = new Button();
+            PrintTextFontTextBox = new TextBox();
             Label36 = new Label();
-            BarcodeQuantityTextBox = new TextBox();
+            PrintTextQuantityTextBox = new TextBox();
             Label35 = new Label();
-            BarcodeMagnitudeTextBox = new TextBox();
+            PrintTextMagnitudeTextBox = new TextBox();
             Label34 = new Label();
-            BarcodeCenterCheckBox = new CheckBox();
-            BarcodePostionYTextBox = new TextBox();
+            PrintTextCenterCheckBox = new CheckBox();
+            PrintTextPostionYTextBox = new TextBox();
             OKButton = new Button();
             Label33 = new Label();
             Label30 = new Label();
             Label29 = new Label();
-            BarcodeGroupBox = new GroupBox();
-            BarcodePostionXTextBox = new TextBox();
+            PrintTextGroupBox = new GroupBox();
+            PrintTextPostionXTextBox = new TextBox();
             Label32 = new Label();
-            BarcodeHeightTextBox = new TextBox();
+            PrintTextHeightTextBox = new TextBox();
             Label31 = new Label();
             HeaderStringTextBox = new TextBox();
             Label22 = new Label();
@@ -86,9 +86,9 @@
             HeaderFooterGroupBox = new GroupBox();
             LabelIntervalGroupBox = new GroupBox();
             CloseButton = new Button();
-            SubstratePrintFontDialog = new FontDialog();
-            SubstrateBarcodeFontDialog = new FontDialog();
-            BarcodeGroupBox.SuspendLayout();
+            HeaderFontDialog = new FontDialog();
+            TextFontDialog = new FontDialog();
+            PrintTextGroupBox.SuspendLayout();
             WhiteSpaceGroupBox.SuspendLayout();
             QuantityGroupBox.SuspendLayout();
             LabelSizeGroupBox.SuspendLayout();
@@ -114,13 +114,13 @@
             Label40.TabIndex = 24;
             Label40.Text = "%T: 型式 %R: リビジョン %S: 製造番号";
             // 
-            // BarcodeFormatTextBox
+            // PrintTextFormatTextBox
             // 
-            BarcodeFormatTextBox.Location = new Point(379, 74);
-            BarcodeFormatTextBox.MaxLength = 50;
-            BarcodeFormatTextBox.Name = "BarcodeFormatTextBox";
-            BarcodeFormatTextBox.Size = new Size(180, 23);
-            BarcodeFormatTextBox.TabIndex = 24;
+            PrintTextFormatTextBox.Location = new Point(379, 74);
+            PrintTextFormatTextBox.MaxLength = 50;
+            PrintTextFormatTextBox.Name = "PrintTextFormatTextBox";
+            PrintTextFormatTextBox.Size = new Size(180, 23);
+            PrintTextFormatTextBox.TabIndex = 24;
             // 
             // Label39
             // 
@@ -131,22 +131,23 @@
             Label39.TabIndex = 24;
             Label39.Text = "フォーマット";
             // 
-            // BarcodeFontButton
+            // PrintTextFontButton
             // 
-            BarcodeFontButton.Location = new Point(479, 29);
-            BarcodeFontButton.Name = "BarcodeFontButton";
-            BarcodeFontButton.Size = new Size(96, 25);
-            BarcodeFontButton.TabIndex = 24;
-            BarcodeFontButton.Text = "フォント選択";
-            BarcodeFontButton.UseVisualStyleBackColor = true;
+            PrintTextFontButton.Location = new Point(479, 29);
+            PrintTextFontButton.Name = "PrintTextFontButton";
+            PrintTextFontButton.Size = new Size(96, 25);
+            PrintTextFontButton.TabIndex = 24;
+            PrintTextFontButton.Text = "フォント選択";
+            PrintTextFontButton.UseVisualStyleBackColor = true;
+            PrintTextFontButton.Click += BtnBarcodeFont_Click;
             // 
-            // BarcodeFontTextBox
+            // PrintTextFontTextBox
             // 
-            BarcodeFontTextBox.Location = new Point(320, 30);
-            BarcodeFontTextBox.MaxLength = 50;
-            BarcodeFontTextBox.Name = "BarcodeFontTextBox";
-            BarcodeFontTextBox.Size = new Size(135, 23);
-            BarcodeFontTextBox.TabIndex = 24;
+            PrintTextFontTextBox.Location = new Point(320, 30);
+            PrintTextFontTextBox.MaxLength = 50;
+            PrintTextFontTextBox.Name = "PrintTextFontTextBox";
+            PrintTextFontTextBox.Size = new Size(135, 23);
+            PrintTextFontTextBox.TabIndex = 24;
             // 
             // Label36
             // 
@@ -157,13 +158,13 @@
             Label36.TabIndex = 24;
             Label36.Text = "フォント";
             // 
-            // BarcodeQuantityTextBox
+            // PrintTextQuantityTextBox
             // 
-            BarcodeQuantityTextBox.Location = new Point(104, 92);
-            BarcodeQuantityTextBox.MaxLength = 5;
-            BarcodeQuantityTextBox.Name = "BarcodeQuantityTextBox";
-            BarcodeQuantityTextBox.Size = new Size(52, 23);
-            BarcodeQuantityTextBox.TabIndex = 10;
+            PrintTextQuantityTextBox.Location = new Point(104, 92);
+            PrintTextQuantityTextBox.MaxLength = 5;
+            PrintTextQuantityTextBox.Name = "PrintTextQuantityTextBox";
+            PrintTextQuantityTextBox.Size = new Size(52, 23);
+            PrintTextQuantityTextBox.TabIndex = 10;
             // 
             // Label35
             // 
@@ -174,13 +175,13 @@
             Label35.TabIndex = 9;
             Label35.Text = "発行枚数";
             // 
-            // BarcodeMagnitudeTextBox
+            // PrintTextMagnitudeTextBox
             // 
-            BarcodeMagnitudeTextBox.Location = new Point(22, 92);
-            BarcodeMagnitudeTextBox.MaxLength = 5;
-            BarcodeMagnitudeTextBox.Name = "BarcodeMagnitudeTextBox";
-            BarcodeMagnitudeTextBox.Size = new Size(52, 23);
-            BarcodeMagnitudeTextBox.TabIndex = 8;
+            PrintTextMagnitudeTextBox.Location = new Point(22, 92);
+            PrintTextMagnitudeTextBox.MaxLength = 5;
+            PrintTextMagnitudeTextBox.Name = "PrintTextMagnitudeTextBox";
+            PrintTextMagnitudeTextBox.Size = new Size(52, 23);
+            PrintTextMagnitudeTextBox.TabIndex = 8;
             // 
             // Label34
             // 
@@ -191,23 +192,24 @@
             Label34.TabIndex = 7;
             Label34.Text = "倍率";
             // 
-            // BarcodeCenterCheckBox
+            // PrintTextCenterCheckBox
             // 
-            BarcodeCenterCheckBox.AutoSize = true;
-            BarcodeCenterCheckBox.Location = new Point(22, 55);
-            BarcodeCenterCheckBox.Name = "BarcodeCenterCheckBox";
-            BarcodeCenterCheckBox.Size = new Size(145, 19);
-            BarcodeCenterCheckBox.TabIndex = 6;
-            BarcodeCenterCheckBox.Text = "横位置を中心に合わせる";
-            BarcodeCenterCheckBox.UseVisualStyleBackColor = true;
+            PrintTextCenterCheckBox.AutoSize = true;
+            PrintTextCenterCheckBox.Location = new Point(22, 55);
+            PrintTextCenterCheckBox.Name = "PrintTextCenterCheckBox";
+            PrintTextCenterCheckBox.Size = new Size(145, 19);
+            PrintTextCenterCheckBox.TabIndex = 6;
+            PrintTextCenterCheckBox.Text = "横位置を中心に合わせる";
+            PrintTextCenterCheckBox.UseVisualStyleBackColor = true;
+            PrintTextCenterCheckBox.CheckedChanged += BarcodeCenterCheckBox_CheckedChanged;
             // 
-            // BarcodePostionYTextBox
+            // PrintTextPostionYTextBox
             // 
-            BarcodePostionYTextBox.Location = new Point(194, 30);
-            BarcodePostionYTextBox.MaxLength = 5;
-            BarcodePostionYTextBox.Name = "BarcodePostionYTextBox";
-            BarcodePostionYTextBox.Size = new Size(68, 23);
-            BarcodePostionYTextBox.TabIndex = 5;
+            PrintTextPostionYTextBox.Location = new Point(194, 30);
+            PrintTextPostionYTextBox.MaxLength = 5;
+            PrintTextPostionYTextBox.Name = "PrintTextPostionYTextBox";
+            PrintTextPostionYTextBox.Size = new Size(68, 23);
+            PrintTextPostionYTextBox.TabIndex = 5;
             // 
             // OKButton
             // 
@@ -217,6 +219,7 @@
             OKButton.TabIndex = 16;
             OKButton.Text = "OK";
             OKButton.UseVisualStyleBackColor = true;
+            OKButton.Click += BtnOK_Click;
             // 
             // Label33
             // 
@@ -245,40 +248,40 @@
             Label29.TabIndex = 22;
             Label29.Text = "%D 印刷日 %M 製番 %O 注番 %T 型式";
             // 
-            // BarcodeGroupBox
+            // PrintTextGroupBox
             // 
-            BarcodeGroupBox.Controls.Add(Label41);
-            BarcodeGroupBox.Controls.Add(Label40);
-            BarcodeGroupBox.Controls.Add(BarcodeFormatTextBox);
-            BarcodeGroupBox.Controls.Add(Label39);
-            BarcodeGroupBox.Controls.Add(BarcodeFontButton);
-            BarcodeGroupBox.Controls.Add(BarcodeFontTextBox);
-            BarcodeGroupBox.Controls.Add(Label36);
-            BarcodeGroupBox.Controls.Add(BarcodeQuantityTextBox);
-            BarcodeGroupBox.Controls.Add(Label35);
-            BarcodeGroupBox.Controls.Add(BarcodeMagnitudeTextBox);
-            BarcodeGroupBox.Controls.Add(Label34);
-            BarcodeGroupBox.Controls.Add(BarcodeCenterCheckBox);
-            BarcodeGroupBox.Controls.Add(BarcodePostionYTextBox);
-            BarcodeGroupBox.Controls.Add(Label33);
-            BarcodeGroupBox.Controls.Add(BarcodePostionXTextBox);
-            BarcodeGroupBox.Controls.Add(Label32);
-            BarcodeGroupBox.Controls.Add(BarcodeHeightTextBox);
-            BarcodeGroupBox.Controls.Add(Label31);
-            BarcodeGroupBox.Location = new Point(27, 309);
-            BarcodeGroupBox.Name = "BarcodeGroupBox";
-            BarcodeGroupBox.Size = new Size(600, 170);
-            BarcodeGroupBox.TabIndex = 14;
-            BarcodeGroupBox.TabStop = false;
-            BarcodeGroupBox.Text = "バーコード";
+            PrintTextGroupBox.Controls.Add(Label41);
+            PrintTextGroupBox.Controls.Add(Label40);
+            PrintTextGroupBox.Controls.Add(PrintTextFormatTextBox);
+            PrintTextGroupBox.Controls.Add(Label39);
+            PrintTextGroupBox.Controls.Add(PrintTextFontButton);
+            PrintTextGroupBox.Controls.Add(PrintTextFontTextBox);
+            PrintTextGroupBox.Controls.Add(Label36);
+            PrintTextGroupBox.Controls.Add(PrintTextQuantityTextBox);
+            PrintTextGroupBox.Controls.Add(Label35);
+            PrintTextGroupBox.Controls.Add(PrintTextMagnitudeTextBox);
+            PrintTextGroupBox.Controls.Add(Label34);
+            PrintTextGroupBox.Controls.Add(PrintTextCenterCheckBox);
+            PrintTextGroupBox.Controls.Add(PrintTextPostionYTextBox);
+            PrintTextGroupBox.Controls.Add(Label33);
+            PrintTextGroupBox.Controls.Add(PrintTextPostionXTextBox);
+            PrintTextGroupBox.Controls.Add(Label32);
+            PrintTextGroupBox.Controls.Add(PrintTextHeightTextBox);
+            PrintTextGroupBox.Controls.Add(Label31);
+            PrintTextGroupBox.Location = new Point(27, 309);
+            PrintTextGroupBox.Name = "PrintTextGroupBox";
+            PrintTextGroupBox.Size = new Size(600, 170);
+            PrintTextGroupBox.TabIndex = 14;
+            PrintTextGroupBox.TabStop = false;
+            PrintTextGroupBox.Text = "印刷文字設定";
             // 
-            // BarcodePostionXTextBox
+            // PrintTextPostionXTextBox
             // 
-            BarcodePostionXTextBox.Location = new Point(104, 30);
-            BarcodePostionXTextBox.MaxLength = 5;
-            BarcodePostionXTextBox.Name = "BarcodePostionXTextBox";
-            BarcodePostionXTextBox.Size = new Size(68, 23);
-            BarcodePostionXTextBox.TabIndex = 3;
+            PrintTextPostionXTextBox.Location = new Point(104, 30);
+            PrintTextPostionXTextBox.MaxLength = 5;
+            PrintTextPostionXTextBox.Name = "PrintTextPostionXTextBox";
+            PrintTextPostionXTextBox.Size = new Size(68, 23);
+            PrintTextPostionXTextBox.TabIndex = 3;
             // 
             // Label32
             // 
@@ -289,13 +292,13 @@
             Label32.TabIndex = 2;
             Label32.Text = "横位置";
             // 
-            // BarcodeHeightTextBox
+            // PrintTextHeightTextBox
             // 
-            BarcodeHeightTextBox.Location = new Point(22, 30);
-            BarcodeHeightTextBox.MaxLength = 5;
-            BarcodeHeightTextBox.Name = "BarcodeHeightTextBox";
-            BarcodeHeightTextBox.Size = new Size(52, 23);
-            BarcodeHeightTextBox.TabIndex = 1;
+            PrintTextHeightTextBox.Location = new Point(22, 30);
+            PrintTextHeightTextBox.MaxLength = 5;
+            PrintTextHeightTextBox.Name = "PrintTextHeightTextBox";
+            PrintTextHeightTextBox.Size = new Size(52, 23);
+            PrintTextHeightTextBox.TabIndex = 1;
             // 
             // Label31
             // 
@@ -583,6 +586,7 @@
             HeaderFooterFontButton.TabIndex = 3;
             HeaderFooterFontButton.Text = "フォント選択";
             HeaderFooterFontButton.UseVisualStyleBackColor = true;
+            HeaderFooterFontButton.Click += BtnHeaderFooterFont_Click;
             // 
             // HeaderFooterFontTextBox
             // 
@@ -699,6 +703,7 @@
             CloseButton.TabIndex = 17;
             CloseButton.Text = "Close";
             CloseButton.UseVisualStyleBackColor = true;
+            CloseButton.Click += CloseButton_Click;
             // 
             // SubstratePrintSetting
             // 
@@ -707,7 +712,7 @@
             ClientSize = new Size(654, 561);
             Controls.Add(CloseButton);
             Controls.Add(OKButton);
-            Controls.Add(BarcodeGroupBox);
+            Controls.Add(PrintTextGroupBox);
             Controls.Add(WhiteSpaceGroupBox);
             Controls.Add(QuantityGroupBox);
             Controls.Add(LabelSizeGroupBox);
@@ -722,8 +727,8 @@
             ShowInTaskbar = false;
             Text = "基板ラベル設定";
             Load += SubstratePrintSetting_Load;
-            BarcodeGroupBox.ResumeLayout(false);
-            BarcodeGroupBox.PerformLayout();
+            PrintTextGroupBox.ResumeLayout(false);
+            PrintTextGroupBox.PerformLayout();
             WhiteSpaceGroupBox.ResumeLayout(false);
             WhiteSpaceGroupBox.PerformLayout();
             QuantityGroupBox.ResumeLayout(false);
@@ -741,25 +746,25 @@
 
         private Label Label41;
         private Label Label40;
-        private TextBox BarcodeFormatTextBox;
+        private TextBox PrintTextFormatTextBox;
         private Label Label39;
-        private Button BarcodeFontButton;
-        private TextBox BarcodeFontTextBox;
+        private Button PrintTextFontButton;
+        private TextBox PrintTextFontTextBox;
         private Label Label36;
-        private TextBox BarcodeQuantityTextBox;
+        private TextBox PrintTextQuantityTextBox;
         private Label Label35;
-        private TextBox BarcodeMagnitudeTextBox;
+        private TextBox PrintTextMagnitudeTextBox;
         private Label Label34;
-        private CheckBox BarcodeCenterCheckBox;
-        private TextBox BarcodePostionYTextBox;
+        private CheckBox PrintTextCenterCheckBox;
+        private TextBox PrintTextPostionYTextBox;
         private Button OKButton;
         private Label Label33;
         private Label Label30;
         private Label Label29;
-        private GroupBox BarcodeGroupBox;
-        private TextBox BarcodePostionXTextBox;
+        private GroupBox PrintTextGroupBox;
+        private TextBox PrintTextPostionXTextBox;
         private Label Label32;
-        private TextBox BarcodeHeightTextBox;
+        private TextBox PrintTextHeightTextBox;
         private Label Label31;
         private TextBox HeaderStringTextBox;
         private Label Label22;
@@ -802,7 +807,7 @@
         private GroupBox HeaderFooterGroupBox;
         private GroupBox LabelIntervalGroupBox;
         private Button CloseButton;
-        private FontDialog SubstratePrintFontDialog;
-        private FontDialog SubstrateBarcodeFontDialog;
+        private FontDialog HeaderFontDialog;
+        private FontDialog TextFontDialog;
     }
 }
