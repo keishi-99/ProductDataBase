@@ -1,5 +1,5 @@
 ﻿namespace ProductDataBase {
-    partial class SeveralDialog {
+    partial class SeveralDialogWindow {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -35,6 +35,7 @@
             SeveralListBox.Name = "SeveralListBox";
             SeveralListBox.Size = new Size(320, 94);
             SeveralListBox.TabIndex = 0;
+            SeveralListBox.KeyPress += SeveralListBox_KeyPress;
             // 
             // OKButton
             // 
@@ -44,8 +45,9 @@
             OKButton.TabIndex = 1;
             OKButton.Text = "OK";
             OKButton.UseVisualStyleBackColor = true;
+            OKButton.Click += OkButton_Click;
             // 
-            // SeveralDialog
+            // SeveralDialogWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -57,10 +59,11 @@
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "SeveralDialog";
+            Name = "SeveralDialogWindow";
             ShowIcon = false;
             ShowInTaskbar = false;
             TopMost = true;
+            Load += SeveralDialogWindow_Load;
             ResumeLayout(false);
         }
 
