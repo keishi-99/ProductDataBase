@@ -258,6 +258,7 @@
             QRCodeButton.TabIndex = 602;
             QRCodeButton.Text = "OK";
             QRCodeButton.UseVisualStyleBackColor = true;
+            QRCodeButton.Click += QRCodeButton_Click;
             // 
             // QRCodeTextBox
             // 
