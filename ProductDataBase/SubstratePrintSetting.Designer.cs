@@ -725,6 +725,7 @@
             Name = "SubstratePrintSetting";
             ShowIcon = false;
             ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "基板ラベル設定";
             Load += SubstratePrintSetting_Load;
             PrintTextGroupBox.ResumeLayout(false);

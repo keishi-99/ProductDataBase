@@ -696,13 +696,14 @@
             Controls.Add(ProductNameLabel1);
             Controls.Add(SubstrateRegistrationMenuStrip);
             Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
             MainMenuStrip = SubstrateRegistrationMenuStrip;
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "SubstrateRegistrationWindow";
             ShowIcon = false;
             ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "基盤登録";
             FormClosing += SubstrateRegistrationWindow_FormClosing;
             Load += SubstrateRegistrationWindow_Load;

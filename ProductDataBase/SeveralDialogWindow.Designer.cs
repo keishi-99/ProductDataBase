@@ -62,6 +62,7 @@
             Name = "SeveralDialogWindow";
             ShowIcon = false;
             ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterParent;
             TopMost = true;
             Load += SeveralDialogWindow_Load;
             ResumeLayout(false);

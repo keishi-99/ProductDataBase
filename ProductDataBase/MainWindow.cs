@@ -55,11 +55,13 @@ namespace ProductDataBase {
         private void LoadEvents() {
             try {
                 // その日のbakファイルがない場合バックアップ作成
-                DateTime d = DateTime.Now;
-                string _filepath = "./db/registration.db";
-                string _bakFilepath = $".\\bak\\{d.Year}\\{d.Month:00}_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db";
+                DateTime _d = DateTime.Now;
+                string _bakFilepath = $".\\bak\\{_d.Year}\\{_d.Month:00}_bak_{_d.Year}-{_d.Month:00}-{_d.Day:00}.db";
 
-                if (!File.Exists(_bakFilepath)) { File.Copy(_filepath, _bakFilepath, true); }
+                if (!File.Exists(_bakFilepath)) {
+                    string _filepath = "./db/registration.db";
+                    File.Copy(_filepath, _bakFilepath, true);
+                }
 
                 ActiveControl = QRCodeTextBox;
             } catch (Exception ex) {
@@ -83,7 +85,7 @@ namespace ProductDataBase {
                         DataRow[] _ret1 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
 
                         if (_ret1.Length > 0) {
-                            SubstrateRegistrationWindow _substrateRegistrationWindow = new() {
+                            using SubstrateRegistrationWindow _substrateRegistrationWindow = new() {
                                 StrFontName = StrFontName,
                                 IntFontSize = IntFontSize,
                                 StrProductName = _ret1[0]["col_Product_Name"].ToString() ?? string.Empty,
@@ -107,7 +109,7 @@ namespace ProductDataBase {
 
                             switch (IntRadioBtnFlg) {
                                 case 2:
-                                    ProductRegistration1Window _productRegistration1Window = new() {
+                                    using (ProductRegistration1Window _productRegistration1Window = new() {
                                         StrFontName = StrFontName,
                                         IntFontSize = IntFontSize,
                                         StrProductName = _ret2[0]["col_Product_Name"].ToString() ?? string.Empty,
@@ -120,11 +122,13 @@ namespace ProductDataBase {
                                         IntCheckBin = Convert.ToInt32(_ret2[0]["col_Checkbox"].ToString(), 2),
                                         StrUseSubstrate = _ret2[0]["col_Use_Substrate"].ToString() ?? string.Empty,
                                         StrInitial = _ret2[0]["col_Initial"].ToString() ?? string.Empty
-                                    };
-                                    _productRegistration1Window.ShowDialog(this);
+                                    }) {
+                                        _productRegistration1Window.ShowDialog(this);
+                                    }
+
                                     break;
                                 case 3:
-                                    RePrintWindow _rePrintWindow = new() {
+                                    using (RePrintWindow _rePrintWindow = new() {
                                         StrFontName = StrFontName,
                                         IntFontSize = IntFontSize,
                                         StrProductName = _ret2[0]["col_Product_Name"].ToString() ?? string.Empty,
@@ -135,15 +139,23 @@ namespace ProductDataBase {
                                         StrProductModel = _ret2[0]["col_Product_Model"].ToString() ?? string.Empty,
                                         IntCheckBin = Convert.ToInt32(_ret2[0]["col_Checkbox"].ToString(), 2),
                                         StrInitial = _ret2[0]["col_Initial"].ToString() ?? string.Empty
-                                    };
-                                    _rePrintWindow.ShowDialog(this);
+                                    }) {
+                                        _rePrintWindow.ShowDialog(this);
+                                    }
+
                                     break;
                                 case 4:
-                                    SubstrateChange1 _substrateChange1 = new();
-                                    _substrateChange1.ShowDialog(this);
+                                    using (SubstrateChange1 _substrateChange1 = new()) {
+                                        _substrateChange1.ShowDialog(this);
+                                    }
+
+                                    break;
+                                default:
                                     break;
                             }
                         }
+                        break;
+                    default:
                         break;
                 }
             } catch (Exception ex) {
@@ -159,7 +171,7 @@ namespace ProductDataBase {
                     case 1:
                         DataRow[] _ret1 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
                         if (_ret1.Length > 0) {
-                            HistoryWindow _historyWindow = new() {
+                            using HistoryWindow _historyWindow = new() {
                                 StrFontName = StrFontName,
                                 IntFontSize = IntFontSize,
                                 IntRadioBtnFlg = IntRadioBtnFlg,
@@ -176,7 +188,7 @@ namespace ProductDataBase {
                     case 4:
                         DataRow[] _ret2 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
                         if (_ret2.Length > 0) {
-                            HistoryWindow _historyWindow = new() {
+                            using HistoryWindow _historyWindow = new() {
                                 StrFontName = StrFontName,
                                 IntFontSize = IntFontSize,
                                 IntRadioBtnFlg = IntRadioBtnFlg,
@@ -204,39 +216,45 @@ namespace ProductDataBase {
                 CategoryListBox3.Items.Clear();
                 Dt.Clear();
 
-                var _radioButton = (RadioButton)sender;
-                string _strSqlQuery = string.Empty;
+                using (RadioButton _radioButton = (RadioButton)sender) {
+                    string _strSqlQuery = string.Empty;
 
-                switch (_radioButton.Name) {
-                    case "CategoryRadioButton1":
-                        IntRadioBtnFlg = 1;
-                        _strSqlQuery = "SELECT * FROM Substrate;";
-                        break;
+                    switch (_radioButton.Name) {
+                        case "CategoryRadioButton1":
+                            IntRadioBtnFlg = 1;
+                            _strSqlQuery = "SELECT * FROM Substrate;";
+                            break;
 
-                    case "CategoryRadioButton2":
-                        IntRadioBtnFlg = 2;
-                        _strSqlQuery = "SELECT * FROM Product;";
-                        break;
+                        case "CategoryRadioButton2":
+                            IntRadioBtnFlg = 2;
+                            _strSqlQuery = "SELECT * FROM Product;";
+                            break;
 
-                    case "CategoryRadioButton3":
-                        IntRadioBtnFlg = 3;
-                        _strSqlQuery = "SELECT * FROM Product;";
-                        break;
+                        case "CategoryRadioButton3":
+                            IntRadioBtnFlg = 3;
+                            _strSqlQuery = "SELECT * FROM Product;";
+                            break;
 
-                    case "CategoryRadioButton4":
-                        IntRadioBtnFlg = 4;
-                        _strSqlQuery = "SELECT * FROM Product WHERE col_Print_Type = '5';";
-                        break;
+                        case "CategoryRadioButton4":
+                            IntRadioBtnFlg = 4;
+                            _strSqlQuery = "SELECT * FROM Product WHERE col_Print_Type = '5';";
+                            break;
+                        default:
+                            break;
+                    }
+
+                    using SQLiteConnection _con = new(GetConnectionString1());
+                    using SQLiteDataAdapter _adapter = new(_strSqlQuery, _con);
+                    _adapter.Fill(Dt);
                 }
 
-                using SQLiteConnection _con = new(GetConnectionString1());
-                using SQLiteDataAdapter _adapter = new(_strSqlQuery, _con);
-                _adapter.Fill(Dt);
+                SortedSet<string> _class001 = new(Dt.AsEnumerable()
+                                                    .Select(_x => _x.Field<string?>("class001"))
+                                                    .Where(_x => _x != null)
+                                                    .Select(_x => _x!));
 
-                SortedSet<string> _class001 = new(Dt.AsEnumerable().Select(x => x.Field<string?>("class001")).Where(x => x != null).Select(x => x!));
-
-                foreach (string b in _class001) {
-                    CategoryListBox1.Items.Add(b);
+                foreach (string _b in _class001) {
+                    CategoryListBox1.Items.Add(_b);
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -252,10 +270,10 @@ namespace ProductDataBase {
 
                 HashSet<string> _productNames = new();
 
-                DataRow[] dr1 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}'", "col_Product_Name ASC");
+                DataRow[] _dr1 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}'", "col_Product_Name ASC");
 
-                foreach (DataRow row in dr1) {
-                    string _productName = row["col_Product_Name"].ToString() ?? string.Empty;
+                foreach (DataRow _row in _dr1) {
+                    string _productName = _row["col_Product_Name"].ToString() ?? string.Empty;
 
                     if (!string.IsNullOrEmpty(_productName)) {
                         _productNames.Add(_productName);
@@ -266,7 +284,6 @@ namespace ProductDataBase {
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } finally {
             }
         }
         private void CategoryListBox2Select() {
@@ -280,10 +297,13 @@ namespace ProductDataBase {
                 switch (IntRadioBtnFlg) {
                     case 1:
                         _dr2 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Substrate_Model ASC");
-                        HashSet<string> _colSubstrateName = new(_dr2.AsEnumerable().Select(x => x.Field<string>("col_Substrate_Name")).Where(x => x != null).Select(x => x!));
+                        HashSet<string> _colSubstrateName = new(_dr2.AsEnumerable()
+                                                                    .Select(x => x.Field<string>("col_Substrate_Name"))
+                                                                    .Where(x => x != null)
+                                                                    .Select(x => x!));
 
-                        foreach (string d in _colSubstrateName) {
-                            CategoryListBox3.Items.Add(d);
+                        foreach (string _d in _colSubstrateName) {
+                            CategoryListBox3.Items.Add(_d);
                         }
                         break;
 
@@ -291,11 +311,16 @@ namespace ProductDataBase {
                     case 3:
                     case 4:
                         _dr2 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Product_Model ASC");
-                        HashSet<string> _colProductType = new(_dr2.AsEnumerable().Select(x => x.Field<string>("col_Product_Type")).Where(x => x != null).Select(x => x!));
+                        HashSet<string> _colProductType = new(_dr2.AsEnumerable()
+                                                                  .Select(x => x.Field<string>("col_Product_Type"))
+                                                                  .Where(x => x != null)
+                                                                  .Select(x => x!));
 
-                        foreach (string d in _colProductType) {
-                            CategoryListBox3.Items.Add(d);
+                        foreach (string _d in _colProductType) {
+                            CategoryListBox3.Items.Add(_d);
                         }
+                        break;
+                    default:
                         break;
                 }
             } catch (Exception ex) {
@@ -366,13 +391,17 @@ namespace ProductDataBase {
                 }
 
                 // 文字列の置換
-                StrProness2 = StrProness2.Replace("-SMT", "").Replace("-H", "").Replace("-GH", "").Replace("-ACGH", "-AC").Replace("-DCGH", "-DC");
+                StrProness2 = StrProness2.Replace("-SMT", "")
+                                         .Replace("-H", "")
+                                         .Replace("-GH", "")
+                                         .Replace("-ACGH", "-AC")
+                                         .Replace("-DCGH", "-DC");
 
-                using (var _con = new SQLiteConnection(GetConnectionString1())) {
+                using (SQLiteConnection _con = new(GetConnectionString1())) {
                     _con.Open();
-                    using var _cmd = _con.CreateCommand();
+                    using SQLiteCommand _cmd = _con.CreateCommand();
                     _cmd.CommandText = $"SELECT * FROM V_ItemList WHERE col_ItemNumber = '{StrProness2}' OR 'col_ItemNumber:1' = '{StrProness2}'";
-                    using var _dr = _cmd.ExecuteReader();
+                    using SQLiteDataReader _dr = _cmd.ExecuteReader();
                     while (_dr.Read()) {
                         string _colItemNumber = _dr["col_ItemNumber"].ToString() ?? string.Empty;
                         string _colItemNumber1 = _dr["col_ItemNumber:1"].ToString() ?? string.Empty;
@@ -396,7 +425,7 @@ namespace ProductDataBase {
                 if (ListCategory11.Count == 0) { throw new Exception($"品目番号:[{StrProness2}] と一致するデータがありませんでした。"); }
 
                 if (ListCategory11.Count >= 2) {
-                    using var _dlg = new SeveralDialogWindow() {
+                    using SeveralDialogWindow _dlg = new() {
                         StrFontName = StrFontName,
                         IntFontSize = IntFontSize,
                         ListCategory11 = ListCategory11,
@@ -417,14 +446,13 @@ namespace ProductDataBase {
 
                 switch (StrCategory14) {
                     case "1":
-                        using (var _con = new SQLiteConnection(GetConnectionString1())) {
-                            using var _adapter = new SQLiteDataAdapter("SELECT * FROM Substrate;", _con);
+                        using (SQLiteConnection _con = new(GetConnectionString1())) {
+                            using SQLiteDataAdapter _adapter = new("SELECT * FROM Substrate;", _con);
                             _adapter.Fill(Dt);
                         }
 
                         DataRow[] _substrateRet = Dt.Select($"col_Product_Name = '{StrCategory13}' and col_Substrate_Name = '{StrCategory12}'");
-
-                        SubstrateRegistrationWindow _substrateRegistrationWindow = new() {
+                        using (SubstrateRegistrationWindow _substrateRegistrationWindow = new() {
                             StrFontName = StrFontName,
                             IntFontSize = IntFontSize,
                             StrProductName = _substrateRet[0]["col_Product_Name"].ToString() ?? string.Empty,
@@ -435,18 +463,20 @@ namespace ProductDataBase {
                             IntRegType = Convert.ToInt32(_substrateRet[0]["col_Reg_Type"]),
                             IntPrintType = Convert.ToInt32(_substrateRet[0]["col_Print_Type"]),
                             IntCheckBin = Convert.ToInt32(_substrateRet[0]["col_Checkbox"].ToString(), 2)
-                        };
-                        _substrateRegistrationWindow.ShowDialog(this);
+                        }) {
+                            _substrateRegistrationWindow.ShowDialog(this);
+                        }
+
                         break;
 
                     case "2":
-                        using (var _con = new SQLiteConnection(GetConnectionString1())) {
-                            using var _adapter = new SQLiteDataAdapter("SELECT * FROM Product;", _con);
+                        using (SQLiteConnection _con = new(GetConnectionString1())) {
+                            using SQLiteDataAdapter _adapter = new("SELECT * FROM Product;", _con);
                             _adapter.Fill(Dt);
                         }
 
                         DataRow[] _productRet = Dt.Select($"col_Product_Name = '{StrCategory13}' and col_Product_Type = '{StrCategory12}'");
-                        ProductRegistration1Window _productRegistration1Window = new() {
+                        using (ProductRegistration1Window _productRegistration1Window = new() {
                             StrFontName = StrFontName,
                             IntFontSize = IntFontSize,
                             StrProductName = _productRet[0]["col_Product_Name"].ToString() ?? string.Empty,
@@ -459,8 +489,10 @@ namespace ProductDataBase {
                             IntPrintType = Convert.ToInt32(_productRet[0]["col_Print_Type"]),
                             IntCheckBin = Convert.ToInt32(_productRet[0]["col_Checkbox"].ToString(), 2),
                             IntSerialDigit = Convert.ToInt32(_productRet[0]["col_Serial_Digit"])
-                        };
-                        _productRegistration1Window.ShowDialog(this);
+                        }) {
+                            _productRegistration1Window.ShowDialog(this);
+                        }
+
                         break;
 
                     default: throw new Exception($"一致する情報がありません。{Environment.NewLine}品目番号:{StrProness2}{Environment.NewLine}");
@@ -475,18 +507,20 @@ namespace ProductDataBase {
         }
         // フォント変更
         private void FontChange(object sender) {
-            var _radioButton = (RadioButton)sender;
-            switch (_radioButton.Name) {
-                case "FontSize9RadioButton":
-                    IntFontSize = 9;
-                    break;
-                case "FontSize12RadioButton":
-                    IntFontSize = 12;
-                    break;
-                case "FontSize16RadioButton":
-                    IntFontSize = 16;
-                    break;
+            using (RadioButton _radioButton = (RadioButton)sender) {
+                switch (_radioButton.Name) {
+                    case "FontSize9RadioButton":
+                        IntFontSize = 9;
+                        break;
+                    case "FontSize12RadioButton":
+                        IntFontSize = 12;
+                        break;
+                    case "FontSize16RadioButton":
+                        IntFontSize = 16;
+                        break;
+                }
             }
+
             Font = new Font(StrFontName, IntFontSize);
         }
 

@@ -1190,6 +1190,7 @@
             Name = "ProductRegistration2Window";
             ShowIcon = false;
             ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "基板選択";
             FormClosing += ProductRegistration2Window_FormClosing;
             Load += ProductRegistration2Window_Load;

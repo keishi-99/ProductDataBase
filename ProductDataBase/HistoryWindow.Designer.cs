@@ -35,6 +35,7 @@
             DataBaseDataGridView.AllowUserToAddRows = false;
             DataBaseDataGridView.AllowUserToDeleteRows = false;
             DataBaseDataGridView.AllowUserToResizeRows = false;
+            DataBaseDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             DataBaseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             DataBaseDataGridView.Location = new Point(0, 0);
             DataBaseDataGridView.Name = "DataBaseDataGridView";
@@ -46,6 +47,7 @@
             // 
             // CategoryComboBox
             // 
+            CategoryComboBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             CategoryComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             CategoryComboBox.FormattingEnabled = true;
             CategoryComboBox.Location = new Point(12, 482);
@@ -84,11 +86,11 @@
             Controls.Add(CategoryComboBox);
             Controls.Add(DataBaseDataGridView);
             Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            MaximizeBox = false;
             MinimizeBox = false;
             Name = "HistoryWindow";
             ShowIcon = false;
             ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "データベース";
             Load += HistoryWindow_Load;
             ((System.ComponentModel.ISupportInitialize)DataBaseDataGridView).EndInit();

@@ -41,25 +41,6 @@ namespace ProductDataBase {
                     "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" };
 
-        //public SubstrateRegistrationWindow(MainWindow _mainWindow) {
-        //    StrFontName = _mainWindow.StrFontName;
-        //    IntFontSize = _mainWindow.IntFontSize;
-        //    StrProductName = _mainWindow.StrProductName;
-        //    StrStockName = _mainWindow.StrStockName;
-        //    StrSubstrateName = _mainWindow.StrSubstrateName;
-        //    StrSubstrateModel = _mainWindow.StrSubstrateModel;
-        //    StrInitial = _mainWindow.StrInitial;
-        //    IntRegType = _mainWindow.IntRegType;
-        //    IntPrintType = _mainWindow.IntPrintType;
-        //    IntCheckBin = _mainWindow.IntCheckBin;
-
-        //    StrProness1 = _mainWindow.StrProness1;
-        //    StrProness2 = _mainWindow.StrProness2;
-        //    StrProness3 = _mainWindow.StrProness3;
-        //    StrProness4 = _mainWindow.StrProness4;
-        //    StrProness5 = _mainWindow.StrProness5;
-        //}
-
         public SubstrateRegistrationWindow() {
             InitializeComponent();
         }

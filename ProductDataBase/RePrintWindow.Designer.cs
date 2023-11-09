@@ -508,7 +508,7 @@
             // 取得情報ToolStripMenuItem
             // 
             取得情報ToolStripMenuItem.Name = "取得情報ToolStripMenuItem";
-            取得情報ToolStripMenuItem.Size = new Size(180, 22);
+            取得情報ToolStripMenuItem.Size = new Size(122, 22);
             取得情報ToolStripMenuItem.Text = "取得情報";
             取得情報ToolStripMenuItem.Click += 取得情報ToolStripMenuItem_Click;
             // 
@@ -615,11 +615,13 @@
             Controls.Add(ProductNameLabel1);
             Controls.Add(RePrintMenuStrip);
             Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "RePrintWindow";
             ShowIcon = false;
             ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "RePrint";
             Load += RePrintWindow_Load;
             RePrintMenuStrip.ResumeLayout(false);
