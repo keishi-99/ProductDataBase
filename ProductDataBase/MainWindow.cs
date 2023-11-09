@@ -214,37 +214,38 @@ namespace ProductDataBase {
                 CategoryListBox3.Items.Clear();
                 Dt.Clear();
 
-                using (RadioButton _radioButton = (RadioButton)sender) {
-                    string _strSqlQuery = string.Empty;
+                RadioButton _radioButton = (RadioButton)sender;
 
-                    switch (_radioButton.Name) {
-                        case "CategoryRadioButton1":
-                            IntRadioBtnFlg = 1;
-                            _strSqlQuery = "SELECT * FROM Substrate;";
-                            break;
+                string _strSqlQuery = string.Empty;
 
-                        case "CategoryRadioButton2":
-                            IntRadioBtnFlg = 2;
-                            _strSqlQuery = "SELECT * FROM Product;";
-                            break;
+                switch (_radioButton.Name) {
+                    case "CategoryRadioButton1":
+                        IntRadioBtnFlg = 1;
+                        _strSqlQuery = "SELECT * FROM Substrate;";
+                        break;
 
-                        case "CategoryRadioButton3":
-                            IntRadioBtnFlg = 3;
-                            _strSqlQuery = "SELECT * FROM Product;";
-                            break;
+                    case "CategoryRadioButton2":
+                        IntRadioBtnFlg = 2;
+                        _strSqlQuery = "SELECT * FROM Product;";
+                        break;
 
-                        case "CategoryRadioButton4":
-                            IntRadioBtnFlg = 4;
-                            _strSqlQuery = "SELECT * FROM Product WHERE col_Print_Type = '5';";
-                            break;
-                        default:
-                            break;
-                    }
+                    case "CategoryRadioButton3":
+                        IntRadioBtnFlg = 3;
+                        _strSqlQuery = "SELECT * FROM Product;";
+                        break;
 
-                    using SQLiteConnection _con = new(GetConnectionString1());
-                    using SQLiteDataAdapter _adapter = new(_strSqlQuery, _con);
-                    _adapter.Fill(Dt);
+                    case "CategoryRadioButton4":
+                        IntRadioBtnFlg = 4;
+                        _strSqlQuery = "SELECT * FROM Product WHERE col_Print_Type = '5';";
+                        break;
+                    default:
+                        break;
                 }
+
+                using SQLiteConnection _con = new(GetConnectionString1());
+                using SQLiteDataAdapter _adapter = new(_strSqlQuery, _con);
+                _adapter.Fill(Dt);
+
 
                 SortedSet<string> _class001 = new(Dt.AsEnumerable()
                                                     .Select(_x => _x.Field<string?>("class001"))
