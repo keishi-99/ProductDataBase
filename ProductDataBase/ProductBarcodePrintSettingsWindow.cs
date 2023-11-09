@@ -78,7 +78,7 @@ namespace ProductDataBase {
                 NumLabels = int.Parse(BarcodeQuantityTextBox.Text);
             } catch (Exception ex) {
                 MessageBox.Show($"入力値が不正です。{Environment.NewLine}{ex.Message}");
-                this.DialogResult = DialogResult.None;
+                DialogResult = DialogResult.None;
                 return;
             }
 
@@ -106,8 +106,8 @@ namespace ProductDataBase {
             BarcodeProLabelSettings.AlignStringCenter = BarcodeCenterCheckBox.Checked;
             BarcodeProLabelSettings.NumLabels = int.Parse(BarcodeQuantityTextBox.Text);
 
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+            DialogResult = DialogResult.OK;
+            Close();
         }
 
         private void BtnHeaderFooterFont_Click(object sender, EventArgs e) {
