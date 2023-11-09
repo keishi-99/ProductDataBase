@@ -567,6 +567,7 @@
             Name = "ProductRegistration1Window";
             ShowIcon = false;
             ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "製品登録";
             FormClosing += ProductRegistration1Window_FormClosing;
             Load += ProductRegistration1Window_Load;

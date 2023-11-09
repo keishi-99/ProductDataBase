@@ -54,19 +54,6 @@ namespace ProductDataBase {
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" };
 
-        public RePrintWindow(MainWindow _mainWindow) {
-            StrFontName = _mainWindow.StrFontName;
-            IntFontSize = _mainWindow.IntFontSize;
-            StrProductName = _mainWindow.StrProductName;
-            StrProductType = _mainWindow.StrProductType;
-            StrProductModel = _mainWindow.StrProductModel;
-            StrInitial = _mainWindow.StrInitial;
-            IntSerialDigit = _mainWindow.IntSerialDigit;
-            IntRegType = _mainWindow.IntRegType;
-            IntPrintType = _mainWindow.IntPrintType;
-            IntCheckBin = _mainWindow.IntCheckBin;
-        }
-
         public RePrintWindow() {
             InitializeComponent();
         }

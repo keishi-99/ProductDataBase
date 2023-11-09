@@ -74,37 +74,6 @@ namespace ProductDataBase {
         readonly List<string> ListUsedProductNumber = new();
         readonly List<int> ListUsedQuantity = new();
 
-        //public ProductRegistration2Window(ProductRegistration2Window _productRegistration1Window) {
-        //    StrFontName = _productRegistration1Window.StrFontName;
-        //    IntFontSize = _productRegistration1Window.IntFontSize;
-
-        //    StrProductName = _productRegistration1Window.StrProductName;
-        //    StrStockName = _productRegistration1Window.StrStockName;
-        //    StrProductType = _productRegistration1Window.StrProductType;
-        //    StrProductModel = _productRegistration1Window.StrProductModel;
-        //    StrUseSubstrate = _productRegistration1Window.StrUseSubstrate;
-        //    StrInitial = _productRegistration1Window.StrInitial;
-        //    IntQuantity = _productRegistration1Window.IntQuantity;
-        //    IntRegType = _productRegistration1Window.IntRegType;
-        //    StrPerson = _productRegistration1Window.StrPerson;
-        //    IntPrintType = _productRegistration1Window.IntPrintType;
-        //    IntCheckBin = _productRegistration1Window.IntCheckBin;
-        //    IntSerialDigit = _productRegistration1Window.IntSerialDigit;
-        //    IntSerialFirstNumber = _productRegistration1Window.IntSerialFirstNumber;
-        //    IntSerialLastNumber = IntSerialFirstNumber + IntQuantity - 1;
-        //    StrOrderNumber = _productRegistration1Window.StrOrderNumber;
-        //    StrProductNumber = _productRegistration1Window.StrProductNumber;
-        //    StrRegDate = _productRegistration1Window.StrRegDate;
-        //    StrRevision = _productRegistration1Window.StrRevision;
-        //    StrComment = _productRegistration1Window.StrComment;
-
-        //    StrProness1 = _productRegistration1Window.StrProness1;
-        //    StrProness2 = _productRegistration1Window.StrProness2;
-        //    StrProness3 = _productRegistration1Window.StrProness3;
-        //    StrProness4 = _productRegistration1Window.StrProness4;
-        //    StrProness5 = _productRegistration1Window.StrProness5;
-        //}
-
         public ProductRegistration2Window() {
             InitializeComponent();
         }
@@ -1320,15 +1289,17 @@ namespace ProductDataBase {
                     Excel.Workbook _xlBook = _xlBooks.Open($@"{System.Environment.CurrentDirectory}./config/Excel/temporarily_{_i}.xlsx");
 
                     // ワークシートを選択
-                    Excel.Worksheet _xlSheet = (Excel.Worksheet)_xlBook.Sheets[1];
+                    Excel.Sheets _xlSheets = _xlBook.Sheets;
+                    Excel.Worksheet _xlSheet = _xlSheets[1];
 
                     // ワークシートを印刷
                     _xlSheet.PrintOut(Preview: true);
 
                     // ワークブックを閉じてExcelを終了します。
-                    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheet);
                     _xlBook.Close(false);
                     _xlApp.Quit();
+                    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheet);
+                    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheets);
                     _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBook);
                     _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBooks);
                     _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlApp);

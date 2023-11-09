@@ -725,6 +725,7 @@
             Name = "ProductPrintSetting";
             ShowIcon = false;
             ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "製品ラベル設定";
             Load += ProductPrintSetting_Load;
             PrintTextGroupBox.ResumeLayout(false);

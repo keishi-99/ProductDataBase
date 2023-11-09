@@ -73,7 +73,7 @@
             OKButton.Text = "OK";
             OKButton.UseVisualStyleBackColor = true;
             // 
-            // SubstrateChange
+            // SubstrateChange1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -85,9 +85,10 @@
             Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "SubstrateChange";
+            Name = "SubstrateChange1";
             ShowIcon = false;
             ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "変更候補";
             ((System.ComponentModel.ISupportInitialize)SubstrateChangeDataGridView).EndInit();
             ResumeLayout(false);

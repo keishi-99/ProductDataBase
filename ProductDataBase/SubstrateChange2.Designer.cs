@@ -23,46 +23,46 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            DataGridViewCellStyle dataGridViewCellStyle281 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle282 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle283 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle284 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle285 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle286 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle287 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle288 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle289 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle290 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle291 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle292 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle293 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle294 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle295 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle296 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle297 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle298 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle299 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle300 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle301 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle302 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle303 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle304 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle305 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle306 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle307 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle308 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle309 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle310 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle311 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle312 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle313 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle314 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle315 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle316 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle317 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle318 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle319 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle320 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle10 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle11 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle12 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle13 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle14 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle15 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle16 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle17 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle18 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle19 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle20 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle21 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle22 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle23 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle24 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle25 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle26 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle27 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle28 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle29 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle30 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle31 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle32 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle33 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle34 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle35 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle36 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle37 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle38 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle39 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle40 = new DataGridViewCellStyle();
             CloseButton = new Button();
             RegisterButton = new Button();
             SubstrateListPrintButton = new Button();
@@ -206,8 +206,8 @@
             // 
             // dataGridViewTextBoxColumn25
             // 
-            dataGridViewCellStyle281.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn25.DefaultCellStyle = dataGridViewCellStyle281;
+            dataGridViewCellStyle1.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn25.DefaultCellStyle = dataGridViewCellStyle1;
             dataGridViewTextBoxColumn25.HeaderText = "Column1";
             dataGridViewTextBoxColumn25.MaxInputLength = 100;
             dataGridViewTextBoxColumn25.Name = "dataGridViewTextBoxColumn25";
@@ -218,8 +218,8 @@
             // 
             // dataGridViewTextBoxColumn26
             // 
-            dataGridViewCellStyle282.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn26.DefaultCellStyle = dataGridViewCellStyle282;
+            dataGridViewCellStyle2.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn26.DefaultCellStyle = dataGridViewCellStyle2;
             dataGridViewTextBoxColumn26.HeaderText = "Column2";
             dataGridViewTextBoxColumn26.MaxInputLength = 100;
             dataGridViewTextBoxColumn26.Name = "dataGridViewTextBoxColumn26";
@@ -230,8 +230,8 @@
             // 
             // dataGridViewTextBoxColumn27
             // 
-            dataGridViewCellStyle283.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn27.DefaultCellStyle = dataGridViewCellStyle283;
+            dataGridViewCellStyle3.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn27.DefaultCellStyle = dataGridViewCellStyle3;
             dataGridViewTextBoxColumn27.HeaderText = "Column3";
             dataGridViewTextBoxColumn27.MaxInputLength = 100;
             dataGridViewTextBoxColumn27.Name = "dataGridViewTextBoxColumn27";
@@ -242,10 +242,10 @@
             // 
             // dataGridViewCheckBoxColumn9
             // 
-            dataGridViewCellStyle284.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle284.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle284.NullValue = false;
-            dataGridViewCheckBoxColumn9.DefaultCellStyle = dataGridViewCellStyle284;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle4.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle4.NullValue = false;
+            dataGridViewCheckBoxColumn9.DefaultCellStyle = dataGridViewCellStyle4;
             dataGridViewCheckBoxColumn9.HeaderText = "Column4";
             dataGridViewCheckBoxColumn9.Name = "dataGridViewCheckBoxColumn9";
             dataGridViewCheckBoxColumn9.ReadOnly = true;
@@ -284,8 +284,8 @@
             // 
             // dataGridViewTextBoxColumn22
             // 
-            dataGridViewCellStyle285.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn22.DefaultCellStyle = dataGridViewCellStyle285;
+            dataGridViewCellStyle5.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn22.DefaultCellStyle = dataGridViewCellStyle5;
             dataGridViewTextBoxColumn22.HeaderText = "Column1";
             dataGridViewTextBoxColumn22.MaxInputLength = 100;
             dataGridViewTextBoxColumn22.Name = "dataGridViewTextBoxColumn22";
@@ -296,8 +296,8 @@
             // 
             // dataGridViewTextBoxColumn23
             // 
-            dataGridViewCellStyle286.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn23.DefaultCellStyle = dataGridViewCellStyle286;
+            dataGridViewCellStyle6.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn23.DefaultCellStyle = dataGridViewCellStyle6;
             dataGridViewTextBoxColumn23.HeaderText = "Column2";
             dataGridViewTextBoxColumn23.MaxInputLength = 100;
             dataGridViewTextBoxColumn23.Name = "dataGridViewTextBoxColumn23";
@@ -308,8 +308,8 @@
             // 
             // dataGridViewTextBoxColumn24
             // 
-            dataGridViewCellStyle287.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn24.DefaultCellStyle = dataGridViewCellStyle287;
+            dataGridViewCellStyle7.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn24.DefaultCellStyle = dataGridViewCellStyle7;
             dataGridViewTextBoxColumn24.HeaderText = "Column3";
             dataGridViewTextBoxColumn24.MaxInputLength = 100;
             dataGridViewTextBoxColumn24.Name = "dataGridViewTextBoxColumn24";
@@ -320,10 +320,10 @@
             // 
             // dataGridViewCheckBoxColumn8
             // 
-            dataGridViewCellStyle288.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle288.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle288.NullValue = false;
-            dataGridViewCheckBoxColumn8.DefaultCellStyle = dataGridViewCellStyle288;
+            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle8.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle8.NullValue = false;
+            dataGridViewCheckBoxColumn8.DefaultCellStyle = dataGridViewCellStyle8;
             dataGridViewCheckBoxColumn8.HeaderText = "Column4";
             dataGridViewCheckBoxColumn8.Name = "dataGridViewCheckBoxColumn8";
             dataGridViewCheckBoxColumn8.ReadOnly = true;
@@ -362,8 +362,8 @@
             // 
             // dataGridViewTextBoxColumn19
             // 
-            dataGridViewCellStyle289.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn19.DefaultCellStyle = dataGridViewCellStyle289;
+            dataGridViewCellStyle9.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn19.DefaultCellStyle = dataGridViewCellStyle9;
             dataGridViewTextBoxColumn19.HeaderText = "Column1";
             dataGridViewTextBoxColumn19.MaxInputLength = 100;
             dataGridViewTextBoxColumn19.Name = "dataGridViewTextBoxColumn19";
@@ -374,8 +374,8 @@
             // 
             // dataGridViewTextBoxColumn20
             // 
-            dataGridViewCellStyle290.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn20.DefaultCellStyle = dataGridViewCellStyle290;
+            dataGridViewCellStyle10.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn20.DefaultCellStyle = dataGridViewCellStyle10;
             dataGridViewTextBoxColumn20.HeaderText = "Column2";
             dataGridViewTextBoxColumn20.MaxInputLength = 100;
             dataGridViewTextBoxColumn20.Name = "dataGridViewTextBoxColumn20";
@@ -386,8 +386,8 @@
             // 
             // dataGridViewTextBoxColumn21
             // 
-            dataGridViewCellStyle291.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn21.DefaultCellStyle = dataGridViewCellStyle291;
+            dataGridViewCellStyle11.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn21.DefaultCellStyle = dataGridViewCellStyle11;
             dataGridViewTextBoxColumn21.HeaderText = "Column3";
             dataGridViewTextBoxColumn21.MaxInputLength = 100;
             dataGridViewTextBoxColumn21.Name = "dataGridViewTextBoxColumn21";
@@ -398,10 +398,10 @@
             // 
             // dataGridViewCheckBoxColumn7
             // 
-            dataGridViewCellStyle292.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle292.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle292.NullValue = false;
-            dataGridViewCheckBoxColumn7.DefaultCellStyle = dataGridViewCellStyle292;
+            dataGridViewCellStyle12.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle12.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle12.NullValue = false;
+            dataGridViewCheckBoxColumn7.DefaultCellStyle = dataGridViewCellStyle12;
             dataGridViewCheckBoxColumn7.HeaderText = "Column4";
             dataGridViewCheckBoxColumn7.Name = "dataGridViewCheckBoxColumn7";
             dataGridViewCheckBoxColumn7.ReadOnly = true;
@@ -440,8 +440,8 @@
             // 
             // dataGridViewTextBoxColumn16
             // 
-            dataGridViewCellStyle293.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn16.DefaultCellStyle = dataGridViewCellStyle293;
+            dataGridViewCellStyle13.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn16.DefaultCellStyle = dataGridViewCellStyle13;
             dataGridViewTextBoxColumn16.HeaderText = "Column1";
             dataGridViewTextBoxColumn16.MaxInputLength = 100;
             dataGridViewTextBoxColumn16.Name = "dataGridViewTextBoxColumn16";
@@ -452,8 +452,8 @@
             // 
             // dataGridViewTextBoxColumn17
             // 
-            dataGridViewCellStyle294.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn17.DefaultCellStyle = dataGridViewCellStyle294;
+            dataGridViewCellStyle14.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn17.DefaultCellStyle = dataGridViewCellStyle14;
             dataGridViewTextBoxColumn17.HeaderText = "Column2";
             dataGridViewTextBoxColumn17.MaxInputLength = 100;
             dataGridViewTextBoxColumn17.Name = "dataGridViewTextBoxColumn17";
@@ -464,8 +464,8 @@
             // 
             // dataGridViewTextBoxColumn18
             // 
-            dataGridViewCellStyle295.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn18.DefaultCellStyle = dataGridViewCellStyle295;
+            dataGridViewCellStyle15.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn18.DefaultCellStyle = dataGridViewCellStyle15;
             dataGridViewTextBoxColumn18.HeaderText = "Column3";
             dataGridViewTextBoxColumn18.MaxInputLength = 100;
             dataGridViewTextBoxColumn18.Name = "dataGridViewTextBoxColumn18";
@@ -476,10 +476,10 @@
             // 
             // dataGridViewCheckBoxColumn6
             // 
-            dataGridViewCellStyle296.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle296.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle296.NullValue = false;
-            dataGridViewCheckBoxColumn6.DefaultCellStyle = dataGridViewCellStyle296;
+            dataGridViewCellStyle16.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle16.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle16.NullValue = false;
+            dataGridViewCheckBoxColumn6.DefaultCellStyle = dataGridViewCellStyle16;
             dataGridViewCheckBoxColumn6.HeaderText = "Column4";
             dataGridViewCheckBoxColumn6.Name = "dataGridViewCheckBoxColumn6";
             dataGridViewCheckBoxColumn6.ReadOnly = true;
@@ -518,8 +518,8 @@
             // 
             // dataGridViewTextBoxColumn13
             // 
-            dataGridViewCellStyle297.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn13.DefaultCellStyle = dataGridViewCellStyle297;
+            dataGridViewCellStyle17.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn13.DefaultCellStyle = dataGridViewCellStyle17;
             dataGridViewTextBoxColumn13.HeaderText = "Column1";
             dataGridViewTextBoxColumn13.MaxInputLength = 100;
             dataGridViewTextBoxColumn13.Name = "dataGridViewTextBoxColumn13";
@@ -530,8 +530,8 @@
             // 
             // dataGridViewTextBoxColumn14
             // 
-            dataGridViewCellStyle298.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn14.DefaultCellStyle = dataGridViewCellStyle298;
+            dataGridViewCellStyle18.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn14.DefaultCellStyle = dataGridViewCellStyle18;
             dataGridViewTextBoxColumn14.HeaderText = "Column2";
             dataGridViewTextBoxColumn14.MaxInputLength = 100;
             dataGridViewTextBoxColumn14.Name = "dataGridViewTextBoxColumn14";
@@ -542,8 +542,8 @@
             // 
             // dataGridViewTextBoxColumn15
             // 
-            dataGridViewCellStyle299.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn15.DefaultCellStyle = dataGridViewCellStyle299;
+            dataGridViewCellStyle19.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn15.DefaultCellStyle = dataGridViewCellStyle19;
             dataGridViewTextBoxColumn15.HeaderText = "Column3";
             dataGridViewTextBoxColumn15.MaxInputLength = 100;
             dataGridViewTextBoxColumn15.Name = "dataGridViewTextBoxColumn15";
@@ -554,10 +554,10 @@
             // 
             // dataGridViewCheckBoxColumn5
             // 
-            dataGridViewCellStyle300.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle300.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle300.NullValue = false;
-            dataGridViewCheckBoxColumn5.DefaultCellStyle = dataGridViewCellStyle300;
+            dataGridViewCellStyle20.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle20.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle20.NullValue = false;
+            dataGridViewCheckBoxColumn5.DefaultCellStyle = dataGridViewCellStyle20;
             dataGridViewCheckBoxColumn5.HeaderText = "Column4";
             dataGridViewCheckBoxColumn5.Name = "dataGridViewCheckBoxColumn5";
             dataGridViewCheckBoxColumn5.ReadOnly = true;
@@ -596,8 +596,8 @@
             // 
             // dataGridViewTextBoxColumn10
             // 
-            dataGridViewCellStyle301.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn10.DefaultCellStyle = dataGridViewCellStyle301;
+            dataGridViewCellStyle21.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn10.DefaultCellStyle = dataGridViewCellStyle21;
             dataGridViewTextBoxColumn10.HeaderText = "Column1";
             dataGridViewTextBoxColumn10.MaxInputLength = 100;
             dataGridViewTextBoxColumn10.Name = "dataGridViewTextBoxColumn10";
@@ -608,8 +608,8 @@
             // 
             // dataGridViewTextBoxColumn11
             // 
-            dataGridViewCellStyle302.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn11.DefaultCellStyle = dataGridViewCellStyle302;
+            dataGridViewCellStyle22.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn11.DefaultCellStyle = dataGridViewCellStyle22;
             dataGridViewTextBoxColumn11.HeaderText = "Column2";
             dataGridViewTextBoxColumn11.MaxInputLength = 100;
             dataGridViewTextBoxColumn11.Name = "dataGridViewTextBoxColumn11";
@@ -620,8 +620,8 @@
             // 
             // dataGridViewTextBoxColumn12
             // 
-            dataGridViewCellStyle303.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn12.DefaultCellStyle = dataGridViewCellStyle303;
+            dataGridViewCellStyle23.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn12.DefaultCellStyle = dataGridViewCellStyle23;
             dataGridViewTextBoxColumn12.HeaderText = "Column3";
             dataGridViewTextBoxColumn12.MaxInputLength = 100;
             dataGridViewTextBoxColumn12.Name = "dataGridViewTextBoxColumn12";
@@ -632,10 +632,10 @@
             // 
             // dataGridViewCheckBoxColumn4
             // 
-            dataGridViewCellStyle304.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle304.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle304.NullValue = false;
-            dataGridViewCheckBoxColumn4.DefaultCellStyle = dataGridViewCellStyle304;
+            dataGridViewCellStyle24.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle24.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle24.NullValue = false;
+            dataGridViewCheckBoxColumn4.DefaultCellStyle = dataGridViewCellStyle24;
             dataGridViewCheckBoxColumn4.HeaderText = "Column4";
             dataGridViewCheckBoxColumn4.Name = "dataGridViewCheckBoxColumn4";
             dataGridViewCheckBoxColumn4.ReadOnly = true;
@@ -675,8 +675,8 @@
             // 
             // dataGridViewTextBoxColumn7
             // 
-            dataGridViewCellStyle305.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn7.DefaultCellStyle = dataGridViewCellStyle305;
+            dataGridViewCellStyle25.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn7.DefaultCellStyle = dataGridViewCellStyle25;
             dataGridViewTextBoxColumn7.HeaderText = "Column1";
             dataGridViewTextBoxColumn7.MaxInputLength = 100;
             dataGridViewTextBoxColumn7.Name = "dataGridViewTextBoxColumn7";
@@ -687,8 +687,8 @@
             // 
             // dataGridViewTextBoxColumn8
             // 
-            dataGridViewCellStyle306.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn8.DefaultCellStyle = dataGridViewCellStyle306;
+            dataGridViewCellStyle26.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn8.DefaultCellStyle = dataGridViewCellStyle26;
             dataGridViewTextBoxColumn8.HeaderText = "Column2";
             dataGridViewTextBoxColumn8.MaxInputLength = 100;
             dataGridViewTextBoxColumn8.Name = "dataGridViewTextBoxColumn8";
@@ -699,8 +699,8 @@
             // 
             // dataGridViewTextBoxColumn9
             // 
-            dataGridViewCellStyle307.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn9.DefaultCellStyle = dataGridViewCellStyle307;
+            dataGridViewCellStyle27.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn9.DefaultCellStyle = dataGridViewCellStyle27;
             dataGridViewTextBoxColumn9.HeaderText = "Column3";
             dataGridViewTextBoxColumn9.MaxInputLength = 100;
             dataGridViewTextBoxColumn9.Name = "dataGridViewTextBoxColumn9";
@@ -711,10 +711,10 @@
             // 
             // dataGridViewCheckBoxColumn3
             // 
-            dataGridViewCellStyle308.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle308.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle308.NullValue = false;
-            dataGridViewCheckBoxColumn3.DefaultCellStyle = dataGridViewCellStyle308;
+            dataGridViewCellStyle28.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle28.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle28.NullValue = false;
+            dataGridViewCheckBoxColumn3.DefaultCellStyle = dataGridViewCellStyle28;
             dataGridViewCheckBoxColumn3.HeaderText = "Column4";
             dataGridViewCheckBoxColumn3.Name = "dataGridViewCheckBoxColumn3";
             dataGridViewCheckBoxColumn3.ReadOnly = true;
@@ -754,8 +754,8 @@
             // 
             // dataGridViewTextBoxColumn4
             // 
-            dataGridViewCellStyle309.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn4.DefaultCellStyle = dataGridViewCellStyle309;
+            dataGridViewCellStyle29.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn4.DefaultCellStyle = dataGridViewCellStyle29;
             dataGridViewTextBoxColumn4.HeaderText = "Column1";
             dataGridViewTextBoxColumn4.MaxInputLength = 100;
             dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
@@ -766,8 +766,8 @@
             // 
             // dataGridViewTextBoxColumn5
             // 
-            dataGridViewCellStyle310.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn5.DefaultCellStyle = dataGridViewCellStyle310;
+            dataGridViewCellStyle30.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn5.DefaultCellStyle = dataGridViewCellStyle30;
             dataGridViewTextBoxColumn5.HeaderText = "Column2";
             dataGridViewTextBoxColumn5.MaxInputLength = 100;
             dataGridViewTextBoxColumn5.Name = "dataGridViewTextBoxColumn5";
@@ -778,8 +778,8 @@
             // 
             // dataGridViewTextBoxColumn6
             // 
-            dataGridViewCellStyle311.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn6.DefaultCellStyle = dataGridViewCellStyle311;
+            dataGridViewCellStyle31.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn6.DefaultCellStyle = dataGridViewCellStyle31;
             dataGridViewTextBoxColumn6.HeaderText = "Column3";
             dataGridViewTextBoxColumn6.MaxInputLength = 100;
             dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
@@ -790,10 +790,10 @@
             // 
             // dataGridViewCheckBoxColumn2
             // 
-            dataGridViewCellStyle312.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle312.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle312.NullValue = false;
-            dataGridViewCheckBoxColumn2.DefaultCellStyle = dataGridViewCellStyle312;
+            dataGridViewCellStyle32.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle32.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle32.NullValue = false;
+            dataGridViewCheckBoxColumn2.DefaultCellStyle = dataGridViewCellStyle32;
             dataGridViewCheckBoxColumn2.HeaderText = "Column4";
             dataGridViewCheckBoxColumn2.Name = "dataGridViewCheckBoxColumn2";
             dataGridViewCheckBoxColumn2.ReadOnly = true;
@@ -833,8 +833,8 @@
             // 
             // dataGridViewTextBoxColumn1
             // 
-            dataGridViewCellStyle313.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle313;
+            dataGridViewCellStyle33.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle33;
             dataGridViewTextBoxColumn1.HeaderText = "Column1";
             dataGridViewTextBoxColumn1.MaxInputLength = 100;
             dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
@@ -845,8 +845,8 @@
             // 
             // dataGridViewTextBoxColumn2
             // 
-            dataGridViewCellStyle314.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn2.DefaultCellStyle = dataGridViewCellStyle314;
+            dataGridViewCellStyle34.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn2.DefaultCellStyle = dataGridViewCellStyle34;
             dataGridViewTextBoxColumn2.HeaderText = "Column2";
             dataGridViewTextBoxColumn2.MaxInputLength = 100;
             dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
@@ -857,8 +857,8 @@
             // 
             // dataGridViewTextBoxColumn3
             // 
-            dataGridViewCellStyle315.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn3.DefaultCellStyle = dataGridViewCellStyle315;
+            dataGridViewCellStyle35.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn3.DefaultCellStyle = dataGridViewCellStyle35;
             dataGridViewTextBoxColumn3.HeaderText = "Column3";
             dataGridViewTextBoxColumn3.MaxInputLength = 100;
             dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
@@ -869,10 +869,10 @@
             // 
             // dataGridViewCheckBoxColumn1
             // 
-            dataGridViewCellStyle316.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle316.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle316.NullValue = false;
-            dataGridViewCheckBoxColumn1.DefaultCellStyle = dataGridViewCellStyle316;
+            dataGridViewCellStyle36.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle36.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle36.NullValue = false;
+            dataGridViewCheckBoxColumn1.DefaultCellStyle = dataGridViewCellStyle36;
             dataGridViewCheckBoxColumn1.HeaderText = "Column4";
             dataGridViewCheckBoxColumn1.Name = "dataGridViewCheckBoxColumn1";
             dataGridViewCheckBoxColumn1.ReadOnly = true;
@@ -912,8 +912,8 @@
             // 
             // Column1
             // 
-            dataGridViewCellStyle317.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            Column1.DefaultCellStyle = dataGridViewCellStyle317;
+            dataGridViewCellStyle37.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            Column1.DefaultCellStyle = dataGridViewCellStyle37;
             Column1.HeaderText = "Column1";
             Column1.MaxInputLength = 100;
             Column1.Name = "Column1";
@@ -924,8 +924,8 @@
             // 
             // Column2
             // 
-            dataGridViewCellStyle318.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            Column2.DefaultCellStyle = dataGridViewCellStyle318;
+            dataGridViewCellStyle38.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            Column2.DefaultCellStyle = dataGridViewCellStyle38;
             Column2.HeaderText = "Column2";
             Column2.MaxInputLength = 100;
             Column2.Name = "Column2";
@@ -936,8 +936,8 @@
             // 
             // Column3
             // 
-            dataGridViewCellStyle319.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            Column3.DefaultCellStyle = dataGridViewCellStyle319;
+            dataGridViewCellStyle39.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            Column3.DefaultCellStyle = dataGridViewCellStyle39;
             Column3.HeaderText = "Column3";
             Column3.MaxInputLength = 100;
             Column3.Name = "Column3";
@@ -948,10 +948,10 @@
             // 
             // Column4
             // 
-            dataGridViewCellStyle320.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle320.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle320.NullValue = false;
-            Column4.DefaultCellStyle = dataGridViewCellStyle320;
+            dataGridViewCellStyle40.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle40.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle40.NullValue = false;
+            Column4.DefaultCellStyle = dataGridViewCellStyle40;
             Column4.HeaderText = "Column4";
             Column4.Name = "Column4";
             Column4.ReadOnly = true;
@@ -1169,6 +1169,7 @@
             Name = "SubstrateChange2";
             ShowIcon = false;
             ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "変更情報登録";
             ((System.ComponentModel.ISupportInitialize)SubstrateData10GridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)SubstrateData9GridView).EndInit();

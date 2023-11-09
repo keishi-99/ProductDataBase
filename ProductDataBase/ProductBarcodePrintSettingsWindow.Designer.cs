@@ -862,6 +862,7 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ProductBarcodePrintSettingsWindow";
+            StartPosition = FormStartPosition.CenterParent;
             Text = "製品バーコード設定";
             Load += ProductBarcodePrintSetting_Load;
             BarcodeGroupBox.ResumeLayout(false);
