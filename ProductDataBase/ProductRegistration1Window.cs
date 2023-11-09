@@ -30,9 +30,7 @@ namespace ProductDataBase {
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" };
 
-        public ProductRegistration1Window() {
-            InitializeComponent();
-        }
+        public ProductRegistration1Window() => InitializeComponent();
         // ロードイベント
         private void LoadEvents() {
             try {
@@ -121,9 +119,6 @@ namespace ProductDataBase {
                 DialogResult _result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (_result == DialogResult.Cancel) return;
 
-                int _quantity = Convert.ToInt32(QuantityTextBox.Text);
-                int _firstSerial = Convert.ToInt32(FirstSerialNumberTextBox.Text);
-
                 switch (IntSerialDigit) {
                     case 3:
                         CheckAndAdjustSerial(999, 1);
@@ -131,11 +126,13 @@ namespace ProductDataBase {
                     case 4:
                         CheckAndAdjustSerial(9999, 1);
                         break;
+                    default:
+                        break;
                 }
 
                 RegisterButton.Enabled = false;
 
-                ProductRegistration2Window _productRegistration2Window = new() {
+                using ProductRegistration2Window _productRegistration2Window = new() {
                     StrProductName = StrProductName,
                     StrStockName = StrStockName,
                     StrProductType = StrProductType,
@@ -157,8 +154,10 @@ namespace ProductDataBase {
                 };
                 _productRegistration2Window.ShowDialog(this);
 
-
                 void CheckAndAdjustSerial(int threshold, int resetValue) {
+
+                    int _quantity = Convert.ToInt32(QuantityTextBox.Text);
+                    int _firstSerial = Convert.ToInt32(FirstSerialNumberTextBox.Text);
                     if (_quantity + _firstSerial >= threshold) {
                         MessageBox.Show($"シリアルが{threshold}を超えるので{resetValue.ToString().PadLeft(IntSerialDigit, '0')}から開始します。");
                         FirstSerialNumberTextBox.Text = resetValue.ToString();
@@ -229,6 +228,8 @@ namespace ProductDataBase {
                     CommentTextBox.Enabled = _checkBox.Checked;
                     CommentComboBox.Enabled = _checkBox.Checked;
                     TemplateButton.Enabled = _checkBox.Checked;
+                    break;
+                default:
                     break;
             }
         }
