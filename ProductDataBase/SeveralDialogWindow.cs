@@ -11,9 +11,7 @@
         public List<string> ListCategory13 { get; set; } = new List<string>();
         public List<string> ListCategory14 { get; set; } = new List<string>();
 
-        public SeveralDialogWindow() {
-            InitializeComponent();
-        }
+        public SeveralDialogWindow() => InitializeComponent();
 
         // ロードイベント
         private void LoadEvents() {
@@ -21,12 +19,10 @@
             Font = new Font(StrFontName, IntFontSize);
             int j = 0;
 
-            foreach (var Category in ListCategory11) {
+            foreach (string Category in ListCategory11) {
                 string type = (ListCategory14[j] == "1") ? "基板" : "製品";
 
-                if (!string.IsNullOrEmpty(ListCategory11[j]))
-                    SeveralListBox.Items.Add($"[{type}]  [{ListCategory13[j]}]  [{ListCategory12[j]}]  [{Category}]");
-
+                if (!string.IsNullOrEmpty(ListCategory11[j])) { SeveralListBox.Items.Add($"[{type}]  [{ListCategory13[j]}]  [{ListCategory12[j]}]  [{Category}]"); }
                 j++;
             }
 
