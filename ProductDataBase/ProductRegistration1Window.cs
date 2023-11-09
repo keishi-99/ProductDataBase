@@ -40,7 +40,7 @@ namespace ProductDataBase {
                 SubstrateModelLabel2.Text = $"{StrProductName} - {StrProductModel}";
 
                 OrderNumberTextBox.Text = StrProness5;
-                ManufacturingNumberMaskedTextBox.Text = StrProness1;
+                ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(StrProness1) ? StrProness1 : ManufacturingNumberMaskedTextBox.Text;
                 QuantityTextBox.Text = StrProness4.ToString();
 
                 FirstSerialNumberTextBox.MaxLength = IntSerialDigit;

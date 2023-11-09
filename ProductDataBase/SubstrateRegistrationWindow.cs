@@ -52,7 +52,7 @@ namespace ProductDataBase {
                 StockLabel2.Text = "0";
 
                 OrderNumberTextBox.Text = StrProness5;
-                ManufacturingNumberMaskedTextBox.Text = StrProness1;
+                ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(StrProness1) ? StrProness1 : ManufacturingNumberMaskedTextBox.Text;
                 QuantityTextBox.Text = StrProness4.ToString();
 
                 RegisterButton.Enabled = true;
