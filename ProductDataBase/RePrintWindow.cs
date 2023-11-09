@@ -54,9 +54,7 @@ namespace ProductDataBase {
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" };
 
-        public RePrintWindow() {
-            InitializeComponent();
-        }
+        public RePrintWindow() => InitializeComponent();
 
         // ロードイベント
         private void LoadEvents() {
@@ -103,6 +101,8 @@ namespace ProductDataBase {
                         LabelPrintButton.Enabled = false;
                         BarcodePrintButton.Enabled = false;
                         break;
+                    default:
+                        break;
                 }
 
                 // TextBoxへ今日の年月日を入力
@@ -147,17 +147,16 @@ namespace ProductDataBase {
             }
         }
         private void LoadSettings(string strLabelSettingFilePath, string strBarcodeSettingFilePath) {
-            System.Xml.Serialization.XmlSerializer _serializerLabel = new(typeof(CSettingsLabelPro));
-            System.Xml.Serialization.XmlSerializer _serializerBarcode = new(typeof(CSettingsBarcodePro));
-
             try {
                 if (strLabelSettingFilePath != string.Empty) {
                     StreamReader? _srLabel = new(strLabelSettingFilePath, new System.Text.UTF8Encoding(false));
+                    System.Xml.Serialization.XmlSerializer _serializerLabel = new(typeof(CSettingsLabelPro));
                     if (_serializerLabel.Deserialize(_srLabel) is CSettingsLabelPro _result) { SettingsLabelPro = _result; }
                     _srLabel?.Close();
                 }
                 if (strBarcodeSettingFilePath != string.Empty) {
                     StreamReader? _srBarcode = new(strBarcodeSettingFilePath, new System.Text.UTF8Encoding(false));
+                    System.Xml.Serialization.XmlSerializer _serializerBarcode = new(typeof(CSettingsBarcodePro));
                     if (_serializerBarcode.Deserialize(_srBarcode) is CSettingsBarcodePro _result) { SettingsBarcodePro = _result; }
                     _srBarcode?.Close();
                 }
@@ -203,6 +202,8 @@ namespace ProductDataBase {
                         break;
                     case 4:
                         CheckAndAdjustSerial(9999, 1);
+                        break;
+                    default:
                         break;
                 }
 
@@ -265,7 +266,7 @@ namespace ProductDataBase {
         // 印刷処理
         private void PrintBarcode(int PrintFlg) {
             // PrintDocumentオブジェクトの作成
-            System.Drawing.Printing.PrintDocument _pd = new();
+            using System.Drawing.Printing.PrintDocument _pd = new();
 
             // PrintPageイベントハンドラの追加
             _pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
@@ -294,12 +295,23 @@ namespace ProductDataBase {
                     RePrintPrintPreviewDialog.Document = _pd;
                     RePrintPrintPreviewDialog.ShowDialog();
                     break;
+                default:
+                    break;
             }
         }
         private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
             try {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
-                int _txtNumPublish = 0;
+
+                e.Graphics.PageUnit = GraphicsUnit.Millimeter;
+                int _startLineLabel = (int)PrintPostionNumericUpDown.Value - 1;
+                Point _headerPos = new(0, 0);
+                string _headerString = string.Empty;
+                Font _headerFooterFont = new("Arial", 6);
+                int _intNumLabels = 0;
+                int _intCountNumLabels = 0;
+
+
                 int _maxX = 0;
                 int _maxY = 0;
                 float _sizeX = 0;
@@ -308,22 +320,6 @@ namespace ProductDataBase {
                 double _offsetY = 0;
                 double _intervalX = 0;
                 double _intervalY = 0;
-                float _posX = 0, _posY = 0;
-                e.Graphics.PageUnit = GraphicsUnit.Millimeter;
-                Point _offset;
-                int _x = 0, _y = 0;
-                string _s = string.Empty;
-
-                int _startLineLabel = (int)PrintPostionNumericUpDown.Value - 1;
-                int _startLineBarcode = (int)PrintPostionNumericUpDown.Value - 1;
-
-                int _barcodePageNum = 0;
-                Point _headerPos = new(0, 0);
-                string _headerString = string.Empty;
-                Font _headerFooterFont = new("Arial", 6);
-                int _intNumLabels = 0;
-                int _intCountNumLabels = 0;
-
                 switch (StrSerialType) {
                     case "Label":
                         if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnullです。"); }
@@ -357,8 +353,13 @@ namespace ProductDataBase {
                         _intNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
                         _intCountNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
                         break;
+                    default:
+                        break;
                 }
 
+                int _startLineBarcode = (int)PrintPostionNumericUpDown.Value - 1;
+
+                Point _offset;
                 if (!RePrintPrintDocument.PrintController.IsPreview) {
                     _offsetX -= e.PageSettings.HardMarginX * 0.254;
                     _offsetY -= e.PageSettings.HardMarginY * 0.254;
@@ -379,6 +380,7 @@ namespace ProductDataBase {
                 _headerPos.Offset(_offset);
                 e.Graphics.DrawString(_headerString, _headerFooterFont, Brushes.Black, _headerPos);
 
+                int _barcodePageNum = 0;
                 if (_barcodePageNum == 0) {
                     _offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLineBarcode * (_intervalY + _sizeY))));
                 }
@@ -388,12 +390,13 @@ namespace ProductDataBase {
 
                 if (LabelProPageNum >= 1) { _startLineBarcode = 0; }
 
-
+                int _y = 0;
                 for (_y = _startLineBarcode; _y < _maxY; _y++) {
+                    int _x = 0;
                     for (_x = 0; _x < _maxX; _x++) {
-                        _s = GenerateCode(LabelProNSerial);
-                        _posX = (float)(_offsetX + (_x * (_intervalX + _sizeX)));
-                        _posY = (float)(_offsetY + (_y * (_intervalY + _sizeY)));
+                        string _s = GenerateCode(LabelProNSerial);
+                        float _posX = (float)(_offsetX + (_x * (_intervalX + _sizeX)));
+                        float _posY = (float)(_offsetY + (_y * (_intervalY + _sizeY)));
                         e.Graphics.DrawImage(MakeLabelImage(_s, (int)e.Graphics.DpiX, 1), _posX, _posY, _sizeX, _sizeY);
 
                         LabelProNLabel = 0;
@@ -404,6 +407,7 @@ namespace ProductDataBase {
                             if (_intCountNumLabels <= 0) {
                                 e.HasMorePages = false;
                                 LabelProPageNum = 0;
+                                int _txtNumPublish = 0;
                                 LabelProNumLabelsToPrint = _txtNumPublish;
                                 return;
                             }
@@ -446,7 +450,6 @@ namespace ProductDataBase {
             return s;
         }
         private string GenerateCode(int serialCode) {
-            string _serialCode = Convert.ToInt32(serialCode).ToString($"D{IntSerialDigit}");
             string _monthCode = DateTime.Parse(StrRegDate).ToString("MM");
 
             _monthCode = _monthCode switch {
@@ -462,6 +465,7 @@ namespace ProductDataBase {
                 _ => string.Empty
             };
 
+            string _serialCode = Convert.ToInt32(serialCode).ToString($"D{IntSerialDigit}");
             _outputCode = _outputCode.Replace("%Y", DateTime.Parse(StrRegDate).ToString("yy"))
                                     .Replace("%MM", DateTime.Parse(StrRegDate).ToString("MM"))
                                     .Replace("%T", StrInitial)
@@ -472,13 +476,13 @@ namespace ProductDataBase {
             return _outputCode;
         }
         private Bitmap MakeLabelImage(string text, int resolution, int magnitude) {
+            Bitmap _labelImage = new(0, 0);
             decimal _sizeX;
             decimal _sizeY;
             decimal _fontSize;
             float _stringPosX;
             float _stringPosY;
             Font _fnt;
-            Bitmap _labelImage = new(0, 0);
             Graphics _g;
             SizeF _stringSize;
             switch (StrSerialType) {
@@ -504,10 +508,7 @@ namespace ProductDataBase {
                     break;
                 case "Barcode":
                     if (SettingsBarcodePro == null) { throw new Exception("SettingsBarcodeProがnull"); }
-                    int _barWeight;
-                    float _barCodePosX;
-                    float _barCodePosY;
-                    int _barcodeHeight = (int)(SettingsBarcodePro.BarcodeProLabelSettings.BarcodeHeight / 25.4F * resolution * magnitude);
+
                     _sizeX = (decimal)SettingsBarcodePro.BarcodeProPageSettings.SizeX / 25.4M * resolution * magnitude;
                     _sizeY = (decimal)SettingsBarcodePro.BarcodeProPageSettings.SizeY / 25.4M * resolution * magnitude;
                     _fontSize = (decimal)SettingsBarcodePro.BarcodeProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
@@ -516,6 +517,7 @@ namespace ProductDataBase {
                     _labelImage = new((int)_sizeX, (int)_sizeY);
                     _g = Graphics.FromImage(_labelImage);
 
+                    int _barWeight;
                     if (resolution == DisplayResolution) { _barWeight = 1; }
                     else { _barWeight = (int)(1 * resolution / DisplayResolution / DisplayMagnitude); }
 
@@ -531,23 +533,29 @@ namespace ProductDataBase {
 
                     _stringPosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
 
+
+                    float _barCodePosX;
                     if (SettingsBarcodePro.BarcodeProLabelSettings.AlignBarcodeCenter) { _barCodePosX = (float)((_labelImage.Width / 2) - (_imageWidth / 2)); }
                     else { _barCodePosX = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude); }
 
-                    _barCodePosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.BarcodePosY / 25.4M * resolution * magnitude);
+                    float _barCodePosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.BarcodePosY / 25.4M * resolution * magnitude);
 
                     _g.DrawString(text, _fnt, Brushes.Black, _stringPosX, _stringPosY);
+
+                    int _barcodeHeight = (int)(SettingsBarcodePro.BarcodeProLabelSettings.BarcodeHeight / 25.4F * resolution * magnitude);
                     _g.DrawImage(_img, _barCodePosX, _barCodePosY, (float)_imageWidth, _barcodeHeight);
 
                     _g.Dispose();
                     _img.Dispose();
+                    break;
+                default:
                     break;
             }
             return _labelImage;
         }
         // チェックボックスイベント
         private void CheckBoxChecked(object sender, EventArgs e) {
-            CheckBox _checkBox = (CheckBox)sender;
+            using CheckBox _checkBox = (CheckBox)sender;
 
             switch (_checkBox.Name) {
                 case "OrderNumberCheckBox":
