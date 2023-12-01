@@ -1,4 +1,4 @@
-﻿namespace ProductDataBase {
+﻿namespace ProductDatabase {
     partial class SubstrateRegistrationWindow {
         /// <summary>
         /// Required designer variable.

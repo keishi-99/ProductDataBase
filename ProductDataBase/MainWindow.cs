@@ -2,11 +2,11 @@
 using System.Data.Odbc;
 using System.Data.SQLite;
 
-namespace ProductDataBase {
+namespace ProductDatabase {
     public partial class MainWindow : Form {
 
-        public DataTable Dt { get; } = new();
-        public string StrFontName { get; set; } = "Meiryo UI";
+        public DataTable productDataTable { get; } = new();
+        public string fontName { get; set; } = "Meiryo UI";
 
         public int IntFontSize { get; set; } = 9;
         public int IntRadioBtnFlg { get; set; }
@@ -80,11 +80,11 @@ namespace ProductDataBase {
 
                 switch (IntRadioBtnFlg) {
                     case 1:
-                        DataRow[] _ret1 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
+                        DataRow[] _ret1 = productDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
 
                         if (_ret1.Length > 0) {
                             using SubstrateRegistrationWindow _substrateRegistrationWindow = new() {
-                                StrFontName = StrFontName,
+                                StrFontName = fontName,
                                 IntFontSize = IntFontSize,
                                 StrProductName = _ret1[0]["col_Product_Name"].ToString() ?? string.Empty,
                                 StrStockName = _ret1[0]["col_Stock_Name"].ToString() ?? string.Empty,
@@ -101,14 +101,14 @@ namespace ProductDataBase {
                     case 2:
                     case 3:
                     case 4:
-                        DataRow[] _ret2 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+                        DataRow[] _ret2 = productDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
 
                         if (_ret2.Length > 0) {
 
                             switch (IntRadioBtnFlg) {
                                 case 2:
                                     using (ProductRegistration1Window _productRegistration1Window = new() {
-                                        StrFontName = StrFontName,
+                                        StrFontName = fontName,
                                         IntFontSize = IntFontSize,
                                         StrProductName = _ret2[0]["col_Product_Name"].ToString() ?? string.Empty,
                                         StrStockName = _ret2[0]["col_Stock_Name"].ToString() ?? string.Empty,
@@ -127,7 +127,7 @@ namespace ProductDataBase {
                                     break;
                                 case 3:
                                     using (RePrintWindow _rePrintWindow = new() {
-                                        StrFontName = StrFontName,
+                                        StrFontName = fontName,
                                         IntFontSize = IntFontSize,
                                         StrProductName = _ret2[0]["col_Product_Name"].ToString() ?? string.Empty,
                                         StrProductType = _ret2[0]["col_Product_Type"].ToString() ?? string.Empty,
@@ -167,10 +167,10 @@ namespace ProductDataBase {
             try {
                 switch (IntRadioBtnFlg) {
                     case 1:
-                        DataRow[] _ret1 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
+                        DataRow[] _ret1 = productDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
                         if (_ret1.Length > 0) {
                             using HistoryWindow _historyWindow = new() {
-                                StrFontName = StrFontName,
+                                StrFontName = fontName,
                                 IntFontSize = IntFontSize,
                                 IntRadioBtnFlg = IntRadioBtnFlg,
                                 StrProductName = _ret1[0]["col_Product_Name"].ToString() ?? string.Empty,
@@ -184,10 +184,10 @@ namespace ProductDataBase {
                     case 2:
                     case 3:
                     case 4:
-                        DataRow[] _ret2 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+                        DataRow[] _ret2 = productDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
                         if (_ret2.Length > 0) {
                             using HistoryWindow _historyWindow = new() {
-                                StrFontName = StrFontName,
+                                StrFontName = fontName,
                                 IntFontSize = IntFontSize,
                                 IntRadioBtnFlg = IntRadioBtnFlg,
                                 StrProductName = _ret2[0]["col_Product_Name"].ToString() ?? string.Empty,
@@ -212,7 +212,7 @@ namespace ProductDataBase {
                 CategoryListBox1.Items.Clear();
                 CategoryListBox2.Items.Clear();
                 CategoryListBox3.Items.Clear();
-                Dt.Clear();
+                productDataTable.Clear();
 
                 RadioButton _radioButton = (RadioButton)sender;
 
@@ -244,10 +244,10 @@ namespace ProductDataBase {
 
                 using SQLiteConnection _con = new(GetConnectionString1());
                 using SQLiteDataAdapter _adapter = new(_strSqlQuery, _con);
-                _adapter.Fill(Dt);
+                _adapter.Fill(productDataTable);
 
 
-                SortedSet<string> _class001 = new(Dt.AsEnumerable()
+                SortedSet<string> _class001 = new(productDataTable.AsEnumerable()
                                                     .Select(_x => _x.Field<string?>("class001"))
                                                     .Where(_x => _x != null)
                                                     .Select(_x => _x!));
@@ -269,7 +269,7 @@ namespace ProductDataBase {
 
                 HashSet<string> _productNames = new();
 
-                DataRow[] _dr1 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}'", "col_Product_Name ASC");
+                DataRow[] _dr1 = productDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}'", "col_Product_Name ASC");
 
                 foreach (DataRow _row in _dr1) {
                     string _productName = _row["col_Product_Name"].ToString() ?? string.Empty;
@@ -295,7 +295,7 @@ namespace ProductDataBase {
 
                 switch (IntRadioBtnFlg) {
                     case 1:
-                        _dr2 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Substrate_Model ASC");
+                        _dr2 = productDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Substrate_Model ASC");
                         HashSet<string> _colSubstrateName = new(_dr2.AsEnumerable()
                                                                     .Select(x => x.Field<string>("col_Substrate_Name"))
                                                                     .Where(x => x != null)
@@ -309,7 +309,7 @@ namespace ProductDataBase {
                     case 2:
                     case 3:
                     case 4:
-                        _dr2 = Dt.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Product_Model ASC");
+                        _dr2 = productDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Product_Model ASC");
                         HashSet<string> _colProductType = new(_dr2.AsEnumerable()
                                                                   .Select(x => x.Field<string>("col_Product_Type"))
                                                                   .Where(x => x != null)
@@ -425,7 +425,7 @@ namespace ProductDataBase {
 
                 if (ListCategory11.Count >= 2) {
                     using SeveralDialogWindow _dlg = new() {
-                        StrFontName = StrFontName,
+                        StrFontName = fontName,
                         IntFontSize = IntFontSize,
                         ListCategory11 = ListCategory11,
                         ListCategory12 = ListCategory12,
@@ -447,12 +447,12 @@ namespace ProductDataBase {
                     case "1":
                         using (SQLiteConnection _con = new(GetConnectionString1())) {
                             using SQLiteDataAdapter _adapter = new("SELECT * FROM Substrate;", _con);
-                            _adapter.Fill(Dt);
+                            _adapter.Fill(productDataTable);
                         }
 
-                        DataRow[] _substrateRet = Dt.Select($"col_Product_Name = '{StrCategory13}' and col_Substrate_Name = '{StrCategory12}'");
+                        DataRow[] _substrateRet = productDataTable.Select($"col_Product_Name = '{StrCategory13}' and col_Substrate_Name = '{StrCategory12}'");
                         using (SubstrateRegistrationWindow _substrateRegistrationWindow = new() {
-                            StrFontName = StrFontName,
+                            StrFontName = fontName,
                             IntFontSize = IntFontSize,
                             StrProductName = _substrateRet[0]["col_Product_Name"].ToString() ?? string.Empty,
                             StrStockName = _substrateRet[0]["col_Stock_Name"].ToString() ?? string.Empty,
@@ -471,12 +471,12 @@ namespace ProductDataBase {
                     case "2":
                         using (SQLiteConnection _con = new(GetConnectionString1())) {
                             using SQLiteDataAdapter _adapter = new("SELECT * FROM Product;", _con);
-                            _adapter.Fill(Dt);
+                            _adapter.Fill(productDataTable);
                         }
 
-                        DataRow[] _productRet = Dt.Select($"col_Product_Name = '{StrCategory13}' and col_Product_Type = '{StrCategory12}'");
+                        DataRow[] _productRet = productDataTable.Select($"col_Product_Name = '{StrCategory13}' and col_Product_Type = '{StrCategory12}'");
                         using (ProductRegistration1Window _productRegistration1Window = new() {
-                            StrFontName = StrFontName,
+                            StrFontName = fontName,
                             IntFontSize = IntFontSize,
                             StrProductName = _productRet[0]["col_Product_Name"].ToString() ?? string.Empty,
                             StrStockName = _productRet[0]["col_Stock_Name"].ToString() ?? string.Empty,
@@ -520,7 +520,7 @@ namespace ProductDataBase {
                 }
             }
 
-            Font = new Font(StrFontName, IntFontSize);
+            Font = new Font(fontName, IntFontSize);
         }
 
         private void MainWindow_Load(object sender, EventArgs e) { LoadEvents(); }

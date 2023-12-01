@@ -1,6 +1,6 @@
 ﻿using System.Data.SQLite;
 
-namespace ProductDataBase {
+namespace ProductDatabase {
     public partial class ProductRegistration1Window : Form {
 
         public string StrFontName { get; set; } = "Meiryo UI";

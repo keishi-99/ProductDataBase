@@ -1,4 +1,4 @@
-﻿namespace ProductDataBase {
+﻿namespace ProductDatabase {
     partial class SubstratePrintSetting {
         /// <summary>
         /// Required designer variable.

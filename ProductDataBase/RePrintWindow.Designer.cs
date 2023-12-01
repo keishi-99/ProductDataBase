@@ -1,4 +1,4 @@
-﻿namespace ProductDataBase {
+﻿namespace ProductDatabase {
     partial class RePrintWindow {
         /// <summary>
         /// Required designer variable.

@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.SQLite;
 
-namespace ProductDataBase {
+namespace ProductDatabase {
     public partial class SubstrateRegistrationWindow : Form {
 
         public CSettingsLabelSub SettingsLabelSub { get; set; } = new CSettingsLabelSub();
