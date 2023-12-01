@@ -1,4 +1,4 @@
-﻿namespace ProductDataBase {
+﻿namespace ProductDatabase {
     partial class ProductBarcodePrintSettingsWindow {
         /// <summary>
         /// Required designer variable.

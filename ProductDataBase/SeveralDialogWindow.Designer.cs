@@ -1,4 +1,4 @@
-﻿namespace ProductDataBase {
+﻿namespace ProductDatabase {
     partial class SeveralDialogWindow {
         /// <summary>
         /// Required designer variable.

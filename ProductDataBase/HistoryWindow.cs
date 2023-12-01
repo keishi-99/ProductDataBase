@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.SQLite;
 
-namespace ProductDataBase {
+namespace ProductDatabase {
     public partial class HistoryWindow : Form {
 
         public string StrFontName { get; set; } = "Meiryo UI";

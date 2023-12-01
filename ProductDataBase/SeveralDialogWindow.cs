@@ -1,4 +1,4 @@
-﻿namespace ProductDataBase {
+﻿namespace ProductDatabase {
     public partial class SeveralDialogWindow : Form {
 
         public string StrFontName { get; set; } = "Meiryo UI";

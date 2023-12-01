@@ -1,6 +1,6 @@
 ﻿using LabelGenerator;
 
-namespace ProductDataBase {
+namespace ProductDatabase {
     public partial class ProductPrintSetting : Form {
 
         private CLabelProLabelSettings LabelProLabelSettings;

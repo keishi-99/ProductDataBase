@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ProductDataBase {
+namespace ProductDatabase {
     public partial class SubstrateChange1 : Form {
         public SubstrateChange1() {
             InitializeComponent();

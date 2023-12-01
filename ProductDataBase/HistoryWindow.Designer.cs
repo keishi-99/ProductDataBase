@@ -1,4 +1,4 @@
-﻿namespace ProductDataBase {
+﻿namespace ProductDatabase {
     partial class HistoryWindow {
         /// <summary>
         /// Required designer variable.

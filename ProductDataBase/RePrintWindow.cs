@@ -3,7 +3,7 @@ using LabelGenerator;
 using System.Data;
 using System.Data.SQLite;
 
-namespace ProductDataBase {
+namespace ProductDatabase {
     public partial class RePrintWindow : Form {
 
         public CSettingsLabelPro SettingsLabelPro { get; set; } = new CSettingsLabelPro();

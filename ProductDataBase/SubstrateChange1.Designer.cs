@@ -1,4 +1,4 @@
-﻿namespace ProductDataBase {
+﻿namespace ProductDatabase {
     partial class SubstrateChange1 {
         /// <summary>
         /// Required designer variable.

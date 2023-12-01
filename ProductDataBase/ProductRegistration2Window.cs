@@ -5,7 +5,7 @@ using System.Data;
 using System.Data.SQLite;
 using Excel = Microsoft.Office.Interop.Excel;
 
-namespace ProductDataBase {
+namespace ProductDatabase {
     public partial class ProductRegistration2Window : Form {
 
         public CSettingsLabelPro SettingsLabelPro { get; set; } = new CSettingsLabelPro();
