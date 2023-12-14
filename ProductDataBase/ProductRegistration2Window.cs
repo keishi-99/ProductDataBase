@@ -58,7 +58,7 @@ namespace ProductDatabase {
         private string StrSerialFirstNumber = string.Empty;
         private string StrSerialLastNumber = string.Empty;
         private string StrTotalSubstrate = string.Empty;
-        private readonly int IntSerialLastNumber;
+        private int IntSerialLastNumber;
         private bool FontUnderbar = false;
 
         readonly List<string> StrSerial = new();
@@ -82,6 +82,8 @@ namespace ProductDatabase {
 
                 RegisterButton.Enabled = true;
                 ArrUseSubstrate = StrUseSubstrate.Split(",");
+
+                IntSerialLastNumber = IntSerialFirstNumber + IntQuantity - 1;
 
                 bool _quantityFlg = false;
                 string _strQuantity = string.Empty;
