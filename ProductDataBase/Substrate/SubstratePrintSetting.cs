@@ -1,6 +1,7 @@
-﻿using LabelGenerator;
+﻿using ProductDatabase.Substrate;
 
-namespace ProductDatabase {
+namespace ProductDatabase
+{
     public partial class SubstratePrintSetting : Form {
 
         private CLabelSubLabelSettings LabelSubLabelSettings;

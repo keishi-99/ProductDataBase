@@ -1,18 +1,22 @@
 ﻿using System.ComponentModel;
 using System.Xml.Serialization;
 
-namespace LabelGenerator {
-    public class CSettingsBarcodePro {
+namespace ProductDatabase.Product
+{
+    public class CSettingsBarcodePro
+    {
         public CBarcodeProPageSettings BarcodeProPageSettings { get; set; }
         public CBarcodeProLabelSettings BarcodeProLabelSettings { get; set; }
 
-        public CSettingsBarcodePro() {
+        public CSettingsBarcodePro()
+        {
             BarcodeProPageSettings = new CBarcodeProPageSettings();
             BarcodeProLabelSettings = new CBarcodeProLabelSettings();
         }
     }
 
-    public class CBarcodeProPageSettings {
+    public class CBarcodeProPageSettings
+    {
         public int NumLabelsX { get; set; } = 10;
         public int NumLabelsY { get; set; } = 31;
         public double SizeX { get; set; } = 15;
@@ -29,21 +33,25 @@ namespace LabelGenerator {
         [XmlIgnore]
         public Font HeaderFooterFont { get; set; } = new Font("Arial", 6);
 
-        public string FontAsString {
+        public string FontAsString
+        {
             get { return ConvertToString(HeaderFooterFont); }
             set { HeaderFooterFont = ConvertFromString<Font>(value); }
         }
 
-        public static string ConvertToString<T>(T value) {
+        public static string ConvertToString<T>(T value)
+        {
             return TypeDescriptor.GetConverter(typeof(T)).ConvertToString(value)!;
         }
 
-        public static T ConvertFromString<T>(string value) {
+        public static T ConvertFromString<T>(string value)
+        {
             return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(value)!;
         }
     }
 
-    public class CBarcodeProLabelSettings {
+    public class CBarcodeProLabelSettings
+    {
         public double BarcodeHeight { get; set; } = 1;
         public double BarcodePosX { get; set; } = 4;
         public double BarcodePosY { get; set; } = 1;
@@ -58,16 +66,19 @@ namespace LabelGenerator {
         public Font Font { get; set; } = new Font("Arial", 6);
 
         [Browsable(false)]
-        public string FontAsString {
+        public string FontAsString
+        {
             get { return ConvertToString(Font); }
             set { Font = ConvertFromString<Font>(value); }
         }
 
-        public static string ConvertToString<T>(T value) {
+        public static string ConvertToString<T>(T value)
+        {
             return TypeDescriptor.GetConverter(typeof(T)).ConvertToString(value)!;
         }
 
-        public static T ConvertFromString<T>(string value) {
+        public static T ConvertFromString<T>(string value)
+        {
             return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(value)!;
         }
     }

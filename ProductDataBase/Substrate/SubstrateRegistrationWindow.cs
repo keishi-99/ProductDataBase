@@ -1,8 +1,9 @@
-﻿using LabelGenerator;
+﻿using ProductDatabase.Substrate;
 using System.Data;
 using System.Data.SQLite;
 
-namespace ProductDatabase {
+namespace ProductDatabase
+{
     public partial class SubstrateRegistrationWindow : Form {
 
         public CSettingsLabelSub SettingsLabelSub { get; set; } = new CSettingsLabelSub();
