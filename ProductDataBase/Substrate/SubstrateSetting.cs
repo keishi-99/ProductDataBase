@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Xml.Serialization;
 
-namespace LabelGenerator {
+namespace ProductDatabase.Substrate {
     public class CSettingsLabelSub {
         public CLabelSubPageSettings LabelSubPageSettings { get; set; }
         public CLabelSubLabelSettings LabelSubLabelSettings { get; set; }

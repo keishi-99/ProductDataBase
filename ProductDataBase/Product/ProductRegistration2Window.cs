@@ -1,11 +1,12 @@
 ﻿using ClosedXML.Excel;
 using GenCode128;
-using LabelGenerator;
+using ProductDatabase.Product;
 using System.Data;
 using System.Data.SQLite;
 using Excel = Microsoft.Office.Interop.Excel;
 
-namespace ProductDatabase {
+namespace ProductDatabase
+{
     public partial class ProductRegistration2Window : Form {
 
         public CSettingsLabelPro SettingsLabelPro { get; set; } = new CSettingsLabelPro();

@@ -1,6 +1,7 @@
-﻿using LabelGenerator;
+﻿using ProductDatabase.Product;
 
-namespace ProductDatabase {
+namespace ProductDatabase
+{
     public partial class ProductBarcodePrintSettingsWindow : Form {
 
         private CBarcodeProLabelSettings BarcodeProLabelSettings;
