@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="401.ico" />
+    <Content Include="Other\401.ico" />
   </ItemGroup>
 
   <ItemGroup>
