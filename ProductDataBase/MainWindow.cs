@@ -54,10 +54,16 @@ namespace ProductDatabase {
             try {
                 // その日のbakファイルがない場合バックアップ作成
                 DateTime _d = DateTime.Now;
-                string _bakFilepath = $".\\bak\\{_d.Year}\\{_d.Month:00}_bak_{_d.Year}-{_d.Month:00}-{_d.Day:00}.db";
+                string _bakFilepath = $".\\bak\\{_d.Year}\\_bak_{_d.Year}-{_d.Month:00}-{_d.Day:00}.db";
 
                 if (!File.Exists(_bakFilepath)) {
                     string _filepath = "./db/registration.db";
+
+                    //コピー先のフォルダーが存在するか確認し、なければ作成します。
+                    string _targetFolder = Path.GetDirectoryName(_bakFilepath) ?? throw new ArgumentNullException(nameof(_bakFilepath));
+                    if (!Directory.Exists(_targetFolder)) {
+                        Directory.CreateDirectory(_targetFolder);
+                    }
                     File.Copy(_filepath, _bakFilepath, true);
                 }
 
