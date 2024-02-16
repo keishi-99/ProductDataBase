@@ -90,14 +90,14 @@ namespace ProductDatabase {
                 switch (IntRegType) {
                     case 2:
                         for (int _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
-                            using CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox;
+                            CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox;
 
                             if (_objCbx != null) {
                                 _objCbx.Enabled = true;
                                 _objCbx.Checked = true;
                             }
 
-                            using DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView;
+                            DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView;
                             if (_objDgv != null) {
                                 _objDgv.Columns[2].ReadOnly = false;
                                 _objDgv.Columns[3].ReadOnly = false;
@@ -168,14 +168,14 @@ namespace ProductDatabase {
                     case 3:
                         if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
                         for (int _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
-                            using CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox;
+                            CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox;
 
                             if (_objCbx != null) {
                                 _objCbx.Enabled = true;
                                 _objCbx.Checked = true;
                             }
 
-                            using DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView;
+                            DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView;
                             if (_objDgv != null) {
                                 _objDgv.Columns[2].ReadOnly = false;
                                 _objDgv.Columns[3].ReadOnly = false;
@@ -520,10 +520,10 @@ namespace ProductDatabase {
                         if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
                         for (int _i = 0; _i <= ArrUseSubstrate.Length; _i++) {
 
-                            using CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                            CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
 
                             if (_objCbx.Checked) {
-                                using DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
+                                DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
                                 int _dgvRowCnt = _objDgv.Rows.Count;
 
                                 for (int _j = 0; _j <= _dgvRowCnt - 1; _j++) {
@@ -836,11 +836,11 @@ namespace ProductDatabase {
                         if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
                         for (int _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
 
-                            using CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                            CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
                             _objCbx.Enabled = true;
                             _objCbx.Checked = true;
 
-                            using DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
+                            DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
                             _objDgv.Columns[2].ReadOnly = false;
                             _objDgv.Columns[3].ReadOnly = false;
 
