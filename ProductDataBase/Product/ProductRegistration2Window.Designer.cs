@@ -167,7 +167,7 @@
             ProductRegistration2MenuStrip.Items.AddRange(new ToolStripItem[] { ファイルToolStripMenuItem, 設定ToolStripMenuItem, ヘルプToolStripMenuItem });
             ProductRegistration2MenuStrip.Location = new Point(0, 0);
             ProductRegistration2MenuStrip.Name = "ProductRegistration2MenuStrip";
-            ProductRegistration2MenuStrip.Size = new Size(734, 24);
+            ProductRegistration2MenuStrip.Size = new Size(784, 24);
             ProductRegistration2MenuStrip.TabIndex = 0;
             ProductRegistration2MenuStrip.Text = "menuStrip1";
             // 
@@ -276,7 +276,7 @@
             Substrate1DataGridView.MultiSelect = false;
             Substrate1DataGridView.Name = "Substrate1DataGridView";
             Substrate1DataGridView.RowTemplate.Height = 21;
-            Substrate1DataGridView.Size = new Size(260, 74);
+            Substrate1DataGridView.Size = new Size(300, 74);
             Substrate1DataGridView.TabIndex = 2;
             // 
             // Column1
@@ -343,7 +343,7 @@
             Substrate2DataGridView.MultiSelect = false;
             Substrate2DataGridView.Name = "Substrate2DataGridView";
             Substrate2DataGridView.RowTemplate.Height = 21;
-            Substrate2DataGridView.Size = new Size(260, 74);
+            Substrate2DataGridView.Size = new Size(300, 74);
             Substrate2DataGridView.TabIndex = 4;
             // 
             // dataGridViewTextBoxColumn1
@@ -423,7 +423,7 @@
             Substrate3DataGridView.MultiSelect = false;
             Substrate3DataGridView.Name = "Substrate3DataGridView";
             Substrate3DataGridView.RowTemplate.Height = 21;
-            Substrate3DataGridView.Size = new Size(260, 74);
+            Substrate3DataGridView.Size = new Size(300, 74);
             Substrate3DataGridView.TabIndex = 6;
             // 
             // dataGridViewTextBoxColumn4
@@ -503,7 +503,7 @@
             Substrate4DataGridView.MultiSelect = false;
             Substrate4DataGridView.Name = "Substrate4DataGridView";
             Substrate4DataGridView.RowTemplate.Height = 21;
-            Substrate4DataGridView.Size = new Size(260, 74);
+            Substrate4DataGridView.Size = new Size(300, 74);
             Substrate4DataGridView.TabIndex = 8;
             // 
             // dataGridViewTextBoxColumn7
@@ -583,7 +583,7 @@
             Substrate5DataGridView.MultiSelect = false;
             Substrate5DataGridView.Name = "Substrate5DataGridView";
             Substrate5DataGridView.RowTemplate.Height = 21;
-            Substrate5DataGridView.Size = new Size(260, 74);
+            Substrate5DataGridView.Size = new Size(300, 74);
             Substrate5DataGridView.TabIndex = 10;
             // 
             // dataGridViewTextBoxColumn10
@@ -663,7 +663,7 @@
             Substrate6DataGridView.MultiSelect = false;
             Substrate6DataGridView.Name = "Substrate6DataGridView";
             Substrate6DataGridView.RowTemplate.Height = 21;
-            Substrate6DataGridView.Size = new Size(260, 74);
+            Substrate6DataGridView.Size = new Size(300, 74);
             Substrate6DataGridView.TabIndex = 12;
             // 
             // dataGridViewTextBoxColumn13
@@ -742,7 +742,7 @@
             Substrate7DataGridView.MultiSelect = false;
             Substrate7DataGridView.Name = "Substrate7DataGridView";
             Substrate7DataGridView.RowTemplate.Height = 21;
-            Substrate7DataGridView.Size = new Size(260, 74);
+            Substrate7DataGridView.Size = new Size(300, 74);
             Substrate7DataGridView.TabIndex = 14;
             // 
             // dataGridViewTextBoxColumn16
@@ -821,7 +821,7 @@
             Substrate8DataGridView.MultiSelect = false;
             Substrate8DataGridView.Name = "Substrate8DataGridView";
             Substrate8DataGridView.RowTemplate.Height = 21;
-            Substrate8DataGridView.Size = new Size(260, 74);
+            Substrate8DataGridView.Size = new Size(300, 74);
             Substrate8DataGridView.TabIndex = 16;
             // 
             // dataGridViewTextBoxColumn19
@@ -900,7 +900,7 @@
             Substrate9DataGridView.MultiSelect = false;
             Substrate9DataGridView.Name = "Substrate9DataGridView";
             Substrate9DataGridView.RowTemplate.Height = 21;
-            Substrate9DataGridView.Size = new Size(260, 74);
+            Substrate9DataGridView.Size = new Size(300, 74);
             Substrate9DataGridView.TabIndex = 18;
             // 
             // dataGridViewTextBoxColumn22
@@ -979,7 +979,7 @@
             Substrate10DataGridView.MultiSelect = false;
             Substrate10DataGridView.Name = "Substrate10DataGridView";
             Substrate10DataGridView.RowTemplate.Height = 21;
-            Substrate10DataGridView.Size = new Size(260, 74);
+            Substrate10DataGridView.Size = new Size(300, 74);
             Substrate10DataGridView.TabIndex = 20;
             // 
             // dataGridViewTextBoxColumn25
@@ -1046,7 +1046,7 @@
             // 
             SerialPrintPostionLabel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             SerialPrintPostionLabel.AutoSize = true;
-            SerialPrintPostionLabel.Location = new Point(249, 549);
+            SerialPrintPostionLabel.Location = new Point(299, 549);
             SerialPrintPostionLabel.Name = "SerialPrintPostionLabel";
             SerialPrintPostionLabel.Size = new Size(79, 30);
             SerialPrintPostionLabel.TabIndex = 21;
@@ -1055,7 +1055,7 @@
             // SerialPrintPostionNumericUpDown
             // 
             SerialPrintPostionNumericUpDown.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            SerialPrintPostionNumericUpDown.Location = new Point(237, 580);
+            SerialPrintPostionNumericUpDown.Location = new Point(287, 580);
             SerialPrintPostionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
             SerialPrintPostionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             SerialPrintPostionNumericUpDown.Name = "SerialPrintPostionNumericUpDown";
@@ -1067,7 +1067,7 @@
             // BarcodePrintPostionNumericUpDown
             // 
             BarcodePrintPostionNumericUpDown.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            BarcodePrintPostionNumericUpDown.Location = new Point(376, 580);
+            BarcodePrintPostionNumericUpDown.Location = new Point(426, 580);
             BarcodePrintPostionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
             BarcodePrintPostionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             BarcodePrintPostionNumericUpDown.Name = "BarcodePrintPostionNumericUpDown";
@@ -1080,7 +1080,7 @@
             // 
             BarcodePrintPostionLabel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             BarcodePrintPostionLabel.AutoSize = true;
-            BarcodePrintPostionLabel.Location = new Point(388, 549);
+            BarcodePrintPostionLabel.Location = new Point(438, 549);
             BarcodePrintPostionLabel.Name = "BarcodePrintPostionLabel";
             BarcodePrintPostionLabel.Size = new Size(79, 30);
             BarcodePrintPostionLabel.TabIndex = 23;
@@ -1090,7 +1090,7 @@
             // 
             SubstrateListPrintButton.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             SubstrateListPrintButton.Enabled = false;
-            SubstrateListPrintButton.Location = new Point(516, 544);
+            SubstrateListPrintButton.Location = new Point(566, 544);
             SubstrateListPrintButton.Name = "SubstrateListPrintButton";
             SubstrateListPrintButton.Size = new Size(100, 25);
             SubstrateListPrintButton.TabIndex = 25;
@@ -1102,7 +1102,7 @@
             // 
             CheckSheetPrintButton.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             CheckSheetPrintButton.Enabled = false;
-            CheckSheetPrintButton.Location = new Point(622, 544);
+            CheckSheetPrintButton.Location = new Point(672, 544);
             CheckSheetPrintButton.Name = "CheckSheetPrintButton";
             CheckSheetPrintButton.Size = new Size(100, 25);
             CheckSheetPrintButton.TabIndex = 26;
@@ -1114,7 +1114,7 @@
             // 
             RegisterButton.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             RegisterButton.Enabled = false;
-            RegisterButton.Location = new Point(516, 577);
+            RegisterButton.Location = new Point(566, 577);
             RegisterButton.Name = "RegisterButton";
             RegisterButton.Size = new Size(100, 25);
             RegisterButton.TabIndex = 27;
@@ -1126,7 +1126,7 @@
             // 
             CloseButton.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             CloseButton.Enabled = false;
-            CloseButton.Location = new Point(622, 577);
+            CloseButton.Location = new Point(672, 577);
             CloseButton.Name = "CloseButton";
             CloseButton.Size = new Size(100, 25);
             CloseButton.TabIndex = 28;
@@ -1152,7 +1152,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(734, 611);
+            ClientSize = new Size(784, 611);
             Controls.Add(CloseButton);
             Controls.Add(RegisterButton);
             Controls.Add(CheckSheetPrintButton);

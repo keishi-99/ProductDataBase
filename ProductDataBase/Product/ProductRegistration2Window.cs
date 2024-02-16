@@ -67,8 +67,8 @@ namespace ProductDatabase {
                         "Substrate6CheckBox", "Substrate7CheckBox", "Substrate8CheckBox", "Substrate9CheckBox","Substrate10CheckBox"
                         };
         readonly List<string> DataGridViewNames = new() {
-                        "DataGridView1", "DataGridView2", "DataGridView3", "DataGridView4","DataGridView5",
-                        "DataGridView6", "DataGridView7", "DataGridView8", "DataGridView9","DataGridView10"
+                        "Substrate1DataGridView", "Substrate2DataGridView", "Substrate3DataGridView", "Substrate4DataGridView","Substrate5DataGridView",
+                        "Substrate6DataGridView", "Substrate7DataGridView", "Substrate8DataGridView", "Substrate9DataGridView","Substrate10DataGridView"
                         };
         readonly List<string> ListUsedSubstrate = new();
         readonly List<string> ListUsedProductNumber = new();
@@ -99,6 +99,7 @@ namespace ProductDatabase {
 
                             DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView;
                             if (_objDgv != null) {
+                                _objDgv.RowHeadersWidth = 30;
                                 _objDgv.Columns[2].ReadOnly = false;
                                 _objDgv.Columns[3].ReadOnly = false;
                             }
@@ -177,6 +178,7 @@ namespace ProductDatabase {
 
                             DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView;
                             if (_objDgv != null) {
+                                _objDgv.RowHeadersWidth = 30;
                                 _objDgv.Columns[2].ReadOnly = false;
                                 _objDgv.Columns[3].ReadOnly = false;
                             }
@@ -213,6 +215,7 @@ namespace ProductDatabase {
                                                 _quantityFlg = false;
                                                 _strQuantity = $"{_strQuantity}[{_strSubstrateName}]{Environment.NewLine}";
                                             }
+                                            if (Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value) >= Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value)) { _quantityFlg = true; }
                                         }
                                     }
                                     _j++;
@@ -220,7 +223,7 @@ namespace ProductDatabase {
                             }
                         }
 
-                        if (!_quantityFlg) {
+                        if (_quantityFlg == false) {
                             Activate();
                             MessageBox.Show($"在庫が足りません。{Environment.NewLine}{_strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
@@ -520,10 +523,10 @@ namespace ProductDatabase {
                         if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
                         for (int _i = 0; _i <= ArrUseSubstrate.Length; _i++) {
 
-                            CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                            using CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
 
                             if (_objCbx.Checked) {
-                                DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
+                                using DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
                                 int _dgvRowCnt = _objDgv.Rows.Count;
 
                                 for (int _j = 0; _j <= _dgvRowCnt - 1; _j++) {
@@ -836,11 +839,11 @@ namespace ProductDatabase {
                         if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
                         for (int _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
 
-                            CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                            using CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
                             _objCbx.Enabled = true;
                             _objCbx.Checked = true;
 
-                            DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
+                            using DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
                             _objDgv.Columns[2].ReadOnly = false;
                             _objDgv.Columns[3].ReadOnly = false;
 
