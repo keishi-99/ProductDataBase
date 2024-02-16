@@ -156,7 +156,7 @@
             // 
             CloseButton.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             CloseButton.Enabled = false;
-            CloseButton.Location = new Point(622, 676);
+            CloseButton.Location = new Point(672, 676);
             CloseButton.Name = "CloseButton";
             CloseButton.Size = new Size(100, 25);
             CloseButton.TabIndex = 57;
@@ -167,7 +167,7 @@
             // 
             RegisterButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             RegisterButton.Enabled = false;
-            RegisterButton.Location = new Point(410, 676);
+            RegisterButton.Location = new Point(460, 676);
             RegisterButton.Name = "RegisterButton";
             RegisterButton.Size = new Size(100, 25);
             RegisterButton.TabIndex = 56;
@@ -178,7 +178,7 @@
             // 
             SubstrateListPrintButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             SubstrateListPrintButton.Enabled = false;
-            SubstrateListPrintButton.Location = new Point(516, 676);
+            SubstrateListPrintButton.Location = new Point(566, 676);
             SubstrateListPrintButton.Name = "SubstrateListPrintButton";
             SubstrateListPrintButton.Size = new Size(100, 25);
             SubstrateListPrintButton.TabIndex = 54;
@@ -201,7 +201,7 @@
             SubstrateData10GridView.MultiSelect = false;
             SubstrateData10GridView.Name = "SubstrateData10GridView";
             SubstrateData10GridView.RowTemplate.Height = 21;
-            SubstrateData10GridView.Size = new Size(260, 74);
+            SubstrateData10GridView.Size = new Size(300, 74);
             SubstrateData10GridView.TabIndex = 49;
             // 
             // dataGridViewTextBoxColumn25
@@ -279,7 +279,7 @@
             SubstrateData9GridView.MultiSelect = false;
             SubstrateData9GridView.Name = "SubstrateData9GridView";
             SubstrateData9GridView.RowTemplate.Height = 21;
-            SubstrateData9GridView.Size = new Size(260, 74);
+            SubstrateData9GridView.Size = new Size(300, 74);
             SubstrateData9GridView.TabIndex = 47;
             // 
             // dataGridViewTextBoxColumn22
@@ -357,7 +357,7 @@
             SubstrateData8GridView.MultiSelect = false;
             SubstrateData8GridView.Name = "SubstrateData8GridView";
             SubstrateData8GridView.RowTemplate.Height = 21;
-            SubstrateData8GridView.Size = new Size(260, 74);
+            SubstrateData8GridView.Size = new Size(300, 74);
             SubstrateData8GridView.TabIndex = 45;
             // 
             // dataGridViewTextBoxColumn19
@@ -435,7 +435,7 @@
             Substrate7DataGridView.MultiSelect = false;
             Substrate7DataGridView.Name = "Substrate7DataGridView";
             Substrate7DataGridView.RowTemplate.Height = 21;
-            Substrate7DataGridView.Size = new Size(260, 74);
+            Substrate7DataGridView.Size = new Size(300, 74);
             Substrate7DataGridView.TabIndex = 43;
             // 
             // dataGridViewTextBoxColumn16
@@ -513,7 +513,7 @@
             Substrate6DataGridView.MultiSelect = false;
             Substrate6DataGridView.Name = "Substrate6DataGridView";
             Substrate6DataGridView.RowTemplate.Height = 21;
-            Substrate6DataGridView.Size = new Size(260, 74);
+            Substrate6DataGridView.Size = new Size(300, 74);
             Substrate6DataGridView.TabIndex = 41;
             // 
             // dataGridViewTextBoxColumn13
@@ -591,7 +591,7 @@
             Substrate5DataGridView.MultiSelect = false;
             Substrate5DataGridView.Name = "Substrate5DataGridView";
             Substrate5DataGridView.RowTemplate.Height = 21;
-            Substrate5DataGridView.Size = new Size(260, 74);
+            Substrate5DataGridView.Size = new Size(300, 74);
             Substrate5DataGridView.TabIndex = 39;
             // 
             // dataGridViewTextBoxColumn10
@@ -670,7 +670,7 @@
             Substrate4DataGridView.MultiSelect = false;
             Substrate4DataGridView.Name = "Substrate4DataGridView";
             Substrate4DataGridView.RowTemplate.Height = 21;
-            Substrate4DataGridView.Size = new Size(260, 74);
+            Substrate4DataGridView.Size = new Size(300, 74);
             Substrate4DataGridView.TabIndex = 37;
             // 
             // dataGridViewTextBoxColumn7
@@ -749,7 +749,7 @@
             Substrate3DataGridView.MultiSelect = false;
             Substrate3DataGridView.Name = "Substrate3DataGridView";
             Substrate3DataGridView.RowTemplate.Height = 21;
-            Substrate3DataGridView.Size = new Size(260, 74);
+            Substrate3DataGridView.Size = new Size(300, 74);
             Substrate3DataGridView.TabIndex = 35;
             // 
             // dataGridViewTextBoxColumn4
@@ -828,7 +828,7 @@
             Substrate2DataGridView.MultiSelect = false;
             Substrate2DataGridView.Name = "Substrate2DataGridView";
             Substrate2DataGridView.RowTemplate.Height = 21;
-            Substrate2DataGridView.Size = new Size(260, 74);
+            Substrate2DataGridView.Size = new Size(300, 74);
             Substrate2DataGridView.TabIndex = 33;
             // 
             // dataGridViewTextBoxColumn1
@@ -907,7 +907,7 @@
             Substrate1DataGridView.MultiSelect = false;
             Substrate1DataGridView.Name = "Substrate1DataGridView";
             Substrate1DataGridView.RowTemplate.Height = 21;
-            Substrate1DataGridView.Size = new Size(260, 74);
+            Substrate1DataGridView.Size = new Size(300, 74);
             Substrate1DataGridView.TabIndex = 31;
             // 
             // Column1
@@ -1125,7 +1125,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(734, 711);
+            ClientSize = new Size(784, 711);
             Controls.Add(CommentTtextBox);
             Controls.Add(CommentCheckBox);
             Controls.Add(PersonComboBox);
