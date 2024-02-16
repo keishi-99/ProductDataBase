@@ -5,8 +5,7 @@ using System.Data;
 using System.Data.SQLite;
 using Excel = Microsoft.Office.Interop.Excel;
 
-namespace ProductDatabase
-{
+namespace ProductDatabase {
     public partial class ProductRegistration2Window : Form {
 
         public CSettingsLabelPro SettingsLabelPro { get; set; } = new CSettingsLabelPro();
@@ -1223,7 +1222,7 @@ namespace ProductDatabase
         }
         // チェックボックスイベント
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
-            using CheckBox _checkBox = (CheckBox)sender;
+            CheckBox _checkBox = (CheckBox)sender;
             DataGridView _dataGridView = new();
 
             switch (_checkBox.Name) {
