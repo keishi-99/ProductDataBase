@@ -133,6 +133,8 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = false;
 
                 using ProductRegistration2Window _productRegistration2Window = new() {
+                    StrFontName = StrFontName,
+                    IntFontSize = IntFontSize,
                     StrProductName = StrProductName,
                     StrStockName = StrStockName,
                     StrProductType = StrProductType,

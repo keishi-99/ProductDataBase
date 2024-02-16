@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Data.Odbc;
 using System.Data.SQLite;
+using System.Security.Policy;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
@@ -149,7 +150,10 @@ namespace ProductDatabase {
 
                                     break;
                                 case 4:
-                                    using (SubstrateChange1 _substrateChange1 = new()) {
+                                    using (SubstrateChange1 _substrateChange1 = new() {
+                                        StrFontName = FontName,
+                                        IntFontSize = IntFontSize
+                                    }) {
                                         _substrateChange1.ShowDialog(this);
                                     }
 
