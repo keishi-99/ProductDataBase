@@ -3,8 +3,7 @@ using ProductDatabase.Product;
 using System.Data;
 using System.Data.SQLite;
 
-namespace ProductDatabase
-{
+namespace ProductDatabase {
     public partial class RePrintWindow : Form {
 
         public CSettingsLabelPro SettingsLabelPro { get; set; } = new CSettingsLabelPro();
@@ -556,7 +555,7 @@ namespace ProductDatabase
         }
         // チェックボックスイベント
         private void CheckBoxChecked(object sender, EventArgs e) {
-            using CheckBox _checkBox = (CheckBox)sender;
+            CheckBox _checkBox = (CheckBox)sender;
 
             switch (_checkBox.Name) {
                 case "OrderNumberCheckBox":
