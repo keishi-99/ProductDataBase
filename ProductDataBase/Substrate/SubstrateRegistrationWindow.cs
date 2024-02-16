@@ -2,8 +2,7 @@
 using System.Data;
 using System.Data.SQLite;
 
-namespace ProductDatabase
-{
+namespace ProductDatabase {
     public partial class SubstrateRegistrationWindow : Form {
 
         public CSettingsLabelSub SettingsLabelSub { get; set; } = new CSettingsLabelSub();
@@ -498,7 +497,7 @@ namespace ProductDatabase
         }
         // チェックボックスイベント
         private void CheckBoxChecked(object sender, EventArgs e) {
-            using CheckBox _checkBox = (CheckBox)sender;
+            CheckBox _checkBox = (CheckBox)sender;
 
             switch (_checkBox.Name) {
                 case "OrderNumberCheckBox":

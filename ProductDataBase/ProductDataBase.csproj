@@ -22,10 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Other\401.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.102.1" />
     <PackageReference Include="GenCode128" Version="2.0.0" />
     <PackageReference Include="System.Data.Odbc" Version="7.0.0" />
