@@ -53,6 +53,12 @@ namespace ProductDatabase {
         // ロードイベント
         private void LoadEvents() {
             try {
+
+                ///////////////////////////////////////////////////////////////////////////////////
+                // 一時的に無効化
+                CategoryRadioButton4.Enabled = false;
+                ///////////////////////////////////////////////////////////////////////////////////
+
                 // その日のbakファイルがない場合バックアップ作成
                 DateTime _d = DateTime.Now;
                 string _bakFilepath = $".\\bak\\{_d.Year}\\_bak_{_d.Year}-{_d.Month:00}-{_d.Day:00}.db";
