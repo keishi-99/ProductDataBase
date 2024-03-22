@@ -1,9 +1,13 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using GenCode128;
 using ProductDatabase.Product;
 using System.Data;
 using System.Data.SQLite;
+using Color = System.Drawing.Color;
+using Control = System.Windows.Forms.Control;
 using Excel = Microsoft.Office.Interop.Excel;
+using Font = System.Drawing.Font;
 
 namespace ProductDatabase {
     public partial class ProductRegistration2Window : Form {
@@ -120,6 +124,7 @@ namespace ProductDatabase {
                             }
 
                             // 在庫テーブルからデータ取得
+                            int _intQuantity = IntQuantity;
                             _cmd.CommandText = $"SELECT col_Substrate_num, col_Stock, col_Substrate_Name FROM 'Stock_{StrStockName}' WHERE col_flg = 1 And col_Substrate_Model = '{ArrUseSubstrate[_i]}' ORDER BY _rowid_ ASC";
                             using (SQLiteDataReader _dr = _cmd.ExecuteReader()) {
                                 while (_dr.Read()) {
@@ -127,7 +132,6 @@ namespace ProductDatabase {
                                     int _intStock = Convert.ToInt32(_dr["col_Stock"]);
                                     _objDgv?.Rows.Add(_strSubstrateNumber, _intStock);
 
-                                    int _intQuantity = IntQuantity;
                                     if (_intQuantity >= _intStock) {
                                         _intQuantity -= _intStock;
                                         if (_objDgv != null) {
@@ -136,17 +140,18 @@ namespace ProductDatabase {
                                         }
                                     }
                                     else {
-                                        if (_intQuantity == 0)
+                                        if (_intQuantity == 0) {
                                             if (_objDgv != null) {
                                                 _objDgv.Rows[^1].Cells[2].Value = null;
                                             }
-                                            else {
-                                                if (_objDgv != null) {
-                                                    _objDgv.Rows[^1].Cells[2].Value = _intQuantity;
-                                                    _objDgv.Rows[^1].Cells[3].Value = true;
-                                                    _intQuantity = 0;
-                                                }
+                                        }
+                                        else {
+                                            if (_objDgv != null) {
+                                                _objDgv.Rows[^1].Cells[2].Value = _intQuantity;
+                                                _objDgv.Rows[^1].Cells[3].Value = true;
+                                                _intQuantity = 0;
                                             }
+                                        }
                                     }
 
                                     if (_intQuantity > 0) {
@@ -1353,24 +1358,47 @@ namespace ProductDatabase {
         // リスト印刷
         private void ListPrint() {
             try {
-                string _cellRange = string.Empty;
-                string _filePath = string.Empty;
                 string _sheetName = string.Empty;
+                string _productName = string.Empty;
+                string _productModel = string.Empty;
+                string _useSubstrateName1 = string.Empty;
+                string _useSubstrateName2 = string.Empty;
+                string _useSubstrateName3 = string.Empty;
+                string _useSubstrateName4 = string.Empty;
+                string _useSubstrateName5 = string.Empty;
+                string _useSubstrateName6 = string.Empty;
+                string _useSubstrateName7 = string.Empty;
+                string _useSubstrateName8 = string.Empty;
+                string _useSubstrateName9 = string.Empty;
+                string _useSubstrateName10 = string.Empty;
 
+                string _productNameRange = string.Empty;
+                string _productNumberRange = string.Empty;
                 string _orderNumberRange = string.Empty;
-                string _regYearRange = string.Empty;
-                string _regMonthRange = string.Empty;
-                string _regDayRange = string.Empty;
-                string _orderFirstSerialRange = string.Empty;
-                string _orderLastSerialRange = string.Empty;
+                string _regDateRange = string.Empty;
+                string _productModelRange = string.Empty;
+                string _quantityRange = string.Empty;
+                string _serialFirstRange = string.Empty;
+                string _serialLastRange = string.Empty;
+                string _commentRange = string.Empty;
+                string _useSubstrateRange1 = string.Empty;
+                string _useSubstrateRange2 = string.Empty;
+                string _useSubstrateRange3 = string.Empty;
+                string _useSubstrateRange4 = string.Empty;
+                string _useSubstrateRange5 = string.Empty;
+                string _useSubstrateRange6 = string.Empty;
+                string _useSubstrateRange7 = string.Empty;
+                string _useSubstrateRange8 = string.Empty;
+                string _useSubstrateRange9 = string.Empty;
+                string _useSubstrateRange10 = string.Empty;
 
                 using (FileStream _fileStream = new($@"{Environment.CurrentDirectory}./config/Excel/ConfigList.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
                     using XLWorkbook _workBook = new(_fileStream);
-                    IXLWorksheet _workSheet = _workBook.Worksheet(1);
+                    IXLWorksheet _workSheetMain = _workBook.Worksheet(1);
 
                     int _findRow = 0;
                     // セル検索
-                    foreach (IXLCell _cell in _workSheet.Search(StrProductModel)) {
+                    foreach (IXLCell _cell in _workSheetMain.Search(StrProductModel)) {
                         _findRow = _cell.Address.RowNumber;
                     }
 
@@ -1379,31 +1407,89 @@ namespace ProductDatabase {
                     }
 
                     // ワークシートのセルから値を取得
-                    _filePath = _workSheet.Cell(_findRow, 10).Value.ToString();
-                    _sheetName = _workSheet.Cell(_findRow, 9).Value.ToString();
+                    _sheetName = StrProductModel;
+                    _productName = _workSheetMain.Cell(_findRow, 2).Value.ToString();
+                    _productNameRange = _workSheetMain.Cell(_findRow, 3).Value.ToString();
+                    _productNumberRange = _workSheetMain.Cell(_findRow, 4).Value.ToString();
+                    _orderNumberRange = _workSheetMain.Cell(_findRow, 5).Value.ToString();
+                    _regDateRange = _workSheetMain.Cell(_findRow, 6).Value.ToString();
+                    _productModel = _workSheetMain.Cell(_findRow, 7).Value.ToString();
+                    _productModelRange = _workSheetMain.Cell(_findRow, 8).Value.ToString();
+                    _quantityRange = _workSheetMain.Cell(_findRow, 9).Value.ToString();
+                    _serialFirstRange = _workSheetMain.Cell(_findRow, 10).Value.ToString();
+                    _serialLastRange = _workSheetMain.Cell(_findRow, 11).Value.ToString();
+                    _commentRange = _workSheetMain.Cell(_findRow, 12).Value.ToString();
+                    //_useSubstrateName1 = _workSheetMain.Cell(_findRow, 13).Value.ToString();
+                    //_useSubstrateRange1 = _workSheetMain.Cell(_findRow, 14).Value.ToString();
+                    //_useSubstrateName2 = _workSheetMain.Cell(_findRow, 15).Value.ToString();
+                    //_useSubstrateRange2 = _workSheetMain.Cell(_findRow, 16).Value.ToString();
+                    //_useSubstrateName3 = _workSheetMain.Cell(_findRow, 17).Value.ToString();
+                    //_useSubstrateRange3 = _workSheetMain.Cell(_findRow, 18).Value.ToString();
+                    //_useSubstrateName4 = _workSheetMain.Cell(_findRow, 19).Value.ToString();
+                    //_useSubstrateRange4 = _workSheetMain.Cell(_findRow, 20).Value.ToString();
+                    //_useSubstrateName5 = _workSheetMain.Cell(_findRow, 21).Value.ToString();
+                    //_useSubstrateRange5 = _workSheetMain.Cell(_findRow, 22).Value.ToString();
+                    //_useSubstrateName6 = _workSheetMain.Cell(_findRow, 23).Value.ToString();
+                    //_useSubstrateRange6 = _workSheetMain.Cell(_findRow, 24).Value.ToString();
+                    //_useSubstrateName7 = _workSheetMain.Cell(_findRow, 25).Value.ToString();
+                    //_useSubstrateRange7 = _workSheetMain.Cell(_findRow, 26).Value.ToString();
+                    //_useSubstrateName8 = _workSheetMain.Cell(_findRow, 27).Value.ToString();
+                    //_useSubstrateRange8 = _workSheetMain.Cell(_findRow, 28).Value.ToString();
+                    //_useSubstrateName9 = _workSheetMain.Cell(_findRow, 29).Value.ToString();
+                    //_useSubstrateRange9 = _workSheetMain.Cell(_findRow, 30).Value.ToString();
+                    //_useSubstrateName10 = _workSheetMain.Cell(_findRow, 31).Value.ToString();
+                    //_useSubstrateRange10 = _workSheetMain.Cell(_findRow, 32).Value.ToString();
 
-                    _orderNumberRange = _workSheet.Cell(_findRow, 3).Value.ToString();
-                    _regYearRange = _workSheet.Cell(_findRow, 4).Value.ToString();
-                    _regMonthRange = _workSheet.Cell(_findRow, 5).Value.ToString();
-                    _regDayRange = _workSheet.Cell(_findRow, 6).Value.ToString();
-                    _orderFirstSerialRange = _workSheet.Cell(_findRow, 7).Value.ToString();
-                    _orderLastSerialRange = _workSheet.Cell(_findRow, 8).Value.ToString();
-                }
 
-                using (FileStream _fileStream = new($@"{_filePath}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
-                    using XLWorkbook _workBook = new(_fileStream);
-                    IXLWorksheet _workSheet = _workBook.Worksheet(_sheetName);
+                    IXLWorksheet _workSheetTemp = _workBook.Worksheet(_sheetName);
+                    _workSheetTemp.Cell(_productNameRange).Value = _productName;
+                    _workSheetTemp.Cell(_productNumberRange).Value = StrProductNumber;
+                    _workSheetTemp.Cell(_orderNumberRange).Value = StrOrderNumber;
+                    _workSheetTemp.Cell(_regDateRange).Value = StrRegDate;
+                    _workSheetTemp.Cell(_productModelRange).Value = _productModel;
+                    _workSheetTemp.Cell(_quantityRange).Value = IntQuantity;
+                    _workSheetTemp.Cell(_serialFirstRange).Value = StrSerialFirstNumber;
+                    _workSheetTemp.Cell(_serialLastRange).Value = StrSerialLastNumber;
+                    _workSheetTemp.Cell(_commentRange).Value = StrComment;
 
-                    _workSheet.Cell(_orderNumberRange).Value = StrOrderNumber;
-                    _workSheet.Cell(_regYearRange).Value = $"{DateTime.Parse(StrRegDate):yy}年";
-                    _workSheet.Cell(_regMonthRange).Value = $"{DateTime.Parse(StrRegDate):MM}月";
-                    _workSheet.Cell(_regDayRange).Value = $"{DateTime.Parse(StrRegDate):dd}日";
-                    _workSheet.Cell(_orderFirstSerialRange).Value = StrSerialFirstNumber;
-                    _workSheet.Cell(_orderLastSerialRange).Value = StrSerialLastNumber;
+                    int _i = 0;
+                    int _findColumn = 0;
+                    IXLRange _findRows = (IXLRange)_workSheetMain.Cell(_findRow, _findRow);
+                    for (_i = 0; _i <= ListUsedSubstrate.Count; _i++) {
+                        // "abc"を含んだセルを探す
+                        foreach (IXLCell cell in _findRows.Search(ListUsedSubstrate[_i])) {
+                            _findColumn = cell.Address.ColumnNumber;
+                        }
+
+                        if (_findColumn == 0) {
+                            throw new Exception($"{ListUsedSubstrate[_i]}が見つかりません。");
+                        }
+
+                        var mainCellValue = _workSheetMain.Cell(_findRow, _findColumn + 1).Value.ToString();
+                        var tempCellValue = _workSheetTemp.Cell(mainCellValue).Value.ToString();
+
+                        if (mainCellValue == string.Empty) {
+                            if (tempCellValue == string.Empty) {
+                                _workSheetTemp.Cell(mainCellValue).Value = $"{ListUsedProductNumber}({ListUsedQuantity})";
+                            }
+                            else {
+                                _workSheetTemp.Cell(mainCellValue).Value += $"{ListUsedProductNumber}({ListUsedQuantity})";
+                            }
+                        }
+                        //if (_workSheetMain.Cell(_findRow, _findColumn + 1).Value.ToString() == string.Empty) {
+                        //    if (_workSheetTemp.Cell(_workSheetMain.Cell(_findRow, _findColumn + 1).Value.ToString()).Value.ToString() == string.Empty) {
+                        //        _workSheetTemp.Cell(_workSheetMain.Cell(_findRow, _findColumn + 1).Value.ToString()).Value = $"{ListUsedProductNumber}({ListUsedQuantity})";
+                        //    }
+                        //    else {
+                        //        _workSheetTemp.Cell(_workSheetMain.Cell(_findRow, _findColumn + 1).Value.ToString()).Value += $"{ListUsedProductNumber}({ListUsedQuantity})";
+                        //    }
+                        //}
+                    }
 
                     //引数に保存先パスを指定
                     _workBook.SaveAs($@"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
                 }
+
                 // 印刷
                 Excel.Application _xlApp = new() {
                     Visible = true // Excelウィンドウを表示します。
@@ -1415,7 +1501,7 @@ namespace ProductDatabase {
 
                 // ワークシート選択
                 Excel.Sheets _xlSheets = _xlBook.Sheets;
-                Excel.Worksheet _xlSheet = _xlSheets[1];
+                Excel.Worksheet _xlSheet = _xlSheets[_sheetName];
 
                 // ワークシート印刷
                 _xlSheet.PrintOut(Preview: true);
