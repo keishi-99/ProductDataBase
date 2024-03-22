@@ -460,7 +460,7 @@ namespace ProductDatabase {
                                     .Replace("%R", RevisionTextBox.Text)
                                     .Replace("%Y", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yy"))
                                     .Replace("%MM", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM"))
-                                    .Replace("%M", _monthCode[^1..])
+                                    .Replace("%M", string.IsNullOrEmpty(_monthCode) ? string.Empty : _monthCode[^1..])
                                     .Replace("%S", _serialCode);
 
             return _outputCode;
