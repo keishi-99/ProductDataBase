@@ -130,16 +130,16 @@
             OrderNumberTextBox = new TextBox();
             label2 = new Label();
             ManufacturingNumberTextBox = new TextBox();
-            QuantityCheckBox = new CheckBox();
             QuantityTextBox = new TextBox();
-            RegistrationDateCheckBox = new CheckBox();
             RegistrationDateMaskedTextBox = new MaskedTextBox();
             RevisionTextBox = new TextBox();
-            RevisionCheckBox = new CheckBox();
             PersonComboBox = new ComboBox();
-            PersonCheckBox = new CheckBox();
             CommentTtextBox = new TextBox();
-            CommentCheckBox = new CheckBox();
+            label103 = new Label();
+            label105 = new Label();
+            label104 = new Label();
+            label106 = new Label();
+            label107 = new Label();
             ((System.ComponentModel.ISupportInitialize)SubstrateData10GridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)SubstrateData9GridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)SubstrateData8GridView).BeginInit();
@@ -973,7 +973,7 @@
             // 
             Label1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             Label1.AutoSize = true;
-            Label1.Location = new Point(36, 549);
+            Label1.Location = new Point(38, 546);
             Label1.Name = "Label1";
             Label1.Size = new Size(55, 15);
             Label1.TabIndex = 58;
@@ -982,6 +982,7 @@
             // OrderNumberTextBox
             // 
             OrderNumberTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            OrderNumberTextBox.Enabled = false;
             OrderNumberTextBox.Location = new Point(38, 564);
             OrderNumberTextBox.MaxLength = 50;
             OrderNumberTextBox.Name = "OrderNumberTextBox";
@@ -993,7 +994,7 @@
             // 
             label2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label2.AutoSize = true;
-            label2.Location = new Point(157, 549);
+            label2.Location = new Point(159, 546);
             label2.Name = "label2";
             label2.Size = new Size(55, 15);
             label2.TabIndex = 60;
@@ -1002,6 +1003,7 @@
             // ManufacturingNumberTextBox
             // 
             ManufacturingNumberTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            ManufacturingNumberTextBox.Enabled = false;
             ManufacturingNumberTextBox.Location = new Point(159, 564);
             ManufacturingNumberTextBox.MaxLength = 50;
             ManufacturingNumberTextBox.Name = "ManufacturingNumberTextBox";
@@ -1009,37 +1011,16 @@
             ManufacturingNumberTextBox.TabIndex = 61;
             ManufacturingNumberTextBox.TextAlign = HorizontalAlignment.Right;
             // 
-            // QuantityCheckBox
-            // 
-            QuantityCheckBox.Location = new Point(38, 589);
-            QuantityCheckBox.Margin = new Padding(0);
-            QuantityCheckBox.Name = "QuantityCheckBox";
-            QuantityCheckBox.Size = new Size(50, 19);
-            QuantityCheckBox.TabIndex = 62;
-            QuantityCheckBox.TabStop = false;
-            QuantityCheckBox.Text = "数量";
-            QuantityCheckBox.UseVisualStyleBackColor = true;
-            // 
             // QuantityTextBox
             // 
             QuantityTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            QuantityTextBox.Enabled = false;
             QuantityTextBox.Location = new Point(38, 614);
             QuantityTextBox.MaxLength = 50;
             QuantityTextBox.Name = "QuantityTextBox";
             QuantityTextBox.Size = new Size(110, 23);
             QuantityTextBox.TabIndex = 63;
             QuantityTextBox.TextAlign = HorizontalAlignment.Right;
-            // 
-            // RegistrationDateCheckBox
-            // 
-            RegistrationDateCheckBox.Location = new Point(159, 589);
-            RegistrationDateCheckBox.Margin = new Padding(0);
-            RegistrationDateCheckBox.Name = "RegistrationDateCheckBox";
-            RegistrationDateCheckBox.Size = new Size(62, 19);
-            RegistrationDateCheckBox.TabIndex = 66;
-            RegistrationDateCheckBox.TabStop = false;
-            RegistrationDateCheckBox.Text = "登録日";
-            RegistrationDateCheckBox.UseVisualStyleBackColor = true;
             // 
             // RegistrationDateMaskedTextBox
             // 
@@ -1054,6 +1035,7 @@
             // 
             // RevisionTextBox
             // 
+            RevisionTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             RevisionTextBox.Enabled = false;
             RevisionTextBox.Location = new Point(38, 664);
             RevisionTextBox.Margin = new Padding(0);
@@ -1064,43 +1046,19 @@
             RevisionTextBox.TabIndex = 69;
             RevisionTextBox.TextAlign = HorizontalAlignment.Right;
             // 
-            // RevisionCheckBox
-            // 
-            RevisionCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            RevisionCheckBox.Location = new Point(38, 639);
-            RevisionCheckBox.Margin = new Padding(0);
-            RevisionCheckBox.Name = "RevisionCheckBox";
-            RevisionCheckBox.Size = new Size(68, 19);
-            RevisionCheckBox.TabIndex = 68;
-            RevisionCheckBox.TabStop = false;
-            RevisionCheckBox.Text = "レビジョン";
-            RevisionCheckBox.UseVisualStyleBackColor = true;
-            // 
             // PersonComboBox
             // 
+            PersonComboBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             PersonComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-            PersonComboBox.Enabled = false;
             PersonComboBox.FormattingEnabled = true;
             PersonComboBox.Location = new Point(159, 664);
             PersonComboBox.Name = "PersonComboBox";
             PersonComboBox.Size = new Size(110, 23);
             PersonComboBox.TabIndex = 71;
             // 
-            // PersonCheckBox
-            // 
-            PersonCheckBox.Location = new Point(159, 639);
-            PersonCheckBox.Margin = new Padding(0);
-            PersonCheckBox.Name = "PersonCheckBox";
-            PersonCheckBox.Size = new Size(62, 19);
-            PersonCheckBox.TabIndex = 70;
-            PersonCheckBox.TabStop = false;
-            PersonCheckBox.Text = "担当者";
-            PersonCheckBox.UseVisualStyleBackColor = true;
-            // 
             // CommentTtextBox
             // 
-            CommentTtextBox.Enabled = false;
-            CommentTtextBox.Location = new Point(281, 574);
+            CommentTtextBox.Location = new Point(281, 564);
             CommentTtextBox.Margin = new Padding(0);
             CommentTtextBox.MaxLength = 500;
             CommentTtextBox.Multiline = true;
@@ -1110,32 +1068,71 @@
             CommentTtextBox.Size = new Size(214, 88);
             CommentTtextBox.TabIndex = 78;
             // 
-            // CommentCheckBox
+            // label103
             // 
-            CommentCheckBox.Location = new Point(281, 549);
-            CommentCheckBox.Margin = new Padding(0);
-            CommentCheckBox.Name = "CommentCheckBox";
-            CommentCheckBox.Size = new Size(59, 19);
-            CommentCheckBox.TabIndex = 77;
-            CommentCheckBox.TabStop = false;
-            CommentCheckBox.Text = "コメント";
-            CommentCheckBox.UseVisualStyleBackColor = true;
+            label103.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label103.AutoSize = true;
+            label103.Location = new Point(38, 596);
+            label103.Name = "label103";
+            label103.Size = new Size(31, 15);
+            label103.TabIndex = 79;
+            label103.Text = "数量";
+            // 
+            // label105
+            // 
+            label105.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label105.AutoSize = true;
+            label105.Location = new Point(38, 646);
+            label105.Name = "label105";
+            label105.Size = new Size(49, 15);
+            label105.TabIndex = 80;
+            label105.Text = "レビジョン";
+            // 
+            // label104
+            // 
+            label104.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label104.AutoSize = true;
+            label104.Location = new Point(159, 596);
+            label104.Name = "label104";
+            label104.Size = new Size(43, 15);
+            label104.TabIndex = 81;
+            label104.Text = "登録日";
+            // 
+            // label106
+            // 
+            label106.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label106.AutoSize = true;
+            label106.Location = new Point(159, 646);
+            label106.Name = "label106";
+            label106.Size = new Size(43, 15);
+            label106.TabIndex = 82;
+            label106.Text = "担当者";
+            // 
+            // label107
+            // 
+            label107.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label107.AutoSize = true;
+            label107.Location = new Point(281, 546);
+            label107.Name = "label107";
+            label107.Size = new Size(40, 15);
+            label107.TabIndex = 83;
+            label107.Text = "コメント";
             // 
             // SubstrateChange2
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(784, 711);
+            Controls.Add(label107);
+            Controls.Add(label106);
+            Controls.Add(label104);
+            Controls.Add(label105);
+            Controls.Add(label103);
             Controls.Add(CommentTtextBox);
-            Controls.Add(CommentCheckBox);
             Controls.Add(PersonComboBox);
-            Controls.Add(PersonCheckBox);
             Controls.Add(RevisionTextBox);
-            Controls.Add(RevisionCheckBox);
             Controls.Add(RegistrationDateMaskedTextBox);
-            Controls.Add(RegistrationDateCheckBox);
             Controls.Add(QuantityTextBox);
-            Controls.Add(QuantityCheckBox);
             Controls.Add(ManufacturingNumberTextBox);
             Controls.Add(label2);
             Controls.Add(OrderNumberTextBox);
@@ -1171,6 +1168,7 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "変更情報登録";
+            Load += SubstrateChange2_Load;
             ((System.ComponentModel.ISupportInitialize)SubstrateData10GridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)SubstrateData9GridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)SubstrateData8GridView).EndInit();
@@ -1254,15 +1252,17 @@
         private TextBox OrderNumberTextBox;
         private Label label2;
         private TextBox ManufacturingNumberTextBox;
-        private CheckBox QuantityCheckBox;
         private TextBox QuantityTextBox;
         private CheckBox RegistrationDateCheckBox;
         private MaskedTextBox RegistrationDateMaskedTextBox;
         private TextBox RevisionTextBox;
-        private CheckBox RevisionCheckBox;
         private ComboBox PersonComboBox;
         private CheckBox PersonCheckBox;
         private TextBox CommentTtextBox;
-        private CheckBox CommentCheckBox;
+        private Label label103;
+        private Label label105;
+        private Label label104;
+        private Label label106;
+        private Label label107;
     }
 }
