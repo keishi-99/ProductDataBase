@@ -53,12 +53,6 @@ namespace ProductDatabase {
         // ロードイベント
         private void LoadEvents() {
             try {
-
-                ///////////////////////////////////////////////////////////////////////////////////
-                // 一時的に無効化
-                CategoryRadioButton4.Enabled = false;
-                ///////////////////////////////////////////////////////////////////////////////////
-
                 // その日のbakファイルがない場合バックアップ作成
                 DateTime _d = DateTime.Now;
                 string _bakFilepath = $".\\bak\\{_d.Year}\\_bak_{_d.Year}-{_d.Month:00}-{_d.Day:00}.db";
@@ -158,7 +152,11 @@ namespace ProductDatabase {
                                 case 4:
                                     using (SubstrateChange1 _substrateChange1 = new() {
                                         StrFontName = FontName,
-                                        IntFontSize = IntFontSize
+                                        IntFontSize = IntFontSize,
+                                        IntRadioBtnFlg = IntRadioBtnFlg,
+                                        StrProductName = _ret2[0]["col_Product_Name"].ToString() ?? string.Empty,
+                                        StrProductType = _ret2[0]["col_Product_Type"].ToString() ?? string.Empty,
+                                        StrProductModel = _ret2[0]["col_Product_Model"].ToString() ?? string.Empty
                                     }) {
                                         _substrateChange1.ShowDialog(this);
                                     }
@@ -237,22 +235,22 @@ namespace ProductDatabase {
                 switch (_radioButton.Name) {
                     case "CategoryRadioButton1":
                         IntRadioBtnFlg = 1;
-                        _strSqlQuery = "SELECT * FROM Substrate;";
+                        _strSqlQuery = "SELECT * FROM Substrate WHERE Visual = '1';";
                         break;
 
                     case "CategoryRadioButton2":
                         IntRadioBtnFlg = 2;
-                        _strSqlQuery = "SELECT * FROM Product;";
+                        _strSqlQuery = "SELECT * FROM Product WHERE Visual = '1';";
                         break;
 
                     case "CategoryRadioButton3":
                         IntRadioBtnFlg = 3;
-                        _strSqlQuery = "SELECT * FROM Product;";
+                        _strSqlQuery = "SELECT * FROM Product WHERE Visual = '1';";
                         break;
 
                     case "CategoryRadioButton4":
                         IntRadioBtnFlg = 4;
-                        _strSqlQuery = "SELECT * FROM Product WHERE col_Print_Type = '5';";
+                        _strSqlQuery = "SELECT * FROM Product WHERE col_Print_Type = '5' OR col_Print_Type = '6';";
                         break;
                     default:
                         break;

@@ -72,6 +72,7 @@
             OKButton.TabIndex = 4;
             OKButton.Text = "OK";
             OKButton.UseVisualStyleBackColor = true;
+            OKButton.Click += OKButton_Click;
             // 
             // SubstrateChange1
             // 
@@ -90,6 +91,7 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "変更候補";
+            Load += SubstrateChange1_Load;
             ((System.ComponentModel.ISupportInitialize)SubstrateChangeDataGridView).EndInit();
             ResumeLayout(false);
             PerformLayout();
