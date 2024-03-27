@@ -30,7 +30,8 @@ namespace ProductDatabase {
         public string StrSubstrateModel { get; set; } = string.Empty;
         public string StrUseSubstrate { get; set; } = string.Empty;
 
-        public int IntRegType = 0;
+        public int IntPrintType { get; set; }
+        public int IntRegType { get; set; }
 
         public SubstrateChange1() => InitializeComponent();
 
@@ -96,36 +97,41 @@ namespace ProductDatabase {
 
             int _i = SubstrateChangeDataGridView.SelectedCells[0].RowIndex;
 
-            string? orderNumber = SubstrateChangeDataGridView.Rows[_i].Cells[1].Value.ToString();
-            string? productNumber = SubstrateChangeDataGridView.Rows[_i].Cells[2].Value.ToString();
-            string? productType = SubstrateChangeDataGridView.Rows[_i].Cells[3].Value.ToString();
-            string? productModel = SubstrateChangeDataGridView.Rows[_i].Cells[4].Value.ToString();
-            string? revision = SubstrateChangeDataGridView.Rows[_i].Cells[8].Value.ToString();
-            string? comment = SubstrateChangeDataGridView.Rows[_i].Cells[12].Value.ToString();
-            string? usedSubstrate = SubstrateChangeDataGridView.Rows[_i].Cells[13].Value.ToString();
+            string orderNumber = SubstrateChangeDataGridView.Rows[_i].Cells[1].Value.ToString() ?? string.Empty;
+            string productNumber = SubstrateChangeDataGridView.Rows[_i].Cells[2].Value.ToString() ?? string.Empty;
+            string productType = SubstrateChangeDataGridView.Rows[_i].Cells[3].Value.ToString() ?? string.Empty;
+            string productModel = SubstrateChangeDataGridView.Rows[_i].Cells[4].Value.ToString() ?? string.Empty;
+            string revision = SubstrateChangeDataGridView.Rows[_i].Cells[8].Value.ToString() ?? string.Empty;
+            string StrSerialFirstNumber = SubstrateChangeDataGridView.Rows[_i].Cells[9].Value.ToString() ?? string.Empty;
+            string StrSerialLastNumber = SubstrateChangeDataGridView.Rows[_i].Cells[10].Value.ToString() ?? string.Empty;
+            string comment = SubstrateChangeDataGridView.Rows[_i].Cells[12].Value.ToString() ?? string.Empty;
+            string usedSubstrate = SubstrateChangeDataGridView.Rows[_i].Cells[13].Value.ToString() ?? string.Empty;
 
             int intQuantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[_i].Cells[5].Value);
-            int intSerialFirstNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[_i].Cells[9].Value);
+            int IntSerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[_i].Cells[11].Value);
 
             using SubstrateChange2 _substrateChange2 = new() {
                 StrFontName = StrFontName,
                 IntFontSize = IntFontSize,
+                IntPrintType = IntPrintType,
                 IntRegType = IntRegType,
                 StrProductName = StrProductName,
                 StrStockName = StrStockName,
-                StrOrderNumber = orderNumber ?? string.Empty,
-                StrProductNumber = productNumber ?? string.Empty,
-                StrProductType = productType ?? string.Empty,
-                StrProductModel = productModel ?? string.Empty,
+                StrOrderNumber = orderNumber,
+                StrProductNumber = productNumber,
+                StrProductType = productType,
+                StrProductModel = productModel,
                 IntQuantity = intQuantity,
-                StrRevision = revision ?? string.Empty,
-                IntSerialFirstNumber = intSerialFirstNumber,
-                StrComment = comment ?? string.Empty,
-                StrUseSubstrate = StrUseSubstrate ?? string.Empty,
-                StrUsedSubstrate = usedSubstrate ?? string.Empty
+                StrRevision = revision,
+                StrComment = comment,
+                StrUseSubstrate = StrUseSubstrate,
+                StrUsedSubstrate = usedSubstrate,
+                StrSerialFirstNumber = StrSerialFirstNumber,
+                StrSerialLastNumber = StrSerialLastNumber,
+                IntSerialLastNumber = IntSerialLastNumber
             };
             _substrateChange2.ShowDialog(this);
-
+            Close();
         }
 
         private void SubstrateChange1_Load(object sender, EventArgs e) { LoadEvents(); }

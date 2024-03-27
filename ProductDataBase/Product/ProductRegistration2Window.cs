@@ -213,14 +213,16 @@ namespace ProductDatabase {
                                     if (_strOrderNumber == StrOrderNumber) {
                                         if (_objDgv != null) {
                                             int _intQuantity = IntQuantity;
+                                            int _stockValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value);
+                                            int _useValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value);
                                             _objDgv.Rows[_j].Cells[2].Value = _intQuantity;
                                             _objDgv.Rows[_j].Cells[3].Value = true;
                                             // 必要数量分割り当てられたかチェック
-                                            if (_intQuantity > Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value)) {
+                                            if (_intQuantity > _stockValue) {
                                                 _quantityFlg = false;
                                                 _strQuantity = $"{_strQuantity}[{_strSubstrateName}]{Environment.NewLine}";
                                             }
-                                            if (Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value) >= Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value)) { _quantityFlg = true; }
+                                            if (_stockValue >= _useValue) { _quantityFlg = true; }
                                         }
                                     }
                                     _j++;
@@ -533,12 +535,17 @@ namespace ProductDatabase {
                             if (_objCbx.Checked) {
                                 DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
                                 int _dgvRowCnt = _objDgv.Rows.Count;
+                                string _subTotalTemp = string.Empty;
 
                                 for (int _j = 0; _j <= _dgvRowCnt - 1; _j++) {
-                                    if (Convert.ToBoolean(_objDgv.Rows[_j].Cells[3].Value)) {
-
+                                    bool _boolCbx = Convert.ToBoolean(_objDgv.Rows[_j].Cells[4].Value);
+                                    if (_boolCbx) {
                                         string _substrateName = string.Empty;
                                         string _substrateModel = string.Empty;
+                                        string _substrateNum = _objDgv.Rows[_j].Cells[0].Value.ToString() ?? string.Empty;
+                                        int _stockValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value);
+                                        int _useValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value);
+
                                         using (SQLiteCommand _cmd = _con.CreateCommand()) {
                                             _cmd.CommandText =
                                                 $"UPDATE 'Stock_{StrStockName}'SET " +
@@ -548,19 +555,19 @@ namespace ProductDatabase {
                                                 $"WHERE " +
                                                 $"col_Substrate_Num = '{_objDgv.Rows[_j].Cells[0].Value}'";
 
-                                            if (Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value) - Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value) == 0) {
+                                            if (_stockValue - _useValue == 0) {
                                                 _cmd.Parameters.Add("@col_Flg", DbType.String).Value = 0;
                                             }
                                             else {
                                                 _cmd.Parameters.Add("@col_Flg", DbType.String).Value = 1;
                                             }
 
-                                            _cmd.Parameters.Add("@col_Stock", DbType.String).Value = Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value) - Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value);
-                                            _cmd.Parameters.Add("@col_History", DbType.String).Value = $"{StrProductNumber}({_objDgv.Rows[_j].Cells[2].Value}),";
+                                            _cmd.Parameters.Add("@col_Stock", DbType.String).Value = _stockValue - _useValue;
+                                            _cmd.Parameters.Add("@col_History", DbType.String).Value = $"{StrProductNumber}({_useValue}),";
 
                                             _cmd.ExecuteNonQuery();
 
-                                            _cmd.CommandText = $@"SELECT * FROM ""Stock_{StrStockName}"" WHERE col_Substrate_Model = ""{ArrUseSubstrate[_i]}"" ORDER BY _rowid_ ASC";
+                                            _cmd.CommandText = $@"SELECT * FROM 'Stock_{StrStockName}' WHERE col_Substrate_Model = '{ArrUseSubstrate[_i]}' ORDER BY _rowid_ ASC";
                                             using SQLiteDataReader _dr = _cmd.ExecuteReader();
                                             while (_dr.Read()) {
                                                 _substrateName = $"{_dr["col_Substrate_Name"]}";
@@ -568,11 +575,13 @@ namespace ProductDatabase {
                                             }
                                         }
 
-                                        if (string.IsNullOrEmpty(StrTotalSubstrate)) {
-                                            StrTotalSubstrate = $"[{ArrUseSubstrate[_i]}]{_objDgv.Rows[_j].Cells[0].Value}({_objDgv.Rows[_j].Cells[2].Value})";
-                                        }
-                                        else {
-                                            StrTotalSubstrate = $"{StrTotalSubstrate},[{ArrUseSubstrate[_i]}]{_objDgv.Rows[_j].Cells[0].Value}({_objDgv.Rows[_j].Cells[2].Value})";
+                                        if (_useValue != 0) {
+                                            if (string.IsNullOrEmpty(_subTotalTemp)) {
+                                                _subTotalTemp = $"{_substrateNum}({_useValue})";
+                                            }
+                                            else {
+                                                _subTotalTemp = $"{_subTotalTemp},{_substrateNum}({_useValue})";
+                                            }
                                         }
 
                                         using (SQLiteCommand _cmd = _con.CreateCommand()) {
@@ -603,7 +612,7 @@ namespace ProductDatabase {
                                             _cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = _substrateName;
                                             _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _substrateModel;
                                             _cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = _objDgv.Rows[_j].Cells[0].Value;
-                                            _cmd.Parameters.Add("@col_Decrease", DbType.String).Value = 0 - Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value);
+                                            _cmd.Parameters.Add("@col_Decrease", DbType.String).Value = 0 - _useValue;
                                             _cmd.Parameters.Add("@col_Use_P_Type", DbType.String).Value = StrProductType;
                                             _cmd.Parameters.Add("@col_Use_P_Num", DbType.String).Value = StrProductNumber;
                                             _cmd.Parameters.Add("@col_Use_O_Num", DbType.String).Value = StrOrderNumber;
@@ -618,15 +627,21 @@ namespace ProductDatabase {
                                             case 5:
                                             case 6:
                                                 ListUsedSubstrate.Add(ArrUseSubstrate[_i]);
-                                                string? _cellValue = _objDgv.Rows[_j].Cells[0].Value?.ToString();
-                                                if (_cellValue != null) { ListUsedProductNumber.Add(_cellValue); }
-                                                ListUsedQuantity.Add(Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value));
+                                                if (_substrateNum != null) { ListUsedProductNumber.Add(_substrateNum); }
+                                                ListUsedQuantity.Add(_useValue);
                                                 break;
                                             default:
                                                 break;
                                         }
                                     }
                                 }
+                                if (string.IsNullOrEmpty(StrTotalSubstrate)) {
+                                    StrTotalSubstrate = $"{ArrUseSubstrate[_i]}{_subTotalTemp}";
+                                }
+                                else {
+                                    StrTotalSubstrate = $"{StrTotalSubstrate},{ArrUseSubstrate[_i]}{_subTotalTemp}";
+                                }
+                                _subTotalTemp = string.Empty;
                             }
                         }
 
@@ -855,17 +870,15 @@ namespace ProductDatabase {
                                 int _dgvRowCnt = _objDgv.Rows.Count;
 
                                 for (int _j = 0; _j < _dgvRowCnt; _j++) {
-                                    if (_objDgv.Rows[_j].Cells[3].Value != null && (bool)_objDgv.Rows[_j].Cells[3].Value) {
+                                    bool _boolCbx = _objDgv.Rows[_j].Cells[3].Value != null && (bool)_objDgv.Rows[_j].Cells[3].Value;
+                                    if (_boolCbx) {
+                                        int _stockValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value.ToString());
+                                        int _useValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value.ToString());
 
-                                        if (!int.TryParse(_objDgv.Rows[_j].Cells[1].Value?.ToString(), out int value1) || !int.TryParse(_objDgv.Rows[_j].Cells[2].Value?.ToString(), out int value2)) {
-                                            throw new Exception("セルの値を数値に変換できませんでした。");
-                                        }
-
-                                        if (value1 < value2) {
+                                        if (_stockValue < _useValue) {
                                             throw new Exception("在庫より多い数量が入力されています。");
                                         }
-
-                                        _intQuantityCheck -= value2;
+                                        _intQuantityCheck -= _useValue;
                                     }
                                 }
 

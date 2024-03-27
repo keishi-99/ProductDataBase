@@ -154,6 +154,7 @@ namespace ProductDatabase {
                                         StrFontName = FontName,
                                         IntFontSize = IntFontSize,
                                         IntRadioBtnFlg = IntRadioBtnFlg,
+                                        IntPrintType = Convert.ToInt32(_ret2[0]["col_Print_Type"]),
                                         IntRegType = Convert.ToInt32(_ret2[0]["col_Reg_Type"]),
                                         StrProductName = _ret2[0]["col_Product_Name"].ToString() ?? string.Empty,
                                         StrStockName = _ret2[0]["col_Stock_Name"].ToString() ?? string.Empty,

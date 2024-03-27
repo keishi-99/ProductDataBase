@@ -66,7 +66,8 @@
             // 
             // OKButton
             // 
-            OKButton.Location = new Point(118, 329);
+            OKButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            OKButton.Location = new Point(1097, 330);
             OKButton.Name = "OKButton";
             OKButton.Size = new Size(75, 23);
             OKButton.TabIndex = 4;
