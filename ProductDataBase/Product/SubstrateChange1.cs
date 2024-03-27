@@ -23,10 +23,14 @@ namespace ProductDatabase {
         public int IntRadioBtnFlg { get; set; }
 
         public string StrProductName { get; set; } = string.Empty;
+        public string StrStockName { get; set; } = string.Empty;
         public string StrProductModel { get; set; } = string.Empty;
         public string StrProductType { get; set; } = string.Empty;
         public string StrSubstrateName { get; set; } = string.Empty;
         public string StrSubstrateModel { get; set; } = string.Empty;
+        public string StrUseSubstrate { get; set; } = string.Empty;
+
+        public int IntRegType = 0;
 
         public SubstrateChange1() => InitializeComponent();
 
@@ -76,6 +80,8 @@ namespace ProductDatabase {
                             SubstrateChangeDataGridView.Columns[11].Width = 40;
                             SubstrateChangeDataGridView.Columns[12].HeaderCell.Value = "コメント";
                             SubstrateChangeDataGridView.Columns[13].HeaderCell.Value = "使用基板";
+                            SubstrateChangeDataGridView.Columns[13].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+                            SubstrateChangeDataGridView.Columns[13].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
 
                         }
                         break;
@@ -96,7 +102,7 @@ namespace ProductDatabase {
             string? productModel = SubstrateChangeDataGridView.Rows[_i].Cells[4].Value.ToString();
             string? revision = SubstrateChangeDataGridView.Rows[_i].Cells[8].Value.ToString();
             string? comment = SubstrateChangeDataGridView.Rows[_i].Cells[12].Value.ToString();
-            string? useSubstrate = SubstrateChangeDataGridView.Rows[_i].Cells[13].Value.ToString();
+            string? usedSubstrate = SubstrateChangeDataGridView.Rows[_i].Cells[13].Value.ToString();
 
             int intQuantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[_i].Cells[5].Value);
             int intSerialFirstNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[_i].Cells[9].Value);
@@ -104,7 +110,9 @@ namespace ProductDatabase {
             using SubstrateChange2 _substrateChange2 = new() {
                 StrFontName = StrFontName,
                 IntFontSize = IntFontSize,
+                IntRegType = IntRegType,
                 StrProductName = StrProductName,
+                StrStockName = StrStockName,
                 StrOrderNumber = orderNumber ?? string.Empty,
                 StrProductNumber = productNumber ?? string.Empty,
                 StrProductType = productType ?? string.Empty,
@@ -113,7 +121,8 @@ namespace ProductDatabase {
                 StrRevision = revision ?? string.Empty,
                 IntSerialFirstNumber = intSerialFirstNumber,
                 StrComment = comment ?? string.Empty,
-                StrUseSubstrate = useSubstrate ?? string.Empty
+                StrUseSubstrate = StrUseSubstrate ?? string.Empty,
+                StrUsedSubstrate = usedSubstrate ?? string.Empty
             };
             _substrateChange2.ShowDialog(this);
 
