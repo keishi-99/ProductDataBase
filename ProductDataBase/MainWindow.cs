@@ -154,9 +154,12 @@ namespace ProductDatabase {
                                         StrFontName = FontName,
                                         IntFontSize = IntFontSize,
                                         IntRadioBtnFlg = IntRadioBtnFlg,
+                                        IntRegType = Convert.ToInt32(_ret2[0]["col_Reg_Type"]),
                                         StrProductName = _ret2[0]["col_Product_Name"].ToString() ?? string.Empty,
+                                        StrStockName = _ret2[0]["col_Stock_Name"].ToString() ?? string.Empty,
                                         StrProductType = _ret2[0]["col_Product_Type"].ToString() ?? string.Empty,
-                                        StrProductModel = _ret2[0]["col_Product_Model"].ToString() ?? string.Empty
+                                        StrProductModel = _ret2[0]["col_Product_Model"].ToString() ?? string.Empty,
+                                        StrUseSubstrate = _ret2[0]["col_Use_Substrate"].ToString() ?? string.Empty
                                     }) {
                                         _substrateChange1.ShowDialog(this);
                                     }

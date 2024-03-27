@@ -23,6 +23,7 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProductRegistration2Window));
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
@@ -63,7 +64,6 @@
             DataGridViewCellStyle dataGridViewCellStyle38 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle39 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle40 = new DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProductRegistration2Window));
             ProductRegistration2MenuStrip = new MenuStrip();
             ファイルToolStripMenuItem = new ToolStripMenuItem();
             シリアルラベル印刷ToolStripMenuItem = new ToolStripMenuItem();
@@ -78,63 +78,23 @@
             取得情報ToolStripMenuItem = new ToolStripMenuItem();
             Substrate1CheckBox = new CheckBox();
             Substrate1DataGridView = new DataGridView();
-            Column1 = new DataGridViewTextBoxColumn();
-            Column2 = new DataGridViewTextBoxColumn();
-            Column3 = new DataGridViewTextBoxColumn();
-            Column4 = new DataGridViewCheckBoxColumn();
             Substrate2DataGridView = new DataGridView();
-            dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn3 = new DataGridViewTextBoxColumn();
-            dataGridViewCheckBoxColumn1 = new DataGridViewCheckBoxColumn();
             Substrate2CheckBox = new CheckBox();
             Substrate3DataGridView = new DataGridView();
-            dataGridViewTextBoxColumn4 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn5 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn6 = new DataGridViewTextBoxColumn();
-            dataGridViewCheckBoxColumn2 = new DataGridViewCheckBoxColumn();
             Substrate3CheckBox = new CheckBox();
             Substrate4DataGridView = new DataGridView();
-            dataGridViewTextBoxColumn7 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn8 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn9 = new DataGridViewTextBoxColumn();
-            dataGridViewCheckBoxColumn3 = new DataGridViewCheckBoxColumn();
             Substrate4CheckBox = new CheckBox();
             Substrate5DataGridView = new DataGridView();
-            dataGridViewTextBoxColumn10 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn11 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn12 = new DataGridViewTextBoxColumn();
-            dataGridViewCheckBoxColumn4 = new DataGridViewCheckBoxColumn();
             Substrate5CheckBox = new CheckBox();
             Substrate6DataGridView = new DataGridView();
-            dataGridViewTextBoxColumn13 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn14 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn15 = new DataGridViewTextBoxColumn();
-            dataGridViewCheckBoxColumn5 = new DataGridViewCheckBoxColumn();
             Substrate6CheckBox = new CheckBox();
             Substrate7DataGridView = new DataGridView();
-            dataGridViewTextBoxColumn16 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn17 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn18 = new DataGridViewTextBoxColumn();
-            dataGridViewCheckBoxColumn6 = new DataGridViewCheckBoxColumn();
             Substrate7CheckBox = new CheckBox();
             Substrate8DataGridView = new DataGridView();
-            dataGridViewTextBoxColumn19 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn20 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn21 = new DataGridViewTextBoxColumn();
-            dataGridViewCheckBoxColumn7 = new DataGridViewCheckBoxColumn();
             Substrate8CheckBox = new CheckBox();
             Substrate9DataGridView = new DataGridView();
-            dataGridViewTextBoxColumn22 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn23 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn24 = new DataGridViewTextBoxColumn();
-            dataGridViewCheckBoxColumn8 = new DataGridViewCheckBoxColumn();
             Substrate9CheckBox = new CheckBox();
             Substrate10DataGridView = new DataGridView();
-            dataGridViewTextBoxColumn25 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn26 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn27 = new DataGridViewTextBoxColumn();
-            dataGridViewCheckBoxColumn9 = new DataGridViewCheckBoxColumn();
             Substrate10CheckBox = new CheckBox();
             SerialPrintPostionLabel = new Label();
             SerialPrintPostionNumericUpDown = new NumericUpDown();
@@ -147,6 +107,46 @@
             ProductRegistration2PrintDialog = new PrintDialog();
             ProductRegistration2PrintDocument = new System.Drawing.Printing.PrintDocument();
             ProductRegistration2PrintPreviewDialog = new PrintPreviewDialog();
+            dataGridViewTextBoxColumn0101 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0102 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0103 = new DataGridViewTextBoxColumn();
+            dataGridViewCheckBoxColumn0101 = new DataGridViewCheckBoxColumn();
+            dataGridViewTextBoxColumn0201 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0202 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0203 = new DataGridViewTextBoxColumn();
+            dataGridViewCheckBoxColumn0201 = new DataGridViewCheckBoxColumn();
+            dataGridViewTextBoxColumn0301 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0302 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0303 = new DataGridViewTextBoxColumn();
+            dataGridViewCheckBoxColumn0301 = new DataGridViewCheckBoxColumn();
+            dataGridViewTextBoxColumn0401 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0402 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0403 = new DataGridViewTextBoxColumn();
+            dataGridViewCheckBoxColumn0401 = new DataGridViewCheckBoxColumn();
+            dataGridViewTextBoxColumn0501 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0502 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0503 = new DataGridViewTextBoxColumn();
+            dataGridViewCheckBoxColumn0501 = new DataGridViewCheckBoxColumn();
+            dataGridViewTextBoxColumn0601 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0602 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0603 = new DataGridViewTextBoxColumn();
+            dataGridViewCheckBoxColumn0601 = new DataGridViewCheckBoxColumn();
+            dataGridViewTextBoxColumn0701 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0702 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0703 = new DataGridViewTextBoxColumn();
+            dataGridViewCheckBoxColumn0701 = new DataGridViewCheckBoxColumn();
+            dataGridViewTextBoxColumn0801 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0802 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0803 = new DataGridViewTextBoxColumn();
+            dataGridViewCheckBoxColumn0801 = new DataGridViewCheckBoxColumn();
+            dataGridViewTextBoxColumn0901 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0902 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn0903 = new DataGridViewTextBoxColumn();
+            dataGridViewCheckBoxColumn0901 = new DataGridViewCheckBoxColumn();
+            dataGridViewTextBoxColumn1001 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn1002 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn1003 = new DataGridViewTextBoxColumn();
+            dataGridViewCheckBoxColumn1001 = new DataGridViewCheckBoxColumn();
             ProductRegistration2MenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)Substrate1DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)Substrate2DataGridView).BeginInit();
@@ -181,35 +181,35 @@
             // シリアルラベル印刷ToolStripMenuItem
             // 
             シリアルラベル印刷ToolStripMenuItem.Name = "シリアルラベル印刷ToolStripMenuItem";
-            シリアルラベル印刷ToolStripMenuItem.Size = new Size(205, 22);
+            シリアルラベル印刷ToolStripMenuItem.Size = new Size(206, 22);
             シリアルラベル印刷ToolStripMenuItem.Text = "シリアルラベル印刷";
             シリアルラベル印刷ToolStripMenuItem.Click += シリアルラベル印刷ToolStripMenuItem_Click;
             // 
             // シリアルラベル印刷プレビューToolStripMenuItem
             // 
             シリアルラベル印刷プレビューToolStripMenuItem.Name = "シリアルラベル印刷プレビューToolStripMenuItem";
-            シリアルラベル印刷プレビューToolStripMenuItem.Size = new Size(205, 22);
+            シリアルラベル印刷プレビューToolStripMenuItem.Size = new Size(206, 22);
             シリアルラベル印刷プレビューToolStripMenuItem.Text = "シリアルラベル印刷プレビュー";
             シリアルラベル印刷プレビューToolStripMenuItem.Click += シリアルラベル印刷プレビューToolStripMenuItem_Click;
             // 
             // バーコード印刷ToolStripMenuItem
             // 
             バーコード印刷ToolStripMenuItem.Name = "バーコード印刷ToolStripMenuItem";
-            バーコード印刷ToolStripMenuItem.Size = new Size(205, 22);
+            バーコード印刷ToolStripMenuItem.Size = new Size(206, 22);
             バーコード印刷ToolStripMenuItem.Text = "バーコード印刷";
             バーコード印刷ToolStripMenuItem.Click += バーコード印刷ToolStripMenuItem_Click;
             // 
             // バーコード印刷プレビューToolStripMenuItem
             // 
             バーコード印刷プレビューToolStripMenuItem.Name = "バーコード印刷プレビューToolStripMenuItem";
-            バーコード印刷プレビューToolStripMenuItem.Size = new Size(205, 22);
+            バーコード印刷プレビューToolStripMenuItem.Size = new Size(206, 22);
             バーコード印刷プレビューToolStripMenuItem.Text = "バーコード印刷プレビュー";
             バーコード印刷プレビューToolStripMenuItem.Click += バーコード印刷プレビューToolStripMenuItem_Click;
             // 
             // 終了ToolStripMenuItem
             // 
             終了ToolStripMenuItem.Name = "終了ToolStripMenuItem";
-            終了ToolStripMenuItem.Size = new Size(205, 22);
+            終了ToolStripMenuItem.Size = new Size(206, 22);
             終了ToolStripMenuItem.Text = "終了";
             終了ToolStripMenuItem.Click += 終了ToolStripMenuItem_Click;
             // 
@@ -223,14 +223,14 @@
             // シリアルラベル印刷設定ToolStripMenuItem
             // 
             シリアルラベル印刷設定ToolStripMenuItem.Name = "シリアルラベル印刷設定ToolStripMenuItem";
-            シリアルラベル印刷設定ToolStripMenuItem.Size = new Size(187, 22);
+            シリアルラベル印刷設定ToolStripMenuItem.Size = new Size(186, 22);
             シリアルラベル印刷設定ToolStripMenuItem.Text = "シリアルラベル印刷設定";
             シリアルラベル印刷設定ToolStripMenuItem.Click += シリアルラベル印刷設定ToolStripMenuItem_Click;
             // 
             // バーコード印刷設定ToolStripMenuItem
             // 
             バーコード印刷設定ToolStripMenuItem.Name = "バーコード印刷設定ToolStripMenuItem";
-            バーコード印刷設定ToolStripMenuItem.Size = new Size(187, 22);
+            バーコード印刷設定ToolStripMenuItem.Size = new Size(186, 22);
             バーコード印刷設定ToolStripMenuItem.Text = "バーコード印刷設定";
             バーコード印刷設定ToolStripMenuItem.Click += バーコード印刷設定ToolStripMenuItem_Click;
             // 
@@ -269,7 +269,7 @@
             Substrate1DataGridView.BackgroundColor = SystemColors.AppWorkspace;
             Substrate1DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             Substrate1DataGridView.ColumnHeadersVisible = false;
-            Substrate1DataGridView.Columns.AddRange(new DataGridViewColumn[] { Column1, Column2, Column3, Column4 });
+            Substrate1DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn0101, dataGridViewTextBoxColumn0102, dataGridViewTextBoxColumn0103, dataGridViewCheckBoxColumn0101 });
             Substrate1DataGridView.Enabled = false;
             Substrate1DataGridView.GridColor = SystemColors.ControlDark;
             Substrate1DataGridView.Location = new Point(54, 50);
@@ -278,54 +278,6 @@
             Substrate1DataGridView.RowTemplate.Height = 21;
             Substrate1DataGridView.Size = new Size(300, 74);
             Substrate1DataGridView.TabIndex = 2;
-            // 
-            // Column1
-            // 
-            dataGridViewCellStyle1.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            Column1.DefaultCellStyle = dataGridViewCellStyle1;
-            Column1.HeaderText = "Column1";
-            Column1.MaxInputLength = 100;
-            Column1.Name = "Column1";
-            Column1.ReadOnly = true;
-            Column1.Resizable = DataGridViewTriState.False;
-            Column1.SortMode = DataGridViewColumnSortMode.NotSortable;
-            Column1.Width = 140;
-            // 
-            // Column2
-            // 
-            dataGridViewCellStyle2.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            Column2.DefaultCellStyle = dataGridViewCellStyle2;
-            Column2.HeaderText = "Column2";
-            Column2.MaxInputLength = 100;
-            Column2.Name = "Column2";
-            Column2.ReadOnly = true;
-            Column2.Resizable = DataGridViewTriState.False;
-            Column2.SortMode = DataGridViewColumnSortMode.NotSortable;
-            Column2.Width = 35;
-            // 
-            // Column3
-            // 
-            dataGridViewCellStyle3.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            Column3.DefaultCellStyle = dataGridViewCellStyle3;
-            Column3.HeaderText = "Column3";
-            Column3.MaxInputLength = 100;
-            Column3.Name = "Column3";
-            Column3.ReadOnly = true;
-            Column3.Resizable = DataGridViewTriState.False;
-            Column3.SortMode = DataGridViewColumnSortMode.NotSortable;
-            Column3.Width = 35;
-            // 
-            // Column4
-            // 
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle4.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle4.NullValue = false;
-            Column4.DefaultCellStyle = dataGridViewCellStyle4;
-            Column4.HeaderText = "Column4";
-            Column4.Name = "Column4";
-            Column4.ReadOnly = true;
-            Column4.Resizable = DataGridViewTriState.False;
-            Column4.Width = 35;
             // 
             // Substrate2DataGridView
             // 
@@ -336,7 +288,7 @@
             Substrate2DataGridView.BackgroundColor = SystemColors.AppWorkspace;
             Substrate2DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             Substrate2DataGridView.ColumnHeadersVisible = false;
-            Substrate2DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn1, dataGridViewTextBoxColumn2, dataGridViewTextBoxColumn3, dataGridViewCheckBoxColumn1 });
+            Substrate2DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn0201, dataGridViewTextBoxColumn0202, dataGridViewTextBoxColumn0203, dataGridViewCheckBoxColumn0201 });
             Substrate2DataGridView.Enabled = false;
             Substrate2DataGridView.GridColor = SystemColors.ControlDark;
             Substrate2DataGridView.Location = new Point(54, 151);
@@ -345,54 +297,6 @@
             Substrate2DataGridView.RowTemplate.Height = 21;
             Substrate2DataGridView.Size = new Size(300, 74);
             Substrate2DataGridView.TabIndex = 4;
-            // 
-            // dataGridViewTextBoxColumn1
-            // 
-            dataGridViewCellStyle5.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle5;
-            dataGridViewTextBoxColumn1.HeaderText = "Column1";
-            dataGridViewTextBoxColumn1.MaxInputLength = 100;
-            dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            dataGridViewTextBoxColumn1.ReadOnly = true;
-            dataGridViewTextBoxColumn1.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn1.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn1.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn2
-            // 
-            dataGridViewCellStyle6.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn2.DefaultCellStyle = dataGridViewCellStyle6;
-            dataGridViewTextBoxColumn2.HeaderText = "Column2";
-            dataGridViewTextBoxColumn2.MaxInputLength = 100;
-            dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
-            dataGridViewTextBoxColumn2.ReadOnly = true;
-            dataGridViewTextBoxColumn2.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn2.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn2.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn3
-            // 
-            dataGridViewCellStyle7.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn3.DefaultCellStyle = dataGridViewCellStyle7;
-            dataGridViewTextBoxColumn3.HeaderText = "Column3";
-            dataGridViewTextBoxColumn3.MaxInputLength = 100;
-            dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
-            dataGridViewTextBoxColumn3.ReadOnly = true;
-            dataGridViewTextBoxColumn3.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn3.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn3.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn1
-            // 
-            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle8.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle8.NullValue = false;
-            dataGridViewCheckBoxColumn1.DefaultCellStyle = dataGridViewCellStyle8;
-            dataGridViewCheckBoxColumn1.HeaderText = "Column4";
-            dataGridViewCheckBoxColumn1.Name = "dataGridViewCheckBoxColumn1";
-            dataGridViewCheckBoxColumn1.ReadOnly = true;
-            dataGridViewCheckBoxColumn1.Resizable = DataGridViewTriState.False;
-            dataGridViewCheckBoxColumn1.Width = 35;
             // 
             // Substrate2CheckBox
             // 
@@ -416,7 +320,7 @@
             Substrate3DataGridView.BackgroundColor = SystemColors.AppWorkspace;
             Substrate3DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             Substrate3DataGridView.ColumnHeadersVisible = false;
-            Substrate3DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn4, dataGridViewTextBoxColumn5, dataGridViewTextBoxColumn6, dataGridViewCheckBoxColumn2 });
+            Substrate3DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn0301, dataGridViewTextBoxColumn0302, dataGridViewTextBoxColumn0303, dataGridViewCheckBoxColumn0301 });
             Substrate3DataGridView.Enabled = false;
             Substrate3DataGridView.GridColor = SystemColors.ControlDark;
             Substrate3DataGridView.Location = new Point(54, 252);
@@ -425,54 +329,6 @@
             Substrate3DataGridView.RowTemplate.Height = 21;
             Substrate3DataGridView.Size = new Size(300, 74);
             Substrate3DataGridView.TabIndex = 6;
-            // 
-            // dataGridViewTextBoxColumn4
-            // 
-            dataGridViewCellStyle9.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn4.DefaultCellStyle = dataGridViewCellStyle9;
-            dataGridViewTextBoxColumn4.HeaderText = "Column1";
-            dataGridViewTextBoxColumn4.MaxInputLength = 100;
-            dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
-            dataGridViewTextBoxColumn4.ReadOnly = true;
-            dataGridViewTextBoxColumn4.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn4.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn4.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn5
-            // 
-            dataGridViewCellStyle10.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn5.DefaultCellStyle = dataGridViewCellStyle10;
-            dataGridViewTextBoxColumn5.HeaderText = "Column2";
-            dataGridViewTextBoxColumn5.MaxInputLength = 100;
-            dataGridViewTextBoxColumn5.Name = "dataGridViewTextBoxColumn5";
-            dataGridViewTextBoxColumn5.ReadOnly = true;
-            dataGridViewTextBoxColumn5.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn5.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn5.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn6
-            // 
-            dataGridViewCellStyle11.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn6.DefaultCellStyle = dataGridViewCellStyle11;
-            dataGridViewTextBoxColumn6.HeaderText = "Column3";
-            dataGridViewTextBoxColumn6.MaxInputLength = 100;
-            dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
-            dataGridViewTextBoxColumn6.ReadOnly = true;
-            dataGridViewTextBoxColumn6.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn6.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn6.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn2
-            // 
-            dataGridViewCellStyle12.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle12.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle12.NullValue = false;
-            dataGridViewCheckBoxColumn2.DefaultCellStyle = dataGridViewCellStyle12;
-            dataGridViewCheckBoxColumn2.HeaderText = "Column4";
-            dataGridViewCheckBoxColumn2.Name = "dataGridViewCheckBoxColumn2";
-            dataGridViewCheckBoxColumn2.ReadOnly = true;
-            dataGridViewCheckBoxColumn2.Resizable = DataGridViewTriState.False;
-            dataGridViewCheckBoxColumn2.Width = 35;
             // 
             // Substrate3CheckBox
             // 
@@ -496,7 +352,7 @@
             Substrate4DataGridView.BackgroundColor = SystemColors.AppWorkspace;
             Substrate4DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             Substrate4DataGridView.ColumnHeadersVisible = false;
-            Substrate4DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn7, dataGridViewTextBoxColumn8, dataGridViewTextBoxColumn9, dataGridViewCheckBoxColumn3 });
+            Substrate4DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn0401, dataGridViewTextBoxColumn0402, dataGridViewTextBoxColumn0403, dataGridViewCheckBoxColumn0401 });
             Substrate4DataGridView.Enabled = false;
             Substrate4DataGridView.GridColor = SystemColors.ControlDark;
             Substrate4DataGridView.Location = new Point(54, 353);
@@ -505,54 +361,6 @@
             Substrate4DataGridView.RowTemplate.Height = 21;
             Substrate4DataGridView.Size = new Size(300, 74);
             Substrate4DataGridView.TabIndex = 8;
-            // 
-            // dataGridViewTextBoxColumn7
-            // 
-            dataGridViewCellStyle13.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn7.DefaultCellStyle = dataGridViewCellStyle13;
-            dataGridViewTextBoxColumn7.HeaderText = "Column1";
-            dataGridViewTextBoxColumn7.MaxInputLength = 100;
-            dataGridViewTextBoxColumn7.Name = "dataGridViewTextBoxColumn7";
-            dataGridViewTextBoxColumn7.ReadOnly = true;
-            dataGridViewTextBoxColumn7.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn7.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn7.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn8
-            // 
-            dataGridViewCellStyle14.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn8.DefaultCellStyle = dataGridViewCellStyle14;
-            dataGridViewTextBoxColumn8.HeaderText = "Column2";
-            dataGridViewTextBoxColumn8.MaxInputLength = 100;
-            dataGridViewTextBoxColumn8.Name = "dataGridViewTextBoxColumn8";
-            dataGridViewTextBoxColumn8.ReadOnly = true;
-            dataGridViewTextBoxColumn8.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn8.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn8.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn9
-            // 
-            dataGridViewCellStyle15.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn9.DefaultCellStyle = dataGridViewCellStyle15;
-            dataGridViewTextBoxColumn9.HeaderText = "Column3";
-            dataGridViewTextBoxColumn9.MaxInputLength = 100;
-            dataGridViewTextBoxColumn9.Name = "dataGridViewTextBoxColumn9";
-            dataGridViewTextBoxColumn9.ReadOnly = true;
-            dataGridViewTextBoxColumn9.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn9.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn9.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn3
-            // 
-            dataGridViewCellStyle16.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle16.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle16.NullValue = false;
-            dataGridViewCheckBoxColumn3.DefaultCellStyle = dataGridViewCellStyle16;
-            dataGridViewCheckBoxColumn3.HeaderText = "Column4";
-            dataGridViewCheckBoxColumn3.Name = "dataGridViewCheckBoxColumn3";
-            dataGridViewCheckBoxColumn3.ReadOnly = true;
-            dataGridViewCheckBoxColumn3.Resizable = DataGridViewTriState.False;
-            dataGridViewCheckBoxColumn3.Width = 35;
             // 
             // Substrate4CheckBox
             // 
@@ -576,7 +384,7 @@
             Substrate5DataGridView.BackgroundColor = SystemColors.AppWorkspace;
             Substrate5DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             Substrate5DataGridView.ColumnHeadersVisible = false;
-            Substrate5DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn10, dataGridViewTextBoxColumn11, dataGridViewTextBoxColumn12, dataGridViewCheckBoxColumn4 });
+            Substrate5DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn0501, dataGridViewTextBoxColumn0502, dataGridViewTextBoxColumn0503, dataGridViewCheckBoxColumn0501 });
             Substrate5DataGridView.Enabled = false;
             Substrate5DataGridView.GridColor = SystemColors.ControlDark;
             Substrate5DataGridView.Location = new Point(54, 454);
@@ -585,54 +393,6 @@
             Substrate5DataGridView.RowTemplate.Height = 21;
             Substrate5DataGridView.Size = new Size(300, 74);
             Substrate5DataGridView.TabIndex = 10;
-            // 
-            // dataGridViewTextBoxColumn10
-            // 
-            dataGridViewCellStyle17.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn10.DefaultCellStyle = dataGridViewCellStyle17;
-            dataGridViewTextBoxColumn10.HeaderText = "Column1";
-            dataGridViewTextBoxColumn10.MaxInputLength = 100;
-            dataGridViewTextBoxColumn10.Name = "dataGridViewTextBoxColumn10";
-            dataGridViewTextBoxColumn10.ReadOnly = true;
-            dataGridViewTextBoxColumn10.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn10.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn10.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn11
-            // 
-            dataGridViewCellStyle18.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn11.DefaultCellStyle = dataGridViewCellStyle18;
-            dataGridViewTextBoxColumn11.HeaderText = "Column2";
-            dataGridViewTextBoxColumn11.MaxInputLength = 100;
-            dataGridViewTextBoxColumn11.Name = "dataGridViewTextBoxColumn11";
-            dataGridViewTextBoxColumn11.ReadOnly = true;
-            dataGridViewTextBoxColumn11.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn11.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn11.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn12
-            // 
-            dataGridViewCellStyle19.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn12.DefaultCellStyle = dataGridViewCellStyle19;
-            dataGridViewTextBoxColumn12.HeaderText = "Column3";
-            dataGridViewTextBoxColumn12.MaxInputLength = 100;
-            dataGridViewTextBoxColumn12.Name = "dataGridViewTextBoxColumn12";
-            dataGridViewTextBoxColumn12.ReadOnly = true;
-            dataGridViewTextBoxColumn12.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn12.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn12.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn4
-            // 
-            dataGridViewCellStyle20.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle20.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle20.NullValue = false;
-            dataGridViewCheckBoxColumn4.DefaultCellStyle = dataGridViewCellStyle20;
-            dataGridViewCheckBoxColumn4.HeaderText = "Column4";
-            dataGridViewCheckBoxColumn4.Name = "dataGridViewCheckBoxColumn4";
-            dataGridViewCheckBoxColumn4.ReadOnly = true;
-            dataGridViewCheckBoxColumn4.Resizable = DataGridViewTriState.False;
-            dataGridViewCheckBoxColumn4.Width = 35;
             // 
             // Substrate5CheckBox
             // 
@@ -656,7 +416,7 @@
             Substrate6DataGridView.BackgroundColor = SystemColors.AppWorkspace;
             Substrate6DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             Substrate6DataGridView.ColumnHeadersVisible = false;
-            Substrate6DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn13, dataGridViewTextBoxColumn14, dataGridViewTextBoxColumn15, dataGridViewCheckBoxColumn5 });
+            Substrate6DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn0601, dataGridViewTextBoxColumn0602, dataGridViewTextBoxColumn0603, dataGridViewCheckBoxColumn0601 });
             Substrate6DataGridView.Enabled = false;
             Substrate6DataGridView.GridColor = SystemColors.ControlDark;
             Substrate6DataGridView.Location = new Point(441, 50);
@@ -665,54 +425,6 @@
             Substrate6DataGridView.RowTemplate.Height = 21;
             Substrate6DataGridView.Size = new Size(300, 74);
             Substrate6DataGridView.TabIndex = 12;
-            // 
-            // dataGridViewTextBoxColumn13
-            // 
-            dataGridViewCellStyle21.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn13.DefaultCellStyle = dataGridViewCellStyle21;
-            dataGridViewTextBoxColumn13.HeaderText = "Column1";
-            dataGridViewTextBoxColumn13.MaxInputLength = 100;
-            dataGridViewTextBoxColumn13.Name = "dataGridViewTextBoxColumn13";
-            dataGridViewTextBoxColumn13.ReadOnly = true;
-            dataGridViewTextBoxColumn13.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn13.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn13.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn14
-            // 
-            dataGridViewCellStyle22.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn14.DefaultCellStyle = dataGridViewCellStyle22;
-            dataGridViewTextBoxColumn14.HeaderText = "Column2";
-            dataGridViewTextBoxColumn14.MaxInputLength = 100;
-            dataGridViewTextBoxColumn14.Name = "dataGridViewTextBoxColumn14";
-            dataGridViewTextBoxColumn14.ReadOnly = true;
-            dataGridViewTextBoxColumn14.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn14.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn14.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn15
-            // 
-            dataGridViewCellStyle23.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn15.DefaultCellStyle = dataGridViewCellStyle23;
-            dataGridViewTextBoxColumn15.HeaderText = "Column3";
-            dataGridViewTextBoxColumn15.MaxInputLength = 100;
-            dataGridViewTextBoxColumn15.Name = "dataGridViewTextBoxColumn15";
-            dataGridViewTextBoxColumn15.ReadOnly = true;
-            dataGridViewTextBoxColumn15.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn15.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn15.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn5
-            // 
-            dataGridViewCellStyle24.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle24.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle24.NullValue = false;
-            dataGridViewCheckBoxColumn5.DefaultCellStyle = dataGridViewCellStyle24;
-            dataGridViewCheckBoxColumn5.HeaderText = "Column4";
-            dataGridViewCheckBoxColumn5.Name = "dataGridViewCheckBoxColumn5";
-            dataGridViewCheckBoxColumn5.ReadOnly = true;
-            dataGridViewCheckBoxColumn5.Resizable = DataGridViewTriState.False;
-            dataGridViewCheckBoxColumn5.Width = 35;
             // 
             // Substrate6CheckBox
             // 
@@ -735,7 +447,7 @@
             Substrate7DataGridView.BackgroundColor = SystemColors.AppWorkspace;
             Substrate7DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             Substrate7DataGridView.ColumnHeadersVisible = false;
-            Substrate7DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn16, dataGridViewTextBoxColumn17, dataGridViewTextBoxColumn18, dataGridViewCheckBoxColumn6 });
+            Substrate7DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn0701, dataGridViewTextBoxColumn0702, dataGridViewTextBoxColumn0703, dataGridViewCheckBoxColumn0701 });
             Substrate7DataGridView.Enabled = false;
             Substrate7DataGridView.GridColor = SystemColors.ControlDark;
             Substrate7DataGridView.Location = new Point(441, 151);
@@ -744,54 +456,6 @@
             Substrate7DataGridView.RowTemplate.Height = 21;
             Substrate7DataGridView.Size = new Size(300, 74);
             Substrate7DataGridView.TabIndex = 14;
-            // 
-            // dataGridViewTextBoxColumn16
-            // 
-            dataGridViewCellStyle25.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn16.DefaultCellStyle = dataGridViewCellStyle25;
-            dataGridViewTextBoxColumn16.HeaderText = "Column1";
-            dataGridViewTextBoxColumn16.MaxInputLength = 100;
-            dataGridViewTextBoxColumn16.Name = "dataGridViewTextBoxColumn16";
-            dataGridViewTextBoxColumn16.ReadOnly = true;
-            dataGridViewTextBoxColumn16.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn16.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn16.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn17
-            // 
-            dataGridViewCellStyle26.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn17.DefaultCellStyle = dataGridViewCellStyle26;
-            dataGridViewTextBoxColumn17.HeaderText = "Column2";
-            dataGridViewTextBoxColumn17.MaxInputLength = 100;
-            dataGridViewTextBoxColumn17.Name = "dataGridViewTextBoxColumn17";
-            dataGridViewTextBoxColumn17.ReadOnly = true;
-            dataGridViewTextBoxColumn17.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn17.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn17.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn18
-            // 
-            dataGridViewCellStyle27.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn18.DefaultCellStyle = dataGridViewCellStyle27;
-            dataGridViewTextBoxColumn18.HeaderText = "Column3";
-            dataGridViewTextBoxColumn18.MaxInputLength = 100;
-            dataGridViewTextBoxColumn18.Name = "dataGridViewTextBoxColumn18";
-            dataGridViewTextBoxColumn18.ReadOnly = true;
-            dataGridViewTextBoxColumn18.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn18.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn18.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn6
-            // 
-            dataGridViewCellStyle28.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle28.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle28.NullValue = false;
-            dataGridViewCheckBoxColumn6.DefaultCellStyle = dataGridViewCellStyle28;
-            dataGridViewCheckBoxColumn6.HeaderText = "Column4";
-            dataGridViewCheckBoxColumn6.Name = "dataGridViewCheckBoxColumn6";
-            dataGridViewCheckBoxColumn6.ReadOnly = true;
-            dataGridViewCheckBoxColumn6.Resizable = DataGridViewTriState.False;
-            dataGridViewCheckBoxColumn6.Width = 35;
             // 
             // Substrate7CheckBox
             // 
@@ -814,7 +478,7 @@
             Substrate8DataGridView.BackgroundColor = SystemColors.AppWorkspace;
             Substrate8DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             Substrate8DataGridView.ColumnHeadersVisible = false;
-            Substrate8DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn19, dataGridViewTextBoxColumn20, dataGridViewTextBoxColumn21, dataGridViewCheckBoxColumn7 });
+            Substrate8DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn0801, dataGridViewTextBoxColumn0802, dataGridViewTextBoxColumn0803, dataGridViewCheckBoxColumn0801 });
             Substrate8DataGridView.Enabled = false;
             Substrate8DataGridView.GridColor = SystemColors.ControlDark;
             Substrate8DataGridView.Location = new Point(441, 252);
@@ -823,54 +487,6 @@
             Substrate8DataGridView.RowTemplate.Height = 21;
             Substrate8DataGridView.Size = new Size(300, 74);
             Substrate8DataGridView.TabIndex = 16;
-            // 
-            // dataGridViewTextBoxColumn19
-            // 
-            dataGridViewCellStyle29.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn19.DefaultCellStyle = dataGridViewCellStyle29;
-            dataGridViewTextBoxColumn19.HeaderText = "Column1";
-            dataGridViewTextBoxColumn19.MaxInputLength = 100;
-            dataGridViewTextBoxColumn19.Name = "dataGridViewTextBoxColumn19";
-            dataGridViewTextBoxColumn19.ReadOnly = true;
-            dataGridViewTextBoxColumn19.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn19.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn19.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn20
-            // 
-            dataGridViewCellStyle30.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn20.DefaultCellStyle = dataGridViewCellStyle30;
-            dataGridViewTextBoxColumn20.HeaderText = "Column2";
-            dataGridViewTextBoxColumn20.MaxInputLength = 100;
-            dataGridViewTextBoxColumn20.Name = "dataGridViewTextBoxColumn20";
-            dataGridViewTextBoxColumn20.ReadOnly = true;
-            dataGridViewTextBoxColumn20.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn20.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn20.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn21
-            // 
-            dataGridViewCellStyle31.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn21.DefaultCellStyle = dataGridViewCellStyle31;
-            dataGridViewTextBoxColumn21.HeaderText = "Column3";
-            dataGridViewTextBoxColumn21.MaxInputLength = 100;
-            dataGridViewTextBoxColumn21.Name = "dataGridViewTextBoxColumn21";
-            dataGridViewTextBoxColumn21.ReadOnly = true;
-            dataGridViewTextBoxColumn21.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn21.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn21.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn7
-            // 
-            dataGridViewCellStyle32.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle32.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle32.NullValue = false;
-            dataGridViewCheckBoxColumn7.DefaultCellStyle = dataGridViewCellStyle32;
-            dataGridViewCheckBoxColumn7.HeaderText = "Column4";
-            dataGridViewCheckBoxColumn7.Name = "dataGridViewCheckBoxColumn7";
-            dataGridViewCheckBoxColumn7.ReadOnly = true;
-            dataGridViewCheckBoxColumn7.Resizable = DataGridViewTriState.False;
-            dataGridViewCheckBoxColumn7.Width = 35;
             // 
             // Substrate8CheckBox
             // 
@@ -893,7 +509,7 @@
             Substrate9DataGridView.BackgroundColor = SystemColors.AppWorkspace;
             Substrate9DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             Substrate9DataGridView.ColumnHeadersVisible = false;
-            Substrate9DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn22, dataGridViewTextBoxColumn23, dataGridViewTextBoxColumn24, dataGridViewCheckBoxColumn8 });
+            Substrate9DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn0901, dataGridViewTextBoxColumn0902, dataGridViewTextBoxColumn0903, dataGridViewCheckBoxColumn0901 });
             Substrate9DataGridView.Enabled = false;
             Substrate9DataGridView.GridColor = SystemColors.ControlDark;
             Substrate9DataGridView.Location = new Point(441, 353);
@@ -902,54 +518,6 @@
             Substrate9DataGridView.RowTemplate.Height = 21;
             Substrate9DataGridView.Size = new Size(300, 74);
             Substrate9DataGridView.TabIndex = 18;
-            // 
-            // dataGridViewTextBoxColumn22
-            // 
-            dataGridViewCellStyle33.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn22.DefaultCellStyle = dataGridViewCellStyle33;
-            dataGridViewTextBoxColumn22.HeaderText = "Column1";
-            dataGridViewTextBoxColumn22.MaxInputLength = 100;
-            dataGridViewTextBoxColumn22.Name = "dataGridViewTextBoxColumn22";
-            dataGridViewTextBoxColumn22.ReadOnly = true;
-            dataGridViewTextBoxColumn22.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn22.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn22.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn23
-            // 
-            dataGridViewCellStyle34.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn23.DefaultCellStyle = dataGridViewCellStyle34;
-            dataGridViewTextBoxColumn23.HeaderText = "Column2";
-            dataGridViewTextBoxColumn23.MaxInputLength = 100;
-            dataGridViewTextBoxColumn23.Name = "dataGridViewTextBoxColumn23";
-            dataGridViewTextBoxColumn23.ReadOnly = true;
-            dataGridViewTextBoxColumn23.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn23.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn23.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn24
-            // 
-            dataGridViewCellStyle35.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn24.DefaultCellStyle = dataGridViewCellStyle35;
-            dataGridViewTextBoxColumn24.HeaderText = "Column3";
-            dataGridViewTextBoxColumn24.MaxInputLength = 100;
-            dataGridViewTextBoxColumn24.Name = "dataGridViewTextBoxColumn24";
-            dataGridViewTextBoxColumn24.ReadOnly = true;
-            dataGridViewTextBoxColumn24.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn24.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn24.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn8
-            // 
-            dataGridViewCellStyle36.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle36.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle36.NullValue = false;
-            dataGridViewCheckBoxColumn8.DefaultCellStyle = dataGridViewCellStyle36;
-            dataGridViewCheckBoxColumn8.HeaderText = "Column4";
-            dataGridViewCheckBoxColumn8.Name = "dataGridViewCheckBoxColumn8";
-            dataGridViewCheckBoxColumn8.ReadOnly = true;
-            dataGridViewCheckBoxColumn8.Resizable = DataGridViewTriState.False;
-            dataGridViewCheckBoxColumn8.Width = 35;
             // 
             // Substrate9CheckBox
             // 
@@ -972,7 +540,7 @@
             Substrate10DataGridView.BackgroundColor = SystemColors.AppWorkspace;
             Substrate10DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             Substrate10DataGridView.ColumnHeadersVisible = false;
-            Substrate10DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn25, dataGridViewTextBoxColumn26, dataGridViewTextBoxColumn27, dataGridViewCheckBoxColumn9 });
+            Substrate10DataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn1001, dataGridViewTextBoxColumn1002, dataGridViewTextBoxColumn1003, dataGridViewCheckBoxColumn1001 });
             Substrate10DataGridView.Enabled = false;
             Substrate10DataGridView.GridColor = SystemColors.ControlDark;
             Substrate10DataGridView.Location = new Point(441, 454);
@@ -981,54 +549,6 @@
             Substrate10DataGridView.RowTemplate.Height = 21;
             Substrate10DataGridView.Size = new Size(300, 74);
             Substrate10DataGridView.TabIndex = 20;
-            // 
-            // dataGridViewTextBoxColumn25
-            // 
-            dataGridViewCellStyle37.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn25.DefaultCellStyle = dataGridViewCellStyle37;
-            dataGridViewTextBoxColumn25.HeaderText = "Column1";
-            dataGridViewTextBoxColumn25.MaxInputLength = 100;
-            dataGridViewTextBoxColumn25.Name = "dataGridViewTextBoxColumn25";
-            dataGridViewTextBoxColumn25.ReadOnly = true;
-            dataGridViewTextBoxColumn25.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn25.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn25.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn26
-            // 
-            dataGridViewCellStyle38.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn26.DefaultCellStyle = dataGridViewCellStyle38;
-            dataGridViewTextBoxColumn26.HeaderText = "Column2";
-            dataGridViewTextBoxColumn26.MaxInputLength = 100;
-            dataGridViewTextBoxColumn26.Name = "dataGridViewTextBoxColumn26";
-            dataGridViewTextBoxColumn26.ReadOnly = true;
-            dataGridViewTextBoxColumn26.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn26.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn26.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn27
-            // 
-            dataGridViewCellStyle39.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewTextBoxColumn27.DefaultCellStyle = dataGridViewCellStyle39;
-            dataGridViewTextBoxColumn27.HeaderText = "Column3";
-            dataGridViewTextBoxColumn27.MaxInputLength = 100;
-            dataGridViewTextBoxColumn27.Name = "dataGridViewTextBoxColumn27";
-            dataGridViewTextBoxColumn27.ReadOnly = true;
-            dataGridViewTextBoxColumn27.Resizable = DataGridViewTriState.False;
-            dataGridViewTextBoxColumn27.SortMode = DataGridViewColumnSortMode.NotSortable;
-            dataGridViewTextBoxColumn27.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn9
-            // 
-            dataGridViewCellStyle40.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle40.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle40.NullValue = false;
-            dataGridViewCheckBoxColumn9.DefaultCellStyle = dataGridViewCellStyle40;
-            dataGridViewCheckBoxColumn9.HeaderText = "Column4";
-            dataGridViewCheckBoxColumn9.Name = "dataGridViewCheckBoxColumn9";
-            dataGridViewCheckBoxColumn9.ReadOnly = true;
-            dataGridViewCheckBoxColumn9.Resizable = DataGridViewTriState.False;
-            dataGridViewCheckBoxColumn9.Width = 35;
             // 
             // Substrate10CheckBox
             // 
@@ -1148,6 +668,486 @@
             ProductRegistration2PrintPreviewDialog.Name = "ProductRegistration2PrintPreviewDialog";
             ProductRegistration2PrintPreviewDialog.Visible = false;
             // 
+            // dataGridViewTextBoxColumn0101
+            // 
+            dataGridViewCellStyle1.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0101.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewTextBoxColumn0101.HeaderText = "Column1";
+            dataGridViewTextBoxColumn0101.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0101.Name = "dataGridViewTextBoxColumn0101";
+            dataGridViewTextBoxColumn0101.ReadOnly = true;
+            dataGridViewTextBoxColumn0101.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0101.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0101.Width = 140;
+            // 
+            // dataGridViewTextBoxColumn0102
+            // 
+            dataGridViewCellStyle2.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0102.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewTextBoxColumn0102.HeaderText = "Column2";
+            dataGridViewTextBoxColumn0102.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0102.Name = "dataGridViewTextBoxColumn0102";
+            dataGridViewTextBoxColumn0102.ReadOnly = true;
+            dataGridViewTextBoxColumn0102.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0102.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0102.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0103
+            // 
+            dataGridViewCellStyle3.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0103.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewTextBoxColumn0103.HeaderText = "Column3";
+            dataGridViewTextBoxColumn0103.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0103.Name = "dataGridViewTextBoxColumn0103";
+            dataGridViewTextBoxColumn0103.ReadOnly = true;
+            dataGridViewTextBoxColumn0103.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0103.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0103.Width = 35;
+            // 
+            // dataGridViewCheckBoxColumn0101
+            // 
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle4.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle4.NullValue = false;
+            dataGridViewCheckBoxColumn0101.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCheckBoxColumn0101.HeaderText = "Column4";
+            dataGridViewCheckBoxColumn0101.Name = "dataGridViewCheckBoxColumn0101";
+            dataGridViewCheckBoxColumn0101.ReadOnly = true;
+            dataGridViewCheckBoxColumn0101.Resizable = DataGridViewTriState.False;
+            dataGridViewCheckBoxColumn0101.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0201
+            // 
+            dataGridViewCellStyle5.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0201.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewTextBoxColumn0201.HeaderText = "Column1";
+            dataGridViewTextBoxColumn0201.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0201.Name = "dataGridViewTextBoxColumn0201";
+            dataGridViewTextBoxColumn0201.ReadOnly = true;
+            dataGridViewTextBoxColumn0201.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0201.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0201.Width = 140;
+            // 
+            // dataGridViewTextBoxColumn0202
+            // 
+            dataGridViewCellStyle6.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0202.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewTextBoxColumn0202.HeaderText = "Column2";
+            dataGridViewTextBoxColumn0202.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0202.Name = "dataGridViewTextBoxColumn0202";
+            dataGridViewTextBoxColumn0202.ReadOnly = true;
+            dataGridViewTextBoxColumn0202.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0202.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0202.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0203
+            // 
+            dataGridViewCellStyle7.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0203.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewTextBoxColumn0203.HeaderText = "Column3";
+            dataGridViewTextBoxColumn0203.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0203.Name = "dataGridViewTextBoxColumn0203";
+            dataGridViewTextBoxColumn0203.ReadOnly = true;
+            dataGridViewTextBoxColumn0203.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0203.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0203.Width = 35;
+            // 
+            // dataGridViewCheckBoxColumn0201
+            // 
+            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle8.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle8.NullValue = false;
+            dataGridViewCheckBoxColumn0201.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCheckBoxColumn0201.HeaderText = "Column4";
+            dataGridViewCheckBoxColumn0201.Name = "dataGridViewCheckBoxColumn0201";
+            dataGridViewCheckBoxColumn0201.ReadOnly = true;
+            dataGridViewCheckBoxColumn0201.Resizable = DataGridViewTriState.False;
+            dataGridViewCheckBoxColumn0201.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0301
+            // 
+            dataGridViewCellStyle9.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0301.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewTextBoxColumn0301.HeaderText = "Column1";
+            dataGridViewTextBoxColumn0301.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0301.Name = "dataGridViewTextBoxColumn0301";
+            dataGridViewTextBoxColumn0301.ReadOnly = true;
+            dataGridViewTextBoxColumn0301.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0301.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0301.Width = 140;
+            // 
+            // dataGridViewTextBoxColumn0302
+            // 
+            dataGridViewCellStyle10.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0302.DefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewTextBoxColumn0302.HeaderText = "Column2";
+            dataGridViewTextBoxColumn0302.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0302.Name = "dataGridViewTextBoxColumn0302";
+            dataGridViewTextBoxColumn0302.ReadOnly = true;
+            dataGridViewTextBoxColumn0302.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0302.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0302.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0303
+            // 
+            dataGridViewCellStyle11.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0303.DefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewTextBoxColumn0303.HeaderText = "Column3";
+            dataGridViewTextBoxColumn0303.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0303.Name = "dataGridViewTextBoxColumn0303";
+            dataGridViewTextBoxColumn0303.ReadOnly = true;
+            dataGridViewTextBoxColumn0303.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0303.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0303.Width = 35;
+            // 
+            // dataGridViewCheckBoxColumn0301
+            // 
+            dataGridViewCellStyle12.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle12.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle12.NullValue = false;
+            dataGridViewCheckBoxColumn0301.DefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCheckBoxColumn0301.HeaderText = "Column4";
+            dataGridViewCheckBoxColumn0301.Name = "dataGridViewCheckBoxColumn0301";
+            dataGridViewCheckBoxColumn0301.ReadOnly = true;
+            dataGridViewCheckBoxColumn0301.Resizable = DataGridViewTriState.False;
+            dataGridViewCheckBoxColumn0301.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0401
+            // 
+            dataGridViewCellStyle13.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0401.DefaultCellStyle = dataGridViewCellStyle13;
+            dataGridViewTextBoxColumn0401.HeaderText = "Column1";
+            dataGridViewTextBoxColumn0401.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0401.Name = "dataGridViewTextBoxColumn0401";
+            dataGridViewTextBoxColumn0401.ReadOnly = true;
+            dataGridViewTextBoxColumn0401.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0401.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0401.Width = 140;
+            // 
+            // dataGridViewTextBoxColumn0402
+            // 
+            dataGridViewCellStyle14.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0402.DefaultCellStyle = dataGridViewCellStyle14;
+            dataGridViewTextBoxColumn0402.HeaderText = "Column2";
+            dataGridViewTextBoxColumn0402.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0402.Name = "dataGridViewTextBoxColumn0402";
+            dataGridViewTextBoxColumn0402.ReadOnly = true;
+            dataGridViewTextBoxColumn0402.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0402.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0402.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0403
+            // 
+            dataGridViewCellStyle15.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0403.DefaultCellStyle = dataGridViewCellStyle15;
+            dataGridViewTextBoxColumn0403.HeaderText = "Column3";
+            dataGridViewTextBoxColumn0403.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0403.Name = "dataGridViewTextBoxColumn0403";
+            dataGridViewTextBoxColumn0403.ReadOnly = true;
+            dataGridViewTextBoxColumn0403.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0403.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0403.Width = 35;
+            // 
+            // dataGridViewCheckBoxColumn0401
+            // 
+            dataGridViewCellStyle16.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle16.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle16.NullValue = false;
+            dataGridViewCheckBoxColumn0401.DefaultCellStyle = dataGridViewCellStyle16;
+            dataGridViewCheckBoxColumn0401.HeaderText = "Column4";
+            dataGridViewCheckBoxColumn0401.Name = "dataGridViewCheckBoxColumn0401";
+            dataGridViewCheckBoxColumn0401.ReadOnly = true;
+            dataGridViewCheckBoxColumn0401.Resizable = DataGridViewTriState.False;
+            dataGridViewCheckBoxColumn0401.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0501
+            // 
+            dataGridViewCellStyle17.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0501.DefaultCellStyle = dataGridViewCellStyle17;
+            dataGridViewTextBoxColumn0501.HeaderText = "Column1";
+            dataGridViewTextBoxColumn0501.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0501.Name = "dataGridViewTextBoxColumn0501";
+            dataGridViewTextBoxColumn0501.ReadOnly = true;
+            dataGridViewTextBoxColumn0501.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0501.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0501.Width = 140;
+            // 
+            // dataGridViewTextBoxColumn0502
+            // 
+            dataGridViewCellStyle18.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0502.DefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewTextBoxColumn0502.HeaderText = "Column2";
+            dataGridViewTextBoxColumn0502.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0502.Name = "dataGridViewTextBoxColumn0502";
+            dataGridViewTextBoxColumn0502.ReadOnly = true;
+            dataGridViewTextBoxColumn0502.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0502.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0502.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0503
+            // 
+            dataGridViewCellStyle19.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0503.DefaultCellStyle = dataGridViewCellStyle19;
+            dataGridViewTextBoxColumn0503.HeaderText = "Column3";
+            dataGridViewTextBoxColumn0503.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0503.Name = "dataGridViewTextBoxColumn0503";
+            dataGridViewTextBoxColumn0503.ReadOnly = true;
+            dataGridViewTextBoxColumn0503.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0503.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0503.Width = 35;
+            // 
+            // dataGridViewCheckBoxColumn0501
+            // 
+            dataGridViewCellStyle20.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle20.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle20.NullValue = false;
+            dataGridViewCheckBoxColumn0501.DefaultCellStyle = dataGridViewCellStyle20;
+            dataGridViewCheckBoxColumn0501.HeaderText = "Column4";
+            dataGridViewCheckBoxColumn0501.Name = "dataGridViewCheckBoxColumn0501";
+            dataGridViewCheckBoxColumn0501.ReadOnly = true;
+            dataGridViewCheckBoxColumn0501.Resizable = DataGridViewTriState.False;
+            dataGridViewCheckBoxColumn0501.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0601
+            // 
+            dataGridViewCellStyle21.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0601.DefaultCellStyle = dataGridViewCellStyle21;
+            dataGridViewTextBoxColumn0601.HeaderText = "Column1";
+            dataGridViewTextBoxColumn0601.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0601.Name = "dataGridViewTextBoxColumn0601";
+            dataGridViewTextBoxColumn0601.ReadOnly = true;
+            dataGridViewTextBoxColumn0601.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0601.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0601.Width = 140;
+            // 
+            // dataGridViewTextBoxColumn0602
+            // 
+            dataGridViewCellStyle22.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0602.DefaultCellStyle = dataGridViewCellStyle22;
+            dataGridViewTextBoxColumn0602.HeaderText = "Column2";
+            dataGridViewTextBoxColumn0602.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0602.Name = "dataGridViewTextBoxColumn0602";
+            dataGridViewTextBoxColumn0602.ReadOnly = true;
+            dataGridViewTextBoxColumn0602.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0602.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0602.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0603
+            // 
+            dataGridViewCellStyle23.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0603.DefaultCellStyle = dataGridViewCellStyle23;
+            dataGridViewTextBoxColumn0603.HeaderText = "Column3";
+            dataGridViewTextBoxColumn0603.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0603.Name = "dataGridViewTextBoxColumn0603";
+            dataGridViewTextBoxColumn0603.ReadOnly = true;
+            dataGridViewTextBoxColumn0603.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0603.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0603.Width = 35;
+            // 
+            // dataGridViewCheckBoxColumn0601
+            // 
+            dataGridViewCellStyle24.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle24.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle24.NullValue = false;
+            dataGridViewCheckBoxColumn0601.DefaultCellStyle = dataGridViewCellStyle24;
+            dataGridViewCheckBoxColumn0601.HeaderText = "Column4";
+            dataGridViewCheckBoxColumn0601.Name = "dataGridViewCheckBoxColumn0601";
+            dataGridViewCheckBoxColumn0601.ReadOnly = true;
+            dataGridViewCheckBoxColumn0601.Resizable = DataGridViewTriState.False;
+            dataGridViewCheckBoxColumn0601.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0701
+            // 
+            dataGridViewCellStyle25.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0701.DefaultCellStyle = dataGridViewCellStyle25;
+            dataGridViewTextBoxColumn0701.HeaderText = "Column1";
+            dataGridViewTextBoxColumn0701.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0701.Name = "dataGridViewTextBoxColumn0701";
+            dataGridViewTextBoxColumn0701.ReadOnly = true;
+            dataGridViewTextBoxColumn0701.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0701.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0701.Width = 140;
+            // 
+            // dataGridViewTextBoxColumn0702
+            // 
+            dataGridViewCellStyle26.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0702.DefaultCellStyle = dataGridViewCellStyle26;
+            dataGridViewTextBoxColumn0702.HeaderText = "Column2";
+            dataGridViewTextBoxColumn0702.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0702.Name = "dataGridViewTextBoxColumn0702";
+            dataGridViewTextBoxColumn0702.ReadOnly = true;
+            dataGridViewTextBoxColumn0702.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0702.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0702.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0703
+            // 
+            dataGridViewCellStyle27.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0703.DefaultCellStyle = dataGridViewCellStyle27;
+            dataGridViewTextBoxColumn0703.HeaderText = "Column3";
+            dataGridViewTextBoxColumn0703.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0703.Name = "dataGridViewTextBoxColumn0703";
+            dataGridViewTextBoxColumn0703.ReadOnly = true;
+            dataGridViewTextBoxColumn0703.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0703.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0703.Width = 35;
+            // 
+            // dataGridViewCheckBoxColumn0701
+            // 
+            dataGridViewCellStyle28.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle28.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle28.NullValue = false;
+            dataGridViewCheckBoxColumn0701.DefaultCellStyle = dataGridViewCellStyle28;
+            dataGridViewCheckBoxColumn0701.HeaderText = "Column4";
+            dataGridViewCheckBoxColumn0701.Name = "dataGridViewCheckBoxColumn0701";
+            dataGridViewCheckBoxColumn0701.ReadOnly = true;
+            dataGridViewCheckBoxColumn0701.Resizable = DataGridViewTriState.False;
+            dataGridViewCheckBoxColumn0701.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0801
+            // 
+            dataGridViewCellStyle29.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0801.DefaultCellStyle = dataGridViewCellStyle29;
+            dataGridViewTextBoxColumn0801.HeaderText = "Column1";
+            dataGridViewTextBoxColumn0801.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0801.Name = "dataGridViewTextBoxColumn0801";
+            dataGridViewTextBoxColumn0801.ReadOnly = true;
+            dataGridViewTextBoxColumn0801.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0801.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0801.Width = 140;
+            // 
+            // dataGridViewTextBoxColumn0802
+            // 
+            dataGridViewCellStyle30.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0802.DefaultCellStyle = dataGridViewCellStyle30;
+            dataGridViewTextBoxColumn0802.HeaderText = "Column2";
+            dataGridViewTextBoxColumn0802.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0802.Name = "dataGridViewTextBoxColumn0802";
+            dataGridViewTextBoxColumn0802.ReadOnly = true;
+            dataGridViewTextBoxColumn0802.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0802.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0802.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0803
+            // 
+            dataGridViewCellStyle31.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0803.DefaultCellStyle = dataGridViewCellStyle31;
+            dataGridViewTextBoxColumn0803.HeaderText = "Column3";
+            dataGridViewTextBoxColumn0803.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0803.Name = "dataGridViewTextBoxColumn0803";
+            dataGridViewTextBoxColumn0803.ReadOnly = true;
+            dataGridViewTextBoxColumn0803.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0803.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0803.Width = 35;
+            // 
+            // dataGridViewCheckBoxColumn0801
+            // 
+            dataGridViewCellStyle32.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle32.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle32.NullValue = false;
+            dataGridViewCheckBoxColumn0801.DefaultCellStyle = dataGridViewCellStyle32;
+            dataGridViewCheckBoxColumn0801.HeaderText = "Column4";
+            dataGridViewCheckBoxColumn0801.Name = "dataGridViewCheckBoxColumn0801";
+            dataGridViewCheckBoxColumn0801.ReadOnly = true;
+            dataGridViewCheckBoxColumn0801.Resizable = DataGridViewTriState.False;
+            dataGridViewCheckBoxColumn0801.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0901
+            // 
+            dataGridViewCellStyle33.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0901.DefaultCellStyle = dataGridViewCellStyle33;
+            dataGridViewTextBoxColumn0901.HeaderText = "Column1";
+            dataGridViewTextBoxColumn0901.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0901.Name = "dataGridViewTextBoxColumn0901";
+            dataGridViewTextBoxColumn0901.ReadOnly = true;
+            dataGridViewTextBoxColumn0901.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0901.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0901.Width = 140;
+            // 
+            // dataGridViewTextBoxColumn0902
+            // 
+            dataGridViewCellStyle34.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0902.DefaultCellStyle = dataGridViewCellStyle34;
+            dataGridViewTextBoxColumn0902.HeaderText = "Column2";
+            dataGridViewTextBoxColumn0902.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0902.Name = "dataGridViewTextBoxColumn0902";
+            dataGridViewTextBoxColumn0902.ReadOnly = true;
+            dataGridViewTextBoxColumn0902.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0902.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0902.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn0903
+            // 
+            dataGridViewCellStyle35.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn0903.DefaultCellStyle = dataGridViewCellStyle35;
+            dataGridViewTextBoxColumn0903.HeaderText = "Column3";
+            dataGridViewTextBoxColumn0903.MaxInputLength = 100;
+            dataGridViewTextBoxColumn0903.Name = "dataGridViewTextBoxColumn0903";
+            dataGridViewTextBoxColumn0903.ReadOnly = true;
+            dataGridViewTextBoxColumn0903.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn0903.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn0903.Width = 35;
+            // 
+            // dataGridViewCheckBoxColumn0901
+            // 
+            dataGridViewCellStyle36.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle36.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle36.NullValue = false;
+            dataGridViewCheckBoxColumn0901.DefaultCellStyle = dataGridViewCellStyle36;
+            dataGridViewCheckBoxColumn0901.HeaderText = "Column4";
+            dataGridViewCheckBoxColumn0901.Name = "dataGridViewCheckBoxColumn0901";
+            dataGridViewCheckBoxColumn0901.ReadOnly = true;
+            dataGridViewCheckBoxColumn0901.Resizable = DataGridViewTriState.False;
+            dataGridViewCheckBoxColumn0901.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn1001
+            // 
+            dataGridViewCellStyle37.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn1001.DefaultCellStyle = dataGridViewCellStyle37;
+            dataGridViewTextBoxColumn1001.HeaderText = "Column1";
+            dataGridViewTextBoxColumn1001.MaxInputLength = 100;
+            dataGridViewTextBoxColumn1001.Name = "dataGridViewTextBoxColumn1001";
+            dataGridViewTextBoxColumn1001.ReadOnly = true;
+            dataGridViewTextBoxColumn1001.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn1001.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn1001.Width = 140;
+            // 
+            // dataGridViewTextBoxColumn1002
+            // 
+            dataGridViewCellStyle38.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn1002.DefaultCellStyle = dataGridViewCellStyle38;
+            dataGridViewTextBoxColumn1002.HeaderText = "Column2";
+            dataGridViewTextBoxColumn1002.MaxInputLength = 100;
+            dataGridViewTextBoxColumn1002.Name = "dataGridViewTextBoxColumn1002";
+            dataGridViewTextBoxColumn1002.ReadOnly = true;
+            dataGridViewTextBoxColumn1002.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn1002.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn1002.Width = 35;
+            // 
+            // dataGridViewTextBoxColumn1003
+            // 
+            dataGridViewCellStyle39.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewTextBoxColumn1003.DefaultCellStyle = dataGridViewCellStyle39;
+            dataGridViewTextBoxColumn1003.HeaderText = "Column3";
+            dataGridViewTextBoxColumn1003.MaxInputLength = 100;
+            dataGridViewTextBoxColumn1003.Name = "dataGridViewTextBoxColumn1003";
+            dataGridViewTextBoxColumn1003.ReadOnly = true;
+            dataGridViewTextBoxColumn1003.Resizable = DataGridViewTriState.False;
+            dataGridViewTextBoxColumn1003.SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataGridViewTextBoxColumn1003.Width = 35;
+            // 
+            // dataGridViewCheckBoxColumn1001
+            // 
+            dataGridViewCellStyle40.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle40.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle40.NullValue = false;
+            dataGridViewCheckBoxColumn1001.DefaultCellStyle = dataGridViewCellStyle40;
+            dataGridViewCheckBoxColumn1001.HeaderText = "Column4";
+            dataGridViewCheckBoxColumn1001.Name = "dataGridViewCheckBoxColumn1001";
+            dataGridViewCheckBoxColumn1001.ReadOnly = true;
+            dataGridViewCheckBoxColumn1001.Resizable = DataGridViewTriState.False;
+            dataGridViewCheckBoxColumn1001.Width = 35;
+            // 
             // ProductRegistration2Window
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1228,63 +1228,23 @@
         private ToolStripMenuItem 取得情報ToolStripMenuItem;
         private CheckBox Substrate1CheckBox;
         private DataGridView Substrate1DataGridView;
-        private DataGridViewTextBoxColumn Column1;
-        private DataGridViewTextBoxColumn Column2;
-        private DataGridViewTextBoxColumn Column3;
-        private DataGridViewCheckBoxColumn Column4;
         private DataGridView Substrate2DataGridView;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
-        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn1;
         private CheckBox Substrate2CheckBox;
         private DataGridView Substrate3DataGridView;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn5;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
-        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn2;
         private CheckBox Substrate3CheckBox;
         private DataGridView Substrate4DataGridView;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn7;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn8;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn9;
-        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn3;
         private CheckBox Substrate4CheckBox;
         private DataGridView Substrate5DataGridView;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn10;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn11;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn12;
-        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn4;
         private CheckBox Substrate5CheckBox;
         private DataGridView Substrate6DataGridView;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn13;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn14;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn15;
-        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn5;
         private CheckBox Substrate6CheckBox;
         private DataGridView Substrate7DataGridView;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn16;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn17;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn18;
-        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn6;
         private CheckBox Substrate7CheckBox;
         private DataGridView Substrate8DataGridView;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn19;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn20;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn21;
-        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn7;
         private CheckBox Substrate8CheckBox;
         private DataGridView Substrate9DataGridView;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn22;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn23;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn24;
-        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn8;
         private CheckBox Substrate9CheckBox;
         private DataGridView Substrate10DataGridView;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn25;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn26;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn27;
-        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn9;
         private CheckBox Substrate10CheckBox;
         private Label SerialPrintPostionLabel;
         private NumericUpDown SerialPrintPostionNumericUpDown;
@@ -1297,5 +1257,45 @@
         private PrintDialog ProductRegistration2PrintDialog;
         private System.Drawing.Printing.PrintDocument ProductRegistration2PrintDocument;
         private PrintPreviewDialog ProductRegistration2PrintPreviewDialog;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0101;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0102;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0103;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn0101;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0201;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0202;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0203;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn0201;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0301;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0302;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0303;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn0301;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0401;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0402;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0403;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn0401;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0501;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0502;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0503;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn0501;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0601;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0602;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0603;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn0601;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0701;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0702;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0703;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn0701;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0801;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0802;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0803;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn0801;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0901;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0902;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0903;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn0901;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1001;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1002;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1003;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn1001;
     }
 }
