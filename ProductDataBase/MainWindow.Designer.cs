@@ -305,6 +305,7 @@
             MainMenuStrip = MainWindowMenuStrip;
             MaximizeBox = false;
             Name = "MainWindow";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "ProductDataBase";
             Load += MainWindow_Load;
             MainWindowMenuStrip.ResumeLayout(false);
