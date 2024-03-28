@@ -42,6 +42,12 @@ namespace ProductDatabase {
                             if (_headerValue != null) { ListColFilter.Add(_headerValue); }
                         }
 
+                        // 最大サイズをディスプレイサイズに合わせる
+                        if (Screen.PrimaryScreen != null) {
+                            int h = Screen.PrimaryScreen.Bounds.Height;
+                            int w = Screen.PrimaryScreen.Bounds.Width;
+                            DataBaseDataGridView.MaximumSize = new Size(w, h);
+                        }
                         DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(DataBaseDataGridView.Font, FontStyle.Bold);
                         DataBaseDataGridView.RowHeadersVisible = true;
                         DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
@@ -94,6 +100,12 @@ namespace ProductDatabase {
                             if (_headerValue != null) { ListColFilter.Add(_headerValue); }
                         }
 
+                        // 最大サイズをディスプレイサイズに合わせる
+                        if (Screen.PrimaryScreen != null) {
+                            int h = Screen.PrimaryScreen.Bounds.Height;
+                            int w = Screen.PrimaryScreen.Bounds.Width;
+                            DataBaseDataGridView.MaximumSize = new Size(w, h);
+                        }
                         DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(DataBaseDataGridView.Font, FontStyle.Bold);
                         DataBaseDataGridView.RowHeadersVisible = true;
                         DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
@@ -145,6 +157,12 @@ namespace ProductDatabase {
                             if (_headerValue != null) { ListColFilter.Add(_headerValue); }
                         }
 
+                        // 最大サイズをディスプレイサイズに合わせる
+                        if (Screen.PrimaryScreen != null) {
+                            int h = Screen.PrimaryScreen.Bounds.Height;
+                            int w = Screen.PrimaryScreen.Bounds.Width;
+                            DataBaseDataGridView.MaximumSize = new Size(w, h);
+                        }
                         DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(DataBaseDataGridView.Font, FontStyle.Bold);
                         DataBaseDataGridView.RowHeadersVisible = true;
                         DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;

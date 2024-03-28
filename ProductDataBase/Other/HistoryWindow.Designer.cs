@@ -67,8 +67,8 @@
             // 
             // ExportCsvButton
             // 
-            ExportCsvButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            ExportCsvButton.Location = new Point(1097, 483);
+            ExportCsvButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            ExportCsvButton.Location = new Point(245, 483);
             ExportCsvButton.Name = "ExportCsvButton";
             ExportCsvButton.Size = new Size(75, 23);
             ExportCsvButton.TabIndex = 3;
@@ -78,8 +78,8 @@
             // 
             // HistoryWindow
             // 
-            AutoScaleDimensions = new SizeF(96F, 96F);
-            AutoScaleMode = AutoScaleMode.Dpi;
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1184, 511);
             Controls.Add(ExportCsvButton);
             Controls.Add(FilterStringTextBox);
