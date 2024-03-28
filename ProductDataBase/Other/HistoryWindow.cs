@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using System.Data.SQLite;
-using System.Windows.Forms;
 
 namespace ProductDatabase {
     public partial class HistoryWindow : Form {
