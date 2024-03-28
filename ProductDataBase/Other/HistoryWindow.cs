@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.SQLite;
+using System.Windows.Forms;
 
 namespace ProductDatabase {
     public partial class HistoryWindow : Form {
@@ -45,6 +46,8 @@ namespace ProductDatabase {
                         DataBaseDataGridView.RowHeadersVisible = true;
                         DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
                         DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
+                        //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
+                        DataBaseDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
 
                         DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
                         DataBaseDataGridView.Columns[0].Width = 40;
@@ -95,6 +98,8 @@ namespace ProductDatabase {
                         DataBaseDataGridView.RowHeadersVisible = true;
                         DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
                         DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
+                        //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
+                        DataBaseDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
 
                         DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
                         DataBaseDataGridView.Columns[0].Width = 40;
@@ -144,6 +149,8 @@ namespace ProductDatabase {
                         DataBaseDataGridView.RowHeadersVisible = true;
                         DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
                         DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
+                        //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
+                        DataBaseDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
 
                         DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
                         DataBaseDataGridView.Columns[0].Width = 40;

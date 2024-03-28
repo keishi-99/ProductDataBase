@@ -59,6 +59,8 @@ namespace ProductDatabase {
                             SubstrateChangeDataGridView.RowHeadersVisible = true;
                             SubstrateChangeDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
                             SubstrateChangeDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
+                            //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
+                            SubstrateChangeDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
 
                             SubstrateChangeDataGridView.Columns[0].HeaderCell.Value = "ID";
                             SubstrateChangeDataGridView.Columns[0].Width = 40;
