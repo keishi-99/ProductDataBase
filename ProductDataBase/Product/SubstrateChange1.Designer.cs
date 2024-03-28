@@ -38,6 +38,7 @@
             SubstrateChangeDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             SubstrateChangeDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             SubstrateChangeDataGridView.Location = new Point(0, 0);
+            SubstrateChangeDataGridView.MultiSelect = false;
             SubstrateChangeDataGridView.Name = "SubstrateChangeDataGridView";
             SubstrateChangeDataGridView.ReadOnly = true;
             SubstrateChangeDataGridView.RowHeadersVisible = false;
@@ -67,9 +68,9 @@
             // OKButton
             // 
             OKButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            OKButton.Location = new Point(1097, 330);
+            OKButton.Location = new Point(1097, 328);
             OKButton.Name = "OKButton";
-            OKButton.Size = new Size(75, 23);
+            OKButton.Size = new Size(75, 25);
             OKButton.TabIndex = 4;
             OKButton.Text = "OK";
             OKButton.UseVisualStyleBackColor = true;
@@ -77,8 +78,8 @@
             // 
             // SubstrateChange1
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(1184, 361);
             Controls.Add(OKButton);
             Controls.Add(FilterStringTextBox);
