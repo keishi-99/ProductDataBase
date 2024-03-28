@@ -67,6 +67,7 @@ namespace ProductDatabase {
                             SubstrateChangeDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
                             //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
                             SubstrateChangeDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+                            SubstrateChangeDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
                             SubstrateChangeDataGridView.Columns[0].HeaderCell.Value = "ID";
                             SubstrateChangeDataGridView.Columns[0].Width = 40;
@@ -90,7 +91,7 @@ namespace ProductDatabase {
                             SubstrateChangeDataGridView.Columns[12].HeaderCell.Value = "コメント";
                             SubstrateChangeDataGridView.Columns[13].HeaderCell.Value = "使用基板";
                             SubstrateChangeDataGridView.Columns[13].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-                            SubstrateChangeDataGridView.Columns[13].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+                            //SubstrateChangeDataGridView.Columns[13].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
 
                         }
                         break;

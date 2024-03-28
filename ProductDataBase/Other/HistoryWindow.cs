@@ -54,6 +54,7 @@ namespace ProductDatabase {
                         DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
                         //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
                         DataBaseDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+                        DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
                         DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
                         DataBaseDataGridView.Columns[0].Width = 40;
@@ -112,6 +113,7 @@ namespace ProductDatabase {
                         DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
                         //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
                         DataBaseDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+                        DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
                         DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
                         DataBaseDataGridView.Columns[0].Width = 40;
@@ -135,7 +137,7 @@ namespace ProductDatabase {
                         DataBaseDataGridView.Columns[12].HeaderCell.Value = "コメント";
                         DataBaseDataGridView.Columns[13].HeaderCell.Value = "使用基板";
                         DataBaseDataGridView.Columns[13].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-                        DataBaseDataGridView.Columns[13].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+                        //DataBaseDataGridView.Columns[13].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
 
                         CategoryComboBox.Items.Add("");
                         for (int _i = 0; _i < DataBaseDataGridView.ColumnCount; _i++) {
@@ -169,6 +171,7 @@ namespace ProductDatabase {
                         DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
                         //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
                         DataBaseDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+                        DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
                         DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
                         DataBaseDataGridView.Columns[0].Width = 40;
