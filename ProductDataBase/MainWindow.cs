@@ -101,7 +101,6 @@ namespace ProductDatabase {
                                 IntPrintType = Convert.ToInt32(_ret1[0]["col_Print_Type"]),
                                 IntCheckBin = Convert.ToInt32(_ret1[0]["col_Checkbox"].ToString(), 2)
                             };
-
                             _substrateRegistrationWindow.ShowDialog(this);
                         }
                         break;

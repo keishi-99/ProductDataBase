@@ -67,8 +67,8 @@
             // 
             // OKButton
             // 
-            OKButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            OKButton.Location = new Point(1097, 328);
+            OKButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            OKButton.Location = new Point(118, 328);
             OKButton.Name = "OKButton";
             OKButton.Size = new Size(75, 25);
             OKButton.TabIndex = 4;
@@ -78,8 +78,8 @@
             // 
             // SubstrateChange1
             // 
-            AutoScaleDimensions = new SizeF(96F, 96F);
-            AutoScaleMode = AutoScaleMode.Dpi;
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1184, 361);
             Controls.Add(OKButton);
             Controls.Add(FilterStringTextBox);

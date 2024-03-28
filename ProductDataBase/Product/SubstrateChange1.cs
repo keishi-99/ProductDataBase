@@ -55,6 +55,12 @@ namespace ProductDatabase {
                                 if (_headerValue != null) { ListColFilter.Add(_headerValue); }
                             }
 
+                            // 最大サイズをディスプレイサイズに合わせる
+                            if (Screen.PrimaryScreen != null) {
+                                int h = Screen.PrimaryScreen.Bounds.Height;
+                                int w = Screen.PrimaryScreen.Bounds.Width;
+                                SubstrateChangeDataGridView.MaximumSize = new Size(w, h);
+                            }
                             SubstrateChangeDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(SubstrateChangeDataGridView.Font, FontStyle.Bold);
                             SubstrateChangeDataGridView.RowHeadersVisible = true;
                             SubstrateChangeDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
