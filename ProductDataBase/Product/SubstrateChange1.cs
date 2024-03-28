@@ -93,6 +93,7 @@ namespace ProductDatabase {
             }
         }
 
+        // 基板変更フォームを開く
         private void OpenSubstrateChangeWindow() {
 
             int _i = SubstrateChangeDataGridView.SelectedCells[0].RowIndex;

@@ -155,6 +155,7 @@ namespace ProductDatabase {
                     IntSerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text)
                 };
                 _productRegistration2Window.ShowDialog(this);
+                Close();
 
                 void CheckAndAdjustSerial(int threshold, int resetValue) {
 

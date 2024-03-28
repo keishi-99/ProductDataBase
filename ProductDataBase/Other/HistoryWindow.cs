@@ -117,6 +117,8 @@ namespace ProductDatabase {
                         DataBaseDataGridView.Columns[11].Width = 40;
                         DataBaseDataGridView.Columns[12].HeaderCell.Value = "コメント";
                         DataBaseDataGridView.Columns[13].HeaderCell.Value = "使用基板";
+                        DataBaseDataGridView.Columns[13].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+                        DataBaseDataGridView.Columns[13].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
 
                         CategoryComboBox.Items.Add("");
                         for (int _i = 0; _i < DataBaseDataGridView.ColumnCount; _i++) {
