@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Data.Odbc;
 using System.Data.SQLite;
-using System.Security.Policy;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
