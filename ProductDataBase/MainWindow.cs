@@ -105,7 +105,6 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
         private void ShowSubstrateRegistrationWindow(object category1, object category2, object category3) {
             DataRow[] matchingRows = ProductDataTable.Select($"class001 = '{category1}' and col_Product_Name = '{category2}' and col_Substrate_Name = '{category3}'");
 
@@ -114,7 +113,6 @@ namespace ProductDatabase {
                 substrateRegistrationWindow.ShowDialog(this);
             }
         }
-
         private void ShowProductRegistrationWindow(object category1, object category2, object category3) {
             DataRow[] matchingRows = ProductDataTable.Select($"class001 = '{category1}' and col_Product_Name = '{category2}' and col_Product_Type = '{category3}'");
 
@@ -138,7 +136,6 @@ namespace ProductDatabase {
                 }
             }
         }
-
         private SubstrateRegistrationWindow CreateSubstrateRegistrationWindow(DataRow row) {
             return new SubstrateRegistrationWindow {
                 StrFontName = FontName,
@@ -152,7 +149,6 @@ namespace ProductDatabase {
                 IntCheckBin = Convert.ToInt32(row["col_Checkbox"].ToString(), 2)
             };
         }
-
         private ProductRegistration1Window CreateProductRegistration1Window(DataRow row) {
             return new ProductRegistration1Window {
                 StrFontName = FontName,
@@ -169,7 +165,6 @@ namespace ProductDatabase {
                 StrInitial = row.Field<string>("col_Initial") ?? string.Empty
             };
         }
-
         private RePrintWindow CreateRePrintWindow(DataRow row) {
             return new RePrintWindow {
                 StrFontName = FontName,
@@ -184,7 +179,6 @@ namespace ProductDatabase {
                 StrInitial = row.Field<string>("col_Initial") ?? string.Empty
             };
         }
-
         private SubstrateChange1 CreateSubstrateChange1(DataRow row) {
             return new SubstrateChange1 {
                 StrFontName = FontName,
@@ -203,43 +197,41 @@ namespace ProductDatabase {
         private void History() {
             ResetFields();
             try {
+                DataRow[]? selectedRow = null;
+
                 switch (IntRadioBtnFlg) {
                     case 1:
-                        DataRow[] _ret1 = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
-                        if (_ret1.Length > 0) {
-                            using HistoryWindow _historyWindow = new() {
-                                StrFontName = FontName,
-                                IntFontSize = IntFontSize,
-                                IntRadioBtnFlg = IntRadioBtnFlg,
-                                StrProductName = _ret1[0]["col_Product_Name"].ToString() ?? string.Empty,
-                                StrSubstrateName = _ret1[0]["col_Substrate_Name"].ToString() ?? string.Empty,
-                                StrSubstrateModel = _ret1[0]["col_Substrate_Model"].ToString() ?? string.Empty,
-                            };
-                            _historyWindow.ShowDialog(this);
-                        }
+                        selectedRow = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
                         break;
-
                     case 2:
                     case 3:
                     case 4:
-                        DataRow[] _ret2 = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
-                        if (_ret2.Length > 0) {
-                            using HistoryWindow _historyWindow = new() {
-                                StrFontName = FontName,
-                                IntFontSize = IntFontSize,
-                                IntRadioBtnFlg = IntRadioBtnFlg,
-                                StrProductName = _ret2[0]["col_Product_Name"].ToString() ?? string.Empty,
-                                StrProductType = _ret2[0]["col_Product_Type"].ToString() ?? string.Empty,
-                                StrProductModel = _ret2[0]["col_Product_Model"].ToString() ?? string.Empty,
-                            };
-                            _historyWindow.ShowDialog(this);
-                        }
+                        selectedRow = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
                         break;
+                }
+
+                if (selectedRow != null && selectedRow.Length > 0) {
+                    using HistoryWindow historyWindow = new();
+                    historyWindow.StrFontName = FontName;
+                    historyWindow.IntFontSize = IntFontSize;
+                    historyWindow.IntRadioBtnFlg = IntRadioBtnFlg;
+
+                    if (IntRadioBtnFlg == 1) {
+                        historyWindow.StrProductName = selectedRow[0]["col_Product_Name"].ToString() ?? string.Empty;
+                        historyWindow.StrSubstrateName = selectedRow[0]["col_Substrate_Name"].ToString() ?? string.Empty;
+                        historyWindow.StrSubstrateModel = selectedRow[0]["col_Substrate_Model"].ToString() ?? string.Empty;
+                    }
+                    else {
+                        historyWindow.StrProductName = selectedRow[0]["col_Product_Name"].ToString() ?? string.Empty;
+                        historyWindow.StrProductType = selectedRow[0]["col_Product_Type"].ToString() ?? string.Empty;
+                        historyWindow.StrProductModel = selectedRow[0]["col_Product_Model"].ToString() ?? string.Empty;
+                    }
+
+                    historyWindow.ShowDialog(this);
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
         }
         // 処理カテゴリセレクト
         private void CategorySelect(object sender) {
