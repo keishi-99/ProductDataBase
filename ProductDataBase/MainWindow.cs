@@ -244,46 +244,39 @@ namespace ProductDatabase {
                 CategoryListBox3.Items.Clear();
                 ProductDataTable.Clear();
 
-                RadioButton _radioButton = (RadioButton)sender;
+                RadioButton selectedRadioButton = (RadioButton)sender;
+                string strSqlQuery = string.Empty;
 
-                string _strSqlQuery = string.Empty;
-
-                switch (_radioButton.Name) {
+                switch (selectedRadioButton.Name) {
                     case "CategoryRadioButton1":
                         IntRadioBtnFlg = 1;
-                        _strSqlQuery = "SELECT * FROM Substrate WHERE Visual = '1';";
+                        strSqlQuery = "SELECT * FROM Substrate WHERE Visual = '1';";
                         break;
-
                     case "CategoryRadioButton2":
-                        IntRadioBtnFlg = 2;
-                        _strSqlQuery = "SELECT * FROM Product WHERE Visual = '1';";
-                        break;
-
                     case "CategoryRadioButton3":
-                        IntRadioBtnFlg = 3;
-                        _strSqlQuery = "SELECT * FROM Product WHERE Visual = '1';";
+                        IntRadioBtnFlg = selectedRadioButton.Name == "CategoryRadioButton2" ? 2 : 3;
+                        strSqlQuery = "SELECT * FROM Product WHERE Visual = '1';";
                         break;
-
                     case "CategoryRadioButton4":
                         IntRadioBtnFlg = 4;
-                        _strSqlQuery = "SELECT * FROM Product WHERE col_Print_Type = '5' OR col_Print_Type = '6';";
+                        strSqlQuery = "SELECT * FROM Product WHERE col_Print_Type = '5' OR col_Print_Type = '6';";
                         break;
                     default:
                         break;
                 }
 
-                using SQLiteConnection _con = new(GetConnectionString1());
-                using SQLiteDataAdapter _adapter = new(_strSqlQuery, _con);
-                _adapter.Fill(ProductDataTable);
+                using (SQLiteConnection con = new(GetConnectionString1()))
+                using (SQLiteDataAdapter adapter = new(strSqlQuery, con)) {
+                    adapter.Fill(ProductDataTable);
+                }
 
+                var class001Set = new SortedSet<string>(ProductDataTable.AsEnumerable()
+                                                            .Select(row => row.Field<string?>("class001"))
+                                                            .Where(classVal => classVal != null)
+                                                            .Select(classVal => classVal!));
 
-                SortedSet<string> _class001 = new(ProductDataTable.AsEnumerable()
-                                                    .Select(_x => _x.Field<string?>("class001"))
-                                                    .Where(_x => _x != null)
-                                                    .Select(_x => _x!));
-
-                foreach (string _b in _class001) {
-                    CategoryListBox1.Items.Add(_b);
+                foreach (string classVal in class001Set) {
+                    CategoryListBox1.Items.Add(classVal);
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
