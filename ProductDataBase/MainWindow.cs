@@ -356,156 +356,190 @@ namespace ProductDatabase {
         // QRコード読み取り
         private void CodeScan() {
             try {
-                IntRadioBtnFlg = 0;
-                CategoryRadioButton1.Checked = CategoryRadioButton2.Checked = CategoryRadioButton3.Checked = CategoryRadioButton4.Checked = false;
-                CategoryListBox1.Items.Clear();
-                CategoryListBox2.Items.Clear();
-                CategoryListBox3.Items.Clear();
-                ListCategory11.Clear();
-                ListCategory12.Clear();
-                ListCategory13.Clear();
-                ListCategory14.Clear();
-                Enabled = false;
+                ResetFieldsForCodeScan();
 
-                if (QRCodeCheckBox.Checked) {
-                    string[] _arr1 = QRCodeTextBox.Text.Split(new string[] { "//" }, StringSplitOptions.None);
-
-                    StrProness1 = _arr1[0];
-                    StrProness2 = _arr1[1];
-                    StrProness4 = Convert.ToInt32(_arr1[2]);
-                    StrProness5 = _arr1[3];
-                }
-                else {
-                    using (OdbcConnection _con = new("DSN=DrSum_PRONES_YD; UID=YD00; PWD=YD00")) {
-                        _con.Open();
-                        using OdbcCommand _cmd = new($"SELECT * FROM V_宮崎手配情報 WHERE 手配管理番号 = '{QRCodeTextBox.Text}'", _con);
-                        using OdbcDataReader _dr = _cmd.ExecuteReader();
-                        while (_dr.Read()) {
-                            StrProness1 = _dr["手配製番"].ToString() ?? string.Empty;
-                            StrProness2 = _dr["品目番号"].ToString() ?? string.Empty;
-                            StrProness3 = _dr["品目名称"].ToString() ?? string.Empty;
-                            StrProness4 = Convert.ToInt32(_dr["手配数"]);
-                            StrProness5 = _dr["請求先注番"].ToString() ?? string.Empty;
-                        }
-                    }
-
-                    if (string.IsNullOrEmpty(StrProness1)) { throw new Exception($"一致する情報がありません。{Environment.NewLine}手配製番:{StrProness1}"); }
-                }
-
-                // 文字列の置換
-                StrProness2 = StrProness2.Replace("-SMT", "")
-                                         .Replace("-H", "")
-                                         .Replace("-GH", "")
-                                         .Replace("-ACGH", "-AC")
-                                         .Replace("-DCGH", "-DC");
-
-                using (SQLiteConnection _con = new(GetConnectionString1())) {
-                    _con.Open();
-                    using SQLiteCommand _cmd = _con.CreateCommand();
-                    _cmd.CommandText = $"SELECT * FROM V_ItemList WHERE col_ItemNumber = '{StrProness2}' OR 'col_ItemNumber:1' = '{StrProness2}'";
-                    using SQLiteDataReader _dr = _cmd.ExecuteReader();
-                    while (_dr.Read()) {
-                        string _colItemNumber = _dr["col_ItemNumber"].ToString() ?? string.Empty;
-                        string _colItemNumber1 = _dr["col_ItemNumber:1"].ToString() ?? string.Empty;
-
-                        if (!string.IsNullOrEmpty(_colItemNumber)) {
-                            ListCategory11.Add(_colItemNumber);
-                            ListCategory12.Add(_dr["col_Substrate_Name"].ToString() ?? string.Empty);
-                            ListCategory13.Add(_dr["col_Product_Name"].ToString() ?? string.Empty);
-                            ListCategory14.Add("1");
-                        }
-
-                        if (!string.IsNullOrEmpty(_colItemNumber1)) {
-                            ListCategory11.Add(_colItemNumber1);
-                            ListCategory12.Add(_dr["col_Product_Type"].ToString() ?? string.Empty);
-                            ListCategory13.Add(_dr["col_Product_Name:1"].ToString() ?? string.Empty);
-                            ListCategory14.Add("2");
-                        }
-                    }
-                }
-
-                if (ListCategory11.Count == 0) { throw new Exception($"品目番号:[{StrProness2}] と一致するデータがありませんでした。"); }
+                string[]? arr = ParseQRCodeInput() ?? throw new Exception("QRコード入力に誤りがあります。");
+                FetchDataFromDatabase(arr);
 
                 if (ListCategory11.Count >= 2) {
-                    using SeveralDialogWindow _dlg = new() {
-                        StrFontName = FontName,
-                        IntFontSize = IntFontSize,
-                        ListCategory11 = ListCategory11,
-                        ListCategory12 = ListCategory12,
-                        ListCategory13 = ListCategory13,
-                        ListCategory14 = ListCategory14
-                    };
-
-                    if (_dlg.ShowDialog(this) == DialogResult.OK) {
-                        ListIndex = _dlg.SelectedIndex;
-                    }
+                    ShowDialogWindowForMultipleItems();
                 }
 
-                StrCategory11 = ListCategory11[ListIndex];
-                StrCategory12 = ListCategory12[ListIndex];
-                StrCategory13 = ListCategory13[ListIndex];
-                StrCategory14 = ListCategory14[ListIndex];
-
-                switch (StrCategory14) {
-                    case "1":
-                        using (SQLiteConnection _con = new(GetConnectionString1())) {
-                            using SQLiteDataAdapter _adapter = new("SELECT * FROM Substrate;", _con);
-                            _adapter.Fill(ProductDataTable);
-                        }
-
-                        DataRow[] _substrateRet = ProductDataTable.Select($"col_Product_Name = '{StrCategory13}' and col_Substrate_Name = '{StrCategory12}'");
-                        using (SubstrateRegistrationWindow _substrateRegistrationWindow = new() {
-                            StrFontName = FontName,
-                            IntFontSize = IntFontSize,
-                            StrProductName = _substrateRet[0]["col_Product_Name"].ToString() ?? string.Empty,
-                            StrStockName = _substrateRet[0]["col_Stock_Name"].ToString() ?? string.Empty,
-                            StrSubstrateName = _substrateRet[0]["col_Substrate_Name"].ToString() ?? string.Empty,
-                            StrSubstrateModel = _substrateRet[0]["col_Substrate_Model"].ToString() ?? string.Empty,
-                            StrInitial = string.Empty,
-                            IntRegType = Convert.ToInt32(_substrateRet[0]["col_Reg_Type"]),
-                            IntPrintType = Convert.ToInt32(_substrateRet[0]["col_Print_Type"]),
-                            IntCheckBin = Convert.ToInt32(_substrateRet[0]["col_Checkbox"].ToString(), 2)
-                        }) {
-                            _substrateRegistrationWindow.ShowDialog(this);
-                        }
-
-                        break;
-
-                    case "2":
-                        using (SQLiteConnection _con = new(GetConnectionString1())) {
-                            using SQLiteDataAdapter _adapter = new("SELECT * FROM Product;", _con);
-                            _adapter.Fill(ProductDataTable);
-                        }
-
-                        DataRow[] _productRet = ProductDataTable.Select($"col_Product_Name = '{StrCategory13}' and col_Product_Type = '{StrCategory12}'");
-                        using (ProductRegistration1Window _productRegistration1Window = new() {
-                            StrFontName = FontName,
-                            IntFontSize = IntFontSize,
-                            StrProductName = _productRet[0]["col_Product_Name"].ToString() ?? string.Empty,
-                            StrStockName = _productRet[0]["col_Stock_Name"].ToString() ?? string.Empty,
-                            StrProductType = _productRet[0]["col_Product_Type"].ToString() ?? string.Empty,
-                            StrProductModel = _productRet[0]["col_Product_Model"].ToString() ?? string.Empty,
-                            StrUseSubstrate = _productRet[0]["col_Use_Substrate"].ToString() ?? string.Empty,
-                            StrInitial = _productRet[0]["col_Initial"].ToString() ?? string.Empty,
-                            IntRegType = Convert.ToInt32(_productRet[0]["col_Reg_Type"]),
-                            IntPrintType = Convert.ToInt32(_productRet[0]["col_Print_Type"]),
-                            IntCheckBin = Convert.ToInt32(_productRet[0]["col_Checkbox"].ToString(), 2),
-                            IntSerialDigit = Convert.ToInt32(_productRet[0]["col_Serial_Digit"])
-                        }) {
-                            _productRegistration1Window.ShowDialog(this);
-                        }
-
-                        break;
-
-                    default: throw new Exception($"一致する情報がありません。{Environment.NewLine}品目番号:{StrProness2}{Environment.NewLine}");
-                }
+                HandleSelectedItem();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
-                QRCodeTextBox.Text = string.Empty;
-                Enabled = true;
-                QRCodeTextBox.Focus();
+                CleanupAfterScan();
             }
+        }
+        private void ResetFieldsForCodeScan() {
+            IntRadioBtnFlg = 0;
+            CategoryRadioButton1.Checked = CategoryRadioButton2.Checked = CategoryRadioButton3.Checked = CategoryRadioButton4.Checked = false;
+            CategoryListBox1.Items.Clear();
+            CategoryListBox2.Items.Clear();
+            CategoryListBox3.Items.Clear();
+            ListCategory11.Clear();
+            ListCategory12.Clear();
+            ListCategory13.Clear();
+            ListCategory14.Clear();
+            Enabled = false;
+        }
+        private string[]? ParseQRCodeInput() {
+            if (QRCodeCheckBox.Checked) {
+                return QRCodeTextBox.Text.Split(new string[] { "//" }, StringSplitOptions.None);
+            }
+            else {
+                using (OdbcConnection con = new("DSN=DrSum_PRONES_YD; UID=YD00; PWD=YD00")) {
+                    con.Open();
+                    using OdbcCommand cmd = new($"SELECT * FROM V_宮崎手配情報 WHERE 手配管理番号 = '{QRCodeTextBox.Text}'", con);
+                    using OdbcDataReader dr = cmd.ExecuteReader();
+                    while (dr.Read()) {
+                        StrProness1 = dr["手配製番"].ToString() ?? string.Empty;
+                        StrProness2 = dr["品目番号"].ToString() ?? string.Empty;
+                        StrProness3 = dr["品目名称"].ToString() ?? string.Empty;
+                        StrProness4 = Convert.ToInt32(dr["手配数"]);
+                        StrProness5 = dr["請求先注番"].ToString() ?? string.Empty;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(StrProness1)) { throw new Exception($"一致する情報がありません。{Environment.NewLine}手配製番:{StrProness1}"); }
+                return null;
+            }
+        }
+        private void FetchDataFromDatabase(string[] arr) {
+            if (arr != null) {
+                ProcessQRCodeInput(arr);
+            }
+
+            ProcessCategoryItemData();
+        }
+        private void ProcessQRCodeInput(string[] arr) {
+            StrProness1 = arr[0];
+            StrProness2 = arr[1];
+            StrProness4 = Convert.ToInt32(arr[2]);
+            StrProness5 = arr[3];
+        }
+        private void ProcessCategoryItemData() {
+            StrProness2 = StrProness2.Replace("-SMT", "")
+                                     .Replace("-H", "")
+                                     .Replace("-GH", "")
+                                     .Replace("-ACGH", "-AC")
+                                     .Replace("-DCGH", "-DC");
+
+            FetchDataFromSQLite();
+        }
+        private void FetchDataFromSQLite() {
+            using SQLiteConnection con = new(GetConnectionString1());
+            con.Open();
+            using SQLiteCommand cmd = con.CreateCommand();
+            cmd.CommandText = $"SELECT * FROM V_ItemList WHERE col_ItemNumber = '{StrProness2}' OR 'col_ItemNumber:1' = '{StrProness2}'";
+            using SQLiteDataReader dr = cmd.ExecuteReader();
+            while (dr.Read()) {
+                string colItemNumber = dr["col_ItemNumber"].ToString() ?? string.Empty;
+                string colItemNumber1 = dr["col_ItemNumber:1"].ToString() ?? string.Empty;
+
+                if (!string.IsNullOrEmpty(colItemNumber)) {
+                    string _substrateName = dr["col_Substrate_Name"].ToString() ?? string.Empty;
+                    string _productName = dr["col_Product_Name"].ToString() ?? string.Empty;
+                    AddToLists(colItemNumber, _substrateName, _productName, "1");
+                }
+
+                if (!string.IsNullOrEmpty(colItemNumber1)) {
+                    string _productType = dr["col_Product_Type"].ToString() ?? string.Empty;
+                    string _productName = dr["col_Product_Name:1"].ToString() ?? string.Empty;
+                    AddToLists(colItemNumber1, _productType, _productName, "2");
+                }
+            }
+        }
+        private void AddToLists(string itemNumber, string category12, string category13, string category14) {
+            ListCategory11.Add(itemNumber);
+            ListCategory12.Add(category12);
+            ListCategory13.Add(category13);
+            ListCategory14.Add(category14);
+        }
+        private void ShowDialogWindowForMultipleItems() {
+            using SeveralDialogWindow dlg = new() {
+                StrFontName = FontName,
+                IntFontSize = IntFontSize,
+                ListCategory11 = ListCategory11,
+                ListCategory12 = ListCategory12,
+                ListCategory13 = ListCategory13,
+                ListCategory14 = ListCategory14
+            };
+
+            if (dlg.ShowDialog(this) == DialogResult.OK) {
+                ListIndex = dlg.SelectedIndex;
+            }
+        }
+        private void HandleSelectedItem() {
+            StrCategory11 = ListCategory11[ListIndex];
+            StrCategory12 = ListCategory12[ListIndex];
+            StrCategory13 = ListCategory13[ListIndex];
+            StrCategory14 = ListCategory14[ListIndex];
+
+            switch (StrCategory14) {
+                case "1":
+                    HandleSubstrateSelection();
+                    break;
+                case "2":
+                    HandleProductSelection();
+                    break;
+                default:
+                    throw new Exception($"一致する情報がありません。{Environment.NewLine}品目番号:{StrProness2}{Environment.NewLine}");
+            }
+        }
+        private void HandleSubstrateSelection() {
+            using (SQLiteConnection con = new(GetConnectionString1())) {
+                using SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con);
+                adapter.Fill(ProductDataTable);
+            }
+
+            DataRow[] substrateRet = ProductDataTable.Select($"col_Product_Name = '{StrCategory13}' and col_Substrate_Name = '{StrCategory12}'");
+            OpenSubstrateRegistrationWindow(substrateRet);
+        }
+        private void OpenSubstrateRegistrationWindow(DataRow[] substrateRet) {
+            using SubstrateRegistrationWindow window = new();
+            window.StrFontName = FontName;
+            window.IntFontSize = IntFontSize;
+            window.StrProductName = substrateRet[0]["col_Product_Name"].ToString() ?? string.Empty;
+            window.StrStockName = substrateRet[0]["col_Stock_Name"].ToString() ?? string.Empty;
+            window.StrSubstrateName = substrateRet[0]["col_Substrate_Name"].ToString() ?? string.Empty;
+            window.StrSubstrateModel = substrateRet[0]["col_Substrate_Model"].ToString() ?? string.Empty;
+            window.StrInitial = string.Empty;
+            window.IntRegType = Convert.ToInt32(substrateRet[0]["col_Reg_Type"]);
+            window.IntPrintType = Convert.ToInt32(substrateRet[0]["col_Print_Type"]);
+            window.IntCheckBin = Convert.ToInt32(substrateRet[0]["col_Checkbox"].ToString(), 2);
+            window.ShowDialog(this);
+        }
+        private void HandleProductSelection() {
+            using (SQLiteConnection con = new(GetConnectionString1())) {
+                using SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con);
+                adapter.Fill(ProductDataTable);
+            }
+
+            DataRow[] productRet = ProductDataTable.Select($"col_Product_Name = '{StrCategory13}' and col_Product_Type = '{StrCategory12}'");
+            OpenProductRegistrationWindow(productRet);
+        }
+        private void OpenProductRegistrationWindow(DataRow[] productRet) {
+            using ProductRegistration1Window window = new();
+            window.StrFontName = FontName;
+            window.IntFontSize = IntFontSize;
+            window.StrProductName = productRet[0]["col_Product_Name"].ToString() ?? string.Empty;
+            window.StrStockName = productRet[0]["col_Stock_Name"].ToString() ?? string.Empty;
+            window.StrProductType = productRet[0]["col_Product_Type"].ToString() ?? string.Empty;
+            window.StrProductModel = productRet[0]["col_Product_Model"].ToString() ?? string.Empty;
+            window.StrUseSubstrate = productRet[0]["col_Use_Substrate"].ToString() ?? string.Empty;
+            window.StrInitial = productRet[0]["col_Initial"].ToString() ?? string.Empty;
+            window.IntRegType = Convert.ToInt32(productRet[0]["col_Reg_Type"]);
+            window.IntPrintType = Convert.ToInt32(productRet[0]["col_Print_Type"]);
+            window.IntCheckBin = Convert.ToInt32(productRet[0]["col_Checkbox"].ToString(), 2);
+            window.IntSerialDigit = Convert.ToInt32(productRet[0]["col_Serial_Digit"]);
+            window.ShowDialog(this);
+        }
+        private void CleanupAfterScan() {
+            QRCodeTextBox.Text = string.Empty;
+            Enabled = true;
+            QRCodeTextBox.Focus();
         }
         // フォント変更
         private void FontChange(object sender) {
