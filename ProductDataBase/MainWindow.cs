@@ -439,14 +439,14 @@ namespace ProductDatabase {
                 string colItemNumber1 = dr["col_ItemNumber:1"].ToString() ?? string.Empty;
 
                 if (!string.IsNullOrEmpty(colItemNumber)) {
-                    string _substrateName = dr["col_Substrate_Name"].ToString() ?? string.Empty;
-                    string _productName = dr["col_Product_Name"].ToString() ?? string.Empty;
+                    string _substrateName = dr["col_Substrate_Name"]?.ToString() ?? string.Empty;
+                    string _productName = dr["col_Product_Name"]?.ToString() ?? string.Empty;
                     AddToLists(colItemNumber, _substrateName, _productName, "1");
                 }
 
                 if (!string.IsNullOrEmpty(colItemNumber1)) {
-                    string _productType = dr["col_Product_Type"].ToString() ?? string.Empty;
-                    string _productName = dr["col_Product_Name:1"].ToString() ?? string.Empty;
+                    string _productType = dr["col_Product_Type"]?.ToString() ?? string.Empty;
+                    string _productName = dr["col_Product_Name:1"]?.ToString() ?? string.Empty;
                     AddToLists(colItemNumber1, _productType, _productName, "2");
                 }
             }
