@@ -290,19 +290,18 @@ namespace ProductDatabase {
                 CategoryListBox2.Items.Clear();
                 CategoryListBox3.Items.Clear();
 
-                HashSet<string> _productNames = new();
+                HashSet<string> productNames = new();
 
-                DataRow[] _dr1 = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}'", "col_Product_Name ASC");
+                DataRow[] selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}'", "col_Product_Name ASC");
 
-                foreach (DataRow _row in _dr1) {
-                    string _productName = _row["col_Product_Name"].ToString() ?? string.Empty;
-
-                    if (!string.IsNullOrEmpty(_productName)) {
-                        _productNames.Add(_productName);
+                foreach (DataRow row in selectedRows) {
+                    string productName = row["col_Product_Name"].ToString() ?? string.Empty;
+                    if (!string.IsNullOrEmpty(productName)) {
+                        productNames.Add(productName);
                     }
                 }
 
-                CategoryListBox2.Items.AddRange(_productNames.ToArray());
+                CategoryListBox2.Items.AddRange(productNames.ToArray());
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -314,34 +313,31 @@ namespace ProductDatabase {
                 HistoryButton.Enabled = false;
                 CategoryListBox3.Items.Clear();
 
-                DataRow[] _dr2;
+                DataRow[] selectedRows;
 
                 switch (IntRadioBtnFlg) {
                     case 1:
-                        _dr2 = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Substrate_Model ASC");
-                        HashSet<string> _colSubstrateName = new(_dr2.AsEnumerable()
-                                                                    .Select(x => x.Field<string>("col_Substrate_Name"))
-                                                                    .Where(x => x != null)
-                                                                    .Select(x => x!));
+                        selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Substrate_Model ASC");
+                        HashSet<string> substrateNames = new(selectedRows.AsEnumerable()
+                                                                                .Select(x => x.Field<string>("col_Substrate_Name"))
+                                                                                .Where(x => x != null)
+                                                                                .Select(x => x!));
 
-                        foreach (string _d in _colSubstrateName) {
-                            CategoryListBox3.Items.Add(_d);
-                        }
+                        CategoryListBox3.Items.AddRange(substrateNames.ToArray());
                         break;
 
                     case 2:
                     case 3:
                     case 4:
-                        _dr2 = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Product_Model ASC");
-                        HashSet<string> _colProductType = new(_dr2.AsEnumerable()
-                                                                  .Select(x => x.Field<string>("col_Product_Type"))
-                                                                  .Where(x => x != null)
-                                                                  .Select(x => x!));
+                        selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Product_Model ASC");
+                        HashSet<string> productTypes = new(selectedRows.AsEnumerable()
+                                                                                .Select(x => x.Field<string>("col_Product_Type"))
+                                                                                .Where(x => x != null)
+                                                                                .Select(x => x!));
 
-                        foreach (string _d in _colProductType) {
-                            CategoryListBox3.Items.Add(_d);
-                        }
+                        CategoryListBox3.Items.AddRange(productTypes.ToArray());
                         break;
+
                     default:
                         break;
                 }
