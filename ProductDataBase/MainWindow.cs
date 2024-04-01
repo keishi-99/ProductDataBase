@@ -525,19 +525,24 @@ namespace ProductDatabase {
         }
         // フォント変更
         private void FontChange(object sender) {
-            RadioButton _radioButton = (RadioButton)sender;
-            switch (_radioButton.Name) {
+            RadioButton radioButton = (RadioButton)sender;
+            int fontSize;
+
+            switch (radioButton.Name) {
                 case "FontSize9RadioButton":
-                    IntFontSize = 9;
+                    fontSize = 9;
                     break;
                 case "FontSize12RadioButton":
-                    IntFontSize = 12;
+                    fontSize = 12;
                     break;
                 case "FontSize16RadioButton":
-                    IntFontSize = 16;
+                    fontSize = 16;
                     break;
+                default:
+                    return;
             }
 
+            IntFontSize = fontSize;
             Font = new Font(FontName, IntFontSize);
         }
 
