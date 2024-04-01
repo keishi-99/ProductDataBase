@@ -79,119 +79,103 @@ namespace ProductDatabase {
             StrProness1 = StrProness2 = StrProness3 = StrProness5 = string.Empty;
             StrProness4 = 0;
         }
-        //// 登録ボタン処理
+        // 登録ボタン処理
         private void Registration() {
             try {
                 ResetFields();
 
-                if (CategoryListBox1.SelectedItem != null && CategoryListBox2.SelectedItem != null && CategoryListBox3.SelectedItem != null) {
-                    switch (IntRadioBtnFlg) {
-                        case 1:
-                            ShowSubstrateRegistrationWindow(CategoryListBox1.SelectedItem, CategoryListBox2.SelectedItem, CategoryListBox3.SelectedItem);
-                            break;
-                        case 2:
-                        case 3:
-                        case 4:
-                            ShowProductRegistrationWindow(CategoryListBox1.SelectedItem, CategoryListBox2.SelectedItem, CategoryListBox3.SelectedItem);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                else {
-                    throw new Exception("カテゴリを選択してください。");
+                switch (IntRadioBtnFlg) {
+                    case 1:
+                        HandleSubstrateRegistration();
+                        break;
+                    case 2:
+                        HandleProductRegistration1();
+                        break;
+                    case 3:
+                        HandleRePrint();
+                        break;
+                    case 4:
+                        HandleSubstrateChange1();
+                        break;
+                    default:
+                        break;
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void ShowSubstrateRegistrationWindow(object category1, object category2, object category3) {
-            DataRow[] matchingRows = ProductDataTable.Select($"class001 = '{category1}' and col_Product_Name = '{category2}' and col_Substrate_Name = '{category3}'");
+        private void HandleSubstrateRegistration() {
+            DataRow[] selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
 
-            if (matchingRows.Length > 0) {
-                using SubstrateRegistrationWindow substrateRegistrationWindow = CreateSubstrateRegistrationWindow(matchingRows[0]);
+            if (selectedRows.Length > 0) {
+                using SubstrateRegistrationWindow substrateRegistrationWindow = new();
+                substrateRegistrationWindow.StrFontName = FontName;
+                substrateRegistrationWindow.IntFontSize = IntFontSize;
+                substrateRegistrationWindow.StrProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
+                substrateRegistrationWindow.StrStockName = selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
+                substrateRegistrationWindow.StrSubstrateName = selectedRows[0]["col_Substrate_Name"].ToString() ?? string.Empty;
+                substrateRegistrationWindow.StrSubstrateModel = selectedRows[0]["col_Substrate_Model"].ToString() ?? string.Empty;
+                substrateRegistrationWindow.IntRegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"]);
+                substrateRegistrationWindow.IntPrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"]);
+                substrateRegistrationWindow.IntCheckBin = Convert.ToInt32(selectedRows[0]["col_Checkbox"].ToString(), 2);
                 substrateRegistrationWindow.ShowDialog(this);
             }
         }
-        private void ShowProductRegistrationWindow(object category1, object category2, object category3) {
-            DataRow[] matchingRows = ProductDataTable.Select($"class001 = '{category1}' and col_Product_Name = '{category2}' and col_Product_Type = '{category3}'");
+        private void HandleProductRegistration1() {
+            DataRow[] selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
 
-            if (matchingRows.Length > 0) {
-                switch (IntRadioBtnFlg) {
-                    case 2: {
-                            using ProductRegistration1Window productRegistration1Window = CreateProductRegistration1Window(matchingRows[0]);
-                            productRegistration1Window.ShowDialog(this);
-                            break;
-                        }
-                    case 3: {
-                            using RePrintWindow rePrintWindow = CreateRePrintWindow(matchingRows[0]);
-                            rePrintWindow.ShowDialog(this);
-                            break;
-                        }
-                    case 4: {
-                            using SubstrateChange1 substrateChange1 = CreateSubstrateChange1(matchingRows[0]);
-                            substrateChange1.ShowDialog(this);
-                            break;
-                        }
-                }
+            if (selectedRows.Length > 0) {
+                using ProductRegistration1Window productRegistration1Window = new();
+                productRegistration1Window.StrFontName = FontName;
+                productRegistration1Window.IntFontSize = IntFontSize;
+                productRegistration1Window.StrProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
+                productRegistration1Window.StrStockName = selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
+                productRegistration1Window.StrProductType = selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
+                productRegistration1Window.IntRegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"]);
+                productRegistration1Window.IntPrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"]);
+                productRegistration1Window.IntSerialDigit = Convert.ToInt32(selectedRows[0]["col_Serial_Digit"]);
+                productRegistration1Window.StrProductModel = selectedRows[0]["col_Product_Model"].ToString() ?? string.Empty;
+                productRegistration1Window.IntCheckBin = Convert.ToInt32(selectedRows[0]["col_Checkbox"].ToString(), 2);
+                productRegistration1Window.StrUseSubstrate = selectedRows[0]["col_Use_Substrate"].ToString() ?? string.Empty;
+                productRegistration1Window.StrInitial = selectedRows[0]["col_Initial"].ToString() ?? string.Empty;
+                productRegistration1Window.ShowDialog(this);
             }
         }
-        private SubstrateRegistrationWindow CreateSubstrateRegistrationWindow(DataRow row) {
-            return new SubstrateRegistrationWindow {
-                StrFontName = FontName,
-                IntFontSize = IntFontSize,
-                StrProductName = row.Field<string>("col_Product_Name") ?? string.Empty,
-                StrStockName = row.Field<string>("col_Stock_Name") ?? string.Empty,
-                StrSubstrateName = row.Field<string>("col_Substrate_Name") ?? string.Empty,
-                StrSubstrateModel = row.Field<string>("col_Substrate_Model") ?? string.Empty,
-                IntRegType = Convert.ToInt32(row["col_Reg_Type"]),
-                IntPrintType = Convert.ToInt32(row["col_Print_Type"]),
-                IntCheckBin = Convert.ToInt32(row["col_Checkbox"].ToString(), 2)
-            };
+        private void HandleRePrint() {
+            DataRow[] selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+
+            if (selectedRows.Length > 0) {
+                using RePrintWindow rePrintWindow = new();
+                rePrintWindow.StrFontName = FontName;
+                rePrintWindow.IntFontSize = IntFontSize;
+                rePrintWindow.StrProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
+                rePrintWindow.StrProductType = selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
+                rePrintWindow.IntRegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"]);
+                rePrintWindow.IntPrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"]);
+                rePrintWindow.IntSerialDigit = Convert.ToInt32(selectedRows[0]["col_Serial_Digit"]);
+                rePrintWindow.StrProductModel = selectedRows[0]["col_Product_Model"].ToString() ?? string.Empty;
+                rePrintWindow.IntCheckBin = Convert.ToInt32(selectedRows[0]["col_Checkbox"].ToString(), 2);
+                rePrintWindow.StrInitial = selectedRows[0]["col_Initial"].ToString() ?? string.Empty;
+                rePrintWindow.ShowDialog(this);
+            }
         }
-        private ProductRegistration1Window CreateProductRegistration1Window(DataRow row) {
-            return new ProductRegistration1Window {
-                StrFontName = FontName,
-                IntFontSize = IntFontSize,
-                StrProductName = row.Field<string>("col_Product_Name") ?? string.Empty,
-                StrStockName = row.Field<string>("col_Stock_Name") ?? string.Empty,
-                StrProductType = row.Field<string>("col_Product_Type") ?? string.Empty,
-                IntRegType = Convert.ToInt32(row["col_Reg_Type"]),
-                IntPrintType = Convert.ToInt32(row["col_Print_Type"]),
-                IntSerialDigit = Convert.ToInt32(row["col_Serial_Digit"]),
-                StrProductModel = row.Field<string>("col_Product_Model") ?? string.Empty,
-                IntCheckBin = Convert.ToInt32(row["col_Checkbox"].ToString(), 2),
-                StrUseSubstrate = row.Field<string>("col_Use_Substrate") ?? string.Empty,
-                StrInitial = row.Field<string>("col_Initial") ?? string.Empty
-            };
-        }
-        private RePrintWindow CreateRePrintWindow(DataRow row) {
-            return new RePrintWindow {
-                StrFontName = FontName,
-                IntFontSize = IntFontSize,
-                StrProductName = row.Field<string>("col_Product_Name") ?? string.Empty,
-                StrProductType = row.Field<string>("col_Product_Type") ?? string.Empty,
-                IntRegType = Convert.ToInt32(row["col_Reg_Type"]),
-                IntPrintType = Convert.ToInt32(row["col_Print_Type"]),
-                IntSerialDigit = Convert.ToInt32(row["col_Serial_Digit"]),
-                StrProductModel = row.Field<string>("col_Product_Model") ?? string.Empty,
-                IntCheckBin = Convert.ToInt32(row["col_Checkbox"].ToString(), 2),
-                StrInitial = row.Field<string>("col_Initial") ?? string.Empty
-            };
-        }
-        private SubstrateChange1 CreateSubstrateChange1(DataRow row) {
-            return new SubstrateChange1 {
-                StrFontName = FontName,
-                IntFontSize = IntFontSize,
-                IntRadioBtnFlg = IntRadioBtnFlg,
-                IntPrintType = Convert.ToInt32(row["col_Print_Type"]),
-                IntRegType = Convert.ToInt32(row["col_Reg_Type"]),
-                StrProductName = row.Field<string>("col_Product_Name") ?? string.Empty,
-                StrStockName = row.Field<string>("col_Stock_Name") ?? string.Empty,
-                StrProductType = row.Field<string>("col_Product_Type") ?? string.Empty,
-                StrProductModel = row.Field<string>("col_Product_Model") ?? string.Empty,
-                StrUseSubstrate = row.Field<string>("col_Use_Substrate") ?? string.Empty
-            };
+        private void HandleSubstrateChange1() {
+            DataRow[] selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+
+            if (selectedRows.Length > 0) {
+                using SubstrateChange1 substrateChange1 = new();
+                substrateChange1.StrFontName = FontName;
+                substrateChange1.IntFontSize = IntFontSize;
+                substrateChange1.IntRadioBtnFlg = IntRadioBtnFlg;
+                substrateChange1.IntPrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"]);
+                substrateChange1.IntRegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"]);
+                substrateChange1.StrProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
+                substrateChange1.StrStockName = selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
+                substrateChange1.StrProductType = selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
+                substrateChange1.StrProductModel = selectedRows[0]["col_Product_Model"].ToString() ?? string.Empty;
+                substrateChange1.StrUseSubstrate = selectedRows[0]["col_Use_Substrate"].ToString() ?? string.Empty;
+                substrateChange1.ShowDialog(this);
+            }
         }
         // 履歴ボタン処理
         private void History() {
