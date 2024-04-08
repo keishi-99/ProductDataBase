@@ -644,7 +644,7 @@ namespace ProductDatabase {
                 $"StrPerson\t\t\t[{StrPerson}]\r\n" +
                 $"IntQuantity\t\t[{IntQuantity}]\r\n" +
                 $"IntSerialFirstNumber\t[{IntSerialFirstNumber}]\r\n" +
-                $"IntSerialLastNumber\t[{IntSerialLastNumber}]\r\n" +
+                $"IntSerialLastNumber\t\t[{IntSerialLastNumber}]\r\n" +
                 $"StrInitial\t\t\t[{StrInitial}]\r\n" +
                 $"IntPrintType\t\t[{IntPrintType}]\r\n" +
                 $"IntSerialDigit\t\t[{IntSerialDigit}]" +
