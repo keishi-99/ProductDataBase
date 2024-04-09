@@ -1463,31 +1463,31 @@ namespace ProductDatabase {
                 //引数に保存先パスを指定
                 _workBook.SaveAs($@"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
 
-                //// 印刷
-                //Excel.Application _xlApp = new() {
-                //    Visible = true // Excelウィンドウを表示します。
-                //};
+                // 印刷
+                Excel.Application _xlApp = new() {
+                    Visible = true // Excelウィンドウを表示します。
+                };
 
-                //// ワークブック開く
-                //Excel.Workbooks _xlBooks = _xlApp.Workbooks;
-                //Excel.Workbook _xlBook = _xlBooks.Open($@"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
+                // ワークブック開く
+                Excel.Workbooks _xlBooks = _xlApp.Workbooks;
+                Excel.Workbook _xlBook = _xlBooks.Open($@"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
 
-                //// ワークシート選択
-                //Excel.Sheets _xlSheets = _xlBook.Sheets;
-                //Excel.Worksheet _xlSheet = _xlSheets[_sheetName];
+                // ワークシート選択
+                Excel.Sheets _xlSheets = _xlBook.Sheets;
+                Excel.Worksheet _xlSheet = _xlSheets[_sheetName];
 
-                //// ワークシート印刷
-                //_xlSheet.PrintOut(Preview: true);
+                // ワークシート印刷
+                _xlSheet.PrintOut(Preview: true);
 
-                //// ワークブックを閉じてExcelを終了
-                //_xlBook.Close(false);
-                //_xlApp.Quit();
+                // ワークブックを閉じてExcelを終了
+                _xlBook.Close(false);
+                _xlApp.Quit();
 
-                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheet);
-                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheets);
-                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBook);
-                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBooks);
-                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlApp);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheet);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheets);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBook);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBooks);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlApp);
 
             } catch (Exception ex) {
                 MessageBox.Show($"{ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);

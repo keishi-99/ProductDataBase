@@ -48,9 +48,9 @@ namespace ProductDatabase {
 
                             // 最大サイズをディスプレイサイズに合わせる
                             if (Screen.PrimaryScreen != null) {
-                                int h = Screen.PrimaryScreen.Bounds.Height;
-                                int w = Screen.PrimaryScreen.Bounds.Width;
-                                SubstrateChangeDataGridView.MaximumSize = new Size(w, h);
+                                int _h = Screen.PrimaryScreen.Bounds.Height;
+                                int _w = Screen.PrimaryScreen.Bounds.Width;
+                                SubstrateChangeDataGridView.MaximumSize = new Size(_w, _h);
                             }
                             SubstrateChangeDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(SubstrateChangeDataGridView.Font, FontStyle.Bold);
                             SubstrateChangeDataGridView.RowHeadersVisible = true;
@@ -98,40 +98,39 @@ namespace ProductDatabase {
 
             int _i = SubstrateChangeDataGridView.SelectedCells[0].RowIndex;
 
-            string orderNumber = SubstrateChangeDataGridView.Rows[_i].Cells[1].Value.ToString() ?? string.Empty;
-            string productNumber = SubstrateChangeDataGridView.Rows[_i].Cells[2].Value.ToString() ?? string.Empty;
-            string productType = SubstrateChangeDataGridView.Rows[_i].Cells[3].Value.ToString() ?? string.Empty;
-            string productModel = SubstrateChangeDataGridView.Rows[_i].Cells[4].Value.ToString() ?? string.Empty;
-            string revision = SubstrateChangeDataGridView.Rows[_i].Cells[8].Value.ToString() ?? string.Empty;
-            string StrSerialFirstNumber = SubstrateChangeDataGridView.Rows[_i].Cells[9].Value.ToString() ?? string.Empty;
-            string StrSerialLastNumber = SubstrateChangeDataGridView.Rows[_i].Cells[10].Value.ToString() ?? string.Empty;
-            string comment = SubstrateChangeDataGridView.Rows[_i].Cells[12].Value.ToString() ?? string.Empty;
-            string usedSubstrate = SubstrateChangeDataGridView.Rows[_i].Cells[13].Value.ToString() ?? string.Empty;
+            string _orderNumber = SubstrateChangeDataGridView.Rows[_i].Cells[1].Value.ToString() ?? string.Empty;
+            string _productNumber = SubstrateChangeDataGridView.Rows[_i].Cells[2].Value.ToString() ?? string.Empty;
+            string _productType = SubstrateChangeDataGridView.Rows[_i].Cells[3].Value.ToString() ?? string.Empty;
+            string _productModel = SubstrateChangeDataGridView.Rows[_i].Cells[4].Value.ToString() ?? string.Empty;
+            string _revision = SubstrateChangeDataGridView.Rows[_i].Cells[8].Value.ToString() ?? string.Empty;
+            string _strSerialFirstNumber = SubstrateChangeDataGridView.Rows[_i].Cells[9].Value.ToString() ?? string.Empty;
+            string _strSerialLastNumber = SubstrateChangeDataGridView.Rows[_i].Cells[10].Value.ToString() ?? string.Empty;
+            string _comment = SubstrateChangeDataGridView.Rows[_i].Cells[12].Value.ToString() ?? string.Empty;
+            string _usedSubstrate = SubstrateChangeDataGridView.Rows[_i].Cells[13].Value.ToString() ?? string.Empty;
 
-            int intQuantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[_i].Cells[5].Value);
-            int IntSerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[_i].Cells[11].Value);
+            int _intQuantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[_i].Cells[5].Value);
+            int _intSerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[_i].Cells[11].Value);
 
-            using SubstrateChange2 _substrateChange2 = new() {
-                StrFontName = StrFontName,
-                IntFontSize = IntFontSize,
-                IntPrintType = IntPrintType,
-                IntRegType = IntRegType,
-                StrProductName = StrProductName,
-                StrStockName = StrStockName,
-                StrOrderNumber = orderNumber,
-                StrProductNumber = productNumber,
-                StrProductType = productType,
-                StrProductModel = productModel,
-                IntQuantity = intQuantity,
-                StrRevision = revision,
-                StrComment = comment,
-                StrUseSubstrate = StrUseSubstrate,
-                StrUsedSubstrate = usedSubstrate,
-                StrSerialFirstNumber = StrSerialFirstNumber,
-                StrSerialLastNumber = StrSerialLastNumber,
-                IntSerialLastNumber = IntSerialLastNumber
-            };
-            _substrateChange2.ShowDialog(this);
+            using SubstrateChange2 _window = new();
+            _window.StrFontName = StrFontName;
+            _window.IntFontSize = IntFontSize;
+            _window.IntPrintType = IntPrintType;
+            _window.IntRegType = IntRegType;
+            _window.StrProductName = StrProductName;
+            _window.StrStockName = StrStockName;
+            _window.StrOrderNumber = _orderNumber;
+            _window.StrProductNumber = _productNumber;
+            _window.StrProductType = _productType;
+            _window.StrProductModel = _productModel;
+            _window.IntQuantity = _intQuantity;
+            _window.StrRevision = _revision;
+            _window.StrComment = _comment;
+            _window.StrUseSubstrate = StrUseSubstrate;
+            _window.StrUsedSubstrate = _usedSubstrate;
+            _window.StrSerialFirstNumber = _strSerialFirstNumber;
+            _window.StrSerialLastNumber = _strSerialLastNumber;
+            _window.IntSerialLastNumber = _intSerialLastNumber;
+            _window.ShowDialog(this);
             Close();
         }
 
