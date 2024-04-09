@@ -90,8 +90,8 @@ namespace ProductDatabase {
                 else { StockLabel2.Text = "---"; }
 
                 // 変数[check_bin]の値に応じてCheckboxにチェックを入れる
-                foreach (string checkBoxName in checkBoxNames) {
-                    if (Controls[checkBoxName] is CheckBox checkBox) {
+                foreach (string _checkBoxName in checkBoxNames) {
+                    if (Controls[_checkBoxName] is CheckBox checkBox) {
                         checkBox.Checked = (IntCheckBin & 0x1) == 1;
                         IntCheckBin >>= 1;
                     }
@@ -142,8 +142,8 @@ namespace ProductDatabase {
                 bool _anyTextBoxEnabled = false;
                 bool _allTextBoxesFilled = true;
 
-                foreach (Control control in Controls) {
-                    if (control is TextBoxBase textBox && textBox.Enabled) {
+                foreach (Control _control in Controls) {
+                    if (_control is TextBoxBase textBox && textBox.Enabled) {
                         _anyTextBoxEnabled = true;
                         if (string.IsNullOrWhiteSpace(textBox.Text)) {
                             _allTextBoxesFilled = false;
@@ -164,8 +164,8 @@ namespace ProductDatabase {
 
                 if (!DefectNumberCheckBox.Checked && string.IsNullOrEmpty(PrintPostionNumericUpDown.Text)) { PrintPostionNumericUpDown.Text = "1"; }
 
-                DialogResult result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                if (result == DialogResult.Cancel) return;
+                DialogResult _result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                if (_result == DialogResult.Cancel) return;
 
                 RegisterButton.Enabled = false;
 

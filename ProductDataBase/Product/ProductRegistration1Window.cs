@@ -79,8 +79,8 @@ namespace ProductDatabase {
                 }
 
                 // 変数[check_bin]の値に応じてCheckboxにチェックを入れる
-                foreach (string checkBoxName in checkBoxNames) {
-                    if (Controls[checkBoxName] is CheckBox checkBox) {
+                foreach (string _checkBoxName in checkBoxNames) {
+                    if (Controls[_checkBoxName] is CheckBox checkBox) {
                         checkBox.Checked = (IntCheckBin & 0x1) == 1;
                         IntCheckBin >>= 1;
                     }
@@ -266,7 +266,6 @@ namespace ProductDatabase {
                             $"StrProness5\t\t[{StrProness5}]\r\n" +
                             $"StrProductName\t\t[{StrProductName}]\r\n" +
                             $"StrStockName\t\t[{StrStockName}]\r\n" +
-                            $"StrProductName\t\t[{StrProductName}]\r\n" +
                             $"StrProductModel\t\t[{StrProductModel}]\r\n" +
                             $"StrInitial\t\t\t[{StrInitial}]\r\n" +
                             $"IntRegType\t\t[{IntRegType}]\r\n" +
