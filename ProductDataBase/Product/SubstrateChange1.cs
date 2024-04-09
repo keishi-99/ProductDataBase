@@ -111,27 +111,26 @@ namespace ProductDatabase {
             int intQuantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[_i].Cells[5].Value);
             int IntSerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[_i].Cells[11].Value);
 
-            using SubstrateChange2 _substrateChange2 = new() {
-                StrFontName = StrFontName,
-                IntFontSize = IntFontSize,
-                IntPrintType = IntPrintType,
-                IntRegType = IntRegType,
-                StrProductName = StrProductName,
-                StrStockName = StrStockName,
-                StrOrderNumber = orderNumber,
-                StrProductNumber = productNumber,
-                StrProductType = productType,
-                StrProductModel = productModel,
-                IntQuantity = intQuantity,
-                StrRevision = revision,
-                StrComment = comment,
-                StrUseSubstrate = StrUseSubstrate,
-                StrUsedSubstrate = usedSubstrate,
-                StrSerialFirstNumber = StrSerialFirstNumber,
-                StrSerialLastNumber = StrSerialLastNumber,
-                IntSerialLastNumber = IntSerialLastNumber
-            };
-            _substrateChange2.ShowDialog(this);
+            using SubstrateChange2 window = new();
+            window.StrFontName = StrFontName;
+            window.IntFontSize = IntFontSize;
+            window.IntPrintType = IntPrintType;
+            window.IntRegType = IntRegType;
+            window.StrProductName = StrProductName;
+            window.StrStockName = StrStockName;
+            window.StrOrderNumber = orderNumber;
+            window.StrProductNumber = productNumber;
+            window.StrProductType = productType;
+            window.StrProductModel = productModel;
+            window.IntQuantity = intQuantity;
+            window.StrRevision = revision;
+            window.StrComment = comment;
+            window.StrUseSubstrate = StrUseSubstrate;
+            window.StrUsedSubstrate = usedSubstrate;
+            window.StrSerialFirstNumber = StrSerialFirstNumber;
+            window.StrSerialLastNumber = StrSerialLastNumber;
+            window.IntSerialLastNumber = IntSerialLastNumber;
+            window.ShowDialog(this);
             Close();
         }
 
