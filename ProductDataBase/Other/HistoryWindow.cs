@@ -197,7 +197,6 @@ namespace ProductDatabase {
                             CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[_i].HeaderCell.Value.ToString());
                         }
                     }
-                    ExportCsvButton.Enabled = false;
                     break;
             }
         }
@@ -218,88 +217,7 @@ namespace ProductDatabase {
             }
         }
 
-        private void ExportCsv() {
-            string _name = string.Empty;
-            switch (IntRadioBtnFlg) {
-                case 1:
-                    _name = $"{StrProductName} - {StrSubstrateName}";
-                    break;
-                case 2:
-                    _name = $"{StrProductName} - {StrProductModel}";
-                    break;
-                case 3:
-                    return;
-            }
-
-            using SaveFileDialog _sfd = new() {
-                FileName = $"{_name}.csv",
-                Filter = "すべてのファイル(*.*)|*.*",
-                Title = "名前を付けて保存",
-                RestoreDirectory = true
-            };
-
-            if (_sfd.ShowDialog() == DialogResult.OK) {
-                CnvDataTableToCsv(DtHistoryTable, _sfd.FileName, true);
-            }
-
-        }
-        public void CnvDataTableToCsv(DataTable dt, string csvPath, bool WriteHeader) {
-            System.Text.Encoding _encoding = System.Text.Encoding.GetEncoding("Shift_JIS");
-
-            // 書き込むファイルを開く
-            using StreamWriter _sr = new(csvPath, false, _encoding);
-            string[] _arr = Array.Empty<string>();
-            int _colCount = 0;
-            int _lastColIndex = 0;
-
-            // ヘッダを書き込む
-            if (WriteHeader) {
-                switch (IntRadioBtnFlg) {
-                    case 1:
-                        _arr = new string[] { "ID", "基板名", "基板型式", "製造番号", "注文番号", "追加量", "減少量", "不良", "使用製品名", "使用製番", "使用注番", "Revision", "担当者", "登録日", "コメント" };
-                        break;
-                    case 2:
-                        _arr = new string[] { "ID", "注文番号", "製造番号", "製品名", "製品型式", "数量", "担当者", "登録日", "Revision", "シリアル先頭", "シリアル末尾", "末番", "コメント", "使用基板" };
-                        break;
-                }
-                List<string> _colName = new();
-                _colName.AddRange(_arr);
-                _colCount = _colName.Count;
-                _lastColIndex = _colCount - 1;
-                for (int _i = 0; _i < _colCount; _i++) {
-                    string _field = _colName[_i];
-                    _field = EncloseDoubleQuotes(_field);
-                    _sr.Write(_field);
-                    // カンマ付与
-                    if (_lastColIndex > _i) _sr.Write(',');
-                }
-                // 改行
-                _sr.Write(Environment.NewLine);
-            }
-
-            // レコードを書き込む
-            foreach (DataRow _row in dt.Rows) {
-                for (int _i = 0; _i < _colCount; _i++) {
-                    // フィールドの取得
-                    string _field = _row[_i]?.ToString() ?? string.Empty; // nullチェックを追加
-                    if (_field != null) {
-                        // "で囲み書き込む
-                        _field = EncloseDoubleQuotes(_field);
-                        _sr.Write(_field);
-                        // カンマ付与
-                        if (_lastColIndex > _i) {
-                            _sr.Write(',');
-                        }
-                    }
-                }
-                _sr.Write(Environment.NewLine);
-            }
-
-        }
-        private static string EncloseDoubleQuotes(string field) { return $"\"{field}\""; }
-
         private void HistoryWindow_Load(object sender, EventArgs e) { LoadEvents(); }
-        private void ExportCsvButton_Click(object sender, EventArgs e) { ExportCsv(); }
         private void FilterStringTextBox_TextChanged(object sender, EventArgs e) { HistoryTableFilter(sender, e); }
     }
 }

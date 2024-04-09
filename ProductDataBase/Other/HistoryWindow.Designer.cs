@@ -26,7 +26,6 @@
             DataBaseDataGridView = new DataGridView();
             CategoryComboBox = new ComboBox();
             FilterStringTextBox = new TextBox();
-            ExportCsvButton = new Button();
             ((System.ComponentModel.ISupportInitialize)DataBaseDataGridView).BeginInit();
             SuspendLayout();
             // 
@@ -65,23 +64,11 @@
             FilterStringTextBox.TabIndex = 2;
             FilterStringTextBox.TextChanged += FilterStringTextBox_TextChanged;
             // 
-            // ExportCsvButton
-            // 
-            ExportCsvButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            ExportCsvButton.Location = new Point(245, 483);
-            ExportCsvButton.Name = "ExportCsvButton";
-            ExportCsvButton.Size = new Size(75, 23);
-            ExportCsvButton.TabIndex = 3;
-            ExportCsvButton.Text = "CSV出力";
-            ExportCsvButton.UseVisualStyleBackColor = true;
-            ExportCsvButton.Click += ExportCsvButton_Click;
-            // 
             // HistoryWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1184, 511);
-            Controls.Add(ExportCsvButton);
             Controls.Add(FilterStringTextBox);
             Controls.Add(CategoryComboBox);
             Controls.Add(DataBaseDataGridView);
@@ -103,6 +90,5 @@
         private DataGridView DataBaseDataGridView;
         private ComboBox CategoryComboBox;
         private TextBox FilterStringTextBox;
-        private Button ExportCsvButton;
     }
 }
