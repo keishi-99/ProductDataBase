@@ -1,7 +1,7 @@
 ﻿using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Office.Word;
 using System.Data;
 using System.Data.SQLite;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ProductDatabase {
     public partial class SubstrateChange2 : Form {
@@ -513,14 +513,14 @@ namespace ProductDatabase {
                 int _findColumn = 0;
                 for (_i = 0; _i <= ListUsedSubstrate.Count - 1; _i++) {
 
-                    IXLRange searchRange = _workSheetMain.Range(_findRow, 1, _findRow, 28);
-                    string searchValue = $"{ListUsedSubstrate[_i]}";
-                    IXLCell? foundCell = searchRange.CellsUsed(c => c.Value.ToString() == searchValue).FirstOrDefault();
+                    IXLRange _searchRange = _workSheetMain.Range(_findRow, 1, _findRow, 28);
+                    string _searchValue = $"{ListUsedSubstrate[_i]}";
+                    IXLCell? _foundCell = _searchRange.CellsUsed(c => c.Value.ToString() == _searchValue).FirstOrDefault();
 
-                    if (foundCell != null) {
+                    if (_foundCell != null) {
                         // セルが見つかった場合の処理
-                        int foundRow = foundCell.Address.RowNumber;
-                        int foundColumn = foundCell.Address.ColumnNumber;
+                        int foundRow = _foundCell.Address.RowNumber;
+                        int foundColumn = _foundCell.Address.ColumnNumber;
                     }
 
                     foreach (IXLCell _cell in _workSheetMain.Search(ListUsedSubstrate[_i])) {
@@ -534,15 +534,15 @@ namespace ProductDatabase {
                         throw new Exception($"{ListUsedSubstrate[_i]}が見つかりません。");
                     }
 
-                    var mainCellValue = _workSheetMain.Cell(_findRow, _findColumn + 1).Value.ToString();
-                    var tempCellValue = _workSheetTemp.Cell(mainCellValue).Value.ToString();
+                    var _mainCellValue = _workSheetMain.Cell(_findRow, _findColumn + 1).Value.ToString();
+                    var _tempCellValue = _workSheetTemp.Cell(_mainCellValue).Value.ToString();
 
-                    if (mainCellValue != string.Empty) {
-                        if (tempCellValue == string.Empty) {
-                            _workSheetTemp.Cell(mainCellValue).Value = $"{ListUsedProductNumber[_i]}({ListUsedQuantity[_i]})";
+                    if (_mainCellValue != string.Empty) {
+                        if (_tempCellValue == string.Empty) {
+                            _workSheetTemp.Cell(_mainCellValue).Value = $"{ListUsedProductNumber[_i]}({ListUsedQuantity[_i]})";
                         }
                         else {
-                            _workSheetTemp.Cell(mainCellValue).Value += $"    {ListUsedProductNumber[_i]}({ListUsedQuantity[_i]})";
+                            _workSheetTemp.Cell(_mainCellValue).Value += $"    {ListUsedProductNumber[_i]}({ListUsedQuantity[_i]})";
                         }
                     }
                 }
@@ -550,31 +550,31 @@ namespace ProductDatabase {
                 //引数に保存先パスを指定
                 _workBook.SaveAs($@"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
 
-                //// 印刷
-                //Excel.Application _xlApp = new() {
-                //    Visible = true // Excelウィンドウを表示します。
-                //};
+                // 印刷
+                Excel.Application _xlApp = new() {
+                    Visible = true // Excelウィンドウを表示します。
+                };
 
-                //// ワークブック開く
-                //Excel.Workbooks _xlBooks = _xlApp.Workbooks;
-                //Excel.Workbook _xlBook = _xlBooks.Open($@"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
+                // ワークブック開く
+                Excel.Workbooks _xlBooks = _xlApp.Workbooks;
+                Excel.Workbook _xlBook = _xlBooks.Open($@"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
 
-                //// ワークシート選択
-                //Excel.Sheets _xlSheets = _xlBook.Sheets;
-                //Excel.Worksheet _xlSheet = _xlSheets[_sheetName];
+                // ワークシート選択
+                Excel.Sheets _xlSheets = _xlBook.Sheets;
+                Excel.Worksheet _xlSheet = _xlSheets[_sheetName];
 
-                //// ワークシート印刷
-                //_xlSheet.PrintOut(Preview: true);
+                // ワークシート印刷
+                _xlSheet.PrintOut(Preview: true);
 
-                //// ワークブックを閉じてExcelを終了
-                //_xlBook.Close(false);
-                //_xlApp.Quit();
+                // ワークブックを閉じてExcelを終了
+                _xlBook.Close(false);
+                _xlApp.Quit();
 
-                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheet);
-                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheets);
-                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBook);
-                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBooks);
-                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlApp);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheet);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheets);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBook);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBooks);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlApp);
 
             } catch (Exception ex) {
                 MessageBox.Show($"{ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);

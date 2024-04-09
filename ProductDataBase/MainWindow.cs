@@ -278,8 +278,8 @@ namespace ProductDatabase {
 
                 DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}'", "col_Product_Name ASC");
 
-                foreach (DataRow row in _selectedRows) {
-                    string _productName = row["col_Product_Name"].ToString() ?? string.Empty;
+                foreach (DataRow _row in _selectedRows) {
+                    string _productName = _row["col_Product_Name"].ToString() ?? string.Empty;
                     if (!string.IsNullOrEmpty(_productName)) {
                         _productNames.Add(_productName);
                     }
