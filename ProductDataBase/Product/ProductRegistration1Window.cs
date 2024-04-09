@@ -132,28 +132,28 @@ namespace ProductDatabase {
 
                 RegisterButton.Enabled = false;
 
-                using ProductRegistration2Window window = new();
-                window.StrFontName = StrFontName;
-                window.IntFontSize = IntFontSize;
-                window.StrProductName = StrProductName;
-                window.StrStockName = StrStockName;
-                window.StrProductType = StrProductType;
-                window.IntRegType = IntRegType;
-                window.IntPrintType = IntPrintType;
-                window.IntSerialDigit = IntSerialDigit;
-                window.StrProductModel = StrProductModel;
-                window.IntCheckBin = IntCheckBin;
-                window.StrUseSubstrate = StrUseSubstrate;
-                window.StrInitial = StrInitial;
-                window.StrOrderNumber = OrderNumberTextBox.Text;
-                window.StrProductNumber = ManufacturingNumberMaskedTextBox.Text;
-                window.StrRegDate = RegistrationDateMaskedTextBox.Text;
-                window.StrPerson = PersonComboBox.Text;
-                window.StrRevision = RevisionTextBox.Text;
-                window.StrComment = CommentTextBox.Text;
-                window.IntQuantity = Convert.ToInt32(QuantityTextBox.Text);
-                window.IntSerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text);
-                window.ShowDialog(this);
+                using ProductRegistration2Window _window = new();
+                _window.StrFontName = StrFontName;
+                _window.IntFontSize = IntFontSize;
+                _window.StrProductName = StrProductName;
+                _window.StrStockName = StrStockName;
+                _window.StrProductType = StrProductType;
+                _window.IntRegType = IntRegType;
+                _window.IntPrintType = IntPrintType;
+                _window.IntSerialDigit = IntSerialDigit;
+                _window.StrProductModel = StrProductModel;
+                _window.IntCheckBin = IntCheckBin;
+                _window.StrUseSubstrate = StrUseSubstrate;
+                _window.StrInitial = StrInitial;
+                _window.StrOrderNumber = OrderNumberTextBox.Text;
+                _window.StrProductNumber = ManufacturingNumberMaskedTextBox.Text;
+                _window.StrRegDate = RegistrationDateMaskedTextBox.Text;
+                _window.StrPerson = PersonComboBox.Text;
+                _window.StrRevision = RevisionTextBox.Text;
+                _window.StrComment = CommentTextBox.Text;
+                _window.IntQuantity = Convert.ToInt32(QuantityTextBox.Text);
+                _window.IntSerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text);
+                _window.ShowDialog(this);
                 Close();
 
                 void CheckAndAdjustSerial(int threshold, int resetValue) {
