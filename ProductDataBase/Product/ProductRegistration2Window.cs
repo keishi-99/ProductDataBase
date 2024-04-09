@@ -1289,78 +1289,78 @@ namespace ProductDatabase {
         // チェックシート印刷
         private void CheckSheetPrint() {
             try {
-                List<string> _filePath = new();
-                List<string> _sheetName = new();
+                //List<string> _filePath = new();
+                //List<string> _sheetName = new();
 
-                List<string> _orderNumberRange = new();
-                List<string> _regYearRange = new();
-                List<string> _regMonthRange = new();
-                List<string> _regDayRange = new();
-                List<string> _orderFirstSerialRange = new();
-                List<string> _orderLastSerialRange = new();
+                //List<string> _orderNumberRange = new();
+                //List<string> _regYearRange = new();
+                //List<string> _regMonthRange = new();
+                //List<string> _regDayRange = new();
+                //List<string> _orderFirstSerialRange = new();
+                //List<string> _orderLastSerialRange = new();
 
-                using FileStream _fileStream = new($@"{Environment.CurrentDirectory}./config/Excel/ConfigCheckSheet.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using XLWorkbook _workBook = new(_fileStream);
-                IXLWorksheet _workSheet = _workBook.Worksheet("Sheet1");
+                //using FileStream _fileStream = new($@"{Environment.CurrentDirectory}./config/Excel/ConfigCheckSheet.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                //using XLWorkbook _workBook = new(_fileStream);
+                //IXLWorksheet _workSheet = _workBook.Worksheet("Sheet1");
 
-                // セル検索
-                foreach (IXLCell _cell in _workSheet.Search(StrProductModel)) {
-                    int _findRow = _cell.Address.RowNumber;
-                    // ワークシートのセルから値を取得してリストに格納
-                    _filePath.Add(_workSheet.Cell("J" + _findRow).Value.ToString());
-                    _sheetName.Add(_workSheet.Cell("I" + _findRow).Value.ToString());
+                //// セル検索
+                //foreach (IXLCell _cell in _workSheet.Search(StrProductModel)) {
+                //    int _findRow = _cell.Address.RowNumber;
+                //    // ワークシートのセルから値を取得してリストに格納
+                //    _filePath.Add(_workSheet.Cell("J" + _findRow).Value.ToString());
+                //    _sheetName.Add(_workSheet.Cell("I" + _findRow).Value.ToString());
 
-                    _orderNumberRange.Add(_workSheet.Cell("C" + _findRow).Value.ToString());
-                    _regYearRange.Add(_workSheet.Cell("D" + _findRow).Value.ToString());
-                    _regMonthRange.Add(_workSheet.Cell("E" + _findRow).Value.ToString());
-                    _regDayRange.Add(_workSheet.Cell("F" + _findRow).Value.ToString());
-                    _orderFirstSerialRange.Add(_workSheet.Cell("G" + _findRow).Value.ToString());
-                    _orderLastSerialRange.Add(_workSheet.Cell("H" + _findRow).Value.ToString());
-                }
+                //    _orderNumberRange.Add(_workSheet.Cell("C" + _findRow).Value.ToString());
+                //    _regYearRange.Add(_workSheet.Cell("D" + _findRow).Value.ToString());
+                //    _regMonthRange.Add(_workSheet.Cell("E" + _findRow).Value.ToString());
+                //    _regDayRange.Add(_workSheet.Cell("F" + _findRow).Value.ToString());
+                //    _orderFirstSerialRange.Add(_workSheet.Cell("G" + _findRow).Value.ToString());
+                //    _orderLastSerialRange.Add(_workSheet.Cell("H" + _findRow).Value.ToString());
+                //}
 
-                if (_filePath.Count == 0) {
-                    throw new Exception($"Configに品目番号:{StrProductModel}が見つかりません。");
-                }
+                //if (_filePath.Count == 0) {
+                //    throw new Exception($"Configに品目番号:{StrProductModel}が見つかりません。");
+                //}
 
-                // 見つかった品目番号の数だけ印刷
-                for (int _i = 0; _i < _filePath.Count; _i++) {
-                    // チェックシート作成
-                    using FileStream _fileStream2 = new($@"{_filePath[_i]}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    using XLWorkbook _workBook2 = new(_fileStream2);
-                    IXLWorksheet _workSheet2 = _workBook2.Worksheet(_sheetName[_i]);
+                //// 見つかった品目番号の数だけ印刷
+                //for (int _i = 0; _i < _filePath.Count; _i++) {
+                //    // チェックシート作成
+                //    using FileStream _fileStream2 = new($@"{_filePath[_i]}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                //    using XLWorkbook _workBook2 = new(_fileStream2);
+                //    IXLWorksheet _workSheet2 = _workBook2.Worksheet(_sheetName[_i]);
 
-                    _workSheet2.Cell(_orderNumberRange[_i]).Value = StrOrderNumber;
-                    _workSheet2.Cell(_regYearRange[_i]).Value = $"{DateTime.Parse(StrRegDate):yy}年";
-                    _workSheet2.Cell(_regMonthRange[_i]).Value = $"{DateTime.Parse(StrRegDate):MM}月";
-                    _workSheet2.Cell(_regDayRange[_i]).Value = $"{DateTime.Parse(StrRegDate):dd}日";
-                    _workSheet2.Cell(_orderFirstSerialRange[_i]).Value = StrSerialFirstNumber;
-                    _workSheet2.Cell(_orderLastSerialRange[_i]).Value = StrSerialLastNumber;
+                //    _workSheet2.Cell(_orderNumberRange[_i]).Value = StrOrderNumber;
+                //    _workSheet2.Cell(_regYearRange[_i]).Value = $"{DateTime.Parse(StrRegDate):yy}年";
+                //    _workSheet2.Cell(_regMonthRange[_i]).Value = $"{DateTime.Parse(StrRegDate):MM}月";
+                //    _workSheet2.Cell(_regDayRange[_i]).Value = $"{DateTime.Parse(StrRegDate):dd}日";
+                //    _workSheet2.Cell(_orderFirstSerialRange[_i]).Value = StrSerialFirstNumber;
+                //    _workSheet2.Cell(_orderLastSerialRange[_i]).Value = StrSerialLastNumber;
 
-                    // 印刷
-                    Excel.Application _xlApp = new() {
-                        Visible = true // Excelウィンドウを表示します。
-                    };
+                //    // 印刷
+                //    Excel.Application _xlApp = new() {
+                //        Visible = true // Excelウィンドウを表示します。
+                //    };
 
-                    // ワークブックを開く。
-                    Excel.Workbooks _xlBooks = _xlApp.Workbooks;
-                    Excel.Workbook _xlBook = _xlBooks.Open($@"{System.Environment.CurrentDirectory}./config/Excel/temporarily_{_i}.xlsx");
+                //    // ワークブックを開く。
+                //    Excel.Workbooks _xlBooks = _xlApp.Workbooks;
+                //    Excel.Workbook _xlBook = _xlBooks.Open($@"{System.Environment.CurrentDirectory}./config/Excel/temporarily_{_i}.xlsx");
 
-                    // ワークシートを選択
-                    Excel.Sheets _xlSheets = _xlBook.Sheets;
-                    Excel.Worksheet _xlSheet = _xlSheets[1];
+                //    // ワークシートを選択
+                //    Excel.Sheets _xlSheets = _xlBook.Sheets;
+                //    Excel.Worksheet _xlSheet = _xlSheets[1];
 
-                    // ワークシートを印刷
-                    _xlSheet.PrintOut(Preview: true);
+                //    // ワークシートを印刷
+                //    _xlSheet.PrintOut(Preview: true);
 
-                    // ワークブックを閉じてExcelを終了します。
-                    _xlBook.Close(false);
-                    _xlApp.Quit();
-                    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheet);
-                    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheets);
-                    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBook);
-                    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBooks);
-                    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlApp);
-                }
+                //    // ワークブックを閉じてExcelを終了します。
+                //    _xlBook.Close(false);
+                //    _xlApp.Quit();
+                //    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheet);
+                //    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheets);
+                //    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBook);
+                //    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBooks);
+                //    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlApp);
+                //}
 
             } catch (Exception ex) {
                 MessageBox.Show($"{ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1426,14 +1426,14 @@ namespace ProductDatabase {
                 int _findColumn = 0;
                 for (_i = 0; _i <= ListUsedSubstrate.Count - 1; _i++) {
 
-                    IXLRange searchRange = _workSheetMain.Range(_findRow, 1, _findRow, 28);
-                    string searchValue = $"{ListUsedSubstrate[_i]}";
-                    IXLCell? foundCell = searchRange.CellsUsed(c => c.Value.ToString() == searchValue).FirstOrDefault();
+                    IXLRange _searchRange = _workSheetMain.Range(_findRow, 1, _findRow, 28);
+                    string _searchValue = $"{ListUsedSubstrate[_i]}";
+                    IXLCell? _foundCell = _searchRange.CellsUsed(c => c.Value.ToString() == _searchValue).FirstOrDefault();
 
-                    if (foundCell != null) {
+                    if (_foundCell != null) {
                         // セルが見つかった場合の処理
-                        int foundRow = foundCell.Address.RowNumber;
-                        int foundColumn = foundCell.Address.ColumnNumber;
+                        int _foundRow = _foundCell.Address.RowNumber;
+                        int _foundColumn = _foundCell.Address.ColumnNumber;
                     }
 
                     foreach (IXLCell _cell in _workSheetMain.Search(ListUsedSubstrate[_i])) {
@@ -1447,15 +1447,15 @@ namespace ProductDatabase {
                         throw new Exception($"{ListUsedSubstrate[_i]}が見つかりません。");
                     }
 
-                    var mainCellValue = _workSheetMain.Cell(_findRow, _findColumn + 1).Value.ToString();
-                    var tempCellValue = _workSheetTemp.Cell(mainCellValue).Value.ToString();
+                    var _mainCellValue = _workSheetMain.Cell(_findRow, _findColumn + 1).Value.ToString();
+                    var _tempCellValue = _workSheetTemp.Cell(_mainCellValue).Value.ToString();
 
-                    if (mainCellValue != string.Empty) {
-                        if (tempCellValue == string.Empty) {
-                            _workSheetTemp.Cell(mainCellValue).Value = $"{ListUsedProductNumber[_i]}({ListUsedQuantity[_i]})";
+                    if (_mainCellValue != string.Empty) {
+                        if (_tempCellValue == string.Empty) {
+                            _workSheetTemp.Cell(_mainCellValue).Value = $"{ListUsedProductNumber[_i]}({ListUsedQuantity[_i]})";
                         }
                         else {
-                            _workSheetTemp.Cell(mainCellValue).Value += $"    {ListUsedProductNumber[_i]}({ListUsedQuantity[_i]})";
+                            _workSheetTemp.Cell(_mainCellValue).Value += $"    {ListUsedProductNumber[_i]}({ListUsedQuantity[_i]})";
                         }
                     }
                 }
@@ -1553,7 +1553,7 @@ namespace ProductDatabase {
                 $"StrPerson\t\t\t[{StrPerson}]\r\n" +
                 $"IntQuantity\t\t[{IntQuantity}]\r\n" +
                 $"IntSerialFirstNumber\t[{IntSerialFirstNumber}]\r\n" +
-                $"IntSerialLastNumber\t[{IntSerialLastNumber}]\r\n" +
+                $"IntSerialLastNumber\t\t[{IntSerialLastNumber}]\r\n" +
                 $"StrInitial\t\t\t[{StrInitial}]\r\n" +
                 $"IntRegType\t\t[{IntRegType}]\r\n" +
                 $"IntPrintType\t\t[{IntPrintType}]\r\n" +

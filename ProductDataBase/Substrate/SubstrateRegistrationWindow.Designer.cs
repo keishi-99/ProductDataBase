@@ -359,6 +359,7 @@
             ExtraCheckBox1.TabStop = false;
             ExtraCheckBox1.Text = "予備";
             ExtraCheckBox1.UseVisualStyleBackColor = true;
+            ExtraCheckBox1.Visible = false;
             ExtraCheckBox1.CheckedChanged += CheckBoxChecked;
             // 
             // ExtraTextBox2
@@ -383,6 +384,7 @@
             ExtraCheckBox2.TabStop = false;
             ExtraCheckBox2.Text = "予備";
             ExtraCheckBox2.UseVisualStyleBackColor = true;
+            ExtraCheckBox2.Visible = false;
             ExtraCheckBox2.CheckedChanged += CheckBoxChecked;
             // 
             // ExtraTextBox3
@@ -407,6 +409,7 @@
             ExtraCheckBox3.TabStop = false;
             ExtraCheckBox3.Text = "予備";
             ExtraCheckBox3.UseVisualStyleBackColor = true;
+            ExtraCheckBox3.Visible = false;
             ExtraCheckBox3.CheckedChanged += CheckBoxChecked;
             // 
             // RegistrationDateCheckBox
@@ -477,6 +480,7 @@
             ExtraCheckBox4.TabStop = false;
             ExtraCheckBox4.Text = "予備";
             ExtraCheckBox4.UseVisualStyleBackColor = true;
+            ExtraCheckBox4.Visible = false;
             ExtraCheckBox4.CheckedChanged += CheckBoxChecked;
             // 
             // ExtraTextBox5
@@ -501,6 +505,7 @@
             ExtraCheckBox5.TabStop = false;
             ExtraCheckBox5.Text = "予備";
             ExtraCheckBox5.UseVisualStyleBackColor = true;
+            ExtraCheckBox5.Visible = false;
             ExtraCheckBox5.CheckedChanged += CheckBoxChecked;
             // 
             // ExtraTextBox6
@@ -525,6 +530,7 @@
             ExtraCheckBox6.TabStop = false;
             ExtraCheckBox6.Text = "予備";
             ExtraCheckBox6.UseVisualStyleBackColor = true;
+            ExtraCheckBox6.Visible = false;
             ExtraCheckBox6.CheckedChanged += CheckBoxChecked;
             // 
             // CommentCheckBox

@@ -85,7 +85,7 @@
             LabelIntervalXTextBox = new TextBox();
             Label13 = new Label();
             Label12 = new Label();
-            CloseButton = new Button();
+            CancelButton = new Button();
             HeaderFontDialog = new FontDialog();
             TextFontDialog = new FontDialog();
             PrintTextGroupBox.SuspendLayout();
@@ -695,22 +695,23 @@
             Label12.TabIndex = 1;
             Label12.Text = "左右間隔";
             // 
-            // CloseButton
+            // CancelButton
             // 
-            CloseButton.Location = new Point(552, 524);
-            CloseButton.Name = "CloseButton";
-            CloseButton.Size = new Size(75, 25);
-            CloseButton.TabIndex = 25;
-            CloseButton.Text = "Close";
-            CloseButton.UseVisualStyleBackColor = true;
-            CloseButton.Click += CloseButton_Click;
+            CancelButton.Location = new Point(552, 524);
+            CancelButton.Name = "CancelButton";
+            CancelButton.Size = new Size(75, 25);
+            CancelButton.TabIndex = 25;
+            CancelButton.Text = "キャンセル";
+            CancelButton.UseVisualStyleBackColor = true;
+            CancelButton.Click += CloseButton_Click;
             // 
             // ProductPrintSetting
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            CancelButton = CancelButton;
             ClientSize = new Size(654, 561);
-            Controls.Add(CloseButton);
+            Controls.Add(CancelButton);
             Controls.Add(OKButton);
             Controls.Add(PrintTextGroupBox);
             Controls.Add(WhiteSpaceGroupBox);
@@ -807,7 +808,7 @@
         private TextBox LabelIntervalXTextBox;
         private Label Label13;
         private Label Label12;
-        private Button CloseButton;
+        private new Button CancelButton;
         private FontDialog HeaderFontDialog;
         private FontDialog TextFontDialog;
     }
