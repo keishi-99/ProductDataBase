@@ -306,7 +306,7 @@ namespace ProductDatabase {
             // PrintDocumentオブジェクトの作成
             using System.Drawing.Printing.PrintDocument _pd = new();
 
-            // PrintPageイベントハンドラの追加
+            //// PrintPageイベントハンドラの追加
             _pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
             LabelSubNumLabelsToPrint = int.Parse(QuantityTextBox.Text);
@@ -330,6 +330,8 @@ namespace ProductDatabase {
                     break;
                 case 2:
                     SubstrateRegistrationPrintPreviewDialog.Document = _pd;
+
+
                     SubstrateRegistrationPrintPreviewDialog.ShowDialog();
                     break;
                 default:
@@ -376,6 +378,7 @@ namespace ProductDatabase {
 
                 int _maxY = SettingsLabelSub.LabelSubPageSettings.NumLabelsY;
                 int _y;
+                int _intNumLabels = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
                 for (_y = _startLine; _y < _maxY; _y++) {
 
                     int _maxX = SettingsLabelSub.LabelSubPageSettings.NumLabelsX;
@@ -394,7 +397,6 @@ namespace ProductDatabase {
                         LabelSubNLabel = 0;
                         LabelSubNumLabelsToPrint--;
 
-                        int _intNumLabels = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
                         if (LabelSubNumLabelsToPrint <= 0) {
                             _intNumLabels--;
                             if (_intNumLabels <= 0) {

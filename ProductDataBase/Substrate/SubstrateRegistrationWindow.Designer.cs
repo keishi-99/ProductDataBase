@@ -639,10 +639,6 @@
             // 
             SubstrateRegistrationPrintDialog.UseEXDialog = true;
             // 
-            // SubstrateRegistrationPrintDocument
-            // 
-            SubstrateRegistrationPrintDocument.PrintPage += SubstrateRegistrationPrintDocument_PrintPage;
-            // 
             // SubstrateRegistrationPrintPreviewDialog
             // 
             SubstrateRegistrationPrintPreviewDialog.AutoScrollMargin = new Size(0, 0);
