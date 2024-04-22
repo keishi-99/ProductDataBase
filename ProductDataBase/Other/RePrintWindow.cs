@@ -231,9 +231,9 @@ namespace ProductDatabase {
                 StrSerialFirstNumber = GenerateCode(IntSerialFirstNumber);
                 StrSerialLastNumber = GenerateCode(IntSerialLastNumber);
 
-                PrintBarcode(1);
+                if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
 
-                // 基板登録テーブルへ追加
+                // 再印刷登録テーブルへ追加
                 using SQLiteConnection _con = new(MainWindow.GetConnectionString2());
                 _con.Open();
                 using SQLiteCommand _cmd = _con.CreateCommand();
@@ -264,7 +264,7 @@ namespace ProductDatabase {
             }
         }
         // 印刷処理
-        private void PrintBarcode(int PrintFlg) {
+        private bool PrintBarcode(int PrintFlg) {
             // PrintDocumentオブジェクトの作成
             using System.Drawing.Printing.PrintDocument _pd = new();
 
@@ -288,7 +288,7 @@ namespace ProductDatabase {
                         }
                     }
                     else {
-                        return;
+                        return false;
                     }
                     break;
                 case 2:
@@ -298,6 +298,7 @@ namespace ProductDatabase {
                 default:
                     break;
             }
+            return true;
         }
         private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
             try {
