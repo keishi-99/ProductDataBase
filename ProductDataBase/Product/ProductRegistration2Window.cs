@@ -313,21 +313,6 @@ namespace ProductDatabase {
                         break;
                 }
 
-                switch (IntPrintType) {
-                    case 5:
-                        SubstrateListPrintButton.Enabled = true;
-                        break;
-                    case 6:
-                        SubstrateListPrintButton.Enabled = true;
-                        CheckSheetPrintButton.Enabled = true;
-                        break;
-                    case 7:
-                        CheckSheetPrintButton.Enabled = true;
-                        break;
-                    default:
-                        break;
-                }
-
                 LoadSettings(StrLabelSettingFilePath, StrBarcodeSettingFilePath);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -714,7 +699,7 @@ namespace ProductDatabase {
                     case 7:
                         MessageBox.Show("シリアルラベルを印刷します。");
                         StrSerialType = "Label";
-                        PrintBarcode(1);
+                        if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
                         break;
                     default:
                         break;
@@ -725,7 +710,7 @@ namespace ProductDatabase {
                     case 3:
                         MessageBox.Show("バーコードラベルを印刷します。");
                         StrSerialType = "Barcode";
-                        PrintBarcode(2);
+                        if (!PrintBarcode(2)) { throw new Exception("キャンセルしました。"); }
                         break;
                     default:
                         break;
@@ -950,7 +935,7 @@ namespace ProductDatabase {
         }
 
         // 印刷処理
-        private void PrintBarcode(int PrintFlg) {
+        private bool PrintBarcode(int PrintFlg) {
             // PrintDocumentオブジェクトの作成
             using System.Drawing.Printing.PrintDocument _pd = new();
 
@@ -974,7 +959,7 @@ namespace ProductDatabase {
                         }
                     }
                     else {
-                        return;
+                        return false;
                     }
                     break;
                 case 2:
@@ -982,6 +967,7 @@ namespace ProductDatabase {
                     ProductRegistration2PrintPreviewDialog.ShowDialog();
                     break;
             }
+            return true;
         }
         private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
             try {
