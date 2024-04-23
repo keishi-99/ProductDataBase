@@ -160,7 +160,7 @@
             FontCenterCheckBox.TabIndex = 35;
             FontCenterCheckBox.Text = "横位置を中心に合わせる";
             FontCenterCheckBox.UseVisualStyleBackColor = true;
-            FontCenterCheckBox.CheckedChanged += BarcodeCenterCheckBox_CheckedChanged;
+            FontCenterCheckBox.CheckedChanged += FontCenterCheckBox_CheckedChanged;
             // 
             // FontPostionYTextBox
             // 
@@ -301,6 +301,7 @@
             BarcodeCenterCheckBox.TabIndex = 6;
             BarcodeCenterCheckBox.Text = "横位置を中心に合わせる";
             BarcodeCenterCheckBox.UseVisualStyleBackColor = true;
+            BarcodeCenterCheckBox.CheckedChanged += BarcodeCenterCheckBox_CheckedChanged;
             // 
             // BarcodePostionYTextBox
             // 
@@ -848,7 +849,6 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            CancelButton = CancelButton;
             ClientSize = new Size(654, 561);
             Controls.Add(OKButton);
             Controls.Add(BarcodeGroupBox);
