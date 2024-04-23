@@ -1,7 +1,6 @@
 ﻿using ProductDatabase.Product;
 
-namespace ProductDatabase
-{
+namespace ProductDatabase {
     public partial class ProductBarcodePrintSettingsWindow : Form {
 
         private CBarcodeProLabelSettings BarcodeProLabelSettings;
@@ -44,20 +43,22 @@ namespace ProductDatabase
                 BarcodeFontTextBox.Text = $"{BarcodeFontDialog.Font.Name} {BarcodeFontDialog.Font.SizeInPoints}pt";
             }
 
-            BarcodePostionXTextBox.Text = BarcodeProLabelSettings.StringPosX.ToString();
-            BarcodePostionYTextBox.Text = BarcodeProLabelSettings.StringPosY.ToString();
-            BarcodeCenterCheckBox.Checked = BarcodeProLabelSettings.AlignStringCenter;
+            BarcodePostionXTextBox.Text = BarcodeProLabelSettings.BarcodePosX.ToString();
+            BarcodePostionYTextBox.Text = BarcodeProLabelSettings.BarcodePosY.ToString();
+            BarcodeCenterCheckBox.Checked = BarcodeProLabelSettings.AlignBarcodeCenter;
 
-            if (BarcodeCenterCheckBox.Checked) {
-                BarcodePostionXTextBox.Enabled = false;
-            }
-            else {
-                BarcodePostionXTextBox.Enabled = true;
-            }
+            if (BarcodeCenterCheckBox.Checked) { BarcodePostionXTextBox.Enabled = false; }
+            else { BarcodePostionXTextBox.Enabled = true; }
+
+            FontPostionXTextBox.Text = BarcodeProLabelSettings.StringPosX.ToString();
+            FontPostionYTextBox.Text = BarcodeProLabelSettings.StringPosY.ToString();
+            FontCenterCheckBox.Checked = BarcodeProLabelSettings.AlignStringCenter;
+            if (FontCenterCheckBox.Checked) { FontPostionXTextBox.Enabled = false; }
+            else { FontPostionXTextBox.Enabled = true; }
         }
 
         private void BtnOK_Click(object sender, EventArgs e) {
-            double SizeX, SizeY, OffsetX, OffsetY, IntervalX, IntervalY, BarcodeHeight, BarcodeMagnitude, StringPosX, StringPosY;
+            double SizeX, SizeY, OffsetX, OffsetY, IntervalX, IntervalY, BarcodePosX, BarcodePosY, BarcodeHeight, BarcodeMagnitude, StringPosX, StringPosY;
             int NumLabelsX, NumLabelsY, HeaderPosX, HeaderPosY, FooterPosX = 0, FooterPosY = 0, NumLabels;
 
             try {
@@ -73,9 +74,11 @@ namespace ProductDatabase
                 HeaderPosY = int.Parse(BarcodeHeaderPostionYTextBox.Text);
 
                 BarcodeHeight = double.Parse(BarcodeHeightTextBox.Text);
-                StringPosX = double.Parse(BarcodePostionXTextBox.Text);
-                StringPosY = double.Parse(BarcodePostionYTextBox.Text);
+                BarcodePosX = double.Parse(BarcodePostionXTextBox.Text);
+                BarcodePosY = double.Parse(BarcodePostionYTextBox.Text);
                 BarcodeMagnitude = double.Parse(BarcodeMagnitudeTextBox.Text);
+                StringPosX = double.Parse(FontPostionXTextBox.Text);
+                StringPosY = double.Parse(FontPostionYTextBox.Text);
                 NumLabels = int.Parse(BarcodeQuantityTextBox.Text);
             } catch (Exception ex) {
                 MessageBox.Show($"入力値が不正です。{Environment.NewLine}{ex.Message}");
@@ -97,14 +100,15 @@ namespace ProductDatabase
             BarcodeProPageSettings.HeaderFooterFont = BarcodeHeaderFontDialog.Font;
 
             BarcodeProLabelSettings.BarcodeHeight = BarcodeHeight;
-            BarcodeProLabelSettings.BarcodePosX = 0; // BarcodePosX is not set in the original VB.NET code
-            BarcodeProLabelSettings.BarcodePosY = 0; // BarcodePosY is not set in the original VB.NET code
+            BarcodeProLabelSettings.BarcodePosX = BarcodePosX;
+            BarcodeProLabelSettings.BarcodePosY = BarcodePosY;
+            BarcodeProLabelSettings.AlignBarcodeCenter = BarcodeCenterCheckBox.Checked;
             BarcodeProLabelSettings.BarcodeMagnitude = BarcodeMagnitude;
             BarcodeProLabelSettings.Format = BarcodeFormatTextBox.Text;
             BarcodeProLabelSettings.Font = BarcodeFontDialog.Font;
             BarcodeProLabelSettings.StringPosX = StringPosX;
             BarcodeProLabelSettings.StringPosY = StringPosY;
-            BarcodeProLabelSettings.AlignStringCenter = BarcodeCenterCheckBox.Checked;
+            BarcodeProLabelSettings.AlignStringCenter = FontCenterCheckBox.Checked;
             BarcodeProLabelSettings.NumLabels = int.Parse(BarcodeQuantityTextBox.Text);
 
             DialogResult = DialogResult.OK;
@@ -135,5 +139,15 @@ namespace ProductDatabase
         private void ProductBarcodePrintSetting_Load(object sender, EventArgs e) { PageSettingsBarcodeLoad(sender, e); }
 
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
+
+        private void FontCenterCheckBox_CheckedChanged(object sender, EventArgs e) {
+            if (FontCenterCheckBox.Checked) {
+                FontPostionXTextBox.Enabled = false;
+            }
+            else {
+                FontPostionXTextBox.Enabled = true;
+            }
+
+        }
     }
 }

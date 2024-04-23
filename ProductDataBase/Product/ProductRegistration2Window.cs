@@ -974,7 +974,6 @@ namespace ProductDatabase {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
 
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
-                int _startLineLabel = (int)SerialPrintPostionNumericUpDown.Value - 1;
                 Point _headerPos = new(0, 0);
                 string _headerString = string.Empty;
                 Font _headerFooterFont = new("Arial", 6);
@@ -989,6 +988,7 @@ namespace ProductDatabase {
                 double _offsetY = 0;
                 double _intervalX = 0;
                 double _intervalY = 0;
+                int _startLine = 0;
 
                 switch (StrSerialType) {
                     case "Label":
@@ -1006,6 +1006,7 @@ namespace ProductDatabase {
                         _headerFooterFont = SettingsLabelPro.LabelProPageSettings.HeaderFooterFont;
                         _intNumLabels = SettingsLabelPro.LabelProLabelSettings.NumLabels;
                         _intCountNumLabels = SettingsLabelPro.LabelProLabelSettings.NumLabels;
+                        _startLine = (int)SerialPrintPostionNumericUpDown.Value - 1;
                         break;
                     case "Barcode":
                         if (SettingsBarcodePro == null) { throw new Exception("SettingsBarcodeProがnullです。"); }
@@ -1022,19 +1023,21 @@ namespace ProductDatabase {
                         _headerFooterFont = SettingsBarcodePro.BarcodeProPageSettings.HeaderFooterFont;
                         _intNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
                         _intCountNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
+                        _startLine = (int)BarcodePrintPostionNumericUpDown.Value - 1;
                         break;
                     default:
                         break;
                 }
 
-                int _startLineBarcode = (int)BarcodePrintPostionNumericUpDown.Value - 1;
+                //int _startLineLabel = (int)SerialPrintPostionNumericUpDown.Value - 1;
+                //int _startLineBarcode = (int)BarcodePrintPostionNumericUpDown.Value - 1;
 
                 Point _offset;
                 if (!ProductRegistration2PrintDocument.PrintController.IsPreview) {
                     _offsetX -= e.PageSettings.HardMarginX * 0.254;
                     _offsetY -= e.PageSettings.HardMarginY * 0.254;
                     if (LabelProPageNum == 0) {
-                        _offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLineBarcode * (_intervalY + _sizeY))));
+                        _offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLine * (_intervalY + _sizeY))));
                     }
                     else {
                         _offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (_intervalY + _sizeY))));
@@ -1050,19 +1053,19 @@ namespace ProductDatabase {
                 _headerPos.Offset(_offset);
                 e.Graphics.DrawString(_headerString, _headerFooterFont, Brushes.Black, _headerPos);
 
-                int _barcodePageNum = 0;
-                if (_barcodePageNum == 0) {
-                    _offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLineBarcode * (_intervalY + _sizeY))));
+                int _pageNum = 0;
+                if (_pageNum == 0) {
+                    _offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLine * (_intervalY + _sizeY))));
                 }
                 else {
                     _offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (_intervalY + _sizeY))));
                 }
 
-                if (LabelProPageNum >= 1) { _startLineBarcode = 0; }
-
+                if (LabelProPageNum == 0) { LabelProNSerial = IntSerialFirstNumber; }
+                if (LabelProPageNum >= 1) { _startLine = 0; }
 
                 int _y = 0;
-                for (_y = _startLineBarcode; _y < _maxY; _y++) {
+                for (_y = _startLine; _y < _maxY; _y++) {
                     int _x = 0;
                     for (_x = 0; _x < _maxX; _x++) {
                         string _s = GenerateCode(LabelProNSerial);
@@ -1071,6 +1074,7 @@ namespace ProductDatabase {
                         e.Graphics.DrawImage(MakeLabelImage(_s, (int)e.Graphics.DpiX, 1), _posX, _posY, _sizeX, _sizeY);
 
                         LabelProNLabel = 0;
+                        LabelProNSerial++;
                         LabelProNumLabelsToPrint--;
 
                         if (LabelProNumLabelsToPrint <= 0) {
@@ -1147,7 +1151,7 @@ namespace ProductDatabase {
             return _outputCode;
         }
         private Bitmap MakeLabelImage(string text, int resolution, int magnitude) {
-            Bitmap _labelImage = new(0, 0);
+            Bitmap _labelImage = new(1, 1);
             Graphics _g;
             SizeF _stringSize;
             decimal _sizeX;
@@ -1487,36 +1491,20 @@ namespace ProductDatabase {
         private void SubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBox_CheckedChanged(sender, e); }
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { ClosingEvents(); }
         private void シリアルラベル印刷ToolStripMenuItem_Click(object sender, EventArgs e) {
-            try {
-                StrSerialType = "Label";
-                PrintBarcode(1);
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
-            }
+            StrSerialType = "Label";
+            PrintBarcode(1);
         }
         private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            try {
-                StrSerialType = "Label";
-                PrintBarcode(2);
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
-            }
+            StrSerialType = "Label";
+            PrintBarcode(2);
         }
         private void バーコード印刷ToolStripMenuItem_Click(object sender, EventArgs e) {
-            try {
-                StrSerialType = "Barcode";
-                PrintBarcode(1);
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
-            }
+            StrSerialType = "Barcode";
+            PrintBarcode(1);
         }
         private void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            try {
-                StrSerialType = "Barcode";
-                PrintBarcode(2);
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
-            }
+            StrSerialType = "Barcode";
+            PrintBarcode(2);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             ProductPrintSetting _ls = new();
