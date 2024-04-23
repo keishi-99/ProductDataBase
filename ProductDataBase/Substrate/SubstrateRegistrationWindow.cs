@@ -119,18 +119,18 @@ namespace ProductDatabase {
         }
         // クロージングイベント
         private void ClosingEvents() {
-            try {
-                StreamWriter? _sw = null;
+            //try {
+            //    StreamWriter? _sw = null;
 
-                _sw = new StreamWriter(StrSettingFilePath, false, new System.Text.UTF8Encoding(false));
-                System.Xml.Serialization.XmlSerializer _serializer = new(typeof(CSettingsLabelSub));
-                _serializer.Serialize(_sw, SettingsLabelSub);
-                _sw?.Close();
-            } catch (Exception ex) {
-                MessageBox.Show($"設定ファイルの保存に失敗しました。{Environment.NewLine}{ex.Message}");
-            } finally {
-                Dispose();
-            }
+            //    _sw = new StreamWriter(StrSettingFilePath, false, new System.Text.UTF8Encoding(false));
+            //    System.Xml.Serialization.XmlSerializer _serializer = new(typeof(CSettingsLabelSub));
+            //    _serializer.Serialize(_sw, SettingsLabelSub);
+            //    _sw?.Close();
+            //} catch (Exception ex) {
+            //    MessageBox.Show($"設定ファイルの保存に失敗しました。{Environment.NewLine}{ex.Message}");
+            //} finally {
+            //    Dispose();
+            //}
         }
         // 登録処理
         private void RegisterCheck() {
@@ -330,8 +330,6 @@ namespace ProductDatabase {
                     break;
                 case 2:
                     SubstrateRegistrationPrintPreviewDialog.Document = _pd;
-
-
                     SubstrateRegistrationPrintPreviewDialog.ShowDialog();
                     break;
                 default:
@@ -586,6 +584,20 @@ namespace ProductDatabase {
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             SubstratePrintSetting _ls = new();
             _ls.ShowDialog(this);
+
+            try {
+                StreamWriter? _sw = null;
+
+                _sw = new StreamWriter(StrSettingFilePath, false, new System.Text.UTF8Encoding(false));
+                System.Xml.Serialization.XmlSerializer _serializer = new(typeof(CSettingsLabelSub));
+                _serializer.Serialize(_sw, SettingsLabelSub);
+                _sw?.Close();
+
+                LoadSettings(StrSettingFilePath);
+            } catch (Exception ex) {
+                MessageBox.Show($"設定ファイルの保存に失敗しました。{Environment.NewLine}{ex.Message}");
+            } finally {
+            }
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
             MessageBox.Show($"" +
@@ -604,7 +616,7 @@ namespace ProductDatabase {
                 $"", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         private void SubstrateRegistrationPrintPreviewDialog_Load(object sender, EventArgs e) {
-            using ToolStrip _tool = (ToolStrip)SubstrateRegistrationPrintPreviewDialog.Controls[1];
+            ToolStrip _tool = (ToolStrip)SubstrateRegistrationPrintPreviewDialog.Controls[1];
             _tool.Items[0].Visible = false;
         }
     }
