@@ -1548,5 +1548,9 @@ namespace ProductDatabase {
         }
         private void SubstrateListPrintButton_Click(object sender, EventArgs e) { ListPrint(); }
         private void CheckSheetPrintButton_Click(object sender, EventArgs e) { CheckSheetPrint(); }
+        private void ProductRegistration2PrintPreviewDialog_Load(object sender, EventArgs e) {
+            ToolStrip _tool = (ToolStrip)ProductRegistration2PrintPreviewDialog.Controls[1];
+            _tool.Items[0].Visible = false;
+        }
     }
 }
