@@ -523,7 +523,7 @@ namespace ProductDatabase {
                                 string _subTotalTemp = string.Empty;
 
                                 for (int _j = 0; _j <= _dgvRowCnt - 1; _j++) {
-                                    bool _boolCbx = Convert.ToBoolean(_objDgv.Rows[_j].Cells[4].Value);
+                                    bool _boolCbx = Convert.ToBoolean(_objDgv.Rows[_j].Cells[3].Value);
                                     if (_boolCbx) {
                                         string _substrateName = string.Empty;
                                         string _substrateModel = string.Empty;
@@ -710,13 +710,15 @@ namespace ProductDatabase {
                     case 3:
                         MessageBox.Show("バーコードラベルを印刷します。");
                         StrSerialType = "Barcode";
-                        if (!PrintBarcode(2)) { throw new Exception("キャンセルしました。"); }
+                        if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
                         break;
                     default:
                         break;
                 }
 
                 RegisterButton.Enabled = false;
+                SerialPrintPostionNumericUpDown.Enabled = false;
+                BarcodePrintPostionNumericUpDown.Enabled = false;
 
                 // シリアル先頭と末尾を生成
                 switch (IntPrintType) {
