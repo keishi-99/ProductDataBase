@@ -42,10 +42,7 @@ namespace ProductDatabase {
         public int IntSerialDigit { get; set; }
         public int IntSerialFirstNumber { get; set; }
 
-        public Bitmap LabelProBmp { get; } = new(1, 1);
-        public int LabelProPageNum { get; set; }
         public int LabelProNSerial { get; set; }
-        public int LabelProNLabel { get; set; }
         public int LabelProNumLabelsToPrint { get; set; }
 
         public decimal DisplayResolution { get; } = 96.0m;
@@ -945,7 +942,6 @@ namespace ProductDatabase {
             _pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
             LabelProNumLabelsToPrint = IntQuantity;
-            LabelProPageNum = 0;
             FontUnderbar = false;
 
             switch (PrintFlg) {
@@ -991,6 +987,7 @@ namespace ProductDatabase {
                 double _intervalX = 0;
                 double _intervalY = 0;
                 int _startLine = 0;
+                int _labelProPageNum = 0;
 
                 switch (StrSerialType) {
                     case "Label":
@@ -1031,14 +1028,11 @@ namespace ProductDatabase {
                         break;
                 }
 
-                //int _startLineLabel = (int)SerialPrintPostionNumericUpDown.Value - 1;
-                //int _startLineBarcode = (int)BarcodePrintPostionNumericUpDown.Value - 1;
-
                 Point _offset;
                 if (!ProductRegistration2PrintDocument.PrintController.IsPreview) {
                     _offsetX -= e.PageSettings.HardMarginX * 0.254;
                     _offsetY -= e.PageSettings.HardMarginY * 0.254;
-                    if (LabelProPageNum == 0) {
+                    if (_labelProPageNum == 0) {
                         _offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLine * (_intervalY + _sizeY))));
                     }
                     else {
@@ -1063,8 +1057,8 @@ namespace ProductDatabase {
                     _offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (_intervalY + _sizeY))));
                 }
 
-                if (LabelProPageNum == 0) { LabelProNSerial = IntSerialFirstNumber; }
-                if (LabelProPageNum >= 1) { _startLine = 0; }
+                if (_labelProPageNum == 0) { LabelProNSerial = IntSerialFirstNumber; }
+                if (_labelProPageNum >= 1) { _startLine = 0; }
 
                 int _y = 0;
                 for (_y = _startLine; _y < _maxY; _y++) {
@@ -1075,7 +1069,6 @@ namespace ProductDatabase {
                         float _posY = (float)(_offsetY + (_y * (_intervalY + _sizeY)));
                         e.Graphics.DrawImage(MakeLabelImage(_s, (int)e.Graphics.DpiX, 1), _posX, _posY, _sizeX, _sizeY);
 
-                        LabelProNLabel = 0;
                         LabelProNSerial++;
                         LabelProNumLabelsToPrint--;
 
@@ -1083,7 +1076,7 @@ namespace ProductDatabase {
                             _intCountNumLabels--;
                             if (_intCountNumLabels <= 0) {
                                 e.HasMorePages = false;
-                                LabelProPageNum = 0;
+                                _labelProPageNum = 0;
                                 int _txtNumPublish = 0;
                                 LabelProNumLabelsToPrint = _txtNumPublish;
                                 return;
@@ -1108,7 +1101,7 @@ namespace ProductDatabase {
                 }
 
                 if (LabelProNumLabelsToPrint > 0) {
-                    LabelProPageNum++;
+                    _labelProPageNum++;
                     IntPageCnt++;
                     e.HasMorePages = true;
                 }

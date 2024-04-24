@@ -34,10 +34,8 @@ namespace ProductDatabase {
         public int IntSerialFirstNumber { get; set; }
         public int IntSerialLastNumber { get; set; }
 
-        public Bitmap LabelProBmp { get; } = new(1, 1);
         public int LabelProPageNum { get; set; }
         public int LabelProNSerial { get; set; }
-        public int LabelProNLabel { get; set; }
         public int LabelProNumLabelsToPrint { get; set; }
 
         public decimal DisplayResolution { get; } = 96.0m;
@@ -401,7 +399,6 @@ namespace ProductDatabase {
                         float _posY = (float)(_offsetY + (_y * (_intervalY + _sizeY)));
                         e.Graphics.DrawImage(MakeLabelImage(_s, (int)e.Graphics.DpiX, 1), _posX, _posY, _sizeX, _sizeY);
 
-                        LabelProNLabel = 0;
                         LabelProNSerial++;
                         LabelProNumLabelsToPrint--;
 
