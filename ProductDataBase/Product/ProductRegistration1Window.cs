@@ -273,6 +273,5 @@ namespace ProductDatabase {
                             $"IntSerialDigit\t\t[{IntSerialDigit}]" +
                             $"", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-
     }
 }

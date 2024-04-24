@@ -389,6 +389,7 @@ namespace ProductDatabase {
                     _offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (_intervalY + _sizeY))));
                 }
 
+                if (LabelProPageNum == 0) { LabelProNSerial = IntSerialFirstNumber; }
                 if (LabelProPageNum >= 1) { _startLineBarcode = 0; }
 
                 int _y = 0;
@@ -401,6 +402,7 @@ namespace ProductDatabase {
                         e.Graphics.DrawImage(MakeLabelImage(_s, (int)e.Graphics.DpiX, 1), _posX, _posY, _sizeX, _sizeY);
 
                         LabelProNLabel = 0;
+                        LabelProNSerial++;
                         LabelProNumLabelsToPrint--;
 
                         if (LabelProNumLabelsToPrint <= 0) {
@@ -457,7 +459,7 @@ namespace ProductDatabase {
                 "10" => "X",
                 "11" => "Y",
                 "12" => "Z",
-                _ => string.Empty
+                _ => _monthCode
             };
 
             string _outputCode = StrSerialType switch {
@@ -477,7 +479,7 @@ namespace ProductDatabase {
             return _outputCode;
         }
         private Bitmap MakeLabelImage(string text, int resolution, int magnitude) {
-            Bitmap _labelImage = new(0, 0);
+            Bitmap _labelImage = new(1, 1);
             decimal _sizeX;
             decimal _sizeY;
             decimal _fontSize;
@@ -621,7 +623,6 @@ namespace ProductDatabase {
                 RegistrationDateMaskedTextBox.Focus();
             }
         }
-
 
         private void RePrintWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void LabelPrintButton_Click(object sender, EventArgs e) {
