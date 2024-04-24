@@ -1134,7 +1134,7 @@ namespace ProductDatabase {
                 "10" => "X",
                 "11" => "Y",
                 "12" => "Z",
-                _ => string.Empty
+                _ => _monthCode
             };
 
             string _outputCode = StrSerialType switch {
