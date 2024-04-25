@@ -618,10 +618,10 @@ namespace ProductDatabase {
                                     }
                                 }
                                 if (string.IsNullOrEmpty(StrTotalSubstrate)) {
-                                    StrTotalSubstrate = $"{ArrUseSubstrate[_i]}{_subTotalTemp}";
+                                    StrTotalSubstrate = $"[{ArrUseSubstrate[_i]}]{_subTotalTemp}";
                                 }
                                 else {
-                                    StrTotalSubstrate = $"{StrTotalSubstrate},{ArrUseSubstrate[_i]}{_subTotalTemp}";
+                                    StrTotalSubstrate = $"{StrTotalSubstrate},[{ArrUseSubstrate[_i]}]{_subTotalTemp}";
                                 }
                                 _subTotalTemp = string.Empty;
                             }

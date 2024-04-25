@@ -1125,7 +1125,6 @@
             // CloseButton
             // 
             CloseButton.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            CloseButton.Enabled = false;
             CloseButton.Location = new Point(672, 577);
             CloseButton.Name = "CloseButton";
             CloseButton.Size = new Size(100, 25);
