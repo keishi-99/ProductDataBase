@@ -67,6 +67,9 @@ namespace ProductDatabase {
                     File.Copy(_filepath, _bakFilepath, true);
                 }
 
+                using SQLiteConnection _con = new(GetConnectionString1());
+                using (SQLiteDataAdapter _adapter = new("SELECT * FROM Product;", _con)) { _adapter.Fill(ProductDataTable); }
+
                 ActiveControl = QRCodeTextBox;
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -255,13 +258,12 @@ namespace ProductDatabase {
                 }
 
                 var _class001Set = new SortedSet<string>(ProductDataTable.AsEnumerable()
-                                                            .Select(row => row.Field<string?>("class001"))
-                                                            .Where(classVal => classVal != null)
-                                                            .Select(classVal => classVal!));
+                    .Select(row => row.Field<string?>("class001"))
+                    .Where(classVal => classVal != null)
+                    .Cast<string>()
+);
 
-                foreach (string _classVal in _class001Set) {
-                    CategoryListBox1.Items.Add(_classVal);
-                }
+                CategoryListBox1.Items.AddRange(_class001Set.ToArray());
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
