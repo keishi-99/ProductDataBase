@@ -108,7 +108,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateRegistration() {
-            DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
+            DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
 
             if (_selectedRows.Length > 0) {
                 using SubstrateRegistrationWindow _window = new();
@@ -125,7 +125,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleProductRegistration1() {
-            DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+            DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Product_Type = '{CategoryListBox3.SelectedItem}'");
 
             if (_selectedRows.Length > 0) {
                 using ProductRegistration1Window _window = new();
@@ -145,7 +145,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleRePrint() {
-            DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+            DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Product_Type = '{CategoryListBox3.SelectedItem}'");
 
             if (_selectedRows.Length > 0) {
                 using RePrintWindow _window = new();
@@ -163,7 +163,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateChange1() {
-            DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+            DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Product_Type = '{CategoryListBox3.SelectedItem}'");
 
             if (_selectedRows.Length > 0) {
                 using SubstrateChange1 _window = new();
@@ -188,12 +188,12 @@ namespace ProductDatabase {
 
                 switch (IntRadioBtnFlg) {
                     case 1:
-                        _selectedRow = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
+                        _selectedRow = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
                         break;
                     case 2:
                     case 3:
                     case 4:
-                        _selectedRow = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}' and col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+                        _selectedRow = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Product_Type = '{CategoryListBox3.SelectedItem}'");
                         break;
                 }
 
@@ -303,7 +303,7 @@ namespace ProductDatabase {
 
                 switch (IntRadioBtnFlg) {
                     case 1:
-                        _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Substrate_Model ASC");
+                        _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Substrate_Model ASC");
                         HashSet<string> _substrateNames = new(_selectedRows.AsEnumerable()
                                                                                 .Select(x => x.Field<string>("col_Substrate_Name"))
                                                                                 .Where(x => x != null)
@@ -315,7 +315,7 @@ namespace ProductDatabase {
                     case 2:
                     case 3:
                     case 4:
-                        _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' and col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Product_Model ASC");
+                        _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Product_Model ASC");
                         HashSet<string> _productTypes = new(_selectedRows.AsEnumerable()
                                                                                 .Select(x => x.Field<string>("col_Product_Type"))
                                                                                 .Where(x => x != null)
@@ -495,7 +495,7 @@ namespace ProductDatabase {
                 _adapter.Fill(ProductDataTable);
             }
 
-            DataRow[] _substrateRet = ProductDataTable.Select($"col_Product_Name = '{StrCategory13}' and col_Substrate_Name = '{StrCategory12}'");
+            DataRow[] _substrateRet = ProductDataTable.Select($"col_Product_Name = '{StrCategory13}' AND col_Substrate_Name = '{StrCategory12}'");
             OpenSubstrateRegistrationWindow(_substrateRet);
         }
         private void OpenSubstrateRegistrationWindow(DataRow[] substrateRet) {
@@ -518,7 +518,7 @@ namespace ProductDatabase {
                 _adapter.Fill(ProductDataTable);
             }
 
-            DataRow[] _productRet = ProductDataTable.Select($"col_Product_Name = '{StrCategory13}' and col_Product_Type = '{StrCategory12}'");
+            DataRow[] _productRet = ProductDataTable.Select($"col_Product_Name = '{StrCategory13}' AND col_Product_Type = '{StrCategory12}'");
             OpenProductRegistrationWindow(_productRet);
         }
         private void OpenProductRegistrationWindow(DataRow[] productRet) {
