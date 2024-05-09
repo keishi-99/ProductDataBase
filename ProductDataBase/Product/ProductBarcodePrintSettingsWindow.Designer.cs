@@ -98,7 +98,7 @@
             BarcodeLabelIntervalXTextBox = new TextBox();
             Label13 = new Label();
             Label12 = new Label();
-            CancelButton = new Button();
+            CloseButton = new Button();
             BarcodeHeaderFontDialog = new FontDialog();
             BarcodeFontDialog = new FontDialog();
             BarcodeGroupBox.SuspendLayout();
@@ -835,24 +835,25 @@
             Label12.TabIndex = 1;
             Label12.Text = "左右間隔";
             // 
-            // CancelButton
+            // CloseButton
             // 
-            CancelButton.Location = new Point(552, 524);
-            CancelButton.Name = "CancelButton";
-            CancelButton.Size = new Size(75, 25);
-            CancelButton.TabIndex = 33;
-            CancelButton.Text = "キャンセル";
-            CancelButton.UseVisualStyleBackColor = true;
-            CancelButton.Click += CloseButton_Click;
+            CloseButton.Location = new Point(552, 524);
+            CloseButton.Name = "CloseButton";
+            CloseButton.Size = new Size(75, 25);
+            CloseButton.TabIndex = 33;
+            CloseButton.Text = "キャンセル";
+            CloseButton.UseVisualStyleBackColor = true;
+            CloseButton.Click += CloseButton_Click;
             // 
             // ProductBarcodePrintSettingsWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            CancelButton = CloseButton;
             ClientSize = new Size(654, 561);
             Controls.Add(OKButton);
             Controls.Add(BarcodeGroupBox);
-            Controls.Add(CancelButton);
+            Controls.Add(CloseButton);
             Controls.Add(WhiteSpaceGroupBox);
             Controls.Add(QuantityGroupBox);
             Controls.Add(BarcodeSizeGroupBox);
@@ -958,7 +959,7 @@
         private TextBox FontPostionXTextBox;
         private Label Label37;
         private Label Label28;
-        private Button CancelButton;
+        private Button CloseButton;
         private FontDialog BarcodeHeaderFontDialog;
         private FontDialog BarcodeFontDialog;
     }

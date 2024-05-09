@@ -1329,11 +1329,9 @@
         private Label label2;
         private TextBox ManufacturingNumberTextBox;
         private TextBox QuantityTextBox;
-        private CheckBox RegistrationDateCheckBox;
         private MaskedTextBox RegistrationDateMaskedTextBox;
         private TextBox RevisionTextBox;
         private ComboBox PersonComboBox;
-        private CheckBox PersonCheckBox;
         private TextBox CommentTextBox;
         private Label label103;
         private Label label105;

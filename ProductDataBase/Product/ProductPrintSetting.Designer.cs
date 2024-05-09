@@ -85,7 +85,7 @@
             LabelIntervalXTextBox = new TextBox();
             Label13 = new Label();
             Label12 = new Label();
-            CancelButton = new Button();
+            CloseButton = new Button();
             HeaderFontDialog = new FontDialog();
             TextFontDialog = new FontDialog();
             PrintTextGroupBox.SuspendLayout();
@@ -695,23 +695,23 @@
             Label12.TabIndex = 1;
             Label12.Text = "左右間隔";
             // 
-            // CancelButton
+            // CloseButton
             // 
-            CancelButton.Location = new Point(552, 524);
-            CancelButton.Name = "CancelButton";
-            CancelButton.Size = new Size(75, 25);
-            CancelButton.TabIndex = 25;
-            CancelButton.Text = "キャンセル";
-            CancelButton.UseVisualStyleBackColor = true;
-            CancelButton.Click += CloseButton_Click;
+            CloseButton.Location = new Point(552, 524);
+            CloseButton.Name = "CloseButton";
+            CloseButton.Size = new Size(75, 25);
+            CloseButton.TabIndex = 25;
+            CloseButton.Text = "キャンセル";
+            CloseButton.UseVisualStyleBackColor = true;
+            CloseButton.Click += CloseButton_Click;
             // 
             // ProductPrintSetting
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            CancelButton = CancelButton;
+            CancelButton = CloseButton;
             ClientSize = new Size(654, 561);
-            Controls.Add(CancelButton);
+            Controls.Add(CloseButton);
             Controls.Add(OKButton);
             Controls.Add(PrintTextGroupBox);
             Controls.Add(WhiteSpaceGroupBox);
@@ -808,7 +808,7 @@
         private TextBox LabelIntervalXTextBox;
         private Label Label13;
         private Label Label12;
-        private new Button CancelButton;
+        private Button CloseButton;
         private FontDialog HeaderFontDialog;
         private FontDialog TextFontDialog;
     }
