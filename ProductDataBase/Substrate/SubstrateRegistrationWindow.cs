@@ -83,7 +83,7 @@ namespace ProductDatabase {
                     StockLabel2.Text = _cmd.ExecuteScalar().ToString();
 
                     // テーブル検索SQL - [Substrate_Reg_[Product_Name]]テーブルの最新の[col_Revison]を取得
-                    _cmd.CommandText = $@"SELECT col_Revision FROM 'Substrate_Reg_{StrStockName}' WHERE col_Substrate_Model = '{StrSubstrateModel}' and col_Revision IS NOT NULL ORDER BY _rowid_ DESC";
+                    _cmd.CommandText = $@"SELECT col_Revision FROM 'Substrate_Reg_{StrStockName}' WHERE col_Substrate_Model = '{StrSubstrateModel}' AND col_Revision IS NOT NULL ORDER BY _rowid_ DESC";
                     object _result = _cmd.ExecuteScalar();
                     RevisionTextBox.Text = _result?.ToString() ?? "";
                 }
@@ -118,7 +118,7 @@ namespace ProductDatabase {
             }
         }
         // クロージングイベント
-        private void ClosingEvents() {
+        private static void ClosingEvents() {
             //try {
             //    StreamWriter? _sw = null;
 

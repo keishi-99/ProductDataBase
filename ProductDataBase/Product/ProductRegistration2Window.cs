@@ -1277,7 +1277,7 @@ namespace ProductDatabase {
             }
         }
         // チェックシート印刷
-        private void CheckSheetPrint() {
+        private static void CheckSheetPrint() {
             try {
                 //List<string> _filePath = new();
                 //List<string> _sheetName = new();
