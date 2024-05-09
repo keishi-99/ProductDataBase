@@ -305,13 +305,14 @@ namespace ProductDatabase {
 
                                             using (SQLiteCommand _cmd = _con.CreateCommand()) {
                                                 _cmd.CommandText =
-                                                    $"UPDATE 'Stock_{StrStockName}'" +
-                                                    $" SET" +
-                                                        $" col_Flg = @col_Flg," +
-                                                        $" col_Stock = @col_Stock," +
-                                                        $" col_History = ifnull(col_History,'')|| @col_History" +
-                                                    $" WHERE" +
-                                                        $" col_Substrate_Num = '{_substrateNum}'";
+                                                    $@"
+                                                    UPDATE 'Stock_{StrStockName}'
+                                                    SET
+                                                        col_Flg = @col_Flg,
+                                                        col_Stock = @col_Stock,
+                                                        col_History = ifnull(col_History,'')|| @col_History
+                                                    WHERE
+                                                        col_Substrate_Num = '{_substrateNum}'";
 
                                                 switch (_useValue - _usedValue) {
                                                     case int diff when diff > 0:
@@ -350,28 +351,29 @@ namespace ProductDatabase {
                                             // 基板テーブルへ追加
                                             using (SQLiteCommand _cmd = _con.CreateCommand()) {
                                                 _cmd.CommandText =
-                                                    $"INSERT INTO 'Substrate_Reg_{StrStockName}'" +
-                                                        $" (col_Substrate_Name," +
-                                                        $" col_Substrate_Model," +
-                                                        $" col_Substrate_Num," +
-                                                        $" col_Decrease," +
-                                                        $" col_Use_P_Type," +
-                                                        $" col_Use_P_Num," +
-                                                        $" col_Use_O_Num," +
-                                                        $" col_Person," +
-                                                        $" col_RegDate," +
-                                                        $" col_Comment)" +
-                                                    $" VALUES" +
-                                                        $" (@col_Substrate_Name," +
-                                                        $" @col_Substrate_Model," +
-                                                        $" @col_Substrate_Num," +
-                                                        $" @col_Decrease," +
-                                                        $" @col_Use_P_Type," +
-                                                        $" @col_Use_P_Num," +
-                                                        $" @col_Use_O_Num," +
-                                                        $" @col_Person," +
-                                                        $" @col_RegDate," +
-                                                        $" @col_Comment)";
+                                                    $@"
+                                                    INSERT INTO 'Substrate_Reg_{StrStockName}'
+                                                        (col_Substrate_Name,
+                                                        col_Substrate_Model,
+                                                        col_Substrate_Num,
+                                                        col_Decrease,
+                                                        col_Use_P_Type,
+                                                        col_Use_P_Num,
+                                                        col_Use_O_Num,
+                                                        col_Person,
+                                                        col_RegDate,
+                                                        col_Comment)
+                                                    VALUES
+                                                        (@col_Substrate_Name,
+                                                        @col_Substrate_Model,
+                                                        @col_Substrate_Num,
+                                                        @col_Decrease,
+                                                        @col_Use_P_Type,
+                                                        @col_Use_P_Num,
+                                                        @col_Use_O_Num,
+                                                        @col_Person,
+                                                        @col_RegDate,
+                                                        @col_Comment)";
 
                                                 _cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = _substrateName;
                                                 _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _substrateModel;
@@ -412,20 +414,21 @@ namespace ProductDatabase {
                             // 製品テーブルへ追加
                             using (SQLiteCommand _cmd = _con.CreateCommand()) {
                                 _cmd.CommandText =
-                                    $"UPDATE 'Product_Reg_{StrProductName}'" +
-                                        $" SET" +
-                                            $" col_Quantity = @col_Quantity" +
-                                            $", col_Person = @col_Person" +
-                                            $", col_RegDate = @col_RegDate" +
-                                            $", col_Revision = @col_Revision" +
-                                            $", col_Serial_Last = @col_Serial_Last" +
-                                            $", col_Serial_LastNum = @col_Serial_LastNum" +
-                                            $", col_Comment = @col_Comment" +
-                                            $", col_Use_Substrate = @col_Use_Substrate" +
-                                        $" WHERE" +
-                                            $" col_Product_Num = '{StrProductNumber}'" +
-                                            $" and" +
-                                            $" col_Serial_First = '{StrSerialFirstNumber}'";
+                                    $@"
+                                    UPDATE 'Product_Reg_{StrProductName}'
+                                    SET
+                                        col_Quantity = @col_Quantity,
+                                        col_Person = @col_Person,
+                                        col_RegDate = @col_RegDate,
+                                        col_Revision = @col_Revision,
+                                        col_Serial_Last = @col_Serial_Last,
+                                        col_Serial_LastNum = @col_Serial_LastNum,
+                                        col_Comment = @col_Comment
+                                        col_Use_Substrate = @col_Use_Substrate
+                                    WHERE
+                                        col_Product_Num = '{StrProductNumber}'
+                                    AND
+                                        col_Serial_First = '{StrSerialFirstNumber}'";
 
                                 _cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
                                 _cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
