@@ -237,16 +237,16 @@ namespace ProductDatabase {
                 switch (_selectedRadioButton.Name) {
                     case "CategoryRadioButton1":
                         IntRadioBtnFlg = 1;
-                        _strSqlQuery = "SELECT * FROM Substrate WHERE Visual = '1';";
+                        _strSqlQuery = "SELECT * FROM Substrate WHERE Visible = '1';";
                         break;
                     case "CategoryRadioButton2":
                     case "CategoryRadioButton3":
                         IntRadioBtnFlg = _selectedRadioButton.Name == "CategoryRadioButton2" ? 2 : 3;
-                        _strSqlQuery = "SELECT * FROM Product WHERE Visual = '1';";
+                        _strSqlQuery = "SELECT * FROM Product WHERE Visible = '1';";
                         break;
                     case "CategoryRadioButton4":
                         IntRadioBtnFlg = 4;
-                        _strSqlQuery = "SELECT * FROM Product WHERE col_Print_Type = '5' OR col_Print_Type = '6';";
+                        _strSqlQuery = "SELECT * FROM Product WHERE Visible = '1' AND (col_Print_Type = '5' OR col_Print_Type = '6');";
                         break;
                     default:
                         break;
