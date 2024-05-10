@@ -124,7 +124,7 @@ namespace ProductDatabase {
                     _con.Open();
                     using SQLiteCommand _cmd = _con.CreateCommand();
                     // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Revision]を取得
-                    _cmd.CommandText = $"SELECT col_Revision FROM 'Product_Reg_{StrProductName}' ORDER BY _rowid_ DESC";
+                    _cmd.CommandText = $"SELECT col_Revision FROM Product_Reg_{StrProductName} ORDER BY _rowid_ DESC";
                     object _result = _cmd.ExecuteScalar();
                     RevisionTextBox.Text = _result?.ToString() ?? "";
                 }
@@ -236,10 +236,12 @@ namespace ProductDatabase {
                 _con.Open();
                 using SQLiteCommand _cmd = _con.CreateCommand();
                 _cmd.CommandText =
-                    $"INSERT INTO 'Reprint'" +
-                    $"(col_Print_Type, col_Order_Num, col_Product_Num, col_Product_Type, col_Product_Model, col_Quantity, col_Person, col_RegDate, col_Revision, col_Serial_First, col_Serial_Last, col_Comment)" +
-                    $"VALUES" +
-                    $"(@col_Print_Type, @col_Order_Num, @col_Product_Num, @col_Product_Type, @col_Product_Model, @col_Quantity, @col_Person, @col_RegDate, @col_Revision, @col_Serial_First, @col_Serial_Last, @col_Comment)";
+                    $@"
+                    INSERT INTO Reprint
+                        (col_Print_Type, col_Order_Num, col_Product_Num, col_Product_Type, col_Product_Model, col_Quantity, col_Person, col_RegDate, col_Revision, col_Serial_First, col_Serial_Last, col_Comment)
+                    VALUES
+                        (@col_Print_Type, @col_Order_Num, @col_Product_Num, @col_Product_Type, @col_Product_Model, @col_Quantity, @col_Person, @col_RegDate, @col_Revision, @col_Serial_First, @col_Serial_Last, @col_Comment)
+                    ";
 
                 // チェックボックスにチェックがない場合はNullを
                 _cmd.Parameters.Add("@col_Print_Type", DbType.AnsiString).Value = IntPrintType;
