@@ -878,6 +878,7 @@ namespace ProductDatabase {
                                     bool _boolCbx = _objDgv.Rows[_j].Cells[3].Value != null && (bool)_objDgv.Rows[_j].Cells[3].Value;
                                     if (_boolCbx) {
                                         int _stockValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value.ToString());
+                                        if (_objDgv.Rows[_j].Cells[2].Value == null) { throw new Exception("使用数が入力されていません。"); }
                                         int _useValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value.ToString());
 
                                         if (_stockValue < _useValue) {
