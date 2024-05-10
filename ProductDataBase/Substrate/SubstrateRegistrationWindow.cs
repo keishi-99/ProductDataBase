@@ -79,13 +79,13 @@ namespace ProductDatabase {
                     _con.Open();
                     using SQLiteCommand _cmd = _con.CreateCommand();
                     // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Stock]の合計を取得
-                    _cmd.CommandText = $@"SELECT total(col_stock) FROM Stock_{StrStockName} WHERE col_Substrate_Model = @StrSubstrateModel";
-                    _cmd.Parameters.Add("@StrSubstrateModel", DbType.AnsiString).Value = StrSubstrateModel;
+                    _cmd.CommandText = $@"SELECT total(col_stock) FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model";
+                    _cmd.Parameters.Add("@col_Substrate_Model", DbType.AnsiString).Value = StrSubstrateModel;
                     StockLabel2.Text = _cmd.ExecuteScalar().ToString();
 
                     // テーブル検索SQL - [Substrate_Reg_[Product_Name]]テーブルの最新の[col_Revison]を取得
-                    _cmd.CommandText = $@"SELECT col_Revision FROM Substrate_Reg_{StrStockName} WHERE col_Substrate_Model = @StrSubstrateModel AND col_Revision IS NOT NULL ORDER BY _rowid_ DESC";
-                    _cmd.Parameters.Add("@StrSubstrateModel", DbType.AnsiString).Value = StrSubstrateModel;
+                    _cmd.CommandText = $@"SELECT col_Revision FROM Substrate_Reg_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model AND col_Revision IS NOT NULL ORDER BY _rowid_ DESC";
+                    _cmd.Parameters.Add("@col_Substrate_Model", DbType.AnsiString).Value = StrSubstrateModel;
                     object _result = _cmd.ExecuteScalar();
                     RevisionTextBox.Text = _result?.ToString() ?? "";
                 }
@@ -206,8 +206,8 @@ namespace ProductDatabase {
                 if (IntRegType != 0) {
                     string _substrateName = string.Empty;
                     using (SQLiteCommand _cmd = _con.CreateCommand()) {
-                        _cmd.CommandText = $@"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Num = @ManufacturingNumber ORDER BY _rowid_ DESC LIMIT 1";
-                        _cmd.Parameters.Add("@ManufacturingNumber", DbType.AnsiString).Value = ManufacturingNumberMaskedTextBox.Text;
+                        _cmd.CommandText = $@"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Num = @col_Substrate_Num ORDER BY _rowid_ DESC LIMIT 1";
+                        _cmd.Parameters.Add("@col_Substrate_Num", DbType.AnsiString).Value = ManufacturingNumberMaskedTextBox.Text;
                         using SQLiteDataReader _dr = _cmd.ExecuteReader();
                         while (_dr.Read()) {
                             _substrateName = $"{_dr["col_Substrate_Name"]}";
@@ -237,7 +237,8 @@ namespace ProductDatabase {
                                 @col_Flg, @col_Substrate_Name, @col_Substrate_Model, @col_Substrate_Num, @col_Order_Num, @col_Stock)
                                 on conflict(col_Substrate_Num)
                                 do update
-                                set col_Flg = 1, col_Stock = col_Stock + excluded.col_Stock";
+                                set col_Flg = 1, col_Stock = col_Stock + excluded.col_Stock
+                            ";
 
                         _cmd.Parameters.Add("@col_Flg", DbType.AnsiString).Value = 1;
                         _cmd.Parameters.Add("@col_Substrate_Name", DbType.AnsiString).Value = StrSubstrateName;
@@ -251,8 +252,8 @@ namespace ProductDatabase {
                     //不良処理
                     else if (!QuantityCheckBox.Checked && DefectNumberCheckBox.Checked) {
                         using SQLiteCommand _cmd = _con.CreateCommand();
-                        _cmd.CommandText = $@"SELECT col_Stock FROM Stock_{StrStockName} WHERE col_Substrate_Num = @ManufacturingNumber";
-                        _cmd.Parameters.Add("@ManufacturingNumber", DbType.AnsiString).Value = ManufacturingNumberMaskedTextBox.Text;
+                        _cmd.CommandText = $@"SELECT col_Stock FROM Stock_{StrStockName} WHERE col_Substrate_Num = @col_Substrate_Num";
+                        _cmd.Parameters.Add("@col_Substrate_Num", DbType.AnsiString).Value = ManufacturingNumberMaskedTextBox.Text;
                         int _intStock = Convert.ToInt32(_cmd.ExecuteScalar());
 
                         if (_intStock == 0) { throw new Exception("該当する製番の在庫がありません。"); }
@@ -268,7 +269,9 @@ namespace ProductDatabase {
                                 col_Stock = @col_Stock,
                                 col_History = ifnull(col_History, '') || @col_History
                             WHERE
-                                col_Substrate_Num = '{ManufacturingNumberMaskedTextBox.Text}'";
+                                col_Substrate_Num = @col_Substrate_Num
+                            ";
+                        _cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
 
                         _cmd.Parameters.Add("@col_Flg", DbType.AnsiString).Value = _intStockFlg;
                         _cmd.Parameters.Add("@col_Stock", DbType.AnsiString).Value = _intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text);
@@ -303,7 +306,8 @@ namespace ProductDatabase {
                             @col_Person,
                             @col_RegDate,
                             @col_Revision,
-                            @col_Comment)";
+                            @col_Comment)
+                        ";
 
                     // チェックボックスにチェックがない場合はNullを
                     _cmd.Parameters.Add("@col_Substrate_Name", DbType.AnsiString).Value = StrSubstrateName;

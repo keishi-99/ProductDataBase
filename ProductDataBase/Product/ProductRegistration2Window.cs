@@ -110,7 +110,8 @@ namespace ProductDatabase {
 
                             using SQLiteCommand _cmd = _con.CreateCommand();
                             // 使用基板表示
-                            _cmd.CommandText = $@"SELECT col_Substrate_Name FROM 'Stock_{StrStockName}' WHERE col_Substrate_Model = '{ArrUseSubstrate[_i]}'";
+                            _cmd.CommandText = $@"SELECT col_Substrate_Name FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model";
+                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.AnsiString).Value = ArrUseSubstrate[_i];
                             using (SQLiteDataReader _dr = _cmd.ExecuteReader()) {
                                 if (_dr.Read()) {
                                     if (_objCbx != null) {
@@ -122,7 +123,8 @@ namespace ProductDatabase {
 
                             // 在庫テーブルからデータ取得
                             int _intQuantity = IntQuantity;
-                            _cmd.CommandText = $@"SELECT col_Substrate_num, col_Stock, col_Substrate_Name FROM 'Stock_{StrStockName}' WHERE col_flg = 1 AND col_Substrate_Model = '{ArrUseSubstrate[_i]}' ORDER BY _rowid_ ASC";
+                            _cmd.CommandText = $@"SELECT col_Substrate_num, col_Stock, col_Substrate_Name FROM Stock_{StrStockName} WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
+                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.AnsiString).Value = ArrUseSubstrate[_i];
                             using (SQLiteDataReader _dr = _cmd.ExecuteReader()) {
                                 while (_dr.Read()) {
                                     string _strSubstrateNumber = $"{_dr["col_Substrate_num"]}";
@@ -188,14 +190,16 @@ namespace ProductDatabase {
                             using SQLiteConnection _con = new(MainWindow.GetConnectionString2());
                             _con.Open();
                             using SQLiteCommand _cmd = _con.CreateCommand();
-                            _cmd.CommandText = $@"SELECT * FROM 'Stock_{StrStockName}' WHERE col_Substrate_Model = '{ArrUseSubstrate[_i]}'";
+                            _cmd.CommandText = $@"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model";
+                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.AnsiString).Value = ArrUseSubstrate[_i];
                             using (SQLiteDataReader _dr = _cmd.ExecuteReader()) {
                                 while (_dr.Read()) {
                                     if (_objCbx != null) { _objCbx.Text = $"{_dr["col_Substrate_Name"]} - {ArrUseSubstrate[_i]}"; }
                                 }
                             }
 
-                            _cmd.CommandText = $@"SELECT * FROM 'Stock_{StrStockName}' WHERE col_flg = 1 AND col_Substrate_Model = '{ArrUseSubstrate[_i]}' ORDER BY _rowid_ ASC";
+                            _cmd.CommandText = $@"SELECT * FROM Stock_{StrStockName} WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
+                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.AnsiString).Value = ArrUseSubstrate[_i];
                             using (SQLiteDataReader _dr = _cmd.ExecuteReader()) {
                                 while (_dr.Read()) {
                                     string _strSubstrateName = string.Empty;
@@ -388,7 +392,7 @@ namespace ProductDatabase {
                     using SQLiteCommand _cmd = _con.CreateCommand();
                     _cmd.CommandText =
                         $@"
-                        INSERT INTO 'Serial_{StrProductName}'
+                        INSERT INTO Serial_{StrProductName}
                             (col_Serial,
                             col_Order_Num,
                             col_Product_Num,
@@ -401,7 +405,8 @@ namespace ProductDatabase {
                             @col_Product_Num,
                             @col_Product_Type,
                             @col_Product_Model,
-                            @col_RegDate)";
+                            @col_RegDate)
+                        ";
 
                     _cmd.Parameters.Add("@col_Serial", DbType.String).Value = _b;
                     _cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
@@ -422,7 +427,7 @@ namespace ProductDatabase {
                         using SQLiteCommand _cmd = _con.CreateCommand();
                         _cmd.CommandText =
                             $@"
-                            INSERT INTO 'Product_Reg_{StrProductName}'
+                            INSERT INTO Product_Reg_{StrProductName}
                                 (col_Order_Num,
                                 col_Product_Num,
                                 col_Product_Type,
@@ -441,7 +446,8 @@ namespace ProductDatabase {
                                 @col_Person,
                                 @col_RegDate,
                                 @col_Revision,
-                                @col_Comment)";
+                                @col_Comment)
+                            ";
 
                         _cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
                         _cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
@@ -464,7 +470,7 @@ namespace ProductDatabase {
                         using SQLiteCommand _cmd = _con.CreateCommand();
                         _cmd.CommandText =
                             $@"
-                            INSERT INTO 'Product_Reg_{StrProductName}'
+                            INSERT INTO Product_Reg_{StrProductName}
                                 (col_Order_Num,
                                 col_Product_Num,
                                 col_Product_Type,
@@ -489,7 +495,8 @@ namespace ProductDatabase {
                                 @col_Serial_First,
                                 @col_Serial_Last,
                                 @col_Serial_LastNum,
-                                @col_Comment)";
+                                @col_Comment)
+                            ";
 
                         _cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
                         _cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
@@ -533,12 +540,15 @@ namespace ProductDatabase {
 
                                         using (SQLiteCommand _cmd = _con.CreateCommand()) {
                                             _cmd.CommandText =
-                                                $@"UPDATE 'Stock_{StrStockName}'SET
+                                                $@"
+                                                UPDATE Stock_{StrStockName} SET
                                                     col_Flg = @col_Flg,
                                                     col_Stock = @col_Stock,
                                                     col_History = ifnull(col_History,'')|| @col_History
                                                 WHERE
-                                                    col_Substrate_Num = '{_objDgv.Rows[_j].Cells[0].Value}'";
+                                                    col_Substrate_Num = @col_Substrate_Num
+                                                ";
+                                            _cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = _objDgv.Rows[_j].Cells[0].Value;
 
                                             if (_stockValue - _useValue == 0) {
                                                 _cmd.Parameters.Add("@col_Flg", DbType.String).Value = 0;
@@ -552,7 +562,9 @@ namespace ProductDatabase {
 
                                             _cmd.ExecuteNonQuery();
 
-                                            _cmd.CommandText = $@"SELECT * FROM 'Stock_{StrStockName}' WHERE col_Substrate_Model = '{ArrUseSubstrate[_i]}' ORDER BY _rowid_ ASC";
+                                            _cmd.CommandText = $@"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
+                                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[_i];
+
                                             using SQLiteDataReader _dr = _cmd.ExecuteReader();
                                             while (_dr.Read()) {
                                                 _substrateName = $"{_dr["col_Substrate_Name"]}";
@@ -572,7 +584,7 @@ namespace ProductDatabase {
                                         using (SQLiteCommand _cmd = _con.CreateCommand()) {
                                             _cmd.CommandText =
                                                 $@"
-                                                    INSERT INTO 'Substrate_Reg_{StrStockName}'
+                                                    INSERT INTO Substrate_Reg_{StrStockName}
                                                     (col_Substrate_Name,
                                                     col_Substrate_Model,
                                                     col_Substrate_Num,
@@ -593,7 +605,8 @@ namespace ProductDatabase {
                                                     @col_Use_O_Num,
                                                     @col_Person,
                                                     @col_RegDate,
-                                                    @col_Comment)";
+                                                    @col_Comment)
+                                                ";
 
                                             _cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = _substrateName;
                                             _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _substrateModel;
@@ -634,7 +647,7 @@ namespace ProductDatabase {
                         using (SQLiteCommand _cmd = _con.CreateCommand()) {
                             _cmd.CommandText =
                                 $@"
-                                INSERT INTO 'Product_Reg_{StrProductName}'
+                                INSERT INTO Product_Reg_{StrProductName}
                                     (col_Order_Num,
                                     col_Product_Num,
                                     col_Product_Type,
@@ -661,7 +674,8 @@ namespace ProductDatabase {
                                     @col_Serial_Last,
                                     @col_Serial_LastNum,
                                     @col_Comment,
-                                    @col_Use_Substrate)";
+                                    @col_Use_Substrate)
+                                ";
 
                             _cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
                             _cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
@@ -787,7 +801,8 @@ namespace ProductDatabase {
 
             // 製番が新規かチェック
             using (SQLiteCommand _cmd = _con.CreateCommand()) {
-                _cmd.CommandText = $@"SELECT * FROM 'Product_Reg_{StrProductName}' WHERE col_Product_Num = '{StrProductNumber}' ORDER BY _rowid_ ASC LIMIT 1";
+                _cmd.CommandText = $@"SELECT * FROM Product_Reg_{StrProductName} WHERE col_Product_Num = @col_Product_Num ORDER BY _rowid_ ASC LIMIT 1";
+                _cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
 
                 using SQLiteDataReader _dr = _cmd.ExecuteReader();
                 while (_dr.Read()) {
@@ -812,7 +827,8 @@ namespace ProductDatabase {
 
             // 注文番号が新規かチェック
             using (SQLiteCommand _cmd = _con.CreateCommand()) {
-                _cmd.CommandText = $@"SELECT * FROM 'Product_Reg_{StrProductName}' WHERE col_Order_Num = '{StrOrderNumber}' ORDER BY _rowid_ ASC LIMIT 1";
+                _cmd.CommandText = $@"SELECT * FROM Product_Reg_{StrProductName} WHERE col_Order_Num = @col_Order_Num ORDER BY _rowid_ ASC LIMIT 1";
+                _cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
 
                 using SQLiteDataReader _dr = _cmd.ExecuteReader();
                 while (_dr.Read()) {
@@ -918,7 +934,8 @@ namespace ProductDatabase {
                     _con.Open();
 
                     using SQLiteCommand _cmd = _con.CreateCommand();
-                    _cmd.CommandText = $@"SELECT 'col_Serial' FROM 'Serial_{StrProductName}' WHERE 'col_Serial' IN ('{_strSQLSerial}')";
+                    _cmd.CommandText = $@"SELECT col_Serial FROM Serial_{StrProductName} WHERE col_Serial IN (@col_Serial)";
+                    _cmd.Parameters.Add("@col_Serial", DbType.String).Value = _strSQLSerial;
 
                     using SQLiteDataReader _dr = _cmd.ExecuteReader();
                     while (_dr.Read()) {
