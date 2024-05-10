@@ -236,7 +236,7 @@ namespace ProductDatabase {
                             VALUES (
                                 @col_Flg, @col_Substrate_Name, @col_Substrate_Model, @col_Substrate_Num, @col_Order_Num, @col_Stock)
                                 on conflict(col_Substrate_Num)
-                                do update
+                            DO UPDATE
                                 set col_Flg = 1, col_Stock = col_Stock + excluded.col_Stock
                             ";
 

@@ -35,7 +35,7 @@ namespace ProductDatabase {
                     case 4:
                         using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
                             DtHistoryTable.Clear();
-                            using SQLiteDataAdapter _adapter = new($"SELECT _rowid_, * FROM 'Product_Reg_{StrProductName}' WHERE col_Product_Model = '{StrProductModel}' ORDER BY _rowid_ DESC", _con);
+                            using SQLiteDataAdapter _adapter = new($"SELECT _rowid_, * FROM Product_Reg_{StrProductName} WHERE col_Product_Model = '{StrProductModel}' ORDER BY _rowid_ DESC", _con);
                             _adapter.Fill(DtHistoryTable);
 
                             SubstrateChangeDataGridView.DataSource = DtHistoryTable;
