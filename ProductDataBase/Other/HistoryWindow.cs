@@ -31,9 +31,9 @@ namespace ProductDatabase {
                     using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
                         DtHistoryTable.Clear();
 
-                        string query = $"SELECT _rowid_, * FROM Substrate_Reg_{StrProductName} WHERE col_Substrate_Model = @SubstrateModel ORDER BY _rowid_ DESC";
+                        string query = $"SELECT _rowid_, * FROM Substrate_Reg_{StrProductName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ DESC";
                         using SQLiteCommand command = new(query, _con);
-                        command.Parameters.AddWithValue("@SubstrateModel", StrSubstrateModel);
+                        command.Parameters.AddWithValue("@col_Substrate_Model", StrSubstrateModel);
                         // SQLiteDataAdapterのインスタンス化
                         using SQLiteDataAdapter _adapter = new(command);
 
@@ -97,9 +97,9 @@ namespace ProductDatabase {
                     using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
                         DtHistoryTable.Clear();
 
-                        string query = $"SELECT _rowid_, * FROM Product_Reg_{StrProductName} WHERE col_Product_Model = @StrProductModel ORDER BY _rowid_ DESC";
+                        string query = $"SELECT _rowid_, * FROM Product_Reg_{StrProductName} WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC";
                         using SQLiteCommand command = new(query, _con);
-                        command.Parameters.AddWithValue("@StrProductModel", StrProductModel);
+                        command.Parameters.AddWithValue("@col_Product_Model", StrProductModel);
                         // SQLiteDataAdapterのインスタンス化
                         using SQLiteDataAdapter _adapter = new(command);
 
@@ -162,9 +162,9 @@ namespace ProductDatabase {
                     using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
                         DtHistoryTable.Clear();
 
-                        string query = $"SELECT _rowid_, * FROM Reprint WHERE col_Product_Model = @ProdcutModel ORDER BY _rowid_ DESC";
+                        string query = $"SELECT _rowid_, * FROM Reprint WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC";
                         using SQLiteCommand command = new(query, _con);
-                        command.Parameters.AddWithValue("@ProdcutModel", StrProductModel);
+                        command.Parameters.AddWithValue("@col_Product_Model", StrProductModel);
                         // SQLiteDataAdapterのインスタンス化
                         using SQLiteDataAdapter _adapter = new(command);
 

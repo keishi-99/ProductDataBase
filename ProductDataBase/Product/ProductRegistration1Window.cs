@@ -68,12 +68,12 @@ namespace ProductDatabase {
                     _con.Open();
                     using SQLiteCommand _cmd = _con.CreateCommand();
                     // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Stock]の合計を取得
-                    _cmd.CommandText = $"SELECT col_Revision FROM 'Product_Reg_{StrProductName}' ORDER BY _rowid_ DESC";
+                    _cmd.CommandText = $"SELECT col_Revision FROM Product_Reg_{StrProductName} ORDER BY _rowid_ DESC";
                     object _result = _cmd.ExecuteScalar();
                     RevisionTextBox.Text = _result?.ToString() ?? "";
 
                     // テーブル検索SQL - [Product_Reg_[Product_Name]]テーブルの最新の[col_Serial_LastNum]を取得
-                    _cmd.CommandText = $"SELECT col_Serial_LastNum FROM 'Product_Reg_{StrProductName}' ORDER BY _rowid_ DESC";
+                    _cmd.CommandText = $"SELECT col_Serial_LastNum FROM Product_Reg_{StrProductName} ORDER BY _rowid_ DESC";
                     IntSerialLastNum = Convert.ToInt32(_cmd.ExecuteScalar());
                     FirstSerialNumberTextBox.Text = (IntSerialLastNum + 1).ToString("000");
                 }
