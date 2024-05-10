@@ -79,11 +79,13 @@ namespace ProductDatabase {
                     _con.Open();
                     using SQLiteCommand _cmd = _con.CreateCommand();
                     // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Stock]の合計を取得
-                    _cmd.CommandText = $@"SELECT total(col_stock) FROM 'Stock_{StrStockName}' WHERE col_Substrate_Model = '{StrSubstrateModel}'";
+                    _cmd.CommandText = $@"SELECT total(col_stock) FROM Stock_{StrStockName} WHERE col_Substrate_Model = @StrSubstrateModel";
+                    _cmd.Parameters.Add("@StrSubstrateModel", DbType.AnsiString).Value = StrSubstrateModel;
                     StockLabel2.Text = _cmd.ExecuteScalar().ToString();
 
                     // テーブル検索SQL - [Substrate_Reg_[Product_Name]]テーブルの最新の[col_Revison]を取得
-                    _cmd.CommandText = $@"SELECT col_Revision FROM 'Substrate_Reg_{StrStockName}' WHERE col_Substrate_Model = '{StrSubstrateModel}' AND col_Revision IS NOT NULL ORDER BY _rowid_ DESC";
+                    _cmd.CommandText = $@"SELECT col_Revision FROM Substrate_Reg_{StrStockName} WHERE col_Substrate_Model = @StrSubstrateModel AND col_Revision IS NOT NULL ORDER BY _rowid_ DESC";
+                    _cmd.Parameters.Add("@StrSubstrateModel", DbType.AnsiString).Value = StrSubstrateModel;
                     object _result = _cmd.ExecuteScalar();
                     RevisionTextBox.Text = _result?.ToString() ?? "";
                 }
@@ -204,7 +206,8 @@ namespace ProductDatabase {
                 if (IntRegType != 0) {
                     string _substrateName = string.Empty;
                     using (SQLiteCommand _cmd = _con.CreateCommand()) {
-                        _cmd.CommandText = $@"SELECT * FROM 'Stock_{StrStockName}' WHERE col_Substrate_Num = '{ManufacturingNumberMaskedTextBox.Text}' ORDER BY _rowid_ DESC LIMIT 1";
+                        _cmd.CommandText = $@"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Num = @ManufacturingNumber ORDER BY _rowid_ DESC LIMIT 1";
+                        _cmd.Parameters.Add("@ManufacturingNumber", DbType.AnsiString).Value = ManufacturingNumberMaskedTextBox.Text;
                         using SQLiteDataReader _dr = _cmd.ExecuteReader();
                         while (_dr.Read()) {
                             _substrateName = $"{_dr["col_Substrate_Name"]}";
@@ -228,7 +231,7 @@ namespace ProductDatabase {
                         using SQLiteCommand _cmd = _con.CreateCommand();
                         _cmd.CommandText =
                             $@"
-                            INSERT INTO 'Stock_{StrStockName}' (
+                            INSERT INTO Stock_{StrStockName} (
                                 col_Flg, col_Substrate_Name, col_Substrate_Model, col_Substrate_Num, col_Order_Num, col_Stock)
                             VALUES (
                                 @col_Flg, @col_Substrate_Name, @col_Substrate_Model, @col_Substrate_Num, @col_Order_Num, @col_Stock)
@@ -248,7 +251,8 @@ namespace ProductDatabase {
                     //不良処理
                     else if (!QuantityCheckBox.Checked && DefectNumberCheckBox.Checked) {
                         using SQLiteCommand _cmd = _con.CreateCommand();
-                        _cmd.CommandText = $@"SELECT col_Stock FROM 'Stock_{StrStockName}' WHERE col_Substrate_Num = '{ManufacturingNumberMaskedTextBox.Text}'";
+                        _cmd.CommandText = $@"SELECT col_Stock FROM Stock_{StrStockName} WHERE col_Substrate_Num = @ManufacturingNumber";
+                        _cmd.Parameters.Add("@ManufacturingNumber", DbType.AnsiString).Value = ManufacturingNumberMaskedTextBox.Text;
                         int _intStock = Convert.ToInt32(_cmd.ExecuteScalar());
 
                         if (_intStock == 0) { throw new Exception("該当する製番の在庫がありません。"); }
@@ -259,7 +263,7 @@ namespace ProductDatabase {
                         else { throw new Exception("不良数が在庫より多く入力されています。"); }
 
                         _cmd.CommandText =
-                            $@"UPDATE 'Stock_{StrStockName}'SET
+                            $@"UPDATE Stock_{StrStockName} SET
                                 col_Flg = @col_Flg,
                                 col_Stock = @col_Stock,
                                 col_History = ifnull(col_History, '') || @col_History
@@ -278,7 +282,7 @@ namespace ProductDatabase {
                 using (SQLiteCommand _cmd = _con.CreateCommand()) {
                     _cmd.CommandText =
                         $@"
-                        INSERT INTO 'Substrate_Reg_{StrProductName}'
+                        INSERT INTO Substrate_Reg_{StrProductName}
                             (col_Substrate_Name,
                             col_Substrate_Model,
                             col_Substrate_Num,
