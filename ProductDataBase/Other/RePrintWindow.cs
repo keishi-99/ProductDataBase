@@ -244,18 +244,18 @@ namespace ProductDatabase {
                     ";
 
                 // チェックボックスにチェックがない場合はNullを
-                _cmd.Parameters.Add("@col_Print_Type", DbType.AnsiString).Value = IntPrintType;
-                _cmd.Parameters.Add("@col_Order_Num", DbType.AnsiString).Value = StrOrderNumber;
-                _cmd.Parameters.Add("@col_Product_Num", DbType.AnsiString).Value = StrProductNumber;
-                _cmd.Parameters.Add("@col_Product_Type", DbType.AnsiString).Value = StrProductType;
-                _cmd.Parameters.Add("@col_Product_Model", DbType.AnsiString).Value = StrProductModel;
-                _cmd.Parameters.Add("@col_Quantity", DbType.AnsiString).Value = IntQuantity;
-                _cmd.Parameters.Add("@col_Person", DbType.AnsiString).Value = StrPerson;
-                _cmd.Parameters.Add("@col_RegDate", DbType.AnsiString).Value = StrRegDate;
-                _cmd.Parameters.Add("@col_Revision", DbType.AnsiString).Value = StrRevision;
-                _cmd.Parameters.Add("@col_Serial_First", DbType.AnsiString).Value = StrSerialFirstNumber;
-                _cmd.Parameters.Add("@col_Serial_Last", DbType.AnsiString).Value = StrSerialLastNumber;
-                _cmd.Parameters.Add("@col_Comment", DbType.AnsiString).Value = StrComment;
+                _cmd.Parameters.Add("@col_Print_Type", DbType.String).Value = IntPrintType;
+                _cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
+                _cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
+                _cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
+                _cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
+                _cmd.Parameters.Add("@col_Quantity", DbType.String).Value = IntQuantity;
+                _cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
+                _cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
+                _cmd.Parameters.Add("@col_Revision", DbType.String).Value = StrRevision;
+                _cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = StrSerialFirstNumber;
+                _cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = StrSerialLastNumber;
+                _cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
 
                 _cmd.ExecuteNonQuery();
 
