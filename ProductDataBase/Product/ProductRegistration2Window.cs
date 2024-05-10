@@ -111,7 +111,7 @@ namespace ProductDatabase {
                             using SQLiteCommand _cmd = _con.CreateCommand();
                             // 使用基板表示
                             _cmd.CommandText = $@"SELECT col_Substrate_Name FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model";
-                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.AnsiString).Value = ArrUseSubstrate[_i];
+                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[_i];
                             using (SQLiteDataReader _dr = _cmd.ExecuteReader()) {
                                 if (_dr.Read()) {
                                     if (_objCbx != null) {
@@ -124,7 +124,7 @@ namespace ProductDatabase {
                             // 在庫テーブルからデータ取得
                             int _intQuantity = IntQuantity;
                             _cmd.CommandText = $@"SELECT col_Substrate_num, col_Stock, col_Substrate_Name FROM Stock_{StrStockName} WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
-                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.AnsiString).Value = ArrUseSubstrate[_i];
+                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[_i];
                             using (SQLiteDataReader _dr = _cmd.ExecuteReader()) {
                                 while (_dr.Read()) {
                                     string _strSubstrateNumber = $"{_dr["col_Substrate_num"]}";
@@ -191,7 +191,7 @@ namespace ProductDatabase {
                             _con.Open();
                             using SQLiteCommand _cmd = _con.CreateCommand();
                             _cmd.CommandText = $@"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model";
-                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.AnsiString).Value = ArrUseSubstrate[_i];
+                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[_i];
                             using (SQLiteDataReader _dr = _cmd.ExecuteReader()) {
                                 while (_dr.Read()) {
                                     if (_objCbx != null) { _objCbx.Text = $"{_dr["col_Substrate_Name"]} - {ArrUseSubstrate[_i]}"; }
@@ -199,7 +199,7 @@ namespace ProductDatabase {
                             }
 
                             _cmd.CommandText = $@"SELECT * FROM Stock_{StrStockName} WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
-                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.AnsiString).Value = ArrUseSubstrate[_i];
+                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[_i];
                             using (SQLiteDataReader _dr = _cmd.ExecuteReader()) {
                                 while (_dr.Read()) {
                                     string _strSubstrateName = string.Empty;
