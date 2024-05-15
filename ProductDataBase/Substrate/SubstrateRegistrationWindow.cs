@@ -30,11 +30,11 @@ namespace ProductDatabase {
         public int DisplayMagnitude { get; } = 3;
         public int IntPageCnt { get; set; } = 1;
 
-        public string StrProness1 { get; } = string.Empty;
+        public string StrProness1 { get; set; } = string.Empty;
         public string StrProness2 { get; } = string.Empty;
         public string StrProness3 { get; } = string.Empty;
-        public int StrProness4 { get; }
-        public string StrProness5 { get; } = string.Empty;
+        public int StrProness4 { get; set; }
+        public string StrProness5 { get; set; } = string.Empty;
 
         readonly List<string> checkBoxNames = new() {
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectNumberCheckBox",
