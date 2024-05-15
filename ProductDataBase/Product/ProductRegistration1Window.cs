@@ -86,6 +86,8 @@ namespace ProductDatabase {
                     }
                 }
 
+                CommentComboBox.Items.Add("[Rev.UP]変更点番号:");
+
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
@@ -174,7 +176,7 @@ namespace ProductDatabase {
         // コメント用テンプレート
         private void TemplateComment() {
             string _templateWord = CommentComboBox.SelectedIndex switch {
-                1 => "[Rev.UP]変更点番号:",
+                0 => "[Rev.UP]変更点番号:",
                 _ => string.Empty
             };
             CommentTextBox.Text = $"{CommentTextBox.Text}{_templateWord}";
