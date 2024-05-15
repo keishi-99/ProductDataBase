@@ -396,7 +396,7 @@ namespace ProductDatabase {
         private void ParseQRCodeInput() {
             try {
                 string[] _arr = QRCodeTextBox.Text.Split(new string[] { "//" }, StringSplitOptions.None);
-                if (_arr.Length != 4) { throw new Exception("QRコードに誤りがあります。"); }
+                if (_arr.Length != 4) { throw new Exception("QRコードが正しくありません。"); }
                 if (_arr != null) {
                     StrProness1 = _arr[0];
                     StrProness2 = _arr[1];
