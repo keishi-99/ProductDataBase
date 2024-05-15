@@ -261,7 +261,7 @@ namespace ProductDatabase {
                     .Select(row => row.Field<string?>("class001"))
                     .Where(classVal => classVal != null)
                     .Cast<string>()
-);
+                );
 
                 CategoryListBox1.Items.AddRange(_class001Set.ToArray());
             } catch (Exception ex) {

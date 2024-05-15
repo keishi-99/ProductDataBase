@@ -41,7 +41,7 @@ namespace ProductDatabase {
 
                 OrderNumberTextBox.Text = StrProness5;
                 ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(StrProness1) ? StrProness1 : ManufacturingNumberMaskedTextBox.Text;
-                QuantityTextBox.Text = StrProness4.ToString();
+                QuantityTextBox.Text = (StrProness4 != 0) ? StrProness4.ToString() : string.Empty;
 
                 FirstSerialNumberTextBox.MaxLength = IntSerialDigit;
 
