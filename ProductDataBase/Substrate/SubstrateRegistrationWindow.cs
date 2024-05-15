@@ -99,6 +99,8 @@ namespace ProductDatabase {
                     }
                 }
 
+                CommentComboBox.Items.Add("[Rev.UP]変更点番号:");
+
                 StrSettingFilePath = "./config/SubstrateConfig.xml";
                 if (File.Exists(StrSettingFilePath) == false) { throw new Exception("設定ファイルが見つかりませんでした"); }
                 SettingsLabelSub = new CSettingsLabelSub();
@@ -518,7 +520,7 @@ namespace ProductDatabase {
         // コメント用テンプレート
         private void TemplateComment() {
             string _templateWord = CommentComboBox.SelectedIndex switch {
-                1 => "[Rev.UP]変更点番号:",
+                0 => "[Rev.UP]変更点番号:",
                 _ => string.Empty
             };
             CommentTextBox.Text = $"{CommentTextBox.Text}{_templateWord}";
