@@ -153,15 +153,15 @@ namespace ProductDatabase {
                 _window.StrPerson = PersonComboBox.Text;
                 _window.StrRevision = RevisionTextBox.Text;
                 _window.StrComment = CommentTextBox.Text;
-                _window.IntQuantity = Convert.ToInt32(QuantityTextBox.Text);
-                _window.IntSerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text);
+                _window.IntQuantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
+                _window.IntSerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception());
                 _window.ShowDialog(this);
                 Close();
 
                 void CheckAndAdjustSerial(int threshold, int resetValue) {
 
-                    int _quantity = Convert.ToInt32(QuantityTextBox.Text);
-                    int _firstSerial = Convert.ToInt32(FirstSerialNumberTextBox.Text);
+                    int _quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
+                    int _firstSerial = Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception());
                     if (_quantity + _firstSerial >= threshold) {
                         MessageBox.Show($"シリアルが{threshold}を超えるので{resetValue.ToString().PadLeft(IntSerialDigit, '0')}から開始します。");
                         FirstSerialNumberTextBox.Text = resetValue.ToString();

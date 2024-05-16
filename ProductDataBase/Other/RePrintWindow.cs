@@ -217,7 +217,7 @@ namespace ProductDatabase {
 
                 StrOrderNumber = OrderNumberTextBox.Text;
                 StrProductNumber = ManufacturingNumberMaskedTextBox.Text;
-                IntQuantity = Convert.ToInt32(QuantityTextBox.Text);
+                IntQuantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
                 StrPerson = PersonComboBox.Text;
                 StrRegDate = RegistrationDateMaskedTextBox.Text;
                 StrRevision = RevisionTextBox.Text;

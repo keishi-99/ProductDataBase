@@ -118,9 +118,9 @@ namespace ProductDatabase {
                 _window.StrStockName = _selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
                 _window.StrSubstrateName = _selectedRows[0]["col_Substrate_Name"].ToString() ?? string.Empty;
                 _window.StrSubstrateModel = _selectedRows[0]["col_Substrate_Model"].ToString() ?? string.Empty;
-                _window.IntRegType = Convert.ToInt32(_selectedRows[0]["col_Reg_Type"]);
-                _window.IntPrintType = Convert.ToInt32(_selectedRows[0]["col_Print_Type"]);
-                _window.IntCheckBin = Convert.ToInt32(_selectedRows[0]["col_Checkbox"].ToString(), 2);
+                _window.IntRegType = Convert.ToInt32(_selectedRows[0]["col_Reg_Type"] ?? throw new Exception());
+                _window.IntPrintType = Convert.ToInt32(_selectedRows[0]["col_Print_Type"] ?? throw new Exception());
+                _window.IntCheckBin = Convert.ToInt32(_selectedRows[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
                 _window.ShowDialog(this);
             }
         }
@@ -134,11 +134,11 @@ namespace ProductDatabase {
                 _window.StrProductName = _selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
                 _window.StrStockName = _selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
                 _window.StrProductType = _selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
-                _window.IntRegType = Convert.ToInt32(_selectedRows[0]["col_Reg_Type"]);
-                _window.IntPrintType = Convert.ToInt32(_selectedRows[0]["col_Print_Type"]);
-                _window.IntSerialDigit = Convert.ToInt32(_selectedRows[0]["col_Serial_Digit"]);
+                _window.IntRegType = Convert.ToInt32(_selectedRows[0]["col_Reg_Type"] ?? throw new Exception());
+                _window.IntPrintType = Convert.ToInt32(_selectedRows[0]["col_Print_Type"] ?? throw new Exception());
+                _window.IntSerialDigit = Convert.ToInt32(_selectedRows[0]["col_Serial_Digit"] ?? throw new Exception());
                 _window.StrProductModel = _selectedRows[0]["col_Product_Model"].ToString() ?? string.Empty;
-                _window.IntCheckBin = Convert.ToInt32(_selectedRows[0]["col_Checkbox"].ToString(), 2);
+                _window.IntCheckBin = Convert.ToInt32(_selectedRows[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
                 _window.StrUseSubstrate = _selectedRows[0]["col_Use_Substrate"].ToString() ?? string.Empty;
                 _window.StrInitial = _selectedRows[0]["col_Initial"].ToString() ?? string.Empty;
                 _window.ShowDialog(this);
@@ -153,11 +153,11 @@ namespace ProductDatabase {
                 _window.IntFontSize = IntFontSize;
                 _window.StrProductName = _selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
                 _window.StrProductType = _selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
-                _window.IntRegType = Convert.ToInt32(_selectedRows[0]["col_Reg_Type"]);
-                _window.IntPrintType = Convert.ToInt32(_selectedRows[0]["col_Print_Type"]);
-                _window.IntSerialDigit = Convert.ToInt32(_selectedRows[0]["col_Serial_Digit"]);
+                _window.IntRegType = Convert.ToInt32(_selectedRows[0]["col_Reg_Type"] ?? throw new Exception());
+                _window.IntPrintType = Convert.ToInt32(_selectedRows[0]["col_Print_Type"] ?? throw new Exception());
+                _window.IntSerialDigit = Convert.ToInt32(_selectedRows[0]["col_Serial_Digit"] ?? throw new Exception());
                 _window.StrProductModel = _selectedRows[0]["col_Product_Model"].ToString() ?? string.Empty;
-                _window.IntCheckBin = Convert.ToInt32(_selectedRows[0]["col_Checkbox"].ToString(), 2);
+                _window.IntCheckBin = Convert.ToInt32(_selectedRows[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
                 _window.StrInitial = _selectedRows[0]["col_Initial"].ToString() ?? string.Empty;
                 _window.ShowDialog(this);
             }
@@ -170,8 +170,8 @@ namespace ProductDatabase {
                 _window.StrFontName = FontName;
                 _window.IntFontSize = IntFontSize;
                 _window.IntRadioBtnFlg = IntRadioBtnFlg;
-                _window.IntPrintType = Convert.ToInt32(_selectedRows[0]["col_Print_Type"]);
-                _window.IntRegType = Convert.ToInt32(_selectedRows[0]["col_Reg_Type"]);
+                _window.IntPrintType = Convert.ToInt32(_selectedRows[0]["col_Print_Type"] ?? throw new Exception());
+                _window.IntRegType = Convert.ToInt32(_selectedRows[0]["col_Reg_Type"] ?? throw new Exception());
                 _window.StrProductName = _selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
                 _window.StrStockName = _selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
                 _window.StrProductType = _selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
@@ -400,7 +400,7 @@ namespace ProductDatabase {
                 if (_arr != null) {
                     StrProness1 = _arr[0];
                     StrProness2 = _arr[1];
-                    StrProness4 = Convert.ToInt32(_arr[2]);
+                    StrProness4 = Convert.ToInt32(_arr[2] ?? throw new Exception());
                     StrProness5 = _arr[3];
                 }
             } catch (Exception ex) {
@@ -416,7 +416,7 @@ namespace ProductDatabase {
                     StrProness1 = _dr["手配製番"].ToString() ?? string.Empty;
                     StrProness2 = _dr["品目番号"].ToString() ?? string.Empty;
                     StrProness3 = _dr["品目名称"].ToString() ?? string.Empty;
-                    StrProness4 = Convert.ToInt32(_dr["手配数"]);
+                    StrProness4 = Convert.ToInt32(_dr["手配数"] ?? throw new Exception());
                     StrProness5 = _dr["請求先注番"].ToString() ?? string.Empty;
                 }
             }
@@ -508,9 +508,9 @@ namespace ProductDatabase {
             _window.StrSubstrateName = substrateRet[0]["col_Substrate_Name"].ToString() ?? string.Empty;
             _window.StrSubstrateModel = substrateRet[0]["col_Substrate_Model"].ToString() ?? string.Empty;
             _window.StrInitial = string.Empty;
-            _window.IntRegType = Convert.ToInt32(substrateRet[0]["col_Reg_Type"]);
-            _window.IntPrintType = Convert.ToInt32(substrateRet[0]["col_Print_Type"]);
-            _window.IntCheckBin = Convert.ToInt32(substrateRet[0]["col_Checkbox"].ToString(), 2);
+            _window.IntRegType = Convert.ToInt32(substrateRet[0]["col_Reg_Type"] ?? throw new Exception());
+            _window.IntPrintType = Convert.ToInt32(substrateRet[0]["col_Print_Type"] ?? throw new Exception());
+            _window.IntCheckBin = Convert.ToInt32(substrateRet[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
             _window.StrProness1 = StrProness1;
             _window.StrProness4 = StrProness4;
             _window.StrProness5 = StrProness5;
@@ -535,10 +535,10 @@ namespace ProductDatabase {
             _window.StrProductModel = productRet[0]["col_Product_Model"].ToString() ?? string.Empty;
             _window.StrUseSubstrate = productRet[0]["col_Use_Substrate"].ToString() ?? string.Empty;
             _window.StrInitial = productRet[0]["col_Initial"].ToString() ?? string.Empty;
-            _window.IntRegType = Convert.ToInt32(productRet[0]["col_Reg_Type"]);
-            _window.IntPrintType = Convert.ToInt32(productRet[0]["col_Print_Type"]);
-            _window.IntCheckBin = Convert.ToInt32(productRet[0]["col_Checkbox"].ToString(), 2);
-            _window.IntSerialDigit = Convert.ToInt32(productRet[0]["col_Serial_Digit"]);
+            _window.IntRegType = Convert.ToInt32(productRet[0]["col_Reg_Type"] ?? throw new Exception());
+            _window.IntPrintType = Convert.ToInt32(productRet[0]["col_Print_Type"] ?? throw new Exception());
+            _window.IntCheckBin = Convert.ToInt32(productRet[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
+            _window.IntSerialDigit = Convert.ToInt32(productRet[0]["col_Serial_Digit"] ?? throw new Exception());
             _window.StrProness1 = StrProness1;
             _window.StrProness4 = StrProness4;
             _window.StrProness5 = StrProness5;
