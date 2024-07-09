@@ -42,16 +42,18 @@ namespace ProductDatabase {
         public int DisplayMagnitude { get; } = 3;
         public int IntPageCnt { get; set; } = 1;
 
-        private string StrSerialType = string.Empty;
-        private string StrSerialFirstNumber = string.Empty;
-        private string StrSerialLastNumber = string.Empty;
-        private bool FontUnderbar = false;
+        private string strSerialType = string.Empty;
+        private string strSerialFirstNumber = string.Empty;
+        private string strSerialLastNumber = string.Empty;
+        private bool fontUnderbar = false;
         private readonly List<string> checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
 
-        public RePrintWindow() => InitializeComponent();
+        public RePrintWindow() {
+            InitializeComponent();
+        }
 
         // ロードイベント
         private void LoadEvents() {
@@ -129,8 +131,8 @@ namespace ProductDatabase {
                 }
 
                 // 変数[check_bin]の値に応じてCheckboxにチェックを入れる
-                foreach (string checkBoxName in checkBoxNames) {
-                    if (Controls[checkBoxName] is CheckBox checkBox) {
+                foreach (string _checkBoxName in checkBoxNames) {
+                    if (Controls[_checkBoxName] is CheckBox checkBox) {
                         checkBox.Checked = (IntCheckBin & 0x1) == 1;
                         IntCheckBin >>= 1;
                     }
@@ -168,6 +170,7 @@ namespace ProductDatabase {
                 // 入力フォームのチェック
                 bool _anyTextBoxEnabled = false;
                 bool _allTextBoxesFilled = true;
+                DialogResult _result;
 
                 foreach (Control control in Controls) {
                     if (control is TextBoxBase textBox && textBox.Enabled) {
@@ -185,7 +188,7 @@ namespace ProductDatabase {
 
                 if (QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
 
-                DialogResult _result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                _result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (_result == DialogResult.Cancel) return;
 
                 int _quantity = Convert.ToInt32(QuantityTextBox.Text);
@@ -211,8 +214,8 @@ namespace ProductDatabase {
                     }
                 }
 
-                DialogResult result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                if (result == DialogResult.Cancel) { return; }
+                _result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                if (_result == DialogResult.Cancel) { return; }
 
                 StrOrderNumber = OrderNumberTextBox.Text;
                 StrProductNumber = ManufacturingNumberMaskedTextBox.Text;
@@ -225,8 +228,8 @@ namespace ProductDatabase {
                 IntSerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text);
                 IntSerialLastNumber = IntSerialFirstNumber + IntQuantity - 1;
 
-                StrSerialFirstNumber = GenerateCode(IntSerialFirstNumber);
-                StrSerialLastNumber = GenerateCode(IntSerialLastNumber);
+                strSerialFirstNumber = GenerateCode(IntSerialFirstNumber);
+                strSerialLastNumber = GenerateCode(IntSerialLastNumber);
 
                 if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
 
@@ -252,8 +255,8 @@ namespace ProductDatabase {
                 _cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
                 _cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
                 _cmd.Parameters.Add("@col_Revision", DbType.String).Value = StrRevision;
-                _cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = StrSerialFirstNumber;
-                _cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = StrSerialLastNumber;
+                _cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = strSerialFirstNumber;
+                _cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = strSerialLastNumber;
                 _cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
 
                 _cmd.ExecuteNonQuery();
@@ -272,7 +275,7 @@ namespace ProductDatabase {
 
             LabelProNumLabelsToPrint = IntQuantity;
             LabelProPageNum = 0;
-            FontUnderbar = false;
+            fontUnderbar = false;
 
             switch (PrintFlg) {
                 case 1:
@@ -320,22 +323,22 @@ namespace ProductDatabase {
                 double _offsetY = 0;
                 double _intervalX = 0;
                 double _intervalY = 0;
-                switch (StrSerialType) {
+                switch (strSerialType) {
                     case "Label":
                         if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnullです。"); }
-                        _maxX = SettingsLabelPro.LabelProPageSettings.NumLabelsX;
-                        _maxY = SettingsLabelPro.LabelProPageSettings.NumLabelsY;
-                        _sizeX = (float)SettingsLabelPro.LabelProPageSettings.SizeX;
-                        _sizeY = (float)SettingsLabelPro.LabelProPageSettings.SizeY;
-                        _offsetX = SettingsLabelPro.LabelProPageSettings.OffsetX;
-                        _offsetY = SettingsLabelPro.LabelProPageSettings.OffsetY;
-                        _intervalX = SettingsLabelPro.LabelProPageSettings.IntervalX;
-                        _intervalY = SettingsLabelPro.LabelProPageSettings.IntervalY;
-                        _headerPos = SettingsLabelPro.LabelProPageSettings.HeaderPos;
-                        _headerString = ConvertHeaderFooterString(SettingsLabelPro.LabelProPageSettings.HeaderString);
-                        _headerFooterFont = SettingsLabelPro.LabelProPageSettings.HeaderFooterFont;
-                        _intNumLabels = SettingsLabelPro.LabelProLabelSettings.NumLabels;
-                        _intCountNumLabels = SettingsLabelPro.LabelProLabelSettings.NumLabels;
+                        _maxX = SettingsLabelPro._labelProPageSettings.NumLabelsX;
+                        _maxY = SettingsLabelPro._labelProPageSettings.NumLabelsY;
+                        _sizeX = (float)SettingsLabelPro._labelProPageSettings.SizeX;
+                        _sizeY = (float)SettingsLabelPro._labelProPageSettings.SizeY;
+                        _offsetX = SettingsLabelPro._labelProPageSettings.OffsetX;
+                        _offsetY = SettingsLabelPro._labelProPageSettings.OffsetY;
+                        _intervalX = SettingsLabelPro._labelProPageSettings.IntervalX;
+                        _intervalY = SettingsLabelPro._labelProPageSettings.IntervalY;
+                        _headerPos = SettingsLabelPro._labelProPageSettings.HeaderPos;
+                        _headerString = ConvertHeaderFooterString(SettingsLabelPro._labelProPageSettings.HeaderString);
+                        _headerFooterFont = SettingsLabelPro._labelProPageSettings.HeaderFooterFont;
+                        _intNumLabels = SettingsLabelPro._labelProLabelSettings.NumLabels;
+                        _intCountNumLabels = SettingsLabelPro._labelProLabelSettings.NumLabels;
                         break;
                     case "Barcode":
                         if (SettingsBarcodePro == null) { throw new Exception("SettingsBarcodeProがnullです。"); }
@@ -460,8 +463,8 @@ namespace ProductDatabase {
                 _ => _monthCode
             };
 
-            string _outputCode = StrSerialType switch {
-                "Label" => SettingsLabelPro.LabelProLabelSettings.Format,
+            string _outputCode = strSerialType switch {
+                "Label" => SettingsLabelPro._labelProLabelSettings.Format,
                 "Barcode" => SettingsBarcodePro.BarcodeProLabelSettings.Format,
                 _ => string.Empty
             };
@@ -486,15 +489,15 @@ namespace ProductDatabase {
             Font _fnt;
             Graphics _g;
             SizeF _stringSize;
-            switch (StrSerialType) {
+            switch (strSerialType) {
                 case "Label":
                     if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnull"); }
-                    _sizeX = (decimal)SettingsLabelPro.LabelProPageSettings.SizeX / 25.4M * resolution * magnitude;
-                    _sizeY = (decimal)SettingsLabelPro.LabelProPageSettings.SizeY / 25.4M * resolution * magnitude;
-                    _fontSize = (decimal)SettingsLabelPro.LabelProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
-                    _stringPosY = (int)((decimal)SettingsLabelPro.LabelProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
-                    FontStyle _style = FontUnderbar ? FontStyle.Underline : FontStyle.Regular;
-                    _fnt = new Font(SettingsLabelPro.LabelProLabelSettings.Font.Name, (float)_fontSize, _style);
+                    _sizeX = (decimal)SettingsLabelPro._labelProPageSettings.SizeX / 25.4M * resolution * magnitude;
+                    _sizeY = (decimal)SettingsLabelPro._labelProPageSettings.SizeY / 25.4M * resolution * magnitude;
+                    _fontSize = (decimal)SettingsLabelPro._labelProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
+                    _stringPosY = (int)((decimal)SettingsLabelPro._labelProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
+                    FontStyle _style = fontUnderbar ? FontStyle.Underline : FontStyle.Regular;
+                    _fnt = new Font(SettingsLabelPro._labelProLabelSettings.Font.Name, (float)_fontSize, _style);
 
                     _labelImage = new((int)_sizeX, (int)_sizeY);
                     _g = Graphics.FromImage(_labelImage);
@@ -610,7 +613,7 @@ namespace ProductDatabase {
         // 入力数値のみ
         private void NumericOnly(object sender, KeyPressEventArgs e) {
             // 0～9と、バックスペース以外の時は、イベントをキャンセルする
-            if ((e.KeyChar < '0' || '9' < e.KeyChar) && e.KeyChar != '\b') {
+            if (e.KeyChar is (< '0' or > '9') and not '\b') {
                 e.Handled = true;
             }
         }
@@ -624,11 +627,11 @@ namespace ProductDatabase {
 
         private void RePrintWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void LabelPrintButton_Click(object sender, EventArgs e) {
-            StrSerialType = "Label";
+            strSerialType = "Label";
             Registeration();
         }
         private void BarcodePrintButton_Click(object sender, EventArgs e) {
-            StrSerialType = "Barcode";
+            strSerialType = "Barcode";
             Registeration();
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {

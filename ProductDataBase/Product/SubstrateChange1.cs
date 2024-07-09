@@ -9,7 +9,7 @@ namespace ProductDatabase {
 
         public DataTable DtHistoryTable { get; set; } = new();
 
-        private readonly List<string> ListColFilter = [];
+        private readonly List<string> listColFilter = [];
 
         public int IntRadioBtnFlg { get; set; }
 
@@ -24,7 +24,9 @@ namespace ProductDatabase {
         public int IntPrintType { get; set; }
         public int IntRegType { get; set; }
 
-        public SubstrateChange1() => InitializeComponent();
+        public SubstrateChange1() {
+            InitializeComponent();
+        }
 
         // ロードイベント
         private void LoadEvents() {
@@ -40,10 +42,10 @@ namespace ProductDatabase {
 
                             SubstrateChangeDataGridView.DataSource = DtHistoryTable;
 
-                            ListColFilter.Add("");
+                            listColFilter.Add("");
                             for (int _i = 0; _i < SubstrateChangeDataGridView.ColumnCount; _i++) {
                                 string _headerValue = SubstrateChangeDataGridView.Columns[_i].HeaderCell.Value?.ToString() ?? string.Empty;
-                                if (_headerValue != null) { ListColFilter.Add(_headerValue); }
+                                if (_headerValue != null) { listColFilter.Add(_headerValue); }
                             }
 
                             // 最大サイズをディスプレイサイズに合わせる

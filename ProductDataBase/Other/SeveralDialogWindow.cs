@@ -11,19 +11,21 @@
         public List<string> ListCategory13 { get; set; } = [];
         public List<string> ListCategory14 { get; set; } = [];
 
-        public SeveralDialogWindow() => InitializeComponent();
+        public SeveralDialogWindow() {
+            InitializeComponent();
+        }
 
         // ロードイベント
         private void LoadEvents() {
             SeveralListBox.Items.Clear();
             Font = new Font(StrFontName, IntFontSize);
-            int j = 0;
+            int _j = 0;
 
             foreach (string Category in ListCategory11) {
-                string type = (ListCategory14[j] == "1") ? "基板" : "製品";
+                string _type = (ListCategory14[_j] == "1") ? "基板" : "製品";
 
-                if (!string.IsNullOrEmpty(ListCategory11[j])) { SeveralListBox.Items.Add($"[{type}]  [{ListCategory13[j]}]  [{ListCategory12[j]}]  [{Category}]"); }
-                j++;
+                if (!string.IsNullOrEmpty(ListCategory11[_j])) { SeveralListBox.Items.Add($"[{_type}]  [{ListCategory13[_j]}]  [{ListCategory12[_j]}]  [{Category}]"); }
+                _j++;
             }
 
             SeveralListBox.SelectedIndex = 0;
