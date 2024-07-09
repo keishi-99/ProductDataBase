@@ -36,10 +36,12 @@ namespace ProductDatabase {
         public string StrCategory12 { get; set; } = string.Empty;
         public string StrCategory13 { get; set; } = string.Empty;
         public string StrCategory14 { get; set; } = string.Empty;
-        public List<string> ListCategory11 { get; } = new();
-        public List<string> ListCategory12 { get; } = new();
-        public List<string> ListCategory13 { get; } = new();
-        public List<string> ListCategory14 { get; } = new();
+        public List<string> ListCategory11 { get; } = [];
+        public List<string> ListCategory12 { get; } = [];
+        public List<string> ListCategory13 { get; } = [];
+        public List<string> ListCategory14 { get; } = [];
+
+        private static readonly string[] separator = ["//"];
 
         public MainWindow() => InitializeComponent();
 
@@ -263,7 +265,7 @@ namespace ProductDatabase {
                     .Cast<string>()
                 );
 
-                CategoryListBox1.Items.AddRange(_class001Set.ToArray());
+                CategoryListBox1.Items.AddRange([.. _class001Set]);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -276,7 +278,7 @@ namespace ProductDatabase {
                 CategoryListBox2.Items.Clear();
                 CategoryListBox3.Items.Clear();
 
-                HashSet<string> _productNames = new();
+                HashSet<string> _productNames = [];
 
                 DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}'", "col_Product_Name ASC");
 
@@ -287,7 +289,7 @@ namespace ProductDatabase {
                     }
                 }
 
-                CategoryListBox2.Items.AddRange(_productNames.ToArray());
+                CategoryListBox2.Items.AddRange([.. _productNames]);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -309,7 +311,7 @@ namespace ProductDatabase {
                                                                                 .Where(x => x != null)
                                                                                 .Select(x => x!));
 
-                        CategoryListBox3.Items.AddRange(_substrateNames.ToArray());
+                        CategoryListBox3.Items.AddRange([.. _substrateNames]);
                         break;
 
                     case 2:
@@ -321,7 +323,7 @@ namespace ProductDatabase {
                                                                                 .Where(x => x != null)
                                                                                 .Select(x => x!));
 
-                        CategoryListBox3.Items.AddRange(_productTypes.ToArray());
+                        CategoryListBox3.Items.AddRange([.. _productTypes]);
                         break;
 
                     default:
@@ -395,7 +397,7 @@ namespace ProductDatabase {
         }
         private void ParseQRCodeInput() {
             try {
-                string[] _arr = QRCodeTextBox.Text.Split(new string[] { "//" }, StringSplitOptions.None);
+                string[] _arr = QRCodeTextBox.Text.Split(separator, StringSplitOptions.None);
                 if (_arr.Length != 4) { throw new Exception("QRコードが正しくありません。"); }
                 if (_arr != null) {
                     StrProness1 = _arr[0];

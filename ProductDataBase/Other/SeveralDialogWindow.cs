@@ -6,10 +6,10 @@
 
         public int SelectedIndex = 0;
 
-        public List<string> ListCategory11 { get; set; } = new List<string>();
-        public List<string> ListCategory12 { get; set; } = new List<string>();
-        public List<string> ListCategory13 { get; set; } = new List<string>();
-        public List<string> ListCategory14 { get; set; } = new List<string>();
+        public List<string> ListCategory11 { get; set; } = [];
+        public List<string> ListCategory12 { get; set; } = [];
+        public List<string> ListCategory13 { get; set; } = [];
+        public List<string> ListCategory14 { get; set; } = [];
 
         public SeveralDialogWindow() => InitializeComponent();
 

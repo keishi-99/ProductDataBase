@@ -1,5 +1,4 @@
 ﻿using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
 using GenCode128;
 using ProductDatabase.Product;
 using System.Data;
@@ -26,7 +25,7 @@ namespace ProductDatabase {
         public string StrProductType { get; set; } = string.Empty;
         public string StrProductModel { get; set; } = string.Empty;
         public string StrUseSubstrate { get; set; } = string.Empty;
-        public string[] ArrUseSubstrate = Array.Empty<string>();
+        public string[] ArrUseSubstrate = [];
         public string StrInitial { get; set; } = string.Empty;
         public string StrOrderNumber { get; set; } = string.Empty;
         public string StrProductNumber { get; set; } = string.Empty;
@@ -61,19 +60,18 @@ namespace ProductDatabase {
         private string StrTotalSubstrate = string.Empty;
         private int IntSerialLastNumber;
         private bool FontUnderbar = false;
-
-        readonly List<string> StrSerial = new();
-        readonly List<string> CheckBoxNames = new() {
+        private readonly List<string> StrSerial = [];
+        private readonly List<string> CheckBoxNames = [
                         "Substrate1CheckBox", "Substrate2CheckBox", "Substrate3CheckBox", "Substrate4CheckBox","Substrate5CheckBox",
                         "Substrate6CheckBox", "Substrate7CheckBox", "Substrate8CheckBox", "Substrate9CheckBox","Substrate10CheckBox"
-                        };
-        readonly List<string> DataGridViewNames = new() {
+                        ];
+        private readonly List<string> DataGridViewNames = [
                         "Substrate1DataGridView", "Substrate2DataGridView", "Substrate3DataGridView", "Substrate4DataGridView","Substrate5DataGridView",
                         "Substrate6DataGridView", "Substrate7DataGridView", "Substrate8DataGridView", "Substrate9DataGridView","Substrate10DataGridView"
-                        };
-        readonly List<string> ListUsedSubstrate = new();
-        readonly List<string> ListUsedProductNumber = new();
-        readonly List<int> ListUsedQuantity = new();
+                        ];
+        private readonly List<string> ListUsedSubstrate = [];
+        private readonly List<string> ListUsedProductNumber = [];
+        private readonly List<int> ListUsedQuantity = [];
 
         public ProductRegistration2Window() => InitializeComponent();
         // ロードイベント
@@ -930,7 +928,7 @@ namespace ProductDatabase {
 
                 string _strSQLSerial = string.Join("','", StrSerial);
 
-                List<string> _strSerialDuplication = new();
+                List<string> _strSerialDuplication = [];
                 using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
                     _con.Open();
 
