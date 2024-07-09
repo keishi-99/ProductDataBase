@@ -9,7 +9,7 @@ namespace ProductDatabase {
 
         public DataTable DtHistoryTable { get; set; } = new();
 
-        private readonly List<string> ListColFilter = new();
+        private readonly List<string> ListColFilter = [];
 
         public int IntRadioBtnFlg { get; set; }
 

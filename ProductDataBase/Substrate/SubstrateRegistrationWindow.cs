@@ -36,10 +36,10 @@ namespace ProductDatabase {
         public int StrProness4 { get; set; }
         public string StrProness5 { get; set; } = string.Empty;
 
-        readonly List<string> checkBoxNames = new() {
+        private readonly List<string> checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectNumberCheckBox",
                     "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
-                    "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" };
+                    "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
 
         public SubstrateRegistrationWindow() => InitializeComponent();
         // ロードイベント

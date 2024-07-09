@@ -46,11 +46,10 @@ namespace ProductDatabase {
         private string StrSerialFirstNumber = string.Empty;
         private string StrSerialLastNumber = string.Empty;
         private bool FontUnderbar = false;
-
-        readonly List<string> checkBoxNames = new() {
+        private readonly List<string> checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
-                    "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" };
+                    "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
 
         public RePrintWindow() => InitializeComponent();
 

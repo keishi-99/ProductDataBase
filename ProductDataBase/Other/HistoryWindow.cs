@@ -9,7 +9,7 @@ namespace ProductDatabase {
 
         public DataTable DtHistoryTable { get; set; } = new();
 
-        private readonly List<string> ListColFilter = new();
+        private readonly List<string> ListColFilter = [];
 
         public int IntRadioBtnFlg { get; set; }
 
@@ -90,7 +90,7 @@ namespace ProductDatabase {
 
                             CategoryComboBox.Items.Add("");
                             for (int _i = 0; _i < DataBaseDataGridView.ColumnCount; _i++) {
-                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[_i].HeaderCell.Value.ToString());
+                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[_i].HeaderCell.Value.ToString() ?? string.Empty);
                             }
                         }
                         break;
@@ -155,7 +155,7 @@ namespace ProductDatabase {
 
                             CategoryComboBox.Items.Add("");
                             for (int _i = 0; _i < DataBaseDataGridView.ColumnCount; _i++) {
-                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[_i].HeaderCell.Value.ToString());
+                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[_i].HeaderCell.Value.ToString() ?? string.Empty);
                             }
                         }
                         break;
@@ -216,7 +216,7 @@ namespace ProductDatabase {
 
                             CategoryComboBox.Items.Add("");
                             for (int _i = 0; _i < DataBaseDataGridView.ColumnCount; _i++) {
-                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[_i].HeaderCell.Value.ToString());
+                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[_i].HeaderCell.Value.ToString() ?? string.Empty);
                             }
                         }
                         break;

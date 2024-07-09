@@ -14,9 +14,9 @@ namespace ProductDatabase {
         public string StrProductType { get; set; } = string.Empty;
         public string StrProductModel { get; set; } = string.Empty;
         public string StrUseSubstrate { get; set; } = string.Empty;
-        public string[] ArrUseSubstrate = Array.Empty<string>();
+        public string[] ArrUseSubstrate = [];
         public string StrUsedSubstrate { get; set; } = string.Empty;
-        public string[] ArrUsedSubstrate = Array.Empty<string>();
+        public string[] ArrUsedSubstrate = [];
         public string StrInitial { get; set; } = string.Empty;
         public string StrOrderNumber { get; set; } = string.Empty;
         public string StrProductNumber { get; set; } = string.Empty;
@@ -34,21 +34,19 @@ namespace ProductDatabase {
         public string StrSerialLastNumber { get; set; } = string.Empty;
         public string StrTotalSubstrate { get; set; } = string.Empty;
 
-        readonly List<string> ListUsedSubstrate = new();
-        readonly List<string> ListUsedProductNumber = new();
-        readonly List<int> ListUsedQuantity = new();
-
-        readonly List<string> CheckBoxNames = new() {
+        private readonly List<string> ListUsedSubstrate = [];
+        private readonly List<string> ListUsedProductNumber = [];
+        private readonly List<int> ListUsedQuantity = [];
+        private readonly List<string> CheckBoxNames = [
                         "Substrate1CheckBox", "Substrate2CheckBox", "Substrate3CheckBox", "Substrate4CheckBox","Substrate5CheckBox",
                         "Substrate6CheckBox", "Substrate7CheckBox", "Substrate8CheckBox", "Substrate9CheckBox","Substrate10CheckBox"
-                        };
-        readonly List<string> DataGridViewNames = new() {
+                        ];
+        private readonly List<string> DataGridViewNames = [
                         "Substrate1DataGridView", "Substrate2DataGridView", "Substrate3DataGridView", "Substrate4DataGridView","Substrate5DataGridView",
                         "Substrate6DataGridView", "Substrate7DataGridView", "Substrate8DataGridView", "Substrate9DataGridView","Substrate10DataGridView"
-                        };
-
-        CheckBox? ObjCbx;
-        DataGridView? ObjDgv;
+                        ];
+        private CheckBox? ObjCbx;
+        private DataGridView? ObjDgv;
 
         public SubstrateChange2() => InitializeComponent();
 
@@ -137,12 +135,12 @@ namespace ProductDatabase {
                                 }
                                 if (_b1 == true) {
                                     _strUsedSubNum = ArrUsedSubstrate[_subIndex];
-                                    _strUsedSubNum = _strUsedSubNum[(_strUsedSubNum.IndexOf("]") + 1)..];
-                                    _strUsedSubNum = _strUsedSubNum[.._strUsedSubNum.IndexOf("(")];
+                                    _strUsedSubNum = _strUsedSubNum[(_strUsedSubNum.IndexOf(']') + 1)..];
+                                    _strUsedSubNum = _strUsedSubNum[.._strUsedSubNum.IndexOf('(')];
 
                                     _strUsedQuantity = ArrUsedSubstrate[_subIndex];
-                                    _strUsedQuantity = _strUsedQuantity[(_strUsedQuantity.IndexOf("(") + 1)..];
-                                    _strUsedQuantity = _strUsedQuantity[.._strUsedQuantity.IndexOf(")")];
+                                    _strUsedQuantity = _strUsedQuantity[(_strUsedQuantity.IndexOf('(') + 1)..];
+                                    _strUsedQuantity = _strUsedQuantity[.._strUsedQuantity.IndexOf(')')];
                                     _intUsedQuantity = int.Parse(_strUsedQuantity);
                                 }
 
