@@ -54,26 +54,29 @@ namespace ProductDatabase {
         public int StrProness4 { get; }
         public string StrProness5 { get; } = string.Empty;
 
-        private string StrSerialType = string.Empty;
-        private string StrSerialFirstNumber = string.Empty;
-        private string StrSerialLastNumber = string.Empty;
-        private string StrTotalSubstrate = string.Empty;
-        private int IntSerialLastNumber;
-        private bool FontUnderbar = false;
-        private readonly List<string> StrSerial = [];
-        private readonly List<string> CheckBoxNames = [
+        private string strSerialType = string.Empty;
+        private string strSerialFirstNumber = string.Empty;
+        private string strSerialLastNumber = string.Empty;
+        private string strTotalSubstrate = string.Empty;
+        private int intSerialLastNumber;
+        private bool fontUnderbar = false;
+        private readonly List<string> strSerial = [];
+        private readonly List<string> checkBoxNames = [
                         "Substrate1CheckBox", "Substrate2CheckBox", "Substrate3CheckBox", "Substrate4CheckBox","Substrate5CheckBox",
                         "Substrate6CheckBox", "Substrate7CheckBox", "Substrate8CheckBox", "Substrate9CheckBox","Substrate10CheckBox"
                         ];
-        private readonly List<string> DataGridViewNames = [
+        private readonly List<string> dataGridViewNames = [
                         "Substrate1DataGridView", "Substrate2DataGridView", "Substrate3DataGridView", "Substrate4DataGridView","Substrate5DataGridView",
                         "Substrate6DataGridView", "Substrate7DataGridView", "Substrate8DataGridView", "Substrate9DataGridView","Substrate10DataGridView"
                         ];
-        private readonly List<string> ListUsedSubstrate = [];
-        private readonly List<string> ListUsedProductNumber = [];
-        private readonly List<int> ListUsedQuantity = [];
+        private readonly List<string> listUsedSubstrate = [];
+        private readonly List<string> listUsedProductNumber = [];
+        private readonly List<int> listUsedQuantity = [];
 
-        public ProductRegistration2Window() => InitializeComponent();
+        public ProductRegistration2Window() {
+            InitializeComponent();
+        }
+
         // ロードイベント
         private void LoadEvents() {
             try {
@@ -82,21 +85,21 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = true;
                 ArrUseSubstrate = StrUseSubstrate.Split(",");
 
-                IntSerialLastNumber = IntSerialFirstNumber + IntQuantity - 1;
+                intSerialLastNumber = IntSerialFirstNumber + IntQuantity - 1;
 
                 bool _quantityFlg = false;
                 string _strQuantity = string.Empty;
                 switch (IntRegType) {
                     case 2:
                         for (int _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
-                            CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox;
+                            CheckBox? _objCbx = Controls[checkBoxNames[_i]] as CheckBox;
 
                             if (_objCbx != null) {
                                 _objCbx.Enabled = true;
                                 _objCbx.Checked = true;
                             }
 
-                            DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView;
+                            DataGridView? _objDgv = Controls[dataGridViewNames[_i]] as DataGridView;
                             if (_objDgv != null) {
                                 _objDgv.RowHeadersWidth = 30;
                                 _objDgv.Columns[2].ReadOnly = false;
@@ -171,14 +174,14 @@ namespace ProductDatabase {
                     case 3:
                         if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
                         for (int _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
-                            CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox;
+                            CheckBox? _objCbx = Controls[checkBoxNames[_i]] as CheckBox;
 
                             if (_objCbx != null) {
                                 _objCbx.Enabled = true;
                                 _objCbx.Checked = true;
                             }
 
-                            DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView;
+                            DataGridView? _objDgv = Controls[dataGridViewNames[_i]] as DataGridView;
                             if (_objDgv != null) {
                                 _objDgv.RowHeadersWidth = 30;
                                 _objDgv.Columns[2].ReadOnly = false;
@@ -386,7 +389,7 @@ namespace ProductDatabase {
                 using SQLiteConnection _con = new(MainWindow.GetConnectionString2());
                 _con.Open();
 
-                foreach (var _b in StrSerial) {
+                foreach (var _b in strSerial) {
                     using SQLiteCommand _cmd = _con.CreateCommand();
                     _cmd.CommandText =
                         $@"
@@ -504,9 +507,9 @@ namespace ProductDatabase {
                         _cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
                         _cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
                         _cmd.Parameters.Add("@col_Revision", DbType.String).Value = StrRevision;
-                        _cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = StrSerialFirstNumber;
-                        _cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = StrSerialLastNumber;
-                        _cmd.Parameters.Add("@col_Serial_LastNum", DbType.String).Value = IntSerialLastNumber;
+                        _cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = strSerialFirstNumber;
+                        _cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = strSerialLastNumber;
+                        _cmd.Parameters.Add("@col_Serial_LastNum", DbType.String).Value = intSerialLastNumber;
                         _cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
 
                         _cmd.ExecuteNonQuery();
@@ -520,10 +523,10 @@ namespace ProductDatabase {
                         if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
                         for (int _i = 0; _i <= ArrUseSubstrate.Length; _i++) {
 
-                            CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                            CheckBox? _objCbx = Controls[checkBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
 
                             if (_objCbx.Checked) {
-                                DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
+                                DataGridView? _objDgv = Controls[dataGridViewNames[_i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
                                 int _dgvRowCnt = _objDgv.Rows.Count;
                                 string _subTotalTemp = string.Empty;
 
@@ -623,20 +626,20 @@ namespace ProductDatabase {
                                         switch (IntPrintType) {
                                             case 5:
                                             case 6:
-                                                ListUsedSubstrate.Add(ArrUseSubstrate[_i]);
-                                                if (_substrateNum != null) { ListUsedProductNumber.Add(_substrateNum); }
-                                                ListUsedQuantity.Add(_useValue);
+                                                listUsedSubstrate.Add(ArrUseSubstrate[_i]);
+                                                if (_substrateNum != null) { listUsedProductNumber.Add(_substrateNum); }
+                                                listUsedQuantity.Add(_useValue);
                                                 break;
                                             default:
                                                 break;
                                         }
                                     }
                                 }
-                                if (string.IsNullOrEmpty(StrTotalSubstrate)) {
-                                    StrTotalSubstrate = $"[{ArrUseSubstrate[_i]}]{_subTotalTemp}";
+                                if (string.IsNullOrEmpty(strTotalSubstrate)) {
+                                    strTotalSubstrate = $"[{ArrUseSubstrate[_i]}]{_subTotalTemp}";
                                 }
                                 else {
-                                    StrTotalSubstrate = $"{StrTotalSubstrate},[{ArrUseSubstrate[_i]}]{_subTotalTemp}";
+                                    strTotalSubstrate = $"{strTotalSubstrate},[{ArrUseSubstrate[_i]}]{_subTotalTemp}";
                                 }
                                 _subTotalTemp = string.Empty;
                             }
@@ -683,10 +686,10 @@ namespace ProductDatabase {
                             _cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
                             _cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
                             _cmd.Parameters.Add("@col_Revision", DbType.String).Value = StrRevision;
-                            _cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = StrSerialFirstNumber;
-                            _cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = StrSerialLastNumber;
-                            _cmd.Parameters.Add("@col_Serial_LastNum", DbType.String).Value = IntSerialLastNumber;
-                            _cmd.Parameters.Add("@col_Use_Substrate", DbType.String).Value = StrTotalSubstrate;
+                            _cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = strSerialFirstNumber;
+                            _cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = strSerialLastNumber;
+                            _cmd.Parameters.Add("@col_Serial_LastNum", DbType.String).Value = intSerialLastNumber;
+                            _cmd.Parameters.Add("@col_Use_Substrate", DbType.String).Value = strTotalSubstrate;
                             _cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
 
                             _cmd.ExecuteNonQuery();
@@ -698,7 +701,7 @@ namespace ProductDatabase {
         }
         private void RegisterCheck() {
             try {
-                StrSerial.Clear();
+                strSerial.Clear();
 
                 if (!NumberCheck()) { return; }
                 if (!QuantityCheck()) { return; }
@@ -712,7 +715,7 @@ namespace ProductDatabase {
                     case 6:
                     case 7:
                         MessageBox.Show("シリアルラベルを印刷します。");
-                        StrSerialType = "Label";
+                        strSerialType = "Label";
                         if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
                         break;
                     default:
@@ -723,7 +726,7 @@ namespace ProductDatabase {
                     case 2:
                     case 3:
                         MessageBox.Show("バーコードラベルを印刷します。");
-                        StrSerialType = "Barcode";
+                        strSerialType = "Barcode";
                         if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
                         break;
                     default:
@@ -743,14 +746,14 @@ namespace ProductDatabase {
                     case 6:
                     case 7:
                     case 8:
-                        StrSerialType = "Label";
-                        StrSerialFirstNumber = GenerateCode(IntSerialFirstNumber);
-                        StrSerialLastNumber = GenerateCode(IntSerialLastNumber);
+                        strSerialType = "Label";
+                        strSerialFirstNumber = GenerateCode(IntSerialFirstNumber);
+                        strSerialLastNumber = GenerateCode(intSerialLastNumber);
                         break;
                     case 2:
-                        StrSerialType = "Barcode";
-                        StrSerialFirstNumber = GenerateCode(IntSerialFirstNumber);
-                        StrSerialLastNumber = GenerateCode(IntSerialLastNumber);
+                        strSerialType = "Barcode";
+                        strSerialFirstNumber = GenerateCode(IntSerialFirstNumber);
+                        strSerialLastNumber = GenerateCode(intSerialLastNumber);
                         break;
                     default:
                         break;
@@ -780,8 +783,8 @@ namespace ProductDatabase {
                                 _checkBox.Enabled = false;
                             }
                         }
-                        if (IntPrintType == 5 || IntPrintType == 6) { SubstrateListPrintButton.Enabled = true; }
-                        if (IntPrintType == 6 || IntPrintType == 7) { CheckSheetPrintButton.Enabled = true; ; }
+                        if (IntPrintType is 5 or 6) { SubstrateListPrintButton.Enabled = true; }
+                        if (IntPrintType is 6 or 7) { CheckSheetPrintButton.Enabled = true; ; }
                         break;
                     default:
                         break;
@@ -860,11 +863,11 @@ namespace ProductDatabase {
                         if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
                         for (int _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
 
-                            CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                            CheckBox? _objCbx = Controls[checkBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
                             _objCbx.Enabled = true;
                             _objCbx.Checked = true;
 
-                            DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
+                            DataGridView? _objDgv = Controls[dataGridViewNames[_i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
                             _objDgv.Columns[2].ReadOnly = false;
                             _objDgv.Columns[3].ReadOnly = false;
 
@@ -912,21 +915,21 @@ namespace ProductDatabase {
                     case 7:
                     case 8:
                         for (int _i = 0; _i < IntQuantity; _i++) {
-                            StrSerialType = "Label";
-                            StrSerial.Add(GenerateCode(IntSerialFirstNumber + _i));
+                            strSerialType = "Label";
+                            strSerial.Add(GenerateCode(IntSerialFirstNumber + _i));
                         }
                         break;
                     case 2:
                         for (int _i = 0; _i < IntQuantity; _i++) {
-                            StrSerialType = "Barcode";
-                            StrSerial.Add(GenerateCode(IntSerialFirstNumber + _i));
+                            strSerialType = "Barcode";
+                            strSerial.Add(GenerateCode(IntSerialFirstNumber + _i));
                         }
                         break;
                     default:
                         break;
                 }
 
-                string _strSQLSerial = string.Join("','", StrSerial);
+                string _strSQLSerial = string.Join("','", strSerial);
 
                 List<string> _strSerialDuplication = [];
                 using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
@@ -963,7 +966,7 @@ namespace ProductDatabase {
             _pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
             LabelProNumLabelsToPrint = IntQuantity;
-            FontUnderbar = false;
+            fontUnderbar = false;
 
             switch (PrintFlg) {
                 case 1:
@@ -1010,22 +1013,22 @@ namespace ProductDatabase {
                 int _startLine = 0;
                 int _labelProPageNum = 0;
 
-                switch (StrSerialType) {
+                switch (strSerialType) {
                     case "Label":
                         if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnullです。"); }
-                        _maxX = SettingsLabelPro.LabelProPageSettings.NumLabelsX;
-                        _maxY = SettingsLabelPro.LabelProPageSettings.NumLabelsY;
-                        _sizeX = (float)SettingsLabelPro.LabelProPageSettings.SizeX;
-                        _sizeY = (float)SettingsLabelPro.LabelProPageSettings.SizeY;
-                        _offsetX = SettingsLabelPro.LabelProPageSettings.OffsetX;
-                        _offsetY = SettingsLabelPro.LabelProPageSettings.OffsetY;
-                        _intervalX = SettingsLabelPro.LabelProPageSettings.IntervalX;
-                        _intervalY = SettingsLabelPro.LabelProPageSettings.IntervalY;
-                        _headerPos = SettingsLabelPro.LabelProPageSettings.HeaderPos;
-                        _headerString = ConvertHeaderFooterString(SettingsLabelPro.LabelProPageSettings.HeaderString);
-                        _headerFooterFont = SettingsLabelPro.LabelProPageSettings.HeaderFooterFont;
-                        _intNumLabels = SettingsLabelPro.LabelProLabelSettings.NumLabels;
-                        _intCountNumLabels = SettingsLabelPro.LabelProLabelSettings.NumLabels;
+                        _maxX = SettingsLabelPro._labelProPageSettings.NumLabelsX;
+                        _maxY = SettingsLabelPro._labelProPageSettings.NumLabelsY;
+                        _sizeX = (float)SettingsLabelPro._labelProPageSettings.SizeX;
+                        _sizeY = (float)SettingsLabelPro._labelProPageSettings.SizeY;
+                        _offsetX = SettingsLabelPro._labelProPageSettings.OffsetX;
+                        _offsetY = SettingsLabelPro._labelProPageSettings.OffsetY;
+                        _intervalX = SettingsLabelPro._labelProPageSettings.IntervalX;
+                        _intervalY = SettingsLabelPro._labelProPageSettings.IntervalY;
+                        _headerPos = SettingsLabelPro._labelProPageSettings.HeaderPos;
+                        _headerString = ConvertHeaderFooterString(SettingsLabelPro._labelProPageSettings.HeaderString);
+                        _headerFooterFont = SettingsLabelPro._labelProPageSettings.HeaderFooterFont;
+                        _intNumLabels = SettingsLabelPro._labelProLabelSettings.NumLabels;
+                        _intCountNumLabels = SettingsLabelPro._labelProLabelSettings.NumLabels;
                         _startLine = (int)SerialPrintPostionNumericUpDown.Value - 1;
                         break;
                     case "Barcode":
@@ -1151,8 +1154,8 @@ namespace ProductDatabase {
                 _ => _monthCode
             };
 
-            string _outputCode = StrSerialType switch {
-                "Label" => SettingsLabelPro.LabelProLabelSettings.Format,
+            string _outputCode = strSerialType switch {
+                "Label" => SettingsLabelPro._labelProLabelSettings.Format,
                 "Barcode" => SettingsBarcodePro.BarcodeProLabelSettings.Format,
                 _ => string.Empty
             };
@@ -1176,15 +1179,15 @@ namespace ProductDatabase {
             float _stringPosX;
             float _stringPosY;
             Font _fnt;
-            switch (StrSerialType) {
+            switch (strSerialType) {
                 case "Label":
                     if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnull"); }
-                    _sizeX = (decimal)SettingsLabelPro.LabelProPageSettings.SizeX / 25.4M * resolution * magnitude;
-                    _sizeY = (decimal)SettingsLabelPro.LabelProPageSettings.SizeY / 25.4M * resolution * magnitude;
-                    _fontSize = (decimal)SettingsLabelPro.LabelProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
-                    _stringPosY = (int)((decimal)SettingsLabelPro.LabelProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
-                    FontStyle _style = FontUnderbar ? FontStyle.Underline : FontStyle.Regular;
-                    _fnt = new Font(SettingsLabelPro.LabelProLabelSettings.Font.Name, (float)_fontSize, _style);
+                    _sizeX = (decimal)SettingsLabelPro._labelProPageSettings.SizeX / 25.4M * resolution * magnitude;
+                    _sizeY = (decimal)SettingsLabelPro._labelProPageSettings.SizeY / 25.4M * resolution * magnitude;
+                    _fontSize = (decimal)SettingsLabelPro._labelProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
+                    _stringPosY = (int)((decimal)SettingsLabelPro._labelProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
+                    FontStyle _style = fontUnderbar ? FontStyle.Underline : FontStyle.Regular;
+                    _fnt = new Font(SettingsLabelPro._labelProLabelSettings.Font.Name, (float)_fontSize, _style);
 
                     _labelImage = new((int)_sizeX, (int)_sizeY);
                     _g = Graphics.FromImage(_labelImage);
@@ -1424,16 +1427,16 @@ namespace ProductDatabase {
                 _workSheetTemp.Cell(_regDateRange).Value = StrRegDate;
                 _workSheetTemp.Cell(_productModelRange).Value = _productModel;
                 _workSheetTemp.Cell(_quantityRange).Value = IntQuantity;
-                _workSheetTemp.Cell(_serialFirstRange).Value = StrSerialFirstNumber;
-                _workSheetTemp.Cell(_serialLastRange).Value = StrSerialLastNumber;
+                _workSheetTemp.Cell(_serialFirstRange).Value = strSerialFirstNumber;
+                _workSheetTemp.Cell(_serialLastRange).Value = strSerialLastNumber;
                 _workSheetTemp.Cell(_commentRange).Value = StrComment;
 
                 int _i = 0;
                 int _findColumn = 0;
-                for (_i = 0; _i <= ListUsedSubstrate.Count - 1; _i++) {
+                for (_i = 0; _i <= listUsedSubstrate.Count - 1; _i++) {
 
                     IXLRange _searchRange = _workSheetMain.Range(_findRow, 1, _findRow, 28);
-                    string _searchValue = $"{ListUsedSubstrate[_i]}";
+                    string _searchValue = $"{listUsedSubstrate[_i]}";
                     IXLCell? _foundCell = _searchRange.CellsUsed(c => c.Value.ToString() == _searchValue).FirstOrDefault();
 
                     if (_foundCell != null) {
@@ -1442,7 +1445,7 @@ namespace ProductDatabase {
                         int _foundColumn = _foundCell.Address.ColumnNumber;
                     }
 
-                    foreach (IXLCell _cell in _workSheetMain.Search(ListUsedSubstrate[_i])) {
+                    foreach (IXLCell _cell in _workSheetMain.Search(listUsedSubstrate[_i])) {
                         if (_cell.Address.RowNumber == _findRow) {
                             _findColumn = _cell.Address.ColumnNumber;
                             break;
@@ -1450,7 +1453,7 @@ namespace ProductDatabase {
                     }
 
                     if (_findColumn == 0) {
-                        throw new Exception($"{ListUsedSubstrate[_i]}が見つかりません。");
+                        throw new Exception($"{listUsedSubstrate[_i]}が見つかりません。");
                     }
 
                     var _mainCellValue = _workSheetMain.Cell(_findRow, _findColumn + 1).Value.ToString();
@@ -1458,10 +1461,10 @@ namespace ProductDatabase {
 
                     if (_mainCellValue != string.Empty) {
                         if (_tempCellValue == string.Empty) {
-                            _workSheetTemp.Cell(_mainCellValue).Value = $"{ListUsedProductNumber[_i]}({ListUsedQuantity[_i]})";
+                            _workSheetTemp.Cell(_mainCellValue).Value = $"{listUsedProductNumber[_i]}({listUsedQuantity[_i]})";
                         }
                         else {
-                            _workSheetTemp.Cell(_mainCellValue).Value += $"    {ListUsedProductNumber[_i]}({ListUsedQuantity[_i]})";
+                            _workSheetTemp.Cell(_mainCellValue).Value += $"    {listUsedProductNumber[_i]}({listUsedQuantity[_i]})";
                         }
                     }
                 }
@@ -1507,19 +1510,19 @@ namespace ProductDatabase {
         private void SubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBox_CheckedChanged(sender, e); }
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { ClosingEvents(); }
         private void シリアルラベル印刷ToolStripMenuItem_Click(object sender, EventArgs e) {
-            StrSerialType = "Label";
+            strSerialType = "Label";
             PrintBarcode(1);
         }
         private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            StrSerialType = "Label";
+            strSerialType = "Label";
             PrintBarcode(2);
         }
         private void バーコード印刷ToolStripMenuItem_Click(object sender, EventArgs e) {
-            StrSerialType = "Barcode";
+            strSerialType = "Barcode";
             PrintBarcode(1);
         }
         private void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            StrSerialType = "Barcode";
+            strSerialType = "Barcode";
             PrintBarcode(2);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -1543,7 +1546,7 @@ namespace ProductDatabase {
                 $"StrPerson\t\t\t[{StrPerson}]\r\n" +
                 $"IntQuantity\t\t[{IntQuantity}]\r\n" +
                 $"IntSerialFirstNumber\t[{IntSerialFirstNumber}]\r\n" +
-                $"IntSerialLastNumber\t\t[{IntSerialLastNumber}]\r\n" +
+                $"IntSerialLastNumber\t\t[{intSerialLastNumber}]\r\n" +
                 $"StrInitial\t\t\t[{StrInitial}]\r\n" +
                 $"IntRegType\t\t[{IntRegType}]\r\n" +
                 $"IntPrintType\t\t[{IntPrintType}]\r\n" +

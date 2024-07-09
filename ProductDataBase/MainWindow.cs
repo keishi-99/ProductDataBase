@@ -43,7 +43,9 @@ namespace ProductDatabase {
 
         private static readonly string[] separator = ["//"];
 
-        public MainWindow() => InitializeComponent();
+        public MainWindow() {
+            InitializeComponent();
+        }
 
         public static string GetConnectionString1() {
             return new SQLiteConnectionStringBuilder() { DataSource = "./db/information.db" }.ToString();

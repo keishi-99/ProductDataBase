@@ -34,21 +34,23 @@ namespace ProductDatabase {
         public string StrSerialLastNumber { get; set; } = string.Empty;
         public string StrTotalSubstrate { get; set; } = string.Empty;
 
-        private readonly List<string> ListUsedSubstrate = [];
-        private readonly List<string> ListUsedProductNumber = [];
-        private readonly List<int> ListUsedQuantity = [];
-        private readonly List<string> CheckBoxNames = [
+        private readonly List<string> listUsedSubstrate = [];
+        private readonly List<string> listUsedProductNumber = [];
+        private readonly List<int> listUsedQuantity = [];
+        private readonly List<string> checkBoxNames = [
                         "Substrate1CheckBox", "Substrate2CheckBox", "Substrate3CheckBox", "Substrate4CheckBox","Substrate5CheckBox",
                         "Substrate6CheckBox", "Substrate7CheckBox", "Substrate8CheckBox", "Substrate9CheckBox","Substrate10CheckBox"
                         ];
-        private readonly List<string> DataGridViewNames = [
+        private readonly List<string> dataGridViewNames = [
                         "Substrate1DataGridView", "Substrate2DataGridView", "Substrate3DataGridView", "Substrate4DataGridView","Substrate5DataGridView",
                         "Substrate6DataGridView", "Substrate7DataGridView", "Substrate8DataGridView", "Substrate9DataGridView","Substrate10DataGridView"
                         ];
-        private CheckBox? ObjCbx;
-        private DataGridView? ObjDgv;
+        private CheckBox? objCbx;
+        private DataGridView? objDgv;
 
-        public SubstrateChange2() => InitializeComponent();
+        public SubstrateChange2() {
+            InitializeComponent();
+        }
 
         // ロードイベント
         private void LoadEvents() {
@@ -88,19 +90,19 @@ namespace ProductDatabase {
                             int _quantity = IntQuantity;
 
                             // チェックボックスとDgvを有効に
-                            ObjCbx = Controls[CheckBoxNames[_i]] as CheckBox;
-                            if (ObjCbx != null) {
-                                ObjCbx.Enabled = true;
-                                ObjCbx.Checked = true;
+                            objCbx = Controls[checkBoxNames[_i]] as CheckBox;
+                            if (objCbx != null) {
+                                objCbx.Enabled = true;
+                                objCbx.Checked = true;
                             }
 
-                            ObjDgv = Controls[DataGridViewNames[_i]] as DataGridView;
-                            if (ObjDgv != null) {
-                                ObjDgv.RowHeadersWidth = 30;
-                                ObjDgv.Columns[2].DefaultCellStyle.BackColor = Color.LightGray;
-                                ObjDgv.Columns[2].ReadOnly = true;
-                                ObjDgv.Columns[3].ReadOnly = false;
-                                ObjDgv.Columns[4].ReadOnly = false;
+                            objDgv = Controls[dataGridViewNames[_i]] as DataGridView;
+                            if (objDgv != null) {
+                                objDgv.RowHeadersWidth = 30;
+                                objDgv.Columns[2].DefaultCellStyle.BackColor = Color.LightGray;
+                                objDgv.Columns[2].ReadOnly = true;
+                                objDgv.Columns[3].ReadOnly = false;
+                                objDgv.Columns[4].ReadOnly = false;
                             }
 
                             using SQLiteConnection _con = new(MainWindow.GetConnectionString2());
@@ -122,7 +124,7 @@ namespace ProductDatabase {
                                 int _intStock = int.Parse($"{_dr["col_Stock"]}");
                                 int _colFlg = int.Parse($"{_dr["col_Flg"]}");
                                 _strSubstrateName = $"{_dr["col_Substrate_Name"]}";
-                                if (ObjCbx != null) { ObjCbx.Text = $"{_strSubstrateName} - {ArrUseSubstrate[_i]}"; }
+                                if (objCbx != null) { objCbx.Text = $"{_strSubstrateName} - {ArrUseSubstrate[_i]}"; }
 
                                 int _subIndex = 0;
                                 bool _b1 = false;
@@ -145,36 +147,36 @@ namespace ProductDatabase {
                                 }
 
                                 if (_colFlg == 1) {
-                                    if (ObjDgv == null) { break; }
-                                    ObjDgv.Rows.Add();
-                                    ObjDgv.Rows[_j].Cells[0].Value = _strSubstrateNum;
-                                    ObjDgv.Rows[_j].Cells[1].Value = _intStock;
+                                    if (objDgv == null) { break; }
+                                    objDgv.Rows.Add();
+                                    objDgv.Rows[_j].Cells[0].Value = _strSubstrateNum;
+                                    objDgv.Rows[_j].Cells[1].Value = _intStock;
 
                                     if (_intUsedQuantity != 0) {
-                                        ObjDgv.Rows[_j].Cells[2].Value = _intUsedQuantity;
-                                        ObjDgv.Rows[_j].Cells[3].Value = _intUsedQuantity;
-                                        ObjDgv.Rows[_j].Cells[4].Value = true;
+                                        objDgv.Rows[_j].Cells[2].Value = _intUsedQuantity;
+                                        objDgv.Rows[_j].Cells[3].Value = _intUsedQuantity;
+                                        objDgv.Rows[_j].Cells[4].Value = true;
                                     }
                                     else {
-                                        ObjDgv.Rows[_j].Cells[2].Value = 0;
-                                        ObjDgv.Rows[_j].Cells[3].Value = 0;
+                                        objDgv.Rows[_j].Cells[2].Value = 0;
+                                        objDgv.Rows[_j].Cells[3].Value = 0;
                                     }
                                     _j++;
                                 }
                                 else if (_strUsedSubNum == _strSubstrateNum) {
-                                    if (ObjDgv == null) { break; }
-                                    ObjDgv.Rows.Add();
-                                    ObjDgv.Rows[_j].Cells[0].Value = _strSubstrateNum;
-                                    ObjDgv.Rows[_j].Cells[1].Value = _intStock;
+                                    if (objDgv == null) { break; }
+                                    objDgv.Rows.Add();
+                                    objDgv.Rows[_j].Cells[0].Value = _strSubstrateNum;
+                                    objDgv.Rows[_j].Cells[1].Value = _intStock;
 
                                     if (_intUsedQuantity != 0) {
-                                        ObjDgv.Rows[_j].Cells[2].Value = _intUsedQuantity;
-                                        ObjDgv.Rows[_j].Cells[3].Value = _intUsedQuantity;
-                                        ObjDgv.Rows[_j].Cells[4].Value = true;
+                                        objDgv.Rows[_j].Cells[2].Value = _intUsedQuantity;
+                                        objDgv.Rows[_j].Cells[3].Value = _intUsedQuantity;
+                                        objDgv.Rows[_j].Cells[4].Value = true;
                                     }
                                     else {
-                                        ObjDgv.Rows[_j].Cells[2].Value = 0;
-                                        ObjDgv.Rows[_j].Cells[3].Value = 0;
+                                        objDgv.Rows[_j].Cells[2].Value = 0;
+                                        objDgv.Rows[_j].Cells[3].Value = 0;
                                     }
                                     _j++;
                                 }
@@ -203,18 +205,18 @@ namespace ProductDatabase {
                 PersonComboBox.Enabled = false;
                 RegisterButton.Enabled = false;
                 for (int _i = 0; _i <= 9; _i++) {
-                    ObjCbx = Controls[CheckBoxNames[_i]] as CheckBox;
-                    if (ObjCbx != null) {
-                        ObjCbx.Enabled = false;
+                    objCbx = Controls[checkBoxNames[_i]] as CheckBox;
+                    if (objCbx != null) {
+                        objCbx.Enabled = false;
                     }
 
-                    ObjDgv = Controls[DataGridViewNames[_i]] as DataGridView;
-                    if (ObjDgv != null) {
-                        ObjDgv.Enabled = false;
+                    objDgv = Controls[dataGridViewNames[_i]] as DataGridView;
+                    if (objDgv != null) {
+                        objDgv.Enabled = false;
                     }
                 }
                 // リスト印刷ボタンを有効に
-                if (IntPrintType == 5 || IntPrintType == 6) {
+                if (IntPrintType is 5 or 6) {
                     SubstrateListPrintButton.Enabled = true;
                 }
 
@@ -230,11 +232,11 @@ namespace ProductDatabase {
                         if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
                         for (int _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
 
-                            CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                            CheckBox? _objCbx = Controls[checkBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
                             _objCbx.Enabled = true;
                             _objCbx.Checked = true;
 
-                            DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
+                            DataGridView? _objDgv = Controls[dataGridViewNames[_i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
                             _objDgv.Columns[3].ReadOnly = false;
                             _objDgv.Columns[4].ReadOnly = false;
 
@@ -285,10 +287,10 @@ namespace ProductDatabase {
                             if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
                             for (int _i = 0; _i <= ArrUseSubstrate.Length; _i++) {
 
-                                CheckBox? _objCbx = Controls[CheckBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                                CheckBox? _objCbx = Controls[checkBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
 
                                 if (_objCbx.Checked) {
-                                    DataGridView? _objDgv = Controls[DataGridViewNames[_i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
+                                    DataGridView? _objDgv = Controls[dataGridViewNames[_i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
                                     int _dgvRowCnt = _objDgv.Rows.Count;
                                     string _subTotalTemp = string.Empty;
 
@@ -395,9 +397,9 @@ namespace ProductDatabase {
                                             switch (IntPrintType) {
                                                 case 5:
                                                 case 6:
-                                                    ListUsedSubstrate.Add(ArrUseSubstrate[_i]);
-                                                    if (_substrateNum != null) { ListUsedProductNumber.Add(_substrateNum); }
-                                                    ListUsedQuantity.Add(_useValue);
+                                                    listUsedSubstrate.Add(ArrUseSubstrate[_i]);
+                                                    if (_substrateNum != null) { listUsedProductNumber.Add(_substrateNum); }
+                                                    listUsedQuantity.Add(_useValue);
                                                     break;
                                                 default:
                                                     break;
@@ -518,10 +520,10 @@ namespace ProductDatabase {
 
                 int _i = 0;
                 int _findColumn = 0;
-                for (_i = 0; _i <= ListUsedSubstrate.Count - 1; _i++) {
+                for (_i = 0; _i <= listUsedSubstrate.Count - 1; _i++) {
 
                     IXLRange _searchRange = _workSheetMain.Range(_findRow, 1, _findRow, 28);
-                    string _searchValue = $"{ListUsedSubstrate[_i]}";
+                    string _searchValue = $"{listUsedSubstrate[_i]}";
                     IXLCell? _foundCell = _searchRange.CellsUsed(c => c.Value.ToString() == _searchValue).FirstOrDefault();
 
                     if (_foundCell != null) {
@@ -530,7 +532,7 @@ namespace ProductDatabase {
                         int foundColumn = _foundCell.Address.ColumnNumber;
                     }
 
-                    foreach (IXLCell _cell in _workSheetMain.Search(ListUsedSubstrate[_i])) {
+                    foreach (IXLCell _cell in _workSheetMain.Search(listUsedSubstrate[_i])) {
                         if (_cell.Address.RowNumber == _findRow) {
                             _findColumn = _cell.Address.ColumnNumber;
                             break;
@@ -538,7 +540,7 @@ namespace ProductDatabase {
                     }
 
                     if (_findColumn == 0) {
-                        throw new Exception($"{ListUsedSubstrate[_i]}が見つかりません。");
+                        throw new Exception($"{listUsedSubstrate[_i]}が見つかりません。");
                     }
 
                     var _mainCellValue = _workSheetMain.Cell(_findRow, _findColumn + 1).Value.ToString();
@@ -546,10 +548,10 @@ namespace ProductDatabase {
 
                     if (_mainCellValue != string.Empty) {
                         if (_tempCellValue == string.Empty) {
-                            _workSheetTemp.Cell(_mainCellValue).Value = $"{ListUsedProductNumber[_i]}({ListUsedQuantity[_i]})";
+                            _workSheetTemp.Cell(_mainCellValue).Value = $"{listUsedProductNumber[_i]}({listUsedQuantity[_i]})";
                         }
                         else {
-                            _workSheetTemp.Cell(_mainCellValue).Value += $"    {ListUsedProductNumber[_i]}({ListUsedQuantity[_i]})";
+                            _workSheetTemp.Cell(_mainCellValue).Value += $"    {listUsedProductNumber[_i]}({listUsedQuantity[_i]})";
                         }
                     }
                 }

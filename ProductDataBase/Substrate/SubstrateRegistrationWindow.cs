@@ -41,7 +41,10 @@ namespace ProductDatabase {
                     "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
 
-        public SubstrateRegistrationWindow() => InitializeComponent();
+        public SubstrateRegistrationWindow() {
+            InitializeComponent();
+        }
+
         // ロードイベント
         private void LoadEvents() {
             try {
@@ -588,7 +591,7 @@ namespace ProductDatabase {
         // 入力数値のみ
         private void NumericOnly(object sender, KeyPressEventArgs e) {
             // 0～9と、バックスペース以外の時は、イベントをキャンセルする
-            if ((e.KeyChar < '0' || '9' < e.KeyChar) && e.KeyChar != '\b') {
+            if (e.KeyChar is (< '0' or > '9') and not '\b') {
                 e.Handled = true;
             }
         }

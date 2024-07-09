@@ -9,7 +9,7 @@ namespace ProductDatabase {
 
         public DataTable DtHistoryTable { get; set; } = new();
 
-        private readonly List<string> ListColFilter = [];
+        private readonly List<string> listColFilter = [];
 
         public int IntRadioBtnFlg { get; set; }
 
@@ -32,28 +32,28 @@ namespace ProductDatabase {
                         using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
                             DtHistoryTable.Clear();
 
-                            string query = $"SELECT _rowid_, * FROM Substrate_Reg_{StrProductName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ DESC";
-                            using SQLiteCommand command = new(query, _con);
-                            command.Parameters.AddWithValue("@col_Substrate_Model", StrSubstrateModel);
+                            string _query = $"SELECT _rowid_, * FROM Substrate_Reg_{StrProductName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ DESC";
+                            using SQLiteCommand _command = new(_query, _con);
+                            _command.Parameters.AddWithValue("@col_Substrate_Model", StrSubstrateModel);
                             // SQLiteDataAdapterのインスタンス化
-                            using SQLiteDataAdapter _adapter = new(command);
+                            using SQLiteDataAdapter _adapter = new(_command);
 
                             // データの取得とDataTableへの格納
                             _adapter.Fill(DtHistoryTable);
 
                             DataBaseDataGridView.DataSource = DtHistoryTable;
 
-                            ListColFilter.Add("");
+                            listColFilter.Add("");
                             for (int _i = 0; _i < DataBaseDataGridView.ColumnCount; _i++) {
                                 string _headerValue = DataBaseDataGridView.Columns[_i].HeaderCell.Value?.ToString() ?? string.Empty;
-                                if (_headerValue != null) { ListColFilter.Add(_headerValue); }
+                                if (_headerValue != null) { listColFilter.Add(_headerValue); }
                             }
 
                             // 最大サイズをディスプレイサイズに合わせる
                             if (Screen.PrimaryScreen != null) {
-                                int h = Screen.PrimaryScreen.Bounds.Height;
-                                int w = Screen.PrimaryScreen.Bounds.Width;
-                                DataBaseDataGridView.MaximumSize = new Size(w, h);
+                                int _h = Screen.PrimaryScreen.Bounds.Height;
+                                int _w = Screen.PrimaryScreen.Bounds.Width;
+                                DataBaseDataGridView.MaximumSize = new Size(_w, _h);
                             }
                             DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(DataBaseDataGridView.Font, FontStyle.Bold);
                             DataBaseDataGridView.RowHeadersVisible = true;
@@ -98,28 +98,28 @@ namespace ProductDatabase {
                         using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
                             DtHistoryTable.Clear();
 
-                            string query = $"SELECT _rowid_, * FROM Product_Reg_{StrProductName} WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC";
-                            using SQLiteCommand command = new(query, _con);
-                            command.Parameters.AddWithValue("@col_Product_Model", StrProductModel);
+                            string _query = $"SELECT _rowid_, * FROM Product_Reg_{StrProductName} WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC";
+                            using SQLiteCommand _command = new(_query, _con);
+                            _command.Parameters.AddWithValue("@col_Product_Model", StrProductModel);
                             // SQLiteDataAdapterのインスタンス化
-                            using SQLiteDataAdapter _adapter = new(command);
+                            using SQLiteDataAdapter _adapter = new(_command);
 
                             // データの取得とDataTableへの格納
                             _adapter.Fill(DtHistoryTable);
 
                             DataBaseDataGridView.DataSource = DtHistoryTable;
 
-                            ListColFilter.Add("");
+                            listColFilter.Add("");
                             for (int _i = 0; _i < DataBaseDataGridView.ColumnCount; _i++) {
                                 string _headerValue = DataBaseDataGridView.Columns[_i].HeaderCell.Value?.ToString() ?? string.Empty;
-                                if (_headerValue != null) { ListColFilter.Add(_headerValue); }
+                                if (_headerValue != null) { listColFilter.Add(_headerValue); }
                             }
 
                             // 最大サイズをディスプレイサイズに合わせる
                             if (Screen.PrimaryScreen != null) {
-                                int h = Screen.PrimaryScreen.Bounds.Height;
-                                int w = Screen.PrimaryScreen.Bounds.Width;
-                                DataBaseDataGridView.MaximumSize = new Size(w, h);
+                                int _h = Screen.PrimaryScreen.Bounds.Height;
+                                int _w = Screen.PrimaryScreen.Bounds.Width;
+                                DataBaseDataGridView.MaximumSize = new Size(_w, _h);
                             }
                             DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(DataBaseDataGridView.Font, FontStyle.Bold);
                             DataBaseDataGridView.RowHeadersVisible = true;
@@ -163,28 +163,28 @@ namespace ProductDatabase {
                         using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
                             DtHistoryTable.Clear();
 
-                            string query = $"SELECT _rowid_, * FROM Reprint WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC";
-                            using SQLiteCommand command = new(query, _con);
-                            command.Parameters.AddWithValue("@col_Product_Model", StrProductModel);
+                            string _query = $"SELECT _rowid_, * FROM Reprint WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC";
+                            using SQLiteCommand _command = new(_query, _con);
+                            _command.Parameters.AddWithValue("@col_Product_Model", StrProductModel);
                             // SQLiteDataAdapterのインスタンス化
-                            using SQLiteDataAdapter _adapter = new(command);
+                            using SQLiteDataAdapter _adapter = new(_command);
 
                             // データの取得とDataTableへの格納
                             _adapter.Fill(DtHistoryTable);
 
                             DataBaseDataGridView.DataSource = DtHistoryTable;
 
-                            ListColFilter.Add("");
+                            listColFilter.Add("");
                             for (int _i = 0; _i < DataBaseDataGridView.ColumnCount; _i++) {
                                 string _headerValue = DataBaseDataGridView.Columns[_i].HeaderCell.Value?.ToString() ?? string.Empty;
-                                if (_headerValue != null) { ListColFilter.Add(_headerValue); }
+                                if (_headerValue != null) { listColFilter.Add(_headerValue); }
                             }
 
                             // 最大サイズをディスプレイサイズに合わせる
                             if (Screen.PrimaryScreen != null) {
-                                int h = Screen.PrimaryScreen.Bounds.Height;
-                                int w = Screen.PrimaryScreen.Bounds.Width;
-                                DataBaseDataGridView.MaximumSize = new Size(w, h);
+                                int _h = Screen.PrimaryScreen.Bounds.Height;
+                                int _w = Screen.PrimaryScreen.Bounds.Width;
+                                DataBaseDataGridView.MaximumSize = new Size(_w, _h);
                             }
                             DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(DataBaseDataGridView.Font, FontStyle.Bold);
                             DataBaseDataGridView.RowHeadersVisible = true;
@@ -232,10 +232,10 @@ namespace ProductDatabase {
                     DtHistoryTable.DefaultView.RowFilter = null;
                 }
                 else if (CategoryComboBox.Text == "ID") {
-                    if (int.TryParse(FilterStringTextBox.Text, out int id)) { DtHistoryTable.DefaultView.RowFilter = $"{ListColFilter[CategoryComboBox.SelectedIndex]} = '{id}'"; }
+                    if (int.TryParse(FilterStringTextBox.Text, out int _id)) { DtHistoryTable.DefaultView.RowFilter = $"{listColFilter[CategoryComboBox.SelectedIndex]} = '{_id}'"; }
                 }
                 else if (CategoryComboBox.Text != "") {
-                    DtHistoryTable.DefaultView.RowFilter = $"{ListColFilter[CategoryComboBox.SelectedIndex]} LIKE '*{FilterStringTextBox.Text}*'";
+                    DtHistoryTable.DefaultView.RowFilter = $"{listColFilter[CategoryComboBox.SelectedIndex]} LIKE '*{FilterStringTextBox.Text}*'";
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
