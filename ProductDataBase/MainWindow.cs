@@ -57,14 +57,14 @@ namespace ProductDatabase {
         private void LoadEvents() {
             try {
                 // その日のbakファイルがない場合バックアップ作成
-                DateTime _d = DateTime.Now;
-                string _bakFilepath = $".\\bak\\{_d.Year}\\_bak_{_d.Year}-{_d.Month:00}-{_d.Day:00}.db";
+                var _d = DateTime.Now;
+                var _bakFilepath = $".\\bak\\{_d.Year}\\_bak_{_d.Year}-{_d.Month:00}-{_d.Day:00}.db";
 
                 if (!File.Exists(_bakFilepath)) {
-                    string _filepath = "./db/registration.db";
+                    var _filepath = "./db/registration.db";
 
                     //コピー先のフォルダーが存在するか確認し、なければ作成します。
-                    string _targetFolder = Path.GetDirectoryName(_bakFilepath) ?? throw new ArgumentNullException(nameof(_bakFilepath));
+                    var _targetFolder = Path.GetDirectoryName(_bakFilepath) ?? throw new ArgumentNullException(nameof(_bakFilepath));
                     if (!Directory.Exists(_targetFolder)) {
                         Directory.CreateDirectory(_targetFolder);
                     }
@@ -112,7 +112,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateRegistration() {
-            DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
+            var _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
 
             if (_selectedRows.Length > 0) {
                 using SubstrateRegistrationWindow _window = new();
@@ -129,7 +129,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleProductRegistration1() {
-            DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+            var _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Product_Type = '{CategoryListBox3.SelectedItem}'");
 
             if (_selectedRows.Length > 0) {
                 using ProductRegistration1Window _window = new();
@@ -149,7 +149,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleRePrint() {
-            DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+            var _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Product_Type = '{CategoryListBox3.SelectedItem}'");
 
             if (_selectedRows.Length > 0) {
                 using RePrintWindow _window = new();
@@ -167,7 +167,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateChange1() {
-            DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+            var _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Product_Type = '{CategoryListBox3.SelectedItem}'");
 
             if (_selectedRows.Length > 0) {
                 using SubstrateChange1 _window = new();
@@ -235,8 +235,8 @@ namespace ProductDatabase {
                 CategoryListBox3.Items.Clear();
                 ProductDataTable.Clear();
 
-                RadioButton _selectedRadioButton = (RadioButton)sender;
-                string _strSqlQuery = string.Empty;
+                var _selectedRadioButton = (RadioButton)sender;
+                var _strSqlQuery = string.Empty;
 
                 switch (_selectedRadioButton.Name) {
                     case "CategoryRadioButton1":
@@ -282,10 +282,10 @@ namespace ProductDatabase {
 
                 HashSet<string> _productNames = [];
 
-                DataRow[] _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}'", "col_Product_Name ASC");
+                var _selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}'", "col_Product_Name ASC");
 
-                foreach (DataRow _row in _selectedRows) {
-                    string _productName = _row["col_Product_Name"].ToString() ?? string.Empty;
+                foreach (var _row in _selectedRows) {
+                    var _productName = _row["col_Product_Name"].ToString() ?? string.Empty;
                     if (!string.IsNullOrEmpty(_productName)) {
                         _productNames.Add(_productName);
                     }
@@ -399,7 +399,7 @@ namespace ProductDatabase {
         }
         private void ParseQRCodeInput() {
             try {
-                string[] _arr = QRCodeTextBox.Text.Split(separator, StringSplitOptions.None);
+                var _arr = QRCodeTextBox.Text.Split(separator, StringSplitOptions.None);
                 if (_arr.Length != 4) { throw new Exception("QRコードが正しくありません。"); }
                 if (_arr != null) {
                     StrProness1 = _arr[0];
@@ -415,7 +415,7 @@ namespace ProductDatabase {
             using (OdbcConnection _con = new("DSN=DrSum_PRONES_YD; UID=YD00; PWD=YD00")) {
                 _con.Open();
                 using OdbcCommand _cmd = new($"SELECT * FROM V_宮崎手配情報 WHERE 手配管理番号 = '{QRCodeTextBox.Text}'", _con);
-                using OdbcDataReader _dr = _cmd.ExecuteReader();
+                using var _dr = _cmd.ExecuteReader();
                 while (_dr.Read()) {
                     StrProness1 = _dr["手配製番"].ToString() ?? string.Empty;
                     StrProness2 = _dr["品目番号"].ToString() ?? string.Empty;
@@ -436,24 +436,24 @@ namespace ProductDatabase {
         private void FetchDataFromSQLite() {
             using SQLiteConnection _con = new(GetConnectionString1());
             _con.Open();
-            using SQLiteCommand _cmd = _con.CreateCommand();
+            using var _cmd = _con.CreateCommand();
             _cmd.CommandText = $"SELECT * FROM V_ItemList WHERE col_ItemNumber = '@StrProness2' OR 'col_ItemNumber:1' = '@StrProness2'";
             _cmd.Parameters.AddWithValue("@StrProness2", StrProness2);
-            using SQLiteDataReader _dr = _cmd.ExecuteReader();
+            using var _dr = _cmd.ExecuteReader();
             if (!_dr.HasRows) { throw new Exception($"品目番号が見つかりません。"); }
             while (_dr.Read()) {
-                string _colItemNumber = _dr["col_ItemNumber"].ToString() ?? string.Empty;
-                string _colItemNumber1 = _dr["col_ItemNumber:1"].ToString() ?? string.Empty;
+                var _colItemNumber = _dr["col_ItemNumber"].ToString() ?? string.Empty;
+                var _colItemNumber1 = _dr["col_ItemNumber:1"].ToString() ?? string.Empty;
 
                 if (!string.IsNullOrEmpty(_colItemNumber)) {
-                    string _substrateName = _dr["col_Substrate_Name"]?.ToString() ?? string.Empty;
-                    string _productName = _dr["col_Product_Name"]?.ToString() ?? string.Empty;
+                    var _substrateName = _dr["col_Substrate_Name"]?.ToString() ?? string.Empty;
+                    var _productName = _dr["col_Product_Name"]?.ToString() ?? string.Empty;
                     AddToLists(_colItemNumber, _substrateName, _productName, "1");
                 }
 
                 if (!string.IsNullOrEmpty(_colItemNumber1)) {
-                    string _productType = _dr["col_Product_Type"]?.ToString() ?? string.Empty;
-                    string _productName = _dr["col_Product_Name:1"]?.ToString() ?? string.Empty;
+                    var _productType = _dr["col_Product_Type"]?.ToString() ?? string.Empty;
+                    var _productName = _dr["col_Product_Name:1"]?.ToString() ?? string.Empty;
                     AddToLists(_colItemNumber1, _productType, _productName, "2");
                 }
             }
@@ -500,7 +500,7 @@ namespace ProductDatabase {
                 _adapter.Fill(ProductDataTable);
             }
 
-            DataRow[] _substrateRet = ProductDataTable.Select($"col_Product_Name = '{StrCategory13}' AND col_Substrate_Name = '{StrCategory12}'");
+            var _substrateRet = ProductDataTable.Select($"col_Product_Name = '{StrCategory13}' AND col_Substrate_Name = '{StrCategory12}'");
             OpenSubstrateRegistrationWindow(_substrateRet);
         }
         private void OpenSubstrateRegistrationWindow(DataRow[] substrateRet) {
@@ -526,7 +526,7 @@ namespace ProductDatabase {
                 _adapter.Fill(ProductDataTable);
             }
 
-            DataRow[] _productRet = ProductDataTable.Select($"col_Product_Name = '{StrCategory13}' AND col_Product_Type = '{StrCategory12}'");
+            var _productRet = ProductDataTable.Select($"col_Product_Name = '{StrCategory13}' AND col_Product_Type = '{StrCategory12}'");
             OpenProductRegistrationWindow(_productRet);
         }
         private void OpenProductRegistrationWindow(DataRow[] productRet) {
@@ -555,7 +555,7 @@ namespace ProductDatabase {
         }
         // フォント変更
         private void FontChange(object sender) {
-            RadioButton _radioButton = (RadioButton)sender;
+            var _radioButton = (RadioButton)sender;
             int _fontSize;
 
             switch (_radioButton.Name) {
