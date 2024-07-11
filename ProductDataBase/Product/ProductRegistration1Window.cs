@@ -30,7 +30,10 @@ namespace ProductDatabase {
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
 
-        public ProductRegistration1Window() => InitializeComponent();
+        public ProductRegistration1Window() {
+            InitializeComponent();
+        }
+
         // ロードイベント
         private void LoadEvents() {
             try {
@@ -48,16 +51,16 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = true;
 
                 // TextBoxへ今日の年月日を入力
-                DateTime _dtNow = DateTime.Now;
+                var _dtNow = DateTime.Now;
                 RegistrationDateMaskedTextBox.Text = _dtNow.ToShortDateString();
 
                 // DB1へ接続し担当者取得
                 using (SQLiteConnection _con = new(MainWindow.GetConnectionString1())) {
                     _con.Open();
-                    using SQLiteCommand _cmd = _con.CreateCommand();
+                    using var _cmd = _con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加
                     _cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
-                    using SQLiteDataReader _dr = _cmd.ExecuteReader();
+                    using var _dr = _cmd.ExecuteReader();
                     while (_dr.Read()) {
                         PersonComboBox.Items.Add($"{_dr["col_Person_Name"]}");
                     }
@@ -66,10 +69,10 @@ namespace ProductDatabase {
                 // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
                 using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
                     _con.Open();
-                    using SQLiteCommand _cmd = _con.CreateCommand();
+                    using var _cmd = _con.CreateCommand();
                     // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Stock]の合計を取得
                     _cmd.CommandText = $"SELECT col_Revision FROM Product_Reg_{StrProductName} ORDER BY _rowid_ DESC";
-                    object _result = _cmd.ExecuteScalar();
+                    var _result = _cmd.ExecuteScalar();
                     RevisionTextBox.Text = _result?.ToString() ?? "";
 
                     // テーブル検索SQL - [Product_Reg_[Product_Name]]テーブルの最新の[col_Serial_LastNum]を取得
@@ -79,7 +82,7 @@ namespace ProductDatabase {
                 }
 
                 // 変数[check_bin]の値に応じてCheckboxにチェックを入れる
-                foreach (string _checkBoxName in checkBoxNames) {
+                foreach (var _checkBoxName in checkBoxNames) {
                     if (Controls[_checkBoxName] is CheckBox checkBox) {
                         checkBox.Checked = (IntCheckBin & 0x1) == 1;
                         IntCheckBin >>= 1;
@@ -99,8 +102,8 @@ namespace ProductDatabase {
         private void RegisterCheck() {
             try {
                 // 入力フォームのチェック
-                bool _anyTextBoxEnabled = false;
-                bool _allTextBoxesFilled = true;
+                var _anyTextBoxEnabled = false;
+                var _allTextBoxesFilled = true;
 
                 foreach (Control control in Controls) {
                     if (control is TextBoxBase textBox && textBox.Enabled) {
@@ -118,8 +121,10 @@ namespace ProductDatabase {
 
                 if (QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
 
-                DialogResult _result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                if (_result == DialogResult.Cancel) return;
+                var _result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                if (_result == DialogResult.Cancel) {
+                    return;
+                }
 
                 switch (IntSerialDigit) {
                     case 3:
@@ -160,8 +165,8 @@ namespace ProductDatabase {
 
                 void CheckAndAdjustSerial(int threshold, int resetValue) {
 
-                    int _quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
-                    int _firstSerial = Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception());
+                    var _quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
+                    var _firstSerial = Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception());
                     if (_quantity + _firstSerial >= threshold) {
                         MessageBox.Show($"シリアルが{threshold}を超えるので{resetValue.ToString().PadLeft(IntSerialDigit, '0')}から開始します。");
                         FirstSerialNumberTextBox.Text = resetValue.ToString();
@@ -175,7 +180,7 @@ namespace ProductDatabase {
         }
         // コメント用テンプレート
         private void TemplateComment() {
-            string _templateWord = CommentComboBox.SelectedIndex switch {
+            var _templateWord = CommentComboBox.SelectedIndex switch {
                 0 => "[Rev.UP]変更点番号:",
                 _ => string.Empty
             };
@@ -183,7 +188,7 @@ namespace ProductDatabase {
         }
         // チェックボックスイベント
         private void CheckBoxChecked(object sender, EventArgs e) {
-            CheckBox _checkBox = (CheckBox)sender;
+            var _checkBox = (CheckBox)sender;
 
             switch (_checkBox.Name) {
                 case "OrderNumberCheckBox":
@@ -194,15 +199,24 @@ namespace ProductDatabase {
                     break;
                 case "QuantityCheckBox":
                     QuantityTextBox.Enabled = _checkBox.Checked;
-                    if (_checkBox.Checked) ExtraCheckBox1.Checked = false;
+                    if (_checkBox.Checked) {
+                        ExtraCheckBox1.Checked = false;
+                    }
+
                     break;
                 case "DefectNumberCheckBox":
                     ExtraTextBox1.Enabled = _checkBox.Checked;
-                    if (_checkBox.Checked) QuantityCheckBox.Checked = false;
+                    if (_checkBox.Checked) {
+                        QuantityCheckBox.Checked = false;
+                    }
+
                     break;
                 case "RevisionCheckBox":
                     RevisionTextBox.Enabled = _checkBox.Checked;
-                    if (_checkBox.Checked) MessageBox.Show("変更する場合は理由を記載して下さい。");
+                    if (_checkBox.Checked) {
+                        MessageBox.Show("変更する場合は理由を記載して下さい。");
+                    }
+
                     break;
                 case "ExtraCheckBox1":
                     ExtraTextBox2.Enabled = _checkBox.Checked;
@@ -240,7 +254,7 @@ namespace ProductDatabase {
         // 入力数値のみ
         private void NumericOnly(object sender, KeyPressEventArgs e) {
             // 0～9と、バックスペース以外の時は、イベントをキャンセルする
-            if ((e.KeyChar < '0' || '9' < e.KeyChar) && e.KeyChar != '\b') {
+            if (e.KeyChar is (< '0' or > '9') and not '\b') {
                 e.Handled = true;
             }
         }
@@ -260,20 +274,21 @@ namespace ProductDatabase {
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void RegistrationDateMaskedTextBox_TypeValidationCompleted(object sender, TypeValidationEventArgs e) { RegistrationDateCheck(sender, e); }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
-            MessageBox.Show($"" +
-                            $"StrProness1\t\t[{StrProness1}]\r\n" +
-                            $"StrProness2\t\t[{StrProness2}]\r\n" +
-                            $"StrProness3\t\t[{StrProness3}]\r\n" +
-                            $"StrProness4\t\t[{StrProness4}]\r\n" +
-                            $"StrProness5\t\t[{StrProness5}]\r\n" +
-                            $"StrProductName\t\t[{StrProductName}]\r\n" +
-                            $"StrStockName\t\t[{StrStockName}]\r\n" +
-                            $"StrProductModel\t\t[{StrProductModel}]\r\n" +
-                            $"StrInitial\t\t\t[{StrInitial}]\r\n" +
-                            $"IntRegType\t\t[{IntRegType}]\r\n" +
-                            $"IntPrintType\t\t[{IntPrintType}]\r\n" +
-                            $"IntSerialDigit\t\t[{IntSerialDigit}]" +
-                            $"", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var message = string.Join(Environment.NewLine,
+                $"StrProness1\t\t[{StrProness1}]",
+                $"StrProness2\t\t[{StrProness2}]",
+                $"StrProness3\t\t[{StrProness3}]",
+                $"StrProness4\t\t[{StrProness4}]",
+                $"StrProness5\t\t[{StrProness5}]",
+                $"StrProductName\t\t[{StrProductName}]",
+                $"StrStockName\t\t[{StrStockName}]",
+                $"StrProductModel\t\t[{StrProductModel}]",
+                $"StrInitial\t\t\t[{StrInitial}]",
+                $"IntRegType\t\t[{IntRegType}]",
+                $"IntPrintType\t\t[{IntPrintType}]",
+                $"IntSerialDigit\t\t[{IntSerialDigit}]"
+            );
+            MessageBox.Show(message, "", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

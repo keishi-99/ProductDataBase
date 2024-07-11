@@ -105,16 +105,16 @@ namespace ProductDatabase {
                 }
 
                 // TextBoxへ今日の年月日を入力
-                DateTime _dtNow = DateTime.Now;
+                var _dtNow = DateTime.Now;
                 RegistrationDateMaskedTextBox.Text = _dtNow.ToShortDateString();
 
                 // DB1へ接続し担当者取得
                 using (SQLiteConnection _con = new(MainWindow.GetConnectionString1())) {
                     _con.Open();
-                    using SQLiteCommand _cmd = _con.CreateCommand();
+                    using var _cmd = _con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加
                     _cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
-                    using SQLiteDataReader _dr = _cmd.ExecuteReader();
+                    using var _dr = _cmd.ExecuteReader();
                     while (_dr.Read()) {
                         PersonComboBox.Items.Add($"{_dr["col_Person_Name"]}");
                     }
@@ -123,15 +123,15 @@ namespace ProductDatabase {
                 // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
                 using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
                     _con.Open();
-                    using SQLiteCommand _cmd = _con.CreateCommand();
+                    using var _cmd = _con.CreateCommand();
                     // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Revision]を取得
                     _cmd.CommandText = $"SELECT col_Revision FROM Product_Reg_{StrProductName} ORDER BY _rowid_ DESC";
-                    object _result = _cmd.ExecuteScalar();
+                    var _result = _cmd.ExecuteScalar();
                     RevisionTextBox.Text = _result?.ToString() ?? "";
                 }
 
                 // 変数[check_bin]の値に応じてCheckboxにチェックを入れる
-                foreach (string _checkBoxName in checkBoxNames) {
+                foreach (var _checkBoxName in checkBoxNames) {
                     if (Controls[_checkBoxName] is CheckBox checkBox) {
                         checkBox.Checked = (IntCheckBin & 0x1) == 1;
                         IntCheckBin >>= 1;
@@ -168,8 +168,8 @@ namespace ProductDatabase {
         private void Registeration() {
             try {
                 // 入力フォームのチェック
-                bool _anyTextBoxEnabled = false;
-                bool _allTextBoxesFilled = true;
+                var _anyTextBoxEnabled = false;
+                var _allTextBoxesFilled = true;
                 DialogResult _result;
 
                 foreach (Control control in Controls) {
@@ -189,11 +189,13 @@ namespace ProductDatabase {
                 if (QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
 
                 _result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                if (_result == DialogResult.Cancel) return;
+                if (_result == DialogResult.Cancel) {
+                    return;
+                }
 
-                int _quantity = Convert.ToInt32(QuantityTextBox.Text);
+                var _quantity = Convert.ToInt32(QuantityTextBox.Text);
                 if (_quantity == 0) { throw new Exception("1以上入力してください。"); }
-                int _firstSerial = Convert.ToInt32(FirstSerialNumberTextBox.Text);
+                var _firstSerial = Convert.ToInt32(FirstSerialNumberTextBox.Text);
                 if (_firstSerial == 0) { throw new Exception("シリアル開始番号を入力してください。"); }
 
                 switch (IntSerialDigit) {
@@ -236,14 +238,14 @@ namespace ProductDatabase {
                 // 再印刷登録テーブルへ追加
                 using SQLiteConnection _con = new(MainWindow.GetConnectionString2());
                 _con.Open();
-                using SQLiteCommand _cmd = _con.CreateCommand();
+                using var _cmd = _con.CreateCommand();
                 _cmd.CommandText =
-                    $@"
+                    $"""
                     INSERT INTO Reprint
                         (col_Print_Type, col_Order_Num, col_Product_Num, col_Product_Type, col_Product_Model, col_Quantity, col_Person, col_RegDate, col_Revision, col_Serial_First, col_Serial_Last, col_Comment)
                     VALUES
                         (@col_Print_Type, @col_Order_Num, @col_Product_Num, @col_Product_Type, @col_Product_Model, @col_Quantity, @col_Person, @col_RegDate, @col_Revision, @col_Serial_First, @col_Serial_Last, @col_Comment)
-                    ";
+                    """;
 
                 // チェックボックスにチェックがない場合はNullを
                 _cmd.Parameters.Add("@col_Print_Type", DbType.String).Value = IntPrintType;
@@ -280,7 +282,7 @@ namespace ProductDatabase {
             switch (PrintFlg) {
                 case 1:
                     RePrintPrintDialog.Document = _pd;
-                    DialogResult _r = RePrintPrintDialog.ShowDialog();
+                    var _r = RePrintPrintDialog.ShowDialog();
 
                     if (_r == DialogResult.OK) {
                         RePrintPrintDialog.Document.Print();
@@ -307,16 +309,16 @@ namespace ProductDatabase {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
 
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
-                int _startLineLabel = (int)PrintPostionNumericUpDown.Value - 1;
+                var _startLineLabel = (int)PrintPostionNumericUpDown.Value - 1;
                 Point _headerPos = new(0, 0);
-                string _headerString = string.Empty;
+                var _headerString = string.Empty;
                 Font _headerFooterFont = new("Arial", 6);
-                int _intNumLabels = 0;
-                int _intCountNumLabels = 0;
+                var _intNumLabels = 0;
+                var _intCountNumLabels = 0;
 
 
-                int _maxX = 0;
-                int _maxY = 0;
+                var _maxX = 0;
+                var _maxY = 0;
                 float _sizeX = 0;
                 float _sizeY = 0;
                 double _offsetX = 0;
@@ -360,18 +362,15 @@ namespace ProductDatabase {
                         break;
                 }
 
-                int _startLineBarcode = (int)PrintPostionNumericUpDown.Value - 1;
+                var _startLineBarcode = (int)PrintPostionNumericUpDown.Value - 1;
 
                 Point _offset;
                 if (!RePrintPrintDocument.PrintController.IsPreview) {
                     _offsetX -= e.PageSettings.HardMarginX * 0.254;
                     _offsetY -= e.PageSettings.HardMarginY * 0.254;
-                    if (LabelProPageNum == 0) {
-                        _offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLineBarcode * (_intervalY + _sizeY))));
-                    }
-                    else {
-                        _offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (_intervalY + _sizeY))));
-                    }
+                    _offset = LabelProPageNum == 0
+                        ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLineBarcode * (_intervalY + _sizeY))))
+                        : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (_intervalY + _sizeY))));
                 }
                 else {
                     _offset = new Point(0, 0);
@@ -383,24 +382,21 @@ namespace ProductDatabase {
                 _headerPos.Offset(_offset);
                 e.Graphics.DrawString(_headerString, _headerFooterFont, Brushes.Black, _headerPos);
 
-                int _barcodePageNum = 0;
-                if (_barcodePageNum == 0) {
-                    _offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLineBarcode * (_intervalY + _sizeY))));
-                }
-                else {
-                    _offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (_intervalY + _sizeY))));
-                }
+                var _barcodePageNum = 0;
+                _offset = _barcodePageNum == 0
+                    ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLineBarcode * (_intervalY + _sizeY))))
+                    : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (_intervalY + _sizeY))));
 
                 if (LabelProPageNum == 0) { LabelProNSerial = IntSerialFirstNumber; }
                 if (LabelProPageNum >= 1) { _startLineBarcode = 0; }
 
-                int _y = 0;
+                var _y = 0;
                 for (_y = _startLineBarcode; _y < _maxY; _y++) {
-                    int _x = 0;
+                    var _x = 0;
                     for (_x = 0; _x < _maxX; _x++) {
-                        string _s = GenerateCode(LabelProNSerial);
-                        float _posX = (float)(_offsetX + (_x * (_intervalX + _sizeX)));
-                        float _posY = (float)(_offsetY + (_y * (_intervalY + _sizeY)));
+                        var _s = GenerateCode(LabelProNSerial);
+                        var _posX = (float)(_offsetX + (_x * (_intervalX + _sizeX)));
+                        var _posY = (float)(_offsetY + (_y * (_intervalY + _sizeY)));
                         e.Graphics.DrawImage(MakeLabelImage(_s, (int)e.Graphics.DpiX, 1), _posX, _posY, _sizeX, _sizeY);
 
                         LabelProNSerial++;
@@ -411,7 +407,7 @@ namespace ProductDatabase {
                             if (_intCountNumLabels <= 0) {
                                 e.HasMorePages = false;
                                 LabelProPageNum = 0;
-                                int _txtNumPublish = 0;
+                                var _txtNumPublish = 0;
                                 LabelProNumLabelsToPrint = _txtNumPublish;
                                 return;
                             }
@@ -454,7 +450,7 @@ namespace ProductDatabase {
             return s;
         }
         private string GenerateCode(int serialCode) {
-            string _monthCode = DateTime.Parse(StrRegDate).ToString("MM");
+            var _monthCode = DateTime.Parse(StrRegDate).ToString("MM");
 
             _monthCode = _monthCode switch {
                 "10" => "X",
@@ -463,13 +459,13 @@ namespace ProductDatabase {
                 _ => _monthCode
             };
 
-            string _outputCode = strSerialType switch {
+            var _outputCode = strSerialType switch {
                 "Label" => SettingsLabelPro._labelProLabelSettings.Format,
                 "Barcode" => SettingsBarcodePro.BarcodeProLabelSettings.Format,
                 _ => string.Empty
             };
 
-            string _serialCode = Convert.ToInt32(serialCode).ToString($"D{IntSerialDigit}");
+            var _serialCode = Convert.ToInt32(serialCode).ToString($"D{IntSerialDigit}");
             _outputCode = _outputCode.Replace("%Y", DateTime.Parse(StrRegDate).ToString("yy"))
                                     .Replace("%MM", DateTime.Parse(StrRegDate).ToString("MM"))
                                     .Replace("%T", StrInitial)
@@ -496,7 +492,7 @@ namespace ProductDatabase {
                     _sizeY = (decimal)SettingsLabelPro._labelProPageSettings.SizeY / 25.4M * resolution * magnitude;
                     _fontSize = (decimal)SettingsLabelPro._labelProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
                     _stringPosY = (int)((decimal)SettingsLabelPro._labelProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
-                    FontStyle _style = fontUnderbar ? FontStyle.Underline : FontStyle.Regular;
+                    var _style = fontUnderbar ? FontStyle.Underline : FontStyle.Regular;
                     _fnt = new Font(SettingsLabelPro._labelProLabelSettings.Font.Name, (float)_fontSize, _style);
 
                     _labelImage = new((int)_sizeX, (int)_sizeY);
@@ -522,31 +518,32 @@ namespace ProductDatabase {
                     _g = Graphics.FromImage(_labelImage);
 
                     int _barWeight;
-                    if (resolution == DisplayResolution) { _barWeight = 1; }
-                    else { _barWeight = (int)(1 * resolution / DisplayResolution / DisplayMagnitude); }
+                    _barWeight = resolution == DisplayResolution ? 1 : (int)(1 * resolution / DisplayResolution / DisplayMagnitude);
 
-                    Image _img = Code128Rendering.MakeBarcodeImage(text, _barWeight, true);
-                    decimal _imageWidth = (decimal)(_img.Width * SettingsBarcodePro.BarcodeProLabelSettings.BarcodeMagnitude);
+                    var _img = Code128Rendering.MakeBarcodeImage(text, _barWeight, true);
+                    var _imageWidth = (decimal)(_img.Width * SettingsBarcodePro.BarcodeProLabelSettings.BarcodeMagnitude);
 
                     if (_imageWidth > _labelImage.Width) { MessageBox.Show($"バーコードの幅がラベル幅を超えています{_imageWidth}>{_labelImage.Width}"); }
 
                     _stringSize = _g.MeasureString(text, _fnt);
 
-                    if (SettingsBarcodePro.BarcodeProLabelSettings.AlignStringCenter) { _stringPosX = (float)((_labelImage.Width / 2) - (_stringSize.Width / 2)); }
-                    else { _stringPosX = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude); }
+                    _stringPosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignStringCenter
+                        ? (float)((_labelImage.Width / 2) - (_stringSize.Width / 2))
+                        : (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
 
                     _stringPosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
 
 
                     float _barCodePosX;
-                    if (SettingsBarcodePro.BarcodeProLabelSettings.AlignBarcodeCenter) { _barCodePosX = (float)((_labelImage.Width / 2) - (_imageWidth / 2)); }
-                    else { _barCodePosX = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude); }
+                    _barCodePosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignBarcodeCenter
+                        ? (float)((_labelImage.Width / 2) - (_imageWidth / 2))
+                        : (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
 
                     float _barCodePosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.BarcodePosY / 25.4M * resolution * magnitude);
 
                     _g.DrawString(text, _fnt, Brushes.Black, _stringPosX, _stringPosY);
 
-                    int _barcodeHeight = (int)(SettingsBarcodePro.BarcodeProLabelSettings.BarcodeHeight / 25.4F * resolution * magnitude);
+                    var _barcodeHeight = (int)(SettingsBarcodePro.BarcodeProLabelSettings.BarcodeHeight / 25.4F * resolution * magnitude);
                     _g.DrawImage(_img, _barCodePosX, _barCodePosY, (float)_imageWidth, _barcodeHeight);
 
                     _g.Dispose();
@@ -559,7 +556,7 @@ namespace ProductDatabase {
         }
         // チェックボックスイベント
         private void CheckBoxChecked(object sender, EventArgs e) {
-            CheckBox _checkBox = (CheckBox)sender;
+            var _checkBox = (CheckBox)sender;
 
             switch (_checkBox.Name) {
                 case "OrderNumberCheckBox":
@@ -570,14 +567,20 @@ namespace ProductDatabase {
                     break;
                 case "QuantityCheckBox":
                     QuantityTextBox.Enabled = _checkBox.Checked;
-                    if (_checkBox.Checked) ExtraCheckBox1.Checked = false;
+                    if (_checkBox.Checked) {
+                        ExtraCheckBox1.Checked = false;
+                    }
+
                     break;
                 case "ExtraCheckBox1":
                     ExtraTextBox2.Enabled = _checkBox.Checked;
                     break;
                 case "RevisionCheckBox":
                     RevisionTextBox.Enabled = _checkBox.Checked;
-                    if (_checkBox.Checked) MessageBox.Show("変更する場合は理由を記載して下さい。");
+                    if (_checkBox.Checked) {
+                        MessageBox.Show("変更する場合は理由を記載して下さい。");
+                    }
+
                     break;
                 case "ExtraCheckBox2":
                     ExtraTextBox3.Enabled = _checkBox.Checked;
@@ -635,23 +638,24 @@ namespace ProductDatabase {
             Registeration();
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
-            MessageBox.Show($"" +
-                $"StrProductName\t\t[{StrProductName}]\r\n" +
-                $"StrProductModel\t\t[{StrProductModel}]\r\n" +
-                $"StrProductType\t\t[{StrProductType}]\r\n" +
-                $"StrOrderNumber\t\t[{StrOrderNumber}]\r\n" +
-                $"StrProductNumber\t\t[{StrProductNumber}]\r\n" +
-                $"StrRevision\t\t[{StrRevision}]\r\n" +
-                $"IntRegType\t\t[{IntRegType}]\r\n" +
-                $"StrRegDate\t\t[{StrRegDate}]\r\n" +
-                $"StrPerson\t\t\t[{StrPerson}]\r\n" +
-                $"IntQuantity\t\t[{IntQuantity}]\r\n" +
-                $"IntSerialFirstNumber\t[{IntSerialFirstNumber}]\r\n" +
-                $"IntSerialLastNumber\t\t[{IntSerialLastNumber}]\r\n" +
-                $"StrInitial\t\t\t[{StrInitial}]\r\n" +
-                $"IntPrintType\t\t[{IntPrintType}]\r\n" +
-                $"IntSerialDigit\t\t[{IntSerialDigit}]" +
-                $"", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var message = string.Join(Environment.NewLine,
+                $"StrProductName\t\t[{StrProductName}]",
+                $"StrProductModel\t\t[{StrProductModel}]",
+                $"StrProductType\t\t[{StrProductType}]",
+                $"StrOrderNumber\t\t[{StrOrderNumber}]",
+                $"StrProductNumber\t\t[{StrProductNumber}]",
+                $"StrRevision\t\t[{StrRevision}]",
+                $"IntRegType\t\t[{IntRegType}]",
+                $"StrRegDate\t\t[{StrRegDate}]",
+                $"StrPerson\t\t\t[{StrPerson}]",
+                $"IntQuantity\t\t[{IntQuantity}]",
+                $"IntSerialFirstNumber\t[{IntSerialFirstNumber}]",
+                $"IntSerialLastNumber\t[{IntSerialLastNumber}]",
+                $"StrInitial\t\t\t[{StrInitial}]",
+                $"IntPrintType\t\t[{IntPrintType}]",
+                $"IntSerialDigit\t\t[{IntSerialDigit}]"
+            );
+            MessageBox.Show(message, "", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

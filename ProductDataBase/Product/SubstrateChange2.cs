@@ -62,7 +62,7 @@ namespace ProductDatabase {
                 OrderNumberTextBox.Text = StrOrderNumber;
                 ManufacturingNumberTextBox.Text = StrProductNumber;
                 QuantityTextBox.Text = IntQuantity.ToString();
-                DateTime _dtNow = DateTime.Now;
+                var _dtNow = DateTime.Now;
                 RegistrationDateMaskedTextBox.Text = _dtNow.ToShortDateString();
                 RevisionTextBox.Text = StrRevision;
                 CommentTextBox.Text = StrComment;
@@ -70,10 +70,10 @@ namespace ProductDatabase {
                 // DB1へ接続し担当者取得
                 using (SQLiteConnection _con = new(MainWindow.GetConnectionString1())) {
                     _con.Open();
-                    using SQLiteCommand _cmd = _con.CreateCommand();
+                    using var _cmd = _con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加
                     _cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
-                    using SQLiteDataReader _dr = _cmd.ExecuteReader();
+                    using var _dr = _cmd.ExecuteReader();
                     while (_dr.Read()) {
                         PersonComboBox.Items.Add($"{_dr["col_Person_Name"]}");
                     }
@@ -81,13 +81,13 @@ namespace ProductDatabase {
 
                 ArrUseSubstrate = StrUseSubstrate.Split(",");
                 ArrUsedSubstrate = StrUsedSubstrate.Split(",");
-                string _strQuantity = string.Empty;
-                string _strSubstrateName = string.Empty;
+                var _strQuantity = string.Empty;
+                var _strSubstrateName = string.Empty;
 
                 switch (IntRegType) {
                     case 2:
-                        for (int _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
-                            int _quantity = IntQuantity;
+                        for (var _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
+                            var _quantity = IntQuantity;
 
                             // チェックボックスとDgvを有効に
                             objCbx = Controls[checkBoxNames[_i]] as CheckBox;
@@ -108,31 +108,33 @@ namespace ProductDatabase {
                             using SQLiteConnection _con = new(MainWindow.GetConnectionString2());
                             _con.Open();
 
-                            using SQLiteCommand _cmd = _con.CreateCommand();
+                            using var _cmd = _con.CreateCommand();
                             // テーブル検索SQL - [Product_Name]_Stockテーブルを在庫数フラグ有&基板型式[Model]で抽出して取得
                             _cmd.CommandText = $"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
                             _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[_i];
-                            using SQLiteDataReader _dr = _cmd.ExecuteReader();
-                            int _j = 0;
+                            using var _dr = _cmd.ExecuteReader();
+                            var _j = 0;
                             while (_dr.Read()) {
-                                string _strUsedSubNum = string.Empty;
-                                string _strUsedQuantity = string.Empty;
-                                int _intUsedQuantity = 0;
+                                var _strUsedSubNum = string.Empty;
+                                var _strUsedQuantity = string.Empty;
+                                var _intUsedQuantity = 0;
 
                                 // 抽出した行から製造番号,在庫取得
-                                string _strSubstrateNum = $"{_dr["col_Substrate_num"]}";
-                                int _intStock = int.Parse($"{_dr["col_Stock"]}");
-                                int _colFlg = int.Parse($"{_dr["col_Flg"]}");
+                                var _strSubstrateNum = $"{_dr["col_Substrate_num"]}";
+                                var _intStock = int.Parse($"{_dr["col_Stock"]}");
+                                var _colFlg = int.Parse($"{_dr["col_Flg"]}");
                                 _strSubstrateName = $"{_dr["col_Substrate_Name"]}";
                                 if (objCbx != null) { objCbx.Text = $"{_strSubstrateName} - {ArrUseSubstrate[_i]}"; }
 
-                                int _subIndex = 0;
-                                bool _b1 = false;
+                                var _subIndex = 0;
+                                var _b1 = false;
 
                                 foreach (var _d in ArrUsedSubstrate) {
                                     _b1 = _d.Contains(_strSubstrateNum);
-                                    if (_b1 == true)
+                                    if (_b1 == true) {
                                         break;
+                                    }
+
                                     _subIndex++;
                                 }
                                 if (_b1 == true) {
@@ -204,7 +206,7 @@ namespace ProductDatabase {
                 RegistrationDateMaskedTextBox.Enabled = false;
                 PersonComboBox.Enabled = false;
                 RegisterButton.Enabled = false;
-                for (int _i = 0; _i <= 9; _i++) {
+                for (var _i = 0; _i <= 9; _i++) {
                     objCbx = Controls[checkBoxNames[_i]] as CheckBox;
                     if (objCbx != null) {
                         objCbx.Enabled = false;
@@ -230,26 +232,26 @@ namespace ProductDatabase {
                     case 2:
                     case 3:
                         if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
-                        for (int _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
+                        for (var _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
 
-                            CheckBox? _objCbx = Controls[checkBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                            var _objCbx = Controls[checkBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
                             _objCbx.Enabled = true;
                             _objCbx.Checked = true;
 
-                            DataGridView? _objDgv = Controls[dataGridViewNames[_i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
+                            var _objDgv = Controls[dataGridViewNames[_i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
                             _objDgv.Columns[3].ReadOnly = false;
                             _objDgv.Columns[4].ReadOnly = false;
 
                             if (_objCbx.Checked) {
-                                int _intQuantityCheck = IntQuantity;
-                                int _dgvRowCnt = _objDgv.Rows.Count;
+                                var _intQuantityCheck = IntQuantity;
+                                var _dgvRowCnt = _objDgv.Rows.Count;
 
-                                for (int _j = 0; _j < _dgvRowCnt; _j++) {
-                                    bool _boolCbx = _objDgv.Rows[_j].Cells[4].Value != null && (bool)_objDgv.Rows[_j].Cells[4].Value;
+                                for (var _j = 0; _j < _dgvRowCnt; _j++) {
+                                    var _boolCbx = _objDgv.Rows[_j].Cells[4].Value != null && (bool)_objDgv.Rows[_j].Cells[4].Value;
                                     if (_boolCbx) {
-                                        int _stockValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value.ToString());
-                                        int _usedValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value.ToString());
-                                        int _useValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[3].Value.ToString());
+                                        var _stockValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value.ToString());
+                                        var _usedValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value.ToString());
+                                        var _useValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[3].Value.ToString());
 
                                         if (_stockValue + _usedValue < _useValue) {
                                             throw new Exception("在庫より多い数量が入力されています。");
@@ -285,28 +287,28 @@ namespace ProductDatabase {
                         using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
                             _con.Open();
                             if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
-                            for (int _i = 0; _i <= ArrUseSubstrate.Length; _i++) {
+                            for (var _i = 0; _i <= ArrUseSubstrate.Length; _i++) {
 
-                                CheckBox? _objCbx = Controls[checkBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                                var _objCbx = Controls[checkBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
 
                                 if (_objCbx.Checked) {
-                                    DataGridView? _objDgv = Controls[dataGridViewNames[_i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
-                                    int _dgvRowCnt = _objDgv.Rows.Count;
-                                    string _subTotalTemp = string.Empty;
+                                    var _objDgv = Controls[dataGridViewNames[_i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
+                                    var _dgvRowCnt = _objDgv.Rows.Count;
+                                    var _subTotalTemp = string.Empty;
 
-                                    for (int _j = 0; _j <= _dgvRowCnt - 1; _j++) {
-                                        bool _boolCbx = Convert.ToBoolean(_objDgv.Rows[_j].Cells[4].Value);
+                                    for (var _j = 0; _j <= _dgvRowCnt - 1; _j++) {
+                                        var _boolCbx = Convert.ToBoolean(_objDgv.Rows[_j].Cells[4].Value);
                                         if (_boolCbx) {
-                                            string _substrateName = string.Empty;
-                                            string _substrateModel = string.Empty;
-                                            string _substrateNum = _objDgv.Rows[_j].Cells[0].Value.ToString() ?? string.Empty;
-                                            int _stockValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value);
-                                            int _usedValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value.ToString());
-                                            int _useValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[3].Value);
+                                            var _substrateName = string.Empty;
+                                            var _substrateModel = string.Empty;
+                                            var _substrateNum = _objDgv.Rows[_j].Cells[0].Value.ToString() ?? string.Empty;
+                                            var _stockValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value);
+                                            var _usedValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value.ToString());
+                                            var _useValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[3].Value);
 
-                                            using (SQLiteCommand _cmd = _con.CreateCommand()) {
+                                            using (var _cmd = _con.CreateCommand()) {
                                                 _cmd.CommandText =
-                                                    $@"
+                                                    $"""
                                                     UPDATE Stock_{StrStockName}
                                                     SET
                                                         col_Flg = @col_Flg,
@@ -314,7 +316,7 @@ namespace ProductDatabase {
                                                         col_History = ifnull(col_History,'')|| @col_History
                                                     WHERE
                                                         col_Substrate_Num = @col_Substrate_Num
-                                                    ";
+                                                    """;
                                                 _cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = _substrateNum;
 
                                                 switch (_useValue - _usedValue) {
@@ -336,7 +338,7 @@ namespace ProductDatabase {
 
                                                 _cmd.CommandText = $@"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
                                                 _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[_i];
-                                                using SQLiteDataReader _dr = _cmd.ExecuteReader();
+                                                using var _dr = _cmd.ExecuteReader();
                                                 while (_dr.Read()) {
                                                     _substrateName = $"{_dr["col_Substrate_Name"]}";
                                                     _substrateModel = $"{_dr["col_Substrate_Model"]}";
@@ -344,20 +346,16 @@ namespace ProductDatabase {
                                             }
 
                                             if (_useValue != 0) {
-                                                if (string.IsNullOrEmpty(_subTotalTemp)) {
-                                                    _subTotalTemp = $"{_substrateNum}({_useValue})";
-                                                }
-                                                else {
-                                                    _subTotalTemp = $"{_subTotalTemp},{_substrateNum}({_useValue})";
-                                                }
+                                                _subTotalTemp = string.IsNullOrEmpty(_subTotalTemp) ? $"{_substrateNum}({_useValue})" : $"{_subTotalTemp},{_substrateNum}({_useValue})";
                                             }
 
                                             // 基板テーブルへ追加
-                                            using (SQLiteCommand _cmd = _con.CreateCommand()) {
+                                            using (var _cmd = _con.CreateCommand()) {
                                                 _cmd.CommandText =
-                                                    $@"
+                                                    $"""
                                                     INSERT INTO Substrate_Reg_{StrStockName}
-                                                        (col_Substrate_Name,
+                                                        (
+                                                        col_Substrate_Name,
                                                         col_Substrate_Model,
                                                         col_Substrate_Num,
                                                         col_Decrease,
@@ -366,9 +364,11 @@ namespace ProductDatabase {
                                                         col_Use_O_Num,
                                                         col_Person,
                                                         col_RegDate,
-                                                        col_Comment)
+                                                        col_Comment
+                                                        )
                                                     VALUES
-                                                        (@col_Substrate_Name,
+                                                        (
+                                                        @col_Substrate_Name,
                                                         @col_Substrate_Model,
                                                         @col_Substrate_Num,
                                                         @col_Decrease,
@@ -377,8 +377,9 @@ namespace ProductDatabase {
                                                         @col_Use_O_Num,
                                                         @col_Person,
                                                         @col_RegDate,
-                                                        @col_Comment)
-                                                    ";
+                                                        @col_Comment
+                                                        )
+                                                    """;
 
                                                 _cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = _substrateName;
                                                 _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _substrateModel;
@@ -406,20 +407,17 @@ namespace ProductDatabase {
                                             }
                                         }
                                     }
-                                    if (string.IsNullOrEmpty(StrTotalSubstrate)) {
-                                        StrTotalSubstrate = $"[{ArrUseSubstrate[_i]}]{_subTotalTemp}";
-                                    }
-                                    else {
-                                        StrTotalSubstrate = $"{StrTotalSubstrate},[{ArrUseSubstrate[_i]}]{_subTotalTemp}";
-                                    }
+                                    StrTotalSubstrate = string.IsNullOrEmpty(StrTotalSubstrate)
+                                        ? $"[{ArrUseSubstrate[_i]}]{_subTotalTemp}"
+                                        : $"{StrTotalSubstrate},[{ArrUseSubstrate[_i]}]{_subTotalTemp}";
                                     _subTotalTemp = string.Empty;
                                 }
                             }
 
                             // 製品テーブルへ追加
-                            using (SQLiteCommand _cmd = _con.CreateCommand()) {
+                            using (var _cmd = _con.CreateCommand()) {
                                 _cmd.CommandText =
-                                    $@"
+                                    $"""
                                     UPDATE Product_Reg_{StrProductName}
                                     SET
                                         col_Quantity = @col_Quantity,
@@ -434,7 +432,7 @@ namespace ProductDatabase {
                                         col_Product_Num = @col_Product_Num
                                     AND
                                         col_Serial_First = @col_Serial_First
-                                    ";
+                                    """;
 
                                 _cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
                                 _cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
@@ -465,27 +463,27 @@ namespace ProductDatabase {
         // リスト印刷
         private void ListPrint() {
             try {
-                string _sheetName = string.Empty;
-                string _productName = string.Empty;
-                string _productModel = string.Empty;
+                var _sheetName = string.Empty;
+                var _productName = string.Empty;
+                var _productModel = string.Empty;
 
-                string _productNameRange = string.Empty;
-                string _productNumberRange = string.Empty;
-                string _orderNumberRange = string.Empty;
-                string _regDateRange = string.Empty;
-                string _productModelRange = string.Empty;
-                string _quantityRange = string.Empty;
-                string _serialFirstRange = string.Empty;
-                string _serialLastRange = string.Empty;
-                string _commentRange = string.Empty;
+                var _productNameRange = string.Empty;
+                var _productNumberRange = string.Empty;
+                var _orderNumberRange = string.Empty;
+                var _regDateRange = string.Empty;
+                var _productModelRange = string.Empty;
+                var _quantityRange = string.Empty;
+                var _serialFirstRange = string.Empty;
+                var _serialLastRange = string.Empty;
+                var _commentRange = string.Empty;
 
-                using FileStream _fileStream = new($@"{Environment.CurrentDirectory}./config/Excel/ConfigList.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using FileStream _fileStream = new($"{Environment.CurrentDirectory}./config/Excel/ConfigList.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using XLWorkbook _workBook = new(_fileStream);
-                IXLWorksheet _workSheetMain = _workBook.Worksheet("Sheet1");
+                var _workSheetMain = _workBook.Worksheet("Sheet1");
 
-                int _findRow = 0;
+                var _findRow = 0;
                 // セル検索
-                foreach (IXLCell _cell in _workSheetMain.Search(StrProductModel)) {
+                foreach (var _cell in _workSheetMain.Search(StrProductModel)) {
                     _findRow = _cell.Address.RowNumber;
                 }
 
@@ -507,7 +505,7 @@ namespace ProductDatabase {
                 _serialLastRange = _workSheetMain.Cell(_findRow, 11).Value.ToString();
                 _commentRange = _workSheetMain.Cell(_findRow, 12).Value.ToString();
 
-                IXLWorksheet _workSheetTemp = _workBook.Worksheet(_sheetName);
+                var _workSheetTemp = _workBook.Worksheet(_sheetName);
                 _workSheetTemp.Cell(_productNameRange).Value = _productName;
                 _workSheetTemp.Cell(_productNumberRange).Value = StrProductNumber;
                 _workSheetTemp.Cell(_orderNumberRange).Value = StrOrderNumber;
@@ -518,21 +516,21 @@ namespace ProductDatabase {
                 _workSheetTemp.Cell(_serialLastRange).Value = StrSerialLastNumber;
                 _workSheetTemp.Cell(_commentRange).Value = StrComment;
 
-                int _i = 0;
-                int _findColumn = 0;
+                var _i = 0;
+                var _findColumn = 0;
                 for (_i = 0; _i <= listUsedSubstrate.Count - 1; _i++) {
 
-                    IXLRange _searchRange = _workSheetMain.Range(_findRow, 1, _findRow, 28);
-                    string _searchValue = $"{listUsedSubstrate[_i]}";
-                    IXLCell? _foundCell = _searchRange.CellsUsed(c => c.Value.ToString() == _searchValue).FirstOrDefault();
+                    var _searchRange = _workSheetMain.Range(_findRow, 1, _findRow, 28);
+                    var _searchValue = $"{listUsedSubstrate[_i]}";
+                    var _foundCell = _searchRange.CellsUsed(c => c.Value.ToString() == _searchValue).FirstOrDefault();
 
                     if (_foundCell != null) {
                         // セルが見つかった場合の処理
-                        int foundRow = _foundCell.Address.RowNumber;
-                        int foundColumn = _foundCell.Address.ColumnNumber;
+                        var foundRow = _foundCell.Address.RowNumber;
+                        var foundColumn = _foundCell.Address.ColumnNumber;
                     }
 
-                    foreach (IXLCell _cell in _workSheetMain.Search(listUsedSubstrate[_i])) {
+                    foreach (var _cell in _workSheetMain.Search(listUsedSubstrate[_i])) {
                         if (_cell.Address.RowNumber == _findRow) {
                             _findColumn = _cell.Address.ColumnNumber;
                             break;
@@ -557,7 +555,7 @@ namespace ProductDatabase {
                 }
 
                 //引数に保存先パスを指定
-                _workBook.SaveAs($@"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
+                _workBook.SaveAs($"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
 
                 // 印刷
                 Excel.Application _xlApp = new() {
@@ -565,11 +563,11 @@ namespace ProductDatabase {
                 };
 
                 // ワークブック開く
-                Excel.Workbooks _xlBooks = _xlApp.Workbooks;
-                Excel.Workbook _xlBook = _xlBooks.Open($@"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
+                var _xlBooks = _xlApp.Workbooks;
+                var _xlBook = _xlBooks.Open($"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
 
                 // ワークシート選択
-                Excel.Sheets _xlSheets = _xlBook.Sheets;
+                var _xlSheets = _xlBook.Sheets;
                 Excel.Worksheet _xlSheet = _xlSheets[_sheetName];
 
                 // ワークシート印刷
@@ -592,7 +590,7 @@ namespace ProductDatabase {
 
         // チェックボックスイベント
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
-            CheckBox _checkBox = (CheckBox)sender;
+            var _checkBox = (CheckBox)sender;
             DataGridView _dataGridView = new();
 
             switch (_checkBox.Name) {
