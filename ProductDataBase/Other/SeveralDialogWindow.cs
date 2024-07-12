@@ -4,7 +4,7 @@
         public string StrFontName { get; set; } = "Meiryo UI";
         public int IntFontSize { get; set; } = 9;
 
-        public int SelectedIndex = 0;
+        public int selectedIndex = 0;
 
         public List<string> ListCategory11 { get; set; } = [];
         public List<string> ListCategory12 { get; set; } = [];
@@ -19,13 +19,13 @@
         private void LoadEvents() {
             SeveralListBox.Items.Clear();
             Font = new Font(StrFontName, IntFontSize);
-            int _j = 0;
+            var j = 0;
 
-            foreach (string Category in ListCategory11) {
-                string _type = (ListCategory14[_j] == "1") ? "基板" : "製品";
+            foreach (var category in ListCategory11) {
+                var type = (ListCategory14[j] == "1") ? "基板" : "製品";
 
-                if (!string.IsNullOrEmpty(ListCategory11[_j])) { SeveralListBox.Items.Add($"[{_type}]  [{ListCategory13[_j]}]  [{ListCategory12[_j]}]  [{Category}]"); }
-                _j++;
+                if (!string.IsNullOrEmpty(ListCategory11[j])) { SeveralListBox.Items.Add($"[{type}]  [{ListCategory13[j]}]  [{ListCategory12[j]}]  [{category}]"); }
+                j++;
             }
 
             SeveralListBox.SelectedIndex = 0;
@@ -33,7 +33,7 @@
 
         private void SeveralDialogWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void OkButton_Click(object sender, EventArgs e) {
-            SelectedIndex = SeveralListBox.SelectedIndex;
+            selectedIndex = SeveralListBox.SelectedIndex;
             DialogResult = DialogResult.OK;
             Close();
         }

@@ -39,8 +39,7 @@ namespace ProductDatabase.Product
             set { HeaderFooterFont = ConvertFromString<Font>(value); }
         }
 
-        public static string ConvertToString<T>(T value)
-        {
+        public static string ConvertToString<T>(T value) {
             return TypeDescriptor.GetConverter(typeof(T)).ConvertToString(value)!;
         }
 

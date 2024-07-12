@@ -36,7 +36,7 @@ namespace ProductDatabase {
         public int StrProness4 { get; set; }
         public string StrProness5 { get; set; } = string.Empty;
 
-        private readonly List<string> checkBoxNames = [
+        private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectNumberCheckBox",
                     "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
@@ -61,42 +61,42 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = true;
 
                 // TextBoxへ今日の年月日を入力
-                var _dtNow = DateTime.Now;
-                RegistrationDateMaskedTextBox.Text = _dtNow.ToShortDateString();
+                var dtNow = DateTime.Now;
+                RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
 
                 // DB1へ接続し担当者取得
-                using (SQLiteConnection _con = new(MainWindow.GetConnectionString1())) {
-                    _con.Open();
-                    using var _cmd = _con.CreateCommand();
+                using (SQLiteConnection con = new(MainWindow.GetConnectionString1())) {
+                    con.Open();
+                    using var cmd = con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加
-                    _cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
-                    using var _dr = _cmd.ExecuteReader();
-                    while (_dr.Read()) {
-                        PersonComboBox.Items.Add($"{_dr["col_Person_Name"]}");
+                    cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
+                    using var dr = cmd.ExecuteReader();
+                    while (dr.Read()) {
+                        PersonComboBox.Items.Add($"{dr["col_Person_Name"]}");
                     }
                 }
 
                 // 在庫管理する基盤はDB2へ接続し対象製品の在庫取得
                 if (IntRegType != 0) {
-                    using SQLiteConnection _con = new(MainWindow.GetConnectionString2());
-                    _con.Open();
-                    using var _cmd = _con.CreateCommand();
+                    using SQLiteConnection con = new(MainWindow.GetConnectionString2());
+                    con.Open();
+                    using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Stock]の合計を取得
-                    _cmd.CommandText = $"SELECT total(col_stock) FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model";
-                    _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = StrSubstrateModel;
-                    StockLabel2.Text = _cmd.ExecuteScalar().ToString();
+                    cmd.CommandText = $"SELECT total(col_stock) FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model";
+                    cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = StrSubstrateModel;
+                    StockLabel2.Text = cmd.ExecuteScalar().ToString();
 
                     // テーブル検索SQL - [Substrate_Reg_[Product_Name]]テーブルの最新の[col_Revison]を取得
-                    _cmd.CommandText = $"SELECT col_Revision FROM Substrate_Reg_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model AND col_Revision IS NOT NULL ORDER BY _rowid_ DESC";
-                    _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = StrSubstrateModel;
-                    var _result = _cmd.ExecuteScalar();
-                    RevisionTextBox.Text = _result?.ToString() ?? "";
+                    cmd.CommandText = $"SELECT col_Revision FROM Substrate_Reg_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model AND col_Revision IS NOT NULL ORDER BY _rowid_ DESC";
+                    cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = StrSubstrateModel;
+                    var result = cmd.ExecuteScalar();
+                    RevisionTextBox.Text = result?.ToString() ?? "";
                 }
                 else { StockLabel2.Text = "---"; }
 
                 // 変数[check_bin]の値に応じてCheckboxにチェックを入れる
-                foreach (var _checkBoxName in checkBoxNames) {
-                    if (Controls[_checkBoxName] is CheckBox checkBox) {
+                foreach (var checkBoxName in _checkBoxNames) {
+                    if (Controls[checkBoxName] is CheckBox checkBox) {
                         checkBox.Checked = (IntCheckBin & 0x1) == 1;
                         IntCheckBin >>= 1;
                     }
@@ -113,12 +113,12 @@ namespace ProductDatabase {
             } finally {
             }
         }
-        private void LoadSettings(string StrSettingFilePath) {
+        private void LoadSettings(string strSettingFilePath) {
             try {
-                StreamReader _sr = new(StrSettingFilePath, new System.Text.UTF8Encoding(false));
-                System.Xml.Serialization.XmlSerializer _serializer = new(typeof(CSettingsLabelSub));
-                if (_serializer.Deserialize(_sr) is CSettingsLabelSub _result) { SettingsLabelSub = _result; }
-                _sr.Close();
+                StreamReader sr = new(strSettingFilePath, new System.Text.UTF8Encoding(false));
+                System.Xml.Serialization.XmlSerializer serializer = new(typeof(CSettingsLabelSub));
+                if (serializer.Deserialize(sr) is CSettingsLabelSub result) { SettingsLabelSub = result; }
+                sr.Close();
             } catch (Exception ex) {
                 MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
@@ -146,20 +146,20 @@ namespace ProductDatabase {
                 if (PrintOnlyCheckBox.Checked) { return; }
 
                 // 入力フォームのチェック
-                var _anyTextBoxEnabled = false;
-                var _allTextBoxesFilled = true;
+                var anyTextBoxEnabled = false;
+                var allTextBoxesFilled = true;
 
-                foreach (Control _control in Controls) {
-                    if (_control is TextBoxBase textBox && textBox.Enabled) {
-                        _anyTextBoxEnabled = true;
+                foreach (Control control in Controls) {
+                    if (control is TextBoxBase textBox && textBox.Enabled) {
+                        anyTextBoxEnabled = true;
                         if (string.IsNullOrWhiteSpace(textBox.Text)) {
-                            _allTextBoxesFilled = false;
+                            allTextBoxesFilled = false;
                             break;
                         }
                     }
                 }
-                if (!_anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
-                if (!_allTextBoxesFilled) { throw new Exception("空欄があります。"); }
+                if (!anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
+                if (!allTextBoxesFilled) { throw new Exception("空欄があります。"); }
 
                 if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
 
@@ -171,8 +171,8 @@ namespace ProductDatabase {
 
                 if (!DefectNumberCheckBox.Checked && string.IsNullOrEmpty(PrintPostionNumericUpDown.Text)) { PrintPostionNumericUpDown.Text = "1"; }
 
-                var _result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                if (_result == DialogResult.Cancel) {
+                var result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                if (result == DialogResult.Cancel) {
                     return;
                 }
 
@@ -206,27 +206,27 @@ namespace ProductDatabase {
         }
         private bool Registration() {
             try {
-                using SQLiteConnection _con = new(MainWindow.GetConnectionString2());
-                _con.Open();
+                using SQLiteConnection con = new(MainWindow.GetConnectionString2());
+                con.Open();
 
                 // 製番が新規かチェック
                 if (IntRegType != 0) {
-                    var _substrateName = string.Empty;
-                    using (var _cmd = _con.CreateCommand()) {
-                        _cmd.CommandText = $"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Num = @col_Substrate_Num ORDER BY _rowid_ DESC LIMIT 1";
-                        _cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
-                        using var _dr = _cmd.ExecuteReader();
-                        while (_dr.Read()) {
-                            _substrateName = $"{_dr["col_Substrate_Name"]}";
+                    var substrateName = string.Empty;
+                    using (var cmd = con.CreateCommand()) {
+                        cmd.CommandText = $"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Num = @col_Substrate_Num ORDER BY _rowid_ DESC LIMIT 1";
+                        cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
+                        using var dr = cmd.ExecuteReader();
+                        while (dr.Read()) {
+                            substrateName = $"{dr["col_Substrate_Name"]}";
                         }
                     }
 
-                    if (_substrateName != string.Empty) {
-                        if (StrSubstrateName == _substrateName) {
-                            var _result = MessageBox.Show($"[{ManufacturingNumberMaskedTextBox.Text}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
-                            if (_result == DialogResult.No) { return false; }
+                    if (substrateName != string.Empty) {
+                        if (StrSubstrateName == substrateName) {
+                            var result = MessageBox.Show($"[{ManufacturingNumberMaskedTextBox.Text}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
+                            if (result == DialogResult.No) { return false; }
                         }
-                        else { throw new Exception($"[{ManufacturingNumberMaskedTextBox.Text}]は[{_substrateName}]として在庫があります。確認してください。"); }
+                        else { throw new Exception($"[{ManufacturingNumberMaskedTextBox.Text}]は[{substrateName}]として在庫があります。確認してください。"); }
                     }
                 }
 
@@ -235,8 +235,8 @@ namespace ProductDatabase {
                     //在庫追加
                     if (QuantityCheckBox.Checked && !DefectNumberCheckBox.Checked) {
                         // 基板在庫テーブルへ追加_製番が一致した行を更新する、製番がない場合は新規追加
-                        using var _cmd = _con.CreateCommand();
-                        _cmd.CommandText =
+                        using var cmd = con.CreateCommand();
+                        cmd.CommandText =
                             $"""
                             INSERT INTO Stock_{StrStockName}
                                 (
@@ -251,28 +251,28 @@ namespace ProductDatabase {
                                 set col_Flg = 1, col_Stock = col_Stock + excluded.col_Stock
                             """;
 
-                        _cmd.Parameters.Add("@col_Flg", DbType.String).Value = 1;
-                        _cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = StrSubstrateName;
-                        _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = StrSubstrateModel;
-                        _cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
-                        _cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = OrderNumberTextBox.Text;
-                        _cmd.Parameters.Add("@col_Stock", DbType.String).Value = QuantityTextBox.Text;
+                        cmd.Parameters.Add("@col_Flg", DbType.String).Value = 1;
+                        cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = StrSubstrateName;
+                        cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = StrSubstrateModel;
+                        cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
+                        cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = OrderNumberTextBox.Text;
+                        cmd.Parameters.Add("@col_Stock", DbType.String).Value = QuantityTextBox.Text;
 
-                        _cmd.ExecuteNonQuery();
+                        cmd.ExecuteNonQuery();
                     }
                     //不良処理
                     else if (!QuantityCheckBox.Checked && DefectNumberCheckBox.Checked) {
-                        using var _cmd = _con.CreateCommand();
-                        _cmd.CommandText = $"SELECT col_Stock FROM Stock_{StrStockName} WHERE col_Substrate_Num = @col_Substrate_Num";
-                        _cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
-                        var _intStock = Convert.ToInt32(_cmd.ExecuteScalar());
+                        using var cmd = con.CreateCommand();
+                        cmd.CommandText = $"SELECT col_Stock FROM Stock_{StrStockName} WHERE col_Substrate_Num = @col_Substrate_Num";
+                        cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
+                        var intStock = Convert.ToInt32(cmd.ExecuteScalar());
 
-                        if (_intStock == 0) { throw new Exception("該当する製番の在庫がありません。"); }
+                        if (intStock == 0) { throw new Exception("該当する製番の在庫がありません。"); }
 
-                        var _intStockFlg = (_intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text)) > 0
+                        var intStockFlg = (intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text)) > 0
                             ? 1
-                            : (_intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text)) == 0 ? 0 : throw new Exception("不良数が在庫より多く入力されています。");
-                        _cmd.CommandText =
+                            : (intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text)) == 0 ? 0 : throw new Exception("不良数が在庫より多く入力されています。");
+                        cmd.CommandText =
                             $"""
                             UPDATE Stock_{StrStockName} SET
                                 col_Flg = @col_Flg,
@@ -281,19 +281,19 @@ namespace ProductDatabase {
                             WHERE
                                 col_Substrate_Num = @col_Substrate_Num
                             """;
-                        _cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
+                        cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
 
-                        _cmd.Parameters.Add("@col_Flg", DbType.String).Value = _intStockFlg;
-                        _cmd.Parameters.Add("@col_Stock", DbType.String).Value = _intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text);
-                        _cmd.Parameters.Add("@col_History", DbType.String).Value = $"[不良]{ManufacturingNumberMaskedTextBox.Text}";
+                        cmd.Parameters.Add("@col_Flg", DbType.String).Value = intStockFlg;
+                        cmd.Parameters.Add("@col_Stock", DbType.String).Value = intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text);
+                        cmd.Parameters.Add("@col_History", DbType.String).Value = $"[不良]{ManufacturingNumberMaskedTextBox.Text}";
 
-                        _cmd.ExecuteNonQuery();
+                        cmd.ExecuteNonQuery();
                     }
                 }
 
                 // 基板登録テーブルへ追加
-                using (var _cmd = _con.CreateCommand()) {
-                    _cmd.CommandText =
+                using (var cmd = con.CreateCommand()) {
+                    cmd.CommandText =
                         $"""
                         INSERT INTO Substrate_Reg_{StrProductName}
                             (
@@ -324,19 +324,20 @@ namespace ProductDatabase {
                         """;
 
                     // チェックボックスにチェックがない場合はNullを
-                    _cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = StrSubstrateName;
-                    _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = StrSubstrateModel;
-                    _cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
-                    _cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = OrderNumberTextBox.Text;
-                    _cmd.Parameters.Add("@col_Increase", DbType.String).Value = QuantityCheckBox.Checked ? QuantityTextBox.Text : DBNull.Value;
-                    _cmd.Parameters.Add("@col_Defect", DbType.String).Value = DefectNumberCheckBox.Checked ? DefectNumberTextBox.Text : DBNull.Value;
-                    _cmd.Parameters.Add("@col_RegDate", DbType.String).Value = RegistrationDateMaskedTextBox.Text;
-                    _cmd.Parameters.Add("@col_Person", DbType.String).Value = PersonComboBox.Text;
-                    _cmd.Parameters.Add("@col_Revision", DbType.String).Value = RevisionTextBox.Text;
-                    _cmd.Parameters.Add("@col_Comment", DbType.String).Value = CommentTextBox.Text;
+                    cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = StrSubstrateName;
+                    cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = StrSubstrateModel;
+                    cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
+                    cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = OrderNumberTextBox.Text;
+                    cmd.Parameters.Add("@col_Increase", DbType.String).Value = QuantityCheckBox.Checked ? QuantityTextBox.Text : DBNull.Value;
+                    cmd.Parameters.Add("@col_Defect", DbType.String).Value = DefectNumberCheckBox.Checked ? DefectNumberTextBox.Text : DBNull.Value;
+                    cmd.Parameters.Add("@col_RegDate", DbType.String).Value = RegistrationDateMaskedTextBox.Text;
+                    cmd.Parameters.Add("@col_Person", DbType.String).Value = PersonComboBox.Text;
+                    cmd.Parameters.Add("@col_Revision", DbType.String).Value = RevisionTextBox.Text;
+                    cmd.Parameters.Add("@col_Comment", DbType.String).Value = CommentTextBox.Text;
 
-                    _cmd.ExecuteNonQuery();
+                    cmd.ExecuteNonQuery();
                 }
+
                 return true;
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -344,22 +345,22 @@ namespace ProductDatabase {
             }
         }
         // 印刷処理
-        private void PrintBarcode(int PrintFlg) {
+        private void PrintBarcode(int printFlg) {
             // PrintDocumentオブジェクトの作成
-            using System.Drawing.Printing.PrintDocument _pd = new();
+            using System.Drawing.Printing.PrintDocument pd = new();
 
             //// PrintPageイベントハンドラの追加
-            _pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
+            pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
             LabelSubNumLabelsToPrint = int.Parse(QuantityTextBox.Text);
             LabelSubPageNum = 0;
 
-            switch (PrintFlg) {
+            switch (printFlg) {
                 case 1:
-                    SubstrateRegistrationPrintDialog.Document = _pd;
-                    var _r = SubstrateRegistrationPrintDialog.ShowDialog();
+                    SubstrateRegistrationPrintDialog.Document = pd;
+                    var r = SubstrateRegistrationPrintDialog.ShowDialog();
 
-                    if (_r == DialogResult.OK) {
+                    if (r == DialogResult.OK) {
                         SubstrateRegistrationPrintDialog.Document.Print();
 
                         if (IntPageCnt >= 2) {
@@ -371,7 +372,7 @@ namespace ProductDatabase {
                     }
                     break;
                 case 2:
-                    SubstrateRegistrationPrintPreviewDialog.Document = _pd;
+                    SubstrateRegistrationPrintPreviewDialog.Document = pd;
                     SubstrateRegistrationPrintPreviewDialog.ShowDialog();
                     break;
                 default:
@@ -383,79 +384,79 @@ namespace ProductDatabase {
                 if (SettingsLabelSub == null || e.Graphics == null) { return; }
 
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
-                var _startLine = (int)PrintPostionNumericUpDown.Value - 1;
-                var _sizeY = (float)SettingsLabelSub.LabelSubPageSettings.SizeY;
-                var _offsetX = SettingsLabelSub.LabelSubPageSettings.OffsetX;
-                var _offsetY = SettingsLabelSub.LabelSubPageSettings.OffsetY;
-                var _intervalY = SettingsLabelSub.LabelSubPageSettings.IntervalY;
-                Point _offset;
+                var startLine = (int)PrintPostionNumericUpDown.Value - 1;
+                var sizeY = (float)SettingsLabelSub.LabelSubPageSettings.SizeY;
+                var offsetX = SettingsLabelSub.LabelSubPageSettings.OffsetX;
+                var offsetY = SettingsLabelSub.LabelSubPageSettings.OffsetY;
+                var intervalY = SettingsLabelSub.LabelSubPageSettings.IntervalY;
+                Point offset;
                 if (!SubstrateRegistrationPrintDocument.PrintController.IsPreview) {
-                    _offsetX -= e.PageSettings.HardMarginX * 0.254;
-                    _offsetY -= e.PageSettings.HardMarginY * 0.254;
-                    _offset = LabelSubPageNum == 0
-                        ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLine * (_intervalY + _sizeY))))
-                        : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (_intervalY + _sizeY))));
+                    offsetX -= e.PageSettings.HardMarginX * 0.254;
+                    offsetY -= e.PageSettings.HardMarginY * 0.254;
+                    offset = LabelSubPageNum == 0
+                        ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (startLine * (intervalY + sizeY))))
+                        : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
                 }
                 else {
-                    _offset = new Point(0, 0);
+                    offset = new Point(0, 0);
                 }
 
                 e.PageSettings.Margins.Left = 0;
                 e.PageSettings.Margins.Top = 0;
-                var _headerPos = SettingsLabelSub.LabelSubPageSettings.HeaderPos;
-                _headerPos.Offset(_offset);
+                var headerPos = SettingsLabelSub.LabelSubPageSettings.HeaderPos;
+                headerPos.Offset(offset);
 
-                var _headerString = ConvertHeaderFooterString(SettingsLabelSub.LabelSubPageSettings.HeaderString);
-                e.Graphics.DrawString(_headerString, SettingsLabelSub.LabelSubPageSettings.HeaderFooterFont, Brushes.Black, _headerPos);
+                var headerString = ConvertHeaderFooterString(SettingsLabelSub.LabelSubPageSettings.HeaderString);
+                e.Graphics.DrawString(headerString, SettingsLabelSub.LabelSubPageSettings.HeaderFooterFont, Brushes.Black, headerPos);
                 LabelSubNSerial = ManufacturingNumberMaskedTextBox.Text;
 
                 if (LabelSubPageNum >= 1) {
-                    _startLine = 0;
+                    startLine = 0;
                 }
 
-                var _maxY = SettingsLabelSub.LabelSubPageSettings.NumLabelsY;
-                int _y;
-                var _intNumLabels = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
-                for (_y = _startLine; _y < _maxY; _y++) {
+                var maxY = SettingsLabelSub.LabelSubPageSettings.NumLabelsY;
+                int y;
+                var intNumLabels = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
+                for (y = startLine; y < maxY; y++) {
 
-                    var _maxX = SettingsLabelSub.LabelSubPageSettings.NumLabelsX;
+                    var maxX = SettingsLabelSub.LabelSubPageSettings.NumLabelsX;
 
-                    int _x;
-                    for (_x = 0; _x < _maxX; _x++) {
-                        var _s = GenerateCode(LabelSubNSerial);
+                    int x;
+                    for (x = 0; x < maxX; x++) {
+                        var s = GenerateCode(LabelSubNSerial);
 
-                        var _sizeX = (float)SettingsLabelSub.LabelSubPageSettings.SizeX;
+                        var sizeX = (float)SettingsLabelSub.LabelSubPageSettings.SizeX;
 
-                        var _intervalX = SettingsLabelSub.LabelSubPageSettings.IntervalX;
-                        var _posX = (float)(_offsetX + (_x * (_intervalX + _sizeX)));
-                        var _posY = (float)(_offsetY + (_y * (_intervalY + _sizeY)));
-                        e.Graphics.DrawImage(MakeLabelImage(_s, (int)e.Graphics.DpiX, 1), _posX, _posY, _sizeX, _sizeY);
+                        var intervalX = SettingsLabelSub.LabelSubPageSettings.IntervalX;
+                        var posX = (float)(offsetX + (x * (intervalX + sizeX)));
+                        var posY = (float)(offsetY + (y * (intervalY + sizeY)));
+                        e.Graphics.DrawImage(MakeLabelImage(s, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
 
                         LabelSubNLabel = 0;
                         LabelSubNumLabelsToPrint--;
 
                         if (LabelSubNumLabelsToPrint <= 0) {
-                            _intNumLabels--;
-                            if (_intNumLabels <= 0) {
+                            intNumLabels--;
+                            if (intNumLabels <= 0) {
                                 e.HasMorePages = false;
                                 LabelSubPageNum = 0;
-                                var _txtNumPublish = 0;
-                                LabelSubNumLabelsToPrint = _txtNumPublish;
+                                var txtNumPublish = 0;
+                                LabelSubNumLabelsToPrint = txtNumPublish;
                                 return;
                             }
                             else {
-                                LabelSubNumLabelsToPrint += _x + 1;
+                                LabelSubNumLabelsToPrint += x + 1;
                                 break;
                             }
                         }
 
-                        if (_x >= _maxX - 1) {
-                            _intNumLabels--;
-                            if (_intNumLabels <= 0) {
-                                _intNumLabels = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
+                        if (x >= maxX - 1) {
+                            intNumLabels--;
+                            if (intNumLabels <= 0) {
+                                intNumLabels = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
                             }
-                            else if (_intNumLabels > 0) {
-                                LabelSubNumLabelsToPrint += _x + 1;
+                            else if (intNumLabels > 0) {
+                                LabelSubNumLabelsToPrint += x + 1;
                                 break;
                             }
                         }
@@ -483,120 +484,120 @@ namespace ProductDatabase {
                  .Replace("%U", PersonComboBox.Text);
             return s;
         }
-        private string GenerateCode(string Serial) {
-            var _monthCode = DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM");
+        private string GenerateCode(string serial) {
+            var monthCode = DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM");
 
-            _monthCode = _monthCode switch {
+            monthCode = monthCode switch {
                 "10" => "X",
                 "11" => "Y",
                 "12" => "Z",
-                _ => _monthCode
+                _ => monthCode
             };
 
-            var _outputCode = SettingsLabelSub.LabelSubLabelSettings.Format;
-            var _serialCode = Serial.Substring(5, 5);
-            _outputCode = _outputCode.Replace("%T", StrInitial)
+            var outputCode = SettingsLabelSub.LabelSubLabelSettings.Format;
+            var serialCode = serial.Substring(5, 5);
+            outputCode = outputCode.Replace("%T", StrInitial)
                                     .Replace("%R", RevisionTextBox.Text)
                                     .Replace("%Y", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yy"))
                                     .Replace("%MM", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM"))
-                                    .Replace("%M", string.IsNullOrEmpty(_monthCode) ? string.Empty : _monthCode[^1..])
-                                    .Replace("%S", _serialCode);
+                                    .Replace("%M", string.IsNullOrEmpty(monthCode) ? string.Empty : monthCode[^1..])
+                                    .Replace("%S", serialCode);
 
-            return _outputCode;
+            return outputCode;
         }
-        private Bitmap MakeLabelImage(string Text, int Resolution, int Magnitude) {
+        private Bitmap MakeLabelImage(string text, int resolution, int magnitude) {
             if (SettingsLabelSub is null) { throw new Exception(); }
-            var _sizeX = (decimal)SettingsLabelSub.LabelSubPageSettings.SizeX / 25.4M * Resolution * Magnitude;
-            var _sizeY = (decimal)SettingsLabelSub.LabelSubPageSettings.SizeY / 25.4M * Resolution * Magnitude;
+            var sizeX = (decimal)SettingsLabelSub.LabelSubPageSettings.SizeX / 25.4M * resolution * magnitude;
+            var sizeY = (decimal)SettingsLabelSub.LabelSubPageSettings.SizeY / 25.4M * resolution * magnitude;
 
-            Bitmap _labelImage = new((int)_sizeX, (int)_sizeY);
-            using (var _g = Graphics.FromImage(_labelImage)) {
-                var _fontSize = (decimal)SettingsLabelSub.LabelSubLabelSettings.Font.SizeInPoints / 72.0M * Resolution * Magnitude;
-                using (Font _fnt = new(SettingsLabelSub.LabelSubLabelSettings.Font.Name, (float)_fontSize)) {
-                    var _stringSize = _g.MeasureString(Text, _fnt);
+            Bitmap labelImage = new((int)sizeX, (int)sizeY);
+            using (var g = Graphics.FromImage(labelImage)) {
+                var fontSize = (decimal)SettingsLabelSub.LabelSubLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
+                using (Font fnt = new(SettingsLabelSub.LabelSubLabelSettings.Font.Name, (float)fontSize)) {
+                    var stringSize = g.MeasureString(text, fnt);
 
-                    var _stringPosX = (int)((_labelImage.Width / 2) - (_stringSize.Width / 2));
-                    var _stringPosY = (int)((decimal)SettingsLabelSub.LabelSubLabelSettings.StringPosY / 25.4M * Resolution * Magnitude);
+                    var stringPosX = (int)((labelImage.Width / 2) - (stringSize.Width / 2));
+                    var stringPosY = (int)((decimal)SettingsLabelSub.LabelSubLabelSettings.StringPosY / 25.4M * resolution * magnitude);
 
-                    _g.DrawString(Text, _fnt, Brushes.Black, _stringPosX, _stringPosY);
+                    g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
                 }
 
-                _g.Dispose();
+                g.Dispose();
             }
 
-            return _labelImage;
+            return labelImage;
         }
         // コメント用テンプレート
         private void TemplateComment() {
-            var _templateWord = CommentComboBox.SelectedIndex switch {
+            var templateWord = CommentComboBox.SelectedIndex switch {
                 0 => "[Rev.UP]変更点番号:",
                 _ => string.Empty
             };
-            CommentTextBox.Text = $"{CommentTextBox.Text}{_templateWord}";
+            CommentTextBox.Text = $"{CommentTextBox.Text}{templateWord}";
         }
         // チェックボックスイベント
         private void CheckBoxChecked(object sender, EventArgs e) {
-            var _checkBox = (CheckBox)sender;
+            var checkBox = (CheckBox)sender;
 
-            switch (_checkBox.Name) {
+            switch (checkBox.Name) {
                 case "OrderNumberCheckBox":
-                    OrderNumberTextBox.Enabled = _checkBox.Checked;
+                    OrderNumberTextBox.Enabled = checkBox.Checked;
                     break;
                 case "ManufacturingNumberCheckBox":
-                    ManufacturingNumberMaskedTextBox.Enabled = _checkBox.Checked;
+                    ManufacturingNumberMaskedTextBox.Enabled = checkBox.Checked;
                     break;
                 case "QuantityCheckBox":
-                    QuantityTextBox.Enabled = _checkBox.Checked;
-                    if (_checkBox.Checked) {
+                    QuantityTextBox.Enabled = checkBox.Checked;
+                    if (checkBox.Checked) {
                         DefectNumberCheckBox.Checked = false;
                     }
 
                     break;
                 case "DefectNumberCheckBox":
-                    DefectNumberTextBox.Enabled = _checkBox.Checked;
-                    if (_checkBox.Checked) {
+                    DefectNumberTextBox.Enabled = checkBox.Checked;
+                    if (checkBox.Checked) {
                         QuantityCheckBox.Checked = false;
                     }
 
                     break;
                 case "RevisionCheckBox":
-                    RevisionTextBox.Enabled = _checkBox.Checked;
-                    if (_checkBox.Checked) {
+                    RevisionTextBox.Enabled = checkBox.Checked;
+                    if (checkBox.Checked) {
                         MessageBox.Show("変更する場合は理由を記載して下さい。");
                     }
 
                     break;
                 case "ExtraCheckBox1":
-                    ExtraTextBox1.Enabled = _checkBox.Checked;
+                    ExtraTextBox1.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox2":
-                    ExtraTextBox2.Enabled = _checkBox.Checked;
+                    ExtraTextBox2.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox3":
-                    ExtraTextBox3.Enabled = _checkBox.Checked;
+                    ExtraTextBox3.Enabled = checkBox.Checked;
                     break;
                 case "RegistrationDateCheckBox":
-                    RegistrationDateMaskedTextBox.Enabled = _checkBox.Checked;
+                    RegistrationDateMaskedTextBox.Enabled = checkBox.Checked;
                     break;
                 case "PersonCheckBox":
-                    PersonComboBox.Enabled = _checkBox.Checked;
+                    PersonComboBox.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox4":
-                    ExtraTextBox4.Enabled = _checkBox.Checked;
+                    ExtraTextBox4.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox5":
-                    ExtraTextBox5.Enabled = _checkBox.Checked;
+                    ExtraTextBox5.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox6":
-                    ExtraTextBox6.Enabled = _checkBox.Checked;
+                    ExtraTextBox6.Enabled = checkBox.Checked;
                     break;
                 case "CommentCheckBox":
-                    CommentTextBox.Enabled = _checkBox.Checked;
-                    CommentComboBox.Enabled = _checkBox.Checked;
-                    TemplateButton.Enabled = _checkBox.Checked;
+                    CommentTextBox.Enabled = checkBox.Checked;
+                    CommentComboBox.Enabled = checkBox.Checked;
+                    TemplateButton.Enabled = checkBox.Checked;
                     break;
                 case "PrintOnlyCheckBox":
-                    PrintButton.Enabled = _checkBox.Checked;
+                    PrintButton.Enabled = checkBox.Checked;
                     if (PrintOnlyCheckBox.Checked) { MessageBox.Show($"登録せずに印刷だけ行います。", "注意", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
                     break;
                 default:
@@ -631,16 +632,16 @@ namespace ProductDatabase {
         private void 印刷ToolStripMenuItem_Click(object sender, EventArgs e) { PrintBarcode(1); }
         private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { PrintBarcode(2); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            SubstratePrintSetting _ls = new();
-            _ls.ShowDialog(this);
+            SubstratePrintSetting ls = new();
+            ls.ShowDialog(this);
 
             try {
-                StreamWriter? _sw = null;
+                StreamWriter? sw = null;
 
-                _sw = new StreamWriter(StrSettingFilePath, false, new System.Text.UTF8Encoding(false));
-                System.Xml.Serialization.XmlSerializer _serializer = new(typeof(CSettingsLabelSub));
-                _serializer.Serialize(_sw, SettingsLabelSub);
-                _sw?.Close();
+                sw = new StreamWriter(StrSettingFilePath, false, new System.Text.UTF8Encoding(false));
+                System.Xml.Serialization.XmlSerializer serializer = new(typeof(CSettingsLabelSub));
+                serializer.Serialize(sw, SettingsLabelSub);
+                sw?.Close();
 
                 LoadSettings(StrSettingFilePath);
             } catch (Exception ex) {
@@ -666,8 +667,8 @@ namespace ProductDatabase {
             MessageBox.Show(message, "", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         private void SubstrateRegistrationPrintPreviewDialog_Load(object sender, EventArgs e) {
-            var _tool = (ToolStrip)SubstrateRegistrationPrintPreviewDialog.Controls[1];
-            _tool.Items[0].Visible = false;
+            var tool = (ToolStrip)SubstrateRegistrationPrintPreviewDialog.Controls[1];
+            tool.Items[0].Visible = false;
         }
     }
 }

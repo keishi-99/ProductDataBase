@@ -42,11 +42,11 @@ namespace ProductDatabase {
         public int DisplayMagnitude { get; } = 3;
         public int IntPageCnt { get; set; } = 1;
 
-        private string strSerialType = string.Empty;
-        private string strSerialFirstNumber = string.Empty;
-        private string strSerialLastNumber = string.Empty;
-        private bool fontUnderbar = false;
-        private readonly List<string> checkBoxNames = [
+        private string _strSerialType = string.Empty;
+        private string _strSerialFirstNumber = string.Empty;
+        private string _strSerialLastNumber = string.Empty;
+        private bool _fontUnderbar = false;
+        private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
@@ -105,34 +105,34 @@ namespace ProductDatabase {
                 }
 
                 // TextBoxへ今日の年月日を入力
-                var _dtNow = DateTime.Now;
-                RegistrationDateMaskedTextBox.Text = _dtNow.ToShortDateString();
+                var dtNow = DateTime.Now;
+                RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
 
                 // DB1へ接続し担当者取得
-                using (SQLiteConnection _con = new(MainWindow.GetConnectionString1())) {
-                    _con.Open();
-                    using var _cmd = _con.CreateCommand();
+                using (SQLiteConnection con = new(MainWindow.GetConnectionString1())) {
+                    con.Open();
+                    using var cmd = con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加
-                    _cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
-                    using var _dr = _cmd.ExecuteReader();
-                    while (_dr.Read()) {
-                        PersonComboBox.Items.Add($"{_dr["col_Person_Name"]}");
+                    cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
+                    using var dr = cmd.ExecuteReader();
+                    while (dr.Read()) {
+                        PersonComboBox.Items.Add($"{dr["col_Person_Name"]}");
                     }
                 }
 
                 // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
-                using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
-                    _con.Open();
-                    using var _cmd = _con.CreateCommand();
+                using (SQLiteConnection con = new(MainWindow.GetConnectionString2())) {
+                    con.Open();
+                    using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Revision]を取得
-                    _cmd.CommandText = $"SELECT col_Revision FROM Product_Reg_{StrProductName} ORDER BY _rowid_ DESC";
-                    var _result = _cmd.ExecuteScalar();
-                    RevisionTextBox.Text = _result?.ToString() ?? "";
+                    cmd.CommandText = $"SELECT col_Revision FROM Product_Reg_{StrProductName} ORDER BY _rowid_ DESC";
+                    var result = cmd.ExecuteScalar();
+                    RevisionTextBox.Text = result?.ToString() ?? "";
                 }
 
                 // 変数[check_bin]の値に応じてCheckboxにチェックを入れる
-                foreach (var _checkBoxName in checkBoxNames) {
-                    if (Controls[_checkBoxName] is CheckBox checkBox) {
+                foreach (var checkBoxName in _checkBoxNames) {
+                    if (Controls[checkBoxName] is CheckBox checkBox) {
                         checkBox.Checked = (IntCheckBin & 0x1) == 1;
                         IntCheckBin >>= 1;
                     }
@@ -148,16 +148,16 @@ namespace ProductDatabase {
         private void LoadSettings(string strLabelSettingFilePath, string strBarcodeSettingFilePath) {
             try {
                 if (strLabelSettingFilePath != string.Empty) {
-                    StreamReader? _srLabel = new(strLabelSettingFilePath, new System.Text.UTF8Encoding(false));
-                    System.Xml.Serialization.XmlSerializer _serializerLabel = new(typeof(CSettingsLabelPro));
-                    if (_serializerLabel.Deserialize(_srLabel) is CSettingsLabelPro _result) { SettingsLabelPro = _result; }
-                    _srLabel?.Close();
+                    StreamReader? srLabel = new(strLabelSettingFilePath, new System.Text.UTF8Encoding(false));
+                    System.Xml.Serialization.XmlSerializer serializerLabel = new(typeof(CSettingsLabelPro));
+                    if (serializerLabel.Deserialize(srLabel) is CSettingsLabelPro result) { SettingsLabelPro = result; }
+                    srLabel?.Close();
                 }
                 if (strBarcodeSettingFilePath != string.Empty) {
-                    StreamReader? _srBarcode = new(strBarcodeSettingFilePath, new System.Text.UTF8Encoding(false));
-                    System.Xml.Serialization.XmlSerializer _serializerBarcode = new(typeof(CSettingsBarcodePro));
-                    if (_serializerBarcode.Deserialize(_srBarcode) is CSettingsBarcodePro _result) { SettingsBarcodePro = _result; }
-                    _srBarcode?.Close();
+                    StreamReader? srBarcode = new(strBarcodeSettingFilePath, new System.Text.UTF8Encoding(false));
+                    System.Xml.Serialization.XmlSerializer serializerBarcode = new(typeof(CSettingsBarcodePro));
+                    if (serializerBarcode.Deserialize(srBarcode) is CSettingsBarcodePro result) { SettingsBarcodePro = result; }
+                    srBarcode?.Close();
                 }
             } catch (Exception ex) {
                 MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -168,35 +168,35 @@ namespace ProductDatabase {
         private void Registeration() {
             try {
                 // 入力フォームのチェック
-                var _anyTextBoxEnabled = false;
-                var _allTextBoxesFilled = true;
-                DialogResult _result;
+                var anyTextBoxEnabled = false;
+                var allTextBoxesFilled = true;
+                DialogResult result;
 
                 foreach (Control control in Controls) {
                     if (control is TextBoxBase textBox && textBox.Enabled) {
-                        _anyTextBoxEnabled = true;
+                        anyTextBoxEnabled = true;
                         if (string.IsNullOrWhiteSpace(textBox.Text)) {
-                            _allTextBoxesFilled = false;
+                            allTextBoxesFilled = false;
                             break;
                         }
                     }
                 }
-                if (!_anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
-                if (!_allTextBoxesFilled) { throw new Exception("空欄があります。"); }
+                if (!anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
+                if (!allTextBoxesFilled) { throw new Exception("空欄があります。"); }
 
                 if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
 
                 if (QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
 
-                _result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                if (_result == DialogResult.Cancel) {
+                result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                if (result == DialogResult.Cancel) {
                     return;
                 }
 
-                var _quantity = Convert.ToInt32(QuantityTextBox.Text);
-                if (_quantity == 0) { throw new Exception("1以上入力してください。"); }
-                var _firstSerial = Convert.ToInt32(FirstSerialNumberTextBox.Text);
-                if (_firstSerial == 0) { throw new Exception("シリアル開始番号を入力してください。"); }
+                var quantity = Convert.ToInt32(QuantityTextBox.Text);
+                if (quantity == 0) { throw new Exception("1以上入力してください。"); }
+                var firstSerial = Convert.ToInt32(FirstSerialNumberTextBox.Text);
+                if (firstSerial == 0) { throw new Exception("シリアル開始番号を入力してください。"); }
 
                 switch (IntSerialDigit) {
                     case 3:
@@ -210,14 +210,14 @@ namespace ProductDatabase {
                 }
 
                 void CheckAndAdjustSerial(int threshold, int resetValue) {
-                    if (_quantity + _firstSerial >= threshold) {
+                    if (quantity + firstSerial >= threshold) {
                         MessageBox.Show($"シリアルが{threshold}を超えるので{resetValue.ToString().PadLeft(IntSerialDigit, '0')}から開始します。");
                         FirstSerialNumberTextBox.Text = resetValue.ToString();
                     }
                 }
 
-                _result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                if (_result == DialogResult.Cancel) { return; }
+                result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                if (result == DialogResult.Cancel) { return; }
 
                 StrOrderNumber = OrderNumberTextBox.Text;
                 StrProductNumber = ManufacturingNumberMaskedTextBox.Text;
@@ -230,16 +230,16 @@ namespace ProductDatabase {
                 IntSerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text);
                 IntSerialLastNumber = IntSerialFirstNumber + IntQuantity - 1;
 
-                strSerialFirstNumber = GenerateCode(IntSerialFirstNumber);
-                strSerialLastNumber = GenerateCode(IntSerialLastNumber);
+                _strSerialFirstNumber = GenerateCode(IntSerialFirstNumber);
+                _strSerialLastNumber = GenerateCode(IntSerialLastNumber);
 
                 if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
 
                 // 再印刷登録テーブルへ追加
-                using SQLiteConnection _con = new(MainWindow.GetConnectionString2());
-                _con.Open();
-                using var _cmd = _con.CreateCommand();
-                _cmd.CommandText =
+                using SQLiteConnection con = new(MainWindow.GetConnectionString2());
+                con.Open();
+                using var cmd = con.CreateCommand();
+                cmd.CommandText =
                     $"""
                     INSERT INTO Reprint
                         (col_Print_Type, col_Order_Num, col_Product_Num, col_Product_Type, col_Product_Model, col_Quantity, col_Person, col_RegDate, col_Revision, col_Serial_First, col_Serial_Last, col_Comment)
@@ -248,43 +248,43 @@ namespace ProductDatabase {
                     """;
 
                 // チェックボックスにチェックがない場合はNullを
-                _cmd.Parameters.Add("@col_Print_Type", DbType.String).Value = IntPrintType;
-                _cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
-                _cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
-                _cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
-                _cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
-                _cmd.Parameters.Add("@col_Quantity", DbType.String).Value = IntQuantity;
-                _cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
-                _cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
-                _cmd.Parameters.Add("@col_Revision", DbType.String).Value = StrRevision;
-                _cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = strSerialFirstNumber;
-                _cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = strSerialLastNumber;
-                _cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
+                cmd.Parameters.Add("@col_Print_Type", DbType.String).Value = IntPrintType;
+                cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
+                cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
+                cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
+                cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
+                cmd.Parameters.Add("@col_Quantity", DbType.String).Value = IntQuantity;
+                cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
+                cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
+                cmd.Parameters.Add("@col_Revision", DbType.String).Value = StrRevision;
+                cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = _strSerialFirstNumber;
+                cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = _strSerialLastNumber;
+                cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
 
-                _cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         // 印刷処理
-        private bool PrintBarcode(int PrintFlg) {
+        private bool PrintBarcode(int printFlg) {
             // PrintDocumentオブジェクトの作成
-            using System.Drawing.Printing.PrintDocument _pd = new();
+            using System.Drawing.Printing.PrintDocument pd = new();
 
             // PrintPageイベントハンドラの追加
-            _pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
+            pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
             LabelProNumLabelsToPrint = IntQuantity;
             LabelProPageNum = 0;
-            fontUnderbar = false;
+            _fontUnderbar = false;
 
-            switch (PrintFlg) {
+            switch (printFlg) {
                 case 1:
-                    RePrintPrintDialog.Document = _pd;
-                    var _r = RePrintPrintDialog.ShowDialog();
+                    RePrintPrintDialog.Document = pd;
+                    var r = RePrintPrintDialog.ShowDialog();
 
-                    if (_r == DialogResult.OK) {
+                    if (r == DialogResult.OK) {
                         RePrintPrintDialog.Document.Print();
 
                         if (IntPageCnt >= 2) {
@@ -296,7 +296,7 @@ namespace ProductDatabase {
                     }
                     break;
                 case 2:
-                    RePrintPrintPreviewDialog.Document = _pd;
+                    RePrintPrintPreviewDialog.Document = pd;
                     RePrintPrintPreviewDialog.ShowDialog();
                     break;
                 default:
@@ -309,121 +309,121 @@ namespace ProductDatabase {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
 
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
-                var _startLineLabel = (int)PrintPostionNumericUpDown.Value - 1;
-                Point _headerPos = new(0, 0);
-                var _headerString = string.Empty;
-                Font _headerFooterFont = new("Arial", 6);
-                var _intNumLabels = 0;
-                var _intCountNumLabels = 0;
+                var startLineLabel = (int)PrintPostionNumericUpDown.Value - 1;
+                Point headerPos = new(0, 0);
+                var headerString = string.Empty;
+                Font headerFooterFont = new("Arial", 6);
+                var intNumLabels = 0;
+                var intCountNumLabels = 0;
 
 
-                var _maxX = 0;
-                var _maxY = 0;
-                float _sizeX = 0;
-                float _sizeY = 0;
-                double _offsetX = 0;
-                double _offsetY = 0;
-                double _intervalX = 0;
-                double _intervalY = 0;
-                switch (strSerialType) {
+                var maxX = 0;
+                var maxY = 0;
+                float sizeX = 0;
+                float sizeY = 0;
+                double offsetX = 0;
+                double offsetY = 0;
+                double intervalX = 0;
+                double intervalY = 0;
+                switch (_strSerialType) {
                     case "Label":
                         if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnullです。"); }
-                        _maxX = SettingsLabelPro._labelProPageSettings.NumLabelsX;
-                        _maxY = SettingsLabelPro._labelProPageSettings.NumLabelsY;
-                        _sizeX = (float)SettingsLabelPro._labelProPageSettings.SizeX;
-                        _sizeY = (float)SettingsLabelPro._labelProPageSettings.SizeY;
-                        _offsetX = SettingsLabelPro._labelProPageSettings.OffsetX;
-                        _offsetY = SettingsLabelPro._labelProPageSettings.OffsetY;
-                        _intervalX = SettingsLabelPro._labelProPageSettings.IntervalX;
-                        _intervalY = SettingsLabelPro._labelProPageSettings.IntervalY;
-                        _headerPos = SettingsLabelPro._labelProPageSettings.HeaderPos;
-                        _headerString = ConvertHeaderFooterString(SettingsLabelPro._labelProPageSettings.HeaderString);
-                        _headerFooterFont = SettingsLabelPro._labelProPageSettings.HeaderFooterFont;
-                        _intNumLabels = SettingsLabelPro._labelProLabelSettings.NumLabels;
-                        _intCountNumLabels = SettingsLabelPro._labelProLabelSettings.NumLabels;
+                        maxX = SettingsLabelPro._labelProPageSettings.NumLabelsX;
+                        maxY = SettingsLabelPro._labelProPageSettings.NumLabelsY;
+                        sizeX = (float)SettingsLabelPro._labelProPageSettings.SizeX;
+                        sizeY = (float)SettingsLabelPro._labelProPageSettings.SizeY;
+                        offsetX = SettingsLabelPro._labelProPageSettings.OffsetX;
+                        offsetY = SettingsLabelPro._labelProPageSettings.OffsetY;
+                        intervalX = SettingsLabelPro._labelProPageSettings.IntervalX;
+                        intervalY = SettingsLabelPro._labelProPageSettings.IntervalY;
+                        headerPos = SettingsLabelPro._labelProPageSettings.HeaderPos;
+                        headerString = ConvertHeaderFooterString(SettingsLabelPro._labelProPageSettings.HeaderString);
+                        headerFooterFont = SettingsLabelPro._labelProPageSettings.HeaderFooterFont;
+                        intNumLabels = SettingsLabelPro._labelProLabelSettings.NumLabels;
+                        intCountNumLabels = SettingsLabelPro._labelProLabelSettings.NumLabels;
                         break;
                     case "Barcode":
                         if (SettingsBarcodePro == null) { throw new Exception("SettingsBarcodeProがnullです。"); }
-                        _maxX = SettingsBarcodePro.BarcodeProPageSettings.NumLabelsX;
-                        _maxY = SettingsBarcodePro.BarcodeProPageSettings.NumLabelsY;
-                        _sizeX = (float)SettingsBarcodePro.BarcodeProPageSettings.SizeX;
-                        _sizeY = (float)SettingsBarcodePro.BarcodeProPageSettings.SizeY;
-                        _offsetX = SettingsBarcodePro.BarcodeProPageSettings.OffsetX;
-                        _offsetY = SettingsBarcodePro.BarcodeProPageSettings.OffsetY;
-                        _intervalX = SettingsBarcodePro.BarcodeProPageSettings.IntervalX;
-                        _intervalY = SettingsBarcodePro.BarcodeProPageSettings.IntervalY;
-                        _headerPos = SettingsBarcodePro.BarcodeProPageSettings.HeaderPos;
-                        _headerString = ConvertHeaderFooterString(SettingsBarcodePro.BarcodeProPageSettings.HeaderString);
-                        _headerFooterFont = SettingsBarcodePro.BarcodeProPageSettings.HeaderFooterFont;
-                        _intNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
-                        _intCountNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
+                        maxX = SettingsBarcodePro.BarcodeProPageSettings.NumLabelsX;
+                        maxY = SettingsBarcodePro.BarcodeProPageSettings.NumLabelsY;
+                        sizeX = (float)SettingsBarcodePro.BarcodeProPageSettings.SizeX;
+                        sizeY = (float)SettingsBarcodePro.BarcodeProPageSettings.SizeY;
+                        offsetX = SettingsBarcodePro.BarcodeProPageSettings.OffsetX;
+                        offsetY = SettingsBarcodePro.BarcodeProPageSettings.OffsetY;
+                        intervalX = SettingsBarcodePro.BarcodeProPageSettings.IntervalX;
+                        intervalY = SettingsBarcodePro.BarcodeProPageSettings.IntervalY;
+                        headerPos = SettingsBarcodePro.BarcodeProPageSettings.HeaderPos;
+                        headerString = ConvertHeaderFooterString(SettingsBarcodePro.BarcodeProPageSettings.HeaderString);
+                        headerFooterFont = SettingsBarcodePro.BarcodeProPageSettings.HeaderFooterFont;
+                        intNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
+                        intCountNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
                         break;
                     default:
                         break;
                 }
 
-                var _startLineBarcode = (int)PrintPostionNumericUpDown.Value - 1;
+                var startLineBarcode = (int)PrintPostionNumericUpDown.Value - 1;
 
-                Point _offset;
+                Point offset;
                 if (!RePrintPrintDocument.PrintController.IsPreview) {
-                    _offsetX -= e.PageSettings.HardMarginX * 0.254;
-                    _offsetY -= e.PageSettings.HardMarginY * 0.254;
-                    _offset = LabelProPageNum == 0
-                        ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLineBarcode * (_intervalY + _sizeY))))
-                        : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (_intervalY + _sizeY))));
+                    offsetX -= e.PageSettings.HardMarginX * 0.254;
+                    offsetY -= e.PageSettings.HardMarginY * 0.254;
+                    offset = LabelProPageNum == 0
+                        ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (startLineBarcode * (intervalY + sizeY))))
+                        : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
                 }
                 else {
-                    _offset = new Point(0, 0);
+                    offset = new Point(0, 0);
                 }
 
                 e.PageSettings.Margins.Left = 0;
                 e.PageSettings.Margins.Top = 0;
 
-                _headerPos.Offset(_offset);
-                e.Graphics.DrawString(_headerString, _headerFooterFont, Brushes.Black, _headerPos);
+                headerPos.Offset(offset);
+                e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
 
-                var _barcodePageNum = 0;
-                _offset = _barcodePageNum == 0
-                    ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLineBarcode * (_intervalY + _sizeY))))
-                    : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (_intervalY + _sizeY))));
+                var barcodePageNum = 0;
+                offset = barcodePageNum == 0
+                    ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (startLineBarcode * (intervalY + sizeY))))
+                    : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
 
                 if (LabelProPageNum == 0) { LabelProNSerial = IntSerialFirstNumber; }
-                if (LabelProPageNum >= 1) { _startLineBarcode = 0; }
+                if (LabelProPageNum >= 1) { startLineBarcode = 0; }
 
-                var _y = 0;
-                for (_y = _startLineBarcode; _y < _maxY; _y++) {
-                    var _x = 0;
-                    for (_x = 0; _x < _maxX; _x++) {
-                        var _s = GenerateCode(LabelProNSerial);
-                        var _posX = (float)(_offsetX + (_x * (_intervalX + _sizeX)));
-                        var _posY = (float)(_offsetY + (_y * (_intervalY + _sizeY)));
-                        e.Graphics.DrawImage(MakeLabelImage(_s, (int)e.Graphics.DpiX, 1), _posX, _posY, _sizeX, _sizeY);
+                var y = 0;
+                for (y = startLineBarcode; y < maxY; y++) {
+                    var x = 0;
+                    for (x = 0; x < maxX; x++) {
+                        var s = GenerateCode(LabelProNSerial);
+                        var posX = (float)(offsetX + (x * (intervalX + sizeX)));
+                        var posY = (float)(offsetY + (y * (intervalY + sizeY)));
+                        e.Graphics.DrawImage(MakeLabelImage(s, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
 
                         LabelProNSerial++;
                         LabelProNumLabelsToPrint--;
 
                         if (LabelProNumLabelsToPrint <= 0) {
-                            _intCountNumLabels--;
-                            if (_intCountNumLabels <= 0) {
+                            intCountNumLabels--;
+                            if (intCountNumLabels <= 0) {
                                 e.HasMorePages = false;
                                 LabelProPageNum = 0;
-                                var _txtNumPublish = 0;
-                                LabelProNumLabelsToPrint = _txtNumPublish;
+                                var txtNumPublish = 0;
+                                LabelProNumLabelsToPrint = txtNumPublish;
                                 return;
                             }
                             else {
-                                LabelProNumLabelsToPrint += _x + 1;
+                                LabelProNumLabelsToPrint += x + 1;
                                 break;
                             }
                         }
 
-                        if (_x >= _maxX - 1) {
-                            _intCountNumLabels--;
-                            if (_intCountNumLabels <= 0) {
-                                _intCountNumLabels = _intNumLabels;
+                        if (x >= maxX - 1) {
+                            intCountNumLabels--;
+                            if (intCountNumLabels <= 0) {
+                                intCountNumLabels = intNumLabels;
                             }
-                            else if (_intCountNumLabels > 0) {
-                                LabelProNumLabelsToPrint += _x + 1;
+                            else if (intCountNumLabels > 0) {
+                                LabelProNumLabelsToPrint += x + 1;
                                 break;
                             }
                         }
@@ -450,166 +450,165 @@ namespace ProductDatabase {
             return s;
         }
         private string GenerateCode(int serialCode) {
-            var _monthCode = DateTime.Parse(StrRegDate).ToString("MM");
+            var monthCode = DateTime.Parse(StrRegDate).ToString("MM");
 
-            _monthCode = _monthCode switch {
+            monthCode = monthCode switch {
                 "10" => "X",
                 "11" => "Y",
                 "12" => "Z",
-                _ => _monthCode
+                _ => monthCode
             };
 
-            var _outputCode = strSerialType switch {
+            var outputCode = _strSerialType switch {
                 "Label" => SettingsLabelPro._labelProLabelSettings.Format,
                 "Barcode" => SettingsBarcodePro.BarcodeProLabelSettings.Format,
                 _ => string.Empty
             };
 
-            var _serialCode = Convert.ToInt32(serialCode).ToString($"D{IntSerialDigit}");
-            _outputCode = _outputCode.Replace("%Y", DateTime.Parse(StrRegDate).ToString("yy"))
+            outputCode = outputCode.Replace("%Y", DateTime.Parse(StrRegDate).ToString("yy"))
                                     .Replace("%MM", DateTime.Parse(StrRegDate).ToString("MM"))
                                     .Replace("%T", StrInitial)
                                     .Replace("%R", StrRevision)
-                                    .Replace("%M", _monthCode[^1..])
-                                    .Replace("%S", _serialCode);
+                                    .Replace("%M", monthCode[^1..])
+                                    .Replace("%S", Convert.ToInt32(serialCode).ToString($"D{IntSerialDigit}"));
 
-            return _outputCode;
+            return outputCode;
         }
         private Bitmap MakeLabelImage(string text, int resolution, int magnitude) {
-            Bitmap _labelImage = new(1, 1);
-            decimal _sizeX;
-            decimal _sizeY;
-            decimal _fontSize;
-            float _stringPosX;
-            float _stringPosY;
-            Font _fnt;
-            Graphics _g;
-            SizeF _stringSize;
-            switch (strSerialType) {
+            Bitmap labelImage = new(1, 1);
+            decimal sizeX;
+            decimal sizeY;
+            decimal fontSize;
+            float stringPosX;
+            float stringPosY;
+            Font fnt;
+            Graphics g;
+            SizeF stringSize;
+            switch (_strSerialType) {
                 case "Label":
                     if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnull"); }
-                    _sizeX = (decimal)SettingsLabelPro._labelProPageSettings.SizeX / 25.4M * resolution * magnitude;
-                    _sizeY = (decimal)SettingsLabelPro._labelProPageSettings.SizeY / 25.4M * resolution * magnitude;
-                    _fontSize = (decimal)SettingsLabelPro._labelProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
-                    _stringPosY = (int)((decimal)SettingsLabelPro._labelProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
-                    var _style = fontUnderbar ? FontStyle.Underline : FontStyle.Regular;
-                    _fnt = new Font(SettingsLabelPro._labelProLabelSettings.Font.Name, (float)_fontSize, _style);
+                    sizeX = (decimal)SettingsLabelPro._labelProPageSettings.SizeX / 25.4M * resolution * magnitude;
+                    sizeY = (decimal)SettingsLabelPro._labelProPageSettings.SizeY / 25.4M * resolution * magnitude;
+                    fontSize = (decimal)SettingsLabelPro._labelProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
+                    stringPosY = (int)((decimal)SettingsLabelPro._labelProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
+                    var style = _fontUnderbar ? FontStyle.Underline : FontStyle.Regular;
+                    fnt = new Font(SettingsLabelPro._labelProLabelSettings.Font.Name, (float)fontSize, style);
 
-                    _labelImage = new((int)_sizeX, (int)_sizeY);
-                    _g = Graphics.FromImage(_labelImage);
+                    labelImage = new((int)sizeX, (int)sizeY);
+                    g = Graphics.FromImage(labelImage);
 
-                    _stringSize = _g.MeasureString(text, _fnt);
+                    stringSize = g.MeasureString(text, fnt);
 
-                    _stringPosX = (int)((_labelImage.Width / 2) - (_stringSize.Width / 2));
+                    stringPosX = (int)((labelImage.Width / 2) - (stringSize.Width / 2));
 
-                    _g.DrawString(text, _fnt, Brushes.Black, _stringPosX, _stringPosY);
+                    g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
 
-                    _g.Dispose();
+                    g.Dispose();
                     break;
                 case "Barcode":
                     if (SettingsBarcodePro == null) { throw new Exception("SettingsBarcodeProがnull"); }
 
-                    _sizeX = (decimal)SettingsBarcodePro.BarcodeProPageSettings.SizeX / 25.4M * resolution * magnitude;
-                    _sizeY = (decimal)SettingsBarcodePro.BarcodeProPageSettings.SizeY / 25.4M * resolution * magnitude;
-                    _fontSize = (decimal)SettingsBarcodePro.BarcodeProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
-                    _fnt = new(SettingsBarcodePro.BarcodeProLabelSettings.Font.Name, (float)_fontSize);
+                    sizeX = (decimal)SettingsBarcodePro.BarcodeProPageSettings.SizeX / 25.4M * resolution * magnitude;
+                    sizeY = (decimal)SettingsBarcodePro.BarcodeProPageSettings.SizeY / 25.4M * resolution * magnitude;
+                    fontSize = (decimal)SettingsBarcodePro.BarcodeProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
+                    fnt = new(SettingsBarcodePro.BarcodeProLabelSettings.Font.Name, (float)fontSize);
 
-                    _labelImage = new((int)_sizeX, (int)_sizeY);
-                    _g = Graphics.FromImage(_labelImage);
+                    labelImage = new((int)sizeX, (int)sizeY);
+                    g = Graphics.FromImage(labelImage);
 
-                    int _barWeight;
-                    _barWeight = resolution == DisplayResolution ? 1 : (int)(1 * resolution / DisplayResolution / DisplayMagnitude);
+                    int barWeight;
+                    barWeight = resolution == DisplayResolution ? 1 : (int)(1 * resolution / DisplayResolution / DisplayMagnitude);
 
-                    var _img = Code128Rendering.MakeBarcodeImage(text, _barWeight, true);
-                    var _imageWidth = (decimal)(_img.Width * SettingsBarcodePro.BarcodeProLabelSettings.BarcodeMagnitude);
+                    var img = Code128Rendering.MakeBarcodeImage(text, barWeight, true);
+                    var imageWidth = (decimal)(img.Width * SettingsBarcodePro.BarcodeProLabelSettings.BarcodeMagnitude);
 
-                    if (_imageWidth > _labelImage.Width) { MessageBox.Show($"バーコードの幅がラベル幅を超えています{_imageWidth}>{_labelImage.Width}"); }
+                    if (imageWidth > labelImage.Width) { MessageBox.Show($"バーコードの幅がラベル幅を超えています{imageWidth}>{labelImage.Width}"); }
 
-                    _stringSize = _g.MeasureString(text, _fnt);
+                    stringSize = g.MeasureString(text, fnt);
 
-                    _stringPosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignStringCenter
-                        ? (float)((_labelImage.Width / 2) - (_stringSize.Width / 2))
+                    stringPosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignStringCenter
+                        ? (float)((labelImage.Width / 2) - (stringSize.Width / 2))
                         : (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
 
-                    _stringPosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
+                    stringPosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
 
 
-                    float _barCodePosX;
-                    _barCodePosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignBarcodeCenter
-                        ? (float)((_labelImage.Width / 2) - (_imageWidth / 2))
+                    float barCodePosX;
+                    barCodePosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignBarcodeCenter
+                        ? (float)((labelImage.Width / 2) - (imageWidth / 2))
                         : (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
 
-                    float _barCodePosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.BarcodePosY / 25.4M * resolution * magnitude);
+                    float barCodePosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.BarcodePosY / 25.4M * resolution * magnitude);
 
-                    _g.DrawString(text, _fnt, Brushes.Black, _stringPosX, _stringPosY);
+                    g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
 
-                    var _barcodeHeight = (int)(SettingsBarcodePro.BarcodeProLabelSettings.BarcodeHeight / 25.4F * resolution * magnitude);
-                    _g.DrawImage(_img, _barCodePosX, _barCodePosY, (float)_imageWidth, _barcodeHeight);
+                    var barcodeHeight = (int)(SettingsBarcodePro.BarcodeProLabelSettings.BarcodeHeight / 25.4F * resolution * magnitude);
+                    g.DrawImage(img, barCodePosX, barCodePosY, (float)imageWidth, barcodeHeight);
 
-                    _g.Dispose();
-                    _img.Dispose();
+                    g.Dispose();
+                    img.Dispose();
                     break;
                 default:
                     break;
             }
-            return _labelImage;
+            return labelImage;
         }
         // チェックボックスイベント
         private void CheckBoxChecked(object sender, EventArgs e) {
-            var _checkBox = (CheckBox)sender;
+            var checkBox = (CheckBox)sender;
 
-            switch (_checkBox.Name) {
+            switch (checkBox.Name) {
                 case "OrderNumberCheckBox":
-                    OrderNumberTextBox.Enabled = _checkBox.Checked;
+                    OrderNumberTextBox.Enabled = checkBox.Checked;
                     break;
                 case "ManufacturingNumberCheckBox":
-                    ManufacturingNumberMaskedTextBox.Enabled = _checkBox.Checked;
+                    ManufacturingNumberMaskedTextBox.Enabled = checkBox.Checked;
                     break;
                 case "QuantityCheckBox":
-                    QuantityTextBox.Enabled = _checkBox.Checked;
-                    if (_checkBox.Checked) {
+                    QuantityTextBox.Enabled = checkBox.Checked;
+                    if (checkBox.Checked) {
                         ExtraCheckBox1.Checked = false;
                     }
 
                     break;
                 case "ExtraCheckBox1":
-                    ExtraTextBox2.Enabled = _checkBox.Checked;
+                    ExtraTextBox2.Enabled = checkBox.Checked;
                     break;
                 case "RevisionCheckBox":
-                    RevisionTextBox.Enabled = _checkBox.Checked;
-                    if (_checkBox.Checked) {
+                    RevisionTextBox.Enabled = checkBox.Checked;
+                    if (checkBox.Checked) {
                         MessageBox.Show("変更する場合は理由を記載して下さい。");
                     }
 
                     break;
                 case "ExtraCheckBox2":
-                    ExtraTextBox3.Enabled = _checkBox.Checked;
+                    ExtraTextBox3.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox3":
-                    ExtraTextBox3.Enabled = _checkBox.Checked;
+                    ExtraTextBox3.Enabled = checkBox.Checked;
                     break;
                 case "FirstSerialNumberCheckBox":
-                    FirstSerialNumberTextBox.Enabled = _checkBox.Checked;
+                    FirstSerialNumberTextBox.Enabled = checkBox.Checked;
                     break;
                 case "RegistrationDateCheckBox":
-                    RegistrationDateMaskedTextBox.Enabled = _checkBox.Checked;
+                    RegistrationDateMaskedTextBox.Enabled = checkBox.Checked;
                     break;
                 case "PersonCheckBox":
-                    PersonComboBox.Enabled = _checkBox.Checked;
+                    PersonComboBox.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox4":
-                    ExtraTextBox4.Enabled = _checkBox.Checked;
+                    ExtraTextBox4.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox5":
-                    ExtraTextBox5.Enabled = _checkBox.Checked;
+                    ExtraTextBox5.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox6":
-                    ExtraTextBox6.Enabled = _checkBox.Checked;
+                    ExtraTextBox6.Enabled = checkBox.Checked;
                     break;
                 case "CommentCheckBox":
-                    CommentTextBox.Enabled = _checkBox.Checked;
-                    CommentComboBox.Enabled = _checkBox.Checked;
-                    TemplateButton.Enabled = _checkBox.Checked;
+                    CommentTextBox.Enabled = checkBox.Checked;
+                    CommentComboBox.Enabled = checkBox.Checked;
+                    TemplateButton.Enabled = checkBox.Checked;
                     break;
             }
         }
@@ -630,11 +629,11 @@ namespace ProductDatabase {
 
         private void RePrintWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void LabelPrintButton_Click(object sender, EventArgs e) {
-            strSerialType = "Label";
+            _strSerialType = "Label";
             Registeration();
         }
         private void BarcodePrintButton_Click(object sender, EventArgs e) {
-            strSerialType = "Barcode";
+            _strSerialType = "Barcode";
             Registeration();
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {

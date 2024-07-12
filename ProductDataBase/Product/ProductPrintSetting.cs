@@ -3,132 +3,128 @@
 namespace ProductDatabase {
     public partial class ProductPrintSetting : Form {
 
-        private CLabelProLabelSettings labelProLabelSettings;
-        private CLabelProPageSettings labelProPageSettings;
+        private CLabelProLabelSettings _labelProLabelSettings;
+        private CLabelProPageSettings _labelProPageSettings;
 
         public ProductPrintSetting() {
             InitializeComponent();
 
-            labelProLabelSettings = new CLabelProLabelSettings();
-            labelProPageSettings = new CLabelProPageSettings();
+            _labelProLabelSettings = new CLabelProLabelSettings();
+            _labelProPageSettings = new CLabelProPageSettings();
         }
 
         private void PageSettingsLabelLoad(object sender, EventArgs e) {
-            labelProPageSettings = ((ProductRegistration2Window)Owner!).SettingsLabelPro!._labelProPageSettings;
-            LabelWidthTextBox.Text = labelProPageSettings.SizeX.ToString();
-            LabelHeightTextBox.Text = labelProPageSettings.SizeY.ToString();
-            QuantityXTextBox.Text = labelProPageSettings.NumLabelsX.ToString();
-            QuantityYTextBox.Text = labelProPageSettings.NumLabelsY.ToString();
-            PageOffsetXTextBox.Text = labelProPageSettings.OffsetX.ToString();
-            PageOffsetYTextBox.Text = labelProPageSettings.OffsetY.ToString();
-            LabelIntervalXTextBox.Text = labelProPageSettings.IntervalX.ToString();
-            LabelIntervalYTextBox.Text = labelProPageSettings.IntervalY.ToString();
-            HeaderStringTextBox.Text = labelProPageSettings.HeaderString;
-            HeaderPostionXTextBox.Text = labelProPageSettings.HeaderPos.X.ToString();
-            HeaderPostionYTextBox.Text = labelProPageSettings.HeaderPos.Y.ToString();
+            _labelProPageSettings = ((ProductRegistration2Window)Owner!).SettingsLabelPro!._labelProPageSettings;
+            LabelWidthTextBox.Text = _labelProPageSettings.SizeX.ToString();
+            LabelHeightTextBox.Text = _labelProPageSettings.SizeY.ToString();
+            QuantityXTextBox.Text = _labelProPageSettings.NumLabelsX.ToString();
+            QuantityYTextBox.Text = _labelProPageSettings.NumLabelsY.ToString();
+            PageOffsetXTextBox.Text = _labelProPageSettings.OffsetX.ToString();
+            PageOffsetYTextBox.Text = _labelProPageSettings.OffsetY.ToString();
+            LabelIntervalXTextBox.Text = _labelProPageSettings.IntervalX.ToString();
+            LabelIntervalYTextBox.Text = _labelProPageSettings.IntervalY.ToString();
+            HeaderStringTextBox.Text = _labelProPageSettings.HeaderString;
+            HeaderPostionXTextBox.Text = _labelProPageSettings.HeaderPos.X.ToString();
+            HeaderPostionYTextBox.Text = _labelProPageSettings.HeaderPos.Y.ToString();
 
-            if (labelProPageSettings.HeaderFooterFont != null) {
-                HeaderFontDialog.Font = labelProPageSettings.HeaderFooterFont;
+            if (_labelProPageSettings.HeaderFooterFont != null) {
+                HeaderFontDialog.Font = _labelProPageSettings.HeaderFooterFont;
                 HeaderFooterFontTextBox.Text = $"{HeaderFontDialog.Font.Name} {HeaderFontDialog.Font.SizeInPoints}pt";
             }
 
-            labelProLabelSettings = ((ProductRegistration2Window)Owner).SettingsLabelPro!._labelProLabelSettings;
-            PrintTextHeightTextBox.Text = labelProLabelSettings.BarcodeHeight.ToString();
-            PrintTextMagnitudeTextBox.Text = labelProLabelSettings.BarcodeMagnitude.ToString();
-            PrintTextQuantityTextBox.Text = labelProLabelSettings.NumLabels.ToString();
-            PrintTextFormatTextBox.Text = labelProLabelSettings.Format;
+            _labelProLabelSettings = ((ProductRegistration2Window)Owner).SettingsLabelPro!._labelProLabelSettings;
+            PrintTextHeightTextBox.Text = _labelProLabelSettings.BarcodeHeight.ToString();
+            PrintTextMagnitudeTextBox.Text = _labelProLabelSettings.BarcodeMagnitude.ToString();
+            PrintTextQuantityTextBox.Text = _labelProLabelSettings.NumLabels.ToString();
+            PrintTextFormatTextBox.Text = _labelProLabelSettings.Format;
 
-            if (labelProLabelSettings.Font != null) {
-                TextFontDialog.Font = labelProLabelSettings.Font;
+            if (_labelProLabelSettings.Font != null) {
+                TextFontDialog.Font = _labelProLabelSettings.Font;
                 PrintTextFontTextBox.Text = $"{TextFontDialog.Font.Name} {TextFontDialog.Font.SizeInPoints}pt";
             }
 
-            PrintTextPostionXTextBox.Text = labelProLabelSettings.StringPosX.ToString();
-            PrintTextPostionYTextBox.Text = labelProLabelSettings.StringPosY.ToString();
-            BarcodeCenterCheckBox.Checked = labelProLabelSettings.AlignStringCenter;
+            PrintTextPostionXTextBox.Text = _labelProLabelSettings.StringPosX.ToString();
+            PrintTextPostionYTextBox.Text = _labelProLabelSettings.StringPosY.ToString();
+            BarcodeCenterCheckBox.Checked = _labelProLabelSettings.AlignStringCenter;
 
-            if (BarcodeCenterCheckBox.Checked) {
-                PrintTextPostionXTextBox.Enabled = false;
-            }
-            else {
-                PrintTextPostionXTextBox.Enabled = true;
-            }
+            PrintTextPostionXTextBox.Enabled = !BarcodeCenterCheckBox.Checked;
         }
 
         private void BtnOK_Click(object sender, EventArgs e) {
-            double _sizeX, _sizeY, _offsetX, _offsetY, _intervalX, _intervalY, _barcodeHeight, _barcodeMagnitude, _stringPosX, _stringPosY;
-            int _numLabelsX, _numLabelsY, _headerPosX, _headerPosY, _footerPosX = 0, _footerPosY = 0, _numLabels;
+            double sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, barcodeHeight, barcodeMagnitude, stringPosX, stringPosY;
+            int numLabelsX, numLabelsY, headerPosX, headerPosY, footerPosX = 0, footerPosY = 0, numLabels;
 
             try {
-                _sizeX = double.Parse(LabelWidthTextBox.Text);
-                _sizeY = double.Parse(LabelHeightTextBox.Text);
-                _numLabelsX = int.Parse(QuantityXTextBox.Text);
-                _numLabelsY = int.Parse(QuantityYTextBox.Text);
-                _offsetX = double.Parse(PageOffsetXTextBox.Text);
-                _offsetY = double.Parse(PageOffsetYTextBox.Text);
-                _intervalX = double.Parse(LabelIntervalXTextBox.Text);
-                _intervalY = double.Parse(LabelIntervalYTextBox.Text);
-                _headerPosX = int.Parse(HeaderPostionXTextBox.Text);
-                _headerPosY = int.Parse(HeaderPostionYTextBox.Text);
+                sizeX = double.Parse(LabelWidthTextBox.Text);
+                sizeY = double.Parse(LabelHeightTextBox.Text);
+                numLabelsX = int.Parse(QuantityXTextBox.Text);
+                numLabelsY = int.Parse(QuantityYTextBox.Text);
+                offsetX = double.Parse(PageOffsetXTextBox.Text);
+                offsetY = double.Parse(PageOffsetYTextBox.Text);
+                intervalX = double.Parse(LabelIntervalXTextBox.Text);
+                intervalY = double.Parse(LabelIntervalYTextBox.Text);
+                headerPosX = int.Parse(HeaderPostionXTextBox.Text);
+                headerPosY = int.Parse(HeaderPostionYTextBox.Text);
 
-                _barcodeHeight = double.Parse(PrintTextHeightTextBox.Text);
-                _stringPosX = double.Parse(PrintTextPostionXTextBox.Text);
-                _stringPosY = double.Parse(PrintTextPostionYTextBox.Text);
-                _barcodeMagnitude = double.Parse(PrintTextMagnitudeTextBox.Text);
-                _numLabels = int.Parse(PrintTextQuantityTextBox.Text);
+                barcodeHeight = double.Parse(PrintTextHeightTextBox.Text);
+                stringPosX = double.Parse(PrintTextPostionXTextBox.Text);
+                stringPosY = double.Parse(PrintTextPostionYTextBox.Text);
+                barcodeMagnitude = double.Parse(PrintTextMagnitudeTextBox.Text);
+                numLabels = int.Parse(PrintTextQuantityTextBox.Text);
             } catch (Exception ex) {
                 MessageBox.Show($"入力値が不正です。{Environment.NewLine}{ex.Message}");
                 DialogResult = DialogResult.None;
                 return;
             }
 
-            labelProPageSettings.SizeX = _sizeX;
-            labelProPageSettings.SizeY = _sizeY;
-            labelProPageSettings.NumLabelsX = _numLabelsX;
-            labelProPageSettings.NumLabelsY = _numLabelsY;
-            labelProPageSettings.OffsetX = _offsetX;
-            labelProPageSettings.OffsetY = _offsetY;
-            labelProPageSettings.IntervalX = _intervalX;
-            labelProPageSettings.IntervalY = _intervalY;
-            labelProPageSettings.HeaderPos = new Point(_headerPosX, _headerPosY);
-            labelProPageSettings.FooterPos = new Point(_footerPosX, _footerPosY);
-            labelProPageSettings.HeaderString = HeaderStringTextBox.Text;
-            labelProPageSettings.HeaderFooterFont = HeaderFontDialog.Font;
+            _labelProPageSettings.SizeX = sizeX;
+            _labelProPageSettings.SizeY = sizeY;
+            _labelProPageSettings.NumLabelsX = numLabelsX;
+            _labelProPageSettings.NumLabelsY = numLabelsY;
+            _labelProPageSettings.OffsetX = offsetX;
+            _labelProPageSettings.OffsetY = offsetY;
+            _labelProPageSettings.IntervalX = intervalX;
+            _labelProPageSettings.IntervalY = intervalY;
+            _labelProPageSettings.HeaderPos = new Point(headerPosX, headerPosY);
+            _labelProPageSettings.FooterPos = new Point(footerPosX, footerPosY);
+            _labelProPageSettings.HeaderString = HeaderStringTextBox.Text;
+            _labelProPageSettings.HeaderFooterFont = HeaderFontDialog.Font;
 
-            labelProLabelSettings.BarcodeHeight = _barcodeHeight;
-            labelProLabelSettings.BarcodePosX = 0;
-            labelProLabelSettings.BarcodePosY = 0;
-            labelProLabelSettings.BarcodeMagnitude = _barcodeMagnitude;
-            labelProLabelSettings.Format = PrintTextFormatTextBox.Text;
-            labelProLabelSettings.Font = TextFontDialog.Font;
-            labelProLabelSettings.StringPosX = _stringPosX;
-            labelProLabelSettings.StringPosY = _stringPosY;
-            labelProLabelSettings.AlignStringCenter = BarcodeCenterCheckBox.Checked;
-            labelProLabelSettings.NumLabels = int.Parse(PrintTextQuantityTextBox.Text);
+            _labelProLabelSettings.BarcodeHeight = barcodeHeight;
+            _labelProLabelSettings.BarcodePosX = 0;
+            _labelProLabelSettings.BarcodePosY = 0;
+            _labelProLabelSettings.BarcodeMagnitude = barcodeMagnitude;
+            _labelProLabelSettings.Format = PrintTextFormatTextBox.Text;
+            _labelProLabelSettings.Font = TextFontDialog.Font;
+            _labelProLabelSettings.StringPosX = stringPosX;
+            _labelProLabelSettings.StringPosY = stringPosY;
+            _labelProLabelSettings.AlignStringCenter = BarcodeCenterCheckBox.Checked;
+            _labelProLabelSettings.NumLabels = int.Parse(PrintTextQuantityTextBox.Text);
 
             DialogResult = DialogResult.OK;
             Close();
         }
 
         private void BtnHeaderFooterFont_Click(object sender, EventArgs e) {
-            DialogResult _r = HeaderFontDialog.ShowDialog();
-            if (_r == DialogResult.Cancel) return;
+            var r = HeaderFontDialog.ShowDialog();
+            if (r == DialogResult.Cancel) {
+                return;
+            }
+
             HeaderFooterFontTextBox.Text = $"{HeaderFontDialog.Font.Name} {HeaderFontDialog.Font.SizeInPoints}pt";
         }
 
         private void BtnBarcodeFont_Click(object sender, EventArgs e) {
-            DialogResult _r = TextFontDialog.ShowDialog();
-            if (_r == DialogResult.Cancel) return;
+            var r = TextFontDialog.ShowDialog();
+            if (r == DialogResult.Cancel) {
+                return;
+            }
+
             PrintTextFontTextBox.Text = $"{TextFontDialog.Font.Name} {TextFontDialog.Font.SizeInPoints}pt";
         }
 
         private void BarcodeCenterCheckBox_CheckedChanged(object sender, EventArgs e) {
-            if (BarcodeCenterCheckBox.Checked) {
-                PrintTextPostionXTextBox.Enabled = false;
-            }
-            else {
-                PrintTextPostionXTextBox.Enabled = true;
-            }
+            PrintTextPostionXTextBox.Enabled = !BarcodeCenterCheckBox.Checked;
         }
 
         private void ProductPrintSetting_Load(object sender, EventArgs e) { PageSettingsLabelLoad(sender, e); }

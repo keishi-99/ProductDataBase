@@ -25,7 +25,7 @@ namespace ProductDatabase {
         public string StrProductType { get; set; } = string.Empty;
         public string StrProductModel { get; set; } = string.Empty;
         public string StrUseSubstrate { get; set; } = string.Empty;
-        public string[] ArrUseSubstrate = [];
+        public string[] ArrUseSubstrate { get; set; } = [];
         public string StrInitial { get; set; } = string.Empty;
         public string StrOrderNumber { get; set; } = string.Empty;
         public string StrProductNumber { get; set; } = string.Empty;
@@ -54,24 +54,24 @@ namespace ProductDatabase {
         public int StrProness4 { get; }
         public string StrProness5 { get; } = string.Empty;
 
-        private string strSerialType = string.Empty;
-        private string strSerialFirstNumber = string.Empty;
-        private string strSerialLastNumber = string.Empty;
-        private string strTotalSubstrate = string.Empty;
-        private int intSerialLastNumber;
-        private bool fontUnderbar = false;
-        private readonly List<string> strSerial = [];
-        private readonly List<string> checkBoxNames = [
+        private string _strSerialType = string.Empty;
+        private string _strSerialFirstNumber = string.Empty;
+        private string _strSerialLastNumber = string.Empty;
+        private string _strTotalSubstrate = string.Empty;
+        private int _intSerialLastNumber;
+        private bool _fontUnderbar = false;
+        private readonly List<string> _strSerial = [];
+        private readonly List<string> _checkBoxNames = [
                         "Substrate1CheckBox", "Substrate2CheckBox", "Substrate3CheckBox", "Substrate4CheckBox","Substrate5CheckBox",
                         "Substrate6CheckBox", "Substrate7CheckBox", "Substrate8CheckBox", "Substrate9CheckBox","Substrate10CheckBox"
                         ];
-        private readonly List<string> dataGridViewNames = [
+        private readonly List<string> _dataGridViewNames = [
                         "Substrate1DataGridView", "Substrate2DataGridView", "Substrate3DataGridView", "Substrate4DataGridView","Substrate5DataGridView",
                         "Substrate6DataGridView", "Substrate7DataGridView", "Substrate8DataGridView", "Substrate9DataGridView","Substrate10DataGridView"
                         ];
-        private readonly List<string> listUsedSubstrate = [];
-        private readonly List<string> listUsedProductNumber = [];
-        private readonly List<int> listUsedQuantity = [];
+        private readonly List<string> _listUsedSubstrate = [];
+        private readonly List<string> _listUsedProductNumber = [];
+        private readonly List<int> _listUsedQuantity = [];
 
         public ProductRegistration2Window() {
             InitializeComponent();
@@ -85,156 +85,156 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = true;
                 ArrUseSubstrate = StrUseSubstrate.Split(",");
 
-                intSerialLastNumber = IntSerialFirstNumber + IntQuantity - 1;
+                _intSerialLastNumber = IntSerialFirstNumber + IntQuantity - 1;
 
-                var _quantityFlg = false;
-                var _strQuantity = string.Empty;
+                var quantityFlg = false;
+                var strQuantity = string.Empty;
                 switch (IntRegType) {
                     case 2:
-                        for (var _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
-                            var _objCbx = Controls[checkBoxNames[_i]] as CheckBox;
+                        for (var i = 0; i <= ArrUseSubstrate.GetUpperBound(0); i++) {
+                            var objCbx = Controls[_checkBoxNames[i]] as CheckBox;
 
-                            if (_objCbx != null) {
-                                _objCbx.Enabled = true;
-                                _objCbx.Checked = true;
+                            if (objCbx != null) {
+                                objCbx.Enabled = true;
+                                objCbx.Checked = true;
                             }
 
-                            var _objDgv = Controls[dataGridViewNames[_i]] as DataGridView;
-                            if (_objDgv != null) {
-                                _objDgv.RowHeadersWidth = 30;
-                                _objDgv.Columns[2].ReadOnly = false;
-                                _objDgv.Columns[3].ReadOnly = false;
+                            var objDgv = Controls[_dataGridViewNames[i]] as DataGridView;
+                            if (objDgv != null) {
+                                objDgv.RowHeadersWidth = 30;
+                                objDgv.Columns[2].ReadOnly = false;
+                                objDgv.Columns[3].ReadOnly = false;
                             }
 
-                            using SQLiteConnection _con = new(MainWindow.GetConnectionString2());
-                            _con.Open();
+                            using SQLiteConnection con = new(MainWindow.GetConnectionString2());
+                            con.Open();
 
-                            using var _cmd = _con.CreateCommand();
+                            using var cmd = con.CreateCommand();
                             // 使用基板表示
-                            _cmd.CommandText = $"SELECT col_Substrate_Name FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model";
-                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[_i];
-                            using (var _dr = _cmd.ExecuteReader()) {
-                                if (_dr.Read()) {
-                                    if (_objCbx != null) {
-                                        var _substrateName = $"{_dr["col_Substrate_Name"]}";
-                                        _objCbx.Text = $"{_substrateName} - {ArrUseSubstrate[_i]}";
+                            cmd.CommandText = $"SELECT col_Substrate_Name FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model";
+                            cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[i];
+                            using (var dr = cmd.ExecuteReader()) {
+                                if (dr.Read()) {
+                                    if (objCbx != null) {
+                                        var substrateName = $"{dr["col_Substrate_Name"]}";
+                                        objCbx.Text = $"{substrateName} - {ArrUseSubstrate[i]}";
                                     }
                                 }
                             }
 
                             // 在庫テーブルからデータ取得
-                            var _intQuantity = IntQuantity;
-                            _cmd.CommandText = $"SELECT col_Substrate_num, col_Stock, col_Substrate_Name FROM Stock_{StrStockName} WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
-                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[_i];
-                            using (var _dr = _cmd.ExecuteReader()) {
-                                while (_dr.Read()) {
-                                    var _strSubstrateNumber = $"{_dr["col_Substrate_num"]}";
-                                    var _intStock = Convert.ToInt32(_dr["col_Stock"]);
-                                    _objDgv?.Rows.Add(_strSubstrateNumber, _intStock);
+                            var intQuantity = IntQuantity;
+                            cmd.CommandText = $"SELECT col_Substrate_num, col_Stock, col_Substrate_Name FROM Stock_{StrStockName} WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
+                            cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[i];
+                            using (var dr = cmd.ExecuteReader()) {
+                                while (dr.Read()) {
+                                    var strSubstrateNumber = $"{dr["col_Substrate_num"]}";
+                                    var intStock = Convert.ToInt32(dr["col_Stock"]);
+                                    objDgv?.Rows.Add(strSubstrateNumber, intStock);
 
-                                    if (_intQuantity >= _intStock) {
-                                        _intQuantity -= _intStock;
-                                        if (_objDgv != null) {
-                                            _objDgv.Rows[^1].Cells[2].Value = _intStock;
-                                            _objDgv.Rows[^1].Cells[3].Value = true;
+                                    if (intQuantity >= intStock) {
+                                        intQuantity -= intStock;
+                                        if (objDgv != null) {
+                                            objDgv.Rows[^1].Cells[2].Value = intStock;
+                                            objDgv.Rows[^1].Cells[3].Value = true;
                                         }
                                     }
                                     else {
-                                        if (_intQuantity == 0) {
-                                            if (_objDgv != null) {
-                                                _objDgv.Rows[^1].Cells[2].Value = 0;
+                                        if (intQuantity == 0) {
+                                            if (objDgv != null) {
+                                                objDgv.Rows[^1].Cells[2].Value = 0;
                                             }
                                         }
                                         else {
-                                            if (_objDgv != null) {
-                                                _objDgv.Rows[^1].Cells[2].Value = _intQuantity;
-                                                _objDgv.Rows[^1].Cells[3].Value = true;
-                                                _intQuantity = 0;
+                                            if (objDgv != null) {
+                                                objDgv.Rows[^1].Cells[2].Value = intQuantity;
+                                                objDgv.Rows[^1].Cells[3].Value = true;
+                                                intQuantity = 0;
                                             }
                                         }
                                     }
 
-                                    if (_intQuantity > 0) {
-                                        _quantityFlg = false;
-                                        var _substrateName = $"{_dr["col_Substrate_Name"]}";
-                                        _strQuantity += $"[{_substrateName}]{Environment.NewLine}";
+                                    if (intQuantity > 0) {
+                                        quantityFlg = false;
+                                        var substrateName = $"{dr["col_Substrate_Name"]}";
+                                        strQuantity += $"[{substrateName}]{Environment.NewLine}";
                                     }
 
-                                    if (_intQuantity == 0) { _quantityFlg = true; }
+                                    if (intQuantity == 0) { quantityFlg = true; }
                                 }
                             }
                         }
 
-                        if (_quantityFlg == false) {
+                        if (quantityFlg == false) {
                             Activate();
-                            MessageBox.Show($"在庫が足りません。{Environment.NewLine}{_strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show($"在庫が足りません。{Environment.NewLine}{strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
 
                         break;
                     case 3:
                         if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
-                        for (var _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
-                            var _objCbx = Controls[checkBoxNames[_i]] as CheckBox;
+                        for (var i = 0; i <= ArrUseSubstrate.GetUpperBound(0); i++) {
+                            var objCbx = Controls[_checkBoxNames[i]] as CheckBox;
 
-                            if (_objCbx != null) {
-                                _objCbx.Enabled = true;
-                                _objCbx.Checked = true;
+                            if (objCbx != null) {
+                                objCbx.Enabled = true;
+                                objCbx.Checked = true;
                             }
 
-                            var _objDgv = Controls[dataGridViewNames[_i]] as DataGridView;
-                            if (_objDgv != null) {
-                                _objDgv.RowHeadersWidth = 30;
-                                _objDgv.Columns[2].ReadOnly = false;
-                                _objDgv.Columns[3].ReadOnly = false;
+                            var objDgv = Controls[_dataGridViewNames[i]] as DataGridView;
+                            if (objDgv != null) {
+                                objDgv.RowHeadersWidth = 30;
+                                objDgv.Columns[2].ReadOnly = false;
+                                objDgv.Columns[3].ReadOnly = false;
                             }
 
-                            using SQLiteConnection _con = new(MainWindow.GetConnectionString2());
-                            _con.Open();
-                            using var _cmd = _con.CreateCommand();
-                            _cmd.CommandText = $"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model";
-                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[_i];
-                            using (var _dr = _cmd.ExecuteReader()) {
-                                while (_dr.Read()) {
-                                    if (_objCbx != null) { _objCbx.Text = $"{_dr["col_Substrate_Name"]} - {ArrUseSubstrate[_i]}"; }
+                            using SQLiteConnection con = new(MainWindow.GetConnectionString2());
+                            con.Open();
+                            using var cmd = con.CreateCommand();
+                            cmd.CommandText = $"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model";
+                            cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[i];
+                            using (var dr = cmd.ExecuteReader()) {
+                                while (dr.Read()) {
+                                    if (objCbx != null) { objCbx.Text = $"{dr["col_Substrate_Name"]} - {ArrUseSubstrate[i]}"; }
                                 }
                             }
 
-                            _cmd.CommandText = $"SELECT * FROM Stock_{StrStockName} WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
-                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[_i];
-                            using (var _dr = _cmd.ExecuteReader()) {
-                                while (_dr.Read()) {
-                                    var _strSubstrateName = string.Empty;
-                                    _strSubstrateName = $"{_dr["col_Substrate_Name"]}";
+                            cmd.CommandText = $"SELECT * FROM Stock_{StrStockName} WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
+                            cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[i];
+                            using (var dr = cmd.ExecuteReader()) {
+                                while (dr.Read()) {
+                                    var strSubstrateName = string.Empty;
+                                    strSubstrateName = $"{dr["col_Substrate_Name"]}";
 
-                                    var _strSubstrateNumber = $"{_dr["col_Substrate_Num"]}";
-                                    var _intStock = Convert.ToInt32(_dr["col_Stock"]);
-                                    _objDgv?.Rows.Add(_strSubstrateNumber, _intStock);
+                                    var strSubstrateNumber = $"{dr["col_Substrate_Num"]}";
+                                    var intStock = Convert.ToInt32(dr["col_Stock"]);
+                                    objDgv?.Rows.Add(strSubstrateNumber, intStock);
 
-                                    var _j = 0;
-                                    var _strOrderNumber = $"{_dr["col_Order_Num"]}";
-                                    if (_strOrderNumber == StrOrderNumber) {
-                                        if (_objDgv != null) {
-                                            var _intQuantity = IntQuantity;
-                                            var _stockValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value);
-                                            var _useValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value);
-                                            _objDgv.Rows[_j].Cells[2].Value = _intQuantity;
-                                            _objDgv.Rows[_j].Cells[3].Value = true;
+                                    var j = 0;
+                                    var strOrderNumber = $"{dr["col_Order_Num"]}";
+                                    if (strOrderNumber == StrOrderNumber) {
+                                        if (objDgv != null) {
+                                            var intQuantity = IntQuantity;
+                                            var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
+                                            var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
+                                            objDgv.Rows[j].Cells[2].Value = intQuantity;
+                                            objDgv.Rows[j].Cells[3].Value = true;
                                             // 必要数量分割り当てられたかチェック
-                                            if (_intQuantity > _stockValue) {
-                                                _quantityFlg = false;
-                                                _strQuantity = $"{_strQuantity}[{_strSubstrateName}]{Environment.NewLine}";
+                                            if (intQuantity > stockValue) {
+                                                quantityFlg = false;
+                                                strQuantity = $"{strQuantity}[{strSubstrateName}]{Environment.NewLine}";
                                             }
-                                            if (_stockValue >= _useValue) { _quantityFlg = true; }
+                                            if (stockValue >= useValue) { quantityFlg = true; }
                                         }
                                     }
-                                    _j++;
+                                    j++;
                                 }
                             }
                         }
 
-                        if (_quantityFlg == false) {
+                        if (quantityFlg == false) {
                             Activate();
-                            MessageBox.Show($"在庫が足りません。{Environment.NewLine}{_strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show($"在庫が足りません。{Environment.NewLine}{strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                         break;
                     default:
@@ -323,16 +323,16 @@ namespace ProductDatabase {
         private void LoadSettings(string strLabelSettingFilePath, string strBarcodeSettingFilePath) {
             try {
                 if (strLabelSettingFilePath != string.Empty) {
-                    using StreamReader? _srLabel = new(strLabelSettingFilePath, new System.Text.UTF8Encoding(false));
-                    System.Xml.Serialization.XmlSerializer _serializerLabel = new(typeof(CSettingsLabelPro));
-                    if (_serializerLabel.Deserialize(_srLabel) is CSettingsLabelPro _result) { SettingsLabelPro = _result; }
-                    _srLabel?.Close();
+                    using StreamReader? srLabel = new(strLabelSettingFilePath, new System.Text.UTF8Encoding(false));
+                    System.Xml.Serialization.XmlSerializer serializerLabel = new(typeof(CSettingsLabelPro));
+                    if (serializerLabel.Deserialize(srLabel) is CSettingsLabelPro result) { SettingsLabelPro = result; }
+                    srLabel?.Close();
                 }
                 if (strBarcodeSettingFilePath != string.Empty) {
-                    using StreamReader? _srBarcode = new(strBarcodeSettingFilePath, new System.Text.UTF8Encoding(false));
-                    System.Xml.Serialization.XmlSerializer _serializerBarcode = new(typeof(CSettingsBarcodePro));
-                    if (_serializerBarcode.Deserialize(_srBarcode) is CSettingsBarcodePro _result) { SettingsBarcodePro = _result; }
-                    _srBarcode?.Close();
+                    using StreamReader? srBarcode = new(strBarcodeSettingFilePath, new System.Text.UTF8Encoding(false));
+                    System.Xml.Serialization.XmlSerializer serializerBarcode = new(typeof(CSettingsBarcodePro));
+                    if (serializerBarcode.Deserialize(srBarcode) is CSettingsBarcodePro result) { SettingsBarcodePro = result; }
+                    srBarcode?.Close();
                 }
             } catch (Exception ex) {
                 MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -342,10 +342,10 @@ namespace ProductDatabase {
         // クロージングイベント
         private void ClosingEvents() {
             try {
-                System.Xml.Serialization.XmlSerializer _serializerLabel = new(typeof(CSettingsLabelPro));
-                StreamWriter? _swLabel = null;
-                System.Xml.Serialization.XmlSerializer _serializerBarcode = new(typeof(CSettingsBarcodePro));
-                StreamWriter? _swBarcode = null;
+                System.Xml.Serialization.XmlSerializer serializerLabel = new(typeof(CSettingsLabelPro));
+                StreamWriter? swLabel = null;
+                System.Xml.Serialization.XmlSerializer serializerBarcode = new(typeof(CSettingsBarcodePro));
+                StreamWriter? swBarcode = null;
 
                 switch (IntPrintType) {
                     case 1:
@@ -354,22 +354,22 @@ namespace ProductDatabase {
                     case 6:
                     case 7:
                     case 8:
-                        _swLabel = new StreamWriter(StrLabelSettingFilePath, false, new System.Text.UTF8Encoding(false));
-                        _serializerLabel.Serialize(_swLabel, SettingsLabelPro);
-                        _swLabel?.Close();
+                        swLabel = new StreamWriter(StrLabelSettingFilePath, false, new System.Text.UTF8Encoding(false));
+                        serializerLabel.Serialize(swLabel, SettingsLabelPro);
+                        swLabel?.Close();
                         break;
                     case 2:
-                        _swBarcode = new StreamWriter(StrBarcodeSettingFilePath, false, new System.Text.UTF8Encoding(false));
-                        _serializerBarcode.Serialize(_swBarcode, SettingsBarcodePro);
-                        _swBarcode?.Close();
+                        swBarcode = new StreamWriter(StrBarcodeSettingFilePath, false, new System.Text.UTF8Encoding(false));
+                        serializerBarcode.Serialize(swBarcode, SettingsBarcodePro);
+                        swBarcode?.Close();
                         break;
                     case 3:
-                        _swLabel = new StreamWriter(StrLabelSettingFilePath, false, new System.Text.UTF8Encoding(false));
-                        _serializerLabel.Serialize(_swLabel, SettingsLabelPro);
-                        _swLabel?.Close();
-                        _swBarcode = new StreamWriter(StrBarcodeSettingFilePath, false, new System.Text.UTF8Encoding(false));
-                        _serializerBarcode.Serialize(_swBarcode, SettingsBarcodePro);
-                        _swBarcode?.Close();
+                        swLabel = new StreamWriter(StrLabelSettingFilePath, false, new System.Text.UTF8Encoding(false));
+                        serializerLabel.Serialize(swLabel, SettingsLabelPro);
+                        swLabel?.Close();
+                        swBarcode = new StreamWriter(StrBarcodeSettingFilePath, false, new System.Text.UTF8Encoding(false));
+                        serializerBarcode.Serialize(swBarcode, SettingsBarcodePro);
+                        swBarcode?.Close();
                         break;
                     default:
                         break;
@@ -377,8 +377,8 @@ namespace ProductDatabase {
             } catch (Exception ex) {
                 MessageBox.Show($"設定ファイルの保存に失敗しました。{Environment.NewLine}{ex.Message}");
             } finally {
-                using (ProductRegistration1Window _productRegistration1Window = new()) {
-                    _productRegistration1Window.Close();
+                using (ProductRegistration1Window productRegistration1Window = new()) {
+                    productRegistration1Window.Close();
                 }
                 Dispose();
             }
@@ -386,12 +386,12 @@ namespace ProductDatabase {
         // 登録処理
         private bool Registration() {
             if (IntRegType > 0) {
-                using SQLiteConnection _con = new(MainWindow.GetConnectionString2());
-                _con.Open();
+                using SQLiteConnection con = new(MainWindow.GetConnectionString2());
+                con.Open();
 
-                foreach (var _b in strSerial) {
-                    using var _cmd = _con.CreateCommand();
-                    _cmd.CommandText =
+                foreach (var b in _strSerial) {
+                    using var cmd = con.CreateCommand();
+                    cmd.CommandText =
                         $"""
                         INSERT INTO Serial_{StrProductName}
                             (
@@ -413,24 +413,24 @@ namespace ProductDatabase {
                             )
                         """;
 
-                    _cmd.Parameters.Add("@col_Serial", DbType.String).Value = _b;
-                    _cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
-                    _cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
-                    _cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
-                    _cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
-                    _cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
+                    cmd.Parameters.Add("@col_Serial", DbType.String).Value = b;
+                    cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
+                    cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
+                    cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
+                    cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
+                    cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
 
-                    _cmd.ExecuteNonQuery();
+                    cmd.ExecuteNonQuery();
                 }
             }
 
             switch (IntRegType) {
                 case 0:
-                    using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
-                        _con.Open();
+                    using (SQLiteConnection con = new(MainWindow.GetConnectionString2())) {
+                        con.Open();
 
-                        using var _cmd = _con.CreateCommand();
-                        _cmd.CommandText =
+                        using var cmd = con.CreateCommand();
+                        cmd.CommandText =
                             $"""
                             INSERT INTO Product_Reg_{StrProductName}
                                 (
@@ -458,26 +458,26 @@ namespace ProductDatabase {
                                 )
                             """;
 
-                        _cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
-                        _cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
-                        _cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
-                        _cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
-                        _cmd.Parameters.Add("@col_Quantity", DbType.String).Value = IntQuantity;
-                        _cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
-                        _cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
-                        _cmd.Parameters.Add("@col_Revision", DbType.String).Value = StrRevision;
-                        _cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
+                        cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
+                        cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
+                        cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
+                        cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
+                        cmd.Parameters.Add("@col_Quantity", DbType.String).Value = IntQuantity;
+                        cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
+                        cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
+                        cmd.Parameters.Add("@col_Revision", DbType.String).Value = StrRevision;
+                        cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
 
-                        _cmd.ExecuteNonQuery();
+                        cmd.ExecuteNonQuery();
                     }
                     break;
 
                 case 1:
-                    using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
-                        _con.Open();
+                    using (SQLiteConnection con = new(MainWindow.GetConnectionString2())) {
+                        con.Open();
 
-                        using var _cmd = _con.CreateCommand();
-                        _cmd.CommandText =
+                        using var cmd = con.CreateCommand();
+                        cmd.CommandText =
                             $"""
                             INSERT INTO Product_Reg_{StrProductName}
                                 (
@@ -511,48 +511,48 @@ namespace ProductDatabase {
                                 )
                             """;
 
-                        _cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
-                        _cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
-                        _cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
-                        _cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
-                        _cmd.Parameters.Add("@col_Quantity", DbType.String).Value = IntQuantity;
-                        _cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
-                        _cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
-                        _cmd.Parameters.Add("@col_Revision", DbType.String).Value = StrRevision;
-                        _cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = strSerialFirstNumber;
-                        _cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = strSerialLastNumber;
-                        _cmd.Parameters.Add("@col_Serial_LastNum", DbType.String).Value = intSerialLastNumber;
-                        _cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
+                        cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
+                        cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
+                        cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
+                        cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
+                        cmd.Parameters.Add("@col_Quantity", DbType.String).Value = IntQuantity;
+                        cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
+                        cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
+                        cmd.Parameters.Add("@col_Revision", DbType.String).Value = StrRevision;
+                        cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = _strSerialFirstNumber;
+                        cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = _strSerialLastNumber;
+                        cmd.Parameters.Add("@col_Serial_LastNum", DbType.String).Value = _intSerialLastNumber;
+                        cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
 
-                        _cmd.ExecuteNonQuery();
+                        cmd.ExecuteNonQuery();
                     }
                     break;
 
                 case 2:
                 case 3:
-                    using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
-                        _con.Open();
+                    using (SQLiteConnection con = new(MainWindow.GetConnectionString2())) {
+                        con.Open();
                         if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
-                        for (var _i = 0; _i <= ArrUseSubstrate.Length; _i++) {
+                        for (var i = 0; i <= ArrUseSubstrate.Length; i++) {
 
-                            var _objCbx = Controls[checkBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                            var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
 
-                            if (_objCbx.Checked) {
-                                var _objDgv = Controls[dataGridViewNames[_i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
-                                var _dgvRowCnt = _objDgv.Rows.Count;
-                                var _subTotalTemp = string.Empty;
+                            if (objCbx.Checked) {
+                                var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
+                                var dgvRowCnt = objDgv.Rows.Count;
+                                var subTotalTemp = string.Empty;
 
-                                for (var _j = 0; _j <= _dgvRowCnt - 1; _j++) {
-                                    var _boolCbx = Convert.ToBoolean(_objDgv.Rows[_j].Cells[3].Value);
-                                    if (_boolCbx) {
-                                        var _substrateName = string.Empty;
-                                        var _substrateModel = string.Empty;
-                                        var _substrateNum = _objDgv.Rows[_j].Cells[0].Value.ToString() ?? string.Empty;
-                                        var _stockValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value);
-                                        var _useValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value);
+                                for (var j = 0; j <= dgvRowCnt - 1; j++) {
+                                    var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[3].Value);
+                                    if (boolCbx) {
+                                        var substrateName = string.Empty;
+                                        var substrateModel = string.Empty;
+                                        var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
+                                        var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
+                                        var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
 
-                                        using (var _cmd = _con.CreateCommand()) {
-                                            _cmd.CommandText =
+                                        using (var cmd = con.CreateCommand()) {
+                                            cmd.CommandText =
                                                 $"""
                                                 UPDATE Stock_{StrStockName} SET
                                                     col_Flg = @col_Flg,
@@ -561,31 +561,31 @@ namespace ProductDatabase {
                                                 WHERE
                                                     col_Substrate_Num = @col_Substrate_Num
                                                 """;
-                                            _cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = _objDgv.Rows[_j].Cells[0].Value;
+                                            cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
 
-                                            _cmd.Parameters.Add("@col_Flg", DbType.String).Value = _stockValue - _useValue == 0 ? 0 : (object)1;
+                                            cmd.Parameters.Add("@col_Flg", DbType.String).Value = stockValue - useValue == 0 ? 0 : (object)1;
 
-                                            _cmd.Parameters.Add("@col_Stock", DbType.String).Value = _stockValue - _useValue;
-                                            _cmd.Parameters.Add("@col_History", DbType.String).Value = $"{StrProductNumber}({_useValue}),";
+                                            cmd.Parameters.Add("@col_Stock", DbType.String).Value = stockValue - useValue;
+                                            cmd.Parameters.Add("@col_History", DbType.String).Value = $"{StrProductNumber}({useValue}),";
 
-                                            _cmd.ExecuteNonQuery();
+                                            cmd.ExecuteNonQuery();
 
-                                            _cmd.CommandText = $"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
-                                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[_i];
+                                            cmd.CommandText = $"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
+                                            cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[i];
 
-                                            using var _dr = _cmd.ExecuteReader();
-                                            while (_dr.Read()) {
-                                                _substrateName = $"{_dr["col_Substrate_Name"]}";
-                                                _substrateModel = $"{_dr["col_Substrate_Model"]}";
+                                            using var dr = cmd.ExecuteReader();
+                                            while (dr.Read()) {
+                                                substrateName = $"{dr["col_Substrate_Name"]}";
+                                                substrateModel = $"{dr["col_Substrate_Model"]}";
                                             }
                                         }
 
-                                        if (_useValue != 0) {
-                                            _subTotalTemp = string.IsNullOrEmpty(_subTotalTemp) ? $"{_substrateNum}({_useValue})" : $"{_subTotalTemp},{_substrateNum}({_useValue})";
+                                        if (useValue != 0) {
+                                            subTotalTemp = string.IsNullOrEmpty(subTotalTemp) ? $"{substrateNum}({useValue})" : $"{subTotalTemp},{substrateNum}({useValue})";
                                         }
 
-                                        using (var _cmd = _con.CreateCommand()) {
-                                            _cmd.CommandText =
+                                        using (var cmd = con.CreateCommand()) {
+                                            cmd.CommandText =
                                                 $"""
                                                 INSERT INTO Substrate_Reg_{StrStockName}
                                                     (
@@ -615,41 +615,41 @@ namespace ProductDatabase {
                                                     )
                                                 """;
 
-                                            _cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = _substrateName;
-                                            _cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _substrateModel;
-                                            _cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = _objDgv.Rows[_j].Cells[0].Value;
-                                            _cmd.Parameters.Add("@col_Decrease", DbType.String).Value = 0 - _useValue;
-                                            _cmd.Parameters.Add("@col_Use_P_Type", DbType.String).Value = StrProductType;
-                                            _cmd.Parameters.Add("@col_Use_P_Num", DbType.String).Value = StrProductNumber;
-                                            _cmd.Parameters.Add("@col_Use_O_Num", DbType.String).Value = StrOrderNumber;
-                                            _cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
-                                            _cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
-                                            _cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
+                                            cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = substrateName;
+                                            cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = substrateModel;
+                                            cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
+                                            cmd.Parameters.Add("@col_Decrease", DbType.String).Value = 0 - useValue;
+                                            cmd.Parameters.Add("@col_Use_P_Type", DbType.String).Value = StrProductType;
+                                            cmd.Parameters.Add("@col_Use_P_Num", DbType.String).Value = StrProductNumber;
+                                            cmd.Parameters.Add("@col_Use_O_Num", DbType.String).Value = StrOrderNumber;
+                                            cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
+                                            cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
+                                            cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
 
-                                            _cmd.ExecuteNonQuery();
+                                            cmd.ExecuteNonQuery();
                                         }
 
                                         switch (IntPrintType) {
                                             case 5:
                                             case 6:
-                                                listUsedSubstrate.Add(ArrUseSubstrate[_i]);
-                                                if (_substrateNum != null) { listUsedProductNumber.Add(_substrateNum); }
-                                                listUsedQuantity.Add(_useValue);
+                                                _listUsedSubstrate.Add(ArrUseSubstrate[i]);
+                                                if (substrateNum != null) { _listUsedProductNumber.Add(substrateNum); }
+                                                _listUsedQuantity.Add(useValue);
                                                 break;
                                             default:
                                                 break;
                                         }
                                     }
                                 }
-                                strTotalSubstrate = string.IsNullOrEmpty(strTotalSubstrate)
-                                    ? $"[{ArrUseSubstrate[_i]}]{_subTotalTemp}"
-                                    : $"{strTotalSubstrate},[{ArrUseSubstrate[_i]}]{_subTotalTemp}";
-                                _subTotalTemp = string.Empty;
+                                _strTotalSubstrate = string.IsNullOrEmpty(_strTotalSubstrate)
+                                    ? $"[{ArrUseSubstrate[i]}]{subTotalTemp}"
+                                    : $"{_strTotalSubstrate},[{ArrUseSubstrate[i]}]{subTotalTemp}";
+                                subTotalTemp = string.Empty;
                             }
                         }
 
-                        using (var _cmd = _con.CreateCommand()) {
-                            _cmd.CommandText =
+                        using (var cmd = con.CreateCommand()) {
+                            cmd.CommandText =
                                 $"""
                                  INSERT INTO Product_Reg_{StrProductName}
                                     (
@@ -685,21 +685,21 @@ namespace ProductDatabase {
                                     )
                                 """;
 
-                            _cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
-                            _cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
-                            _cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
-                            _cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
-                            _cmd.Parameters.Add("@col_Quantity", DbType.String).Value = IntQuantity;
-                            _cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
-                            _cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
-                            _cmd.Parameters.Add("@col_Revision", DbType.String).Value = StrRevision;
-                            _cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = strSerialFirstNumber;
-                            _cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = strSerialLastNumber;
-                            _cmd.Parameters.Add("@col_Serial_LastNum", DbType.String).Value = intSerialLastNumber;
-                            _cmd.Parameters.Add("@col_Use_Substrate", DbType.String).Value = strTotalSubstrate;
-                            _cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
+                            cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
+                            cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
+                            cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
+                            cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
+                            cmd.Parameters.Add("@col_Quantity", DbType.String).Value = IntQuantity;
+                            cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
+                            cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
+                            cmd.Parameters.Add("@col_Revision", DbType.String).Value = StrRevision;
+                            cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = _strSerialFirstNumber;
+                            cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = _strSerialLastNumber;
+                            cmd.Parameters.Add("@col_Serial_LastNum", DbType.String).Value = _intSerialLastNumber;
+                            cmd.Parameters.Add("@col_Use_Substrate", DbType.String).Value = _strTotalSubstrate;
+                            cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
 
-                            _cmd.ExecuteNonQuery();
+                            cmd.ExecuteNonQuery();
                         }
                     }
                     break;
@@ -708,7 +708,7 @@ namespace ProductDatabase {
         }
         private void RegisterCheck() {
             try {
-                strSerial.Clear();
+                _strSerial.Clear();
 
                 if (!NumberCheck()) { return; }
                 if (!QuantityCheck()) { return; }
@@ -722,7 +722,7 @@ namespace ProductDatabase {
                     case 6:
                     case 7:
                         MessageBox.Show("シリアルラベルを印刷します。");
-                        strSerialType = "Label";
+                        _strSerialType = "Label";
                         if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
                         break;
                     default:
@@ -733,7 +733,7 @@ namespace ProductDatabase {
                     case 2:
                     case 3:
                         MessageBox.Show("バーコードラベルを印刷します。");
-                        strSerialType = "Barcode";
+                        _strSerialType = "Barcode";
                         if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
                         break;
                     default:
@@ -753,14 +753,14 @@ namespace ProductDatabase {
                     case 6:
                     case 7:
                     case 8:
-                        strSerialType = "Label";
-                        strSerialFirstNumber = GenerateCode(IntSerialFirstNumber);
-                        strSerialLastNumber = GenerateCode(intSerialLastNumber);
+                        _strSerialType = "Label";
+                        _strSerialFirstNumber = GenerateCode(IntSerialFirstNumber);
+                        _strSerialLastNumber = GenerateCode(_intSerialLastNumber);
                         break;
                     case 2:
-                        strSerialType = "Barcode";
-                        strSerialFirstNumber = GenerateCode(IntSerialFirstNumber);
-                        strSerialLastNumber = GenerateCode(intSerialLastNumber);
+                        _strSerialType = "Barcode";
+                        _strSerialFirstNumber = GenerateCode(IntSerialFirstNumber);
+                        _strSerialLastNumber = GenerateCode(_intSerialLastNumber);
                         break;
                     default:
                         break;
@@ -782,12 +782,12 @@ namespace ProductDatabase {
                     case 5:
                     case 6:
                     case 7:
-                        foreach (Control _control in Controls) {
-                            if (_control is DataGridView _dataGridView) {
-                                _dataGridView.Enabled = false;
+                        foreach (Control control in Controls) {
+                            if (control is DataGridView dataGridView) {
+                                dataGridView.Enabled = false;
                             }
-                            if (_control is CheckBox _checkBox) {
-                                _checkBox.Enabled = false;
+                            if (control is CheckBox checkBox) {
+                                checkBox.Enabled = false;
                             }
                         }
                         if (IntPrintType is 5 or 6) { SubstrateListPrintButton.Enabled = true; }
@@ -802,61 +802,61 @@ namespace ProductDatabase {
             }
         }
         private bool NumberCheck() {
-            using SQLiteConnection _con = new(MainWindow.GetConnectionString2());
-            _con.Open();
+            using SQLiteConnection con = new(MainWindow.GetConnectionString2());
+            con.Open();
 
-            var _productModel = string.Empty;
+            var productModel = string.Empty;
 
             // 製番が新規かチェック
-            using (var _cmd = _con.CreateCommand()) {
-                _cmd.CommandText = $"SELECT * FROM Product_Reg_{StrProductName} WHERE col_Product_Num = @col_Product_Num ORDER BY _rowid_ ASC LIMIT 1";
-                _cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
+            using (var cmd = con.CreateCommand()) {
+                cmd.CommandText = $"SELECT * FROM Product_Reg_{StrProductName} WHERE col_Product_Num = @col_Product_Num ORDER BY _rowid_ ASC LIMIT 1";
+                cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
 
-                using var _dr = _cmd.ExecuteReader();
-                while (_dr.Read()) {
-                    _productModel = $"{_dr["col_Product_Model"]}";
+                using var dr = cmd.ExecuteReader();
+                while (dr.Read()) {
+                    productModel = $"{dr["col_Product_Model"]}";
                 }
             }
 
-            if (_productModel != string.Empty) {
-                if (_productModel == StrProductModel) {
+            if (productModel != string.Empty) {
+                if (productModel == StrProductModel) {
                     Activate();
-                    var _result = MessageBox.Show($"製番[{StrProductNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
-                    if (_result == DialogResult.No) {
+                    var result = MessageBox.Show($"製番[{StrProductNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
+                    if (result == DialogResult.No) {
                         return false;
                     }
                 }
                 else {
                     Activate();
-                    MessageBox.Show($"[{StrProductNumber}]は[{_productModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"[{StrProductNumber}]は[{productModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
             }
 
-            _productModel = string.Empty;
+            productModel = string.Empty;
 
             // 注文番号が新規かチェック
-            using (var _cmd = _con.CreateCommand()) {
-                _cmd.CommandText = $"SELECT * FROM Product_Reg_{StrProductName} WHERE col_Order_Num = @col_Order_Num ORDER BY _rowid_ ASC LIMIT 1";
-                _cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
+            using (var cmd = con.CreateCommand()) {
+                cmd.CommandText = $"SELECT * FROM Product_Reg_{StrProductName} WHERE col_Order_Num = @col_Order_Num ORDER BY _rowid_ ASC LIMIT 1";
+                cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
 
-                using var _dr = _cmd.ExecuteReader();
-                while (_dr.Read()) {
-                    _productModel = $"{_dr["col_Product_Model"]}";
+                using var dr = cmd.ExecuteReader();
+                while (dr.Read()) {
+                    productModel = $"{dr["col_Product_Model"]}";
                 }
             }
 
-            if (_productModel != string.Empty) {
-                if (_productModel == StrProductModel) {
+            if (productModel != string.Empty) {
+                if (productModel == StrProductModel) {
                     Activate();
-                    var _result = MessageBox.Show($"注文番号[{StrOrderNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
-                    if (_result == DialogResult.No) {
+                    var result = MessageBox.Show($"注文番号[{StrOrderNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
+                    if (result == DialogResult.No) {
                         return false;
                     }
                 }
                 else {
                     Activate();
-                    MessageBox.Show($"[{StrOrderNumber}]は[{_productModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"[{StrOrderNumber}]は[{productModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
             }
@@ -872,35 +872,35 @@ namespace ProductDatabase {
                     case 2:
                     case 3:
                         if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
-                        for (var _i = 0; _i <= ArrUseSubstrate.GetUpperBound(0); _i++) {
+                        for (var i = 0; i <= ArrUseSubstrate.GetUpperBound(0); i++) {
 
-                            var _objCbx = Controls[checkBoxNames[_i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
-                            _objCbx.Enabled = true;
-                            _objCbx.Checked = true;
+                            var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                            objCbx.Enabled = true;
+                            objCbx.Checked = true;
 
-                            var _objDgv = Controls[dataGridViewNames[_i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
-                            _objDgv.Columns[2].ReadOnly = false;
-                            _objDgv.Columns[3].ReadOnly = false;
+                            var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
+                            objDgv.Columns[2].ReadOnly = false;
+                            objDgv.Columns[3].ReadOnly = false;
 
-                            if (_objCbx.Checked) {
-                                var _intQuantityCheck = IntQuantity;
-                                var _dgvRowCnt = _objDgv.Rows.Count;
+                            if (objCbx.Checked) {
+                                var intQuantityCheck = IntQuantity;
+                                var dgvRowCnt = objDgv.Rows.Count;
 
-                                for (var _j = 0; _j < _dgvRowCnt; _j++) {
-                                    var _boolCbx = _objDgv.Rows[_j].Cells[3].Value != null && (bool)_objDgv.Rows[_j].Cells[3].Value;
-                                    if (_boolCbx) {
-                                        var _stockValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[1].Value.ToString());
-                                        if (_objDgv.Rows[_j].Cells[2].Value == null) { throw new Exception("使用数が入力されていません。"); }
-                                        var _useValue = Convert.ToInt32(_objDgv.Rows[_j].Cells[2].Value.ToString());
+                                for (var j = 0; j < dgvRowCnt; j++) {
+                                    var boolCbx = objDgv.Rows[j].Cells[3].Value != null && (bool)objDgv.Rows[j].Cells[3].Value;
+                                    if (boolCbx) {
+                                        var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value.ToString());
+                                        if (objDgv.Rows[j].Cells[2].Value == null) { throw new Exception("使用数が入力されていません。"); }
+                                        var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value.ToString());
 
-                                        if (_stockValue < _useValue) {
+                                        if (stockValue < useValue) {
                                             throw new Exception("在庫より多い数量が入力されています。");
                                         }
-                                        _intQuantityCheck -= _useValue;
+                                        intQuantityCheck -= useValue;
                                     }
                                 }
 
-                                if (_intQuantityCheck != 0) {
+                                if (intQuantityCheck != 0) {
                                     throw new Exception("入力された数量の合計が必要数と一致しません。");
                                 }
                             }
@@ -925,40 +925,40 @@ namespace ProductDatabase {
                     case 6:
                     case 7:
                     case 8:
-                        for (var _i = 0; _i < IntQuantity; _i++) {
-                            strSerialType = "Label";
-                            strSerial.Add(GenerateCode(IntSerialFirstNumber + _i));
+                        for (var i = 0; i < IntQuantity; i++) {
+                            _strSerialType = "Label";
+                            _strSerial.Add(GenerateCode(IntSerialFirstNumber + i));
                         }
                         break;
                     case 2:
-                        for (var _i = 0; _i < IntQuantity; _i++) {
-                            strSerialType = "Barcode";
-                            strSerial.Add(GenerateCode(IntSerialFirstNumber + _i));
+                        for (var i = 0; i < IntQuantity; i++) {
+                            _strSerialType = "Barcode";
+                            _strSerial.Add(GenerateCode(IntSerialFirstNumber + i));
                         }
                         break;
                     default:
                         break;
                 }
 
-                var _strSQLSerial = string.Join("','", strSerial);
+                var strSQLSerial = string.Join("','", _strSerial);
 
-                List<string> _strSerialDuplication = [];
-                using (SQLiteConnection _con = new(MainWindow.GetConnectionString2())) {
-                    _con.Open();
+                List<string> strSerialDuplication = [];
+                using (SQLiteConnection con = new(MainWindow.GetConnectionString2())) {
+                    con.Open();
 
-                    using var _cmd = _con.CreateCommand();
-                    _cmd.CommandText = $"SELECT col_Serial FROM Serial_{StrProductName} WHERE col_Serial IN (@col_Serial)";
-                    _cmd.Parameters.Add("@col_Serial", DbType.String).Value = _strSQLSerial;
+                    using var cmd = con.CreateCommand();
+                    cmd.CommandText = $"SELECT col_Serial FROM Serial_{StrProductName} WHERE col_Serial IN (@col_Serial)";
+                    cmd.Parameters.Add("@col_Serial", DbType.String).Value = strSQLSerial;
 
-                    using var _dr = _cmd.ExecuteReader();
-                    while (_dr.Read()) {
-                        _strSerialDuplication.Add($"{_dr["col_Serial"]}");
+                    using var dr = cmd.ExecuteReader();
+                    while (dr.Read()) {
+                        strSerialDuplication.Add($"{dr["col_Serial"]}");
                     }
                 }
 
-                if (_strSerialDuplication.Count > 0) {
-                    var _strSQLDuplication = string.Join($"{Environment.NewLine}", _strSerialDuplication);
-                    throw new Exception($"{_strSQLDuplication}{Environment.NewLine}は既に使用されているシリアルです。");
+                if (strSerialDuplication.Count > 0) {
+                    var strSQLDuplication = string.Join($"{Environment.NewLine}", strSerialDuplication);
+                    throw new Exception($"{strSQLDuplication}{Environment.NewLine}は既に使用されているシリアルです。");
                 }
 
                 return true;
@@ -969,22 +969,22 @@ namespace ProductDatabase {
         }
 
         // 印刷処理
-        private bool PrintBarcode(int PrintFlg) {
+        private bool PrintBarcode(int printFlg) {
             // PrintDocumentオブジェクトの作成
-            using System.Drawing.Printing.PrintDocument _pd = new();
+            using System.Drawing.Printing.PrintDocument pd = new();
 
             // PrintPageイベントハンドラの追加
-            _pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
+            pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
             LabelProNumLabelsToPrint = IntQuantity;
-            fontUnderbar = false;
+            _fontUnderbar = false;
 
-            switch (PrintFlg) {
+            switch (printFlg) {
                 case 1:
-                    ProductRegistration2PrintDialog.Document = _pd;
-                    var _r = ProductRegistration2PrintDialog.ShowDialog();
+                    ProductRegistration2PrintDialog.Document = pd;
+                    var r = ProductRegistration2PrintDialog.ShowDialog();
 
-                    if (_r == DialogResult.OK) {
+                    if (r == DialogResult.OK) {
                         ProductRegistration2PrintDialog.Document.Print();
 
                         if (IntPageCnt >= 2) {
@@ -996,7 +996,7 @@ namespace ProductDatabase {
                     }
                     break;
                 case 2:
-                    ProductRegistration2PrintPreviewDialog.Document = _pd;
+                    ProductRegistration2PrintPreviewDialog.Document = pd;
                     ProductRegistration2PrintPreviewDialog.ShowDialog();
                     break;
             }
@@ -1007,122 +1007,122 @@ namespace ProductDatabase {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
 
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
-                Point _headerPos = new(0, 0);
-                var _headerString = string.Empty;
-                Font _headerFooterFont = new("Arial", 6);
-                var _intNumLabels = 0;
-                var _intCountNumLabels = 0;
+                Point headerPos = new(0, 0);
+                var headerString = string.Empty;
+                Font headerFooterFont = new("Arial", 6);
+                var intNumLabels = 0;
+                var intCountNumLabels = 0;
 
-                var _maxX = 0;
-                var _maxY = 0;
-                float _sizeX = 0;
-                float _sizeY = 0;
-                double _offsetX = 0;
-                double _offsetY = 0;
-                double _intervalX = 0;
-                double _intervalY = 0;
-                var _startLine = 0;
-                var _labelProPageNum = 0;
+                var maxX = 0;
+                var maxY = 0;
+                float sizeX = 0;
+                float sizeY = 0;
+                double offsetX = 0;
+                double offsetY = 0;
+                double intervalX = 0;
+                double intervalY = 0;
+                var startLine = 0;
+                var labelProPageNum = 0;
 
-                switch (strSerialType) {
+                switch (_strSerialType) {
                     case "Label":
                         if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnullです。"); }
-                        _maxX = SettingsLabelPro._labelProPageSettings.NumLabelsX;
-                        _maxY = SettingsLabelPro._labelProPageSettings.NumLabelsY;
-                        _sizeX = (float)SettingsLabelPro._labelProPageSettings.SizeX;
-                        _sizeY = (float)SettingsLabelPro._labelProPageSettings.SizeY;
-                        _offsetX = SettingsLabelPro._labelProPageSettings.OffsetX;
-                        _offsetY = SettingsLabelPro._labelProPageSettings.OffsetY;
-                        _intervalX = SettingsLabelPro._labelProPageSettings.IntervalX;
-                        _intervalY = SettingsLabelPro._labelProPageSettings.IntervalY;
-                        _headerPos = SettingsLabelPro._labelProPageSettings.HeaderPos;
-                        _headerString = ConvertHeaderFooterString(SettingsLabelPro._labelProPageSettings.HeaderString);
-                        _headerFooterFont = SettingsLabelPro._labelProPageSettings.HeaderFooterFont;
-                        _intNumLabels = SettingsLabelPro._labelProLabelSettings.NumLabels;
-                        _intCountNumLabels = SettingsLabelPro._labelProLabelSettings.NumLabels;
-                        _startLine = (int)SerialPrintPostionNumericUpDown.Value - 1;
+                        maxX = SettingsLabelPro._labelProPageSettings.NumLabelsX;
+                        maxY = SettingsLabelPro._labelProPageSettings.NumLabelsY;
+                        sizeX = (float)SettingsLabelPro._labelProPageSettings.SizeX;
+                        sizeY = (float)SettingsLabelPro._labelProPageSettings.SizeY;
+                        offsetX = SettingsLabelPro._labelProPageSettings.OffsetX;
+                        offsetY = SettingsLabelPro._labelProPageSettings.OffsetY;
+                        intervalX = SettingsLabelPro._labelProPageSettings.IntervalX;
+                        intervalY = SettingsLabelPro._labelProPageSettings.IntervalY;
+                        headerPos = SettingsLabelPro._labelProPageSettings.HeaderPos;
+                        headerString = ConvertHeaderFooterString(SettingsLabelPro._labelProPageSettings.HeaderString);
+                        headerFooterFont = SettingsLabelPro._labelProPageSettings.HeaderFooterFont;
+                        intNumLabels = SettingsLabelPro._labelProLabelSettings.NumLabels;
+                        intCountNumLabels = SettingsLabelPro._labelProLabelSettings.NumLabels;
+                        startLine = (int)SerialPrintPostionNumericUpDown.Value - 1;
                         break;
                     case "Barcode":
                         if (SettingsBarcodePro == null) { throw new Exception("SettingsBarcodeProがnullです。"); }
-                        _maxX = SettingsBarcodePro.BarcodeProPageSettings.NumLabelsX;
-                        _maxY = SettingsBarcodePro.BarcodeProPageSettings.NumLabelsY;
-                        _sizeX = (float)SettingsBarcodePro.BarcodeProPageSettings.SizeX;
-                        _sizeY = (float)SettingsBarcodePro.BarcodeProPageSettings.SizeY;
-                        _offsetX = SettingsBarcodePro.BarcodeProPageSettings.OffsetX;
-                        _offsetY = SettingsBarcodePro.BarcodeProPageSettings.OffsetY;
-                        _intervalX = SettingsBarcodePro.BarcodeProPageSettings.IntervalX;
-                        _intervalY = SettingsBarcodePro.BarcodeProPageSettings.IntervalY;
-                        _headerPos = SettingsBarcodePro.BarcodeProPageSettings.HeaderPos;
-                        _headerString = ConvertHeaderFooterString(SettingsBarcodePro.BarcodeProPageSettings.HeaderString);
-                        _headerFooterFont = SettingsBarcodePro.BarcodeProPageSettings.HeaderFooterFont;
-                        _intNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
-                        _intCountNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
-                        _startLine = (int)BarcodePrintPostionNumericUpDown.Value - 1;
+                        maxX = SettingsBarcodePro.BarcodeProPageSettings.NumLabelsX;
+                        maxY = SettingsBarcodePro.BarcodeProPageSettings.NumLabelsY;
+                        sizeX = (float)SettingsBarcodePro.BarcodeProPageSettings.SizeX;
+                        sizeY = (float)SettingsBarcodePro.BarcodeProPageSettings.SizeY;
+                        offsetX = SettingsBarcodePro.BarcodeProPageSettings.OffsetX;
+                        offsetY = SettingsBarcodePro.BarcodeProPageSettings.OffsetY;
+                        intervalX = SettingsBarcodePro.BarcodeProPageSettings.IntervalX;
+                        intervalY = SettingsBarcodePro.BarcodeProPageSettings.IntervalY;
+                        headerPos = SettingsBarcodePro.BarcodeProPageSettings.HeaderPos;
+                        headerString = ConvertHeaderFooterString(SettingsBarcodePro.BarcodeProPageSettings.HeaderString);
+                        headerFooterFont = SettingsBarcodePro.BarcodeProPageSettings.HeaderFooterFont;
+                        intNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
+                        intCountNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
+                        startLine = (int)BarcodePrintPostionNumericUpDown.Value - 1;
                         break;
                     default:
                         break;
                 }
 
-                Point _offset;
+                Point offset;
                 if (!ProductRegistration2PrintDocument.PrintController.IsPreview) {
-                    _offsetX -= e.PageSettings.HardMarginX * 0.254;
-                    _offsetY -= e.PageSettings.HardMarginY * 0.254;
-                    _offset = _labelProPageNum == 0
-                        ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLine * (_intervalY + _sizeY))))
-                        : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (_intervalY + _sizeY))));
+                    offsetX -= e.PageSettings.HardMarginX * 0.254;
+                    offsetY -= e.PageSettings.HardMarginY * 0.254;
+                    offset = labelProPageNum == 0
+                        ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (startLine * (intervalY + sizeY))))
+                        : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
                 }
                 else {
-                    _offset = new Point(0, 0);
+                    offset = new Point(0, 0);
                 }
 
                 e.PageSettings.Margins.Left = 0;
                 e.PageSettings.Margins.Top = 0;
 
-                _headerPos.Offset(_offset);
-                e.Graphics.DrawString(_headerString, _headerFooterFont, Brushes.Black, _headerPos);
+                headerPos.Offset(offset);
+                e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
 
-                var _pageNum = 0;
-                _offset = _pageNum == 0
-                    ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (_startLine * (_intervalY + _sizeY))))
-                    : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (_intervalY + _sizeY))));
+                var pageNum = 0;
+                offset = pageNum == 0
+                    ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (startLine * (intervalY + sizeY))))
+                    : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
 
-                if (_labelProPageNum == 0) { LabelProNSerial = IntSerialFirstNumber; }
-                if (_labelProPageNum >= 1) { _startLine = 0; }
+                if (labelProPageNum == 0) { LabelProNSerial = IntSerialFirstNumber; }
+                if (labelProPageNum >= 1) { startLine = 0; }
 
-                var _y = 0;
-                for (_y = _startLine; _y < _maxY; _y++) {
-                    var _x = 0;
-                    for (_x = 0; _x < _maxX; _x++) {
-                        var _s = GenerateCode(LabelProNSerial);
-                        var _posX = (float)(_offsetX + (_x * (_intervalX + _sizeX)));
-                        var _posY = (float)(_offsetY + (_y * (_intervalY + _sizeY)));
-                        e.Graphics.DrawImage(MakeLabelImage(_s, (int)e.Graphics.DpiX, 1), _posX, _posY, _sizeX, _sizeY);
+                var y = 0;
+                for (y = startLine; y < maxY; y++) {
+                    var x = 0;
+                    for (x = 0; x < maxX; x++) {
+                        var s = GenerateCode(LabelProNSerial);
+                        var posX = (float)(offsetX + (x * (intervalX + sizeX)));
+                        var posY = (float)(offsetY + (y * (intervalY + sizeY)));
+                        e.Graphics.DrawImage(MakeLabelImage(s, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
 
                         LabelProNSerial++;
                         LabelProNumLabelsToPrint--;
 
                         if (LabelProNumLabelsToPrint <= 0) {
-                            _intCountNumLabels--;
-                            if (_intCountNumLabels <= 0) {
+                            intCountNumLabels--;
+                            if (intCountNumLabels <= 0) {
                                 e.HasMorePages = false;
-                                _labelProPageNum = 0;
-                                var _txtNumPublish = 0;
-                                LabelProNumLabelsToPrint = _txtNumPublish;
+                                labelProPageNum = 0;
+                                var txtNumPublish = 0;
+                                LabelProNumLabelsToPrint = txtNumPublish;
                                 return;
                             }
                             else {
-                                LabelProNumLabelsToPrint += _x + 1;
+                                LabelProNumLabelsToPrint += x + 1;
                                 break;
                             }
                         }
 
-                        if (_x >= _maxX - 1) {
-                            _intCountNumLabels--;
-                            if (_intCountNumLabels <= 0) {
-                                _intCountNumLabels = _intNumLabels;
+                        if (x >= maxX - 1) {
+                            intCountNumLabels--;
+                            if (intCountNumLabels <= 0) {
+                                intCountNumLabels = intNumLabels;
                             }
-                            else if (_intCountNumLabels > 0) {
-                                LabelProNumLabelsToPrint += _x + 1;
+                            else if (intCountNumLabels > 0) {
+                                LabelProNumLabelsToPrint += x + 1;
                                 break;
                             }
                         }
@@ -1130,7 +1130,7 @@ namespace ProductDatabase {
                 }
 
                 if (LabelProNumLabelsToPrint > 0) {
-                    _labelProPageNum++;
+                    labelProPageNum++;
                     IntPageCnt++;
                     e.HasMorePages = true;
                 }
@@ -1150,152 +1150,151 @@ namespace ProductDatabase {
             return s;
         }
         private string GenerateCode(int serialCode) {
-            var _monthCode = DateTime.Parse(StrRegDate).ToString("MM");
+            var monthCode = DateTime.Parse(StrRegDate).ToString("MM");
 
-            _monthCode = _monthCode switch {
+            monthCode = monthCode switch {
                 "10" => "X",
                 "11" => "Y",
                 "12" => "Z",
-                _ => _monthCode
+                _ => monthCode
             };
 
-            var _outputCode = strSerialType switch {
+            var outputCode = _strSerialType switch {
                 "Label" => SettingsLabelPro._labelProLabelSettings.Format,
                 "Barcode" => SettingsBarcodePro.BarcodeProLabelSettings.Format,
                 _ => string.Empty
             };
 
-            var _serialCode = Convert.ToInt32(serialCode).ToString($"D{IntSerialDigit}");
-            _outputCode = _outputCode.Replace("%Y", DateTime.Parse(StrRegDate).ToString("yy"))
+            outputCode = outputCode.Replace("%Y", DateTime.Parse(StrRegDate).ToString("yy"))
                                     .Replace("%MM", DateTime.Parse(StrRegDate).ToString("MM"))
                                     .Replace("%T", StrInitial)
                                     .Replace("%R", StrRevision)
-                                    .Replace("%M", string.IsNullOrEmpty(_monthCode) ? string.Empty : _monthCode[^1..])
-                                    .Replace("%S", _serialCode);
-            return _outputCode;
+                                    .Replace("%M", string.IsNullOrEmpty(monthCode) ? string.Empty : monthCode[^1..])
+                                    .Replace("%S", Convert.ToInt32(serialCode).ToString($"D{IntSerialDigit}"));
+            return outputCode;
         }
         private Bitmap MakeLabelImage(string text, int resolution, int magnitude) {
-            Bitmap _labelImage = new(1, 1);
-            Graphics _g;
-            SizeF _stringSize;
-            decimal _sizeX;
-            decimal _sizeY;
-            decimal _fontSize;
-            float _stringPosX;
-            float _stringPosY;
-            Font _fnt;
-            switch (strSerialType) {
+            Bitmap labelImage = new(1, 1);
+            Graphics g;
+            SizeF stringSize;
+            decimal sizeX;
+            decimal sizeY;
+            decimal fontSize;
+            float stringPosX;
+            float stringPosY;
+            Font fnt;
+            switch (_strSerialType) {
                 case "Label":
                     if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnull"); }
-                    _sizeX = (decimal)SettingsLabelPro._labelProPageSettings.SizeX / 25.4M * resolution * magnitude;
-                    _sizeY = (decimal)SettingsLabelPro._labelProPageSettings.SizeY / 25.4M * resolution * magnitude;
-                    _fontSize = (decimal)SettingsLabelPro._labelProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
-                    _stringPosY = (int)((decimal)SettingsLabelPro._labelProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
-                    var _style = fontUnderbar ? FontStyle.Underline : FontStyle.Regular;
-                    _fnt = new Font(SettingsLabelPro._labelProLabelSettings.Font.Name, (float)_fontSize, _style);
+                    sizeX = (decimal)SettingsLabelPro._labelProPageSettings.SizeX / 25.4M * resolution * magnitude;
+                    sizeY = (decimal)SettingsLabelPro._labelProPageSettings.SizeY / 25.4M * resolution * magnitude;
+                    fontSize = (decimal)SettingsLabelPro._labelProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
+                    stringPosY = (int)((decimal)SettingsLabelPro._labelProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
+                    var style = _fontUnderbar ? FontStyle.Underline : FontStyle.Regular;
+                    fnt = new Font(SettingsLabelPro._labelProLabelSettings.Font.Name, (float)fontSize, style);
 
-                    _labelImage = new((int)_sizeX, (int)_sizeY);
-                    _g = Graphics.FromImage(_labelImage);
+                    labelImage = new((int)sizeX, (int)sizeY);
+                    g = Graphics.FromImage(labelImage);
 
-                    _stringSize = _g.MeasureString(text, _fnt);
+                    stringSize = g.MeasureString(text, fnt);
 
-                    _stringPosX = (int)((_labelImage.Width / 2) - (_stringSize.Width / 2));
+                    stringPosX = (int)((labelImage.Width / 2) - (stringSize.Width / 2));
 
-                    _g.DrawString(text, _fnt, Brushes.Black, _stringPosX, _stringPosY);
+                    g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
 
-                    _g.Dispose();
+                    g.Dispose();
                     break;
                 case "Barcode":
                     if (SettingsBarcodePro == null) { throw new Exception("SettingsBarcodeProがnull"); }
 
-                    _sizeX = (decimal)SettingsBarcodePro.BarcodeProPageSettings.SizeX / 25.4M * resolution * magnitude;
-                    _sizeY = (decimal)SettingsBarcodePro.BarcodeProPageSettings.SizeY / 25.4M * resolution * magnitude;
-                    _fontSize = (decimal)SettingsBarcodePro.BarcodeProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
-                    _fnt = new(SettingsBarcodePro.BarcodeProLabelSettings.Font.Name, (float)_fontSize);
+                    sizeX = (decimal)SettingsBarcodePro.BarcodeProPageSettings.SizeX / 25.4M * resolution * magnitude;
+                    sizeY = (decimal)SettingsBarcodePro.BarcodeProPageSettings.SizeY / 25.4M * resolution * magnitude;
+                    fontSize = (decimal)SettingsBarcodePro.BarcodeProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
+                    fnt = new(SettingsBarcodePro.BarcodeProLabelSettings.Font.Name, (float)fontSize);
 
-                    _labelImage = new((int)_sizeX, (int)_sizeY);
-                    _g = Graphics.FromImage(_labelImage);
+                    labelImage = new((int)sizeX, (int)sizeY);
+                    g = Graphics.FromImage(labelImage);
 
-                    int _barWeight;
-                    _barWeight = resolution == DisplayResolution ? 1 : (int)(1 * resolution / DisplayResolution / DisplayMagnitude);
+                    int barWeight;
+                    barWeight = resolution == DisplayResolution ? 1 : (int)(1 * resolution / DisplayResolution / DisplayMagnitude);
 
-                    using (var _img = Code128Rendering.MakeBarcodeImage(text, _barWeight, true)) {
-                        var _imageWidth = (decimal)(_img.Width * SettingsBarcodePro.BarcodeProLabelSettings.BarcodeMagnitude);
+                    using (var img = Code128Rendering.MakeBarcodeImage(text, barWeight, true)) {
+                        var imageWidth = (decimal)(img.Width * SettingsBarcodePro.BarcodeProLabelSettings.BarcodeMagnitude);
 
-                        if (_imageWidth > _labelImage.Width) { MessageBox.Show($"バーコードの幅がラベル幅を超えています{_imageWidth}>{_labelImage.Width}"); }
+                        if (imageWidth > labelImage.Width) { MessageBox.Show($"バーコードの幅がラベル幅を超えています{imageWidth}>{labelImage.Width}"); }
 
-                        _stringSize = _g.MeasureString(text, _fnt);
+                        stringSize = g.MeasureString(text, fnt);
 
-                        _stringPosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignStringCenter
-                            ? (float)((_labelImage.Width / 2) - (_stringSize.Width / 2))
+                        stringPosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignStringCenter
+                            ? (float)((labelImage.Width / 2) - (stringSize.Width / 2))
                             : (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
 
-                        _stringPosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
+                        stringPosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
 
-                        var _barCodePosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignBarcodeCenter
-                            ? (float)((_labelImage.Width / 2) - (_imageWidth / 2))
+                        var barCodePosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignBarcodeCenter
+                            ? (float)((labelImage.Width / 2) - (imageWidth / 2))
                             : (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
-                        float _barCodePosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.BarcodePosY / 25.4M * resolution * magnitude);
+                        float barCodePosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.BarcodePosY / 25.4M * resolution * magnitude);
 
-                        _g.DrawString(text, _fnt, Brushes.Black, _stringPosX, _stringPosY);
+                        g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
 
-                        var _barcodeHeight = (int)(SettingsBarcodePro.BarcodeProLabelSettings.BarcodeHeight / 25.4F * resolution * magnitude);
-                        _g.DrawImage(_img, _barCodePosX, _barCodePosY, (float)_imageWidth, _barcodeHeight);
+                        var barcodeHeight = (int)(SettingsBarcodePro.BarcodeProLabelSettings.BarcodeHeight / 25.4F * resolution * magnitude);
+                        g.DrawImage(img, barCodePosX, barCodePosY, (float)imageWidth, barcodeHeight);
 
-                        _g.Dispose();
-                        _img.Dispose();
+                        g.Dispose();
+                        img.Dispose();
                     }
 
                     break;
                 default:
                     break;
             }
-            return _labelImage;
+            return labelImage;
         }
         // チェックボックスイベント
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
-            var _checkBox = (CheckBox)sender;
-            DataGridView _dataGridView = new();
+            var checkBox = (CheckBox)sender;
+            DataGridView dataGridView = new();
 
-            switch (_checkBox.Name) {
+            switch (checkBox.Name) {
                 case "Substrate1CheckBox":
-                    _dataGridView = Substrate1DataGridView;
+                    dataGridView = Substrate1DataGridView;
                     break;
                 case "Substrate2CheckBox":
-                    _dataGridView = Substrate2DataGridView;
+                    dataGridView = Substrate2DataGridView;
                     break;
                 case "Substrate3CheckBox":
-                    _dataGridView = Substrate3DataGridView;
+                    dataGridView = Substrate3DataGridView;
                     break;
                 case "Substrate4CheckBox":
-                    _dataGridView = Substrate4DataGridView;
+                    dataGridView = Substrate4DataGridView;
                     break;
                 case "Substrate5CheckBox":
-                    _dataGridView = Substrate5DataGridView;
+                    dataGridView = Substrate5DataGridView;
                     break;
                 case "Substrate6CheckBox":
-                    _dataGridView = Substrate6DataGridView;
+                    dataGridView = Substrate6DataGridView;
                     break;
                 case "Substrate7CheckBox":
-                    _dataGridView = Substrate7DataGridView;
+                    dataGridView = Substrate7DataGridView;
                     break;
                 case "Substrate8CheckBox":
-                    _dataGridView = Substrate8DataGridView;
+                    dataGridView = Substrate8DataGridView;
                     break;
                 case "Substrate9CheckBox":
-                    _dataGridView = Substrate9DataGridView;
+                    dataGridView = Substrate9DataGridView;
                     break;
                 case "Substrate10CheckBox":
-                    _dataGridView = Substrate10DataGridView;
+                    dataGridView = Substrate10DataGridView;
                     break;
                 default:
                     break;
             }
 
-            _dataGridView.Enabled = _checkBox.Checked;
-            _checkBox.ForeColor = _checkBox.Checked ? Color.Black : Color.Red;
+            dataGridView.Enabled = checkBox.Checked;
+            checkBox.ForeColor = checkBox.Checked ? Color.Black : Color.Red;
 
-            if (!_checkBox.Checked) {
+            if (!checkBox.Checked) {
                 MessageBox.Show("チェックがない場合在庫から引き落とされなくなります。", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
@@ -1382,125 +1381,125 @@ namespace ProductDatabase {
         // リスト印刷
         private void ListPrint() {
             try {
-                var _sheetName = string.Empty;
-                var _productName = string.Empty;
-                var _productModel = string.Empty;
+                var sheetName = string.Empty;
+                var productName = string.Empty;
+                var productModel = string.Empty;
 
-                var _productNameRange = string.Empty;
-                var _productNumberRange = string.Empty;
-                var _orderNumberRange = string.Empty;
-                var _regDateRange = string.Empty;
-                var _productModelRange = string.Empty;
-                var _quantityRange = string.Empty;
-                var _serialFirstRange = string.Empty;
-                var _serialLastRange = string.Empty;
-                var _commentRange = string.Empty;
+                var productNameRange = string.Empty;
+                var productNumberRange = string.Empty;
+                var orderNumberRange = string.Empty;
+                var regDateRange = string.Empty;
+                var productModelRange = string.Empty;
+                var quantityRange = string.Empty;
+                var serialFirstRange = string.Empty;
+                var serialLastRange = string.Empty;
+                var commentRange = string.Empty;
 
-                using FileStream _fileStream = new($"{Environment.CurrentDirectory}./config/Excel/ConfigList.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using XLWorkbook _workBook = new(_fileStream);
-                var _workSheetMain = _workBook.Worksheet("Sheet1");
+                using FileStream fileStream = new($"{Environment.CurrentDirectory}./config/Excel/ConfigList.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using XLWorkbook workBook = new(fileStream);
+                var workSheetMain = workBook.Worksheet("Sheet1");
 
-                var _findRow = 0;
+                var findRow = 0;
                 // セル検索
-                foreach (var _cell in _workSheetMain.Search(StrProductModel)) {
-                    _findRow = _cell.Address.RowNumber;
+                foreach (var cell in workSheetMain.Search(StrProductModel)) {
+                    findRow = cell.Address.RowNumber;
                 }
 
-                if (_findRow == 0) {
+                if (findRow == 0) {
                     throw new Exception($"Configに品目番号:{StrProductModel}が見つかりません。");
                 }
 
                 // ワークシートのセルから値を取得
-                _sheetName = StrProductModel;
-                _productName = _workSheetMain.Cell(_findRow, 2).Value.ToString();
-                _productNameRange = _workSheetMain.Cell(_findRow, 3).Value.ToString();
-                _productNumberRange = _workSheetMain.Cell(_findRow, 4).Value.ToString();
-                _orderNumberRange = _workSheetMain.Cell(_findRow, 5).Value.ToString();
-                _regDateRange = _workSheetMain.Cell(_findRow, 6).Value.ToString();
-                _productModel = _workSheetMain.Cell(_findRow, 7).Value.ToString();
-                _productModelRange = _workSheetMain.Cell(_findRow, 8).Value.ToString();
-                _quantityRange = _workSheetMain.Cell(_findRow, 9).Value.ToString();
-                _serialFirstRange = _workSheetMain.Cell(_findRow, 10).Value.ToString();
-                _serialLastRange = _workSheetMain.Cell(_findRow, 11).Value.ToString();
-                _commentRange = _workSheetMain.Cell(_findRow, 12).Value.ToString();
+                sheetName = StrProductModel;
+                productName = workSheetMain.Cell(findRow, 2).Value.ToString();
+                productNameRange = workSheetMain.Cell(findRow, 3).Value.ToString();
+                productNumberRange = workSheetMain.Cell(findRow, 4).Value.ToString();
+                orderNumberRange = workSheetMain.Cell(findRow, 5).Value.ToString();
+                regDateRange = workSheetMain.Cell(findRow, 6).Value.ToString();
+                productModel = workSheetMain.Cell(findRow, 7).Value.ToString();
+                productModelRange = workSheetMain.Cell(findRow, 8).Value.ToString();
+                quantityRange = workSheetMain.Cell(findRow, 9).Value.ToString();
+                serialFirstRange = workSheetMain.Cell(findRow, 10).Value.ToString();
+                serialLastRange = workSheetMain.Cell(findRow, 11).Value.ToString();
+                commentRange = workSheetMain.Cell(findRow, 12).Value.ToString();
 
-                var _workSheetTemp = _workBook.Worksheet(_sheetName);
-                _workSheetTemp.Cell(_productNameRange).Value = _productName;
-                _workSheetTemp.Cell(_productNumberRange).Value = StrProductNumber;
-                _workSheetTemp.Cell(_orderNumberRange).Value = StrOrderNumber;
-                _workSheetTemp.Cell(_regDateRange).Value = StrRegDate;
-                _workSheetTemp.Cell(_productModelRange).Value = _productModel;
-                _workSheetTemp.Cell(_quantityRange).Value = IntQuantity;
-                _workSheetTemp.Cell(_serialFirstRange).Value = strSerialFirstNumber;
-                _workSheetTemp.Cell(_serialLastRange).Value = strSerialLastNumber;
-                _workSheetTemp.Cell(_commentRange).Value = StrComment;
+                var workSheetTemp = workBook.Worksheet(sheetName);
+                workSheetTemp.Cell(productNameRange).Value = productName;
+                workSheetTemp.Cell(productNumberRange).Value = StrProductNumber;
+                workSheetTemp.Cell(orderNumberRange).Value = StrOrderNumber;
+                workSheetTemp.Cell(regDateRange).Value = StrRegDate;
+                workSheetTemp.Cell(productModelRange).Value = productModel;
+                workSheetTemp.Cell(quantityRange).Value = IntQuantity;
+                workSheetTemp.Cell(serialFirstRange).Value = _strSerialFirstNumber;
+                workSheetTemp.Cell(serialLastRange).Value = _strSerialLastNumber;
+                workSheetTemp.Cell(commentRange).Value = StrComment;
 
-                var _i = 0;
-                var _findColumn = 0;
-                for (_i = 0; _i <= listUsedSubstrate.Count - 1; _i++) {
+                var i = 0;
+                var findColumn = 0;
+                for (i = 0; i <= _listUsedSubstrate.Count - 1; i++) {
 
-                    var _searchRange = _workSheetMain.Range(_findRow, 1, _findRow, 28);
-                    var _searchValue = $"{listUsedSubstrate[_i]}";
-                    var _foundCell = _searchRange.CellsUsed(c => c.Value.ToString() == _searchValue).FirstOrDefault();
+                    var searchRange = workSheetMain.Range(findRow, 1, findRow, 28);
+                    var searchValue = $"{_listUsedSubstrate[i]}";
+                    var foundCell = searchRange.CellsUsed(c => c.Value.ToString() == searchValue).FirstOrDefault();
 
-                    if (_foundCell != null) {
+                    if (foundCell != null) {
                         // セルが見つかった場合の処理
-                        var _foundRow = _foundCell.Address.RowNumber;
-                        var _foundColumn = _foundCell.Address.ColumnNumber;
+                        var foundRow = foundCell.Address.RowNumber;
+                        var foundColumn = foundCell.Address.ColumnNumber;
                     }
 
-                    foreach (var _cell in _workSheetMain.Search(listUsedSubstrate[_i])) {
-                        if (_cell.Address.RowNumber == _findRow) {
-                            _findColumn = _cell.Address.ColumnNumber;
+                    foreach (var cell in workSheetMain.Search(_listUsedSubstrate[i])) {
+                        if (cell.Address.RowNumber == findRow) {
+                            findColumn = cell.Address.ColumnNumber;
                             break;
                         }
                     }
 
-                    if (_findColumn == 0) {
-                        throw new Exception($"{listUsedSubstrate[_i]}が見つかりません。");
+                    if (findColumn == 0) {
+                        throw new Exception($"{_listUsedSubstrate[i]}が見つかりません。");
                     }
 
-                    var _mainCellValue = _workSheetMain.Cell(_findRow, _findColumn + 1).Value.ToString();
-                    var _tempCellValue = _workSheetTemp.Cell(_mainCellValue).Value.ToString();
+                    var mainCellValue = workSheetMain.Cell(findRow, findColumn + 1).Value.ToString();
+                    var tempCellValue = workSheetTemp.Cell(mainCellValue).Value.ToString();
 
-                    if (_mainCellValue != string.Empty) {
-                        if (_tempCellValue == string.Empty) {
-                            _workSheetTemp.Cell(_mainCellValue).Value = $"{listUsedProductNumber[_i]}({listUsedQuantity[_i]})";
+                    if (mainCellValue != string.Empty) {
+                        if (tempCellValue == string.Empty) {
+                            workSheetTemp.Cell(mainCellValue).Value = $"{_listUsedProductNumber[i]}({_listUsedQuantity[i]})";
                         }
                         else {
-                            _workSheetTemp.Cell(_mainCellValue).Value += $"    {listUsedProductNumber[_i]}({listUsedQuantity[_i]})";
+                            workSheetTemp.Cell(mainCellValue).Value += $"    {_listUsedProductNumber[i]}({_listUsedQuantity[i]})";
                         }
                     }
                 }
 
                 //引数に保存先パスを指定
-                _workBook.SaveAs($"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
+                workBook.SaveAs($"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
 
                 // 印刷
-                Excel.Application _xlApp = new() {
+                Excel.Application xlApp = new() {
                     Visible = true // Excelウィンドウを表示します。
                 };
 
                 // ワークブック開く
-                var _xlBooks = _xlApp.Workbooks;
-                var _xlBook = _xlBooks.Open($"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
+                var xlBooks = xlApp.Workbooks;
+                var xlBook = xlBooks.Open($"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
 
                 // ワークシート選択
-                var _xlSheets = _xlBook.Sheets;
-                Excel.Worksheet _xlSheet = _xlSheets[_sheetName];
+                var xlSheets = xlBook.Sheets;
+                Excel.Worksheet xlSheet = xlSheets[sheetName];
 
                 // ワークシート印刷
-                _xlSheet.PrintOut(Preview: true);
+                xlSheet.PrintOut(Preview: true);
 
                 // ワークブックを閉じてExcelを終了
-                _xlBook.Close(false);
-                _xlApp.Quit();
+                xlBook.Close(false);
+                xlApp.Quit();
 
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheet);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlSheets);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBook);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlBooks);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(_xlApp);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
 
             } catch (Exception ex) {
                 MessageBox.Show($"{ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1514,28 +1513,28 @@ namespace ProductDatabase {
         private void SubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBox_CheckedChanged(sender, e); }
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { ClosingEvents(); }
         private void シリアルラベル印刷ToolStripMenuItem_Click(object sender, EventArgs e) {
-            strSerialType = "Label";
+            _strSerialType = "Label";
             PrintBarcode(1);
         }
         private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            strSerialType = "Label";
+            _strSerialType = "Label";
             PrintBarcode(2);
         }
         private void バーコード印刷ToolStripMenuItem_Click(object sender, EventArgs e) {
-            strSerialType = "Barcode";
+            _strSerialType = "Barcode";
             PrintBarcode(1);
         }
         private void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            strSerialType = "Barcode";
+            _strSerialType = "Barcode";
             PrintBarcode(2);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            ProductPrintSetting _ls = new();
-            _ls.ShowDialog(this);
+            ProductPrintSetting ls = new();
+            ls.ShowDialog(this);
         }
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            ProductBarcodePrintSettingsWindow _ls = new();
-            _ls.ShowDialog(this);
+            ProductBarcodePrintSettingsWindow ls = new();
+            ls.ShowDialog(this);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
             var message = string.Join(Environment.NewLine,
@@ -1550,7 +1549,7 @@ namespace ProductDatabase {
                 $"StrPerson\t\t\t[{StrPerson}]",
                 $"IntQuantity\t\t[{IntQuantity}]",
                 $"IntSerialFirstNumber\t[{IntSerialFirstNumber}]",
-                $"IntSerialLastNumber\t[{intSerialLastNumber}]",
+                $"IntSerialLastNumber\t[{_intSerialLastNumber}]",
                 $"StrInitial\t\t\t[{StrInitial}]",
                 $"IntRegType\t\t[{IntRegType}]",
                 $"IntPrintType\t\t[{IntPrintType}]",
@@ -1561,8 +1560,8 @@ namespace ProductDatabase {
         private void SubstrateListPrintButton_Click(object sender, EventArgs e) { ListPrint(); }
         private void CheckSheetPrintButton_Click(object sender, EventArgs e) { CheckSheetPrint(); }
         private void ProductRegistration2PrintPreviewDialog_Load(object sender, EventArgs e) {
-            var _tool = (ToolStrip)ProductRegistration2PrintPreviewDialog.Controls[1];
-            _tool.Items[0].Visible = false;
+            var tool = (ToolStrip)ProductRegistration2PrintPreviewDialog.Controls[1];
+            tool.Items[0].Visible = false;
         }
     }
 }
