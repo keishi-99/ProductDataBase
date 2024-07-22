@@ -1,28 +1,15 @@
 ﻿using System.Data;
 using System.Data.SQLite;
+using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
     public partial class SubstrateChange1 : Form {
 
-        public string StrFontName { get; set; } = "Meiryo UI";
-        public int IntFontSize { get; set; } = 9;
+        public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
 
-        public DataTable DtHistoryTable { get; set; } = new();
+        public DataTable HistoryTable { get; set; } = new();
 
-        private readonly List<string> _listColFilter = [];
-
-        public int IntRadioBtnFlg { get; set; }
-
-        public string StrProductName { get; set; } = string.Empty;
-        public string StrStockName { get; set; } = string.Empty;
-        public string StrProductModel { get; set; } = string.Empty;
-        public string StrProductType { get; set; } = string.Empty;
-        public string StrSubstrateName { get; set; } = string.Empty;
-        public string StrSubstrateModel { get; set; } = string.Empty;
-        public string StrUseSubstrate { get; set; } = string.Empty;
-
-        public int IntPrintType { get; set; }
-        public int IntRegType { get; set; }
+        private readonly List<string> _colFilter = [];
 
         public SubstrateChange1() {
             InitializeComponent();
@@ -31,64 +18,59 @@ namespace ProductDatabase {
         // ロードイベント
         private void LoadEvents() {
             try {
-                Font = new Font(StrFontName, IntFontSize);
+                Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
 
-                switch (IntRadioBtnFlg) {
-                    case 4:
-                        using (SQLiteConnection con = new(MainWindow.GetConnectionString2())) {
-                            DtHistoryTable.Clear();
-                            using SQLiteDataAdapter adapter = new($"SELECT _rowid_, * FROM Product_Reg_{StrProductName} WHERE col_Product_Model = '{StrProductModel}' ORDER BY _rowid_ DESC", con);
-                            adapter.Fill(DtHistoryTable);
+                using SQLiteConnection con = new(GetConnectionString2());
+                HistoryTable.Clear();
+                using SQLiteDataAdapter adapter = new($"SELECT _rowid_, * FROM Product_Reg_{ProductInfo.ProductName} WHERE col_Product_Model = '{ProductInfo.ProductModel}' ORDER BY _rowid_ DESC", con);
+                adapter.Fill(HistoryTable);
 
-                            SubstrateChangeDataGridView.DataSource = DtHistoryTable;
+                SubstrateChangeDataGridView.DataSource = HistoryTable;
 
-                            _listColFilter.Add("");
-                            for (var i = 0; i < SubstrateChangeDataGridView.ColumnCount; i++) {
-                                var headerValue = SubstrateChangeDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
-                                if (headerValue != null) { _listColFilter.Add(headerValue); }
-                            }
-
-                            // 最大サイズをディスプレイサイズに合わせる
-                            if (Screen.PrimaryScreen != null) {
-                                var h = Screen.PrimaryScreen.Bounds.Height;
-                                var w = Screen.PrimaryScreen.Bounds.Width;
-                                SubstrateChangeDataGridView.MaximumSize = new Size(w, h);
-                            }
-                            SubstrateChangeDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(SubstrateChangeDataGridView.Font, FontStyle.Bold);
-                            SubstrateChangeDataGridView.RowHeadersVisible = true;
-                            SubstrateChangeDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-                            SubstrateChangeDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
-                            //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
-                            SubstrateChangeDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-                            SubstrateChangeDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-
-                            SubstrateChangeDataGridView.Columns[0].HeaderCell.Value = "ID";
-                            SubstrateChangeDataGridView.Columns[0].Width = 40;
-                            SubstrateChangeDataGridView.Columns[1].HeaderCell.Value = "注文番号";
-                            SubstrateChangeDataGridView.Columns[2].HeaderCell.Value = "製造番号";
-                            SubstrateChangeDataGridView.Columns[2].Width = 130;
-                            SubstrateChangeDataGridView.Columns[3].HeaderCell.Value = "製品名";
-                            SubstrateChangeDataGridView.Columns[4].HeaderCell.Value = "製品型式";
-                            SubstrateChangeDataGridView.Columns[5].HeaderCell.Value = "数量";
-                            SubstrateChangeDataGridView.Columns[5].Width = 40;
-                            SubstrateChangeDataGridView.Columns[6].HeaderCell.Value = "担当者";
-                            SubstrateChangeDataGridView.Columns[6].Width = 70;
-                            SubstrateChangeDataGridView.Columns[7].HeaderCell.Value = "登録日";
-                            SubstrateChangeDataGridView.Columns[7].Width = 80;
-                            SubstrateChangeDataGridView.Columns[8].HeaderCell.Value = "Rev";
-                            SubstrateChangeDataGridView.Columns[8].Width = 40;
-                            SubstrateChangeDataGridView.Columns[9].HeaderCell.Value = "シリアル先頭";
-                            SubstrateChangeDataGridView.Columns[10].HeaderCell.Value = "シリアル末尾";
-                            SubstrateChangeDataGridView.Columns[11].HeaderCell.Value = "末番";
-                            SubstrateChangeDataGridView.Columns[11].Width = 40;
-                            SubstrateChangeDataGridView.Columns[12].HeaderCell.Value = "コメント";
-                            SubstrateChangeDataGridView.Columns[13].HeaderCell.Value = "使用基板";
-                            SubstrateChangeDataGridView.Columns[13].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-                            //SubstrateChangeDataGridView.Columns[13].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
-
-                        }
-                        break;
+                _colFilter.Add("");
+                for (var i = 0; i < SubstrateChangeDataGridView.ColumnCount; i++) {
+                    var headerValue = SubstrateChangeDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
+                    if (headerValue != null) { _colFilter.Add(headerValue); }
                 }
+
+                // 最大サイズをディスプレイサイズに合わせる
+                if (Screen.PrimaryScreen != null) {
+                    var h = Screen.PrimaryScreen.Bounds.Height;
+                    var w = Screen.PrimaryScreen.Bounds.Width;
+                    SubstrateChangeDataGridView.MaximumSize = new Size(w, h);
+                }
+                SubstrateChangeDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(SubstrateChangeDataGridView.Font, FontStyle.Bold);
+                SubstrateChangeDataGridView.RowHeadersVisible = true;
+                SubstrateChangeDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                SubstrateChangeDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
+                //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
+                SubstrateChangeDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+                SubstrateChangeDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+
+                SubstrateChangeDataGridView.Columns[0].HeaderCell.Value = "ID";
+                SubstrateChangeDataGridView.Columns[0].Width = 40;
+                SubstrateChangeDataGridView.Columns[1].HeaderCell.Value = "注文番号";
+                SubstrateChangeDataGridView.Columns[2].HeaderCell.Value = "製造番号";
+                SubstrateChangeDataGridView.Columns[2].Width = 130;
+                SubstrateChangeDataGridView.Columns[3].HeaderCell.Value = "製品名";
+                SubstrateChangeDataGridView.Columns[4].HeaderCell.Value = "製品型式";
+                SubstrateChangeDataGridView.Columns[5].HeaderCell.Value = "数量";
+                SubstrateChangeDataGridView.Columns[5].Width = 40;
+                SubstrateChangeDataGridView.Columns[6].HeaderCell.Value = "担当者";
+                SubstrateChangeDataGridView.Columns[6].Width = 70;
+                SubstrateChangeDataGridView.Columns[7].HeaderCell.Value = "登録日";
+                SubstrateChangeDataGridView.Columns[7].Width = 80;
+                SubstrateChangeDataGridView.Columns[8].HeaderCell.Value = "Rev";
+                SubstrateChangeDataGridView.Columns[8].Width = 40;
+                SubstrateChangeDataGridView.Columns[9].HeaderCell.Value = "シリアル先頭";
+                SubstrateChangeDataGridView.Columns[10].HeaderCell.Value = "シリアル末尾";
+                SubstrateChangeDataGridView.Columns[11].HeaderCell.Value = "末番";
+                SubstrateChangeDataGridView.Columns[11].Width = 40;
+                SubstrateChangeDataGridView.Columns[12].HeaderCell.Value = "コメント";
+                SubstrateChangeDataGridView.Columns[13].HeaderCell.Value = "使用基板";
+                SubstrateChangeDataGridView.Columns[13].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+                //SubstrateChangeDataGridView.Columns[13].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
@@ -97,41 +79,22 @@ namespace ProductDatabase {
 
         // 基板変更フォームを開く
         private void OpenSubstrateChangeWindow() {
+            using SubstrateChange2 window = new();
 
             var i = SubstrateChangeDataGridView.SelectedCells[0].RowIndex;
 
-            var orderNumber = SubstrateChangeDataGridView.Rows[i].Cells[1].Value.ToString() ?? string.Empty;
-            var productNumber = SubstrateChangeDataGridView.Rows[i].Cells[2].Value.ToString() ?? string.Empty;
-            var productType = SubstrateChangeDataGridView.Rows[i].Cells[3].Value.ToString() ?? string.Empty;
-            var productModel = SubstrateChangeDataGridView.Rows[i].Cells[4].Value.ToString() ?? string.Empty;
-            var revision = SubstrateChangeDataGridView.Rows[i].Cells[8].Value.ToString() ?? string.Empty;
-            var strSerialFirstNumber = SubstrateChangeDataGridView.Rows[i].Cells[9].Value.ToString() ?? string.Empty;
-            var strSerialLastNumber = SubstrateChangeDataGridView.Rows[i].Cells[10].Value.ToString() ?? string.Empty;
-            var comment = SubstrateChangeDataGridView.Rows[i].Cells[12].Value.ToString() ?? string.Empty;
-            var usedSubstrate = SubstrateChangeDataGridView.Rows[i].Cells[13].Value.ToString() ?? string.Empty;
-
-            var intQuantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells[5].Value);
-            var intSerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells[11].Value);
-
-            using SubstrateChange2 window = new();
-            window.StrFontName = StrFontName;
-            window.IntFontSize = IntFontSize;
-            window.IntPrintType = IntPrintType;
-            window.IntRegType = IntRegType;
-            window.StrProductName = StrProductName;
-            window.StrStockName = StrStockName;
-            window.StrOrderNumber = orderNumber;
-            window.StrProductNumber = productNumber;
-            window.StrProductType = productType;
-            window.StrProductModel = productModel;
-            window.IntQuantity = intQuantity;
-            window.StrRevision = revision;
-            window.StrComment = comment;
-            window.StrUseSubstrate = StrUseSubstrate;
-            window.StrUsedSubstrate = usedSubstrate;
-            window.StrSerialFirstNumber = strSerialFirstNumber;
-            window.StrSerialLastNumber = strSerialLastNumber;
-            window.IntSerialLastNumber = intSerialLastNumber;
+            ProductInfo.OrderNumber = SubstrateChangeDataGridView.Rows[i].Cells[1].Value.ToString() ?? string.Empty;
+            ProductInfo.ProductNumber = SubstrateChangeDataGridView.Rows[i].Cells[2].Value.ToString() ?? string.Empty;
+            ProductInfo.ProductType = SubstrateChangeDataGridView.Rows[i].Cells[3].Value.ToString() ?? string.Empty;
+            ProductInfo.ProductModel = SubstrateChangeDataGridView.Rows[i].Cells[4].Value.ToString() ?? string.Empty;
+            ProductInfo.Revision = SubstrateChangeDataGridView.Rows[i].Cells[8].Value.ToString() ?? string.Empty;
+            ProductInfo.SerialFirst = SubstrateChangeDataGridView.Rows[i].Cells[9].Value.ToString() ?? string.Empty;
+            ProductInfo.SerialLast = SubstrateChangeDataGridView.Rows[i].Cells[10].Value.ToString() ?? string.Empty;
+            ProductInfo.Comment = SubstrateChangeDataGridView.Rows[i].Cells[12].Value.ToString() ?? string.Empty;
+            ProductInfo.UsedSubstrate = SubstrateChangeDataGridView.Rows[i].Cells[13].Value.ToString() ?? string.Empty;
+            ProductInfo.Quantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells[5].Value);
+            ProductInfo.SerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells[11].Value);
+            window.ProductInfo = ProductInfo;
             window.ShowDialog(this);
             Close();
         }

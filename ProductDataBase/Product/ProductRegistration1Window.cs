@@ -1,29 +1,12 @@
 ﻿using System.Data.SQLite;
+using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
     public partial class ProductRegistration1Window : Form {
 
-        public string StrFontName { get; set; } = "Meiryo UI";
-        public int IntFontSize { get; set; } = 9;
+        public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
 
-        public string StrProductName { get; set; } = string.Empty;
-        public string StrStockName { get; set; } = string.Empty;
-        public string StrProductType { get; set; } = string.Empty;
-        public string StrProductModel { get; set; } = string.Empty;
-        public string StrUseSubstrate { get; set; } = string.Empty;
-        public string StrInitial { get; set; } = string.Empty;
-
-        public int IntRegType { get; set; }
-        public int IntPrintType { get; set; }
-        public int IntCheckBin { get; set; }
-        public int IntSerialDigit { get; set; }
-        public int IntSerialLastNum { get; set; }
-
-        public string StrProness1 { get; set; } = string.Empty;
-        public string StrProness2 { get; } = string.Empty;
-        public string StrProness3 { get; } = string.Empty;
-        public int StrProness4 { get; set; }
-        public string StrProness5 { get; set; } = string.Empty;
+        private int _serialLastNum;
 
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
@@ -37,16 +20,16 @@ namespace ProductDatabase {
         // ロードイベント
         private void LoadEvents() {
             try {
-                Font = new Font(StrFontName, IntFontSize);
+                Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
 
-                ProductNameLabel2.Text = StrProductName;
-                SubstrateModelLabel2.Text = $"{StrProductName} - {StrProductModel}";
+                ProductNameLabel2.Text = ProductInfo.ProductName;
+                SubstrateModelLabel2.Text = $"{ProductInfo.ProductName} - {ProductInfo.ProductModel}";
 
-                OrderNumberTextBox.Text = StrProness5;
-                ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(StrProness1) ? StrProness1 : ManufacturingNumberMaskedTextBox.Text;
-                QuantityTextBox.Text = (StrProness4 != 0) ? StrProness4.ToString() : string.Empty;
+                OrderNumberTextBox.Text = ProductInfo.Proness5;
+                ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(ProductInfo.Proness1) ? ProductInfo.Proness1 : ManufacturingNumberMaskedTextBox.Text;
+                QuantityTextBox.Text = (ProductInfo.Proness4 != 0) ? ProductInfo.Proness4.ToString() : string.Empty;
 
-                FirstSerialNumberTextBox.MaxLength = IntSerialDigit;
+                FirstSerialNumberTextBox.MaxLength = ProductInfo.SerialDigit;
 
                 RegisterButton.Enabled = true;
 
@@ -55,7 +38,7 @@ namespace ProductDatabase {
                 RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
 
                 // DB1へ接続し担当者取得
-                using (SQLiteConnection con = new(MainWindow.GetConnectionString1())) {
+                using (SQLiteConnection con = new(GetConnectionString1())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加
@@ -67,25 +50,25 @@ namespace ProductDatabase {
                 }
 
                 // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
-                using (SQLiteConnection con = new(MainWindow.GetConnectionString2())) {
+                using (SQLiteConnection con = new(GetConnectionString2())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Stock]の合計を取得
-                    cmd.CommandText = $"SELECT col_Revision FROM Product_Reg_{StrProductName} ORDER BY _rowid_ DESC";
+                    cmd.CommandText = $"SELECT col_Revision FROM Product_Reg_{ProductInfo.ProductName} ORDER BY _rowid_ DESC";
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
 
                     // テーブル検索SQL - [Product_Reg_[Product_Name]]テーブルの最新の[col_Serial_LastNum]を取得
-                    cmd.CommandText = $"SELECT col_Serial_LastNum FROM Product_Reg_{StrProductName} ORDER BY _rowid_ DESC";
-                    IntSerialLastNum = Convert.ToInt32(cmd.ExecuteScalar());
-                    FirstSerialNumberTextBox.Text = (IntSerialLastNum + 1).ToString("000");
+                    cmd.CommandText = $"SELECT col_Serial_LastNum FROM Product_Reg_{ProductInfo.ProductName} ORDER BY _rowid_ DESC";
+                    _serialLastNum = Convert.ToInt32(cmd.ExecuteScalar());
+                    FirstSerialNumberTextBox.Text = (_serialLastNum + 1).ToString("000");
                 }
 
                 // 変数[check_bin]の値に応じてCheckboxにチェックを入れる
                 foreach (var checkBoxName in _checkBoxNames) {
                     if (Controls[checkBoxName] is CheckBox checkBox) {
-                        checkBox.Checked = (IntCheckBin & 0x1) == 1;
-                        IntCheckBin >>= 1;
+                        checkBox.Checked = (ProductInfo.CheckBin & 0x1) == 1;
+                        ProductInfo.CheckBin >>= 1;
                     }
                 }
 
@@ -126,7 +109,7 @@ namespace ProductDatabase {
                     return;
                 }
 
-                switch (IntSerialDigit) {
+                switch (ProductInfo.SerialDigit) {
                     case 3:
                         CheckAndAdjustSerial(999, 1);
                         break;
@@ -140,26 +123,15 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = false;
 
                 using ProductRegistration2Window window = new();
-                window.StrFontName = StrFontName;
-                window.IntFontSize = IntFontSize;
-                window.StrProductName = StrProductName;
-                window.StrStockName = StrStockName;
-                window.StrProductType = StrProductType;
-                window.IntRegType = IntRegType;
-                window.IntPrintType = IntPrintType;
-                window.IntSerialDigit = IntSerialDigit;
-                window.StrProductModel = StrProductModel;
-                window.IntCheckBin = IntCheckBin;
-                window.StrUseSubstrate = StrUseSubstrate;
-                window.StrInitial = StrInitial;
-                window.StrOrderNumber = OrderNumberTextBox.Text;
-                window.StrProductNumber = ManufacturingNumberMaskedTextBox.Text;
-                window.StrRegDate = RegistrationDateMaskedTextBox.Text;
-                window.StrPerson = PersonComboBox.Text;
-                window.StrRevision = RevisionTextBox.Text;
-                window.StrComment = CommentTextBox.Text;
-                window.IntQuantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
-                window.IntSerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception());
+                ProductInfo.OrderNumber = OrderNumberTextBox.Text;
+                ProductInfo.ProductNumber = ManufacturingNumberMaskedTextBox.Text;
+                ProductInfo.RegDate = RegistrationDateMaskedTextBox.Text;
+                ProductInfo.Person = PersonComboBox.Text;
+                ProductInfo.Revision = RevisionTextBox.Text;
+                ProductInfo.Comment = CommentTextBox.Text;
+                ProductInfo.Quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
+                ProductInfo.SerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception());
+                window.ProductInfo = ProductInfo;
                 window.ShowDialog(this);
                 Close();
 
@@ -168,7 +140,7 @@ namespace ProductDatabase {
                     var quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
                     var firstSerial = Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception());
                     if (quantity + firstSerial >= threshold) {
-                        MessageBox.Show($"シリアルが{threshold}を超えるので{resetValue.ToString().PadLeft(IntSerialDigit, '0')}から開始します。");
+                        MessageBox.Show($"シリアルが{threshold}を超えるので{resetValue.ToString().PadLeft(ProductInfo.SerialDigit, '0')}から開始します。");
                         FirstSerialNumberTextBox.Text = resetValue.ToString();
                     }
                 }
@@ -275,18 +247,18 @@ namespace ProductDatabase {
         private void RegistrationDateMaskedTextBox_TypeValidationCompleted(object sender, TypeValidationEventArgs e) { RegistrationDateCheck(sender, e); }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
             var message = string.Join(Environment.NewLine,
-                $"StrProness1\t\t[{StrProness1}]",
-                $"StrProness2\t\t[{StrProness2}]",
-                $"StrProness3\t\t[{StrProness3}]",
-                $"StrProness4\t\t[{StrProness4}]",
-                $"StrProness5\t\t[{StrProness5}]",
-                $"StrProductName\t\t[{StrProductName}]",
-                $"StrStockName\t\t[{StrStockName}]",
-                $"StrProductModel\t\t[{StrProductModel}]",
-                $"StrInitial\t\t\t[{StrInitial}]",
-                $"IntRegType\t\t[{IntRegType}]",
-                $"IntPrintType\t\t[{IntPrintType}]",
-                $"IntSerialDigit\t\t[{IntSerialDigit}]"
+                $"StrProness1\t\t[{ProductInfo.Proness1}]",
+                $"StrProness2\t\t[{ProductInfo.Proness2}]",
+                $"StrProness3\t\t[{ProductInfo.Proness3}]",
+                $"StrProness4\t\t[{ProductInfo.Proness4}]",
+                $"StrProness5\t\t[{ProductInfo.Proness5}]",
+                $"StrProductName\t\t[{ProductInfo.ProductName}]",
+                $"StrStockName\t\t[{ProductInfo.StockName}]",
+                $"StrProductModel\t\t[{ProductInfo.ProductModel}]",
+                $"StrInitial\t\t\t[{ProductInfo.Initial}]",
+                $"IntRegType\t\t[{ProductInfo.RegType}]",
+                $"IntPrintType\t\t[{ProductInfo.PrintType}]",
+                $"IntSerialDigit\t\t[{ProductInfo.SerialDigit}]"
             );
             MessageBox.Show(message, "", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }

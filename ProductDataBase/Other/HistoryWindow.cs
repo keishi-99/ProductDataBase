@@ -1,23 +1,15 @@
 ﻿using System.Data;
 using System.Data.SQLite;
+using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
     public partial class HistoryWindow : Form {
 
-        public string StrFontName { get; set; } = "Meiryo UI";
-        public int IntFontSize { get; set; } = 9;
+        public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
 
-        public DataTable DtHistoryTable { get; set; } = new();
+        private readonly DataTable _historyTable = new();
 
         private readonly List<string> _listColFilter = [];
-
-        public int IntRadioBtnFlg { get; set; }
-
-        public string StrProductName { get; set; } = string.Empty;
-        public string StrProductModel { get; set; } = string.Empty;
-        public string StrProductType { get; set; } = string.Empty;
-        public string StrSubstrateName { get; set; } = string.Empty;
-        public string StrSubstrateModel { get; set; } = string.Empty;
 
         public HistoryWindow() {
             InitializeComponent();
@@ -25,23 +17,23 @@ namespace ProductDatabase {
 
         private void LoadEvents() {
             try {
-                Font = new Font(StrFontName, IntFontSize);
+                Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
 
-                switch (IntRadioBtnFlg) {
+                switch (ProductInfo.RadioButtonFlg) {
                     case 1:
-                        using (SQLiteConnection con = new(MainWindow.GetConnectionString2())) {
-                            DtHistoryTable.Clear();
+                        using (SQLiteConnection con = new(GetConnectionString2())) {
+                            _historyTable.Clear();
 
-                            var query = $"SELECT _rowid_, * FROM Substrate_Reg_{StrProductName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ DESC";
+                            var query = $"SELECT _rowid_, * FROM Substrate_Reg_{ProductInfo.ProductName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ DESC";
                             using SQLiteCommand command = new(query, con);
-                            command.Parameters.AddWithValue("@col_Substrate_Model", StrSubstrateModel);
+                            command.Parameters.AddWithValue("@col_Substrate_Model", ProductInfo.SubstrateModel);
                             // SQLiteDataAdapterのインスタンス化
                             using SQLiteDataAdapter adapter = new(command);
 
                             // データの取得とDataTableへの格納
-                            adapter.Fill(DtHistoryTable);
+                            adapter.Fill(_historyTable);
 
-                            DataBaseDataGridView.DataSource = DtHistoryTable;
+                            DataBaseDataGridView.DataSource = _historyTable;
 
                             _listColFilter.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
@@ -95,19 +87,19 @@ namespace ProductDatabase {
                         }
                         break;
                     case 2:
-                        using (SQLiteConnection con = new(MainWindow.GetConnectionString2())) {
-                            DtHistoryTable.Clear();
+                        using (SQLiteConnection con = new(GetConnectionString2())) {
+                            _historyTable.Clear();
 
-                            var query = $"SELECT _rowid_, * FROM Product_Reg_{StrProductName} WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC";
+                            var query = $"SELECT _rowid_, * FROM Product_Reg_{ProductInfo.ProductName} WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC";
                             using SQLiteCommand command = new(query, con);
-                            command.Parameters.AddWithValue("@col_Product_Model", StrProductModel);
+                            command.Parameters.AddWithValue("@col_Product_Model", ProductInfo.ProductModel);
                             // SQLiteDataAdapterのインスタンス化
                             using SQLiteDataAdapter adapter = new(command);
 
                             // データの取得とDataTableへの格納
-                            adapter.Fill(DtHistoryTable);
+                            adapter.Fill(_historyTable);
 
-                            DataBaseDataGridView.DataSource = DtHistoryTable;
+                            DataBaseDataGridView.DataSource = _historyTable;
 
                             _listColFilter.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
@@ -160,19 +152,19 @@ namespace ProductDatabase {
                         }
                         break;
                     case 3:
-                        using (SQLiteConnection con = new(MainWindow.GetConnectionString2())) {
-                            DtHistoryTable.Clear();
+                        using (SQLiteConnection con = new(GetConnectionString2())) {
+                            _historyTable.Clear();
 
                             var query = $"SELECT _rowid_, * FROM Reprint WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC";
                             using SQLiteCommand command = new(query, con);
-                            command.Parameters.AddWithValue("@col_Product_Model", StrProductModel);
+                            command.Parameters.AddWithValue("@col_Product_Model", ProductInfo.ProductModel);
                             // SQLiteDataAdapterのインスタンス化
                             using SQLiteDataAdapter adapter = new(command);
 
                             // データの取得とDataTableへの格納
-                            adapter.Fill(DtHistoryTable);
+                            adapter.Fill(_historyTable);
 
-                            DataBaseDataGridView.DataSource = DtHistoryTable;
+                            DataBaseDataGridView.DataSource = _historyTable;
 
                             _listColFilter.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
@@ -229,13 +221,13 @@ namespace ProductDatabase {
         private void HistoryTableFilter(object sender, EventArgs e) {
             try {
                 if (string.IsNullOrEmpty(FilterStringTextBox.Text) || CategoryComboBox.SelectedIndex == 0) {
-                    DtHistoryTable.DefaultView.RowFilter = null;
+                    _historyTable.DefaultView.RowFilter = null;
                 }
                 else if (CategoryComboBox.Text == "ID") {
-                    if (int.TryParse(FilterStringTextBox.Text, out var id)) { DtHistoryTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} = '{id}'"; }
+                    if (int.TryParse(FilterStringTextBox.Text, out var id)) { _historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} = '{id}'"; }
                 }
                 else if (CategoryComboBox.Text != "") {
-                    DtHistoryTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} LIKE '*{FilterStringTextBox.Text}*'";
+                    _historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} LIKE '*{FilterStringTextBox.Text}*'";
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
