@@ -23,298 +23,302 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
-            MainWindowMenuStrip = new MenuStrip();
-            ファイルToolStripMenuItem = new ToolStripMenuItem();
-            終了ToolStripMenuItem = new ToolStripMenuItem();
-            CategoryRadioButton1 = new RadioButton();
-            CategoryRadioButton2 = new RadioButton();
-            CategoryRadioButton3 = new RadioButton();
-            CategoryRadioButton4 = new RadioButton();
-            CategoryListBox1 = new ListBox();
-            CategoryListBox2 = new ListBox();
-            CategoryListBox3 = new ListBox();
-            HistoryButton = new Button();
-            RegisterButton = new Button();
-            FontSizePanel = new Panel();
-            FontSize16RadioButton = new RadioButton();
-            FontSize12RadioButton = new RadioButton();
-            FontSize9RadioButton = new RadioButton();
-            FontSizeLabel = new Label();
-            QRCodePanel = new Panel();
-            QRCodeButton = new Button();
-            QRCodeTextBox = new TextBox();
-            QRCodeCheckBox = new CheckBox();
-            MainWindowMenuStrip.SuspendLayout();
-            FontSizePanel.SuspendLayout();
-            QRCodePanel.SuspendLayout();
-            SuspendLayout();
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
+            this.MainWindowMenuStrip = new MenuStrip();
+            this.ファイルToolStripMenuItem = new ToolStripMenuItem();
+            this.終了ToolStripMenuItem = new ToolStripMenuItem();
+            this.CategoryRadioButton1 = new RadioButton();
+            this.CategoryRadioButton2 = new RadioButton();
+            this.CategoryRadioButton3 = new RadioButton();
+            this.CategoryRadioButton4 = new RadioButton();
+            this.CategoryListBox1 = new ListBox();
+            this.CategoryListBox2 = new ListBox();
+            this.CategoryListBox3 = new ListBox();
+            this.HistoryButton = new Button();
+            this.RegisterButton = new Button();
+            this.FontSizePanel = new Panel();
+            this.FontSize16RadioButton = new RadioButton();
+            this.FontSize12RadioButton = new RadioButton();
+            this.FontSize9RadioButton = new RadioButton();
+            this.FontSizeLabel = new Label();
+            this.QRCodePanel = new Panel();
+            this.QRCodeButton = new Button();
+            this.QRCodeTextBox = new TextBox();
+            this.QRCodeCheckBox = new CheckBox();
+            this.MainWindowMenuStrip.SuspendLayout();
+            this.FontSizePanel.SuspendLayout();
+            this.QRCodePanel.SuspendLayout();
+            this.SuspendLayout();
             // 
             // MainWindowMenuStrip
             // 
-            MainWindowMenuStrip.Items.AddRange(new ToolStripItem[] { ファイルToolStripMenuItem });
-            MainWindowMenuStrip.Location = new Point(0, 0);
-            MainWindowMenuStrip.Name = "MainWindowMenuStrip";
-            MainWindowMenuStrip.Size = new Size(684, 24);
-            MainWindowMenuStrip.TabIndex = 0;
-            MainWindowMenuStrip.Text = "menuStrip1";
+            this.MainWindowMenuStrip.Items.AddRange(new ToolStripItem[] { this.ファイルToolStripMenuItem });
+            this.MainWindowMenuStrip.Location = new Point(0, 0);
+            this.MainWindowMenuStrip.Name = "MainWindowMenuStrip";
+            this.MainWindowMenuStrip.Size = new Size(684, 24);
+            this.MainWindowMenuStrip.TabIndex = 0;
+            this.MainWindowMenuStrip.Text = "menuStrip1";
             // 
             // ファイルToolStripMenuItem
             // 
-            ファイルToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { 終了ToolStripMenuItem });
-            ファイルToolStripMenuItem.Name = "ファイルToolStripMenuItem";
-            ファイルToolStripMenuItem.Size = new Size(53, 20);
-            ファイルToolStripMenuItem.Text = "ファイル";
+            this.ファイルToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.終了ToolStripMenuItem });
+            this.ファイルToolStripMenuItem.Name = "ファイルToolStripMenuItem";
+            this.ファイルToolStripMenuItem.Size = new Size(53, 20);
+            this.ファイルToolStripMenuItem.Text = "ファイル";
             // 
             // 終了ToolStripMenuItem
             // 
-            終了ToolStripMenuItem.Name = "終了ToolStripMenuItem";
-            終了ToolStripMenuItem.Size = new Size(98, 22);
-            終了ToolStripMenuItem.Text = "終了";
-            終了ToolStripMenuItem.Click += 終了ToolStripMenuItem_Click;
+            this.終了ToolStripMenuItem.Name = "終了ToolStripMenuItem";
+            this.終了ToolStripMenuItem.Size = new Size(98, 22);
+            this.終了ToolStripMenuItem.Text = "終了";
+            this.終了ToolStripMenuItem.Click += this.終了ToolStripMenuItem_Click;
             // 
             // CategoryRadioButton1
             // 
-            CategoryRadioButton1.Appearance = Appearance.Button;
-            CategoryRadioButton1.Location = new Point(42, 47);
-            CategoryRadioButton1.Name = "CategoryRadioButton1";
-            CategoryRadioButton1.Size = new Size(70, 30);
-            CategoryRadioButton1.TabIndex = 1;
-            CategoryRadioButton1.Text = "基盤登録";
-            CategoryRadioButton1.TextAlign = ContentAlignment.MiddleCenter;
-            CategoryRadioButton1.UseVisualStyleBackColor = true;
-            CategoryRadioButton1.CheckedChanged += CategoryRadioButton_CheckedChanged;
+            this.CategoryRadioButton1.Appearance = Appearance.Button;
+            this.CategoryRadioButton1.Location = new Point(42, 47);
+            this.CategoryRadioButton1.Name = "CategoryRadioButton1";
+            this.CategoryRadioButton1.Size = new Size(70, 30);
+            this.CategoryRadioButton1.TabIndex = 1;
+            this.CategoryRadioButton1.Tag = "1";
+            this.CategoryRadioButton1.Text = "基盤登録";
+            this.CategoryRadioButton1.TextAlign = ContentAlignment.MiddleCenter;
+            this.CategoryRadioButton1.UseVisualStyleBackColor = true;
+            this.CategoryRadioButton1.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
             // 
             // CategoryRadioButton2
             // 
-            CategoryRadioButton2.Appearance = Appearance.Button;
-            CategoryRadioButton2.Location = new Point(118, 47);
-            CategoryRadioButton2.Name = "CategoryRadioButton2";
-            CategoryRadioButton2.Size = new Size(70, 30);
-            CategoryRadioButton2.TabIndex = 2;
-            CategoryRadioButton2.Text = "製品登録";
-            CategoryRadioButton2.TextAlign = ContentAlignment.MiddleCenter;
-            CategoryRadioButton2.UseVisualStyleBackColor = true;
-            CategoryRadioButton2.CheckedChanged += CategoryRadioButton_CheckedChanged;
+            this.CategoryRadioButton2.Appearance = Appearance.Button;
+            this.CategoryRadioButton2.Location = new Point(118, 47);
+            this.CategoryRadioButton2.Name = "CategoryRadioButton2";
+            this.CategoryRadioButton2.Size = new Size(70, 30);
+            this.CategoryRadioButton2.TabIndex = 2;
+            this.CategoryRadioButton2.Tag = "2";
+            this.CategoryRadioButton2.Text = "製品登録";
+            this.CategoryRadioButton2.TextAlign = ContentAlignment.MiddleCenter;
+            this.CategoryRadioButton2.UseVisualStyleBackColor = true;
+            this.CategoryRadioButton2.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
             // 
             // CategoryRadioButton3
             // 
-            CategoryRadioButton3.Appearance = Appearance.Button;
-            CategoryRadioButton3.Location = new Point(194, 47);
-            CategoryRadioButton3.Name = "CategoryRadioButton3";
-            CategoryRadioButton3.Size = new Size(70, 30);
-            CategoryRadioButton3.TabIndex = 3;
-            CategoryRadioButton3.Text = "再印刷";
-            CategoryRadioButton3.TextAlign = ContentAlignment.MiddleCenter;
-            CategoryRadioButton3.UseVisualStyleBackColor = true;
-            CategoryRadioButton3.CheckedChanged += CategoryRadioButton_CheckedChanged;
+            this.CategoryRadioButton3.Appearance = Appearance.Button;
+            this.CategoryRadioButton3.Location = new Point(194, 47);
+            this.CategoryRadioButton3.Name = "CategoryRadioButton3";
+            this.CategoryRadioButton3.Size = new Size(70, 30);
+            this.CategoryRadioButton3.TabIndex = 3;
+            this.CategoryRadioButton3.Tag = "3";
+            this.CategoryRadioButton3.Text = "再印刷";
+            this.CategoryRadioButton3.TextAlign = ContentAlignment.MiddleCenter;
+            this.CategoryRadioButton3.UseVisualStyleBackColor = true;
+            this.CategoryRadioButton3.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
             // 
             // CategoryRadioButton4
             // 
-            CategoryRadioButton4.Appearance = Appearance.Button;
-            CategoryRadioButton4.Location = new Point(270, 47);
-            CategoryRadioButton4.Name = "CategoryRadioButton4";
-            CategoryRadioButton4.Size = new Size(70, 30);
-            CategoryRadioButton4.TabIndex = 4;
-            CategoryRadioButton4.Text = "基盤変更";
-            CategoryRadioButton4.TextAlign = ContentAlignment.MiddleCenter;
-            CategoryRadioButton4.UseVisualStyleBackColor = true;
-            CategoryRadioButton4.CheckedChanged += CategoryRadioButton_CheckedChanged;
+            this.CategoryRadioButton4.Appearance = Appearance.Button;
+            this.CategoryRadioButton4.Location = new Point(270, 47);
+            this.CategoryRadioButton4.Name = "CategoryRadioButton4";
+            this.CategoryRadioButton4.Size = new Size(70, 30);
+            this.CategoryRadioButton4.TabIndex = 4;
+            this.CategoryRadioButton4.Tag = "4";
+            this.CategoryRadioButton4.Text = "基盤変更";
+            this.CategoryRadioButton4.TextAlign = ContentAlignment.MiddleCenter;
+            this.CategoryRadioButton4.UseVisualStyleBackColor = true;
+            this.CategoryRadioButton4.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
             // 
             // CategoryListBox1
             // 
-            CategoryListBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            CategoryListBox1.FormattingEnabled = true;
-            CategoryListBox1.HorizontalScrollbar = true;
-            CategoryListBox1.ItemHeight = 15;
-            CategoryListBox1.Location = new Point(42, 97);
-            CategoryListBox1.Name = "CategoryListBox1";
-            CategoryListBox1.Size = new Size(60, 214);
-            CategoryListBox1.TabIndex = 5;
-            CategoryListBox1.SelectedIndexChanged += CategoryListBox1_SelectedIndexChanged;
+            this.CategoryListBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            this.CategoryListBox1.FormattingEnabled = true;
+            this.CategoryListBox1.HorizontalScrollbar = true;
+            this.CategoryListBox1.ItemHeight = 15;
+            this.CategoryListBox1.Location = new Point(42, 97);
+            this.CategoryListBox1.Name = "CategoryListBox1";
+            this.CategoryListBox1.Size = new Size(60, 214);
+            this.CategoryListBox1.TabIndex = 5;
+            this.CategoryListBox1.SelectedIndexChanged += this.CategoryListBox1_SelectedIndexChanged;
             // 
             // CategoryListBox2
             // 
-            CategoryListBox2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            CategoryListBox2.FormattingEnabled = true;
-            CategoryListBox2.HorizontalScrollbar = true;
-            CategoryListBox2.ItemHeight = 15;
-            CategoryListBox2.Location = new Point(142, 97);
-            CategoryListBox2.Name = "CategoryListBox2";
-            CategoryListBox2.Size = new Size(210, 214);
-            CategoryListBox2.TabIndex = 6;
-            CategoryListBox2.SelectedIndexChanged += CategoryListBox2_SelectedIndexChanged;
+            this.CategoryListBox2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            this.CategoryListBox2.FormattingEnabled = true;
+            this.CategoryListBox2.HorizontalScrollbar = true;
+            this.CategoryListBox2.ItemHeight = 15;
+            this.CategoryListBox2.Location = new Point(142, 97);
+            this.CategoryListBox2.Name = "CategoryListBox2";
+            this.CategoryListBox2.Size = new Size(210, 214);
+            this.CategoryListBox2.TabIndex = 6;
+            this.CategoryListBox2.SelectedIndexChanged += this.CategoryListBox2_SelectedIndexChanged;
             // 
             // CategoryListBox3
             // 
-            CategoryListBox3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            CategoryListBox3.FormattingEnabled = true;
-            CategoryListBox3.HorizontalScrollbar = true;
-            CategoryListBox3.ItemHeight = 15;
-            CategoryListBox3.Location = new Point(392, 97);
-            CategoryListBox3.Name = "CategoryListBox3";
-            CategoryListBox3.Size = new Size(250, 214);
-            CategoryListBox3.TabIndex = 7;
-            CategoryListBox3.SelectedIndexChanged += CategoryListBox3_SelectedIndexChanged;
+            this.CategoryListBox3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            this.CategoryListBox3.FormattingEnabled = true;
+            this.CategoryListBox3.HorizontalScrollbar = true;
+            this.CategoryListBox3.ItemHeight = 15;
+            this.CategoryListBox3.Location = new Point(392, 97);
+            this.CategoryListBox3.Name = "CategoryListBox3";
+            this.CategoryListBox3.Size = new Size(250, 214);
+            this.CategoryListBox3.TabIndex = 7;
+            this.CategoryListBox3.SelectedIndexChanged += this.CategoryListBox3_SelectedIndexChanged;
             // 
             // HistoryButton
             // 
-            HistoryButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            HistoryButton.Location = new Point(392, 344);
-            HistoryButton.Name = "HistoryButton";
-            HistoryButton.Size = new Size(75, 25);
-            HistoryButton.TabIndex = 8;
-            HistoryButton.Text = "履歴";
-            HistoryButton.UseVisualStyleBackColor = true;
-            HistoryButton.Click += HistoryButton_Click;
+            this.HistoryButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            this.HistoryButton.Location = new Point(392, 344);
+            this.HistoryButton.Name = "HistoryButton";
+            this.HistoryButton.Size = new Size(75, 25);
+            this.HistoryButton.TabIndex = 8;
+            this.HistoryButton.Text = "履歴";
+            this.HistoryButton.UseVisualStyleBackColor = true;
+            this.HistoryButton.Click += this.HistoryButton_Click;
             // 
             // RegisterButton
             // 
-            RegisterButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            RegisterButton.Location = new Point(567, 344);
-            RegisterButton.Name = "RegisterButton";
-            RegisterButton.Size = new Size(75, 25);
-            RegisterButton.TabIndex = 9;
-            RegisterButton.Text = "登録";
-            RegisterButton.UseVisualStyleBackColor = true;
-            RegisterButton.Click += RegisterButton_Click;
+            this.RegisterButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            this.RegisterButton.Location = new Point(567, 344);
+            this.RegisterButton.Name = "RegisterButton";
+            this.RegisterButton.Size = new Size(75, 25);
+            this.RegisterButton.TabIndex = 9;
+            this.RegisterButton.Text = "登録";
+            this.RegisterButton.UseVisualStyleBackColor = true;
+            this.RegisterButton.Click += this.RegisterButton_Click;
             // 
             // FontSizePanel
             // 
-            FontSizePanel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            FontSizePanel.Controls.Add(FontSize16RadioButton);
-            FontSizePanel.Controls.Add(FontSize12RadioButton);
-            FontSizePanel.Controls.Add(FontSize9RadioButton);
-            FontSizePanel.Controls.Add(FontSizeLabel);
-            FontSizePanel.Location = new Point(558, 27);
-            FontSizePanel.Name = "FontSizePanel";
-            FontSizePanel.Size = new Size(125, 64);
-            FontSizePanel.TabIndex = 600;
+            this.FontSizePanel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.FontSizePanel.Controls.Add(this.FontSize16RadioButton);
+            this.FontSizePanel.Controls.Add(this.FontSize12RadioButton);
+            this.FontSizePanel.Controls.Add(this.FontSize9RadioButton);
+            this.FontSizePanel.Controls.Add(this.FontSizeLabel);
+            this.FontSizePanel.Location = new Point(558, 27);
+            this.FontSizePanel.Name = "FontSizePanel";
+            this.FontSizePanel.Size = new Size(125, 64);
+            this.FontSizePanel.TabIndex = 600;
             // 
             // FontSize16RadioButton
             // 
-            FontSize16RadioButton.Appearance = Appearance.Button;
-            FontSize16RadioButton.Location = new Point(82, 28);
-            FontSize16RadioButton.Name = "FontSize16RadioButton";
-            FontSize16RadioButton.Size = new Size(30, 22);
-            FontSize16RadioButton.TabIndex = 604;
-            FontSize16RadioButton.Text = "16";
-            FontSize16RadioButton.TextAlign = ContentAlignment.MiddleCenter;
-            FontSize16RadioButton.UseVisualStyleBackColor = true;
-            FontSize16RadioButton.CheckedChanged += FontSize_CheckedChanged;
+            this.FontSize16RadioButton.Appearance = Appearance.Button;
+            this.FontSize16RadioButton.Location = new Point(82, 28);
+            this.FontSize16RadioButton.Name = "FontSize16RadioButton";
+            this.FontSize16RadioButton.Size = new Size(30, 22);
+            this.FontSize16RadioButton.TabIndex = 604;
+            this.FontSize16RadioButton.Text = "16";
+            this.FontSize16RadioButton.TextAlign = ContentAlignment.MiddleCenter;
+            this.FontSize16RadioButton.UseVisualStyleBackColor = true;
+            this.FontSize16RadioButton.CheckedChanged += this.FontSize_CheckedChanged;
             // 
             // FontSize12RadioButton
             // 
-            FontSize12RadioButton.Appearance = Appearance.Button;
-            FontSize12RadioButton.Location = new Point(49, 28);
-            FontSize12RadioButton.Name = "FontSize12RadioButton";
-            FontSize12RadioButton.Size = new Size(30, 22);
-            FontSize12RadioButton.TabIndex = 603;
-            FontSize12RadioButton.Text = "12";
-            FontSize12RadioButton.TextAlign = ContentAlignment.MiddleCenter;
-            FontSize12RadioButton.UseVisualStyleBackColor = true;
-            FontSize12RadioButton.CheckedChanged += FontSize_CheckedChanged;
+            this.FontSize12RadioButton.Appearance = Appearance.Button;
+            this.FontSize12RadioButton.Location = new Point(49, 28);
+            this.FontSize12RadioButton.Name = "FontSize12RadioButton";
+            this.FontSize12RadioButton.Size = new Size(30, 22);
+            this.FontSize12RadioButton.TabIndex = 603;
+            this.FontSize12RadioButton.Text = "12";
+            this.FontSize12RadioButton.TextAlign = ContentAlignment.MiddleCenter;
+            this.FontSize12RadioButton.UseVisualStyleBackColor = true;
+            this.FontSize12RadioButton.CheckedChanged += this.FontSize_CheckedChanged;
             // 
             // FontSize9RadioButton
             // 
-            FontSize9RadioButton.Appearance = Appearance.Button;
-            FontSize9RadioButton.Checked = true;
-            FontSize9RadioButton.Location = new Point(16, 28);
-            FontSize9RadioButton.Name = "FontSize9RadioButton";
-            FontSize9RadioButton.Size = new Size(30, 22);
-            FontSize9RadioButton.TabIndex = 602;
-            FontSize9RadioButton.TabStop = true;
-            FontSize9RadioButton.Text = "9";
-            FontSize9RadioButton.TextAlign = ContentAlignment.MiddleCenter;
-            FontSize9RadioButton.UseVisualStyleBackColor = true;
-            FontSize9RadioButton.CheckedChanged += FontSize_CheckedChanged;
+            this.FontSize9RadioButton.Appearance = Appearance.Button;
+            this.FontSize9RadioButton.Checked = true;
+            this.FontSize9RadioButton.Location = new Point(16, 28);
+            this.FontSize9RadioButton.Name = "FontSize9RadioButton";
+            this.FontSize9RadioButton.Size = new Size(30, 22);
+            this.FontSize9RadioButton.TabIndex = 602;
+            this.FontSize9RadioButton.TabStop = true;
+            this.FontSize9RadioButton.Text = "9";
+            this.FontSize9RadioButton.TextAlign = ContentAlignment.MiddleCenter;
+            this.FontSize9RadioButton.UseVisualStyleBackColor = true;
+            this.FontSize9RadioButton.CheckedChanged += this.FontSize_CheckedChanged;
             // 
             // FontSizeLabel
             // 
-            FontSizeLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            FontSizeLabel.Location = new Point(29, 11);
-            FontSizeLabel.Name = "FontSizeLabel";
-            FontSizeLabel.Size = new Size(69, 15);
-            FontSizeLabel.TabIndex = 601;
-            FontSizeLabel.Text = "フォントサイズ";
+            this.FontSizeLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.FontSizeLabel.Location = new Point(29, 11);
+            this.FontSizeLabel.Name = "FontSizeLabel";
+            this.FontSizeLabel.Size = new Size(69, 15);
+            this.FontSizeLabel.TabIndex = 601;
+            this.FontSizeLabel.Text = "フォントサイズ";
             // 
             // QRCodePanel
             // 
-            QRCodePanel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            QRCodePanel.BorderStyle = BorderStyle.FixedSingle;
-            QRCodePanel.Controls.Add(QRCodeButton);
-            QRCodePanel.Controls.Add(QRCodeTextBox);
-            QRCodePanel.Location = new Point(42, 333);
-            QRCodePanel.Name = "QRCodePanel";
-            QRCodePanel.Size = new Size(218, 46);
-            QRCodePanel.TabIndex = 500;
+            this.QRCodePanel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            this.QRCodePanel.BorderStyle = BorderStyle.FixedSingle;
+            this.QRCodePanel.Controls.Add(this.QRCodeButton);
+            this.QRCodePanel.Controls.Add(this.QRCodeTextBox);
+            this.QRCodePanel.Location = new Point(42, 333);
+            this.QRCodePanel.Name = "QRCodePanel";
+            this.QRCodePanel.Size = new Size(218, 46);
+            this.QRCodePanel.TabIndex = 500;
             // 
             // QRCodeButton
             // 
-            QRCodeButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            QRCodeButton.Location = new Point(124, 16);
-            QRCodeButton.Name = "QRCodeButton";
-            QRCodeButton.Size = new Size(75, 23);
-            QRCodeButton.TabIndex = 602;
-            QRCodeButton.Text = "OK";
-            QRCodeButton.UseVisualStyleBackColor = true;
-            QRCodeButton.Click += QRCodeButton_Click;
+            this.QRCodeButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            this.QRCodeButton.Location = new Point(124, 16);
+            this.QRCodeButton.Name = "QRCodeButton";
+            this.QRCodeButton.Size = new Size(75, 23);
+            this.QRCodeButton.TabIndex = 602;
+            this.QRCodeButton.Text = "OK";
+            this.QRCodeButton.UseVisualStyleBackColor = true;
+            this.QRCodeButton.Click += this.QRCodeButton_Click;
             // 
             // QRCodeTextBox
             // 
-            QRCodeTextBox.Location = new Point(18, 16);
-            QRCodeTextBox.MaxLength = 50;
-            QRCodeTextBox.Name = "QRCodeTextBox";
-            QRCodeTextBox.Size = new Size(100, 23);
-            QRCodeTextBox.TabIndex = 601;
-            QRCodeTextBox.KeyDown += QRCodeTextBox_KeyDown;
+            this.QRCodeTextBox.Location = new Point(18, 16);
+            this.QRCodeTextBox.MaxLength = 50;
+            this.QRCodeTextBox.Name = "QRCodeTextBox";
+            this.QRCodeTextBox.Size = new Size(100, 23);
+            this.QRCodeTextBox.TabIndex = 601;
+            this.QRCodeTextBox.KeyDown += this.QRCodeTextBox_KeyDown;
             // 
             // QRCodeCheckBox
             // 
-            QRCodeCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            QRCodeCheckBox.Checked = true;
-            QRCodeCheckBox.CheckState = CheckState.Checked;
-            QRCodeCheckBox.Location = new Point(61, 325);
-            QRCodeCheckBox.Name = "QRCodeCheckBox";
-            QRCodeCheckBox.Size = new Size(69, 19);
-            QRCodeCheckBox.TabIndex = 501;
-            QRCodeCheckBox.Text = "QRコード";
-            QRCodeCheckBox.UseVisualStyleBackColor = true;
+            this.QRCodeCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            this.QRCodeCheckBox.Checked = true;
+            this.QRCodeCheckBox.CheckState = CheckState.Checked;
+            this.QRCodeCheckBox.Location = new Point(61, 325);
+            this.QRCodeCheckBox.Name = "QRCodeCheckBox";
+            this.QRCodeCheckBox.Size = new Size(69, 19);
+            this.QRCodeCheckBox.TabIndex = 501;
+            this.QRCodeCheckBox.Text = "QRコード";
+            this.QRCodeCheckBox.UseVisualStyleBackColor = true;
             // 
             // MainWindow
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(684, 381);
-            Controls.Add(QRCodeCheckBox);
-            Controls.Add(QRCodePanel);
-            Controls.Add(FontSizePanel);
-            Controls.Add(RegisterButton);
-            Controls.Add(HistoryButton);
-            Controls.Add(CategoryListBox3);
-            Controls.Add(CategoryListBox2);
-            Controls.Add(CategoryListBox1);
-            Controls.Add(CategoryRadioButton4);
-            Controls.Add(CategoryRadioButton3);
-            Controls.Add(CategoryRadioButton2);
-            Controls.Add(CategoryRadioButton1);
-            Controls.Add(MainWindowMenuStrip);
-            Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
-            Icon = (Icon)resources.GetObject("$this.Icon");
-            MainMenuStrip = MainWindowMenuStrip;
-            MaximizeBox = false;
-            Name = "MainWindow";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "ProductDataBase";
-            Load += MainWindow_Load;
-            MainWindowMenuStrip.ResumeLayout(false);
-            MainWindowMenuStrip.PerformLayout();
-            FontSizePanel.ResumeLayout(false);
-            QRCodePanel.ResumeLayout(false);
-            QRCodePanel.PerformLayout();
-            ResumeLayout(false);
-            PerformLayout();
+            this.AutoScaleDimensions = new SizeF(7F, 15F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.ClientSize = new Size(684, 381);
+            this.Controls.Add(this.QRCodeCheckBox);
+            this.Controls.Add(this.QRCodePanel);
+            this.Controls.Add(this.FontSizePanel);
+            this.Controls.Add(this.RegisterButton);
+            this.Controls.Add(this.HistoryButton);
+            this.Controls.Add(this.CategoryListBox3);
+            this.Controls.Add(this.CategoryListBox2);
+            this.Controls.Add(this.CategoryListBox1);
+            this.Controls.Add(this.CategoryRadioButton4);
+            this.Controls.Add(this.CategoryRadioButton3);
+            this.Controls.Add(this.CategoryRadioButton2);
+            this.Controls.Add(this.CategoryRadioButton1);
+            this.Controls.Add(this.MainWindowMenuStrip);
+            this.Font = new Font("Meiryo UI", 9F);
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.Icon = (Icon)resources.GetObject("$this.Icon");
+            this.MainMenuStrip = this.MainWindowMenuStrip;
+            this.MaximizeBox = false;
+            this.Name = "MainWindow";
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.Text = "ProductDataBase";
+            this.Load += this.MainWindow_Load;
+            this.MainWindowMenuStrip.ResumeLayout(false);
+            this.MainWindowMenuStrip.PerformLayout();
+            this.FontSizePanel.ResumeLayout(false);
+            this.QRCodePanel.ResumeLayout(false);
+            this.QRCodePanel.PerformLayout();
+            this.ResumeLayout(false);
+            this.PerformLayout();
         }
 
         #endregion

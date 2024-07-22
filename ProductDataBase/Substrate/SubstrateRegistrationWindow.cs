@@ -1,40 +1,22 @@
 ﻿using ProductDatabase.Substrate;
 using System.Data;
 using System.Data.SQLite;
+using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
     public partial class SubstrateRegistrationWindow : Form {
 
+        public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
+
         public CSettingsLabelSub SettingsLabelSub { get; set; } = new CSettingsLabelSub();
-        public string StrSettingFilePath { get; set; } = string.Empty;
 
-        public string StrFontName { get; set; } = "Meiryo UI";
-        public int IntFontSize { get; set; } = 9;
+        private readonly string _settingFilePath = "./config/SubstrateConfig.xml";
 
-        public string StrProductName { get; set; } = string.Empty;
-        public string StrStockName { get; set; } = string.Empty;
-        public string StrSubstrateName { get; set; } = string.Empty;
-        public string StrSubstrateModel { get; set; } = string.Empty;
-        public string StrInitial { get; set; } = string.Empty;
-        public int IntRegType { get; set; }
-        public int IntPrintType { get; set; }
-        public int IntCheckBin { get; set; }
+        private string _labelSubNSerial = string.Empty;
 
-        public Bitmap LabelSubBmp { get; } = new(1, 1);
-        public int LabelSubPageNum { get; set; }
-        public string LabelSubNSerial { get; set; } = string.Empty;
-        public int LabelSubNLabel { get; set; }
-        public int LabelSubNumLabelsToPrint { get; set; }
-
-        public decimal DisplayResolution { get; } = 96.0m;
-        public int DisplayMagnitude { get; } = 3;
-        public int IntPageCnt { get; set; } = 1;
-
-        public string StrProness1 { get; set; } = string.Empty;
-        public string StrProness2 { get; } = string.Empty;
-        public string StrProness3 { get; } = string.Empty;
-        public int StrProness4 { get; set; }
-        public string StrProness5 { get; set; } = string.Empty;
+        private int _labelSubPageNum;
+        private int _labelSubNumLabelsToPrint;
+        private int _intPageCnt = 1;
 
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectNumberCheckBox",
@@ -48,15 +30,15 @@ namespace ProductDatabase {
         // ロードイベント
         private void LoadEvents() {
             try {
-                Font = new Font(StrFontName, IntFontSize);
+                Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
 
-                ProductNameLabel2.Text = StrProductName;
-                SubstrateModelLabel2.Text = $"{StrSubstrateName} - {StrSubstrateModel}";
-                StockLabel2.Text = "0";
+                ProductNameLabel2.Text = ProductInfo.ProductName;
 
-                OrderNumberTextBox.Text = StrProness5;
-                ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(StrProness1) ? StrProness1 : ManufacturingNumberMaskedTextBox.Text;
-                QuantityTextBox.Text = (StrProness4 != 0) ? StrProness4.ToString() : string.Empty;
+                SubstrateModelLabel2.Text = $"{ProductInfo.SubstrateName} - {ProductInfo.SubstrateModel}";
+
+                OrderNumberTextBox.Text = ProductInfo.Proness5;
+                ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(ProductInfo.Proness1) ? ProductInfo.Proness1 : ManufacturingNumberMaskedTextBox.Text;
+                QuantityTextBox.Text = (ProductInfo.Proness4 != 0) ? ProductInfo.Proness4.ToString() : string.Empty;
 
                 RegisterButton.Enabled = true;
 
@@ -65,7 +47,7 @@ namespace ProductDatabase {
                 RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
 
                 // DB1へ接続し担当者取得
-                using (SQLiteConnection con = new(MainWindow.GetConnectionString1())) {
+                using (SQLiteConnection con = new(GetConnectionString1())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加
@@ -77,18 +59,18 @@ namespace ProductDatabase {
                 }
 
                 // 在庫管理する基盤はDB2へ接続し対象製品の在庫取得
-                if (IntRegType != 0) {
-                    using SQLiteConnection con = new(MainWindow.GetConnectionString2());
+                if (ProductInfo.RegType != 0) {
+                    using SQLiteConnection con = new(GetConnectionString2());
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Stock]の合計を取得
-                    cmd.CommandText = $"SELECT total(col_stock) FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model";
-                    cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = StrSubstrateModel;
+                    cmd.CommandText = $"SELECT total(col_stock) FROM Stock_{ProductInfo.StockName} WHERE col_Substrate_Model = @col_Substrate_Model";
+                    cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ProductInfo.SubstrateModel;
                     StockLabel2.Text = cmd.ExecuteScalar().ToString();
 
                     // テーブル検索SQL - [Substrate_Reg_[Product_Name]]テーブルの最新の[col_Revison]を取得
-                    cmd.CommandText = $"SELECT col_Revision FROM Substrate_Reg_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model AND col_Revision IS NOT NULL ORDER BY _rowid_ DESC";
-                    cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = StrSubstrateModel;
+                    cmd.CommandText = $"SELECT col_Revision FROM Substrate_Reg_{ProductInfo.StockName} WHERE col_Substrate_Model = @col_Substrate_Model AND col_Revision IS NOT NULL ORDER BY _rowid_ DESC";
+                    cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ProductInfo.SubstrateModel;
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
                 }
@@ -97,17 +79,16 @@ namespace ProductDatabase {
                 // 変数[check_bin]の値に応じてCheckboxにチェックを入れる
                 foreach (var checkBoxName in _checkBoxNames) {
                     if (Controls[checkBoxName] is CheckBox checkBox) {
-                        checkBox.Checked = (IntCheckBin & 0x1) == 1;
-                        IntCheckBin >>= 1;
+                        checkBox.Checked = (ProductInfo.CheckBin & 0x1) == 1;
+                        ProductInfo.CheckBin >>= 1;
                     }
                 }
 
                 CommentComboBox.Items.Add("[Rev.UP]変更点番号:");
 
-                StrSettingFilePath = "./config/SubstrateConfig.xml";
-                if (File.Exists(StrSettingFilePath) == false) { throw new Exception("設定ファイルが見つかりませんでした"); }
+                if (File.Exists(_settingFilePath) == false) { throw new Exception("設定ファイルが見つかりませんでした"); }
                 SettingsLabelSub = new CSettingsLabelSub();
-                LoadSettings(StrSettingFilePath);
+                LoadSettings(_settingFilePath);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
@@ -180,7 +161,7 @@ namespace ProductDatabase {
 
                 if (!Registration()) { return; }
 
-                switch (IntPrintType) {
+                switch (ProductInfo.PrintType) {
                     case 0:
                         MessageBox.Show("登録完了");
                         break;
@@ -206,14 +187,14 @@ namespace ProductDatabase {
         }
         private bool Registration() {
             try {
-                using SQLiteConnection con = new(MainWindow.GetConnectionString2());
+                using SQLiteConnection con = new(GetConnectionString2());
                 con.Open();
 
                 // 製番が新規かチェック
-                if (IntRegType != 0) {
+                if (ProductInfo.RegType != 0) {
                     var substrateName = string.Empty;
                     using (var cmd = con.CreateCommand()) {
-                        cmd.CommandText = $"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Num = @col_Substrate_Num ORDER BY _rowid_ DESC LIMIT 1";
+                        cmd.CommandText = $"SELECT * FROM Stock_{ProductInfo.StockName} WHERE col_Substrate_Num = @col_Substrate_Num ORDER BY _rowid_ DESC LIMIT 1";
                         cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
                         using var dr = cmd.ExecuteReader();
                         while (dr.Read()) {
@@ -222,7 +203,7 @@ namespace ProductDatabase {
                     }
 
                     if (substrateName != string.Empty) {
-                        if (StrSubstrateName == substrateName) {
+                        if (ProductInfo.SubstrateName == substrateName) {
                             var result = MessageBox.Show($"[{ManufacturingNumberMaskedTextBox.Text}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
                             if (result == DialogResult.No) { return false; }
                         }
@@ -231,14 +212,14 @@ namespace ProductDatabase {
                 }
 
                 // 在庫管理する基盤のみ
-                if (IntRegType != 0) {
+                if (ProductInfo.RegType != 0) {
                     //在庫追加
                     if (QuantityCheckBox.Checked && !DefectNumberCheckBox.Checked) {
                         // 基板在庫テーブルへ追加_製番が一致した行を更新する、製番がない場合は新規追加
                         using var cmd = con.CreateCommand();
                         cmd.CommandText =
                             $"""
-                            INSERT INTO Stock_{StrStockName}
+                            INSERT INTO Stock_{ProductInfo.StockName}
                                 (
                                 col_Flg, col_Substrate_Name, col_Substrate_Model, col_Substrate_Num, col_Order_Num, col_Stock
                                 )
@@ -252,8 +233,8 @@ namespace ProductDatabase {
                             """;
 
                         cmd.Parameters.Add("@col_Flg", DbType.String).Value = 1;
-                        cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = StrSubstrateName;
-                        cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = StrSubstrateModel;
+                        cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = ProductInfo.SubstrateName;
+                        cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ProductInfo.SubstrateModel;
                         cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
                         cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = OrderNumberTextBox.Text;
                         cmd.Parameters.Add("@col_Stock", DbType.String).Value = QuantityTextBox.Text;
@@ -263,7 +244,7 @@ namespace ProductDatabase {
                     //不良処理
                     else if (!QuantityCheckBox.Checked && DefectNumberCheckBox.Checked) {
                         using var cmd = con.CreateCommand();
-                        cmd.CommandText = $"SELECT col_Stock FROM Stock_{StrStockName} WHERE col_Substrate_Num = @col_Substrate_Num";
+                        cmd.CommandText = $"SELECT col_Stock FROM Stock_{ProductInfo.StockName} WHERE col_Substrate_Num = @col_Substrate_Num";
                         cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
                         var intStock = Convert.ToInt32(cmd.ExecuteScalar());
 
@@ -274,7 +255,7 @@ namespace ProductDatabase {
                             : (intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text)) == 0 ? 0 : throw new Exception("不良数が在庫より多く入力されています。");
                         cmd.CommandText =
                             $"""
-                            UPDATE Stock_{StrStockName} SET
+                            UPDATE Stock_{ProductInfo.StockName} SET
                                 col_Flg = @col_Flg,
                                 col_Stock = @col_Stock,
                                 col_History = ifnull(col_History, '') || @col_History
@@ -295,7 +276,7 @@ namespace ProductDatabase {
                 using (var cmd = con.CreateCommand()) {
                     cmd.CommandText =
                         $"""
-                        INSERT INTO Substrate_Reg_{StrProductName}
+                        INSERT INTO Substrate_Reg_{ProductInfo.ProductName}
                             (
                             col_Substrate_Name,
                             col_Substrate_Model,
@@ -324,8 +305,8 @@ namespace ProductDatabase {
                         """;
 
                     // チェックボックスにチェックがない場合はNullを
-                    cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = StrSubstrateName;
-                    cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = StrSubstrateModel;
+                    cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = ProductInfo.SubstrateName;
+                    cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ProductInfo.SubstrateModel;
                     cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
                     cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = OrderNumberTextBox.Text;
                     cmd.Parameters.Add("@col_Increase", DbType.String).Value = QuantityCheckBox.Checked ? QuantityTextBox.Text : DBNull.Value;
@@ -346,37 +327,44 @@ namespace ProductDatabase {
         }
         // 印刷処理
         private void PrintBarcode(int printFlg) {
-            // PrintDocumentオブジェクトの作成
-            using System.Drawing.Printing.PrintDocument pd = new();
+            try {
+                // PrintDocumentオブジェクトの作成
+                using System.Drawing.Printing.PrintDocument pd = new();
 
-            //// PrintPageイベントハンドラの追加
-            pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
+                //// PrintPageイベントハンドラの追加
+                pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
-            LabelSubNumLabelsToPrint = int.Parse(QuantityTextBox.Text);
-            LabelSubPageNum = 0;
+                _labelSubNumLabelsToPrint = int.TryParse(QuantityTextBox.Text, out var quantity) ? quantity : 0;
+                if (_labelSubNumLabelsToPrint == 0) {
+                    throw new Exception("数量が入力されていません。");
+                }
+                _labelSubPageNum = 0;
 
-            switch (printFlg) {
-                case 1:
-                    SubstrateRegistrationPrintDialog.Document = pd;
-                    var r = SubstrateRegistrationPrintDialog.ShowDialog();
+                switch (printFlg) {
+                    case 1:
+                        SubstrateRegistrationPrintDialog.Document = pd;
+                        var r = SubstrateRegistrationPrintDialog.ShowDialog();
 
-                    if (r == DialogResult.OK) {
-                        SubstrateRegistrationPrintDialog.Document.Print();
+                        if (r == DialogResult.OK) {
+                            SubstrateRegistrationPrintDialog.Document.Print();
 
-                        if (IntPageCnt >= 2) {
-                            MessageBox.Show($"{IntPageCnt}枚印刷されます。2枚目以降は1行目から印刷されます。");
+                            if (_intPageCnt >= 2) {
+                                MessageBox.Show($"{_intPageCnt}枚印刷されます。2枚目以降は1行目から印刷されます。");
+                            }
                         }
-                    }
-                    else {
-                        return;
-                    }
-                    break;
-                case 2:
-                    SubstrateRegistrationPrintPreviewDialog.Document = pd;
-                    SubstrateRegistrationPrintPreviewDialog.ShowDialog();
-                    break;
-                default:
-                    break;
+                        else {
+                            return;
+                        }
+                        break;
+                    case 2:
+                        SubstrateRegistrationPrintPreviewDialog.Document = pd;
+                        SubstrateRegistrationPrintPreviewDialog.ShowDialog();
+                        break;
+                    default:
+                        break;
+                }
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
@@ -393,7 +381,7 @@ namespace ProductDatabase {
                 if (!SubstrateRegistrationPrintDocument.PrintController.IsPreview) {
                     offsetX -= e.PageSettings.HardMarginX * 0.254;
                     offsetY -= e.PageSettings.HardMarginY * 0.254;
-                    offset = LabelSubPageNum == 0
+                    offset = _labelSubPageNum == 0
                         ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (startLine * (intervalY + sizeY))))
                         : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
                 }
@@ -408,9 +396,9 @@ namespace ProductDatabase {
 
                 var headerString = ConvertHeaderFooterString(SettingsLabelSub.LabelSubPageSettings.HeaderString);
                 e.Graphics.DrawString(headerString, SettingsLabelSub.LabelSubPageSettings.HeaderFooterFont, Brushes.Black, headerPos);
-                LabelSubNSerial = ManufacturingNumberMaskedTextBox.Text;
+                _labelSubNSerial = ManufacturingNumberMaskedTextBox.Text;
 
-                if (LabelSubPageNum >= 1) {
+                if (_labelSubPageNum >= 1) {
                     startLine = 0;
                 }
 
@@ -423,7 +411,7 @@ namespace ProductDatabase {
 
                     int x;
                     for (x = 0; x < maxX; x++) {
-                        var s = GenerateCode(LabelSubNSerial);
+                        var s = GenerateCode(_labelSubNSerial);
 
                         var sizeX = (float)SettingsLabelSub.LabelSubPageSettings.SizeX;
 
@@ -432,20 +420,19 @@ namespace ProductDatabase {
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
                         e.Graphics.DrawImage(MakeLabelImage(s, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
 
-                        LabelSubNLabel = 0;
-                        LabelSubNumLabelsToPrint--;
+                        _labelSubNumLabelsToPrint--;
 
-                        if (LabelSubNumLabelsToPrint <= 0) {
+                        if (_labelSubNumLabelsToPrint <= 0) {
                             intNumLabels--;
                             if (intNumLabels <= 0) {
                                 e.HasMorePages = false;
-                                LabelSubPageNum = 0;
+                                _labelSubPageNum = 0;
                                 var txtNumPublish = 0;
-                                LabelSubNumLabelsToPrint = txtNumPublish;
+                                _labelSubNumLabelsToPrint = txtNumPublish;
                                 return;
                             }
                             else {
-                                LabelSubNumLabelsToPrint += x + 1;
+                                _labelSubNumLabelsToPrint += x + 1;
                                 break;
                             }
                         }
@@ -456,16 +443,16 @@ namespace ProductDatabase {
                                 intNumLabels = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
                             }
                             else if (intNumLabels > 0) {
-                                LabelSubNumLabelsToPrint += x + 1;
+                                _labelSubNumLabelsToPrint += x + 1;
                                 break;
                             }
                         }
                     }
                 }
 
-                if (LabelSubNumLabelsToPrint > 0) {
-                    LabelSubPageNum++;
-                    IntPageCnt++;
+                if (_labelSubNumLabelsToPrint > 0) {
+                    _labelSubPageNum++;
+                    _intPageCnt++;
                     e.HasMorePages = true;
                 }
 
@@ -475,8 +462,8 @@ namespace ProductDatabase {
             }
         }
         private string ConvertHeaderFooterString(string s) {
-            s = s.Replace("%P", StrSubstrateName)
-                 .Replace("%T", StrSubstrateModel)
+            s = s.Replace("%P", ProductInfo.SubstrateName)
+                 .Replace("%T", ProductInfo.SubstrateModel)
                  .Replace("%D", DateTime.Today.ToShortDateString())
                  .Replace("%M", ManufacturingNumberMaskedTextBox.Text)
                  .Replace("%O", OrderNumberTextBox.Text)
@@ -496,7 +483,7 @@ namespace ProductDatabase {
 
             var outputCode = SettingsLabelSub.LabelSubLabelSettings.Format;
             var serialCode = serial.Substring(5, 5);
-            outputCode = outputCode.Replace("%T", StrInitial)
+            outputCode = outputCode.Replace("%T", ProductInfo.Initial)
                                     .Replace("%R", RevisionTextBox.Text)
                                     .Replace("%Y", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yy"))
                                     .Replace("%MM", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM"))
@@ -638,12 +625,12 @@ namespace ProductDatabase {
             try {
                 StreamWriter? sw = null;
 
-                sw = new StreamWriter(StrSettingFilePath, false, new System.Text.UTF8Encoding(false));
+                sw = new StreamWriter(_settingFilePath, false, new System.Text.UTF8Encoding(false));
                 System.Xml.Serialization.XmlSerializer serializer = new(typeof(CSettingsLabelSub));
                 serializer.Serialize(sw, SettingsLabelSub);
                 sw?.Close();
 
-                LoadSettings(StrSettingFilePath);
+                LoadSettings(_settingFilePath);
             } catch (Exception ex) {
                 MessageBox.Show($"設定ファイルの保存に失敗しました。{Environment.NewLine}{ex.Message}");
             } finally {
@@ -651,18 +638,18 @@ namespace ProductDatabase {
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
             var message = string.Join(Environment.NewLine,
-                $"StrProness1\t\t[{StrProness1}]",
-                $"StrProness2\t\t[{StrProness2}]",
-                $"StrProness3\t\t[{StrProness3}]",
-                $"StrProness4\t\t[{StrProness4}]",
-                $"StrProness5\t\t[{StrProness5}]",
-                $"StrProductName\t\t[{StrProductName}]",
-                $"StrStockName\t\t[{StrStockName}]",
-                $"StrSubstrateName\t\t[{StrSubstrateName}]",
-                $"StrSubstrateModel\t\t[{StrSubstrateModel}]",
-                $"StrInitial\t\t\t[{StrInitial}]",
-                $"IntRegType\t\t[{IntRegType}]",
-                $"IntPrintType\t\t[{IntPrintType}]"
+                $"StrProness1\t\t[{ProductInfo.Proness1}]",
+                $"StrProness2\t\t[{ProductInfo.Proness2}]",
+                $"StrProness3\t\t[{ProductInfo.Proness3}]",
+                $"StrProness4\t\t[{ProductInfo.Proness4}]",
+                $"StrProness5\t\t[{ProductInfo.Proness5}]",
+                $"StrProductName\t\t[{ProductInfo.ProductName}]",
+                $"StrStockName\t\t[{ProductInfo.StockName}]",
+                $"StrSubstrateName\t\t[{ProductInfo.SubstrateName}]",
+                $"StrSubstrateModel\t\t[{ProductInfo.SubstrateModel}]",
+                $"StrInitial\t\t\t[{ProductInfo.Initial}]",
+                $"IntRegType\t\t[{ProductInfo.RegType}]",
+                $"IntPrintType\t\t[{ProductInfo.PrintType}]"
             );
             MessageBox.Show(message, "", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }

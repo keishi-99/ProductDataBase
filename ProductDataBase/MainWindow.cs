@@ -5,41 +5,92 @@ using System.Data.SQLite;
 namespace ProductDatabase {
     public partial class MainWindow : Form {
 
+        public class ProductInfomation {
+            public string ProductName { get; set; } = string.Empty;
+            public string StockName { get; set; } = string.Empty;
+            public string ProductType { get; set; } = string.Empty;
+            public string ProductModel { get; set; } = string.Empty;
+            public string SubstrateName { get; set; } = string.Empty;
+            public string SubstrateModel { get; set; } = string.Empty;
+            public string UseSubstrate { get; set; } = string.Empty;
+            public string Initial { get; set; } = string.Empty;
+            public int SerialDigit { get; set; }
+            public int RegType { get; set; }
+            public int PrintType { get; set; }
+            public int CheckBin { get; set; }
+            public string Proness1 { get; set; } = string.Empty;
+            public string Proness2 { get; set; } = string.Empty;
+            public string Proness3 { get; set; } = string.Empty;
+            public int Proness4 { get; set; }
+            public string Proness5 { get; set; } = string.Empty;
+            public List<string> Category11 { get; set; } = [];
+            public List<string> Category12 { get; set; } = [];
+            public List<string> Category13 { get; set; } = [];
+            public List<string> Category14 { get; set; } = [];
+            public int RadioButtonFlg { get; set; }
+            public string FontName { get; } = "Meiryo UI";
+            public int FontSize { get; set; } = 9;
+
+            public string OrderNumber { get; set; } = string.Empty;
+            public string ProductNumber { get; set; } = string.Empty;
+            public string RegDate { get; set; } = string.Empty;
+            public string Person { get; set; } = string.Empty;
+            public string Revision { get; set; } = string.Empty;
+            public string Comment { get; set; } = string.Empty;
+            public string SerialFirst { get; set; } = string.Empty;
+            public string SerialLast { get; set; } = string.Empty;
+            public string UsedSubstrate { get; set; } = string.Empty;
+
+            public int Quantity { get; set; }
+            public int SerialFirstNumber { get; set; }
+            public int SerialLastNumber { get; set; }
+
+            public void Reset() {
+                ProductName = string.Empty;
+                StockName = string.Empty;
+                ProductType = string.Empty;
+                ProductModel = string.Empty;
+                SubstrateName = string.Empty;
+                SubstrateModel = string.Empty;
+                UseSubstrate = string.Empty;
+                Initial = string.Empty;
+                SerialDigit = 0;
+                RegType = 0;
+                PrintType = 0;
+                CheckBin = 0;
+                Proness1 = string.Empty;
+                Proness2 = string.Empty;
+                Proness3 = string.Empty;
+                Proness4 = 0;
+                Proness5 = string.Empty;
+                Category11 = [];
+                Category12 = [];
+                Category13 = [];
+                Category14 = [];
+                OrderNumber = string.Empty;
+                ProductNumber = string.Empty;
+                RegDate = string.Empty;
+                Person = string.Empty;
+                Revision = string.Empty;
+                Comment = string.Empty;
+                SerialFirst = string.Empty;
+                SerialLast = string.Empty;
+                UsedSubstrate = string.Empty;
+                SerialLastNumber = 0;
+                Quantity = 0;
+                SerialFirstNumber = 0;
+            }
+        }
+
+        public ProductInfomation ProductInfo { get; set; } = new();
+
         public DataTable ProductDataTable { get; } = new();
-        public string FontName { get; set; } = "Meiryo UI";
-
-        public int IntFontSize { get; set; } = 9;
-        public int IntRadioBtnFlg { get; set; }
-        public int IntRegType { get; set; }
-        public int IntPrintType { get; set; }
-        public int IntSerialDigit { get; set; }
-
-        public string StrProductName { get; set; } = string.Empty;
-        public string StrStockName { get; set; } = string.Empty;
-        public string StrProductType { get; set; } = string.Empty;
-        public string StrProductModel { get; set; } = string.Empty;
-        public string StrSubstrateName { get; set; } = string.Empty;
-        public string StrSubstrateModel { get; set; } = string.Empty;
-        public string StrUseSubstrate { get; set; } = string.Empty;
-        public string StrInitial { get; set; } = string.Empty;
-
-        public int IntCheckBin { get; set; }
-        public string StrProness1 { get; set; } = string.Empty;
-        public string StrProness2 { get; set; } = string.Empty;
-        public string StrProness3 { get; set; } = string.Empty;
-        public int StrProness4 { get; set; }
-        public string StrProness5 { get; set; } = string.Empty;
 
         private int ListIndex { get; set; }
 
-        public string StrCategory11 { get; set; } = string.Empty;
-        public string StrCategory12 { get; set; } = string.Empty;
-        public string StrCategory13 { get; set; } = string.Empty;
-        public string StrCategory14 { get; set; } = string.Empty;
-        public List<string> ListCategory11 { get; } = [];
-        public List<string> ListCategory12 { get; } = [];
-        public List<string> ListCategory13 { get; } = [];
-        public List<string> ListCategory14 { get; } = [];
+        private string _strCategory12 = string.Empty;
+        private string _strCategory13 = string.Empty;
+        private string _strCategory14 = string.Empty;
 
         private static readonly string[] s_separator = ["//"];
 
@@ -80,18 +131,14 @@ namespace ProductDatabase {
             }
         }
         private void ResetFields() {
-            IntRegType = IntPrintType = IntSerialDigit = ListIndex = 0;
-            StrProductName = StrProductType = StrProductModel = StrSubstrateName = StrSubstrateModel = StrUseSubstrate = StrInitial = string.Empty;
-            IntCheckBin = 0;
-            StrProness1 = StrProness2 = StrProness3 = StrProness5 = string.Empty;
-            StrProness4 = 0;
+            ProductInfo.Reset();
         }
         // 登録ボタン処理
         private void Registration() {
             try {
                 ResetFields();
 
-                switch (IntRadioBtnFlg) {
+                switch (ProductInfo.RadioButtonFlg) {
                     case 1:
                         HandleSubstrateRegistration();
                         break;
@@ -116,15 +163,14 @@ namespace ProductDatabase {
 
             if (selectedRows.Length > 0) {
                 using SubstrateRegistrationWindow window = new();
-                window.StrFontName = FontName;
-                window.IntFontSize = IntFontSize;
-                window.StrProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
-                window.StrStockName = selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
-                window.StrSubstrateName = selectedRows[0]["col_Substrate_Name"].ToString() ?? string.Empty;
-                window.StrSubstrateModel = selectedRows[0]["col_Substrate_Model"].ToString() ?? string.Empty;
-                window.IntRegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"] ?? throw new Exception());
-                window.IntPrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"] ?? throw new Exception());
-                window.IntCheckBin = Convert.ToInt32(selectedRows[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
+                ProductInfo.ProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
+                ProductInfo.StockName = selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
+                ProductInfo.SubstrateName = selectedRows[0]["col_Substrate_Name"].ToString() ?? string.Empty;
+                ProductInfo.SubstrateModel = selectedRows[0]["col_Substrate_Model"].ToString() ?? string.Empty;
+                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"] ?? throw new Exception());
+                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"] ?? throw new Exception());
+                ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
+                window.ProductInfo = ProductInfo;
                 window.ShowDialog(this);
             }
         }
@@ -133,18 +179,17 @@ namespace ProductDatabase {
 
             if (selectedRows.Length > 0) {
                 using ProductRegistration1Window window = new();
-                window.StrFontName = FontName;
-                window.IntFontSize = IntFontSize;
-                window.StrProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
-                window.StrStockName = selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
-                window.StrProductType = selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
-                window.IntRegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"] ?? throw new Exception());
-                window.IntPrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"] ?? throw new Exception());
-                window.IntSerialDigit = Convert.ToInt32(selectedRows[0]["col_Serial_Digit"] ?? throw new Exception());
-                window.StrProductModel = selectedRows[0]["col_Product_Model"].ToString() ?? string.Empty;
-                window.IntCheckBin = Convert.ToInt32(selectedRows[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
-                window.StrUseSubstrate = selectedRows[0]["col_Use_Substrate"].ToString() ?? string.Empty;
-                window.StrInitial = selectedRows[0]["col_Initial"].ToString() ?? string.Empty;
+                ProductInfo.ProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
+                ProductInfo.StockName = selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
+                ProductInfo.ProductType = selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
+                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"] ?? throw new Exception());
+                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"] ?? throw new Exception());
+                ProductInfo.SerialDigit = Convert.ToInt32(selectedRows[0]["col_Serial_Digit"] ?? throw new Exception());
+                ProductInfo.ProductModel = selectedRows[0]["col_Product_Model"].ToString() ?? string.Empty;
+                ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
+                ProductInfo.UseSubstrate = selectedRows[0]["col_Use_Substrate"].ToString() ?? string.Empty;
+                ProductInfo.Initial = selectedRows[0]["col_Initial"].ToString() ?? string.Empty;
+                window.ProductInfo = ProductInfo;
                 window.ShowDialog(this);
             }
         }
@@ -153,16 +198,15 @@ namespace ProductDatabase {
 
             if (selectedRows.Length > 0) {
                 using RePrintWindow window = new();
-                window.StrFontName = FontName;
-                window.IntFontSize = IntFontSize;
-                window.StrProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
-                window.StrProductType = selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
-                window.IntRegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"] ?? throw new Exception());
-                window.IntPrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"] ?? throw new Exception());
-                window.IntSerialDigit = Convert.ToInt32(selectedRows[0]["col_Serial_Digit"] ?? throw new Exception());
-                window.StrProductModel = selectedRows[0]["col_Product_Model"].ToString() ?? string.Empty;
-                window.IntCheckBin = Convert.ToInt32(selectedRows[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
-                window.StrInitial = selectedRows[0]["col_Initial"].ToString() ?? string.Empty;
+                ProductInfo.ProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
+                ProductInfo.ProductType = selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
+                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"] ?? throw new Exception());
+                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"] ?? throw new Exception());
+                ProductInfo.SerialDigit = Convert.ToInt32(selectedRows[0]["col_Serial_Digit"] ?? throw new Exception());
+                ProductInfo.ProductModel = selectedRows[0]["col_Product_Model"].ToString() ?? string.Empty;
+                ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
+                ProductInfo.Initial = selectedRows[0]["col_Initial"].ToString() ?? string.Empty;
+                window.ProductInfo = ProductInfo;
                 window.ShowDialog(this);
             }
         }
@@ -171,16 +215,14 @@ namespace ProductDatabase {
 
             if (selectedRows.Length > 0) {
                 using SubstrateChange1 window = new();
-                window.StrFontName = FontName;
-                window.IntFontSize = IntFontSize;
-                window.IntRadioBtnFlg = IntRadioBtnFlg;
-                window.IntPrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"] ?? throw new Exception());
-                window.IntRegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"] ?? throw new Exception());
-                window.StrProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
-                window.StrStockName = selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
-                window.StrProductType = selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
-                window.StrProductModel = selectedRows[0]["col_Product_Model"].ToString() ?? string.Empty;
-                window.StrUseSubstrate = selectedRows[0]["col_Use_Substrate"].ToString() ?? string.Empty;
+                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"] ?? throw new Exception());
+                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"] ?? throw new Exception());
+                ProductInfo.ProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
+                ProductInfo.StockName = selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
+                ProductInfo.ProductType = selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
+                ProductInfo.ProductModel = selectedRows[0]["col_Product_Model"].ToString() ?? string.Empty;
+                ProductInfo.UseSubstrate = selectedRows[0]["col_Use_Substrate"].ToString() ?? string.Empty;
+                window.ProductInfo = ProductInfo;
                 window.ShowDialog(this);
             }
         }
@@ -190,7 +232,7 @@ namespace ProductDatabase {
             try {
                 DataRow[]? selectedRow = null;
 
-                switch (IntRadioBtnFlg) {
+                switch (ProductInfo.RadioButtonFlg) {
                     case 1:
                         selectedRow = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
                         break;
@@ -203,21 +245,21 @@ namespace ProductDatabase {
 
                 if (selectedRow != null && selectedRow.Length > 0) {
                     using HistoryWindow window = new();
-                    window.StrFontName = FontName;
-                    window.IntFontSize = IntFontSize;
-                    window.IntRadioBtnFlg = IntRadioBtnFlg;
 
-                    if (IntRadioBtnFlg == 1) {
-                        window.StrProductName = selectedRow[0]["col_Product_Name"].ToString() ?? string.Empty;
-                        window.StrSubstrateName = selectedRow[0]["col_Substrate_Name"].ToString() ?? string.Empty;
-                        window.StrSubstrateModel = selectedRow[0]["col_Substrate_Model"].ToString() ?? string.Empty;
-                    }
-                    else {
-                        window.StrProductName = selectedRow[0]["col_Product_Name"].ToString() ?? string.Empty;
-                        window.StrProductType = selectedRow[0]["col_Product_Type"].ToString() ?? string.Empty;
-                        window.StrProductModel = selectedRow[0]["col_Product_Model"].ToString() ?? string.Empty;
+                    switch (ProductInfo.RadioButtonFlg) {
+                        case 1:
+                            ProductInfo.ProductName = selectedRow[0]["col_Product_Name"].ToString() ?? string.Empty;
+                            ProductInfo.SubstrateName = selectedRow[0]["col_Substrate_Name"].ToString() ?? string.Empty;
+                            ProductInfo.SubstrateModel = selectedRow[0]["col_Substrate_Model"].ToString() ?? string.Empty;
+                            break;
+                        case 2:
+                            ProductInfo.ProductName = selectedRow[0]["col_Product_Name"].ToString() ?? string.Empty;
+                            ProductInfo.ProductType = selectedRow[0]["col_Product_Type"].ToString() ?? string.Empty;
+                            ProductInfo.ProductModel = selectedRow[0]["col_Product_Model"].ToString() ?? string.Empty;
+                            break;
                     }
 
+                    window.ProductInfo = ProductInfo;
                     window.ShowDialog(this);
                 }
             } catch (Exception ex) {
@@ -229,7 +271,6 @@ namespace ProductDatabase {
             try {
                 RegisterButton.Enabled = false;
                 HistoryButton.Enabled = false;
-                IntRadioBtnFlg = 0;
                 CategoryListBox1.Items.Clear();
                 CategoryListBox2.Items.Clear();
                 CategoryListBox3.Items.Clear();
@@ -238,18 +279,21 @@ namespace ProductDatabase {
                 var selectedRadioButton = (RadioButton)sender;
                 var strSqlQuery = string.Empty;
 
-                switch (selectedRadioButton.Name) {
-                    case "CategoryRadioButton1":
-                        IntRadioBtnFlg = 1;
+                switch (selectedRadioButton.Tag) {
+                    case "1":
+                        ProductInfo.RadioButtonFlg = 1;
                         strSqlQuery = "SELECT * FROM Substrate WHERE Visible = '1';";
                         break;
-                    case "CategoryRadioButton2":
-                    case "CategoryRadioButton3":
-                        IntRadioBtnFlg = selectedRadioButton.Name == "CategoryRadioButton2" ? 2 : 3;
+                    case "2":
+                        ProductInfo.RadioButtonFlg = 2;
                         strSqlQuery = "SELECT * FROM Product WHERE Visible = '1';";
                         break;
-                    case "CategoryRadioButton4":
-                        IntRadioBtnFlg = 4;
+                    case "3":
+                        ProductInfo.RadioButtonFlg = 3;
+                        strSqlQuery = "SELECT * FROM Product WHERE Visible = '1';";
+                        break;
+                    case "4":
+                        ProductInfo.RadioButtonFlg = 4;
                         strSqlQuery = "SELECT * FROM Product WHERE Visible = '1' AND (col_Print_Type = '5' OR col_Print_Type = '6');";
                         break;
                     default:
@@ -305,7 +349,7 @@ namespace ProductDatabase {
 
                 DataRow[] selectedRows;
 
-                switch (IntRadioBtnFlg) {
+                switch (ProductInfo.RadioButtonFlg) {
                     case 1:
                         selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Substrate_Model ASC");
                         HashSet<string> substrateNames = new(selectedRows.AsEnumerable()
@@ -340,18 +384,18 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = true;
                 HistoryButton.Enabled = true;
 
-                switch (IntRadioBtnFlg) {
+                switch (ProductInfo.RadioButtonFlg) {
                     case 1:
-                        StrSubstrateName = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
+                        ProductInfo.SubstrateName = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
                         break;
 
                     case 2:
                     case 3:
-                        StrProductType = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
+                        ProductInfo.ProductType = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
                         break;
 
                     case 4:
-                        StrProductType = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
+                        ProductInfo.ProductType = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
                         HistoryButton.Enabled = false;
                         break;
                 }
@@ -374,7 +418,7 @@ namespace ProductDatabase {
                 ProcessCategoryItemData();
                 FetchDataFromSQLite();
 
-                if (ListCategory11.Count >= 2) {
+                if (ProductInfo.Category11.Count >= 2) {
                     ShowDialogWindowForMultipleItems();
                 }
 
@@ -386,15 +430,14 @@ namespace ProductDatabase {
             }
         }
         private void ResetFieldsForCodeScan() {
-            IntRadioBtnFlg = 0;
             CategoryRadioButton1.Checked = CategoryRadioButton2.Checked = CategoryRadioButton3.Checked = CategoryRadioButton4.Checked = false;
             CategoryListBox1.Items.Clear();
             CategoryListBox2.Items.Clear();
             CategoryListBox3.Items.Clear();
-            ListCategory11.Clear();
-            ListCategory12.Clear();
-            ListCategory13.Clear();
-            ListCategory14.Clear();
+            ProductInfo.Category11.Clear();
+            ProductInfo.Category12.Clear();
+            ProductInfo.Category13.Clear();
+            ProductInfo.Category14.Clear();
             Enabled = false;
         }
         private void ParseQRCodeInput() {
@@ -402,10 +445,10 @@ namespace ProductDatabase {
                 var arr = QRCodeTextBox.Text.Split(s_separator, StringSplitOptions.None);
                 if (arr.Length != 4) { throw new Exception("QRコードが正しくありません。"); }
                 if (arr != null) {
-                    StrProness1 = arr[0];
-                    StrProness2 = arr[1];
-                    StrProness4 = Convert.ToInt32(arr[2] ?? throw new Exception());
-                    StrProness5 = arr[3];
+                    ProductInfo.Proness1 = arr[0];
+                    ProductInfo.Proness2 = arr[1];
+                    ProductInfo.Proness4 = Convert.ToInt32(arr[2] ?? throw new Exception());
+                    ProductInfo.Proness5 = arr[3];
                 }
             } catch (Exception ex) {
                 throw new Exception($"{ex.Message}");
@@ -417,17 +460,17 @@ namespace ProductDatabase {
                 using OdbcCommand cmd = new($"SELECT * FROM V_宮崎手配情報 WHERE 手配管理番号 = '{QRCodeTextBox.Text}'", con);
                 using var dr = cmd.ExecuteReader();
                 while (dr.Read()) {
-                    StrProness1 = dr["手配製番"].ToString() ?? string.Empty;
-                    StrProness2 = dr["品目番号"].ToString() ?? string.Empty;
-                    StrProness3 = dr["品目名称"].ToString() ?? string.Empty;
-                    StrProness4 = Convert.ToInt32(dr["手配数"] ?? throw new Exception());
-                    StrProness5 = dr["請求先注番"].ToString() ?? string.Empty;
+                    ProductInfo.Proness1 = dr["手配製番"].ToString() ?? string.Empty;
+                    ProductInfo.Proness2 = dr["品目番号"].ToString() ?? string.Empty;
+                    ProductInfo.Proness3 = dr["品目名称"].ToString() ?? string.Empty;
+                    ProductInfo.Proness4 = Convert.ToInt32(dr["手配数"] ?? throw new Exception());
+                    ProductInfo.Proness5 = dr["請求先注番"].ToString() ?? string.Empty;
                 }
             }
-            if (string.IsNullOrEmpty(StrProness1)) { throw new Exception($"一致する情報がありません。{Environment.NewLine}手配製番:{StrProness1}"); }
+            if (string.IsNullOrEmpty(ProductInfo.Proness1)) { throw new Exception($"一致する情報がありません。{Environment.NewLine}手配製番:{ProductInfo.Proness1}"); }
         }
         private void ProcessCategoryItemData() {
-            StrProness2 = StrProness2.Replace("-SMT", "")
+            ProductInfo.Proness2 = ProductInfo.Proness2.Replace("-SMT", "")
                                      .Replace("-H", "")
                                      .Replace("-GH", "")
                                      .Replace("-ACGH", "-AC")
@@ -438,7 +481,7 @@ namespace ProductDatabase {
             con.Open();
             using var cmd = con.CreateCommand();
             cmd.CommandText = $"SELECT * FROM V_ItemList WHERE col_ItemNumber = '@StrProness2' OR 'col_ItemNumber:1' = '@StrProness2'";
-            cmd.Parameters.AddWithValue("@StrProness2", StrProness2);
+            cmd.Parameters.AddWithValue("@StrProness2", ProductInfo.Proness2);
             using var dr = cmd.ExecuteReader();
             if (!dr.HasRows) { throw new Exception($"品目番号が見つかりません。"); }
             while (dr.Read()) {
@@ -459,31 +502,25 @@ namespace ProductDatabase {
             }
         }
         private void AddToLists(string itemNumber, string category12, string category13, string category14) {
-            ListCategory11.Add(itemNumber);
-            ListCategory12.Add(category12);
-            ListCategory13.Add(category13);
-            ListCategory14.Add(category14);
+            ProductInfo.Category11.Add(itemNumber);
+            ProductInfo.Category12.Add(category12);
+            ProductInfo.Category13.Add(category13);
+            ProductInfo.Category14.Add(category14);
         }
         private void ShowDialogWindowForMultipleItems() {
             using SeveralDialogWindow window = new();
-            window.StrFontName = FontName;
-            window.IntFontSize = IntFontSize;
-            window.ListCategory11 = ListCategory11;
-            window.ListCategory12 = ListCategory12;
-            window.ListCategory13 = ListCategory13;
-            window.ListCategory14 = ListCategory14;
+            window.ProductInfo = ProductInfo;
 
             if (window.ShowDialog(this) == DialogResult.OK) {
-                ListIndex = window.selectedIndex;
+                ListIndex = window.SelectedIndex;
             }
         }
         private void HandleSelectedItem() {
-            StrCategory11 = ListCategory11[ListIndex];
-            StrCategory12 = ListCategory12[ListIndex];
-            StrCategory13 = ListCategory13[ListIndex];
-            StrCategory14 = ListCategory14[ListIndex];
+            _strCategory12 = ProductInfo.Category12[ListIndex];
+            _strCategory13 = ProductInfo.Category13[ListIndex];
+            _strCategory14 = ProductInfo.Category14[ListIndex];
 
-            switch (StrCategory14) {
+            switch (_strCategory14) {
                 case "1":
                     HandleSubstrateSelection();
                     break;
@@ -491,7 +528,7 @@ namespace ProductDatabase {
                     HandleProductSelection();
                     break;
                 default:
-                    throw new Exception($"一致する情報がありません。{Environment.NewLine}品目番号:{StrProness2}{Environment.NewLine}");
+                    throw new Exception($"一致する情報がありません。{Environment.NewLine}品目番号:{ProductInfo.Proness2}{Environment.NewLine}");
             }
         }
         private void HandleSubstrateSelection() {
@@ -500,24 +537,20 @@ namespace ProductDatabase {
                 adapter.Fill(ProductDataTable);
             }
 
-            var substrateRet = ProductDataTable.Select($"col_Product_Name = '{StrCategory13}' AND col_Substrate_Name = '{StrCategory12}'");
+            var substrateRet = ProductDataTable.Select($"col_Product_Name = '{_strCategory13}' AND col_Substrate_Name = '{_strCategory12}'");
             OpenSubstrateRegistrationWindow(substrateRet);
         }
         private void OpenSubstrateRegistrationWindow(DataRow[] substrateRet) {
             using SubstrateRegistrationWindow window = new();
-            window.StrFontName = FontName;
-            window.IntFontSize = IntFontSize;
-            window.StrProductName = substrateRet[0]["col_Product_Name"].ToString() ?? string.Empty;
-            window.StrStockName = substrateRet[0]["col_Stock_Name"].ToString() ?? string.Empty;
-            window.StrSubstrateName = substrateRet[0]["col_Substrate_Name"].ToString() ?? string.Empty;
-            window.StrSubstrateModel = substrateRet[0]["col_Substrate_Model"].ToString() ?? string.Empty;
-            window.StrInitial = string.Empty;
-            window.IntRegType = Convert.ToInt32(substrateRet[0]["col_Reg_Type"] ?? throw new Exception());
-            window.IntPrintType = Convert.ToInt32(substrateRet[0]["col_Print_Type"] ?? throw new Exception());
-            window.IntCheckBin = Convert.ToInt32(substrateRet[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
-            window.StrProness1 = StrProness1;
-            window.StrProness4 = StrProness4;
-            window.StrProness5 = StrProness5;
+            ProductInfo.ProductName = substrateRet[0]["col_Product_Name"].ToString() ?? string.Empty;
+            ProductInfo.StockName = substrateRet[0]["col_Stock_Name"].ToString() ?? string.Empty;
+            ProductInfo.SubstrateName = substrateRet[0]["col_Substrate_Name"].ToString() ?? string.Empty;
+            ProductInfo.SubstrateModel = substrateRet[0]["col_Substrate_Model"].ToString() ?? string.Empty;
+            ProductInfo.Initial = string.Empty;
+            ProductInfo.RegType = Convert.ToInt32(substrateRet[0]["col_Reg_Type"] ?? throw new Exception());
+            ProductInfo.PrintType = Convert.ToInt32(substrateRet[0]["col_Print_Type"] ?? throw new Exception());
+            ProductInfo.CheckBin = Convert.ToInt32(substrateRet[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
+            window.ProductInfo = ProductInfo;
             window.ShowDialog(this);
         }
         private void HandleProductSelection() {
@@ -526,26 +559,22 @@ namespace ProductDatabase {
                 adapter.Fill(ProductDataTable);
             }
 
-            var productRet = ProductDataTable.Select($"col_Product_Name = '{StrCategory13}' AND col_Product_Type = '{StrCategory12}'");
+            var productRet = ProductDataTable.Select($"col_Product_Name = '{_strCategory13}' AND col_Product_Type = '{_strCategory12}'");
             OpenProductRegistrationWindow(productRet);
         }
         private void OpenProductRegistrationWindow(DataRow[] productRet) {
             using ProductRegistration1Window window = new();
-            window.StrFontName = FontName;
-            window.IntFontSize = IntFontSize;
-            window.StrProductName = productRet[0]["col_Product_Name"].ToString() ?? string.Empty;
-            window.StrStockName = productRet[0]["col_Stock_Name"].ToString() ?? string.Empty;
-            window.StrProductType = productRet[0]["col_Product_Type"].ToString() ?? string.Empty;
-            window.StrProductModel = productRet[0]["col_Product_Model"].ToString() ?? string.Empty;
-            window.StrUseSubstrate = productRet[0]["col_Use_Substrate"].ToString() ?? string.Empty;
-            window.StrInitial = productRet[0]["col_Initial"].ToString() ?? string.Empty;
-            window.IntRegType = Convert.ToInt32(productRet[0]["col_Reg_Type"] ?? throw new Exception());
-            window.IntPrintType = Convert.ToInt32(productRet[0]["col_Print_Type"] ?? throw new Exception());
-            window.IntCheckBin = Convert.ToInt32(productRet[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
-            window.IntSerialDigit = Convert.ToInt32(productRet[0]["col_Serial_Digit"] ?? throw new Exception());
-            window.StrProness1 = StrProness1;
-            window.StrProness4 = StrProness4;
-            window.StrProness5 = StrProness5;
+            ProductInfo.ProductName = productRet[0]["col_Product_Name"].ToString() ?? string.Empty;
+            ProductInfo.StockName = productRet[0]["col_Stock_Name"].ToString() ?? string.Empty;
+            ProductInfo.ProductType = productRet[0]["col_Product_Type"].ToString() ?? string.Empty;
+            ProductInfo.ProductModel = productRet[0]["col_Product_Model"].ToString() ?? string.Empty;
+            ProductInfo.UseSubstrate = productRet[0]["col_Use_Substrate"].ToString() ?? string.Empty;
+            ProductInfo.Initial = productRet[0]["col_Initial"].ToString() ?? string.Empty;
+            ProductInfo.RegType = Convert.ToInt32(productRet[0]["col_Reg_Type"] ?? throw new Exception());
+            ProductInfo.PrintType = Convert.ToInt32(productRet[0]["col_Print_Type"] ?? throw new Exception());
+            ProductInfo.CheckBin = Convert.ToInt32(productRet[0]["col_Checkbox"].ToString() ?? throw new Exception(), 2);
+            ProductInfo.SerialDigit = Convert.ToInt32(productRet[0]["col_Serial_Digit"] ?? throw new Exception());
+            window.ProductInfo = ProductInfo;
             window.ShowDialog(this);
         }
         private void CleanupAfterScan() {
@@ -572,8 +601,8 @@ namespace ProductDatabase {
                     return;
             }
 
-            IntFontSize = fontSize;
-            Font = new Font(FontName, IntFontSize);
+            ProductInfo.FontSize = fontSize;
+            Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
         }
 
         private void MainWindow_Load(object sender, EventArgs e) { LoadEvents(); }

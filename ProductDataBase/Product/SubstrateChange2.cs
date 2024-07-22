@@ -1,38 +1,18 @@
 ﻿using ClosedXML.Excel;
 using System.Data;
 using System.Data.SQLite;
+using static ProductDatabase.MainWindow;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ProductDatabase {
     public partial class SubstrateChange2 : Form {
 
-        public string StrFontName { get; set; } = "Meiryo UI";
-        public int IntFontSize { get; set; } = 9;
+        public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
 
-        public string? StrProductName { get; set; } = string.Empty;
-        public string StrStockName { get; set; } = string.Empty;
-        public string StrProductType { get; set; } = string.Empty;
-        public string StrProductModel { get; set; } = string.Empty;
-        public string StrUseSubstrate { get; set; } = string.Empty;
-        public string[] ArrUseSubstrate { get; set; } = [];
-        public string StrUsedSubstrate { get; set; } = string.Empty;
-        public string[] ArrUsedSubstrate { get; set; } = [];
-        public string StrInitial { get; set; } = string.Empty;
-        public string StrOrderNumber { get; set; } = string.Empty;
-        public string StrProductNumber { get; set; } = string.Empty;
-        public string StrRegDate { get; set; } = string.Empty;
-        public string StrPerson { get; set; } = string.Empty;
-        public string StrRevision { get; set; } = string.Empty;
-        public string StrComment { get; set; } = string.Empty;
+        private string _totalSubstrate = string.Empty;
 
-        public int IntQuantity { get; set; }
-        public int IntRegType { get; set; }
-        public int IntPrintType { get; set; }
-        public int IntSerialLastNumber { get; set; }
-
-        public string StrSerialFirstNumber { get; set; } = string.Empty;
-        public string StrSerialLastNumber { get; set; } = string.Empty;
-        public string StrTotalSubstrate { get; set; } = string.Empty;
+        private string[] _useSubstrate = [];
+        private string[] _usedSubstrate = [];
 
         private readonly List<string> _listUsedSubstrate = [];
         private readonly List<string> _listUsedProductNumber = [];
@@ -55,20 +35,20 @@ namespace ProductDatabase {
         // ロードイベント
         private void LoadEvents() {
             try {
-                Font = new Font(StrFontName, IntFontSize);
+                Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
                 CloseButton.Enabled = true;
 
                 // テキストボックスに入力
-                OrderNumberTextBox.Text = StrOrderNumber;
-                ManufacturingNumberTextBox.Text = StrProductNumber;
-                QuantityTextBox.Text = IntQuantity.ToString();
+                OrderNumberTextBox.Text = ProductInfo.OrderNumber;
+                ManufacturingNumberTextBox.Text = ProductInfo.ProductNumber;
+                QuantityTextBox.Text = ProductInfo.Quantity.ToString();
                 var dtNow = DateTime.Now;
                 RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
-                RevisionTextBox.Text = StrRevision;
-                CommentTextBox.Text = StrComment;
+                RevisionTextBox.Text = ProductInfo.Revision;
+                CommentTextBox.Text = ProductInfo.Comment;
 
                 // DB1へ接続し担当者取得
-                using (SQLiteConnection con = new(MainWindow.GetConnectionString1())) {
+                using (SQLiteConnection con = new(GetConnectionString1())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加
@@ -79,15 +59,15 @@ namespace ProductDatabase {
                     }
                 }
 
-                ArrUseSubstrate = StrUseSubstrate.Split(",");
-                ArrUsedSubstrate = StrUsedSubstrate.Split(",");
+                _useSubstrate = ProductInfo.UseSubstrate.Split(",");
+                _usedSubstrate = ProductInfo.UsedSubstrate.Split(",");
                 var strQuantity = string.Empty;
                 var strSubstrateName = string.Empty;
 
-                switch (IntRegType) {
+                switch (ProductInfo.RegType) {
                     case 2:
-                        for (var i = 0; i <= ArrUseSubstrate.GetUpperBound(0); i++) {
-                            var quantity = IntQuantity;
+                        for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
+                            var quantity = ProductInfo.Quantity;
 
                             // チェックボックスとDgvを有効に
                             _objCbx = Controls[_checkBoxNames[i]] as CheckBox;
@@ -105,13 +85,13 @@ namespace ProductDatabase {
                                 _objDgv.Columns[4].ReadOnly = false;
                             }
 
-                            using SQLiteConnection con = new(MainWindow.GetConnectionString2());
+                            using SQLiteConnection con = new(GetConnectionString2());
                             con.Open();
 
                             using var cmd = con.CreateCommand();
                             // テーブル検索SQL - [Product_Name]_Stockテーブルを在庫数フラグ有&基板型式[Model]で抽出して取得
-                            cmd.CommandText = $"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
-                            cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[i];
+                            cmd.CommandText = $"SELECT * FROM Stock_{ProductInfo.StockName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
+                            cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _useSubstrate[i];
                             using var dr = cmd.ExecuteReader();
                             var j = 0;
                             while (dr.Read()) {
@@ -124,13 +104,13 @@ namespace ProductDatabase {
                                 var intStock = int.Parse($"{dr["col_Stock"]}");
                                 var colFlg = int.Parse($"{dr["col_Flg"]}");
                                 strSubstrateName = $"{dr["col_Substrate_Name"]}";
-                                if (_objCbx != null) { _objCbx.Text = $"{strSubstrateName} - {ArrUseSubstrate[i]}"; }
+                                if (_objCbx != null) { _objCbx.Text = $"{strSubstrateName} - {_useSubstrate[i]}"; }
 
                                 var subIndex = 0;
                                 var b1 = false;
 
-                                for (var i1 = 0; i1 < ArrUsedSubstrate.Length; i1++) {
-                                    var d = ArrUsedSubstrate[i1];
+                                for (var i1 = 0; i1 < _usedSubstrate.Length; i1++) {
+                                    var d = _usedSubstrate[i1];
                                     b1 = d.Contains(strSubstrateNum);
                                     if (b1 == true) {
                                         break;
@@ -139,11 +119,11 @@ namespace ProductDatabase {
                                     subIndex++;
                                 }
                                 if (b1 == true) {
-                                    strUsedSubNum = ArrUsedSubstrate[subIndex];
+                                    strUsedSubNum = _usedSubstrate[subIndex];
                                     strUsedSubNum = strUsedSubNum[(strUsedSubNum.IndexOf(']') + 1)..];
                                     strUsedSubNum = strUsedSubNum[..strUsedSubNum.IndexOf('(')];
 
-                                    strUsedQuantity = ArrUsedSubstrate[subIndex];
+                                    strUsedQuantity = _usedSubstrate[subIndex];
                                     strUsedQuantity = strUsedQuantity[(strUsedQuantity.IndexOf('(') + 1)..];
                                     strUsedQuantity = strUsedQuantity[..strUsedQuantity.IndexOf(')')];
                                     intUsedQuantity = int.Parse(strUsedQuantity);
@@ -219,7 +199,7 @@ namespace ProductDatabase {
                     }
                 }
                 // リスト印刷ボタンを有効に
-                if (IntPrintType is 5 or 6) {
+                if (ProductInfo.PrintType is 5 or 6) {
                     SubstrateListPrintButton.Enabled = true;
                 }
 
@@ -229,11 +209,11 @@ namespace ProductDatabase {
         }
         private bool QuantityCheck() {
             try {
-                switch (IntRegType) {
+                switch (ProductInfo.RegType) {
                     case 2:
                     case 3:
-                        if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
-                        for (var i = 0; i <= ArrUseSubstrate.GetUpperBound(0); i++) {
+                        if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
+                        for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
 
                             var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
                             objCbx.Enabled = true;
@@ -244,7 +224,7 @@ namespace ProductDatabase {
                             objDgv.Columns[4].ReadOnly = false;
 
                             if (objCbx.Checked) {
-                                var intQuantityCheck = IntQuantity;
+                                var intQuantityCheck = ProductInfo.Quantity;
                                 var dgvRowCnt = objDgv.Rows.Count;
 
                                 for (var j = 0; j < dgvRowCnt; j++) {
@@ -278,17 +258,17 @@ namespace ProductDatabase {
         }
         private bool Registration() {
             try {
-                StrRegDate = RegistrationDateMaskedTextBox.Text;
-                StrPerson = PersonComboBox.Text;
-                if (string.IsNullOrEmpty(StrPerson)) { throw new Exception("担当者を選択してください。"); }
+                ProductInfo.RegDate = RegistrationDateMaskedTextBox.Text;
+                ProductInfo.Person = PersonComboBox.Text;
+                if (string.IsNullOrEmpty(ProductInfo.Person)) { throw new Exception("担当者を選択してください。"); }
 
-                switch (IntRegType) {
+                switch (ProductInfo.RegType) {
                     case 2:
                     case 3:
-                        using (SQLiteConnection con = new(MainWindow.GetConnectionString2())) {
+                        using (SQLiteConnection con = new(GetConnectionString2())) {
                             con.Open();
-                            if (ArrUseSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
-                            for (var i = 0; i <= ArrUseSubstrate.Length; i++) {
+                            if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
+                            for (var i = 0; i <= _useSubstrate.Length; i++) {
 
                                 var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
 
@@ -310,7 +290,7 @@ namespace ProductDatabase {
                                             using (var cmd = con.CreateCommand()) {
                                                 cmd.CommandText =
                                                     $"""
-                                                    UPDATE Stock_{StrStockName}
+                                                    UPDATE Stock_{ProductInfo.StockName}
                                                     SET
                                                         col_Flg = @col_Flg,
                                                         col_Stock = @col_Stock,
@@ -333,12 +313,12 @@ namespace ProductDatabase {
                                                 }
 
                                                 cmd.Parameters.Add("@col_Stock", DbType.String).Value = stockValue + usedValue - useValue;
-                                                cmd.Parameters.Add("@col_History", DbType.String).Value = $"{StrProductNumber}({useValue}),";
+                                                cmd.Parameters.Add("@col_History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue}),";
 
                                                 cmd.ExecuteNonQuery();
 
-                                                cmd.CommandText = $@"SELECT * FROM Stock_{StrStockName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
-                                                cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ArrUseSubstrate[i];
+                                                cmd.CommandText = $@"SELECT * FROM Stock_{ProductInfo.StockName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
+                                                cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _useSubstrate[i];
                                                 using var dr = cmd.ExecuteReader();
                                                 while (dr.Read()) {
                                                     substrateName = $"{dr["col_Substrate_Name"]}";
@@ -354,7 +334,7 @@ namespace ProductDatabase {
                                             using (var cmd = con.CreateCommand()) {
                                                 cmd.CommandText =
                                                     $"""
-                                                    INSERT INTO Substrate_Reg_{StrStockName}
+                                                    INSERT INTO Substrate_Reg_{ProductInfo.StockName}
                                                         (
                                                         col_Substrate_Name,
                                                         col_Substrate_Model,
@@ -386,20 +366,20 @@ namespace ProductDatabase {
                                                 cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = substrateModel;
                                                 cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = substrateNum;
                                                 cmd.Parameters.Add("@col_Decrease", DbType.String).Value = 0 - useValue;
-                                                cmd.Parameters.Add("@col_Use_P_Type", DbType.String).Value = StrProductType;
-                                                cmd.Parameters.Add("@col_Use_P_Num", DbType.String).Value = StrProductNumber;
-                                                cmd.Parameters.Add("@col_Use_O_Num", DbType.String).Value = StrOrderNumber;
-                                                cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
-                                                cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
-                                                cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
+                                                cmd.Parameters.Add("@col_Use_P_Type", DbType.String).Value = ProductInfo.ProductType;
+                                                cmd.Parameters.Add("@col_Use_P_Num", DbType.String).Value = ProductInfo.ProductNumber;
+                                                cmd.Parameters.Add("@col_Use_O_Num", DbType.String).Value = ProductInfo.OrderNumber;
+                                                cmd.Parameters.Add("@col_Person", DbType.String).Value = ProductInfo.Person;
+                                                cmd.Parameters.Add("@col_RegDate", DbType.String).Value = ProductInfo.RegDate;
+                                                cmd.Parameters.Add("@col_Comment", DbType.String).Value = ProductInfo.Comment;
 
                                                 cmd.ExecuteNonQuery();
                                             }
 
-                                            switch (IntPrintType) {
+                                            switch (ProductInfo.PrintType) {
                                                 case 5:
                                                 case 6:
-                                                    _listUsedSubstrate.Add(ArrUseSubstrate[i]);
+                                                    _listUsedSubstrate.Add(_useSubstrate[i]);
                                                     if (substrateNum != null) { _listUsedProductNumber.Add(substrateNum); }
                                                     _listUsedQuantity.Add(useValue);
                                                     break;
@@ -408,9 +388,9 @@ namespace ProductDatabase {
                                             }
                                         }
                                     }
-                                    StrTotalSubstrate = string.IsNullOrEmpty(StrTotalSubstrate)
-                                        ? $"[{ArrUseSubstrate[i]}]{subTotalTemp}"
-                                        : $"{StrTotalSubstrate},[{ArrUseSubstrate[i]}]{subTotalTemp}";
+                                    _totalSubstrate = string.IsNullOrEmpty(_totalSubstrate)
+                                        ? $"[{_useSubstrate[i]}]{subTotalTemp}"
+                                        : $"{_totalSubstrate},[{_useSubstrate[i]}]{subTotalTemp}";
                                     subTotalTemp = string.Empty;
                                 }
                             }
@@ -419,7 +399,7 @@ namespace ProductDatabase {
                             using (var cmd = con.CreateCommand()) {
                                 cmd.CommandText =
                                     $"""
-                                    UPDATE Product_Reg_{StrProductName}
+                                    UPDATE Product_Reg_{ProductInfo.ProductName}
                                     SET
                                         col_Quantity = @col_Quantity,
                                         col_Person = @col_Person,
@@ -435,19 +415,19 @@ namespace ProductDatabase {
                                         col_Serial_First = @col_Serial_First
                                     """;
 
-                                cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = StrProductType;
-                                cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = StrProductModel;
-                                cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = StrOrderNumber;
-                                cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = StrProductNumber;
-                                cmd.Parameters.Add("@col_Quantity", DbType.String).Value = IntQuantity;
-                                cmd.Parameters.Add("@col_Person", DbType.String).Value = StrPerson;
-                                cmd.Parameters.Add("@col_RegDate", DbType.String).Value = StrRegDate;
-                                cmd.Parameters.Add("@col_Revision", DbType.String).Value = StrRevision;
-                                cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = StrSerialFirstNumber;
-                                cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = StrSerialLastNumber;
-                                cmd.Parameters.Add("@col_Serial_LastNum", DbType.String).Value = IntSerialLastNumber;
-                                cmd.Parameters.Add("@col_Use_Substrate", DbType.String).Value = StrTotalSubstrate;
-                                cmd.Parameters.Add("@col_Comment", DbType.String).Value = StrComment;
+                                cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = ProductInfo.ProductType;
+                                cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = ProductInfo.ProductModel;
+                                cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = ProductInfo.OrderNumber;
+                                cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = ProductInfo.ProductNumber;
+                                cmd.Parameters.Add("@col_Quantity", DbType.String).Value = ProductInfo.Quantity;
+                                cmd.Parameters.Add("@col_Person", DbType.String).Value = ProductInfo.Person;
+                                cmd.Parameters.Add("@col_RegDate", DbType.String).Value = ProductInfo.RegDate;
+                                cmd.Parameters.Add("@col_Revision", DbType.String).Value = ProductInfo.Revision;
+                                cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = ProductInfo.SerialFirst;
+                                cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = ProductInfo.SerialLast;
+                                cmd.Parameters.Add("@col_Serial_LastNum", DbType.String).Value = ProductInfo.SerialLastNumber;
+                                cmd.Parameters.Add("@col_Use_Substrate", DbType.String).Value = _totalSubstrate;
+                                cmd.Parameters.Add("@col_Comment", DbType.String).Value = ProductInfo.Comment;
 
                                 cmd.ExecuteNonQuery();
                             }
@@ -484,16 +464,16 @@ namespace ProductDatabase {
 
                 var findRow = 0;
                 // セル検索
-                foreach (var cell in workSheetMain.Search(StrProductModel)) {
+                foreach (var cell in workSheetMain.Search(ProductInfo.ProductModel)) {
                     findRow = cell.Address.RowNumber;
                 }
 
                 if (findRow == 0) {
-                    throw new Exception($"Configに品目番号:{StrProductModel}が見つかりません。");
+                    throw new Exception($"Configに品目番号:{ProductInfo.ProductModel}が見つかりません。");
                 }
 
                 // ワークシートのセルから値を取得
-                sheetName = StrProductModel;
+                sheetName = ProductInfo.ProductModel;
                 productName = workSheetMain.Cell(findRow, 2).Value.ToString();
                 productNameRange = workSheetMain.Cell(findRow, 3).Value.ToString();
                 productNumberRange = workSheetMain.Cell(findRow, 4).Value.ToString();
@@ -508,14 +488,14 @@ namespace ProductDatabase {
 
                 var workSheetTemp = workBook.Worksheet(sheetName);
                 workSheetTemp.Cell(productNameRange).Value = productName;
-                workSheetTemp.Cell(productNumberRange).Value = StrProductNumber;
-                workSheetTemp.Cell(orderNumberRange).Value = StrOrderNumber;
-                workSheetTemp.Cell(regDateRange).Value = StrRegDate;
+                workSheetTemp.Cell(productNumberRange).Value = ProductInfo.ProductNumber;
+                workSheetTemp.Cell(orderNumberRange).Value = ProductInfo.OrderNumber;
+                workSheetTemp.Cell(regDateRange).Value = ProductInfo.RegDate;
                 workSheetTemp.Cell(productModelRange).Value = productModel;
-                workSheetTemp.Cell(quantityRange).Value = IntQuantity;
-                workSheetTemp.Cell(serialFirstRange).Value = StrSerialFirstNumber;
-                workSheetTemp.Cell(serialLastRange).Value = StrSerialLastNumber;
-                workSheetTemp.Cell(commentRange).Value = StrComment;
+                workSheetTemp.Cell(quantityRange).Value = ProductInfo.Quantity;
+                workSheetTemp.Cell(serialFirstRange).Value = ProductInfo.SerialFirst;
+                workSheetTemp.Cell(serialLastRange).Value = ProductInfo.SerialLast;
+                workSheetTemp.Cell(commentRange).Value = ProductInfo.Comment;
 
                 var i = 0;
                 var findColumn = 0;
