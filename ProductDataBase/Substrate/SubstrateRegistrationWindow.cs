@@ -170,9 +170,11 @@ namespace ProductDatabase {
                             MessageBox.Show("登録完了 続けて印刷します。");
                             PrintBarcode(1);
                             PrintButton.Enabled = true;
+                            break;
                         }
-                        else if (DefectNumberCheckBox.Checked) {
+                        if (DefectNumberCheckBox.Checked) {
                             MessageBox.Show("登録完了");
+                            break;
                         }
                         break;
                     default:
@@ -535,24 +537,15 @@ namespace ProductDatabase {
                     break;
                 case "QuantityCheckBox":
                     QuantityTextBox.Enabled = checkBox.Checked;
-                    if (checkBox.Checked) {
-                        DefectNumberCheckBox.Checked = false;
-                    }
-
+                    if (checkBox.Checked) { DefectNumberCheckBox.Checked = false; }
                     break;
                 case "DefectNumberCheckBox":
                     DefectNumberTextBox.Enabled = checkBox.Checked;
-                    if (checkBox.Checked) {
-                        QuantityCheckBox.Checked = false;
-                    }
-
+                    if (checkBox.Checked) { QuantityCheckBox.Checked = false; }
                     break;
                 case "RevisionCheckBox":
                     RevisionTextBox.Enabled = checkBox.Checked;
-                    if (checkBox.Checked) {
-                        MessageBox.Show("変更する場合は理由を記載して下さい。");
-                    }
-
+                    if (checkBox.Checked) { MessageBox.Show("変更する場合は理由を記載して下さい。"); }
                     break;
                 case "ExtraCheckBox1":
                     ExtraTextBox1.Enabled = checkBox.Checked;
