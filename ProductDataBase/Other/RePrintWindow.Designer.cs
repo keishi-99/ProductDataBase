@@ -104,7 +104,6 @@
             CommentTextBox.Multiline = true;
             CommentTextBox.Name = "CommentTextBox";
             CommentTextBox.ScrollBars = ScrollBars.Vertical;
-            CommentTextBox.ShortcutsEnabled = false;
             CommentTextBox.Size = new Size(150, 175);
             CommentTextBox.TabIndex = 114;
             // 
@@ -127,7 +126,6 @@
             ExtraTextBox6.Margin = new Padding(0);
             ExtraTextBox6.MaxLength = 20;
             ExtraTextBox6.Name = "ExtraTextBox6";
-            ExtraTextBox6.ShortcutsEnabled = false;
             ExtraTextBox6.Size = new Size(120, 23);
             ExtraTextBox6.TabIndex = 112;
             ExtraTextBox6.TextAlign = HorizontalAlignment.Right;
@@ -152,7 +150,6 @@
             ExtraTextBox5.Margin = new Padding(0);
             ExtraTextBox5.MaxLength = 20;
             ExtraTextBox5.Name = "ExtraTextBox5";
-            ExtraTextBox5.ShortcutsEnabled = false;
             ExtraTextBox5.Size = new Size(120, 23);
             ExtraTextBox5.TabIndex = 110;
             ExtraTextBox5.TextAlign = HorizontalAlignment.Right;
@@ -177,7 +174,6 @@
             ExtraTextBox4.Margin = new Padding(0);
             ExtraTextBox4.MaxLength = 20;
             ExtraTextBox4.Name = "ExtraTextBox4";
-            ExtraTextBox4.ShortcutsEnabled = false;
             ExtraTextBox4.Size = new Size(120, 23);
             ExtraTextBox4.TabIndex = 108;
             ExtraTextBox4.TextAlign = HorizontalAlignment.Right;
@@ -247,7 +243,6 @@
             FirstSerialNumberTextBox.Margin = new Padding(0);
             FirstSerialNumberTextBox.MaxLength = 20;
             FirstSerialNumberTextBox.Name = "FirstSerialNumberTextBox";
-            FirstSerialNumberTextBox.ShortcutsEnabled = false;
             FirstSerialNumberTextBox.Size = new Size(120, 23);
             FirstSerialNumberTextBox.TabIndex = 102;
             FirstSerialNumberTextBox.TextAlign = HorizontalAlignment.Right;
@@ -271,7 +266,6 @@
             ExtraTextBox3.Margin = new Padding(0);
             ExtraTextBox3.MaxLength = 20;
             ExtraTextBox3.Name = "ExtraTextBox3";
-            ExtraTextBox3.ShortcutsEnabled = false;
             ExtraTextBox3.Size = new Size(120, 23);
             ExtraTextBox3.TabIndex = 100;
             ExtraTextBox3.TextAlign = HorizontalAlignment.Right;
@@ -296,7 +290,6 @@
             ExtraTextBox2.Margin = new Padding(0);
             ExtraTextBox2.MaxLength = 20;
             ExtraTextBox2.Name = "ExtraTextBox2";
-            ExtraTextBox2.ShortcutsEnabled = false;
             ExtraTextBox2.Size = new Size(120, 23);
             ExtraTextBox2.TabIndex = 98;
             ExtraTextBox2.TextAlign = HorizontalAlignment.Right;
@@ -321,7 +314,6 @@
             RevisionTextBox.Margin = new Padding(0);
             RevisionTextBox.MaxLength = 4;
             RevisionTextBox.Name = "RevisionTextBox";
-            RevisionTextBox.ShortcutsEnabled = false;
             RevisionTextBox.Size = new Size(120, 23);
             RevisionTextBox.TabIndex = 96;
             RevisionTextBox.TextAlign = HorizontalAlignment.Right;
@@ -345,7 +337,6 @@
             ExtraTextBox1.Margin = new Padding(0);
             ExtraTextBox1.MaxLength = 4;
             ExtraTextBox1.Name = "ExtraTextBox1";
-            ExtraTextBox1.ShortcutsEnabled = false;
             ExtraTextBox1.Size = new Size(120, 23);
             ExtraTextBox1.TabIndex = 94;
             ExtraTextBox1.TextAlign = HorizontalAlignment.Right;
@@ -370,7 +361,6 @@
             QuantityTextBox.Margin = new Padding(0);
             QuantityTextBox.MaxLength = 4;
             QuantityTextBox.Name = "QuantityTextBox";
-            QuantityTextBox.ShortcutsEnabled = false;
             QuantityTextBox.Size = new Size(120, 23);
             QuantityTextBox.TabIndex = 92;
             QuantityTextBox.TextAlign = HorizontalAlignment.Right;
@@ -418,7 +408,6 @@
             OrderNumberTextBox.Margin = new Padding(0);
             OrderNumberTextBox.MaxLength = 20;
             OrderNumberTextBox.Name = "OrderNumberTextBox";
-            OrderNumberTextBox.ShortcutsEnabled = false;
             OrderNumberTextBox.Size = new Size(120, 23);
             OrderNumberTextBox.TabIndex = 88;
             OrderNumberTextBox.TextAlign = HorizontalAlignment.Right;
