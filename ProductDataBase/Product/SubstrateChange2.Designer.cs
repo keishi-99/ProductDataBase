@@ -1157,7 +1157,6 @@
             RevisionTextBox.Margin = new Padding(0);
             RevisionTextBox.MaxLength = 4;
             RevisionTextBox.Name = "RevisionTextBox";
-            RevisionTextBox.ShortcutsEnabled = false;
             RevisionTextBox.Size = new Size(110, 23);
             RevisionTextBox.TabIndex = 69;
             RevisionTextBox.TextAlign = HorizontalAlignment.Right;
@@ -1180,7 +1179,6 @@
             CommentTextBox.Multiline = true;
             CommentTextBox.Name = "CommentTextBox";
             CommentTextBox.ScrollBars = ScrollBars.Vertical;
-            CommentTextBox.ShortcutsEnabled = false;
             CommentTextBox.Size = new Size(214, 88);
             CommentTextBox.TabIndex = 78;
             // 
