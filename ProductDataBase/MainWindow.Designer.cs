@@ -44,7 +44,8 @@
             this.QRCodePanel = new Panel();
             this.QRCodeButton = new Button();
             this.QRCodeTextBox = new TextBox();
-            this.QRCodeCheckBox = new CheckBox();
+            this.RadioButtonBarcode = new RadioButton();
+            this.RadioButtonQR = new RadioButton();
             this.MainWindowMenuStrip.SuspendLayout();
             this.FontSizePanel.SuspendLayout();
             this.QRCodePanel.SuspendLayout();
@@ -164,7 +165,7 @@
             // HistoryButton
             // 
             this.HistoryButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            this.HistoryButton.Location = new Point(392, 344);
+            this.HistoryButton.Location = new Point(392, 354);
             this.HistoryButton.Name = "HistoryButton";
             this.HistoryButton.Size = new Size(75, 25);
             this.HistoryButton.TabIndex = 8;
@@ -175,7 +176,7 @@
             // RegisterButton
             // 
             this.RegisterButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            this.RegisterButton.Location = new Point(567, 344);
+            this.RegisterButton.Location = new Point(567, 354);
             this.RegisterButton.Name = "RegisterButton";
             this.RegisterButton.Size = new Size(75, 25);
             this.RegisterButton.TabIndex = 9;
@@ -246,17 +247,19 @@
             // 
             this.QRCodePanel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.QRCodePanel.BorderStyle = BorderStyle.FixedSingle;
+            this.QRCodePanel.Controls.Add(this.RadioButtonBarcode);
+            this.QRCodePanel.Controls.Add(this.RadioButtonQR);
             this.QRCodePanel.Controls.Add(this.QRCodeButton);
             this.QRCodePanel.Controls.Add(this.QRCodeTextBox);
             this.QRCodePanel.Location = new Point(42, 333);
             this.QRCodePanel.Name = "QRCodePanel";
-            this.QRCodePanel.Size = new Size(218, 46);
+            this.QRCodePanel.Size = new Size(218, 56);
             this.QRCodePanel.TabIndex = 500;
             // 
             // QRCodeButton
             // 
             this.QRCodeButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            this.QRCodeButton.Location = new Point(124, 16);
+            this.QRCodeButton.Location = new Point(124, 28);
             this.QRCodeButton.Name = "QRCodeButton";
             this.QRCodeButton.Size = new Size(75, 23);
             this.QRCodeButton.TabIndex = 602;
@@ -266,31 +269,40 @@
             // 
             // QRCodeTextBox
             // 
-            this.QRCodeTextBox.Location = new Point(18, 16);
+            this.QRCodeTextBox.Location = new Point(18, 28);
             this.QRCodeTextBox.MaxLength = 50;
             this.QRCodeTextBox.Name = "QRCodeTextBox";
             this.QRCodeTextBox.Size = new Size(100, 23);
             this.QRCodeTextBox.TabIndex = 601;
             this.QRCodeTextBox.KeyDown += this.QRCodeTextBox_KeyDown;
             // 
-            // QRCodeCheckBox
+            // RadioButtonBarcode
             // 
-            this.QRCodeCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            this.QRCodeCheckBox.Checked = true;
-            this.QRCodeCheckBox.CheckState = CheckState.Checked;
-            this.QRCodeCheckBox.Location = new Point(61, 325);
-            this.QRCodeCheckBox.Name = "QRCodeCheckBox";
-            this.QRCodeCheckBox.Size = new Size(69, 19);
-            this.QRCodeCheckBox.TabIndex = 501;
-            this.QRCodeCheckBox.Text = "QRコード";
-            this.QRCodeCheckBox.UseVisualStyleBackColor = true;
+            this.RadioButtonBarcode.AutoSize = true;
+            this.RadioButtonBarcode.Location = new Point(97, 3);
+            this.RadioButtonBarcode.Name = "RadioButtonBarcode";
+            this.RadioButtonBarcode.Size = new Size(97, 19);
+            this.RadioButtonBarcode.TabIndex = 606;
+            this.RadioButtonBarcode.Text = "手配管理番号";
+            this.RadioButtonBarcode.UseVisualStyleBackColor = true;
+            // 
+            // RadioButtonQR
+            // 
+            this.RadioButtonQR.AutoSize = true;
+            this.RadioButtonQR.Checked = true;
+            this.RadioButtonQR.Location = new Point(23, 3);
+            this.RadioButtonQR.Name = "RadioButtonQR";
+            this.RadioButtonQR.Size = new Size(68, 19);
+            this.RadioButtonQR.TabIndex = 605;
+            this.RadioButtonQR.TabStop = true;
+            this.RadioButtonQR.Text = "QRコード";
+            this.RadioButtonQR.UseVisualStyleBackColor = true;
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(684, 381);
-            this.Controls.Add(this.QRCodeCheckBox);
+            this.ClientSize = new Size(684, 391);
             this.Controls.Add(this.QRCodePanel);
             this.Controls.Add(this.FontSizePanel);
             this.Controls.Add(this.RegisterButton);
@@ -342,7 +354,8 @@
         private RadioButton FontSize12RadioButton;
         private Panel QRCodePanel;
         private TextBox QRCodeTextBox;
-        private CheckBox QRCodeCheckBox;
         private Button QRCodeButton;
+        private RadioButton RadioButtonBarcode;
+        private RadioButton RadioButtonQR;
     }
 }
