@@ -122,15 +122,15 @@ namespace ProductDatabase {
 
                 RegisterButton.Enabled = false;
 
-                using ProductRegistration2Window window = new();
                 ProductInfo.OrderNumber = OrderNumberTextBox.Text;
                 ProductInfo.ProductNumber = ManufacturingNumberMaskedTextBox.Text;
                 ProductInfo.RegDate = RegistrationDateMaskedTextBox.Text;
                 ProductInfo.Person = PersonComboBox.Text;
                 ProductInfo.Revision = RevisionTextBox.Text;
                 ProductInfo.Comment = CommentTextBox.Text;
-                ProductInfo.Quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
-                ProductInfo.SerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception());
+                ProductInfo.Quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception("QuantityTextBox.Text is null"));
+                ProductInfo.SerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception("FirstSerialNumberTextBox.Text is null"));
+                using ProductRegistration2Window window = new();
                 window.ProductInfo = ProductInfo;
                 window.ShowDialog(this);
                 Close();

@@ -79,7 +79,6 @@ namespace ProductDatabase {
 
         // 基板変更フォームを開く
         private void OpenSubstrateChangeWindow() {
-            using SubstrateChange2 window = new();
 
             var i = SubstrateChangeDataGridView.SelectedCells[0].RowIndex;
 
@@ -94,6 +93,7 @@ namespace ProductDatabase {
             ProductInfo.UsedSubstrate = SubstrateChangeDataGridView.Rows[i].Cells[13].Value.ToString() ?? string.Empty;
             ProductInfo.Quantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells[5].Value);
             ProductInfo.SerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells[11].Value);
+            using SubstrateChange2 window = new();
             window.ProductInfo = ProductInfo;
             window.ShowDialog(this);
             Close();
