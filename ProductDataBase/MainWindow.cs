@@ -406,10 +406,10 @@ namespace ProductDatabase {
             try {
                 ResetFieldsForCodeScan();
 
-                if (QRCodeCheckBox.Checked) {
+                if (RadioButtonQR.Checked) {
                     ParseQRCodeInput();
                 }
-                else {
+                else if (RadioButtonBarcode.Checked) {
                     BarcodeInput();
                 }
 
@@ -465,7 +465,7 @@ namespace ProductDatabase {
                     ProductInfo.Proness5 = dr["請求先注番"].ToString() ?? string.Empty;
                 }
             }
-            if (string.IsNullOrEmpty(ProductInfo.Proness1)) { throw new Exception($"一致する情報がありません。{Environment.NewLine}手配製番:{ProductInfo.Proness1}"); }
+            if (string.IsNullOrEmpty(ProductInfo.Proness1)) { throw new Exception($"一致する情報がありません。{Environment.NewLine}手配管理番号:{QRCodeTextBox.Text}"); }
         }
         private void ProcessCategoryItemData() {
             ProductInfo.Proness2 = ProductInfo.Proness2
