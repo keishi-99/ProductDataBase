@@ -325,7 +325,6 @@ namespace ProductDatabase {
                     case 5:
                     case 6:
                     case 7:
-                    case 8:
                         swLabel = new StreamWriter(_strLabelSettingFilePath, false, new System.Text.UTF8Encoding(false));
                         serializerLabel.Serialize(swLabel, SettingsLabelPro);
                         swLabel?.Close();
@@ -343,6 +342,7 @@ namespace ProductDatabase {
                         serializerBarcode.Serialize(swBarcode, SettingsBarcodePro);
                         swBarcode?.Close();
                         break;
+                    case 8:
                     default:
                         break;
                 }
