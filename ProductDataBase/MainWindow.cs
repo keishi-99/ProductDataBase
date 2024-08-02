@@ -109,7 +109,7 @@ namespace ProductDatabase {
             try {
                 // その日のbakファイルがない場合バックアップ作成
                 var d = DateTime.Now;
-                var bakFilepath = $".\\bak\\{d.Year}\\_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db";
+                var bakFilepath = $".\\bak\\{d.Year}\\{d.Month:00}\\_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db";
 
                 if (!File.Exists(bakFilepath)) {
                     var filepath = "./db/registration.db";
