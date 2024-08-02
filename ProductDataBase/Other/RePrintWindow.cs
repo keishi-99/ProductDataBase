@@ -399,11 +399,11 @@ namespace ProductDatabase {
                             if (intCountNumLabels <= 0) {
                                 e.HasMorePages = false;
                                 _labelProPageNum = 0;
-                                var txtNumPublish = 0;
-                                _labelProNumLabelsToPrint = txtNumPublish;
+                                _labelProNumLabelsToPrint = 0;
                                 return;
                             }
                             else {
+                                _labelProNSerial -= x + 1;
                                 _labelProNumLabelsToPrint += x + 1;
                                 break;
                             }
