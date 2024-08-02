@@ -365,7 +365,7 @@ namespace ProductDatabase {
                         : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
                 }
                 else {
-                    offset = new Point(0, 0);
+                    offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
                 }
 
                 e.PageSettings.Margins.Left = 0;
