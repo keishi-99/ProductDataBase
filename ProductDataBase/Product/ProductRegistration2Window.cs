@@ -1048,7 +1048,7 @@ namespace ProductDatabase {
                         : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
                 }
                 else {
-                    offset = new Point(0, 0);
+                    offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
                 }
 
                 e.PageSettings.Margins.Left = 0;
@@ -1057,10 +1057,10 @@ namespace ProductDatabase {
                 headerPos.Offset(offset);
                 e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
 
-                var pageNum = 0;
-                offset = pageNum == 0
-                    ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (startLine * (intervalY + sizeY))))
-                    : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
+                //var pageNum = 0;
+                //offset = pageNum == 0
+                //    ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (startLine * (intervalY + sizeY))))
+                //    : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
 
                 if (labelProPageNum == 0) { _labelProNSerial = ProductInfo.SerialFirstNumber; }
                 if (labelProPageNum >= 1) { startLine = 0; }
