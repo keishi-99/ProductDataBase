@@ -244,7 +244,6 @@ namespace ProductDatabase {
                         バーコード印刷プレビューToolStripMenuItem.Enabled = false;
                         シリアルラベル印刷設定ToolStripMenuItem.Enabled = true;
                         バーコード印刷設定ToolStripMenuItem.Enabled = false;
-                        LoadSettings(_strLabelSettingFilePath, _strBarcodeSettingFilePath);
                         break;
                     case 2:
                         SettingsBarcodePro = new CSettingsBarcodePro();
@@ -258,7 +257,6 @@ namespace ProductDatabase {
                         バーコード印刷プレビューToolStripMenuItem.Enabled = true;
                         シリアルラベル印刷設定ToolStripMenuItem.Enabled = false;
                         バーコード印刷設定ToolStripMenuItem.Enabled = true;
-                        LoadSettings(_strLabelSettingFilePath, _strBarcodeSettingFilePath);
                         break;
                     case 3:
                         SettingsLabelPro = new CSettingsLabelPro();
@@ -274,12 +272,8 @@ namespace ProductDatabase {
                         バーコード印刷プレビューToolStripMenuItem.Enabled = true;
                         シリアルラベル印刷設定ToolStripMenuItem.Enabled = true;
                         バーコード印刷設定ToolStripMenuItem.Enabled = true;
-                        LoadSettings(_strLabelSettingFilePath, _strBarcodeSettingFilePath);
                         break;
                     case 8:
-                        SettingsLabelPro = new CSettingsLabelPro();
-                        _strLabelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
-
                         SerialPrintPostionNumericUpDown.Enabled = false;
                         BarcodePrintPostionNumericUpDown.Enabled = false;
                         シリアルラベル印刷ToolStripMenuItem.Enabled = false;
@@ -288,12 +282,12 @@ namespace ProductDatabase {
                         バーコード印刷プレビューToolStripMenuItem.Enabled = false;
                         シリアルラベル印刷設定ToolStripMenuItem.Enabled = true;
                         バーコード印刷設定ToolStripMenuItem.Enabled = false;
-                        LoadSettings(_strLabelSettingFilePath, _strBarcodeSettingFilePath);
                         break;
                     default:
                         break;
                 }
 
+                LoadSettings(_strLabelSettingFilePath, _strBarcodeSettingFilePath);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
