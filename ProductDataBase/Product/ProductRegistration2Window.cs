@@ -1037,15 +1037,16 @@ namespace ProductDatabase {
 
                 Point offset;
                 const double MM_PER_HUNDREDTH_INCH = 0.254;
+                //if (true) {
                 if (!ProductRegistration2PrintDocument.PrintController.IsPreview) {
                     offsetX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
                     offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
                     offset = labelProPageNum == 0
-                        ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (startLine * (intervalY + sizeY))))
-                        : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
+                        ? new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * 0.254)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * 0.254) + (startLine * (intervalY + sizeY))))
+                        : new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * 0.254)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * 0.254) + (0 * (intervalY + sizeY))));
                 }
                 else {
-                    offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
+                    offset = new Point(0, 0);
                 }
 
                 e.PageSettings.Margins.Left = 0;
@@ -1053,11 +1054,6 @@ namespace ProductDatabase {
 
                 headerPos.Offset(offset);
                 e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
-
-                //var pageNum = 0;
-                //offset = pageNum == 0
-                //    ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (startLine * (intervalY + sizeY))))
-                //    : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
 
                 if (labelProPageNum == 0) { _labelProNSerial = ProductInfo.SerialFirstNumber; }
                 if (labelProPageNum >= 1) { startLine = 0; }
