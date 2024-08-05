@@ -381,12 +381,13 @@ namespace ProductDatabase {
                 var intervalY = SettingsLabelSub.LabelSubPageSettings.IntervalY;
                 var headerPos = SettingsLabelSub.LabelSubPageSettings.HeaderPos;
                 Point offset;
+                const double MM_PER_HUNDREDTH_INCH = 0.254;
                 if (!SubstrateRegistrationPrintDocument.PrintController.IsPreview) {
                     offsetX -= e.PageSettings.HardMarginX * 0.254;
                     offsetY -= e.PageSettings.HardMarginY * 0.254;
                     offset = _labelSubPageNum == 0
-                        ? new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * 0.254)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * 0.254) + (startLine * (intervalY + sizeY))))
-                        : new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * 0.254)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * 0.254) + (0 * (intervalY + sizeY))));
+                        ? new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
+                        : new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
                 else {
                     offset = new Point(0, 0);
