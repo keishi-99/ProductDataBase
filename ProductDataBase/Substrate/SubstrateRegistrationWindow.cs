@@ -509,12 +509,7 @@ namespace ProductDatabase {
                     var stringPosX = (int)((labelImage.Width / 2) - (stringSize.Width / 2));
                     var stringPosY = (int)((decimal)SettingsLabelSub.LabelSubLabelSettings.StringPosY / 25.4M * resolution * magnitude);
 
-                    var stringFormat = new StringFormat {
-                        Alignment = StringAlignment.Center,
-                        LineAlignment = StringAlignment.Center
-                    };
-
-                    g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY, stringFormat);
+                    g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
                 }
 
                 g.Dispose();
