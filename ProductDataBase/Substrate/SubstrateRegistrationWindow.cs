@@ -380,22 +380,20 @@ namespace ProductDatabase {
                 var offsetY = SettingsLabelSub.LabelSubPageSettings.OffsetY;
                 var intervalY = SettingsLabelSub.LabelSubPageSettings.IntervalY;
                 var headerPos = SettingsLabelSub.LabelSubPageSettings.HeaderPos;
-                Point offset;
                 const double MM_PER_HUNDREDTH_INCH = 0.254;
                 if (!SubstrateRegistrationPrintDocument.PrintController.IsPreview) {
                     offsetX -= e.PageSettings.HardMarginX * 0.254;
                     offsetY -= e.PageSettings.HardMarginY * 0.254;
-                    offset = _labelSubPageNum == 0
+                    headerPos = _labelSubPageNum == 0
                         ? new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
                         : new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
                 else {
-                    offset = new Point(0, 0);
+                    headerPos = new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))));
                 }
 
                 e.PageSettings.Margins.Left = 0;
                 e.PageSettings.Margins.Top = 0;
-                headerPos.Offset(offset);
 
                 var headerString = ConvertHeaderFooterString(SettingsLabelSub.LabelSubPageSettings.HeaderString);
                 e.Graphics.DrawString(headerString, SettingsLabelSub.LabelSubPageSettings.HeaderFooterFont, Brushes.Black, headerPos);
