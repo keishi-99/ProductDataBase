@@ -320,19 +320,19 @@ namespace ProductDatabase {
                 switch (_strSerialType) {
                     case "Label":
                         if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnullです。"); }
-                        maxX = SettingsLabelPro._labelProPageSettings.NumLabelsX;
-                        maxY = SettingsLabelPro._labelProPageSettings.NumLabelsY;
-                        sizeX = (float)SettingsLabelPro._labelProPageSettings.SizeX;
-                        sizeY = (float)SettingsLabelPro._labelProPageSettings.SizeY;
-                        offsetX = SettingsLabelPro._labelProPageSettings.OffsetX;
-                        offsetY = SettingsLabelPro._labelProPageSettings.OffsetY;
-                        intervalX = SettingsLabelPro._labelProPageSettings.IntervalX;
-                        intervalY = SettingsLabelPro._labelProPageSettings.IntervalY;
-                        headerPos = SettingsLabelPro._labelProPageSettings.HeaderPos;
-                        headerString = ConvertHeaderFooterString(SettingsLabelPro._labelProPageSettings.HeaderString);
-                        headerFooterFont = SettingsLabelPro._labelProPageSettings.HeaderFooterFont;
-                        intNumLabels = SettingsLabelPro._labelProLabelSettings.NumLabels;
-                        intCountNumLabels = SettingsLabelPro._labelProLabelSettings.NumLabels;
+                        maxX = SettingsLabelPro.LabelProPageSettings.NumLabelsX;
+                        maxY = SettingsLabelPro.LabelProPageSettings.NumLabelsY;
+                        sizeX = (float)SettingsLabelPro.LabelProPageSettings.SizeX;
+                        sizeY = (float)SettingsLabelPro.LabelProPageSettings.SizeY;
+                        offsetX = SettingsLabelPro.LabelProPageSettings.OffsetX;
+                        offsetY = SettingsLabelPro.LabelProPageSettings.OffsetY;
+                        intervalX = SettingsLabelPro.LabelProPageSettings.IntervalX;
+                        intervalY = SettingsLabelPro.LabelProPageSettings.IntervalY;
+                        headerPos = SettingsLabelPro.LabelProPageSettings.HeaderPos;
+                        headerString = ConvertHeaderFooterString(SettingsLabelPro.LabelProPageSettings.HeaderString);
+                        headerFooterFont = SettingsLabelPro.LabelProPageSettings.HeaderFooterFont;
+                        intNumLabels = SettingsLabelPro.LabelProLabelSettings.NumLabels;
+                        intCountNumLabels = SettingsLabelPro.LabelProLabelSettings.NumLabels;
                         break;
                     case "Barcode":
                         if (SettingsBarcodePro == null) { throw new Exception("SettingsBarcodeProがnullです。"); }
@@ -452,7 +452,7 @@ namespace ProductDatabase {
             };
 
             var outputCode = _strSerialType switch {
-                "Label" => SettingsLabelPro._labelProLabelSettings.Format,
+                "Label" => SettingsLabelPro.LabelProLabelSettings.Format,
                 "Barcode" => SettingsBarcodePro.BarcodeProLabelSettings.Format,
                 _ => string.Empty
             };
@@ -479,12 +479,12 @@ namespace ProductDatabase {
             switch (_strSerialType) {
                 case "Label":
                     if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnull"); }
-                    sizeX = (decimal)SettingsLabelPro._labelProPageSettings.SizeX / 25.4M * resolution * magnitude;
-                    sizeY = (decimal)SettingsLabelPro._labelProPageSettings.SizeY / 25.4M * resolution * magnitude;
-                    fontSize = (decimal)SettingsLabelPro._labelProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
-                    stringPosY = (int)((decimal)SettingsLabelPro._labelProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
+                    sizeX = (decimal)SettingsLabelPro.LabelProPageSettings.SizeX / 25.4M * resolution * magnitude;
+                    sizeY = (decimal)SettingsLabelPro.LabelProPageSettings.SizeY / 25.4M * resolution * magnitude;
+                    fontSize = (decimal)SettingsLabelPro.LabelProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
+                    stringPosY = (int)((decimal)SettingsLabelPro.LabelProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
                     var style = _fontUnderbar ? FontStyle.Underline : FontStyle.Regular;
-                    fnt = new Font(SettingsLabelPro._labelProLabelSettings.Font.Name, (float)fontSize, style);
+                    fnt = new Font(SettingsLabelPro.LabelProLabelSettings.Font.Name, (float)fontSize, style);
 
                     labelImage = new((int)sizeX, (int)sizeY);
                     g = Graphics.FromImage(labelImage);

@@ -14,7 +14,7 @@ namespace ProductDatabase {
         }
 
         private void PageSettingsLabelLoad(object sender, EventArgs e) {
-            _labelProPageSettings = ((ProductRegistration2Window)Owner!).SettingsLabelPro!._labelProPageSettings;
+            _labelProPageSettings = ((ProductRegistration2Window)Owner!).SettingsLabelPro!.LabelProPageSettings;
             LabelWidthTextBox.Text = _labelProPageSettings.SizeX.ToString();
             LabelHeightTextBox.Text = _labelProPageSettings.SizeY.ToString();
             QuantityXTextBox.Text = _labelProPageSettings.NumLabelsX.ToString();
@@ -32,7 +32,7 @@ namespace ProductDatabase {
                 HeaderFooterFontTextBox.Text = $"{HeaderFontDialog.Font.Name} {HeaderFontDialog.Font.SizeInPoints}pt";
             }
 
-            _labelProLabelSettings = ((ProductRegistration2Window)Owner).SettingsLabelPro!._labelProLabelSettings;
+            _labelProLabelSettings = ((ProductRegistration2Window)Owner).SettingsLabelPro!.LabelProLabelSettings;
             PrintTextHeightTextBox.Text = _labelProLabelSettings.BarcodeHeight.ToString();
             PrintTextMagnitudeTextBox.Text = _labelProLabelSettings.BarcodeMagnitude.ToString();
             PrintTextQuantityTextBox.Text = _labelProLabelSettings.NumLabels.ToString();
