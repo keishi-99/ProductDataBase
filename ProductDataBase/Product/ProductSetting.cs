@@ -3,12 +3,12 @@ using System.Xml.Serialization;
 
 namespace ProductDatabase.Product {
     public class CSettingsLabelPro {
-        public CLabelProPageSettings _labelProPageSettings { get; set; }
-        public CLabelProLabelSettings _labelProLabelSettings { get; set; }
+        public CLabelProPageSettings LabelProPageSettings { get; set; }
+        public CLabelProLabelSettings LabelProLabelSettings { get; set; }
 
         public CSettingsLabelPro() {
-            _labelProPageSettings = new CLabelProPageSettings();
-            _labelProLabelSettings = new CLabelProLabelSettings();
+            LabelProPageSettings = new CLabelProPageSettings();
+            LabelProLabelSettings = new CLabelProLabelSettings();
         }
     }
 
@@ -34,12 +34,12 @@ namespace ProductDatabase.Product {
             set => HeaderFooterFont = ConvertFromString<Font>(value);
         }
 
-        public static string ConvertToString<T>(T value) {
-            return TypeDescriptor.GetConverter(typeof(T)).ConvertToString(value)!;
+        public static string ConvertToString<tValue>(tValue value) {
+            return TypeDescriptor.GetConverter(typeof(tValue)).ConvertToString(value)!;
         }
 
-        public static T ConvertFromString<T>(string value) {
-            return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(value)!;
+        public static tValue ConvertFromString<tValue>(string value) {
+            return (tValue)TypeDescriptor.GetConverter(typeof(tValue)).ConvertFromString(value)!;
         }
     }
 
@@ -63,12 +63,12 @@ namespace ProductDatabase.Product {
             set => Font = ConvertFromString<Font>(value);
         }
 
-        public static string ConvertToString<T>(T value) {
-            return TypeDescriptor.GetConverter(typeof(T)).ConvertToString(value)!;
+        public static string ConvertToString<tValue>(tValue value) {
+            return TypeDescriptor.GetConverter(typeof(tValue)).ConvertToString(value)!;
         }
 
-        public static T ConvertFromString<T>(string value) {
-            return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(value)!;
+        public static tValue ConvertFromString<tValue>(string value) {
+            return (tValue)TypeDescriptor.GetConverter(typeof(tValue)).ConvertFromString(value)!;
         }
     }
 }
