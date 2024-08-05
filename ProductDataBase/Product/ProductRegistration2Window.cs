@@ -1035,23 +1035,21 @@ namespace ProductDatabase {
                         break;
                 }
 
-                Point offset;
                 const double MM_PER_HUNDREDTH_INCH = 0.254;
                 if (!ProductRegistration2PrintDocument.PrintController.IsPreview) {
                     offsetX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
                     offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
-                    offset = labelProPageNum == 0
+                    headerPos = labelProPageNum == 0
                         ? new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
                         : new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
                 else {
-                    offset = new Point(0, 0);
+                    headerPos = new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))));
                 }
 
                 e.PageSettings.Margins.Left = 0;
                 e.PageSettings.Margins.Top = 0;
 
-                headerPos.Offset(offset);
                 e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
 
                 if (labelProPageNum == 0) { _labelProNSerial = ProductInfo.SerialFirstNumber; }
