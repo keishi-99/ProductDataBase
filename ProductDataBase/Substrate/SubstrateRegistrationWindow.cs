@@ -1,6 +1,7 @@
 ﻿using ProductDatabase.Substrate;
 using System.Data;
 using System.Data.SQLite;
+using System.Drawing.Printing;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
@@ -380,22 +381,28 @@ namespace ProductDatabase {
                 var offsetY = SettingsLabelSub.LabelSubPageSettings.OffsetY;
                 var intervalY = SettingsLabelSub.LabelSubPageSettings.IntervalY;
                 var headerPos = SettingsLabelSub.LabelSubPageSettings.HeaderPos;
+                var offset = new Point(0, 0);
                 const double MM_PER_HUNDREDTH_INCH = 0.254;
-                if (!SubstrateRegistrationPrintDocument.PrintController.IsPreview) {
+
+                var pd = (PrintDocument)sender;
+                var bPrintMode = pd.PrintController.IsPreview;
+
+                if (!bPrintMode) {
                     offsetX -= e.PageSettings.HardMarginX * 0.254;
                     offsetY -= e.PageSettings.HardMarginY * 0.254;
-                    headerPos = _labelSubPageNum == 0
-                        ? new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
-                        : new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
+                    offset = _labelSubPageNum == 0
+                        ? new Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
+                        : new Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
                 else {
-                    headerPos = new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))));
+                    offset = new Point(0, 0);
                 }
 
                 e.PageSettings.Margins.Left = 0;
                 e.PageSettings.Margins.Top = 0;
 
                 var headerString = ConvertHeaderFooterString(SettingsLabelSub.LabelSubPageSettings.HeaderString);
+                headerPos.Offset(offset);
                 e.Graphics.DrawString(headerString, SettingsLabelSub.LabelSubPageSettings.HeaderFooterFont, Brushes.Black, headerPos);
                 _labelSubNSerial = ManufacturingNumberMaskedTextBox.Text;
 
