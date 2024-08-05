@@ -1037,13 +1037,12 @@ namespace ProductDatabase {
 
                 Point offset;
                 const double MM_PER_HUNDREDTH_INCH = 0.254;
-                //if (true) {
                 if (!ProductRegistration2PrintDocument.PrintController.IsPreview) {
                     offsetX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
                     offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
                     offset = labelProPageNum == 0
-                        ? new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * 0.254)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * 0.254) + (startLine * (intervalY + sizeY))))
-                        : new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * 0.254)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * 0.254) + (0 * (intervalY + sizeY))));
+                        ? new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
+                        : new Point((int)(headerPos.X - (e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH)), (int)(headerPos.Y - (e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
                 else {
                     offset = new Point(0, 0);
