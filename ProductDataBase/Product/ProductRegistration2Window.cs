@@ -1169,7 +1169,12 @@ namespace ProductDatabase {
 
                     stringPosX = (int)((labelImage.Width / 2) - (stringSize.Width / 2));
 
-                    g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
+                    var stringFormat = new StringFormat {
+                        Alignment = StringAlignment.Center,
+                        LineAlignment = StringAlignment.Center
+                    };
+
+                    g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY, stringFormat);
 
                     g.Dispose();
                     break;
