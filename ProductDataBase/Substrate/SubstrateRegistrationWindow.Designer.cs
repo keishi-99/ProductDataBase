@@ -23,686 +23,686 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SubstrateRegistrationWindow));
-            SubstrateRegistrationMenuStrip = new MenuStrip();
-            ファイルToolStripMenuItem = new ToolStripMenuItem();
-            印刷ToolStripMenuItem = new ToolStripMenuItem();
-            印刷プレビューToolStripMenuItem = new ToolStripMenuItem();
-            終了ToolStripMenuItem = new ToolStripMenuItem();
-            設定ToolStripMenuItem = new ToolStripMenuItem();
-            印刷設定ToolStripMenuItem = new ToolStripMenuItem();
-            ヘルプToolStripMenuItem = new ToolStripMenuItem();
-            取得情報ToolStripMenuItem = new ToolStripMenuItem();
-            ProductNameLabel1 = new Label();
-            ProductNameLabel2 = new Label();
-            SubstrateModelLabel1 = new Label();
-            SubstrateModelLabel2 = new Label();
-            StockLabel1 = new Label();
-            StockLabel2 = new Label();
-            OrderNumberCheckBox = new CheckBox();
-            OrderNumberTextBox = new TextBox();
-            ManufacturingNumberCheckBox = new CheckBox();
-            ManufacturingNumberMaskedTextBox = new MaskedTextBox();
-            QuantityTextBox = new TextBox();
-            QuantityCheckBox = new CheckBox();
-            DefectNumberTextBox = new TextBox();
-            DefectNumberCheckBox = new CheckBox();
-            RevisionTextBox = new TextBox();
-            RevisionCheckBox = new CheckBox();
-            ExtraTextBox1 = new TextBox();
-            ExtraCheckBox1 = new CheckBox();
-            ExtraTextBox2 = new TextBox();
-            ExtraCheckBox2 = new CheckBox();
-            ExtraTextBox3 = new TextBox();
-            ExtraCheckBox3 = new CheckBox();
-            RegistrationDateCheckBox = new CheckBox();
-            RegistrationDateMaskedTextBox = new MaskedTextBox();
-            PersonCheckBox = new CheckBox();
-            PersonComboBox = new ComboBox();
-            ExtraTextBox4 = new TextBox();
-            ExtraCheckBox4 = new CheckBox();
-            ExtraTextBox5 = new TextBox();
-            ExtraCheckBox5 = new CheckBox();
-            ExtraTextBox6 = new TextBox();
-            ExtraCheckBox6 = new CheckBox();
-            CommentCheckBox = new CheckBox();
-            CommentTextBox = new TextBox();
-            CommentComboBox = new ComboBox();
-            TemplateButton = new Button();
-            PrintRowLabel = new Label();
-            PrintPostionNumericUpDown = new NumericUpDown();
-            RegisterButton = new Button();
-            PrintOnlyCheckBox = new CheckBox();
-            PrintButton = new Button();
-            SubstrateRegistrationPrintDialog = new PrintDialog();
-            SubstrateRegistrationPrintDocument = new System.Drawing.Printing.PrintDocument();
-            SubstrateRegistrationPrintPreviewDialog = new PrintPreviewDialog();
-            SubstrateRegistrationMenuStrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)PrintPostionNumericUpDown).BeginInit();
-            SuspendLayout();
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(SubstrateRegistrationWindow));
+            this.SubstrateRegistrationMenuStrip = new MenuStrip();
+            this.ファイルToolStripMenuItem = new ToolStripMenuItem();
+            this.印刷ToolStripMenuItem = new ToolStripMenuItem();
+            this.印刷プレビューToolStripMenuItem = new ToolStripMenuItem();
+            this.終了ToolStripMenuItem = new ToolStripMenuItem();
+            this.設定ToolStripMenuItem = new ToolStripMenuItem();
+            this.印刷設定ToolStripMenuItem = new ToolStripMenuItem();
+            this.ヘルプToolStripMenuItem = new ToolStripMenuItem();
+            this.取得情報ToolStripMenuItem = new ToolStripMenuItem();
+            this.ProductNameLabel1 = new Label();
+            this.ProductNameLabel2 = new Label();
+            this.SubstrateModelLabel1 = new Label();
+            this.SubstrateModelLabel2 = new Label();
+            this.StockLabel1 = new Label();
+            this.StockLabel2 = new Label();
+            this.OrderNumberCheckBox = new CheckBox();
+            this.OrderNumberTextBox = new TextBox();
+            this.ManufacturingNumberCheckBox = new CheckBox();
+            this.ManufacturingNumberMaskedTextBox = new MaskedTextBox();
+            this.QuantityTextBox = new TextBox();
+            this.QuantityCheckBox = new CheckBox();
+            this.DefectNumberTextBox = new TextBox();
+            this.DefectNumberCheckBox = new CheckBox();
+            this.RevisionTextBox = new TextBox();
+            this.RevisionCheckBox = new CheckBox();
+            this.ExtraTextBox1 = new TextBox();
+            this.ExtraCheckBox1 = new CheckBox();
+            this.ExtraTextBox2 = new TextBox();
+            this.ExtraCheckBox2 = new CheckBox();
+            this.ExtraTextBox3 = new TextBox();
+            this.ExtraCheckBox3 = new CheckBox();
+            this.RegistrationDateCheckBox = new CheckBox();
+            this.RegistrationDateMaskedTextBox = new MaskedTextBox();
+            this.PersonCheckBox = new CheckBox();
+            this.PersonComboBox = new ComboBox();
+            this.ExtraTextBox4 = new TextBox();
+            this.ExtraCheckBox4 = new CheckBox();
+            this.ExtraTextBox5 = new TextBox();
+            this.ExtraCheckBox5 = new CheckBox();
+            this.ExtraTextBox6 = new TextBox();
+            this.ExtraCheckBox6 = new CheckBox();
+            this.CommentCheckBox = new CheckBox();
+            this.CommentTextBox = new TextBox();
+            this.CommentComboBox = new ComboBox();
+            this.TemplateButton = new Button();
+            this.PrintRowLabel = new Label();
+            this.PrintPostionNumericUpDown = new NumericUpDown();
+            this.RegisterButton = new Button();
+            this.PrintOnlyCheckBox = new CheckBox();
+            this.PrintButton = new Button();
+            this.SubstrateRegistrationPrintDialog = new PrintDialog();
+            this.SubstrateRegistrationPrintDocument = new System.Drawing.Printing.PrintDocument();
+            this.SubstrateRegistrationPrintPreviewDialog = new PrintPreviewDialog();
+            this.SubstrateRegistrationMenuStrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)this.PrintPostionNumericUpDown).BeginInit();
+            this.SuspendLayout();
             // 
             // SubstrateRegistrationMenuStrip
             // 
-            SubstrateRegistrationMenuStrip.Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            SubstrateRegistrationMenuStrip.Items.AddRange(new ToolStripItem[] { ファイルToolStripMenuItem, 設定ToolStripMenuItem, ヘルプToolStripMenuItem });
-            SubstrateRegistrationMenuStrip.Location = new Point(0, 0);
-            SubstrateRegistrationMenuStrip.Name = "SubstrateRegistrationMenuStrip";
-            SubstrateRegistrationMenuStrip.Size = new Size(630, 24);
-            SubstrateRegistrationMenuStrip.TabIndex = 0;
-            SubstrateRegistrationMenuStrip.Text = "menuStrip";
+            this.SubstrateRegistrationMenuStrip.Font = new Font("Meiryo UI", 9F);
+            this.SubstrateRegistrationMenuStrip.Items.AddRange(new ToolStripItem[] { this.ファイルToolStripMenuItem, this.設定ToolStripMenuItem, this.ヘルプToolStripMenuItem });
+            this.SubstrateRegistrationMenuStrip.Location = new Point(0, 0);
+            this.SubstrateRegistrationMenuStrip.Name = "SubstrateRegistrationMenuStrip";
+            this.SubstrateRegistrationMenuStrip.Size = new Size(630, 24);
+            this.SubstrateRegistrationMenuStrip.TabIndex = 0;
+            this.SubstrateRegistrationMenuStrip.Text = "menuStrip";
             // 
             // ファイルToolStripMenuItem
             // 
-            ファイルToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { 印刷ToolStripMenuItem, 印刷プレビューToolStripMenuItem, 終了ToolStripMenuItem });
-            ファイルToolStripMenuItem.Name = "ファイルToolStripMenuItem";
-            ファイルToolStripMenuItem.Size = new Size(53, 20);
-            ファイルToolStripMenuItem.Text = "ファイル";
+            this.ファイルToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.印刷ToolStripMenuItem, this.印刷プレビューToolStripMenuItem, this.終了ToolStripMenuItem });
+            this.ファイルToolStripMenuItem.Name = "ファイルToolStripMenuItem";
+            this.ファイルToolStripMenuItem.Size = new Size(53, 20);
+            this.ファイルToolStripMenuItem.Text = "ファイル";
             // 
             // 印刷ToolStripMenuItem
             // 
-            印刷ToolStripMenuItem.Name = "印刷ToolStripMenuItem";
-            印刷ToolStripMenuItem.Size = new Size(142, 22);
-            印刷ToolStripMenuItem.Text = "印刷";
-            印刷ToolStripMenuItem.Click += 印刷ToolStripMenuItem_Click;
+            this.印刷ToolStripMenuItem.Name = "印刷ToolStripMenuItem";
+            this.印刷ToolStripMenuItem.Size = new Size(142, 22);
+            this.印刷ToolStripMenuItem.Text = "印刷";
+            this.印刷ToolStripMenuItem.Click += this.印刷ToolStripMenuItem_Click;
             // 
             // 印刷プレビューToolStripMenuItem
             // 
-            印刷プレビューToolStripMenuItem.Name = "印刷プレビューToolStripMenuItem";
-            印刷プレビューToolStripMenuItem.Size = new Size(142, 22);
-            印刷プレビューToolStripMenuItem.Text = "印刷プレビュー";
-            印刷プレビューToolStripMenuItem.Click += 印刷プレビューToolStripMenuItem_Click;
+            this.印刷プレビューToolStripMenuItem.Name = "印刷プレビューToolStripMenuItem";
+            this.印刷プレビューToolStripMenuItem.Size = new Size(142, 22);
+            this.印刷プレビューToolStripMenuItem.Text = "印刷プレビュー";
+            this.印刷プレビューToolStripMenuItem.Click += this.印刷プレビューToolStripMenuItem_Click;
             // 
             // 終了ToolStripMenuItem
             // 
-            終了ToolStripMenuItem.Name = "終了ToolStripMenuItem";
-            終了ToolStripMenuItem.Size = new Size(142, 22);
-            終了ToolStripMenuItem.Text = "終了";
+            this.終了ToolStripMenuItem.Name = "終了ToolStripMenuItem";
+            this.終了ToolStripMenuItem.Size = new Size(142, 22);
+            this.終了ToolStripMenuItem.Text = "終了";
             // 
             // 設定ToolStripMenuItem
             // 
-            設定ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { 印刷設定ToolStripMenuItem });
-            設定ToolStripMenuItem.Name = "設定ToolStripMenuItem";
-            設定ToolStripMenuItem.Size = new Size(43, 20);
-            設定ToolStripMenuItem.Text = "設定";
+            this.設定ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.印刷設定ToolStripMenuItem });
+            this.設定ToolStripMenuItem.Name = "設定ToolStripMenuItem";
+            this.設定ToolStripMenuItem.Size = new Size(43, 20);
+            this.設定ToolStripMenuItem.Text = "設定";
             // 
             // 印刷設定ToolStripMenuItem
             // 
-            印刷設定ToolStripMenuItem.Name = "印刷設定ToolStripMenuItem";
-            印刷設定ToolStripMenuItem.Size = new Size(122, 22);
-            印刷設定ToolStripMenuItem.Text = "印刷設定";
-            印刷設定ToolStripMenuItem.Click += 印刷設定ToolStripMenuItem_Click;
+            this.印刷設定ToolStripMenuItem.Name = "印刷設定ToolStripMenuItem";
+            this.印刷設定ToolStripMenuItem.Size = new Size(122, 22);
+            this.印刷設定ToolStripMenuItem.Text = "印刷設定";
+            this.印刷設定ToolStripMenuItem.Click += this.印刷設定ToolStripMenuItem_Click;
             // 
             // ヘルプToolStripMenuItem
             // 
-            ヘルプToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { 取得情報ToolStripMenuItem });
-            ヘルプToolStripMenuItem.Name = "ヘルプToolStripMenuItem";
-            ヘルプToolStripMenuItem.Size = new Size(48, 20);
-            ヘルプToolStripMenuItem.Text = "ヘルプ";
+            this.ヘルプToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.取得情報ToolStripMenuItem });
+            this.ヘルプToolStripMenuItem.Name = "ヘルプToolStripMenuItem";
+            this.ヘルプToolStripMenuItem.Size = new Size(48, 20);
+            this.ヘルプToolStripMenuItem.Text = "ヘルプ";
             // 
             // 取得情報ToolStripMenuItem
             // 
-            取得情報ToolStripMenuItem.Name = "取得情報ToolStripMenuItem";
-            取得情報ToolStripMenuItem.Size = new Size(122, 22);
-            取得情報ToolStripMenuItem.Text = "取得情報";
-            取得情報ToolStripMenuItem.Click += 取得情報ToolStripMenuItem_Click;
+            this.取得情報ToolStripMenuItem.Name = "取得情報ToolStripMenuItem";
+            this.取得情報ToolStripMenuItem.Size = new Size(122, 22);
+            this.取得情報ToolStripMenuItem.Text = "取得情報";
+            this.取得情報ToolStripMenuItem.Click += this.取得情報ToolStripMenuItem_Click;
             // 
             // ProductNameLabel1
             // 
-            ProductNameLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            ProductNameLabel1.Location = new Point(28, 39);
-            ProductNameLabel1.Margin = new Padding(4, 0, 4, 0);
-            ProductNameLabel1.Name = "ProductNameLabel1";
-            ProductNameLabel1.Size = new Size(48, 15);
-            ProductNameLabel1.TabIndex = 1;
-            ProductNameLabel1.Text = "製品名:";
-            ProductNameLabel1.TextAlign = ContentAlignment.MiddleRight;
+            this.ProductNameLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.ProductNameLabel1.Location = new Point(28, 39);
+            this.ProductNameLabel1.Margin = new Padding(4, 0, 4, 0);
+            this.ProductNameLabel1.Name = "ProductNameLabel1";
+            this.ProductNameLabel1.Size = new Size(48, 15);
+            this.ProductNameLabel1.TabIndex = 1;
+            this.ProductNameLabel1.Text = "製品名:";
+            this.ProductNameLabel1.TextAlign = ContentAlignment.MiddleRight;
             // 
             // ProductNameLabel2
             // 
-            ProductNameLabel2.AutoSize = true;
-            ProductNameLabel2.BorderStyle = BorderStyle.Fixed3D;
-            ProductNameLabel2.Location = new Point(84, 39);
-            ProductNameLabel2.Margin = new Padding(4, 0, 4, 0);
-            ProductNameLabel2.Name = "ProductNameLabel2";
-            ProductNameLabel2.Size = new Size(24, 17);
-            ProductNameLabel2.TabIndex = 2;
-            ProductNameLabel2.Text = "---";
-            ProductNameLabel2.TextAlign = ContentAlignment.MiddleLeft;
+            this.ProductNameLabel2.AutoSize = true;
+            this.ProductNameLabel2.BorderStyle = BorderStyle.Fixed3D;
+            this.ProductNameLabel2.Location = new Point(84, 37);
+            this.ProductNameLabel2.Margin = new Padding(4, 0, 4, 0);
+            this.ProductNameLabel2.Name = "ProductNameLabel2";
+            this.ProductNameLabel2.Size = new Size(24, 17);
+            this.ProductNameLabel2.TabIndex = 2;
+            this.ProductNameLabel2.Text = "---";
+            this.ProductNameLabel2.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // SubstrateModelLabel1
             // 
-            SubstrateModelLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            SubstrateModelLabel1.Location = new Point(16, 61);
-            SubstrateModelLabel1.Margin = new Padding(4, 0, 4, 0);
-            SubstrateModelLabel1.Name = "SubstrateModelLabel1";
-            SubstrateModelLabel1.Size = new Size(60, 15);
-            SubstrateModelLabel1.TabIndex = 3;
-            SubstrateModelLabel1.Text = "基盤型式:";
-            SubstrateModelLabel1.TextAlign = ContentAlignment.MiddleRight;
+            this.SubstrateModelLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.SubstrateModelLabel1.Location = new Point(16, 61);
+            this.SubstrateModelLabel1.Margin = new Padding(4, 0, 4, 0);
+            this.SubstrateModelLabel1.Name = "SubstrateModelLabel1";
+            this.SubstrateModelLabel1.Size = new Size(60, 15);
+            this.SubstrateModelLabel1.TabIndex = 3;
+            this.SubstrateModelLabel1.Text = "基盤型式:";
+            this.SubstrateModelLabel1.TextAlign = ContentAlignment.MiddleRight;
             // 
             // SubstrateModelLabel2
             // 
-            SubstrateModelLabel2.AutoSize = true;
-            SubstrateModelLabel2.BorderStyle = BorderStyle.Fixed3D;
-            SubstrateModelLabel2.Location = new Point(84, 61);
-            SubstrateModelLabel2.Margin = new Padding(4, 0, 4, 0);
-            SubstrateModelLabel2.Name = "SubstrateModelLabel2";
-            SubstrateModelLabel2.Size = new Size(24, 17);
-            SubstrateModelLabel2.TabIndex = 4;
-            SubstrateModelLabel2.Text = "---";
-            SubstrateModelLabel2.TextAlign = ContentAlignment.MiddleLeft;
+            this.SubstrateModelLabel2.AutoSize = true;
+            this.SubstrateModelLabel2.BorderStyle = BorderStyle.Fixed3D;
+            this.SubstrateModelLabel2.Location = new Point(84, 59);
+            this.SubstrateModelLabel2.Margin = new Padding(4, 0, 4, 0);
+            this.SubstrateModelLabel2.Name = "SubstrateModelLabel2";
+            this.SubstrateModelLabel2.Size = new Size(24, 17);
+            this.SubstrateModelLabel2.TabIndex = 4;
+            this.SubstrateModelLabel2.Text = "---";
+            this.SubstrateModelLabel2.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // StockLabel1
             // 
-            StockLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            StockLabel1.Location = new Point(40, 83);
-            StockLabel1.Margin = new Padding(4, 0, 4, 0);
-            StockLabel1.Name = "StockLabel1";
-            StockLabel1.Size = new Size(36, 15);
-            StockLabel1.TabIndex = 5;
-            StockLabel1.Text = "在庫:";
-            StockLabel1.TextAlign = ContentAlignment.MiddleRight;
+            this.StockLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.StockLabel1.Location = new Point(40, 82);
+            this.StockLabel1.Margin = new Padding(4, 0, 4, 0);
+            this.StockLabel1.Name = "StockLabel1";
+            this.StockLabel1.Size = new Size(36, 15);
+            this.StockLabel1.TabIndex = 5;
+            this.StockLabel1.Text = "在庫:";
+            this.StockLabel1.TextAlign = ContentAlignment.MiddleRight;
             // 
             // StockLabel2
             // 
-            StockLabel2.AutoSize = true;
-            StockLabel2.BorderStyle = BorderStyle.Fixed3D;
-            StockLabel2.Location = new Point(84, 83);
-            StockLabel2.Margin = new Padding(4, 0, 4, 0);
-            StockLabel2.Name = "StockLabel2";
-            StockLabel2.Size = new Size(24, 17);
-            StockLabel2.TabIndex = 6;
-            StockLabel2.Text = "---";
-            StockLabel2.TextAlign = ContentAlignment.MiddleLeft;
+            this.StockLabel2.AutoSize = true;
+            this.StockLabel2.BorderStyle = BorderStyle.Fixed3D;
+            this.StockLabel2.Location = new Point(84, 81);
+            this.StockLabel2.Margin = new Padding(4, 0, 4, 0);
+            this.StockLabel2.Name = "StockLabel2";
+            this.StockLabel2.Size = new Size(24, 17);
+            this.StockLabel2.TabIndex = 6;
+            this.StockLabel2.Text = "---";
+            this.StockLabel2.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // OrderNumberCheckBox
             // 
-            OrderNumberCheckBox.Location = new Point(19, 118);
-            OrderNumberCheckBox.Margin = new Padding(0);
-            OrderNumberCheckBox.Name = "OrderNumberCheckBox";
-            OrderNumberCheckBox.Size = new Size(74, 19);
-            OrderNumberCheckBox.TabIndex = 7;
-            OrderNumberCheckBox.TabStop = false;
-            OrderNumberCheckBox.Text = "注文番号";
-            OrderNumberCheckBox.UseVisualStyleBackColor = true;
-            OrderNumberCheckBox.CheckedChanged += NumberCheckBox_CheckedChanged;
+            this.OrderNumberCheckBox.Location = new Point(19, 118);
+            this.OrderNumberCheckBox.Margin = new Padding(0);
+            this.OrderNumberCheckBox.Name = "OrderNumberCheckBox";
+            this.OrderNumberCheckBox.Size = new Size(74, 19);
+            this.OrderNumberCheckBox.TabIndex = 7;
+            this.OrderNumberCheckBox.TabStop = false;
+            this.OrderNumberCheckBox.Text = "注文番号";
+            this.OrderNumberCheckBox.UseVisualStyleBackColor = true;
+            this.OrderNumberCheckBox.CheckedChanged += this.NumberCheckBox_CheckedChanged;
             // 
             // OrderNumberTextBox
             // 
-            OrderNumberTextBox.Enabled = false;
-            OrderNumberTextBox.Location = new Point(19, 141);
-            OrderNumberTextBox.Margin = new Padding(0);
-            OrderNumberTextBox.MaxLength = 20;
-            OrderNumberTextBox.Name = "OrderNumberTextBox";
-            OrderNumberTextBox.Size = new Size(120, 23);
-            OrderNumberTextBox.TabIndex = 8;
-            OrderNumberTextBox.TextAlign = HorizontalAlignment.Right;
+            this.OrderNumberTextBox.Enabled = false;
+            this.OrderNumberTextBox.Location = new Point(19, 141);
+            this.OrderNumberTextBox.Margin = new Padding(0);
+            this.OrderNumberTextBox.MaxLength = 20;
+            this.OrderNumberTextBox.Name = "OrderNumberTextBox";
+            this.OrderNumberTextBox.Size = new Size(120, 23);
+            this.OrderNumberTextBox.TabIndex = 8;
+            this.OrderNumberTextBox.TextAlign = HorizontalAlignment.Right;
             // 
             // ManufacturingNumberCheckBox
             // 
-            ManufacturingNumberCheckBox.Location = new Point(19, 168);
-            ManufacturingNumberCheckBox.Margin = new Padding(0);
-            ManufacturingNumberCheckBox.Name = "ManufacturingNumberCheckBox";
-            ManufacturingNumberCheckBox.Size = new Size(74, 19);
-            ManufacturingNumberCheckBox.TabIndex = 9;
-            ManufacturingNumberCheckBox.TabStop = false;
-            ManufacturingNumberCheckBox.Text = "製造番号";
-            ManufacturingNumberCheckBox.UseVisualStyleBackColor = true;
-            ManufacturingNumberCheckBox.CheckedChanged += CheckBoxChecked;
+            this.ManufacturingNumberCheckBox.Location = new Point(19, 168);
+            this.ManufacturingNumberCheckBox.Margin = new Padding(0);
+            this.ManufacturingNumberCheckBox.Name = "ManufacturingNumberCheckBox";
+            this.ManufacturingNumberCheckBox.Size = new Size(74, 19);
+            this.ManufacturingNumberCheckBox.TabIndex = 9;
+            this.ManufacturingNumberCheckBox.TabStop = false;
+            this.ManufacturingNumberCheckBox.Text = "製造番号";
+            this.ManufacturingNumberCheckBox.UseVisualStyleBackColor = true;
+            this.ManufacturingNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // ManufacturingNumberMaskedTextBox
             // 
-            ManufacturingNumberMaskedTextBox.Enabled = false;
-            ManufacturingNumberMaskedTextBox.Location = new Point(19, 191);
-            ManufacturingNumberMaskedTextBox.Mask = "LA00L00000-0000";
-            ManufacturingNumberMaskedTextBox.Name = "ManufacturingNumberMaskedTextBox";
-            ManufacturingNumberMaskedTextBox.PromptChar = '*';
-            ManufacturingNumberMaskedTextBox.Size = new Size(120, 23);
-            ManufacturingNumberMaskedTextBox.TabIndex = 10;
-            ManufacturingNumberMaskedTextBox.Text = "H";
-            ManufacturingNumberMaskedTextBox.TextAlign = HorizontalAlignment.Right;
+            this.ManufacturingNumberMaskedTextBox.Enabled = false;
+            this.ManufacturingNumberMaskedTextBox.Location = new Point(19, 191);
+            this.ManufacturingNumberMaskedTextBox.Mask = "LA00L00000-0000";
+            this.ManufacturingNumberMaskedTextBox.Name = "ManufacturingNumberMaskedTextBox";
+            this.ManufacturingNumberMaskedTextBox.PromptChar = '*';
+            this.ManufacturingNumberMaskedTextBox.Size = new Size(120, 23);
+            this.ManufacturingNumberMaskedTextBox.TabIndex = 10;
+            this.ManufacturingNumberMaskedTextBox.Text = "H";
+            this.ManufacturingNumberMaskedTextBox.TextAlign = HorizontalAlignment.Right;
             // 
             // QuantityTextBox
             // 
-            QuantityTextBox.Enabled = false;
-            QuantityTextBox.Location = new Point(19, 241);
-            QuantityTextBox.Margin = new Padding(0);
-            QuantityTextBox.MaxLength = 4;
-            QuantityTextBox.Name = "QuantityTextBox";
-            QuantityTextBox.Size = new Size(120, 23);
-            QuantityTextBox.TabIndex = 12;
-            QuantityTextBox.TextAlign = HorizontalAlignment.Right;
-            QuantityTextBox.KeyPress += QuantityTextBox_KeyPress;
+            this.QuantityTextBox.Enabled = false;
+            this.QuantityTextBox.Location = new Point(19, 241);
+            this.QuantityTextBox.Margin = new Padding(0);
+            this.QuantityTextBox.MaxLength = 4;
+            this.QuantityTextBox.Name = "QuantityTextBox";
+            this.QuantityTextBox.Size = new Size(120, 23);
+            this.QuantityTextBox.TabIndex = 12;
+            this.QuantityTextBox.TextAlign = HorizontalAlignment.Right;
+            this.QuantityTextBox.KeyPress += this.QuantityTextBox_KeyPress;
             // 
             // QuantityCheckBox
             // 
-            QuantityCheckBox.Location = new Point(19, 218);
-            QuantityCheckBox.Margin = new Padding(0);
-            QuantityCheckBox.Name = "QuantityCheckBox";
-            QuantityCheckBox.Size = new Size(50, 19);
-            QuantityCheckBox.TabIndex = 11;
-            QuantityCheckBox.TabStop = false;
-            QuantityCheckBox.Text = "数量";
-            QuantityCheckBox.UseVisualStyleBackColor = true;
-            QuantityCheckBox.CheckedChanged += CheckBoxChecked;
+            this.QuantityCheckBox.Location = new Point(19, 218);
+            this.QuantityCheckBox.Margin = new Padding(0);
+            this.QuantityCheckBox.Name = "QuantityCheckBox";
+            this.QuantityCheckBox.Size = new Size(50, 19);
+            this.QuantityCheckBox.TabIndex = 11;
+            this.QuantityCheckBox.TabStop = false;
+            this.QuantityCheckBox.Text = "数量";
+            this.QuantityCheckBox.UseVisualStyleBackColor = true;
+            this.QuantityCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // DefectNumberTextBox
             // 
-            DefectNumberTextBox.Enabled = false;
-            DefectNumberTextBox.Location = new Point(19, 291);
-            DefectNumberTextBox.Margin = new Padding(0);
-            DefectNumberTextBox.MaxLength = 4;
-            DefectNumberTextBox.Name = "DefectNumberTextBox";
-            DefectNumberTextBox.Size = new Size(120, 23);
-            DefectNumberTextBox.TabIndex = 14;
-            DefectNumberTextBox.TextAlign = HorizontalAlignment.Right;
-            DefectNumberTextBox.KeyPress += DefectNumberTextBox_KeyPress;
+            this.DefectNumberTextBox.Enabled = false;
+            this.DefectNumberTextBox.Location = new Point(19, 291);
+            this.DefectNumberTextBox.Margin = new Padding(0);
+            this.DefectNumberTextBox.MaxLength = 4;
+            this.DefectNumberTextBox.Name = "DefectNumberTextBox";
+            this.DefectNumberTextBox.Size = new Size(120, 23);
+            this.DefectNumberTextBox.TabIndex = 14;
+            this.DefectNumberTextBox.TextAlign = HorizontalAlignment.Right;
+            this.DefectNumberTextBox.KeyPress += this.DefectNumberTextBox_KeyPress;
             // 
             // DefectNumberCheckBox
             // 
-            DefectNumberCheckBox.Location = new Point(19, 268);
-            DefectNumberCheckBox.Margin = new Padding(0);
-            DefectNumberCheckBox.Name = "DefectNumberCheckBox";
-            DefectNumberCheckBox.Size = new Size(62, 19);
-            DefectNumberCheckBox.TabIndex = 13;
-            DefectNumberCheckBox.TabStop = false;
-            DefectNumberCheckBox.Text = "不良量";
-            DefectNumberCheckBox.UseVisualStyleBackColor = true;
-            DefectNumberCheckBox.CheckedChanged += CheckBoxChecked;
+            this.DefectNumberCheckBox.Location = new Point(19, 268);
+            this.DefectNumberCheckBox.Margin = new Padding(0);
+            this.DefectNumberCheckBox.Name = "DefectNumberCheckBox";
+            this.DefectNumberCheckBox.Size = new Size(62, 19);
+            this.DefectNumberCheckBox.TabIndex = 13;
+            this.DefectNumberCheckBox.TabStop = false;
+            this.DefectNumberCheckBox.Text = "不良量";
+            this.DefectNumberCheckBox.UseVisualStyleBackColor = true;
+            this.DefectNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // RevisionTextBox
             // 
-            RevisionTextBox.Enabled = false;
-            RevisionTextBox.Location = new Point(19, 341);
-            RevisionTextBox.Margin = new Padding(0);
-            RevisionTextBox.MaxLength = 4;
-            RevisionTextBox.Name = "RevisionTextBox";
-            RevisionTextBox.Size = new Size(120, 23);
-            RevisionTextBox.TabIndex = 16;
-            RevisionTextBox.TextAlign = HorizontalAlignment.Right;
+            this.RevisionTextBox.Enabled = false;
+            this.RevisionTextBox.Location = new Point(19, 341);
+            this.RevisionTextBox.Margin = new Padding(0);
+            this.RevisionTextBox.MaxLength = 4;
+            this.RevisionTextBox.Name = "RevisionTextBox";
+            this.RevisionTextBox.Size = new Size(120, 23);
+            this.RevisionTextBox.TabIndex = 16;
+            this.RevisionTextBox.TextAlign = HorizontalAlignment.Right;
             // 
             // RevisionCheckBox
             // 
-            RevisionCheckBox.Location = new Point(19, 318);
-            RevisionCheckBox.Margin = new Padding(0);
-            RevisionCheckBox.Name = "RevisionCheckBox";
-            RevisionCheckBox.Size = new Size(68, 19);
-            RevisionCheckBox.TabIndex = 15;
-            RevisionCheckBox.TabStop = false;
-            RevisionCheckBox.Text = "レビジョン";
-            RevisionCheckBox.UseVisualStyleBackColor = true;
-            RevisionCheckBox.CheckedChanged += CheckBoxChecked;
+            this.RevisionCheckBox.Location = new Point(19, 318);
+            this.RevisionCheckBox.Margin = new Padding(0);
+            this.RevisionCheckBox.Name = "RevisionCheckBox";
+            this.RevisionCheckBox.Size = new Size(68, 19);
+            this.RevisionCheckBox.TabIndex = 15;
+            this.RevisionCheckBox.TabStop = false;
+            this.RevisionCheckBox.Text = "レビジョン";
+            this.RevisionCheckBox.UseVisualStyleBackColor = true;
+            this.RevisionCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // ExtraTextBox1
             // 
-            ExtraTextBox1.Enabled = false;
-            ExtraTextBox1.Location = new Point(166, 141);
-            ExtraTextBox1.Margin = new Padding(0);
-            ExtraTextBox1.MaxLength = 20;
-            ExtraTextBox1.Name = "ExtraTextBox1";
-            ExtraTextBox1.Size = new Size(120, 23);
-            ExtraTextBox1.TabIndex = 18;
-            ExtraTextBox1.TextAlign = HorizontalAlignment.Right;
+            this.ExtraTextBox1.Enabled = false;
+            this.ExtraTextBox1.Location = new Point(166, 141);
+            this.ExtraTextBox1.Margin = new Padding(0);
+            this.ExtraTextBox1.MaxLength = 20;
+            this.ExtraTextBox1.Name = "ExtraTextBox1";
+            this.ExtraTextBox1.Size = new Size(120, 23);
+            this.ExtraTextBox1.TabIndex = 18;
+            this.ExtraTextBox1.TextAlign = HorizontalAlignment.Right;
             // 
             // ExtraCheckBox1
             // 
-            ExtraCheckBox1.Location = new Point(166, 118);
-            ExtraCheckBox1.Margin = new Padding(0);
-            ExtraCheckBox1.Name = "ExtraCheckBox1";
-            ExtraCheckBox1.Size = new Size(50, 19);
-            ExtraCheckBox1.TabIndex = 17;
-            ExtraCheckBox1.TabStop = false;
-            ExtraCheckBox1.Text = "予備";
-            ExtraCheckBox1.UseVisualStyleBackColor = true;
-            ExtraCheckBox1.Visible = false;
-            ExtraCheckBox1.CheckedChanged += CheckBoxChecked;
+            this.ExtraCheckBox1.Location = new Point(166, 118);
+            this.ExtraCheckBox1.Margin = new Padding(0);
+            this.ExtraCheckBox1.Name = "ExtraCheckBox1";
+            this.ExtraCheckBox1.Size = new Size(50, 19);
+            this.ExtraCheckBox1.TabIndex = 17;
+            this.ExtraCheckBox1.TabStop = false;
+            this.ExtraCheckBox1.Text = "予備";
+            this.ExtraCheckBox1.UseVisualStyleBackColor = true;
+            this.ExtraCheckBox1.Visible = false;
+            this.ExtraCheckBox1.CheckedChanged += this.CheckBoxChecked;
             // 
             // ExtraTextBox2
             // 
-            ExtraTextBox2.Enabled = false;
-            ExtraTextBox2.Location = new Point(166, 191);
-            ExtraTextBox2.Margin = new Padding(0);
-            ExtraTextBox2.MaxLength = 20;
-            ExtraTextBox2.Name = "ExtraTextBox2";
-            ExtraTextBox2.Size = new Size(120, 23);
-            ExtraTextBox2.TabIndex = 20;
-            ExtraTextBox2.TextAlign = HorizontalAlignment.Right;
+            this.ExtraTextBox2.Enabled = false;
+            this.ExtraTextBox2.Location = new Point(166, 191);
+            this.ExtraTextBox2.Margin = new Padding(0);
+            this.ExtraTextBox2.MaxLength = 20;
+            this.ExtraTextBox2.Name = "ExtraTextBox2";
+            this.ExtraTextBox2.Size = new Size(120, 23);
+            this.ExtraTextBox2.TabIndex = 20;
+            this.ExtraTextBox2.TextAlign = HorizontalAlignment.Right;
             // 
             // ExtraCheckBox2
             // 
-            ExtraCheckBox2.Location = new Point(166, 168);
-            ExtraCheckBox2.Margin = new Padding(0);
-            ExtraCheckBox2.Name = "ExtraCheckBox2";
-            ExtraCheckBox2.Size = new Size(50, 19);
-            ExtraCheckBox2.TabIndex = 19;
-            ExtraCheckBox2.TabStop = false;
-            ExtraCheckBox2.Text = "予備";
-            ExtraCheckBox2.UseVisualStyleBackColor = true;
-            ExtraCheckBox2.Visible = false;
-            ExtraCheckBox2.CheckedChanged += CheckBoxChecked;
+            this.ExtraCheckBox2.Location = new Point(166, 168);
+            this.ExtraCheckBox2.Margin = new Padding(0);
+            this.ExtraCheckBox2.Name = "ExtraCheckBox2";
+            this.ExtraCheckBox2.Size = new Size(50, 19);
+            this.ExtraCheckBox2.TabIndex = 19;
+            this.ExtraCheckBox2.TabStop = false;
+            this.ExtraCheckBox2.Text = "予備";
+            this.ExtraCheckBox2.UseVisualStyleBackColor = true;
+            this.ExtraCheckBox2.Visible = false;
+            this.ExtraCheckBox2.CheckedChanged += this.CheckBoxChecked;
             // 
             // ExtraTextBox3
             // 
-            ExtraTextBox3.Enabled = false;
-            ExtraTextBox3.Location = new Point(166, 241);
-            ExtraTextBox3.Margin = new Padding(0);
-            ExtraTextBox3.MaxLength = 20;
-            ExtraTextBox3.Name = "ExtraTextBox3";
-            ExtraTextBox3.Size = new Size(120, 23);
-            ExtraTextBox3.TabIndex = 22;
-            ExtraTextBox3.TextAlign = HorizontalAlignment.Right;
+            this.ExtraTextBox3.Enabled = false;
+            this.ExtraTextBox3.Location = new Point(166, 241);
+            this.ExtraTextBox3.Margin = new Padding(0);
+            this.ExtraTextBox3.MaxLength = 20;
+            this.ExtraTextBox3.Name = "ExtraTextBox3";
+            this.ExtraTextBox3.Size = new Size(120, 23);
+            this.ExtraTextBox3.TabIndex = 22;
+            this.ExtraTextBox3.TextAlign = HorizontalAlignment.Right;
             // 
             // ExtraCheckBox3
             // 
-            ExtraCheckBox3.Location = new Point(166, 218);
-            ExtraCheckBox3.Margin = new Padding(0);
-            ExtraCheckBox3.Name = "ExtraCheckBox3";
-            ExtraCheckBox3.Size = new Size(50, 19);
-            ExtraCheckBox3.TabIndex = 21;
-            ExtraCheckBox3.TabStop = false;
-            ExtraCheckBox3.Text = "予備";
-            ExtraCheckBox3.UseVisualStyleBackColor = true;
-            ExtraCheckBox3.Visible = false;
-            ExtraCheckBox3.CheckedChanged += CheckBoxChecked;
+            this.ExtraCheckBox3.Location = new Point(166, 218);
+            this.ExtraCheckBox3.Margin = new Padding(0);
+            this.ExtraCheckBox3.Name = "ExtraCheckBox3";
+            this.ExtraCheckBox3.Size = new Size(50, 19);
+            this.ExtraCheckBox3.TabIndex = 21;
+            this.ExtraCheckBox3.TabStop = false;
+            this.ExtraCheckBox3.Text = "予備";
+            this.ExtraCheckBox3.UseVisualStyleBackColor = true;
+            this.ExtraCheckBox3.Visible = false;
+            this.ExtraCheckBox3.CheckedChanged += this.CheckBoxChecked;
             // 
             // RegistrationDateCheckBox
             // 
-            RegistrationDateCheckBox.Location = new Point(166, 268);
-            RegistrationDateCheckBox.Margin = new Padding(0);
-            RegistrationDateCheckBox.Name = "RegistrationDateCheckBox";
-            RegistrationDateCheckBox.Size = new Size(62, 19);
-            RegistrationDateCheckBox.TabIndex = 23;
-            RegistrationDateCheckBox.TabStop = false;
-            RegistrationDateCheckBox.Text = "登録日";
-            RegistrationDateCheckBox.UseVisualStyleBackColor = true;
-            RegistrationDateCheckBox.CheckedChanged += CheckBoxChecked;
+            this.RegistrationDateCheckBox.Location = new Point(166, 268);
+            this.RegistrationDateCheckBox.Margin = new Padding(0);
+            this.RegistrationDateCheckBox.Name = "RegistrationDateCheckBox";
+            this.RegistrationDateCheckBox.Size = new Size(62, 19);
+            this.RegistrationDateCheckBox.TabIndex = 23;
+            this.RegistrationDateCheckBox.TabStop = false;
+            this.RegistrationDateCheckBox.Text = "登録日";
+            this.RegistrationDateCheckBox.UseVisualStyleBackColor = true;
+            this.RegistrationDateCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // RegistrationDateMaskedTextBox
             // 
-            RegistrationDateMaskedTextBox.Enabled = false;
-            RegistrationDateMaskedTextBox.Location = new Point(166, 291);
-            RegistrationDateMaskedTextBox.Mask = "0000/00/00";
-            RegistrationDateMaskedTextBox.Name = "RegistrationDateMaskedTextBox";
-            RegistrationDateMaskedTextBox.PromptChar = '*';
-            RegistrationDateMaskedTextBox.Size = new Size(120, 23);
-            RegistrationDateMaskedTextBox.TabIndex = 24;
-            RegistrationDateMaskedTextBox.TextAlign = HorizontalAlignment.Right;
-            RegistrationDateMaskedTextBox.TypeValidationCompleted += RegistrationDateMaskedTextBox_TypeValidationCompleted;
+            this.RegistrationDateMaskedTextBox.Enabled = false;
+            this.RegistrationDateMaskedTextBox.Location = new Point(166, 291);
+            this.RegistrationDateMaskedTextBox.Mask = "0000/00/00";
+            this.RegistrationDateMaskedTextBox.Name = "RegistrationDateMaskedTextBox";
+            this.RegistrationDateMaskedTextBox.PromptChar = '*';
+            this.RegistrationDateMaskedTextBox.Size = new Size(120, 23);
+            this.RegistrationDateMaskedTextBox.TabIndex = 24;
+            this.RegistrationDateMaskedTextBox.TextAlign = HorizontalAlignment.Right;
+            this.RegistrationDateMaskedTextBox.TypeValidationCompleted += this.RegistrationDateMaskedTextBox_TypeValidationCompleted;
             // 
             // PersonCheckBox
             // 
-            PersonCheckBox.Location = new Point(166, 318);
-            PersonCheckBox.Margin = new Padding(0);
-            PersonCheckBox.Name = "PersonCheckBox";
-            PersonCheckBox.Size = new Size(62, 19);
-            PersonCheckBox.TabIndex = 25;
-            PersonCheckBox.TabStop = false;
-            PersonCheckBox.Text = "担当者";
-            PersonCheckBox.UseVisualStyleBackColor = true;
-            PersonCheckBox.CheckedChanged += CheckBoxChecked;
+            this.PersonCheckBox.Location = new Point(166, 318);
+            this.PersonCheckBox.Margin = new Padding(0);
+            this.PersonCheckBox.Name = "PersonCheckBox";
+            this.PersonCheckBox.Size = new Size(62, 19);
+            this.PersonCheckBox.TabIndex = 25;
+            this.PersonCheckBox.TabStop = false;
+            this.PersonCheckBox.Text = "担当者";
+            this.PersonCheckBox.UseVisualStyleBackColor = true;
+            this.PersonCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // PersonComboBox
             // 
-            PersonComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-            PersonComboBox.Enabled = false;
-            PersonComboBox.FormattingEnabled = true;
-            PersonComboBox.Location = new Point(166, 341);
-            PersonComboBox.Name = "PersonComboBox";
-            PersonComboBox.Size = new Size(121, 23);
-            PersonComboBox.TabIndex = 26;
+            this.PersonComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.PersonComboBox.Enabled = false;
+            this.PersonComboBox.FormattingEnabled = true;
+            this.PersonComboBox.Location = new Point(166, 341);
+            this.PersonComboBox.Name = "PersonComboBox";
+            this.PersonComboBox.Size = new Size(121, 23);
+            this.PersonComboBox.TabIndex = 26;
             // 
             // ExtraTextBox4
             // 
-            ExtraTextBox4.Enabled = false;
-            ExtraTextBox4.Location = new Point(313, 141);
-            ExtraTextBox4.Margin = new Padding(0);
-            ExtraTextBox4.MaxLength = 20;
-            ExtraTextBox4.Name = "ExtraTextBox4";
-            ExtraTextBox4.Size = new Size(120, 23);
-            ExtraTextBox4.TabIndex = 28;
-            ExtraTextBox4.TextAlign = HorizontalAlignment.Right;
+            this.ExtraTextBox4.Enabled = false;
+            this.ExtraTextBox4.Location = new Point(313, 141);
+            this.ExtraTextBox4.Margin = new Padding(0);
+            this.ExtraTextBox4.MaxLength = 20;
+            this.ExtraTextBox4.Name = "ExtraTextBox4";
+            this.ExtraTextBox4.Size = new Size(120, 23);
+            this.ExtraTextBox4.TabIndex = 28;
+            this.ExtraTextBox4.TextAlign = HorizontalAlignment.Right;
             // 
             // ExtraCheckBox4
             // 
-            ExtraCheckBox4.Location = new Point(313, 118);
-            ExtraCheckBox4.Margin = new Padding(0);
-            ExtraCheckBox4.Name = "ExtraCheckBox4";
-            ExtraCheckBox4.Size = new Size(50, 19);
-            ExtraCheckBox4.TabIndex = 27;
-            ExtraCheckBox4.TabStop = false;
-            ExtraCheckBox4.Text = "予備";
-            ExtraCheckBox4.UseVisualStyleBackColor = true;
-            ExtraCheckBox4.Visible = false;
-            ExtraCheckBox4.CheckedChanged += CheckBoxChecked;
+            this.ExtraCheckBox4.Location = new Point(313, 118);
+            this.ExtraCheckBox4.Margin = new Padding(0);
+            this.ExtraCheckBox4.Name = "ExtraCheckBox4";
+            this.ExtraCheckBox4.Size = new Size(50, 19);
+            this.ExtraCheckBox4.TabIndex = 27;
+            this.ExtraCheckBox4.TabStop = false;
+            this.ExtraCheckBox4.Text = "予備";
+            this.ExtraCheckBox4.UseVisualStyleBackColor = true;
+            this.ExtraCheckBox4.Visible = false;
+            this.ExtraCheckBox4.CheckedChanged += this.CheckBoxChecked;
             // 
             // ExtraTextBox5
             // 
-            ExtraTextBox5.Enabled = false;
-            ExtraTextBox5.Location = new Point(313, 191);
-            ExtraTextBox5.Margin = new Padding(0);
-            ExtraTextBox5.MaxLength = 20;
-            ExtraTextBox5.Name = "ExtraTextBox5";
-            ExtraTextBox5.Size = new Size(120, 23);
-            ExtraTextBox5.TabIndex = 30;
-            ExtraTextBox5.TextAlign = HorizontalAlignment.Right;
+            this.ExtraTextBox5.Enabled = false;
+            this.ExtraTextBox5.Location = new Point(313, 191);
+            this.ExtraTextBox5.Margin = new Padding(0);
+            this.ExtraTextBox5.MaxLength = 20;
+            this.ExtraTextBox5.Name = "ExtraTextBox5";
+            this.ExtraTextBox5.Size = new Size(120, 23);
+            this.ExtraTextBox5.TabIndex = 30;
+            this.ExtraTextBox5.TextAlign = HorizontalAlignment.Right;
             // 
             // ExtraCheckBox5
             // 
-            ExtraCheckBox5.Location = new Point(313, 168);
-            ExtraCheckBox5.Margin = new Padding(0);
-            ExtraCheckBox5.Name = "ExtraCheckBox5";
-            ExtraCheckBox5.Size = new Size(50, 19);
-            ExtraCheckBox5.TabIndex = 29;
-            ExtraCheckBox5.TabStop = false;
-            ExtraCheckBox5.Text = "予備";
-            ExtraCheckBox5.UseVisualStyleBackColor = true;
-            ExtraCheckBox5.Visible = false;
-            ExtraCheckBox5.CheckedChanged += CheckBoxChecked;
+            this.ExtraCheckBox5.Location = new Point(313, 168);
+            this.ExtraCheckBox5.Margin = new Padding(0);
+            this.ExtraCheckBox5.Name = "ExtraCheckBox5";
+            this.ExtraCheckBox5.Size = new Size(50, 19);
+            this.ExtraCheckBox5.TabIndex = 29;
+            this.ExtraCheckBox5.TabStop = false;
+            this.ExtraCheckBox5.Text = "予備";
+            this.ExtraCheckBox5.UseVisualStyleBackColor = true;
+            this.ExtraCheckBox5.Visible = false;
+            this.ExtraCheckBox5.CheckedChanged += this.CheckBoxChecked;
             // 
             // ExtraTextBox6
             // 
-            ExtraTextBox6.Enabled = false;
-            ExtraTextBox6.Location = new Point(313, 241);
-            ExtraTextBox6.Margin = new Padding(0);
-            ExtraTextBox6.MaxLength = 20;
-            ExtraTextBox6.Name = "ExtraTextBox6";
-            ExtraTextBox6.Size = new Size(120, 23);
-            ExtraTextBox6.TabIndex = 32;
-            ExtraTextBox6.TextAlign = HorizontalAlignment.Right;
+            this.ExtraTextBox6.Enabled = false;
+            this.ExtraTextBox6.Location = new Point(313, 241);
+            this.ExtraTextBox6.Margin = new Padding(0);
+            this.ExtraTextBox6.MaxLength = 20;
+            this.ExtraTextBox6.Name = "ExtraTextBox6";
+            this.ExtraTextBox6.Size = new Size(120, 23);
+            this.ExtraTextBox6.TabIndex = 32;
+            this.ExtraTextBox6.TextAlign = HorizontalAlignment.Right;
             // 
             // ExtraCheckBox6
             // 
-            ExtraCheckBox6.Location = new Point(313, 218);
-            ExtraCheckBox6.Margin = new Padding(0);
-            ExtraCheckBox6.Name = "ExtraCheckBox6";
-            ExtraCheckBox6.Size = new Size(50, 19);
-            ExtraCheckBox6.TabIndex = 31;
-            ExtraCheckBox6.TabStop = false;
-            ExtraCheckBox6.Text = "予備";
-            ExtraCheckBox6.UseVisualStyleBackColor = true;
-            ExtraCheckBox6.Visible = false;
-            ExtraCheckBox6.CheckedChanged += CheckBoxChecked;
+            this.ExtraCheckBox6.Location = new Point(313, 218);
+            this.ExtraCheckBox6.Margin = new Padding(0);
+            this.ExtraCheckBox6.Name = "ExtraCheckBox6";
+            this.ExtraCheckBox6.Size = new Size(50, 19);
+            this.ExtraCheckBox6.TabIndex = 31;
+            this.ExtraCheckBox6.TabStop = false;
+            this.ExtraCheckBox6.Text = "予備";
+            this.ExtraCheckBox6.UseVisualStyleBackColor = true;
+            this.ExtraCheckBox6.Visible = false;
+            this.ExtraCheckBox6.CheckedChanged += this.CheckBoxChecked;
             // 
             // CommentCheckBox
             // 
-            CommentCheckBox.Location = new Point(464, 118);
-            CommentCheckBox.Margin = new Padding(0);
-            CommentCheckBox.Name = "CommentCheckBox";
-            CommentCheckBox.Size = new Size(59, 19);
-            CommentCheckBox.TabIndex = 33;
-            CommentCheckBox.TabStop = false;
-            CommentCheckBox.Text = "コメント";
-            CommentCheckBox.UseVisualStyleBackColor = true;
-            CommentCheckBox.CheckedChanged += CheckBoxChecked;
+            this.CommentCheckBox.Location = new Point(464, 118);
+            this.CommentCheckBox.Margin = new Padding(0);
+            this.CommentCheckBox.Name = "CommentCheckBox";
+            this.CommentCheckBox.Size = new Size(59, 19);
+            this.CommentCheckBox.TabIndex = 33;
+            this.CommentCheckBox.TabStop = false;
+            this.CommentCheckBox.Text = "コメント";
+            this.CommentCheckBox.UseVisualStyleBackColor = true;
+            this.CommentCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // CommentTextBox
             // 
-            CommentTextBox.Enabled = false;
-            CommentTextBox.Location = new Point(464, 141);
-            CommentTextBox.Margin = new Padding(0);
-            CommentTextBox.MaxLength = 500;
-            CommentTextBox.Multiline = true;
-            CommentTextBox.Name = "CommentTextBox";
-            CommentTextBox.ScrollBars = ScrollBars.Vertical;
-            CommentTextBox.Size = new Size(150, 175);
-            CommentTextBox.TabIndex = 34;
+            this.CommentTextBox.Enabled = false;
+            this.CommentTextBox.Location = new Point(464, 141);
+            this.CommentTextBox.Margin = new Padding(0);
+            this.CommentTextBox.MaxLength = 500;
+            this.CommentTextBox.Multiline = true;
+            this.CommentTextBox.Name = "CommentTextBox";
+            this.CommentTextBox.ScrollBars = ScrollBars.Vertical;
+            this.CommentTextBox.Size = new Size(150, 175);
+            this.CommentTextBox.TabIndex = 34;
             // 
             // CommentComboBox
             // 
-            CommentComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-            CommentComboBox.DropDownWidth = 150;
-            CommentComboBox.Enabled = false;
-            CommentComboBox.FormattingEnabled = true;
-            CommentComboBox.Location = new Point(464, 320);
-            CommentComboBox.Name = "CommentComboBox";
-            CommentComboBox.Size = new Size(150, 23);
-            CommentComboBox.TabIndex = 35;
+            this.CommentComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.CommentComboBox.DropDownWidth = 150;
+            this.CommentComboBox.Enabled = false;
+            this.CommentComboBox.FormattingEnabled = true;
+            this.CommentComboBox.Location = new Point(464, 320);
+            this.CommentComboBox.Name = "CommentComboBox";
+            this.CommentComboBox.Size = new Size(150, 23);
+            this.CommentComboBox.TabIndex = 35;
             // 
             // TemplateButton
             // 
-            TemplateButton.Enabled = false;
-            TemplateButton.Location = new Point(539, 347);
-            TemplateButton.Name = "TemplateButton";
-            TemplateButton.Size = new Size(75, 25);
-            TemplateButton.TabIndex = 36;
-            TemplateButton.Text = "定型文";
-            TemplateButton.UseVisualStyleBackColor = true;
-            TemplateButton.Click += TemplateButton_Click;
+            this.TemplateButton.Enabled = false;
+            this.TemplateButton.Location = new Point(539, 347);
+            this.TemplateButton.Name = "TemplateButton";
+            this.TemplateButton.Size = new Size(75, 25);
+            this.TemplateButton.TabIndex = 36;
+            this.TemplateButton.Text = "定型文";
+            this.TemplateButton.UseVisualStyleBackColor = true;
+            this.TemplateButton.Click += this.TemplateButton_Click;
             // 
             // PrintRowLabel
             // 
-            PrintRowLabel.Location = new Point(177, 392);
-            PrintRowLabel.Margin = new Padding(0);
-            PrintRowLabel.Name = "PrintRowLabel";
-            PrintRowLabel.Size = new Size(79, 15);
-            PrintRowLabel.TabIndex = 37;
-            PrintRowLabel.Text = "印刷開始位置";
+            this.PrintRowLabel.Location = new Point(177, 392);
+            this.PrintRowLabel.Margin = new Padding(0);
+            this.PrintRowLabel.Name = "PrintRowLabel";
+            this.PrintRowLabel.Size = new Size(79, 15);
+            this.PrintRowLabel.TabIndex = 37;
+            this.PrintRowLabel.Text = "印刷開始位置";
             // 
             // PrintPostionNumericUpDown
             // 
-            PrintPostionNumericUpDown.Location = new Point(166, 410);
-            PrintPostionNumericUpDown.Margin = new Padding(0);
-            PrintPostionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
-            PrintPostionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            PrintPostionNumericUpDown.Name = "PrintPostionNumericUpDown";
-            PrintPostionNumericUpDown.Size = new Size(110, 23);
-            PrintPostionNumericUpDown.TabIndex = 38;
-            PrintPostionNumericUpDown.TextAlign = HorizontalAlignment.Right;
-            PrintPostionNumericUpDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            this.PrintPostionNumericUpDown.Location = new Point(166, 410);
+            this.PrintPostionNumericUpDown.Margin = new Padding(0);
+            this.PrintPostionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
+            this.PrintPostionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            this.PrintPostionNumericUpDown.Name = "PrintPostionNumericUpDown";
+            this.PrintPostionNumericUpDown.Size = new Size(110, 23);
+            this.PrintPostionNumericUpDown.TabIndex = 38;
+            this.PrintPostionNumericUpDown.TextAlign = HorizontalAlignment.Right;
+            this.PrintPostionNumericUpDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // RegisterButton
             // 
-            RegisterButton.Location = new Point(313, 407);
-            RegisterButton.Margin = new Padding(0);
-            RegisterButton.Name = "RegisterButton";
-            RegisterButton.Size = new Size(75, 25);
-            RegisterButton.TabIndex = 39;
-            RegisterButton.Text = "OK";
-            RegisterButton.UseVisualStyleBackColor = true;
-            RegisterButton.Click += RegisterButton_Click;
+            this.RegisterButton.Location = new Point(313, 407);
+            this.RegisterButton.Margin = new Padding(0);
+            this.RegisterButton.Name = "RegisterButton";
+            this.RegisterButton.Size = new Size(75, 25);
+            this.RegisterButton.TabIndex = 39;
+            this.RegisterButton.Text = "OK";
+            this.RegisterButton.UseVisualStyleBackColor = true;
+            this.RegisterButton.Click += this.RegisterButton_Click;
             // 
             // PrintOnlyCheckBox
             // 
-            PrintOnlyCheckBox.Location = new Point(426, 382);
-            PrintOnlyCheckBox.Name = "PrintOnlyCheckBox";
-            PrintOnlyCheckBox.Size = new Size(71, 19);
-            PrintOnlyCheckBox.TabIndex = 40;
-            PrintOnlyCheckBox.TabStop = false;
-            PrintOnlyCheckBox.Text = "印刷のみ";
-            PrintOnlyCheckBox.UseVisualStyleBackColor = true;
-            PrintOnlyCheckBox.CheckedChanged += CheckBoxChecked;
+            this.PrintOnlyCheckBox.Location = new Point(426, 382);
+            this.PrintOnlyCheckBox.Name = "PrintOnlyCheckBox";
+            this.PrintOnlyCheckBox.Size = new Size(71, 19);
+            this.PrintOnlyCheckBox.TabIndex = 40;
+            this.PrintOnlyCheckBox.TabStop = false;
+            this.PrintOnlyCheckBox.Text = "印刷のみ";
+            this.PrintOnlyCheckBox.UseVisualStyleBackColor = true;
+            this.PrintOnlyCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // PrintButton
             // 
-            PrintButton.Enabled = false;
-            PrintButton.Location = new Point(426, 407);
-            PrintButton.Margin = new Padding(0);
-            PrintButton.Name = "PrintButton";
-            PrintButton.Size = new Size(75, 25);
-            PrintButton.TabIndex = 41;
-            PrintButton.Text = "印刷";
-            PrintButton.UseVisualStyleBackColor = true;
-            PrintButton.Click += PrintButton_Click;
+            this.PrintButton.Enabled = false;
+            this.PrintButton.Location = new Point(426, 407);
+            this.PrintButton.Margin = new Padding(0);
+            this.PrintButton.Name = "PrintButton";
+            this.PrintButton.Size = new Size(75, 25);
+            this.PrintButton.TabIndex = 41;
+            this.PrintButton.Text = "印刷";
+            this.PrintButton.UseVisualStyleBackColor = true;
+            this.PrintButton.Click += this.PrintButton_Click;
             // 
             // SubstrateRegistrationPrintDialog
             // 
-            SubstrateRegistrationPrintDialog.UseEXDialog = true;
+            this.SubstrateRegistrationPrintDialog.UseEXDialog = true;
             // 
             // SubstrateRegistrationPrintPreviewDialog
             // 
-            SubstrateRegistrationPrintPreviewDialog.AutoScrollMargin = new Size(0, 0);
-            SubstrateRegistrationPrintPreviewDialog.AutoScrollMinSize = new Size(0, 0);
-            SubstrateRegistrationPrintPreviewDialog.ClientSize = new Size(400, 300);
-            SubstrateRegistrationPrintPreviewDialog.Enabled = true;
-            SubstrateRegistrationPrintPreviewDialog.Icon = (Icon)resources.GetObject("SubstrateRegistrationPrintPreviewDialog.Icon");
-            SubstrateRegistrationPrintPreviewDialog.Name = "SubstrateRegistrationPrintPreviewDialog";
-            SubstrateRegistrationPrintPreviewDialog.Visible = false;
-            SubstrateRegistrationPrintPreviewDialog.Load += SubstrateRegistrationPrintPreviewDialog_Load;
+            this.SubstrateRegistrationPrintPreviewDialog.AutoScrollMargin = new Size(0, 0);
+            this.SubstrateRegistrationPrintPreviewDialog.AutoScrollMinSize = new Size(0, 0);
+            this.SubstrateRegistrationPrintPreviewDialog.ClientSize = new Size(400, 300);
+            this.SubstrateRegistrationPrintPreviewDialog.Enabled = true;
+            this.SubstrateRegistrationPrintPreviewDialog.Icon = (Icon)resources.GetObject("SubstrateRegistrationPrintPreviewDialog.Icon");
+            this.SubstrateRegistrationPrintPreviewDialog.Name = "SubstrateRegistrationPrintPreviewDialog";
+            this.SubstrateRegistrationPrintPreviewDialog.Visible = false;
+            this.SubstrateRegistrationPrintPreviewDialog.Load += this.SubstrateRegistrationPrintPreviewDialog_Load;
             // 
             // SubstrateRegistrationWindow
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(630, 441);
-            Controls.Add(PrintButton);
-            Controls.Add(PrintOnlyCheckBox);
-            Controls.Add(RegisterButton);
-            Controls.Add(PrintPostionNumericUpDown);
-            Controls.Add(PrintRowLabel);
-            Controls.Add(TemplateButton);
-            Controls.Add(CommentComboBox);
-            Controls.Add(CommentTextBox);
-            Controls.Add(CommentCheckBox);
-            Controls.Add(ExtraTextBox6);
-            Controls.Add(ExtraCheckBox6);
-            Controls.Add(ExtraTextBox5);
-            Controls.Add(ExtraCheckBox5);
-            Controls.Add(ExtraTextBox4);
-            Controls.Add(ExtraCheckBox4);
-            Controls.Add(PersonComboBox);
-            Controls.Add(PersonCheckBox);
-            Controls.Add(RegistrationDateMaskedTextBox);
-            Controls.Add(RegistrationDateCheckBox);
-            Controls.Add(ExtraTextBox3);
-            Controls.Add(ExtraCheckBox3);
-            Controls.Add(ExtraTextBox2);
-            Controls.Add(ExtraCheckBox2);
-            Controls.Add(ExtraTextBox1);
-            Controls.Add(ExtraCheckBox1);
-            Controls.Add(RevisionTextBox);
-            Controls.Add(RevisionCheckBox);
-            Controls.Add(DefectNumberTextBox);
-            Controls.Add(DefectNumberCheckBox);
-            Controls.Add(QuantityTextBox);
-            Controls.Add(QuantityCheckBox);
-            Controls.Add(ManufacturingNumberMaskedTextBox);
-            Controls.Add(ManufacturingNumberCheckBox);
-            Controls.Add(OrderNumberTextBox);
-            Controls.Add(OrderNumberCheckBox);
-            Controls.Add(StockLabel2);
-            Controls.Add(StockLabel1);
-            Controls.Add(SubstrateModelLabel2);
-            Controls.Add(SubstrateModelLabel1);
-            Controls.Add(ProductNameLabel2);
-            Controls.Add(ProductNameLabel1);
-            Controls.Add(SubstrateRegistrationMenuStrip);
-            Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MainMenuStrip = SubstrateRegistrationMenuStrip;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            Name = "SubstrateRegistrationWindow";
-            ShowIcon = false;
-            ShowInTaskbar = false;
-            StartPosition = FormStartPosition.CenterParent;
-            Text = "基盤登録";
-            FormClosing += SubstrateRegistrationWindow_FormClosing;
-            Load += SubstrateRegistrationWindow_Load;
-            SubstrateRegistrationMenuStrip.ResumeLayout(false);
-            SubstrateRegistrationMenuStrip.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)PrintPostionNumericUpDown).EndInit();
-            ResumeLayout(false);
-            PerformLayout();
+            this.AutoScaleDimensions = new SizeF(7F, 15F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.PrintButton);
+            this.Controls.Add(this.PrintOnlyCheckBox);
+            this.Controls.Add(this.RegisterButton);
+            this.Controls.Add(this.PrintPostionNumericUpDown);
+            this.Controls.Add(this.PrintRowLabel);
+            this.Controls.Add(this.TemplateButton);
+            this.Controls.Add(this.CommentComboBox);
+            this.Controls.Add(this.CommentTextBox);
+            this.Controls.Add(this.CommentCheckBox);
+            this.Controls.Add(this.ExtraTextBox6);
+            this.Controls.Add(this.ExtraCheckBox6);
+            this.Controls.Add(this.ExtraTextBox5);
+            this.Controls.Add(this.ExtraCheckBox5);
+            this.Controls.Add(this.ExtraTextBox4);
+            this.Controls.Add(this.ExtraCheckBox4);
+            this.Controls.Add(this.PersonComboBox);
+            this.Controls.Add(this.PersonCheckBox);
+            this.Controls.Add(this.RegistrationDateMaskedTextBox);
+            this.Controls.Add(this.RegistrationDateCheckBox);
+            this.Controls.Add(this.ExtraTextBox3);
+            this.Controls.Add(this.ExtraCheckBox3);
+            this.Controls.Add(this.ExtraTextBox2);
+            this.Controls.Add(this.ExtraCheckBox2);
+            this.Controls.Add(this.ExtraTextBox1);
+            this.Controls.Add(this.ExtraCheckBox1);
+            this.Controls.Add(this.RevisionTextBox);
+            this.Controls.Add(this.RevisionCheckBox);
+            this.Controls.Add(this.DefectNumberTextBox);
+            this.Controls.Add(this.DefectNumberCheckBox);
+            this.Controls.Add(this.QuantityTextBox);
+            this.Controls.Add(this.QuantityCheckBox);
+            this.Controls.Add(this.ManufacturingNumberMaskedTextBox);
+            this.Controls.Add(this.ManufacturingNumberCheckBox);
+            this.Controls.Add(this.OrderNumberTextBox);
+            this.Controls.Add(this.OrderNumberCheckBox);
+            this.Controls.Add(this.StockLabel2);
+            this.Controls.Add(this.StockLabel1);
+            this.Controls.Add(this.SubstrateModelLabel2);
+            this.Controls.Add(this.SubstrateModelLabel1);
+            this.Controls.Add(this.ProductNameLabel2);
+            this.Controls.Add(this.ProductNameLabel1);
+            this.Controls.Add(this.SubstrateRegistrationMenuStrip);
+            this.Font = new Font("Meiryo UI", 9F);
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MainMenuStrip = this.SubstrateRegistrationMenuStrip;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "SubstrateRegistrationWindow";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
+            this.StartPosition = FormStartPosition.CenterParent;
+            this.Text = "基盤登録";
+            this.FormClosing += this.SubstrateRegistrationWindow_FormClosing;
+            this.Load += this.SubstrateRegistrationWindow_Load;
+            this.SubstrateRegistrationMenuStrip.ResumeLayout(false);
+            this.SubstrateRegistrationMenuStrip.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)this.PrintPostionNumericUpDown).EndInit();
+            this.ResumeLayout(false);
+            this.PerformLayout();
         }
 
         #endregion

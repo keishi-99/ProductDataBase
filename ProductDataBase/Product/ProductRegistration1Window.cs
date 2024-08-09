@@ -24,6 +24,7 @@ namespace ProductDatabase {
 
                 ProductNameLabel2.Text = ProductInfo.ProductName;
                 SubstrateModelLabel2.Text = $"{ProductInfo.ProductName} - {ProductInfo.ProductModel}";
+                ProductTypeLabel2.Text = ProductInfo.ProductType;
 
                 OrderNumberTextBox.Text = ProductInfo.Proness5;
                 ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(ProductInfo.Proness1) ? ProductInfo.Proness1 : ManufacturingNumberMaskedTextBox.Text;
