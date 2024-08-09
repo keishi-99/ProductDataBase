@@ -484,19 +484,19 @@ namespace ProductDatabase {
             using var dr = cmd.ExecuteReader();
             if (!dr.HasRows) { throw new Exception($"品目番号が見つかりません。\n品目番号:[{ProductInfo.Proness2}]"); }
             while (dr.Read()) {
-                var colItemNumber = dr["col_SubItemNumber"].ToString() ?? string.Empty;
-                var colItemNumber1 = dr["col_ProItemNumber"].ToString() ?? string.Empty;
+                var colSubItemNumber = dr["col_SubItemNumber"].ToString() ?? string.Empty;
+                var colProItemNumber = dr["col_ProItemNumber"].ToString() ?? string.Empty;
 
-                if (!string.IsNullOrEmpty(colItemNumber)) {
+                if (!string.IsNullOrEmpty(colSubItemNumber)) {
                     var substrateName = dr["col_Substrate_Name"]?.ToString() ?? string.Empty;
                     var productName = dr["col_Product_Name"]?.ToString() ?? string.Empty;
-                    AddToLists(colItemNumber, substrateName, productName, "1");
+                    AddToLists(colSubItemNumber, substrateName, productName, "1");
                 }
 
-                if (!string.IsNullOrEmpty(colItemNumber1)) {
+                if (!string.IsNullOrEmpty(colProItemNumber)) {
                     var productType = dr["col_Product_Type"]?.ToString() ?? string.Empty;
                     var productName = dr["col_Product_Name:1"]?.ToString() ?? string.Empty;
-                    AddToLists(colItemNumber1, productType, productName, "2");
+                    AddToLists(colProItemNumber, productType, productName, "2");
                 }
             }
         }
