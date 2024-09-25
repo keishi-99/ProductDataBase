@@ -14,10 +14,10 @@ namespace ProductDatabase {
     public partial class ProductRegistration2Window : Form {
 
         public CSettingsLabelPro SettingsLabelPro { get; set; } = new CSettingsLabelPro();
-        private string _strLabelSettingFilePath = string.Empty;
+        private string _strLabelSettingFilePath = String.Empty;
 
         public CSettingsBarcodePro SettingsBarcodePro { get; set; } = new CSettingsBarcodePro();
-        private string _strBarcodeSettingFilePath = string.Empty;
+        private string _strBarcodeSettingFilePath = String.Empty;
 
         public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
 
@@ -30,10 +30,10 @@ namespace ProductDatabase {
         private readonly int _displayMagnitude = 3;
         private int _pageCnt = 1;
 
-        private string _serialType = string.Empty;
-        private string _serialFirst = string.Empty;
-        private string _serialLast = string.Empty;
-        private string _totalSubstrate = string.Empty;
+        private string _serialType = String.Empty;
+        private string _serialFirst = String.Empty;
+        private string _serialLast = String.Empty;
+        private string _totalSubstrate = String.Empty;
         private int _serialLastNumber;
         private bool _fontUnderbar = false;
         private readonly List<string> _strSerial = [];
@@ -64,7 +64,7 @@ namespace ProductDatabase {
                 _serialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
 
                 var quantityFlg = false;
-                var strQuantity = string.Empty;
+                var strQuantity = String.Empty;
                 switch (ProductInfo.RegType) {
                     case 2:
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
@@ -179,7 +179,7 @@ namespace ProductDatabase {
                             cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _useSubstrate[i];
                             using (var dr = cmd.ExecuteReader()) {
                                 while (dr.Read()) {
-                                    var strSubstrateName = string.Empty;
+                                    var strSubstrateName = String.Empty;
                                     strSubstrateName = $"{dr["col_Substrate_Name"]}";
 
                                     var strSubstrateNumber = $"{dr["col_Substrate_Num"]}";
@@ -295,13 +295,13 @@ namespace ProductDatabase {
         }
         private void LoadSettings(string strLabelSettingFilePath, string strBarcodeSettingFilePath) {
             try {
-                if (strLabelSettingFilePath != string.Empty) {
+                if (strLabelSettingFilePath != String.Empty) {
                     using StreamReader? srLabel = new(strLabelSettingFilePath, new System.Text.UTF8Encoding(false));
                     System.Xml.Serialization.XmlSerializer serializerLabel = new(typeof(CSettingsLabelPro));
                     if (serializerLabel.Deserialize(srLabel) is CSettingsLabelPro result) { SettingsLabelPro = result; }
                     srLabel?.Close();
                 }
-                if (strBarcodeSettingFilePath != string.Empty) {
+                if (strBarcodeSettingFilePath != String.Empty) {
                     using StreamReader? srBarcode = new(strBarcodeSettingFilePath, new System.Text.UTF8Encoding(false));
                     System.Xml.Serialization.XmlSerializer serializerBarcode = new(typeof(CSettingsBarcodePro));
                     if (serializerBarcode.Deserialize(srBarcode) is CSettingsBarcodePro result) { SettingsBarcodePro = result; }
@@ -513,14 +513,14 @@ namespace ProductDatabase {
                             if (objCbx.Checked) {
                                 var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
                                 var dgvRowCnt = objDgv.Rows.Count;
-                                var subTotalTemp = string.Empty;
+                                var subTotalTemp = String.Empty;
 
                                 for (var j = 0; j <= dgvRowCnt - 1; j++) {
                                     var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[3].Value);
                                     if (boolCbx) {
-                                        var substrateName = string.Empty;
-                                        var substrateModel = string.Empty;
-                                        var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
+                                        var substrateName = String.Empty;
+                                        var substrateModel = String.Empty;
+                                        var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? String.Empty;
                                         var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
                                         var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
 
@@ -554,7 +554,7 @@ namespace ProductDatabase {
                                         }
 
                                         if (useValue != 0) {
-                                            subTotalTemp = string.IsNullOrEmpty(subTotalTemp) ? $"{substrateNum}({useValue})" : $"{subTotalTemp},{substrateNum}({useValue})";
+                                            subTotalTemp = String.IsNullOrEmpty(subTotalTemp) ? $"{substrateNum}({useValue})" : $"{subTotalTemp},{substrateNum}({useValue})";
                                         }
 
                                         using (var cmd = con.CreateCommand()) {
@@ -614,10 +614,10 @@ namespace ProductDatabase {
                                         }
                                     }
                                 }
-                                _totalSubstrate = string.IsNullOrEmpty(_totalSubstrate)
+                                _totalSubstrate = String.IsNullOrEmpty(_totalSubstrate)
                                     ? $"[{_useSubstrate[i]}]{subTotalTemp}"
                                     : $"{_totalSubstrate},[{_useSubstrate[i]}]{subTotalTemp}";
-                                subTotalTemp = string.Empty;
+                                subTotalTemp = String.Empty;
                             }
                         }
 
@@ -778,7 +778,7 @@ namespace ProductDatabase {
             using SQLiteConnection con = new(GetConnectionString2());
             con.Open();
 
-            var productModel = string.Empty;
+            var productModel = String.Empty;
 
             // 製番が新規かチェック
             using (var cmd = con.CreateCommand()) {
@@ -791,7 +791,7 @@ namespace ProductDatabase {
                 }
             }
 
-            if (productModel != string.Empty) {
+            if (productModel != String.Empty) {
                 if (productModel == ProductInfo.ProductModel) {
                     Activate();
                     var result = MessageBox.Show($"製番[{ProductInfo.ProductNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
@@ -806,7 +806,7 @@ namespace ProductDatabase {
                 }
             }
 
-            productModel = string.Empty;
+            productModel = String.Empty;
 
             // 注文番号が新規かチェック
             using (var cmd = con.CreateCommand()) {
@@ -819,7 +819,7 @@ namespace ProductDatabase {
                 }
             }
 
-            if (productModel != string.Empty) {
+            if (productModel != String.Empty) {
                 if (productModel == ProductInfo.ProductModel) {
                     Activate();
                     var result = MessageBox.Show($"注文番号[{ProductInfo.OrderNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
@@ -913,7 +913,7 @@ namespace ProductDatabase {
                         break;
                 }
 
-                var strSQLSerial = string.Join("','", _strSerial);
+                var strSQLSerial = String.Join("','", _strSerial);
 
                 List<string> strSerialDuplication = [];
                 using (SQLiteConnection con = new(GetConnectionString2())) {
@@ -930,7 +930,7 @@ namespace ProductDatabase {
                 }
 
                 if (strSerialDuplication.Count > 0) {
-                    var strSQLDuplication = string.Join($"{Environment.NewLine}", strSerialDuplication);
+                    var strSQLDuplication = String.Join($"{Environment.NewLine}", strSerialDuplication);
                     throw new Exception($"{strSQLDuplication}{Environment.NewLine}は既に使用されているシリアルです。");
                 }
 
@@ -981,7 +981,7 @@ namespace ProductDatabase {
 
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
                 Point headerPos = new(0, 0);
-                var headerString = string.Empty;
+                var headerString = String.Empty;
                 Font headerFooterFont = new("Arial", 6);
                 var intNumLabels = 0;
                 var intCountNumLabels = 0;
@@ -1136,14 +1136,14 @@ namespace ProductDatabase {
             var outputCode = _serialType switch {
                 "Label" => SettingsLabelPro.LabelProLabelSettings.Format,
                 "Barcode" => SettingsBarcodePro.BarcodeProLabelSettings.Format,
-                _ => string.Empty
+                _ => String.Empty
             };
 
             outputCode = outputCode.Replace("%Y", DateTime.Parse(ProductInfo.RegDate).ToString("yy"))
                                     .Replace("%MM", DateTime.Parse(ProductInfo.RegDate).ToString("MM"))
                                     .Replace("%T", ProductInfo.Initial)
                                     .Replace("%R", ProductInfo.Revision)
-                                    .Replace("%M", string.IsNullOrEmpty(monthCode) ? string.Empty : monthCode[^1..])
+                                    .Replace("%M", String.IsNullOrEmpty(monthCode) ? String.Empty : monthCode[^1..])
                                     .Replace("%S", Convert.ToInt32(serialCode).ToString($"D{ProductInfo.SerialDigit}"));
             return outputCode;
         }
@@ -1355,19 +1355,19 @@ namespace ProductDatabase {
         // リスト印刷
         private void ListPrint() {
             try {
-                var sheetName = string.Empty;
-                var productName = string.Empty;
-                var productModel = string.Empty;
+                var sheetName = String.Empty;
+                var productName = String.Empty;
+                var productModel = String.Empty;
 
-                var productNameRange = string.Empty;
-                var productNumberRange = string.Empty;
-                var orderNumberRange = string.Empty;
-                var regDateRange = string.Empty;
-                var productModelRange = string.Empty;
-                var quantityRange = string.Empty;
-                var serialFirstRange = string.Empty;
-                var serialLastRange = string.Empty;
-                var commentRange = string.Empty;
+                var productNameRange = String.Empty;
+                var productNumberRange = String.Empty;
+                var orderNumberRange = String.Empty;
+                var regDateRange = String.Empty;
+                var productModelRange = String.Empty;
+                var quantityRange = String.Empty;
+                var serialFirstRange = String.Empty;
+                var serialLastRange = String.Empty;
+                var commentRange = String.Empty;
 
                 using FileStream fileStream = new($"{Environment.CurrentDirectory}./config/Excel/ConfigList.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using XLWorkbook workBook = new(fileStream);
@@ -1436,8 +1436,8 @@ namespace ProductDatabase {
                     var mainCellValue = workSheetMain.Cell(findRow, findColumn + 1).Value.ToString();
                     var tempCellValue = workSheetTemp.Cell(mainCellValue).Value.ToString();
 
-                    if (mainCellValue != string.Empty) {
-                        if (tempCellValue == string.Empty) {
+                    if (mainCellValue != String.Empty) {
+                        if (tempCellValue == String.Empty) {
                             workSheetTemp.Cell(mainCellValue).Value = $"{_usedProductNumber[i]}({_usedQuantity[i]})";
                         }
                         else {
@@ -1511,7 +1511,7 @@ namespace ProductDatabase {
             ls.ShowDialog(this);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
-            var message = string.Join(Environment.NewLine,
+            var message = String.Join(Environment.NewLine,
                 $"StrProductName\t\t[{ProductInfo.ProductName}]",
                 $"StrProductModel\t\t[{ProductInfo.ProductModel}]",
                 $"StrStockName\t\t[{ProductInfo.StockName}]",

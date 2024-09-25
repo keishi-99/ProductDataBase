@@ -37,7 +37,7 @@ namespace ProductDatabase {
 
                             _listColFilter.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
+                                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? String.Empty;
                                 if (headerValue != null) { _listColFilter.Add(headerValue); }
                             }
 
@@ -82,7 +82,7 @@ namespace ProductDatabase {
 
                             CategoryComboBox.Items.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? string.Empty);
+                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? String.Empty);
                             }
                         }
                         break;
@@ -103,7 +103,7 @@ namespace ProductDatabase {
 
                             _listColFilter.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
+                                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? String.Empty;
                                 if (headerValue != null) { _listColFilter.Add(headerValue); }
                             }
 
@@ -147,7 +147,7 @@ namespace ProductDatabase {
 
                             CategoryComboBox.Items.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? string.Empty);
+                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? String.Empty);
                             }
                         }
                         break;
@@ -168,7 +168,7 @@ namespace ProductDatabase {
 
                             _listColFilter.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
+                                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? String.Empty;
                                 if (headerValue != null) { _listColFilter.Add(headerValue); }
                             }
 
@@ -208,7 +208,7 @@ namespace ProductDatabase {
 
                             CategoryComboBox.Items.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? string.Empty);
+                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? String.Empty);
                             }
                         }
                         break;
@@ -220,11 +220,11 @@ namespace ProductDatabase {
 
         private void HistoryTableFilter(object sender, EventArgs e) {
             try {
-                if (string.IsNullOrEmpty(FilterStringTextBox.Text) || CategoryComboBox.SelectedIndex == 0) {
+                if (String.IsNullOrEmpty(FilterStringTextBox.Text) || CategoryComboBox.SelectedIndex == 0) {
                     _historyTable.DefaultView.RowFilter = null;
                 }
                 else if (CategoryComboBox.Text == "ID") {
-                    if (int.TryParse(FilterStringTextBox.Text, out var id)) { _historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} = '{id}'"; }
+                    if (Int32.TryParse(FilterStringTextBox.Text, out var id)) { _historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} = '{id}'"; }
                 }
                 else if (CategoryComboBox.Text != "") {
                     _historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} LIKE '*{FilterStringTextBox.Text}*'";

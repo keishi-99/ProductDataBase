@@ -22,7 +22,7 @@ namespace ProductDatabase.Substrate {
         public double IntervalX { get; set; } = 4;
         public double IntervalY { get; set; } = 4;
         public string HeaderString { get; set; } = "%D 製番 %M 注番 %O %T 台数 %N 担当者 %U";
-        public string FooterString { get; set; } = string.Empty;
+        public string FooterString { get; set; } = String.Empty;
         public Point HeaderPos { get; set; } = Point.Empty;
         public Point FooterPos { get; set; } = Point.Empty;
 
@@ -30,8 +30,8 @@ namespace ProductDatabase.Substrate {
         public Font HeaderFooterFont { get; set; } = new Font("Arial", 6);
 
         public string FontAsString {
-            get { return ConvertToString(HeaderFooterFont); }
-            set { HeaderFooterFont = ConvertFromString<Font>(value); }
+            get => ConvertToString(HeaderFooterFont);
+            set => HeaderFooterFont = ConvertFromString<Font>(value);
         }
 
         public static string ConvertToString<T>(T value) {
@@ -59,8 +59,8 @@ namespace ProductDatabase.Substrate {
 
         [Browsable(false)]
         public string FontAsString {
-            get { return ConvertToString(Font); }
-            set { Font = ConvertFromString<Font>(value); }
+            get => ConvertToString(Font);
+            set => Font = ConvertFromString<Font>(value);
         }
 
         public static string ConvertToString<T>(T value) {

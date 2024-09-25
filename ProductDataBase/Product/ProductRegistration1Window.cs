@@ -27,8 +27,8 @@ namespace ProductDatabase {
                 ProductTypeLabel2.Text = ProductInfo.ProductType;
 
                 OrderNumberTextBox.Text = ProductInfo.Proness5;
-                ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(ProductInfo.Proness1) ? ProductInfo.Proness1 : ManufacturingNumberMaskedTextBox.Text;
-                QuantityTextBox.Text = (ProductInfo.Proness4 != 0) ? ProductInfo.Proness4.ToString() : string.Empty;
+                ManufacturingNumberMaskedTextBox.Text = !String.IsNullOrEmpty(ProductInfo.Proness1) ? ProductInfo.Proness1 : ManufacturingNumberMaskedTextBox.Text;
+                QuantityTextBox.Text = (ProductInfo.Proness4 != 0) ? ProductInfo.Proness4.ToString() : String.Empty;
 
                 FirstSerialNumberTextBox.MaxLength = ProductInfo.SerialDigit;
 
@@ -92,7 +92,7 @@ namespace ProductDatabase {
                 foreach (Control control in Controls) {
                     if (control is TextBoxBase textBox && textBox.Enabled) {
                         anyTextBoxEnabled = true;
-                        if (string.IsNullOrWhiteSpace(textBox.Text)) {
+                        if (String.IsNullOrWhiteSpace(textBox.Text)) {
                             allTextBoxesFilled = false;
                             break;
                         }
@@ -103,7 +103,7 @@ namespace ProductDatabase {
 
                 if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
 
-                if (QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
+                if (QuantityCheckBox.Checked && Int32.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
 
                 var result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) {
@@ -155,7 +155,7 @@ namespace ProductDatabase {
         private void TemplateComment() {
             var templateWord = CommentComboBox.SelectedIndex switch {
                 0 => "[Rev.UP]変更点番号:",
-                _ => string.Empty
+                _ => String.Empty
             };
             CommentTextBox.Text = $"{CommentTextBox.Text}{templateWord}";
         }
@@ -247,7 +247,7 @@ namespace ProductDatabase {
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void RegistrationDateMaskedTextBox_TypeValidationCompleted(object sender, TypeValidationEventArgs e) { RegistrationDateCheck(sender, e); }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
-            var message = string.Join(Environment.NewLine,
+            var message = String.Join(Environment.NewLine,
                 $"StrProness1\t\t[{ProductInfo.Proness1}]",
                 $"StrProness2\t\t[{ProductInfo.Proness2}]",
                 $"StrProness3\t\t[{ProductInfo.Proness3}]",
