@@ -29,8 +29,8 @@ dotnet_style_qualification_for_method = true
 dotnet_style_qualification_for_property = true
 
 # 言語キーワードと BCL の種類の設定
-dotnet_style_predefined_type_for_locals_parameters_members = true
-dotnet_style_predefined_type_for_member_access = true
+dotnet_style_predefined_type_for_locals_parameters_members = true:error
+dotnet_style_predefined_type_for_member_access = false:error
 
 # かっこの設定
 dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity

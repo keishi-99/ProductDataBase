@@ -29,7 +29,7 @@ namespace ProductDatabase {
 
                 _colFilter.Add("");
                 for (var i = 0; i < SubstrateChangeDataGridView.ColumnCount; i++) {
-                    var headerValue = SubstrateChangeDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
+                    var headerValue = SubstrateChangeDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? String.Empty;
                     if (headerValue != null) { _colFilter.Add(headerValue); }
                 }
 
@@ -82,15 +82,15 @@ namespace ProductDatabase {
 
             var i = SubstrateChangeDataGridView.SelectedCells[0].RowIndex;
 
-            ProductInfo.OrderNumber = SubstrateChangeDataGridView.Rows[i].Cells[1].Value.ToString() ?? string.Empty;
-            ProductInfo.ProductNumber = SubstrateChangeDataGridView.Rows[i].Cells[2].Value.ToString() ?? string.Empty;
-            ProductInfo.ProductType = SubstrateChangeDataGridView.Rows[i].Cells[3].Value.ToString() ?? string.Empty;
-            ProductInfo.ProductModel = SubstrateChangeDataGridView.Rows[i].Cells[4].Value.ToString() ?? string.Empty;
-            ProductInfo.Revision = SubstrateChangeDataGridView.Rows[i].Cells[8].Value.ToString() ?? string.Empty;
-            ProductInfo.SerialFirst = SubstrateChangeDataGridView.Rows[i].Cells[9].Value.ToString() ?? string.Empty;
-            ProductInfo.SerialLast = SubstrateChangeDataGridView.Rows[i].Cells[10].Value.ToString() ?? string.Empty;
-            ProductInfo.Comment = SubstrateChangeDataGridView.Rows[i].Cells[12].Value.ToString() ?? string.Empty;
-            ProductInfo.UsedSubstrate = SubstrateChangeDataGridView.Rows[i].Cells[13].Value.ToString() ?? string.Empty;
+            ProductInfo.OrderNumber = SubstrateChangeDataGridView.Rows[i].Cells[1].Value.ToString() ?? String.Empty;
+            ProductInfo.ProductNumber = SubstrateChangeDataGridView.Rows[i].Cells[2].Value.ToString() ?? String.Empty;
+            ProductInfo.ProductType = SubstrateChangeDataGridView.Rows[i].Cells[3].Value.ToString() ?? String.Empty;
+            ProductInfo.ProductModel = SubstrateChangeDataGridView.Rows[i].Cells[4].Value.ToString() ?? String.Empty;
+            ProductInfo.Revision = SubstrateChangeDataGridView.Rows[i].Cells[8].Value.ToString() ?? String.Empty;
+            ProductInfo.SerialFirst = SubstrateChangeDataGridView.Rows[i].Cells[9].Value.ToString() ?? String.Empty;
+            ProductInfo.SerialLast = SubstrateChangeDataGridView.Rows[i].Cells[10].Value.ToString() ?? String.Empty;
+            ProductInfo.Comment = SubstrateChangeDataGridView.Rows[i].Cells[12].Value.ToString() ?? String.Empty;
+            ProductInfo.UsedSubstrate = SubstrateChangeDataGridView.Rows[i].Cells[13].Value.ToString() ?? String.Empty;
             ProductInfo.Quantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells[5].Value);
             ProductInfo.SerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells[11].Value);
             using SubstrateChange2 window = new();

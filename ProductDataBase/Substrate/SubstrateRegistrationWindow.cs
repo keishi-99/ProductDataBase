@@ -13,7 +13,7 @@ namespace ProductDatabase {
 
         private readonly string _settingFilePath = "./config/SubstrateConfig.xml";
 
-        private string _labelSubNSerial = string.Empty;
+        private string _labelSubNSerial = String.Empty;
 
         private int _labelSubPageNum;
         private int _labelSubNumLabelsToPrint;
@@ -38,8 +38,8 @@ namespace ProductDatabase {
                 SubstrateModelLabel2.Text = $"{ProductInfo.SubstrateName} - {ProductInfo.SubstrateModel}";
 
                 OrderNumberTextBox.Text = ProductInfo.Proness5;
-                ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(ProductInfo.Proness1) ? ProductInfo.Proness1 : ManufacturingNumberMaskedTextBox.Text;
-                QuantityTextBox.Text = (ProductInfo.Proness4 != 0) ? ProductInfo.Proness4.ToString() : string.Empty;
+                ManufacturingNumberMaskedTextBox.Text = !String.IsNullOrEmpty(ProductInfo.Proness1) ? ProductInfo.Proness1 : ManufacturingNumberMaskedTextBox.Text;
+                QuantityTextBox.Text = (ProductInfo.Proness4 != 0) ? ProductInfo.Proness4.ToString() : String.Empty;
 
                 RegisterButton.Enabled = true;
 
@@ -134,7 +134,7 @@ namespace ProductDatabase {
                 foreach (Control control in Controls) {
                     if (control is TextBoxBase textBox && textBox.Enabled) {
                         anyTextBoxEnabled = true;
-                        if (string.IsNullOrWhiteSpace(textBox.Text)) {
+                        if (String.IsNullOrWhiteSpace(textBox.Text)) {
                             allTextBoxesFilled = false;
                             break;
                         }
@@ -145,13 +145,13 @@ namespace ProductDatabase {
 
                 if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
 
-                if (QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
+                if (QuantityCheckBox.Checked && Int32.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
 
-                if (DefectNumberCheckBox.Checked && int.Parse(DefectNumberTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
+                if (DefectNumberCheckBox.Checked && Int32.Parse(DefectNumberTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
 
                 if (!QuantityCheckBox.Checked && !DefectNumberCheckBox.Checked) { throw new Exception("数量か不良数を入力してください。"); }
 
-                if (!DefectNumberCheckBox.Checked && string.IsNullOrEmpty(PrintPostionNumericUpDown.Text)) { PrintPostionNumericUpDown.Text = "1"; }
+                if (!DefectNumberCheckBox.Checked && String.IsNullOrEmpty(PrintPostionNumericUpDown.Text)) { PrintPostionNumericUpDown.Text = "1"; }
 
                 var result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) {
@@ -195,7 +195,7 @@ namespace ProductDatabase {
 
                 // 製番が新規かチェック
                 if (ProductInfo.RegType != 0) {
-                    var substrateName = string.Empty;
+                    var substrateName = String.Empty;
                     using (var cmd = con.CreateCommand()) {
                         cmd.CommandText = $"SELECT * FROM Stock_{ProductInfo.StockName} WHERE col_Substrate_Num = @col_Substrate_Num ORDER BY _rowid_ DESC LIMIT 1";
                         cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
@@ -205,7 +205,7 @@ namespace ProductDatabase {
                         }
                     }
 
-                    if (substrateName != string.Empty) {
+                    if (substrateName != String.Empty) {
                         if (ProductInfo.SubstrateName == substrateName) {
                             var result = MessageBox.Show($"[{ManufacturingNumberMaskedTextBox.Text}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
                             if (result == DialogResult.No) { return false; }
@@ -337,7 +337,7 @@ namespace ProductDatabase {
                 //// PrintPageイベントハンドラの追加
                 pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
-                _labelSubNumLabelsToPrint = int.TryParse(QuantityTextBox.Text, out var quantity) ? quantity : 0;
+                _labelSubNumLabelsToPrint = Int32.TryParse(QuantityTextBox.Text, out var quantity) ? quantity : 0;
                 if (_labelSubNumLabelsToPrint == 0) {
                     throw new Exception("数量が入力されていません。");
                 }
@@ -495,7 +495,7 @@ namespace ProductDatabase {
                                     .Replace("%R", RevisionTextBox.Text)
                                     .Replace("%Y", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yy"))
                                     .Replace("%MM", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM"))
-                                    .Replace("%M", string.IsNullOrEmpty(monthCode) ? string.Empty : monthCode[^1..])
+                                    .Replace("%M", String.IsNullOrEmpty(monthCode) ? String.Empty : monthCode[^1..])
                                     .Replace("%S", serialCode);
 
             return outputCode;
@@ -526,7 +526,7 @@ namespace ProductDatabase {
         private void TemplateComment() {
             var templateWord = CommentComboBox.SelectedIndex switch {
                 0 => "[Rev.UP]変更点番号:",
-                _ => string.Empty
+                _ => String.Empty
             };
             CommentTextBox.Text = $"{CommentTextBox.Text}{templateWord}";
         }
@@ -636,7 +636,7 @@ namespace ProductDatabase {
             }
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
-            var message = string.Join(Environment.NewLine,
+            var message = String.Join(Environment.NewLine,
                 $"StrProness1\t\t[{ProductInfo.Proness1}]",
                 $"StrProness2\t\t[{ProductInfo.Proness2}]",
                 $"StrProness3\t\t[{ProductInfo.Proness3}]",

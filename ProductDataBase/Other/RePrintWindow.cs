@@ -8,19 +8,19 @@ namespace ProductDatabase {
     public partial class RePrintWindow : Form {
 
         public CSettingsLabelPro SettingsLabelPro { get; set; } = new CSettingsLabelPro();
-        private string _labelSettingFilePath = string.Empty;
+        private string _labelSettingFilePath = String.Empty;
 
         public CSettingsBarcodePro SettingsBarcodePro { get; set; } = new CSettingsBarcodePro();
-        private string _barcodeSettingFilePath = string.Empty;
+        private string _barcodeSettingFilePath = String.Empty;
 
         public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
 
-        private string _orderNumber = string.Empty;
-        private string _productNumber = string.Empty;
-        private string _regDate = string.Empty;
-        private string _person = string.Empty;
-        private string _revision = string.Empty;
-        private string _comment = string.Empty;
+        private string _orderNumber = String.Empty;
+        private string _productNumber = String.Empty;
+        private string _regDate = String.Empty;
+        private string _person = String.Empty;
+        private string _revision = String.Empty;
+        private string _comment = String.Empty;
 
         private int _quantity;
         private int _serialFirstNumber;
@@ -34,9 +34,9 @@ namespace ProductDatabase {
         private readonly int _displayMagnitude = 3;
         private int _intPageCnt = 1;
 
-        private string _strSerialType = string.Empty;
-        private string _strSerialFirstNumber = string.Empty;
-        private string _strSerialLastNumber = string.Empty;
+        private string _strSerialType = String.Empty;
+        private string _strSerialFirstNumber = String.Empty;
+        private string _strSerialLastNumber = String.Empty;
         private bool _fontUnderbar = false;
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
@@ -139,13 +139,13 @@ namespace ProductDatabase {
         }
         private void LoadSettings(string strLabelSettingFilePath, string strBarcodeSettingFilePath) {
             try {
-                if (strLabelSettingFilePath != string.Empty) {
+                if (strLabelSettingFilePath != String.Empty) {
                     StreamReader? srLabel = new(strLabelSettingFilePath, new System.Text.UTF8Encoding(false));
                     System.Xml.Serialization.XmlSerializer serializerLabel = new(typeof(CSettingsLabelPro));
                     if (serializerLabel.Deserialize(srLabel) is CSettingsLabelPro result) { SettingsLabelPro = result; }
                     srLabel?.Close();
                 }
-                if (strBarcodeSettingFilePath != string.Empty) {
+                if (strBarcodeSettingFilePath != String.Empty) {
                     StreamReader? srBarcode = new(strBarcodeSettingFilePath, new System.Text.UTF8Encoding(false));
                     System.Xml.Serialization.XmlSerializer serializerBarcode = new(typeof(CSettingsBarcodePro));
                     if (serializerBarcode.Deserialize(srBarcode) is CSettingsBarcodePro result) { SettingsBarcodePro = result; }
@@ -167,7 +167,7 @@ namespace ProductDatabase {
                 foreach (Control control in Controls) {
                     if (control is TextBoxBase textBox && textBox.Enabled) {
                         anyTextBoxEnabled = true;
-                        if (string.IsNullOrWhiteSpace(textBox.Text)) {
+                        if (String.IsNullOrWhiteSpace(textBox.Text)) {
                             allTextBoxesFilled = false;
                             break;
                         }
@@ -178,7 +178,7 @@ namespace ProductDatabase {
 
                 if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
 
-                if (QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
+                if (QuantityCheckBox.Checked && Int32.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
 
                 result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) {
@@ -303,7 +303,7 @@ namespace ProductDatabase {
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
                 var startLineLabel = (int)PrintPostionNumericUpDown.Value - 1;
                 Point headerPos = new(0, 0);
-                var headerString = string.Empty;
+                var headerString = String.Empty;
                 Font headerFooterFont = new("Arial", 6);
                 var intNumLabels = 0;
                 var intCountNumLabels = 0;
@@ -454,7 +454,7 @@ namespace ProductDatabase {
             var outputCode = _strSerialType switch {
                 "Label" => SettingsLabelPro.LabelProLabelSettings.Format,
                 "Barcode" => SettingsBarcodePro.BarcodeProLabelSettings.Format,
-                _ => string.Empty
+                _ => String.Empty
             };
 
             outputCode = outputCode.Replace("%Y", DateTime.Parse(_regDate).ToString("yy"))
@@ -629,7 +629,7 @@ namespace ProductDatabase {
             Registeration();
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
-            var message = string.Join(Environment.NewLine,
+            var message = String.Join(Environment.NewLine,
                 $"StrProductName\t\t[{ProductInfo.ProductName}]",
                 $"StrProductModel\t\t[{ProductInfo.ProductModel}]",
                 $"StrProductType\t\t[{ProductInfo.ProductType}]",

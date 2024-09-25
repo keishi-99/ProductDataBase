@@ -9,7 +9,7 @@ namespace ProductDatabase {
 
         public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
 
-        private string _totalSubstrate = string.Empty;
+        private string _totalSubstrate = String.Empty;
 
         private string[] _useSubstrate = [];
         private string[] _usedSubstrate = [];
@@ -61,8 +61,8 @@ namespace ProductDatabase {
 
                 _useSubstrate = ProductInfo.UseSubstrate.Split(",");
                 _usedSubstrate = ProductInfo.UsedSubstrate.Split(",");
-                var strQuantity = string.Empty;
-                var strSubstrateName = string.Empty;
+                var strQuantity = String.Empty;
+                var strSubstrateName = String.Empty;
 
                 switch (ProductInfo.RegType) {
                     case 2:
@@ -95,14 +95,14 @@ namespace ProductDatabase {
                             using var dr = cmd.ExecuteReader();
                             var j = 0;
                             while (dr.Read()) {
-                                var strUsedSubNum = string.Empty;
-                                var strUsedQuantity = string.Empty;
+                                var strUsedSubNum = String.Empty;
+                                var strUsedQuantity = String.Empty;
                                 var intUsedQuantity = 0;
 
                                 // 抽出した行から製造番号,在庫取得
                                 var strSubstrateNum = $"{dr["col_Substrate_num"]}";
-                                var intStock = int.Parse($"{dr["col_Stock"]}");
-                                var colFlg = int.Parse($"{dr["col_Flg"]}");
+                                var intStock = Int32.Parse($"{dr["col_Stock"]}");
+                                var colFlg = Int32.Parse($"{dr["col_Flg"]}");
                                 strSubstrateName = $"{dr["col_Substrate_Name"]}";
                                 if (_objCbx != null) { _objCbx.Text = $"{strSubstrateName} - {_useSubstrate[i]}"; }
 
@@ -126,7 +126,7 @@ namespace ProductDatabase {
                                     strUsedQuantity = _usedSubstrate[subIndex];
                                     strUsedQuantity = strUsedQuantity[(strUsedQuantity.IndexOf('(') + 1)..];
                                     strUsedQuantity = strUsedQuantity[..strUsedQuantity.IndexOf(')')];
-                                    intUsedQuantity = int.Parse(strUsedQuantity);
+                                    intUsedQuantity = Int32.Parse(strUsedQuantity);
                                 }
 
                                 if (colFlg == 1) {
@@ -260,7 +260,7 @@ namespace ProductDatabase {
             try {
                 ProductInfo.RegDate = RegistrationDateMaskedTextBox.Text;
                 ProductInfo.Person = PersonComboBox.Text;
-                if (string.IsNullOrEmpty(ProductInfo.Person)) { throw new Exception("担当者を選択してください。"); }
+                if (String.IsNullOrEmpty(ProductInfo.Person)) { throw new Exception("担当者を選択してください。"); }
 
                 switch (ProductInfo.RegType) {
                     case 2:
@@ -275,14 +275,14 @@ namespace ProductDatabase {
                                 if (objCbx.Checked) {
                                     var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
                                     var dgvRowCnt = objDgv.Rows.Count;
-                                    var subTotalTemp = string.Empty;
+                                    var subTotalTemp = String.Empty;
 
                                     for (var j = 0; j <= dgvRowCnt - 1; j++) {
                                         var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[4].Value);
                                         if (boolCbx) {
-                                            var substrateName = string.Empty;
-                                            var substrateModel = string.Empty;
-                                            var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
+                                            var substrateName = String.Empty;
+                                            var substrateModel = String.Empty;
+                                            var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? String.Empty;
                                             var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
                                             var usedValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value.ToString());
                                             var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[3].Value);
@@ -327,7 +327,7 @@ namespace ProductDatabase {
                                             }
 
                                             if (useValue != 0) {
-                                                subTotalTemp = string.IsNullOrEmpty(subTotalTemp) ? $"{substrateNum}({useValue})" : $"{subTotalTemp},{substrateNum}({useValue})";
+                                                subTotalTemp = String.IsNullOrEmpty(subTotalTemp) ? $"{substrateNum}({useValue})" : $"{subTotalTemp},{substrateNum}({useValue})";
                                             }
 
                                             // 基板テーブルへ追加
@@ -388,10 +388,10 @@ namespace ProductDatabase {
                                             }
                                         }
                                     }
-                                    _totalSubstrate = string.IsNullOrEmpty(_totalSubstrate)
+                                    _totalSubstrate = String.IsNullOrEmpty(_totalSubstrate)
                                         ? $"[{_useSubstrate[i]}]{subTotalTemp}"
                                         : $"{_totalSubstrate},[{_useSubstrate[i]}]{subTotalTemp}";
-                                    subTotalTemp = string.Empty;
+                                    subTotalTemp = String.Empty;
                                 }
                             }
 
@@ -444,19 +444,19 @@ namespace ProductDatabase {
         // リスト印刷
         private void ListPrint() {
             try {
-                var sheetName = string.Empty;
-                var productName = string.Empty;
-                var productModel = string.Empty;
+                var sheetName = String.Empty;
+                var productName = String.Empty;
+                var productModel = String.Empty;
 
-                var productNameRange = string.Empty;
-                var productNumberRange = string.Empty;
-                var orderNumberRange = string.Empty;
-                var regDateRange = string.Empty;
-                var productModelRange = string.Empty;
-                var quantityRange = string.Empty;
-                var serialFirstRange = string.Empty;
-                var serialLastRange = string.Empty;
-                var commentRange = string.Empty;
+                var productNameRange = String.Empty;
+                var productNumberRange = String.Empty;
+                var orderNumberRange = String.Empty;
+                var regDateRange = String.Empty;
+                var productModelRange = String.Empty;
+                var quantityRange = String.Empty;
+                var serialFirstRange = String.Empty;
+                var serialLastRange = String.Empty;
+                var commentRange = String.Empty;
 
                 using FileStream fileStream = new($"{Environment.CurrentDirectory}./config/Excel/ConfigList.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using XLWorkbook workBook = new(fileStream);
@@ -525,8 +525,8 @@ namespace ProductDatabase {
                     var mainCellValue = workSheetMain.Cell(findRow, findColumn + 1).Value.ToString();
                     var tempCellValue = workSheetTemp.Cell(mainCellValue).Value.ToString();
 
-                    if (mainCellValue != string.Empty) {
-                        if (tempCellValue == string.Empty) {
+                    if (mainCellValue != String.Empty) {
+                        if (tempCellValue == String.Empty) {
                             workSheetTemp.Cell(mainCellValue).Value = $"{_listUsedProductNumber[i]}({_listUsedQuantity[i]})";
                         }
                         else {

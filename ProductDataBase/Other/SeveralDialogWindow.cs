@@ -20,7 +20,7 @@ namespace ProductDatabase {
             foreach (var category in ProductInfo.Category11) {
                 var type = (ProductInfo.Category14[j] == "1") ? "基板" : "製品";
 
-                if (!string.IsNullOrEmpty(ProductInfo.Category11[j])) { SeveralListBox.Items.Add($"[{type}]  [{ProductInfo.Category13[j]}]  [{ProductInfo.Category12[j]}]  [{category}]"); }
+                if (!String.IsNullOrEmpty(ProductInfo.Category11[j])) { SeveralListBox.Items.Add($"[{type}]  [{ProductInfo.Category13[j]}]  [{ProductInfo.Category12[j]}]  [{category}]"); }
                 j++;
             }
 
