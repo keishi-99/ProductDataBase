@@ -1523,7 +1523,7 @@ namespace ProductDatabase {
                 $"StrPerson\t\t\t[{ProductInfo.Person}]",
                 $"IntQuantity\t\t[{ProductInfo.Quantity}]",
                 $"IntSerialFirstNumber\t[{ProductInfo.SerialFirstNumber}]",
-                $"IntSerialLastNumber\t[{_serialLastNumber}]",
+                $"IntSerialLastNumber\t\t[{_serialLastNumber}]",
                 $"StrInitial\t\t\t[{ProductInfo.Initial}]",
                 $"IntRegType\t\t[{ProductInfo.RegType}]",
                 $"IntPrintType\t\t[{ProductInfo.PrintType}]",
