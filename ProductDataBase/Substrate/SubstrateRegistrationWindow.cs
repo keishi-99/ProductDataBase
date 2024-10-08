@@ -584,6 +584,7 @@ namespace ProductDatabase {
                     break;
                 case "PrintOnlyCheckBox":
                     PrintButton.Enabled = checkBox.Checked;
+                    RegisterButton.Enabled = !checkBox.Checked;
                     if (PrintOnlyCheckBox.Checked) { MessageBox.Show($"登録せずに印刷だけ行います。", "注意", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
                     break;
                 default:

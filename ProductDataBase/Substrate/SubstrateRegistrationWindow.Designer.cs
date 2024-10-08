@@ -597,7 +597,7 @@
             this.RegisterButton.Name = "RegisterButton";
             this.RegisterButton.Size = new Size(75, 25);
             this.RegisterButton.TabIndex = 39;
-            this.RegisterButton.Text = "OK";
+            this.RegisterButton.Text = "登録";
             this.RegisterButton.UseVisualStyleBackColor = true;
             this.RegisterButton.Click += this.RegisterButton_Click;
             // 
