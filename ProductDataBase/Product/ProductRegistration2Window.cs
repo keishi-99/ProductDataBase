@@ -1120,7 +1120,7 @@ namespace ProductDatabase {
                  .Replace("%M", ProductInfo.ProductNumber)
                  .Replace("%O", ProductInfo.OrderNumber)
                  .Replace("%N", ProductInfo.Quantity.ToString())
-                 .Replace("%U", "");
+                 .Replace("%U", ProductInfo.Person);
             return s;
         }
         private string GenerateCode(int serialCode) {
