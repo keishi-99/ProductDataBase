@@ -125,6 +125,11 @@ namespace ProductDatabase {
                 using SQLiteConnection con = new(GetConnectionString1());
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductDataTable); }
 
+                if (Environment.UserName != "製造2I") {
+                    RegisterButton.Enabled = false;
+                    QRCodePanel.Enabled = false;
+                }
+
                 ActiveControl = QRCodeTextBox;
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -379,7 +384,13 @@ namespace ProductDatabase {
         }
         private void CategoryListBox3Select() {
             try {
-                RegisterButton.Enabled = true;
+                if (Environment.UserName != "製造2I") {
+                    RegisterButton.Enabled = false;
+                    QRCodePanel.Enabled = false;
+                }
+                else {
+                    RegisterButton.Enabled = true;
+                }
                 HistoryButton.Enabled = true;
 
                 switch (ProductInfo.RadioButtonFlg) {
