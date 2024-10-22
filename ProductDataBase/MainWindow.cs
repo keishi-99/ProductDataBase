@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Data.Odbc;
 using System.Data.SQLite;
+using System.Text;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
@@ -125,9 +126,14 @@ namespace ProductDatabase {
                 using SQLiteConnection con = new(GetConnectionString1());
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductDataTable); }
 
+                var userTextPath = "./Config/general/user.txt";
+                var userNames = File.ReadAllLines(userTextPath, Encoding.GetEncoding("UTF-8"))
+                   .Select(line => line.Trim())
+                   .ToList();
+
                 RegisterButton.Enabled = false;
                 HistoryButton.Enabled = false;
-                if (Environment.UserName != "製造2I") {
+                if (!userNames.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase))) {
                     QRCodePanel.Enabled = false;
                 }
 
