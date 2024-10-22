@@ -3,7 +3,13 @@ using GenCode128;
 using ProductDatabase.Product;
 using System.Data;
 using System.Data.SQLite;
+using System.Drawing.Imaging;
 using System.Drawing.Printing;
+using System.Runtime.InteropServices;
+using ZXing;
+using ZXing.QrCode;
+using ZXing.QrCode.Internal;
+using ZXing.Rendering;
 using static ProductDatabase.MainWindow;
 using Color = System.Drawing.Color;
 using Control = System.Windows.Forms.Control;
@@ -68,7 +74,7 @@ namespace ProductDatabase {
                 switch (ProductInfo.RegType) {
                     case 2:
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
-                            var objCbx = Controls[_checkBoxNames[i]] as CheckBox;
+                            var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox;
 
                             if (objCbx != null) {
                                 objCbx.Enabled = true;
@@ -150,7 +156,7 @@ namespace ProductDatabase {
                     case 3:
                         if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
-                            var objCbx = Controls[_checkBoxNames[i]] as CheckBox;
+                            var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox;
 
                             if (objCbx != null) {
                                 objCbx.Enabled = true;
@@ -508,7 +514,7 @@ namespace ProductDatabase {
                         if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
                         for (var i = 0; i <= _useSubstrate.Length; i++) {
 
-                            var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                            var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxがnullです。");
 
                             if (objCbx.Checked) {
                                 var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
@@ -759,7 +765,7 @@ namespace ProductDatabase {
                             if (control is DataGridView dataGridView) {
                                 dataGridView.Enabled = false;
                             }
-                            if (control is CheckBox checkBox) {
+                            if (control is System.Windows.Forms.CheckBox checkBox) {
                                 checkBox.Enabled = false;
                             }
                         }
@@ -847,7 +853,7 @@ namespace ProductDatabase {
                         if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
 
-                            var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                            var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxがnullです。");
                             objCbx.Enabled = true;
                             objCbx.Checked = true;
 
@@ -980,7 +986,7 @@ namespace ProductDatabase {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
 
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
-                Point headerPos = new(0, 0);
+                System.Drawing.Point headerPos = new(0, 0);
                 var headerString = String.Empty;
                 Font headerFooterFont = new("Arial", 6);
                 var intNumLabels = 0;
@@ -1036,7 +1042,7 @@ namespace ProductDatabase {
                         break;
                 }
 
-                var offset = new Point(0, 0);
+                var offset = new System.Drawing.Point(0, 0);
                 const double MM_PER_HUNDREDTH_INCH = 0.254;
 
                 var pd = (PrintDocument)sender;
@@ -1046,11 +1052,11 @@ namespace ProductDatabase {
                     offsetX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
                     offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
                     offset = labelProPageNum == 0
-                        ? new Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
-                        : new Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
+                        ? new System.Drawing.Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
+                        : new System.Drawing.Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
                 else {
-                    offset = new Point(0, 0);
+                    offset = new System.Drawing.Point(0, 0);
                 }
 
                 e.PageSettings.Margins.Left = 0;
@@ -1227,7 +1233,7 @@ namespace ProductDatabase {
         }
         // チェックボックスイベント
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
-            var checkBox = (CheckBox)sender;
+            var checkBox = (System.Windows.Forms.CheckBox)sender;
             DataGridView dataGridView = new();
 
             switch (checkBox.Name) {
@@ -1368,6 +1374,7 @@ namespace ProductDatabase {
                 var serialFirstRange = String.Empty;
                 var serialLastRange = String.Empty;
                 var commentRange = String.Empty;
+                var qrCodeRange = String.Empty;
 
                 using FileStream fileStream = new($"{Environment.CurrentDirectory}./config/Excel/ConfigList.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using XLWorkbook workBook = new(fileStream);
@@ -1396,6 +1403,7 @@ namespace ProductDatabase {
                 serialFirstRange = workSheetMain.Cell(findRow, 10).Value.ToString();
                 serialLastRange = workSheetMain.Cell(findRow, 11).Value.ToString();
                 commentRange = workSheetMain.Cell(findRow, 12).Value.ToString();
+                qrCodeRange = workSheetMain.Cell(findRow, 13).Value.ToString();
 
                 var workSheetTemp = workBook.Worksheet(sheetName);
                 workSheetTemp.Cell(productNameRange).Value = productName;
@@ -1444,6 +1452,45 @@ namespace ProductDatabase {
                             workSheetTemp.Cell(mainCellValue).Value += $"    {_usedProductNumber[i]}({_usedQuantity[i]})";
                         }
                     }
+                }
+
+                // QRコード
+                if (!String.IsNullOrEmpty(qrCodeRange)) {
+                    BarcodeWriter<PixelData> qr = new() {
+                        Format = BarcodeFormat.QR_CODE,
+                        Options = new QrCodeEncodingOptions {
+                            ErrorCorrection = ErrorCorrectionLevel.L,
+                            CharacterSet = "Shift_JIS",
+                            Width = 100,
+                            Height = 100,
+                        },
+                        Renderer = new PixelDataRenderer {
+                            Foreground = new(Color.Gray.ToArgb()),
+                            Background = new(Color.White.ToArgb()),
+                        },
+                    };
+
+                    var pixelData = qr.Write($"{ProductInfo.OrderNumber};{ProductInfo.ProductNumber};{productModel};{ProductInfo.Quantity};{_serialFirst};{_serialLast}");
+
+                    var bmp = ConvertToBitmapFrom32bppArgb(pixelData.Width, pixelData.Height, pixelData.Pixels);
+
+                    static Bitmap ConvertToBitmapFrom32bppArgb(int width, int height, byte[] data) {
+                        if (width * height * 4 != data.Length) { throw new ArgumentException(); }
+
+                        var gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                        try {
+                            return new(
+                                width, height, width * 4,
+                                PixelFormat.Format32bppArgb,
+                                gcHandle.AddrOfPinnedObject());
+                        } finally {
+                            gcHandle.Free();
+                        }
+                    }
+                    using MemoryStream stream = new();
+                    bmp.Save(stream, ImageFormat.Bmp);
+                    var image = workSheetTemp.AddPicture(stream);
+                    image.MoveTo(workSheetTemp.Cell(qrCodeRange));
                 }
 
                 //引数に保存先パスを指定
