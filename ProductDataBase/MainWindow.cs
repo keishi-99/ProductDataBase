@@ -93,6 +93,7 @@ namespace ProductDatabase {
         private string _strCategory13 = String.Empty;
         private string _strCategory14 = String.Empty;
 
+        private List<string> _userNames = [];
         private static readonly string[] s_separator = ["//"];
 
         public MainWindow() {
@@ -127,13 +128,13 @@ namespace ProductDatabase {
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductDataTable); }
 
                 var userTextPath = "./Config/general/user.txt";
-                var userNames = File.ReadAllLines(userTextPath, Encoding.GetEncoding("UTF-8"))
+                _userNames = File.ReadAllLines(userTextPath, Encoding.GetEncoding("UTF-8"))
                    .Select(line => line.Trim())
                    .ToList();
 
                 RegisterButton.Enabled = false;
                 HistoryButton.Enabled = false;
-                if (!userNames.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase))) {
+                if (!_userNames.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase))) {
                     QRCodePanel.Enabled = false;
                 }
 
@@ -391,7 +392,7 @@ namespace ProductDatabase {
         }
         private void CategoryListBox3Select() {
             try {
-                if (Environment.UserName != "製造2I") {
+                if (!_userNames.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase))) {
                     RegisterButton.Enabled = false;
                     QRCodePanel.Enabled = false;
                 }
