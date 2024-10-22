@@ -5,7 +5,6 @@ using System.Data;
 using System.Data.SQLite;
 using System.Drawing.Imaging;
 using System.Drawing.Printing;
-using System.Runtime.InteropServices;
 using ZXing;
 using ZXing.QrCode;
 using ZXing.QrCode.Internal;
@@ -1472,23 +1471,14 @@ namespace ProductDatabase {
 
                     var pixelData = qr.Write($"{ProductInfo.OrderNumber};{ProductInfo.ProductNumber};{productModel};{ProductInfo.Quantity};{_serialFirst};{_serialLast}");
 
-                    var bmp = ConvertToBitmapFrom32bppArgb(pixelData.Width, pixelData.Height, pixelData.Pixels);
-
-                    static Bitmap ConvertToBitmapFrom32bppArgb(int width, int height, byte[] data) {
-                        if (width * height * 4 != data.Length) { throw new ArgumentException(); }
-
-                        var gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                        try {
-                            return new(
-                                width, height, width * 4,
-                                PixelFormat.Format32bppArgb,
-                                gcHandle.AddrOfPinnedObject());
-                        } finally {
-                            gcHandle.Free();
-                        }
-                    }
+                    // PixelData を Bitmap に変換
+                    using var bitmap = new Bitmap(pixelData.Width, pixelData.Height, PixelFormat.Format32bppArgb);
+                    var bmpData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bmpData.Scan0, pixelData.Pixels.Length);
+                    bitmap.UnlockBits(bmpData);
                     using MemoryStream stream = new();
-                    bmp.Save(stream, ImageFormat.Bmp);
+                    bitmap.Save(stream, ImageFormat.Bmp);
+
                     var image = workSheetTemp.AddPicture(stream);
                     image.MoveTo(workSheetTemp.Cell(qrCodeRange));
                 }
