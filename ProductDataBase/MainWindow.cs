@@ -125,8 +125,9 @@ namespace ProductDatabase {
                 using SQLiteConnection con = new(GetConnectionString1());
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductDataTable); }
 
+                RegisterButton.Enabled = false;
+                HistoryButton.Enabled = false;
                 if (Environment.UserName != "製造2I") {
-                    RegisterButton.Enabled = false;
                     QRCodePanel.Enabled = false;
                 }
 
