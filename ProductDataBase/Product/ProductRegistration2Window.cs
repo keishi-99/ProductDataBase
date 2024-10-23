@@ -40,7 +40,7 @@ namespace ProductDatabase {
         private string _serialLast = String.Empty;
         private string _totalSubstrate = String.Empty;
         private int _serialLastNumber;
-        private bool _fontUnderbar = false;
+        private bool _serialUnderbar = false;
         private readonly List<string> _strSerial = [];
         private readonly List<string> _checkBoxNames = [
                         "Substrate1CheckBox", "Substrate2CheckBox", "Substrate3CheckBox", "Substrate4CheckBox","Substrate5CheckBox",
@@ -955,7 +955,7 @@ namespace ProductDatabase {
             pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
             _labelProNumLabelsToPrint = ProductInfo.Quantity;
-            _fontUnderbar = false;
+            _serialUnderbar = false;
 
             switch (printFlg) {
                 case 1:
@@ -1076,6 +1076,15 @@ namespace ProductDatabase {
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
                         e.Graphics.DrawImage(MakeLabelImage(s, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
 
+                        // アンダーバー付きを描画
+                        if (ProductInfo.PrintType == 4) {
+                            _serialUnderbar = true;
+                            // 下の行にアンダーバー付きのシリアルを描画
+                            posY = (float)(offsetY + ((y + 1) * (intervalY + sizeY)));
+                            e.Graphics.DrawImage(MakeLabelImage(s, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
+                            _serialUnderbar = false;
+                        }
+
                         _labelProNSerial++;
                         _labelProNumLabelsToPrint--;
 
@@ -1106,6 +1115,7 @@ namespace ProductDatabase {
                             }
                         }
                     }
+                    if (ProductInfo.PrintType == 4) { y++; }
                 }
 
                 if (_labelProNumLabelsToPrint > 0) {
@@ -1169,7 +1179,7 @@ namespace ProductDatabase {
                     sizeY = (decimal)SettingsLabelPro.LabelProPageSettings.SizeY / 25.4M * resolution * magnitude;
                     fontSize = (decimal)SettingsLabelPro.LabelProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
                     stringPosY = (int)((decimal)SettingsLabelPro.LabelProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
-                    var style = _fontUnderbar ? FontStyle.Underline : FontStyle.Regular;
+                    var style = _serialUnderbar ? FontStyle.Underline : FontStyle.Regular;
                     fnt = new Font(SettingsLabelPro.LabelProLabelSettings.Font.Name, (float)fontSize, style);
 
                     labelImage = new((int)sizeX, (int)sizeY);
