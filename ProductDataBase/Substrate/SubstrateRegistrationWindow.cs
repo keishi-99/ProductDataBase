@@ -419,14 +419,14 @@ namespace ProductDatabase {
 
                     int x;
                     for (x = 0; x < maxX; x++) {
-                        var s = GenerateCode(_labelSubNSerial);
+                        var generatedCode = GenerateCode(_labelSubNSerial);
 
                         var sizeX = (float)SettingsLabelSub.LabelSubPageSettings.SizeX;
 
                         var intervalX = SettingsLabelSub.LabelSubPageSettings.IntervalX;
                         var posX = (float)(offsetX + (x * (intervalX + sizeX)));
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
-                        e.Graphics.DrawImage(MakeLabelImage(s, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
+                        e.Graphics.DrawImage(MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
 
                         _labelSubNumLabelsToPrint--;
 

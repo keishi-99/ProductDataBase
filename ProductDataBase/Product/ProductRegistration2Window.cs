@@ -1071,23 +1071,23 @@ namespace ProductDatabase {
                 for (y = startLine; y < maxY; y++) {
                     var x = 0;
                     for (x = 0; x < maxX; x++) {
-                        var s = GenerateCode(_labelProNSerial);
+                        var generatedCode = GenerateCode(_labelProNSerial);
                         var posX = (float)(offsetX + (x * (intervalX + sizeX)));
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
-                        e.Graphics.DrawImage(MakeLabelImage(s, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
+                        e.Graphics.DrawImage(MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
 
                         // アンダーバー付きを描画
                         if (ProductInfo.PrintType == 4 && intCountNumLabels == 1) {
                             _serialUnderbar = true;
                             posY = (float)(offsetY + ((y + 1) * (intervalY + sizeY)));
-                            e.Graphics.DrawImage(MakeLabelImage(s, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
+                            e.Graphics.DrawImage(MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
                             _serialUnderbar = false;
-                            if (x >= maxX - 1) { y++; }
                         }
 
                         _labelProNSerial++;
                         _labelProNumLabelsToPrint--;
 
+                        // 印刷するラベルがなくなった場合の処理
                         if (_labelProNumLabelsToPrint <= 0) {
                             intCountNumLabels--;
                             if (intCountNumLabels <= 0) {
@@ -1103,7 +1103,9 @@ namespace ProductDatabase {
                             }
                         }
 
+                        // 列の終わりの処理
                         if (x >= maxX - 1) {
+                            if (intCountNumLabels == 1) { y++; }
                             intCountNumLabels--;
                             if (intCountNumLabels <= 0) {
                                 intCountNumLabels = intNumLabels;
