@@ -386,10 +386,10 @@ namespace ProductDatabase {
                 for (y = startLineBarcode; y < maxY; y++) {
                     var x = 0;
                     for (x = 0; x < maxX; x++) {
-                        var s = GenerateCode(_labelProNSerial);
+                        var generatedCode = GenerateCode(_labelProNSerial);
                         var posX = (float)(offsetX + (x * (intervalX + sizeX)));
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
-                        e.Graphics.DrawImage(MakeLabelImage(s, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
+                        e.Graphics.DrawImage(MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
 
                         _labelProNSerial++;
                         _labelProNumLabelsToPrint--;
