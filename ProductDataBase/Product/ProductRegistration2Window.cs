@@ -1077,12 +1077,12 @@ namespace ProductDatabase {
                         e.Graphics.DrawImage(MakeLabelImage(s, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
 
                         // アンダーバー付きを描画
-                        if (ProductInfo.PrintType == 4) {
+                        if (ProductInfo.PrintType == 4 && intCountNumLabels == 1) {
                             _serialUnderbar = true;
-                            // 下の行にアンダーバー付きのシリアルを描画
                             posY = (float)(offsetY + ((y + 1) * (intervalY + sizeY)));
                             e.Graphics.DrawImage(MakeLabelImage(s, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
                             _serialUnderbar = false;
+                            if (x >= maxX - 1) { y++; }
                         }
 
                         _labelProNSerial++;
@@ -1115,7 +1115,6 @@ namespace ProductDatabase {
                             }
                         }
                     }
-                    if (ProductInfo.PrintType == 4) { y++; }
                 }
 
                 if (_labelProNumLabelsToPrint > 0) {
