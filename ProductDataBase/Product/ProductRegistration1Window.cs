@@ -54,15 +54,16 @@ namespace ProductDatabase {
                 using (SQLiteConnection con = new(GetConnectionString2())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
-                    // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Stock]の合計を取得
-                    cmd.CommandText = $"SELECT col_Revision FROM Product_Reg_{ProductInfo.ProductName} ORDER BY _rowid_ DESC";
+                    // テーブル検索SQL - [Product_Reg_[Product_Name]]テーブルの最新の[col_Revision]を取得
+                    cmd.CommandText = $"""SELECT col_Revision FROM "Product_Reg_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
 
                     // テーブル検索SQL - [Product_Reg_[Product_Name]]テーブルの最新の[col_Serial_LastNum]を取得
-                    cmd.CommandText = $"SELECT col_Serial_LastNum FROM Product_Reg_{ProductInfo.ProductName} ORDER BY _rowid_ DESC";
-                    _serialLastNum = Convert.ToInt32(cmd.ExecuteScalar());
-                    FirstSerialNumberTextBox.Text = (_serialLastNum + 1).ToString("000");
+                    cmd.CommandText = $"""SELECT col_Serial_LastNum FROM "Product_Reg_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
+                    FirstSerialNumberTextBox.Text = Int32.TryParse(cmd.ExecuteScalar()?.ToString(), out _serialLastNum)
+                        ? (_serialLastNum + 1).ToString("000")
+                        : throw new Exception("シリアル番号の取得に失敗しました。");
                 }
 
                 // 変数[check_bin]の値に応じてCheckboxにチェックを入れる
