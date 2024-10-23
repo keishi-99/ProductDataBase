@@ -34,6 +34,16 @@ namespace ProductDatabase {
 
                 RegisterButton.Enabled = true;
 
+                CommentComboBox.Items.Add("[Rev.UP]変更点番号:");
+
+                // 変数[check_bin]のビットに応じてCheckboxにチェックを入れる
+                for (var i = 0; i < _checkBoxNames.Count; i++) {
+                    if (Controls[_checkBoxNames[i]] is CheckBox checkBox) {
+                        // i番目のビットが1かどうかをチェック
+                        checkBox.Checked = (ProductInfo.CheckBin & (1 << i)) != 0;
+                    }
+                }
+
                 // TextBoxへ今日の年月日を入力
                 var dtNow = DateTime.Now;
                 RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
@@ -65,17 +75,6 @@ namespace ProductDatabase {
                         ? (_serialLastNum + 1).ToString("000")
                         : throw new Exception("シリアル番号の取得に失敗しました。");
                 }
-
-                // 変数[check_bin]の値に応じてCheckboxにチェックを入れる
-                foreach (var checkBoxName in _checkBoxNames) {
-                    if (Controls[checkBoxName] is CheckBox checkBox) {
-                        checkBox.Checked = (ProductInfo.CheckBin & 0x1) == 1;
-                        ProductInfo.CheckBin >>= 1;
-                    }
-                }
-
-                CommentComboBox.Items.Add("[Rev.UP]変更点番号:");
-
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {

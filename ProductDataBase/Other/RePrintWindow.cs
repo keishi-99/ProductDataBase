@@ -57,6 +57,14 @@ namespace ProductDatabase {
 
                 FirstSerialNumberTextBox.MaxLength = ProductInfo.SerialDigit;
 
+                // 変数[check_bin]のビットに応じてCheckboxにチェックを入れる
+                for (var i = 0; i < _checkBoxNames.Count; i++) {
+                    if (Controls[_checkBoxNames[i]] is CheckBox checkBox) {
+                        // i番目のビットが1かどうかをチェック
+                        checkBox.Checked = (ProductInfo.CheckBin & (1 << i)) != 0;
+                    }
+                }
+
                 switch (ProductInfo.PrintType) {
                     case 0:
                         LabelPrintButton.Enabled = false;
@@ -120,14 +128,6 @@ namespace ProductDatabase {
                     cmd.CommandText = $"""SELECT col_Revision FROM "Product_Reg_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
-                }
-
-                // 変数[check_bin]の値に応じてCheckboxにチェックを入れる
-                foreach (var checkBoxName in _checkBoxNames) {
-                    if (Controls[checkBoxName] is CheckBox checkBox) {
-                        checkBox.Checked = (ProductInfo.CheckBin & 0x1) == 1;
-                        ProductInfo.CheckBin >>= 1;
-                    }
                 }
 
                 FirstSerialNumberCheckBox.Checked = true;
