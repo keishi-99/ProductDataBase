@@ -65,12 +65,12 @@ namespace ProductDatabase {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Stock]の合計を取得
-                    cmd.CommandText = $"SELECT total(col_stock) FROM Stock_{ProductInfo.StockName} WHERE col_Substrate_Model = @col_Substrate_Model";
+                    cmd.CommandText = $"""SELECT total(col_stock) FROM "Stock_{ProductInfo.StockName}" WHERE col_Substrate_Model = @col_Substrate_Model""";
                     cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ProductInfo.SubstrateModel;
                     StockLabel2.Text = cmd.ExecuteScalar().ToString();
 
                     // テーブル検索SQL - [Substrate_Reg_[Product_Name]]テーブルの最新の[col_Revison]を取得
-                    cmd.CommandText = $"SELECT col_Revision FROM Substrate_Reg_{ProductInfo.StockName} WHERE col_Substrate_Model = @col_Substrate_Model AND col_Revision IS NOT NULL ORDER BY _rowid_ DESC";
+                    cmd.CommandText = $"""SELECT col_Revision FROM "Substrate_Reg_{ProductInfo.StockName}" WHERE col_Substrate_Model = @col_Substrate_Model AND col_Revision IS NOT NULL ORDER BY _rowid_ DESC""";
                     cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ProductInfo.SubstrateModel;
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
@@ -197,7 +197,7 @@ namespace ProductDatabase {
                 if (ProductInfo.RegType != 0) {
                     var substrateName = String.Empty;
                     using (var cmd = con.CreateCommand()) {
-                        cmd.CommandText = $"SELECT * FROM Stock_{ProductInfo.StockName} WHERE col_Substrate_Num = @col_Substrate_Num ORDER BY _rowid_ DESC LIMIT 1";
+                        cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE col_Substrate_Num = @col_Substrate_Num ORDER BY _rowid_ DESC LIMIT 1""";
                         cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
                         using var dr = cmd.ExecuteReader();
                         while (dr.Read()) {
@@ -222,7 +222,7 @@ namespace ProductDatabase {
                         using var cmd = con.CreateCommand();
                         cmd.CommandText =
                             $"""
-                            INSERT INTO Stock_{ProductInfo.StockName}
+                            INSERT INTO "Stock_{ProductInfo.StockName}"
                                 (
                                 col_Flg, col_Substrate_Name, col_Substrate_Model, col_Substrate_Num, col_Order_Num, col_Stock
                                 )
@@ -247,7 +247,7 @@ namespace ProductDatabase {
                     //不良処理
                     else if (!QuantityCheckBox.Checked && DefectNumberCheckBox.Checked) {
                         using var cmd = con.CreateCommand();
-                        cmd.CommandText = $"SELECT col_Stock FROM Stock_{ProductInfo.StockName} WHERE col_Substrate_Num = @col_Substrate_Num";
+                        cmd.CommandText = $"""SELECT col_Stock FROM "Stock_{ProductInfo.StockName}" WHERE col_Substrate_Num = @col_Substrate_Num""";
                         cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
                         var intStock = Convert.ToInt32(cmd.ExecuteScalar());
 
@@ -258,7 +258,7 @@ namespace ProductDatabase {
                             : (intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text)) == 0 ? 0 : throw new Exception("不良数が在庫より多く入力されています。");
                         cmd.CommandText =
                             $"""
-                            UPDATE Stock_{ProductInfo.StockName} SET
+                            UPDATE "Stock_{ProductInfo.StockName}" SET
                                 col_Flg = @col_Flg,
                                 col_Stock = @col_Stock,
                                 col_History = ifnull(col_History, '') || @col_History
@@ -279,7 +279,7 @@ namespace ProductDatabase {
                 using (var cmd = con.CreateCommand()) {
                     cmd.CommandText =
                         $"""
-                        INSERT INTO Substrate_Reg_{ProductInfo.ProductName}
+                        INSERT INTO "Substrate_Reg_{ProductInfo.ProductName}"
                             (
                             col_Substrate_Name,
                             col_Substrate_Model,

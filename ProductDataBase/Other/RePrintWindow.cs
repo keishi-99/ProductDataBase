@@ -105,7 +105,7 @@ namespace ProductDatabase {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加
-                    cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
+                    cmd.CommandText = """SELECT * FROM Person ORDER BY _rowid_ ASC""";
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read()) {
                         PersonComboBox.Items.Add($"{dr["col_Person_Name"]}");
@@ -117,7 +117,7 @@ namespace ProductDatabase {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Revision]を取得
-                    cmd.CommandText = $"SELECT col_Revision FROM Product_Reg_{ProductInfo.ProductName} ORDER BY _rowid_ DESC";
+                    cmd.CommandText = $"""SELECT col_Revision FROM "Product_Reg_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
                 }

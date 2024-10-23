@@ -24,7 +24,7 @@ namespace ProductDatabase {
                         using (SQLiteConnection con = new(GetConnectionString2())) {
                             _historyTable.Clear();
 
-                            var query = $"SELECT _rowid_, * FROM Substrate_Reg_{ProductInfo.ProductName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ DESC";
+                            var query = $"""SELECT _rowid_, * FROM "Substrate_Reg_{ProductInfo.ProductName}" WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ DESC""";
                             using SQLiteCommand command = new(query, con);
                             command.Parameters.AddWithValue("@col_Substrate_Model", ProductInfo.SubstrateModel);
                             // SQLiteDataAdapterのインスタンス化
@@ -90,7 +90,7 @@ namespace ProductDatabase {
                         using (SQLiteConnection con = new(GetConnectionString2())) {
                             _historyTable.Clear();
 
-                            var query = $"SELECT _rowid_, * FROM Product_Reg_{ProductInfo.ProductName} WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC";
+                            var query = $"""SELECT _rowid_, * FROM "Product_Reg_{ProductInfo.ProductName}" WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC""";
                             using SQLiteCommand command = new(query, con);
                             command.Parameters.AddWithValue("@col_Product_Model", ProductInfo.ProductModel);
                             // SQLiteDataAdapterのインスタンス化
@@ -155,7 +155,7 @@ namespace ProductDatabase {
                         using (SQLiteConnection con = new(GetConnectionString2())) {
                             _historyTable.Clear();
 
-                            var query = $"SELECT _rowid_, * FROM Reprint WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC";
+                            var query = $"""SELECT _rowid_, * FROM Reprint WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC""";
                             using SQLiteCommand command = new(query, con);
                             command.Parameters.AddWithValue("@col_Product_Model", ProductInfo.ProductModel);
                             // SQLiteDataAdapterのインスタンス化

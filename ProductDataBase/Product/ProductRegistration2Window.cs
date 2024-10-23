@@ -92,7 +92,7 @@ namespace ProductDatabase {
 
                             using var cmd = con.CreateCommand();
                             // 使用基板表示
-                            cmd.CommandText = $"SELECT col_Substrate_Name FROM Stock_{ProductInfo.StockName} WHERE col_Substrate_Model = @col_Substrate_Model";
+                            cmd.CommandText = $"""SELECT col_Substrate_Name FROM "Stock_{ProductInfo.StockName}" WHERE col_Substrate_Model = @col_Substrate_Model""";
                             cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _useSubstrate[i];
                             using (var dr = cmd.ExecuteReader()) {
                                 if (dr.Read()) {
@@ -105,7 +105,7 @@ namespace ProductDatabase {
 
                             // 在庫テーブルからデータ取得
                             var intQuantity = ProductInfo.Quantity;
-                            cmd.CommandText = $"SELECT col_Substrate_num, col_Stock, col_Substrate_Name FROM Stock_{ProductInfo.StockName} WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
+                            cmd.CommandText = $"""SELECT col_Substrate_num, col_Stock, col_Substrate_Name FROM "Stock_{ProductInfo.StockName}" WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC""";
                             cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _useSubstrate[i];
                             using (var dr = cmd.ExecuteReader()) {
                                 while (dr.Read()) {
@@ -172,7 +172,7 @@ namespace ProductDatabase {
                             using SQLiteConnection con = new(GetConnectionString2());
                             con.Open();
                             using var cmd = con.CreateCommand();
-                            cmd.CommandText = $"SELECT * FROM Stock_{ProductInfo.StockName} WHERE col_Substrate_Model = @col_Substrate_Model";
+                            cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE col_Substrate_Model = @col_Substrate_Model""";
                             cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _useSubstrate[i];
                             using (var dr = cmd.ExecuteReader()) {
                                 while (dr.Read()) {
@@ -180,7 +180,7 @@ namespace ProductDatabase {
                                 }
                             }
 
-                            cmd.CommandText = $"SELECT * FROM Stock_{ProductInfo.StockName} WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
+                            cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC""";
                             cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _useSubstrate[i];
                             using (var dr = cmd.ExecuteReader()) {
                                 while (dr.Read()) {
@@ -371,7 +371,7 @@ namespace ProductDatabase {
                     using var cmd = con.CreateCommand();
                     cmd.CommandText =
                         $"""
-                        INSERT INTO Serial_{ProductInfo.ProductName}
+                        INSERT INTO "Serial_{ProductInfo.ProductName}"
                             (
                             col_Serial,
                             col_Order_Num,
@@ -410,7 +410,7 @@ namespace ProductDatabase {
                         using var cmd = con.CreateCommand();
                         cmd.CommandText =
                             $"""
-                            INSERT INTO Product_Reg_{ProductInfo.ProductName}
+                            INSERT INTO "Product_Reg_{ProductInfo.ProductName}"
                                 (
                                 col_Order_Num,
                                 col_Product_Num,
@@ -457,7 +457,7 @@ namespace ProductDatabase {
                         using var cmd = con.CreateCommand();
                         cmd.CommandText =
                             $"""
-                            INSERT INTO Product_Reg_{ProductInfo.ProductName}
+                            INSERT INTO "Product_Reg_{ProductInfo.ProductName}"
                                 (
                                 col_Order_Num,
                                 col_Product_Num,
@@ -532,7 +532,7 @@ namespace ProductDatabase {
                                         using (var cmd = con.CreateCommand()) {
                                             cmd.CommandText =
                                                 $"""
-                                                UPDATE Stock_{ProductInfo.StockName} SET
+                                                UPDATE "Stock_{ProductInfo.StockName}" SET
                                                     col_Flg = @col_Flg,
                                                     col_Stock = @col_Stock,
                                                     col_History = ifnull(col_History,'')|| @col_History
@@ -565,7 +565,7 @@ namespace ProductDatabase {
                                         using (var cmd = con.CreateCommand()) {
                                             cmd.CommandText =
                                                 $"""
-                                                INSERT INTO Substrate_Reg_{ProductInfo.StockName}
+                                                INSERT INTO "Substrate_Reg_{ProductInfo.StockName}"
                                                     (
                                                     col_Substrate_Name,
                                                     col_Substrate_Model,
@@ -629,7 +629,7 @@ namespace ProductDatabase {
                         using (var cmd = con.CreateCommand()) {
                             cmd.CommandText =
                                 $"""
-                                 INSERT INTO Product_Reg_{ProductInfo.ProductName}
+                                 INSERT INTO "Product_Reg_{ProductInfo.ProductName}"
                                     (
                                     col_Order_Num,
                                     col_Product_Num,
@@ -787,7 +787,7 @@ namespace ProductDatabase {
 
             // 製番が新規かチェック
             using (var cmd = con.CreateCommand()) {
-                cmd.CommandText = $"SELECT * FROM Product_Reg_{ProductInfo.ProductName} WHERE col_Product_Num = @col_Product_Num ORDER BY _rowid_ ASC LIMIT 1";
+                cmd.CommandText = $"""SELECT * FROM "Product_Reg_{ProductInfo.ProductName}" WHERE col_Product_Num = @col_Product_Num ORDER BY _rowid_ ASC LIMIT 1""";
                 cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = ProductInfo.ProductNumber;
 
                 using var dr = cmd.ExecuteReader();
@@ -815,7 +815,7 @@ namespace ProductDatabase {
 
             // 注文番号が新規かチェック
             using (var cmd = con.CreateCommand()) {
-                cmd.CommandText = $"SELECT * FROM Product_Reg_{ProductInfo.ProductName} WHERE col_Order_Num = @col_Order_Num ORDER BY _rowid_ ASC LIMIT 1";
+                cmd.CommandText = $"""SELECT * FROM "Product_Reg_{ProductInfo.ProductName}" WHERE col_Order_Num = @col_Order_Num ORDER BY _rowid_ ASC LIMIT 1""";
                 cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = ProductInfo.OrderNumber;
 
                 using var dr = cmd.ExecuteReader();
@@ -925,7 +925,7 @@ namespace ProductDatabase {
                     con.Open();
 
                     using var cmd = con.CreateCommand();
-                    cmd.CommandText = $"SELECT col_Serial FROM Serial_{ProductInfo.ProductName} WHERE col_Serial IN (@col_Serial)";
+                    cmd.CommandText = $"""SELECT col_Serial FROM "Serial_{ProductInfo.ProductName}" WHERE col_Serial IN (@col_Serial)""";
                     cmd.Parameters.Add("@col_Serial", DbType.String).Value = strSQLSerial;
 
                     using var dr = cmd.ExecuteReader();
