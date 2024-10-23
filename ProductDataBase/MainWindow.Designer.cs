@@ -42,10 +42,10 @@
             this.FontSize9RadioButton = new RadioButton();
             this.FontSizeLabel = new Label();
             this.QRCodePanel = new Panel();
-            this.QRCodeButton = new Button();
-            this.QRCodeTextBox = new TextBox();
             this.RadioButtonBarcode = new RadioButton();
             this.RadioButtonQR = new RadioButton();
+            this.QRCodeButton = new Button();
+            this.QRCodeTextBox = new TextBox();
             this.MainWindowMenuStrip.SuspendLayout();
             this.FontSizePanel.SuspendLayout();
             this.QRCodePanel.SuspendLayout();
@@ -56,7 +56,7 @@
             this.MainWindowMenuStrip.Items.AddRange(new ToolStripItem[] { this.ファイルToolStripMenuItem });
             this.MainWindowMenuStrip.Location = new Point(0, 0);
             this.MainWindowMenuStrip.Name = "MainWindowMenuStrip";
-            this.MainWindowMenuStrip.Size = new Size(684, 24);
+            this.MainWindowMenuStrip.Size = new Size(880, 24);
             this.MainWindowMenuStrip.TabIndex = 0;
             this.MainWindowMenuStrip.Text = "menuStrip1";
             // 
@@ -90,7 +90,7 @@
             // CategoryRadioButton2
             // 
             this.CategoryRadioButton2.Appearance = Appearance.Button;
-            this.CategoryRadioButton2.Location = new Point(118, 47);
+            this.CategoryRadioButton2.Location = new Point(134, 47);
             this.CategoryRadioButton2.Name = "CategoryRadioButton2";
             this.CategoryRadioButton2.Size = new Size(70, 30);
             this.CategoryRadioButton2.TabIndex = 2;
@@ -103,7 +103,7 @@
             // CategoryRadioButton3
             // 
             this.CategoryRadioButton3.Appearance = Appearance.Button;
-            this.CategoryRadioButton3.Location = new Point(194, 47);
+            this.CategoryRadioButton3.Location = new Point(226, 47);
             this.CategoryRadioButton3.Name = "CategoryRadioButton3";
             this.CategoryRadioButton3.Size = new Size(70, 30);
             this.CategoryRadioButton3.TabIndex = 3;
@@ -116,7 +116,7 @@
             // CategoryRadioButton4
             // 
             this.CategoryRadioButton4.Appearance = Appearance.Button;
-            this.CategoryRadioButton4.Location = new Point(270, 47);
+            this.CategoryRadioButton4.Location = new Point(318, 47);
             this.CategoryRadioButton4.Name = "CategoryRadioButton4";
             this.CategoryRadioButton4.Size = new Size(70, 30);
             this.CategoryRadioButton4.TabIndex = 4;
@@ -128,46 +128,43 @@
             // 
             // CategoryListBox1
             // 
-            this.CategoryListBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             this.CategoryListBox1.FormattingEnabled = true;
             this.CategoryListBox1.HorizontalScrollbar = true;
             this.CategoryListBox1.ItemHeight = 15;
-            this.CategoryListBox1.Location = new Point(42, 97);
+            this.CategoryListBox1.Location = new Point(74, 103);
             this.CategoryListBox1.Name = "CategoryListBox1";
-            this.CategoryListBox1.Size = new Size(60, 214);
+            this.CategoryListBox1.Size = new Size(60, 259);
             this.CategoryListBox1.TabIndex = 5;
             this.CategoryListBox1.SelectedIndexChanged += this.CategoryListBox1_SelectedIndexChanged;
             // 
             // CategoryListBox2
             // 
-            this.CategoryListBox2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             this.CategoryListBox2.FormattingEnabled = true;
             this.CategoryListBox2.HorizontalScrollbar = true;
             this.CategoryListBox2.ItemHeight = 15;
-            this.CategoryListBox2.Location = new Point(142, 97);
+            this.CategoryListBox2.Location = new Point(190, 103);
             this.CategoryListBox2.Name = "CategoryListBox2";
-            this.CategoryListBox2.Size = new Size(210, 214);
+            this.CategoryListBox2.Size = new Size(210, 259);
             this.CategoryListBox2.TabIndex = 6;
             this.CategoryListBox2.SelectedIndexChanged += this.CategoryListBox2_SelectedIndexChanged;
             // 
             // CategoryListBox3
             // 
-            this.CategoryListBox3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             this.CategoryListBox3.FormattingEnabled = true;
             this.CategoryListBox3.HorizontalScrollbar = true;
             this.CategoryListBox3.ItemHeight = 15;
-            this.CategoryListBox3.Location = new Point(392, 97);
+            this.CategoryListBox3.Location = new Point(456, 103);
             this.CategoryListBox3.Name = "CategoryListBox3";
-            this.CategoryListBox3.Size = new Size(250, 214);
+            this.CategoryListBox3.Size = new Size(350, 259);
             this.CategoryListBox3.TabIndex = 7;
             this.CategoryListBox3.SelectedIndexChanged += this.CategoryListBox3_SelectedIndexChanged;
             // 
             // HistoryButton
             // 
             this.HistoryButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            this.HistoryButton.Location = new Point(392, 354);
+            this.HistoryButton.Location = new Point(307, 389);
             this.HistoryButton.Name = "HistoryButton";
-            this.HistoryButton.Size = new Size(75, 25);
+            this.HistoryButton.Size = new Size(96, 54);
             this.HistoryButton.TabIndex = 8;
             this.HistoryButton.Text = "履歴";
             this.HistoryButton.UseVisualStyleBackColor = true;
@@ -176,9 +173,9 @@
             // RegisterButton
             // 
             this.RegisterButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            this.RegisterButton.Location = new Point(567, 354);
+            this.RegisterButton.Location = new Point(478, 389);
             this.RegisterButton.Name = "RegisterButton";
-            this.RegisterButton.Size = new Size(75, 25);
+            this.RegisterButton.Size = new Size(96, 54);
             this.RegisterButton.TabIndex = 9;
             this.RegisterButton.Text = "登録";
             this.RegisterButton.UseVisualStyleBackColor = true;
@@ -191,15 +188,15 @@
             this.FontSizePanel.Controls.Add(this.FontSize12RadioButton);
             this.FontSizePanel.Controls.Add(this.FontSize9RadioButton);
             this.FontSizePanel.Controls.Add(this.FontSizeLabel);
-            this.FontSizePanel.Location = new Point(558, 27);
+            this.FontSizePanel.Location = new Point(755, 27);
             this.FontSizePanel.Name = "FontSizePanel";
-            this.FontSizePanel.Size = new Size(125, 64);
+            this.FontSizePanel.Size = new Size(125, 55);
             this.FontSizePanel.TabIndex = 600;
             // 
             // FontSize16RadioButton
             // 
             this.FontSize16RadioButton.Appearance = Appearance.Button;
-            this.FontSize16RadioButton.Location = new Point(82, 28);
+            this.FontSize16RadioButton.Location = new Point(82, 19);
             this.FontSize16RadioButton.Name = "FontSize16RadioButton";
             this.FontSize16RadioButton.Size = new Size(30, 22);
             this.FontSize16RadioButton.TabIndex = 604;
@@ -211,7 +208,7 @@
             // FontSize12RadioButton
             // 
             this.FontSize12RadioButton.Appearance = Appearance.Button;
-            this.FontSize12RadioButton.Location = new Point(49, 28);
+            this.FontSize12RadioButton.Location = new Point(49, 19);
             this.FontSize12RadioButton.Name = "FontSize12RadioButton";
             this.FontSize12RadioButton.Size = new Size(30, 22);
             this.FontSize12RadioButton.TabIndex = 603;
@@ -224,7 +221,7 @@
             // 
             this.FontSize9RadioButton.Appearance = Appearance.Button;
             this.FontSize9RadioButton.Checked = true;
-            this.FontSize9RadioButton.Location = new Point(16, 28);
+            this.FontSize9RadioButton.Location = new Point(16, 19);
             this.FontSize9RadioButton.Name = "FontSize9RadioButton";
             this.FontSize9RadioButton.Size = new Size(30, 22);
             this.FontSize9RadioButton.TabIndex = 602;
@@ -237,7 +234,7 @@
             // FontSizeLabel
             // 
             this.FontSizeLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            this.FontSizeLabel.Location = new Point(29, 11);
+            this.FontSizeLabel.Location = new Point(29, 2);
             this.FontSizeLabel.Name = "FontSizeLabel";
             this.FontSizeLabel.Size = new Size(69, 15);
             this.FontSizeLabel.TabIndex = 601;
@@ -251,30 +248,10 @@
             this.QRCodePanel.Controls.Add(this.RadioButtonQR);
             this.QRCodePanel.Controls.Add(this.QRCodeButton);
             this.QRCodePanel.Controls.Add(this.QRCodeTextBox);
-            this.QRCodePanel.Location = new Point(42, 333);
+            this.QRCodePanel.Location = new Point(12, 397);
             this.QRCodePanel.Name = "QRCodePanel";
             this.QRCodePanel.Size = new Size(218, 56);
             this.QRCodePanel.TabIndex = 500;
-            // 
-            // QRCodeButton
-            // 
-            this.QRCodeButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            this.QRCodeButton.Location = new Point(124, 28);
-            this.QRCodeButton.Name = "QRCodeButton";
-            this.QRCodeButton.Size = new Size(75, 23);
-            this.QRCodeButton.TabIndex = 602;
-            this.QRCodeButton.Text = "OK";
-            this.QRCodeButton.UseVisualStyleBackColor = true;
-            this.QRCodeButton.Click += this.QRCodeButton_Click;
-            // 
-            // QRCodeTextBox
-            // 
-            this.QRCodeTextBox.Location = new Point(18, 28);
-            this.QRCodeTextBox.MaxLength = 50;
-            this.QRCodeTextBox.Name = "QRCodeTextBox";
-            this.QRCodeTextBox.Size = new Size(100, 23);
-            this.QRCodeTextBox.TabIndex = 601;
-            this.QRCodeTextBox.KeyDown += this.QRCodeTextBox_KeyDown;
             // 
             // RadioButtonBarcode
             // 
@@ -298,11 +275,31 @@
             this.RadioButtonQR.Text = "QRコード";
             this.RadioButtonQR.UseVisualStyleBackColor = true;
             // 
+            // QRCodeButton
+            // 
+            this.QRCodeButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            this.QRCodeButton.Location = new Point(124, 28);
+            this.QRCodeButton.Name = "QRCodeButton";
+            this.QRCodeButton.Size = new Size(75, 23);
+            this.QRCodeButton.TabIndex = 602;
+            this.QRCodeButton.Text = "OK";
+            this.QRCodeButton.UseVisualStyleBackColor = true;
+            this.QRCodeButton.Click += this.QRCodeButton_Click;
+            // 
+            // QRCodeTextBox
+            // 
+            this.QRCodeTextBox.Location = new Point(18, 28);
+            this.QRCodeTextBox.MaxLength = 50;
+            this.QRCodeTextBox.Name = "QRCodeTextBox";
+            this.QRCodeTextBox.Size = new Size(100, 23);
+            this.QRCodeTextBox.TabIndex = 601;
+            this.QRCodeTextBox.KeyDown += this.QRCodeTextBox_KeyDown;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(684, 391);
+            this.ClientSize = new Size(880, 465);
             this.Controls.Add(this.QRCodePanel);
             this.Controls.Add(this.FontSizePanel);
             this.Controls.Add(this.RegisterButton);
