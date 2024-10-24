@@ -13,6 +13,7 @@ namespace ProductDatabase {
 
         private readonly string _settingFilePath = "./config/SubstrateConfig.xml";
 
+
         private string _labelSubNSerial = String.Empty;
 
         private int _labelSubPageNum;
@@ -207,8 +208,10 @@ namespace ProductDatabase {
 
                     if (substrateName != String.Empty) {
                         if (ProductInfo.SubstrateName == substrateName) {
-                            var result = MessageBox.Show($"[{ManufacturingNumberMaskedTextBox.Text}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
-                            if (result == DialogResult.No) { return false; }
+                            if (ManufacturingNumberMaskedTextBox.Text != "宮崎在庫") {
+                                var result = MessageBox.Show($"[{ManufacturingNumberMaskedTextBox.Text}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
+                                if (result == DialogResult.No) { return false; }
+                            }
                         }
                         else { throw new Exception($"[{ManufacturingNumberMaskedTextBox.Text}]は[{substrateName}]として在庫があります。確認してください。"); }
                     }
