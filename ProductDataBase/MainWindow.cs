@@ -83,6 +83,7 @@ namespace ProductDatabase {
             }
         }
 
+
         public ProductInfomation ProductInfo { get; set; } = new();
 
         public DataTable ProductDataTable { get; } = new();

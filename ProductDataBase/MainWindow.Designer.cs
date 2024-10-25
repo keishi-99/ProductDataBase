@@ -46,9 +46,15 @@
             this.RadioButtonQR = new RadioButton();
             this.QRCodeButton = new Button();
             this.QRCodeTextBox = new TextBox();
+            this.panelCategory1 = new Panel();
+            this.panelCategory2 = new Panel();
+            this.panelCategory3 = new Panel();
             this.MainWindowMenuStrip.SuspendLayout();
             this.FontSizePanel.SuspendLayout();
             this.QRCodePanel.SuspendLayout();
+            this.panelCategory1.SuspendLayout();
+            this.panelCategory2.SuspendLayout();
+            this.panelCategory3.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainWindowMenuStrip
@@ -128,10 +134,11 @@
             // 
             // CategoryListBox1
             // 
+            this.CategoryListBox1.Dock = DockStyle.Fill;
             this.CategoryListBox1.FormattingEnabled = true;
             this.CategoryListBox1.HorizontalScrollbar = true;
             this.CategoryListBox1.ItemHeight = 15;
-            this.CategoryListBox1.Location = new Point(74, 103);
+            this.CategoryListBox1.Location = new Point(0, 0);
             this.CategoryListBox1.Name = "CategoryListBox1";
             this.CategoryListBox1.Size = new Size(60, 259);
             this.CategoryListBox1.TabIndex = 5;
@@ -139,10 +146,11 @@
             // 
             // CategoryListBox2
             // 
+            this.CategoryListBox2.Dock = DockStyle.Fill;
             this.CategoryListBox2.FormattingEnabled = true;
             this.CategoryListBox2.HorizontalScrollbar = true;
             this.CategoryListBox2.ItemHeight = 15;
-            this.CategoryListBox2.Location = new Point(190, 103);
+            this.CategoryListBox2.Location = new Point(0, 0);
             this.CategoryListBox2.Name = "CategoryListBox2";
             this.CategoryListBox2.Size = new Size(210, 259);
             this.CategoryListBox2.TabIndex = 6;
@@ -150,10 +158,11 @@
             // 
             // CategoryListBox3
             // 
+            this.CategoryListBox3.Dock = DockStyle.Fill;
             this.CategoryListBox3.FormattingEnabled = true;
             this.CategoryListBox3.HorizontalScrollbar = true;
             this.CategoryListBox3.ItemHeight = 15;
-            this.CategoryListBox3.Location = new Point(456, 103);
+            this.CategoryListBox3.Location = new Point(0, 0);
             this.CategoryListBox3.Name = "CategoryListBox3";
             this.CategoryListBox3.Size = new Size(350, 259);
             this.CategoryListBox3.TabIndex = 7;
@@ -295,6 +304,30 @@
             this.QRCodeTextBox.TabIndex = 601;
             this.QRCodeTextBox.KeyDown += this.QRCodeTextBox_KeyDown;
             // 
+            // panelCategory1
+            // 
+            this.panelCategory1.Controls.Add(this.CategoryListBox1);
+            this.panelCategory1.Location = new Point(74, 103);
+            this.panelCategory1.Name = "panelCategory1";
+            this.panelCategory1.Size = new Size(60, 259);
+            this.panelCategory1.TabIndex = 601;
+            // 
+            // panelCategory2
+            // 
+            this.panelCategory2.Controls.Add(this.CategoryListBox2);
+            this.panelCategory2.Location = new Point(190, 103);
+            this.panelCategory2.Name = "panelCategory2";
+            this.panelCategory2.Size = new Size(210, 259);
+            this.panelCategory2.TabIndex = 602;
+            // 
+            // panelCategory3
+            // 
+            this.panelCategory3.Controls.Add(this.CategoryListBox3);
+            this.panelCategory3.Location = new Point(456, 103);
+            this.panelCategory3.Name = "panelCategory3";
+            this.panelCategory3.Size = new Size(350, 259);
+            this.panelCategory3.TabIndex = 603;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
@@ -304,14 +337,14 @@
             this.Controls.Add(this.FontSizePanel);
             this.Controls.Add(this.RegisterButton);
             this.Controls.Add(this.HistoryButton);
-            this.Controls.Add(this.CategoryListBox3);
-            this.Controls.Add(this.CategoryListBox2);
-            this.Controls.Add(this.CategoryListBox1);
             this.Controls.Add(this.CategoryRadioButton4);
             this.Controls.Add(this.CategoryRadioButton3);
             this.Controls.Add(this.CategoryRadioButton2);
             this.Controls.Add(this.CategoryRadioButton1);
             this.Controls.Add(this.MainWindowMenuStrip);
+            this.Controls.Add(this.panelCategory1);
+            this.Controls.Add(this.panelCategory2);
+            this.Controls.Add(this.panelCategory3);
             this.Font = new Font("Meiryo UI", 9F);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.Icon = (Icon)resources.GetObject("$this.Icon");
@@ -326,6 +359,9 @@
             this.FontSizePanel.ResumeLayout(false);
             this.QRCodePanel.ResumeLayout(false);
             this.QRCodePanel.PerformLayout();
+            this.panelCategory1.ResumeLayout(false);
+            this.panelCategory2.ResumeLayout(false);
+            this.panelCategory3.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -354,5 +390,8 @@
         private Button QRCodeButton;
         private RadioButton RadioButtonBarcode;
         private RadioButton RadioButtonQR;
+        private Panel panelCategory1;
+        private Panel panelCategory2;
+        private Panel panelCategory3;
     }
 }
