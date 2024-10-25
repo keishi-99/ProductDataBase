@@ -105,7 +105,8 @@ namespace ProductDatabase {
 
                             // 在庫テーブルからデータ取得
                             var intQuantity = ProductInfo.Quantity;
-                            cmd.CommandText = $"""SELECT col_Substrate_num, col_Stock, col_Substrate_Name FROM "Stock_{ProductInfo.StockName}" WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC""";
+                            cmd.CommandText = $"""SELECT col_Substrate_num, col_Stock, col_Substrate_Name FROM "Stock_{ProductInfo.StockName}" WHERE col_Stock > 0 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC""";
+                            //cmd.CommandText = $"""SELECT col_Substrate_num, col_Stock, col_Substrate_Name FROM "Stock_{ProductInfo.StockName}" WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC""";
                             cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _useSubstrate[i];
                             using (var dr = cmd.ExecuteReader()) {
                                 while (dr.Read()) {
@@ -180,7 +181,8 @@ namespace ProductDatabase {
                                 }
                             }
 
-                            cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC""";
+                            cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE col_Stock > 0 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC""";
+                            //cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC""";
                             cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _useSubstrate[i];
                             using (var dr = cmd.ExecuteReader()) {
                                 while (dr.Read()) {
@@ -533,15 +535,23 @@ namespace ProductDatabase {
                                             cmd.CommandText =
                                                 $"""
                                                 UPDATE "Stock_{ProductInfo.StockName}" SET
-                                                    col_Flg = @col_Flg,
                                                     col_Stock = @col_Stock,
                                                     col_History = ifnull(col_History,'')|| @col_History
                                                 WHERE
                                                     col_Substrate_Num = @col_Substrate_Num
                                                 """;
+                                            //cmd.CommandText =
+                                            //    $"""
+                                            //    UPDATE "Stock_{ProductInfo.StockName}" SET
+                                            //        col_Flg = @col_Flg,
+                                            //        col_Stock = @col_Stock,
+                                            //        col_History = ifnull(col_History,'')|| @col_History
+                                            //    WHERE
+                                            //        col_Substrate_Num = @col_Substrate_Num
+                                            //    """;
                                             cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
 
-                                            cmd.Parameters.Add("@col_Flg", DbType.String).Value = stockValue - useValue == 0 ? 0 : (object)1;
+                                            //cmd.Parameters.Add("@col_Flg", DbType.String).Value = stockValue - useValue == 0 ? 0 : (object)1;
 
                                             cmd.Parameters.Add("@col_Stock", DbType.String).Value = stockValue - useValue;
                                             cmd.Parameters.Add("@col_History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue}),";

@@ -102,7 +102,7 @@ namespace ProductDatabase {
                                 // 抽出した行から製造番号,在庫取得
                                 var strSubstrateNum = $"{dr["col_Substrate_num"]}";
                                 var intStock = Int32.Parse($"{dr["col_Stock"]}");
-                                var colFlg = Int32.Parse($"{dr["col_Flg"]}");
+                                //var colFlg = Int32.Parse($"{dr["col_Flg"]}");
                                 strSubstrateName = $"{dr["col_Substrate_Name"]}";
                                 if (_objCbx != null) { _objCbx.Text = $"{strSubstrateName} - {_useSubstrate[i]}"; }
 
@@ -129,7 +129,7 @@ namespace ProductDatabase {
                                     intUsedQuantity = Int32.Parse(strUsedQuantity);
                                 }
 
-                                if (colFlg == 1) {
+                                if (intStock > 0) {
                                     if (_objDgv == null) { break; }
                                     _objDgv.Rows.Add();
                                     _objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
@@ -292,25 +292,34 @@ namespace ProductDatabase {
                                                     $"""
                                                     UPDATE Stock_{ProductInfo.StockName}
                                                     SET
-                                                        col_Flg = @col_Flg,
                                                         col_Stock = @col_Stock,
                                                         col_History = ifnull(col_History,'')|| @col_History
                                                     WHERE
                                                         col_Substrate_Num = @col_Substrate_Num
                                                     """;
+                                                //cmd.CommandText =
+                                                //    $"""
+                                                //    UPDATE Stock_{ProductInfo.StockName}
+                                                //    SET
+                                                //        col_Flg = @col_Flg,
+                                                //        col_Stock = @col_Stock,
+                                                //        col_History = ifnull(col_History,'')|| @col_History
+                                                //    WHERE
+                                                //        col_Substrate_Num = @col_Substrate_Num
+                                                //    """;
                                                 cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = substrateNum;
 
-                                                switch (useValue - usedValue) {
-                                                    case int diff when diff > 0:
-                                                        cmd.Parameters.Add("@col_Flg", DbType.String).Value = (stockValue - diff == 0) ? 0 : 1;
-                                                        break;
-                                                    case int diff when diff < 0:
-                                                        cmd.Parameters.Add("@col_Flg", DbType.String).Value = 1;
-                                                        break;
-                                                    case int diff when diff == 0:
-                                                        cmd.Parameters.Add("@col_Flg", DbType.String).Value = (stockValue == 0) ? 0 : 1;
-                                                        break;
-                                                }
+                                                //switch (useValue - usedValue) {
+                                                //    case int diff when diff > 0:
+                                                //        cmd.Parameters.Add("@col_Flg", DbType.String).Value = (stockValue - diff == 0) ? 0 : 1;
+                                                //        break;
+                                                //    case int diff when diff < 0:
+                                                //        cmd.Parameters.Add("@col_Flg", DbType.String).Value = 1;
+                                                //        break;
+                                                //    case int diff when diff == 0:
+                                                //        cmd.Parameters.Add("@col_Flg", DbType.String).Value = (stockValue == 0) ? 0 : 1;
+                                                //        break;
+                                                //}
 
                                                 cmd.Parameters.Add("@col_Stock", DbType.String).Value = stockValue + usedValue - useValue;
                                                 cmd.Parameters.Add("@col_History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue}),";
