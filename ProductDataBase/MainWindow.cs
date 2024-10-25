@@ -295,19 +295,19 @@ namespace ProductDatabase {
                 switch (selectedRadioButton.Tag) {
                     case "1":
                         ProductInfo.RadioButtonFlg = 1;
-                        strSqlQuery = """SELECT * FROM Substrate WHERE Visible = "1";""";
+                        strSqlQuery = """SELECT * FROM Substrate WHERE Visible = 1;""";
                         break;
                     case "2":
                         ProductInfo.RadioButtonFlg = 2;
-                        strSqlQuery = """SELECT * FROM Product WHERE Visible = "1";""";
+                        strSqlQuery = """SELECT * FROM Product WHERE Visible = 1;""";
                         break;
                     case "3":
                         ProductInfo.RadioButtonFlg = 3;
-                        strSqlQuery = """SELECT * FROM Product WHERE Visible = "1";""";
+                        strSqlQuery = """SELECT * FROM Product WHERE Visible = 1;""";
                         break;
                     case "4":
                         ProductInfo.RadioButtonFlg = 4;
-                        strSqlQuery = """SELECT * FROM Product WHERE Visible = "1" AND (col_Print_Type = "5" OR col_Print_Type = "6");""";
+                        strSqlQuery = """SELECT * FROM Product WHERE Visible = 1 AND (col_Print_Type = 5 OR col_Print_Type = 6);""";
                         break;
                     default:
                         break;
