@@ -225,18 +225,32 @@ namespace ProductDatabase {
                             $"""
                             INSERT INTO "Stock_{ProductInfo.StockName}"
                                 (
-                                col_Flg, col_Substrate_Name, col_Substrate_Model, col_Substrate_Num, col_Order_Num, col_Stock
+                                col_Substrate_Name, col_Substrate_Model, col_Substrate_Num, col_Order_Num, col_Stock
                                 )
                             VALUES
                                 (
-                                @col_Flg, @col_Substrate_Name, @col_Substrate_Model, @col_Substrate_Num, @col_Order_Num, @col_Stock
+                                @col_Substrate_Name, @col_Substrate_Model, @col_Substrate_Num, @col_Order_Num, @col_Stock
                                 )
                                 on conflict(col_Substrate_Num)
                             DO UPDATE
-                                set col_Flg = 1, col_Stock = col_Stock + excluded.col_Stock
+                                set col_Stock = col_Stock + excluded.col_Stock
                             """;
+                        //cmd.CommandText =
+                        //    $"""
+                        //    INSERT INTO "Stock_{ProductInfo.StockName}"
+                        //        (
+                        //        col_Flg, col_Substrate_Name, col_Substrate_Model, col_Substrate_Num, col_Order_Num, col_Stock
+                        //        )
+                        //    VALUES
+                        //        (
+                        //        @col_Flg, @col_Substrate_Name, @col_Substrate_Model, @col_Substrate_Num, @col_Order_Num, @col_Stock
+                        //        )
+                        //        on conflict(col_Substrate_Num)
+                        //    DO UPDATE
+                        //        set col_Flg = 1, col_Stock = col_Stock + excluded.col_Stock
+                        //    """;
 
-                        cmd.Parameters.Add("@col_Flg", DbType.String).Value = 1;
+                        //cmd.Parameters.Add("@col_Flg", DbType.String).Value = 1;
                         cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = ProductInfo.SubstrateName;
                         cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ProductInfo.SubstrateModel;
                         cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
@@ -260,15 +274,22 @@ namespace ProductDatabase {
                         cmd.CommandText =
                             $"""
                             UPDATE "Stock_{ProductInfo.StockName}" SET
-                                col_Flg = @col_Flg,
                                 col_Stock = @col_Stock,
                                 col_History = ifnull(col_History, '') || @col_History
                             WHERE
                                 col_Substrate_Num = @col_Substrate_Num
                             """;
+                        //$"""
+                        //    UPDATE "Stock_{ProductInfo.StockName}" SET
+                        //        col_Flg = @col_Flg,
+                        //        col_Stock = @col_Stock,
+                        //        col_History = ifnull(col_History, '') || @col_History
+                        //    WHERE
+                        //        col_Substrate_Num = @col_Substrate_Num
+                        //    """;
                         cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
 
-                        cmd.Parameters.Add("@col_Flg", DbType.String).Value = intStockFlg;
+                        //cmd.Parameters.Add("@col_Flg", DbType.String).Value = intStockFlg;
                         cmd.Parameters.Add("@col_Stock", DbType.String).Value = intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text);
                         cmd.Parameters.Add("@col_History", DbType.String).Value = $"[不良]{ManufacturingNumberMaskedTextBox.Text}";
 
