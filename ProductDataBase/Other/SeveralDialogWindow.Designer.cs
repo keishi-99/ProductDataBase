@@ -23,49 +23,50 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            SeveralListBox = new ListBox();
-            OKButton = new Button();
-            SuspendLayout();
+            this.SeveralListBox = new ListBox();
+            this.OKButton = new Button();
+            this.SuspendLayout();
             // 
             // SeveralListBox
             // 
-            SeveralListBox.FormattingEnabled = true;
-            SeveralListBox.ItemHeight = 15;
-            SeveralListBox.Location = new Point(37, 12);
-            SeveralListBox.Name = "SeveralListBox";
-            SeveralListBox.Size = new Size(320, 94);
-            SeveralListBox.TabIndex = 0;
-            SeveralListBox.KeyPress += SeveralListBox_KeyPress;
+            this.SeveralListBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            this.SeveralListBox.FormattingEnabled = true;
+            this.SeveralListBox.ItemHeight = 15;
+            this.SeveralListBox.Location = new Point(12, 12);
+            this.SeveralListBox.Name = "SeveralListBox";
+            this.SeveralListBox.Size = new Size(482, 214);
+            this.SeveralListBox.TabIndex = 0;
+            this.SeveralListBox.KeyPress += this.SeveralListBox_KeyPress;
             // 
             // OKButton
             // 
-            OKButton.Location = new Point(160, 119);
-            OKButton.Name = "OKButton";
-            OKButton.Size = new Size(75, 23);
-            OKButton.TabIndex = 1;
-            OKButton.Text = "OK";
-            OKButton.UseVisualStyleBackColor = true;
-            OKButton.Click += OkButton_Click;
+            this.OKButton.Location = new Point(216, 247);
+            this.OKButton.Name = "OKButton";
+            this.OKButton.Size = new Size(75, 23);
+            this.OKButton.TabIndex = 1;
+            this.OKButton.Text = "OK";
+            this.OKButton.UseVisualStyleBackColor = true;
+            this.OKButton.Click += this.OkButton_Click;
             // 
             // SeveralDialogWindow
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(394, 154);
-            ControlBox = false;
-            Controls.Add(OKButton);
-            Controls.Add(SeveralListBox);
-            Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            Name = "SeveralDialogWindow";
-            ShowIcon = false;
-            ShowInTaskbar = false;
-            StartPosition = FormStartPosition.CenterParent;
-            TopMost = true;
-            Load += SeveralDialogWindow_Load;
-            ResumeLayout(false);
+            this.AutoScaleDimensions = new SizeF(7F, 15F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.ClientSize = new Size(506, 282);
+            this.ControlBox = false;
+            this.Controls.Add(this.OKButton);
+            this.Controls.Add(this.SeveralListBox);
+            this.Font = new Font("Meiryo UI", 9F);
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "SeveralDialogWindow";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
+            this.StartPosition = FormStartPosition.CenterParent;
+            this.TopMost = true;
+            this.Load += this.SeveralDialogWindow_Load;
+            this.ResumeLayout(false);
         }
 
         #endregion
