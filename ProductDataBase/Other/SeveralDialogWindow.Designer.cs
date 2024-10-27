@@ -25,6 +25,8 @@
         private void InitializeComponent() {
             this.SeveralListBox = new ListBox();
             this.OKButton = new Button();
+            this.panelSeveralList = new Panel();
+            this.panelSeveralList.SuspendLayout();
             this.SuspendLayout();
             // 
             // SeveralListBox
@@ -32,7 +34,7 @@
             this.SeveralListBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             this.SeveralListBox.FormattingEnabled = true;
             this.SeveralListBox.ItemHeight = 15;
-            this.SeveralListBox.Location = new Point(12, 12);
+            this.SeveralListBox.Location = new Point(0, 0);
             this.SeveralListBox.Name = "SeveralListBox";
             this.SeveralListBox.Size = new Size(482, 214);
             this.SeveralListBox.TabIndex = 0;
@@ -48,6 +50,14 @@
             this.OKButton.UseVisualStyleBackColor = true;
             this.OKButton.Click += this.OkButton_Click;
             // 
+            // panelSeveralList
+            // 
+            this.panelSeveralList.Controls.Add(this.SeveralListBox);
+            this.panelSeveralList.Location = new Point(12, 12);
+            this.panelSeveralList.Name = "panelSeveralList";
+            this.panelSeveralList.Size = new Size(482, 214);
+            this.panelSeveralList.TabIndex = 2;
+            // 
             // SeveralDialogWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
@@ -55,7 +65,7 @@
             this.ClientSize = new Size(506, 282);
             this.ControlBox = false;
             this.Controls.Add(this.OKButton);
-            this.Controls.Add(this.SeveralListBox);
+            this.Controls.Add(this.panelSeveralList);
             this.Font = new Font("Meiryo UI", 9F);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -66,6 +76,7 @@
             this.StartPosition = FormStartPosition.CenterParent;
             this.TopMost = true;
             this.Load += this.SeveralDialogWindow_Load;
+            this.panelSeveralList.ResumeLayout(false);
             this.ResumeLayout(false);
         }
 
@@ -73,5 +84,6 @@
 
         private ListBox SeveralListBox;
         private Button OKButton;
+        private Panel panelSeveralList;
     }
 }
