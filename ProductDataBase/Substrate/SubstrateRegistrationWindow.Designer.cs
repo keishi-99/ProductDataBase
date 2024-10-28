@@ -77,8 +77,10 @@
             this.SubstrateRegistrationPrintDialog = new PrintDialog();
             this.SubstrateRegistrationPrintDocument = new System.Drawing.Printing.PrintDocument();
             this.SubstrateRegistrationPrintPreviewDialog = new PrintPreviewDialog();
+            this.panelCommentTexrBox = new Panel();
             this.SubstrateRegistrationMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPostionNumericUpDown).BeginInit();
+            this.panelCommentTexrBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // SubstrateRegistrationMenuStrip
@@ -149,6 +151,7 @@
             // ProductNameLabel1
             // 
             this.ProductNameLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.ProductNameLabel1.AutoSize = true;
             this.ProductNameLabel1.Location = new Point(28, 39);
             this.ProductNameLabel1.Margin = new Padding(4, 0, 4, 0);
             this.ProductNameLabel1.Name = "ProductNameLabel1";
@@ -161,7 +164,7 @@
             // 
             this.ProductNameLabel2.AutoSize = true;
             this.ProductNameLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.ProductNameLabel2.Location = new Point(84, 37);
+            this.ProductNameLabel2.Location = new Point(84, 38);
             this.ProductNameLabel2.Margin = new Padding(4, 0, 4, 0);
             this.ProductNameLabel2.Name = "ProductNameLabel2";
             this.ProductNameLabel2.Size = new Size(24, 17);
@@ -172,7 +175,8 @@
             // SubstrateModelLabel1
             // 
             this.SubstrateModelLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            this.SubstrateModelLabel1.Location = new Point(16, 61);
+            this.SubstrateModelLabel1.AutoSize = true;
+            this.SubstrateModelLabel1.Location = new Point(16, 62);
             this.SubstrateModelLabel1.Margin = new Padding(4, 0, 4, 0);
             this.SubstrateModelLabel1.Name = "SubstrateModelLabel1";
             this.SubstrateModelLabel1.Size = new Size(60, 15);
@@ -184,7 +188,7 @@
             // 
             this.SubstrateModelLabel2.AutoSize = true;
             this.SubstrateModelLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.SubstrateModelLabel2.Location = new Point(84, 59);
+            this.SubstrateModelLabel2.Location = new Point(84, 61);
             this.SubstrateModelLabel2.Margin = new Padding(4, 0, 4, 0);
             this.SubstrateModelLabel2.Name = "SubstrateModelLabel2";
             this.SubstrateModelLabel2.Size = new Size(24, 17);
@@ -195,7 +199,8 @@
             // StockLabel1
             // 
             this.StockLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            this.StockLabel1.Location = new Point(40, 82);
+            this.StockLabel1.AutoSize = true;
+            this.StockLabel1.Location = new Point(40, 85);
             this.StockLabel1.Margin = new Padding(4, 0, 4, 0);
             this.StockLabel1.Name = "StockLabel1";
             this.StockLabel1.Size = new Size(36, 15);
@@ -207,7 +212,7 @@
             // 
             this.StockLabel2.AutoSize = true;
             this.StockLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.StockLabel2.Location = new Point(84, 81);
+            this.StockLabel2.Location = new Point(84, 84);
             this.StockLabel2.Margin = new Padding(4, 0, 4, 0);
             this.StockLabel2.Name = "StockLabel2";
             this.StockLabel2.Size = new Size(24, 17);
@@ -538,7 +543,7 @@
             // CommentTextBox
             // 
             this.CommentTextBox.Enabled = false;
-            this.CommentTextBox.Location = new Point(464, 141);
+            this.CommentTextBox.Location = new Point(0, 0);
             this.CommentTextBox.Margin = new Padding(0);
             this.CommentTextBox.MaxLength = 500;
             this.CommentTextBox.Multiline = true;
@@ -639,6 +644,14 @@
             this.SubstrateRegistrationPrintPreviewDialog.Visible = false;
             this.SubstrateRegistrationPrintPreviewDialog.Load += this.SubstrateRegistrationPrintPreviewDialog_Load;
             // 
+            // panelCommentTexrBox
+            // 
+            this.panelCommentTexrBox.Controls.Add(this.CommentTextBox);
+            this.panelCommentTexrBox.Location = new Point(464, 141);
+            this.panelCommentTexrBox.Name = "panelCommentTexrBox";
+            this.panelCommentTexrBox.Size = new Size(150, 175);
+            this.panelCommentTexrBox.TabIndex = 42;
+            // 
             // SubstrateRegistrationWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
@@ -651,7 +664,6 @@
             this.Controls.Add(this.PrintRowLabel);
             this.Controls.Add(this.TemplateButton);
             this.Controls.Add(this.CommentComboBox);
-            this.Controls.Add(this.CommentTextBox);
             this.Controls.Add(this.CommentCheckBox);
             this.Controls.Add(this.ExtraTextBox6);
             this.Controls.Add(this.ExtraCheckBox6);
@@ -686,6 +698,7 @@
             this.Controls.Add(this.ProductNameLabel2);
             this.Controls.Add(this.ProductNameLabel1);
             this.Controls.Add(this.SubstrateRegistrationMenuStrip);
+            this.Controls.Add(this.panelCommentTexrBox);
             this.Font = new Font("Meiryo UI", 9F);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MainMenuStrip = this.SubstrateRegistrationMenuStrip;
@@ -701,6 +714,8 @@
             this.SubstrateRegistrationMenuStrip.ResumeLayout(false);
             this.SubstrateRegistrationMenuStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPostionNumericUpDown).EndInit();
+            this.panelCommentTexrBox.ResumeLayout(false);
+            this.panelCommentTexrBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -760,5 +775,6 @@
         private PrintDialog SubstrateRegistrationPrintDialog;
         private System.Drawing.Printing.PrintDocument SubstrateRegistrationPrintDocument;
         private PrintPreviewDialog SubstrateRegistrationPrintPreviewDialog;
+        private Panel panelCommentTexrBox;
     }
 }
