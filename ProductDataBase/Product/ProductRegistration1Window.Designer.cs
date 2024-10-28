@@ -65,7 +65,9 @@
             this.ProductRegistration1MenuStrip = new MenuStrip();
             this.ProductTypeLabel2 = new Label();
             this.ProductTypeLabel1 = new Label();
+            this.panelCommentTextBox = new Panel();
             this.ProductRegistration1MenuStrip.SuspendLayout();
+            this.panelCommentTextBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // RegisterButton
@@ -104,7 +106,7 @@
             // CommentTextBox
             // 
             this.CommentTextBox.Enabled = false;
-            this.CommentTextBox.Location = new Point(464, 141);
+            this.CommentTextBox.Location = new Point(0, 0);
             this.CommentTextBox.Margin = new Padding(0);
             this.CommentTextBox.MaxLength = 500;
             this.CommentTextBox.Multiline = true;
@@ -436,7 +438,7 @@
             // 
             this.SubstrateModelLabel2.AutoSize = true;
             this.SubstrateModelLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.SubstrateModelLabel2.Location = new Point(84, 81);
+            this.SubstrateModelLabel2.Location = new Point(84, 84);
             this.SubstrateModelLabel2.Margin = new Padding(4, 0, 4, 0);
             this.SubstrateModelLabel2.Name = "SubstrateModelLabel2";
             this.SubstrateModelLabel2.Size = new Size(24, 17);
@@ -447,7 +449,8 @@
             // SubstrateModelLabel1
             // 
             this.SubstrateModelLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            this.SubstrateModelLabel1.Location = new Point(16, 82);
+            this.SubstrateModelLabel1.AutoSize = true;
+            this.SubstrateModelLabel1.Location = new Point(16, 85);
             this.SubstrateModelLabel1.Margin = new Padding(4, 0, 4, 0);
             this.SubstrateModelLabel1.Name = "SubstrateModelLabel1";
             this.SubstrateModelLabel1.Size = new Size(60, 15);
@@ -472,7 +475,7 @@
             // 
             this.ProductNameLabel2.AutoSize = true;
             this.ProductNameLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.ProductNameLabel2.Location = new Point(84, 37);
+            this.ProductNameLabel2.Location = new Point(84, 38);
             this.ProductNameLabel2.Margin = new Padding(4, 0, 4, 0);
             this.ProductNameLabel2.Name = "ProductNameLabel2";
             this.ProductNameLabel2.Size = new Size(24, 17);
@@ -497,6 +500,7 @@
             // ProductNameLabel1
             // 
             this.ProductNameLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.ProductNameLabel1.AutoSize = true;
             this.ProductNameLabel1.Location = new Point(28, 39);
             this.ProductNameLabel1.Margin = new Padding(4, 0, 4, 0);
             this.ProductNameLabel1.Name = "ProductNameLabel1";
@@ -519,7 +523,7 @@
             // 
             this.ProductTypeLabel2.AutoSize = true;
             this.ProductTypeLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.ProductTypeLabel2.Location = new Point(84, 59);
+            this.ProductTypeLabel2.Location = new Point(84, 61);
             this.ProductTypeLabel2.Margin = new Padding(4, 0, 4, 0);
             this.ProductTypeLabel2.Name = "ProductTypeLabel2";
             this.ProductTypeLabel2.Size = new Size(24, 17);
@@ -530,13 +534,22 @@
             // ProductTypeLabel1
             // 
             this.ProductTypeLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            this.ProductTypeLabel1.Location = new Point(16, 61);
+            this.ProductTypeLabel1.AutoSize = true;
+            this.ProductTypeLabel1.Location = new Point(38, 62);
             this.ProductTypeLabel1.Margin = new Padding(4, 0, 4, 0);
             this.ProductTypeLabel1.Name = "ProductTypeLabel1";
-            this.ProductTypeLabel1.Size = new Size(60, 15);
+            this.ProductTypeLabel1.Size = new Size(38, 15);
             this.ProductTypeLabel1.TabIndex = 82;
             this.ProductTypeLabel1.Text = "タイプ:";
             this.ProductTypeLabel1.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // panelCommentTextBox
+            // 
+            this.panelCommentTextBox.Controls.Add(this.CommentTextBox);
+            this.panelCommentTextBox.Location = new Point(464, 141);
+            this.panelCommentTextBox.Name = "panelCommentTextBox";
+            this.panelCommentTextBox.Size = new Size(150, 175);
+            this.panelCommentTextBox.TabIndex = 84;
             // 
             // ProductRegistration1Window
             // 
@@ -548,7 +561,6 @@
             this.Controls.Add(this.RegisterButton);
             this.Controls.Add(this.TemplateButton);
             this.Controls.Add(this.CommentComboBox);
-            this.Controls.Add(this.CommentTextBox);
             this.Controls.Add(this.CommentCheckBox);
             this.Controls.Add(this.ExtraTextBox6);
             this.Controls.Add(this.ExtraCheckBox6);
@@ -581,6 +593,7 @@
             this.Controls.Add(this.ProductNameLabel2);
             this.Controls.Add(this.ProductNameLabel1);
             this.Controls.Add(this.ProductRegistration1MenuStrip);
+            this.Controls.Add(this.panelCommentTextBox);
             this.Font = new Font("Meiryo UI", 9F);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MainMenuStrip = this.ProductRegistration1MenuStrip;
@@ -595,6 +608,8 @@
             this.Load += this.ProductRegistration1Window_Load;
             this.ProductRegistration1MenuStrip.ResumeLayout(false);
             this.ProductRegistration1MenuStrip.PerformLayout();
+            this.panelCommentTextBox.ResumeLayout(false);
+            this.panelCommentTextBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -643,5 +658,6 @@
         private MenuStrip ProductRegistration1MenuStrip;
         private Label ProductTypeLabel2;
         private Label ProductTypeLabel1;
+        private Panel panelCommentTextBox;
     }
 }
