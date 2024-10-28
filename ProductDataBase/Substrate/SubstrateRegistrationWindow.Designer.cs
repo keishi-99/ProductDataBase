@@ -152,10 +152,11 @@
             // 
             this.ProductNameLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             this.ProductNameLabel1.AutoSize = true;
+            this.ProductNameLabel1.BorderStyle = BorderStyle.Fixed3D;
             this.ProductNameLabel1.Location = new Point(28, 39);
             this.ProductNameLabel1.Margin = new Padding(4, 0, 4, 0);
             this.ProductNameLabel1.Name = "ProductNameLabel1";
-            this.ProductNameLabel1.Size = new Size(48, 15);
+            this.ProductNameLabel1.Size = new Size(50, 17);
             this.ProductNameLabel1.TabIndex = 1;
             this.ProductNameLabel1.Text = "製品名:";
             this.ProductNameLabel1.TextAlign = ContentAlignment.MiddleRight;
@@ -164,7 +165,7 @@
             // 
             this.ProductNameLabel2.AutoSize = true;
             this.ProductNameLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.ProductNameLabel2.Location = new Point(84, 38);
+            this.ProductNameLabel2.Location = new Point(84, 39);
             this.ProductNameLabel2.Margin = new Padding(4, 0, 4, 0);
             this.ProductNameLabel2.Name = "ProductNameLabel2";
             this.ProductNameLabel2.Size = new Size(24, 17);
@@ -176,10 +177,11 @@
             // 
             this.SubstrateModelLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             this.SubstrateModelLabel1.AutoSize = true;
+            this.SubstrateModelLabel1.BorderStyle = BorderStyle.Fixed3D;
             this.SubstrateModelLabel1.Location = new Point(16, 62);
             this.SubstrateModelLabel1.Margin = new Padding(4, 0, 4, 0);
             this.SubstrateModelLabel1.Name = "SubstrateModelLabel1";
-            this.SubstrateModelLabel1.Size = new Size(60, 15);
+            this.SubstrateModelLabel1.Size = new Size(62, 17);
             this.SubstrateModelLabel1.TabIndex = 3;
             this.SubstrateModelLabel1.Text = "基盤型式:";
             this.SubstrateModelLabel1.TextAlign = ContentAlignment.MiddleRight;
@@ -188,7 +190,7 @@
             // 
             this.SubstrateModelLabel2.AutoSize = true;
             this.SubstrateModelLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.SubstrateModelLabel2.Location = new Point(84, 61);
+            this.SubstrateModelLabel2.Location = new Point(84, 62);
             this.SubstrateModelLabel2.Margin = new Padding(4, 0, 4, 0);
             this.SubstrateModelLabel2.Name = "SubstrateModelLabel2";
             this.SubstrateModelLabel2.Size = new Size(24, 17);
@@ -200,10 +202,11 @@
             // 
             this.StockLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             this.StockLabel1.AutoSize = true;
+            this.StockLabel1.BorderStyle = BorderStyle.Fixed3D;
             this.StockLabel1.Location = new Point(40, 85);
             this.StockLabel1.Margin = new Padding(4, 0, 4, 0);
             this.StockLabel1.Name = "StockLabel1";
-            this.StockLabel1.Size = new Size(36, 15);
+            this.StockLabel1.Size = new Size(38, 17);
             this.StockLabel1.TabIndex = 5;
             this.StockLabel1.Text = "在庫:";
             this.StockLabel1.TextAlign = ContentAlignment.MiddleRight;
@@ -212,7 +215,7 @@
             // 
             this.StockLabel2.AutoSize = true;
             this.StockLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.StockLabel2.Location = new Point(84, 84);
+            this.StockLabel2.Location = new Point(84, 85);
             this.StockLabel2.Margin = new Padding(4, 0, 4, 0);
             this.StockLabel2.Name = "StockLabel2";
             this.StockLabel2.Size = new Size(24, 17);
