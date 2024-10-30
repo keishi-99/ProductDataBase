@@ -70,7 +70,7 @@ namespace ProductDatabase {
                     }
                 }
 
-                // 在庫管理する基盤はDB2へ接続し対象製品の在庫取得
+                // 在庫管理する基板はDB2へ接続し対象製品の在庫取得
                 if (ProductInfo.RegType != 0) {
                     using SQLiteConnection con = new(GetConnectionString2());
                     con.Open();
@@ -215,7 +215,7 @@ namespace ProductDatabase {
                     }
                 }
 
-                // 在庫管理する基盤のみ
+                // 在庫管理する基板のみ
                 if (ProductInfo.RegType != 0) {
                     //在庫追加
                     if (QuantityCheckBox.Checked && !DefectNumberCheckBox.Checked) {
