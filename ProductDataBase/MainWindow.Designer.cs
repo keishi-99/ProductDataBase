@@ -88,7 +88,7 @@
             this.CategoryRadioButton1.Size = new Size(70, 30);
             this.CategoryRadioButton1.TabIndex = 1;
             this.CategoryRadioButton1.Tag = "1";
-            this.CategoryRadioButton1.Text = "基盤登録";
+            this.CategoryRadioButton1.Text = "基板登録";
             this.CategoryRadioButton1.TextAlign = ContentAlignment.MiddleCenter;
             this.CategoryRadioButton1.UseVisualStyleBackColor = true;
             this.CategoryRadioButton1.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
@@ -127,7 +127,7 @@
             this.CategoryRadioButton4.Size = new Size(70, 30);
             this.CategoryRadioButton4.TabIndex = 4;
             this.CategoryRadioButton4.Tag = "4";
-            this.CategoryRadioButton4.Text = "基盤変更";
+            this.CategoryRadioButton4.Text = "基板変更";
             this.CategoryRadioButton4.TextAlign = ContentAlignment.MiddleCenter;
             this.CategoryRadioButton4.UseVisualStyleBackColor = true;
             this.CategoryRadioButton4.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
