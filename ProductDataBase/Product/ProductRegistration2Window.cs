@@ -30,6 +30,7 @@ namespace ProductDatabase {
 
         private int _labelProNSerial;
         private int _labelProNumLabelsToPrint;
+        private int _remainingCount;
 
         private readonly decimal _displayResolution = 96.0m;
         private readonly int _displayMagnitude = 3;
@@ -66,6 +67,7 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = true;
                 _useSubstrate = ProductInfo.UseSubstrate.Split(",");
 
+                _labelProNSerial = ProductInfo.SerialFirstNumber;
                 _serialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
 
                 var quantityFlg = false;
@@ -1074,7 +1076,7 @@ namespace ProductDatabase {
                 headerPos.Offset(offset);
                 e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
 
-                if (labelProPageNum == 0) { _labelProNSerial = ProductInfo.SerialFirstNumber; }
+                if (_pageCnt == 1) { _remainingCount = intCountNumLabels; }
                 if (labelProPageNum >= 1) { startLine = 0; }
 
                 var y = 0;
@@ -1087,7 +1089,7 @@ namespace ProductDatabase {
                         e.Graphics.DrawImage(MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
 
                         // アンダーバー付きを描画
-                        if (ProductInfo.PrintType == 4 && intCountNumLabels == 1) {
+                        if (ProductInfo.PrintType == 4 && _remainingCount == 1) {
                             _serialUnderbar = true;
                             posY = (float)(offsetY + ((y + 1) * (intervalY + sizeY)));
                             e.Graphics.DrawImage(MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
@@ -1099,8 +1101,9 @@ namespace ProductDatabase {
 
                         // 印刷するラベルがなくなった場合の処理
                         if (_labelProNumLabelsToPrint <= 0) {
-                            intCountNumLabels--;
-                            if (intCountNumLabels <= 0) {
+                            _remainingCount--;
+
+                            if (_remainingCount <= 0) {
                                 e.HasMorePages = false;
                                 labelProPageNum = 0;
                                 _labelProNumLabelsToPrint = 0;
@@ -1115,12 +1118,14 @@ namespace ProductDatabase {
 
                         // 列の終わりの処理
                         if (x >= maxX - 1) {
-                            if (intCountNumLabels == 1) { y++; }
-                            intCountNumLabels--;
-                            if (intCountNumLabels <= 0) {
-                                intCountNumLabels = intNumLabels;
+                            if (ProductInfo.PrintType == 4 && _remainingCount == 1) {
+                                y++;
                             }
-                            else if (intCountNumLabels > 0) {
+                            _remainingCount--;
+                            if (_remainingCount <= 0) {
+                                _remainingCount = intNumLabels;
+                            }
+                            else if (_remainingCount > 0) {
                                 _labelProNSerial -= x + 1;
                                 _labelProNumLabelsToPrint += x + 1;
                                 break;
