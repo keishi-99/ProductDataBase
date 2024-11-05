@@ -240,7 +240,7 @@ namespace ProductDatabase {
                     """;
 
                 // チェックボックスにチェックがない場合はNullを
-                cmd.Parameters.Add("@col_Print_Type", DbType.String).Value = ProductInfo.PrintType;
+                cmd.Parameters.Add("@col_Print_Type", DbType.String).Value = _strSerialType;
                 cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = _orderNumber;
                 cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = _productNumber;
                 cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = ProductInfo.ProductType;
@@ -641,7 +641,7 @@ namespace ProductDatabase {
                 $"StrPerson\t\t\t[{_person}]",
                 $"IntQuantity\t\t[{_quantity}]",
                 $"IntSerialFirstNumber\t[{_serialFirstNumber}]",
-                $"IntSerialLastNumber\t[{_serialLastNumber}]",
+                $"IntSerialLastNumber\t\t[{_serialLastNumber}]",
                 $"StrInitial\t\t\t[{ProductInfo.Initial}]",
                 $"IntPrintType\t\t[{ProductInfo.PrintType}]",
                 $"IntSerialDigit\t\t[{ProductInfo.SerialDigit}]"

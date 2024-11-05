@@ -266,6 +266,7 @@ namespace ProductDatabase {
                             ProductInfo.SubstrateModel = selectedRow[0]["col_Substrate_Model"].ToString() ?? String.Empty;
                             break;
                         case 2:
+                        case 3:
                             ProductInfo.ProductName = selectedRow[0]["col_Product_Name"].ToString() ?? String.Empty;
                             ProductInfo.ProductType = selectedRow[0]["col_Product_Type"].ToString() ?? String.Empty;
                             ProductInfo.ProductModel = selectedRow[0]["col_Product_Model"].ToString() ?? String.Empty;
