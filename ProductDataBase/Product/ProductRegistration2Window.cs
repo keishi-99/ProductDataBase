@@ -223,6 +223,15 @@ namespace ProductDatabase {
                         }
                         break;
                     default:
+                        for (var i = 0; i <= 9; i++) {
+                            if (Controls[_checkBoxNames[i]] is CheckBox objCbx) {
+                                objCbx.Visible = false;
+                            }
+
+                            if (Controls[_dataGridViewNames[i]] is DataGridView objDgv) {
+                                objDgv.Visible = false;
+                            }
+                        }
                         break;
                 }
 
