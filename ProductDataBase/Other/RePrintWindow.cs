@@ -26,9 +26,10 @@ namespace ProductDatabase {
         private int _serialFirstNumber;
         private int _serialLastNumber;
 
-        private int _labelProPageNum;
+        private int _labelProPageNum = 1;
         private int _labelProNSerial;
         private int _labelProNumLabelsToPrint;
+        private int _remainingCount;
 
         private readonly decimal _displayResolution = 96.0m;
         private readonly int _displayMagnitude = 3;
@@ -37,7 +38,7 @@ namespace ProductDatabase {
         private string _strSerialType = String.Empty;
         private string _strSerialFirstNumber = String.Empty;
         private string _strSerialLastNumber = String.Empty;
-        private bool _fontUnderbar = false;
+        private bool _serialUnderbar = false;
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
@@ -270,8 +271,8 @@ namespace ProductDatabase {
             pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
             _labelProNumLabelsToPrint = _quantity;
-            _labelProPageNum = 0;
-            _fontUnderbar = false;
+            _labelProPageNum = 1;
+            _serialUnderbar = false;
 
             switch (printFlg) {
                 case 1:
@@ -362,7 +363,7 @@ namespace ProductDatabase {
                 if (!RePrintPrintDocument.PrintController.IsPreview) {
                     offsetX -= e.PageSettings.HardMarginX * 0.254;
                     offsetY -= e.PageSettings.HardMarginY * 0.254;
-                    offset = _labelProPageNum == 0
+                    offset = _labelProPageNum == 1
                         ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (startLineBarcode * (intervalY + sizeY))))
                         : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
                 }
@@ -381,8 +382,11 @@ namespace ProductDatabase {
                     ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (startLineBarcode * (intervalY + sizeY))))
                     : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
 
-                if (_labelProPageNum == 0) { _labelProNSerial = _serialFirstNumber; }
-                if (_labelProPageNum >= 1) { startLineBarcode = 0; }
+                if (_labelProPageNum == 1) {
+                    _remainingCount = intCountNumLabels;
+                    _labelProNSerial = _serialFirstNumber;
+                }
+                if (_labelProPageNum >= 2) { startLineBarcode = 0; }
 
                 var y = 0;
                 for (y = startLineBarcode; y < maxY; y++) {
@@ -393,14 +397,23 @@ namespace ProductDatabase {
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
                         e.Graphics.DrawImage(MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
 
+                        // アンダーバー付きを描画
+                        if (ProductInfo.PrintType == 4 && _remainingCount == 1) {
+                            _serialUnderbar = true;
+                            posY = (float)(offsetY + ((y + 1) * (intervalY + sizeY)));
+                            e.Graphics.DrawImage(MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
+                            _serialUnderbar = false;
+                        }
+
                         _labelProNSerial++;
                         _labelProNumLabelsToPrint--;
 
                         if (_labelProNumLabelsToPrint <= 0) {
-                            intCountNumLabels--;
-                            if (intCountNumLabels <= 0) {
+                            _remainingCount--;
+
+                            if (_remainingCount <= 0) {
                                 e.HasMorePages = false;
-                                _labelProPageNum = 0;
+                                _labelProPageNum = 1;
                                 _labelProNumLabelsToPrint = 0;
                                 return;
                             }
@@ -411,12 +424,17 @@ namespace ProductDatabase {
                             }
                         }
 
+                        // 列の終わりの処理
                         if (x >= maxX - 1) {
-                            intCountNumLabels--;
-                            if (intCountNumLabels <= 0) {
-                                intCountNumLabels = intNumLabels;
+                            if (ProductInfo.PrintType == 4 && _remainingCount == 1) {
+                                y++;
                             }
-                            else if (intCountNumLabels > 0) {
+                            _remainingCount--;
+                            if (_remainingCount <= 0) {
+                                _remainingCount = intNumLabels;
+                            }
+                            else if (_remainingCount > 0) {
+                                _labelProNSerial -= x + 1;
                                 _labelProNumLabelsToPrint += x + 1;
                                 break;
                             }
@@ -485,7 +503,7 @@ namespace ProductDatabase {
                     sizeY = (decimal)SettingsLabelPro.LabelProPageSettings.SizeY / 25.4M * resolution * magnitude;
                     fontSize = (decimal)SettingsLabelPro.LabelProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
                     stringPosY = (int)((decimal)SettingsLabelPro.LabelProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
-                    var style = _fontUnderbar ? FontStyle.Underline : FontStyle.Regular;
+                    var style = _serialUnderbar ? FontStyle.Underline : FontStyle.Regular;
                     fnt = new Font(SettingsLabelPro.LabelProLabelSettings.Font.Name, (float)fontSize, style);
 
                     labelImage = new((int)sizeX, (int)sizeY);

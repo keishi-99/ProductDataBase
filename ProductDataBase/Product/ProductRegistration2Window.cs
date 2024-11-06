@@ -985,8 +985,6 @@ namespace ProductDatabase {
             // PrintPageイベントハンドラの追加
             pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
-
-            _labelProNSerial = ProductInfo.SerialFirstNumber;
             _labelProNumLabelsToPrint = ProductInfo.Quantity;
             _serialUnderbar = false;
 
@@ -1097,8 +1095,11 @@ namespace ProductDatabase {
                 headerPos.Offset(offset);
                 e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
 
-                if (_pageCnt == 1) { _remainingCount = intCountNumLabels; }
-                if (labelProPageNum >= 1) { startLine = 0; }
+                if (_pageCnt == 1) {
+                    _remainingCount = intCountNumLabels;
+                    _labelProNSerial = ProductInfo.SerialFirstNumber;
+                }
+                if (_pageCnt >= 2) { startLine = 0; }
 
                 var y = 0;
                 for (y = startLine; y < maxY; y++) {
@@ -1126,7 +1127,7 @@ namespace ProductDatabase {
 
                             if (_remainingCount <= 0) {
                                 e.HasMorePages = false;
-                                labelProPageNum = 0;
+                                _pageCnt = 1;
                                 _labelProNumLabelsToPrint = 0;
                                 return;
                             }
@@ -1156,7 +1157,6 @@ namespace ProductDatabase {
                 }
 
                 if (_labelProNumLabelsToPrint > 0) {
-                    labelProPageNum++;
                     _pageCnt++;
                     e.HasMorePages = true;
                 }
