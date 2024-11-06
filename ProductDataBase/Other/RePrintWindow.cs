@@ -255,6 +255,8 @@ namespace ProductDatabase {
 
                 cmd.ExecuteNonQuery();
 
+                Dispose();
+
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }

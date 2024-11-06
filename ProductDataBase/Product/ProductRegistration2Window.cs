@@ -237,8 +237,10 @@ namespace ProductDatabase {
 
                 switch (ProductInfo.PrintType) {
                     case 0:
-                        SerialPrintPostionNumericUpDown.Enabled = false;
-                        BarcodePrintPostionNumericUpDown.Enabled = false;
+                        SerialPrintPostionLabel.Visible = false;
+                        SerialPrintPostionNumericUpDown.Visible = false;
+                        BarcodePrintPostionLabel.Visible = false;
+                        BarcodePrintPostionNumericUpDown.Visible = false;
                         シリアルラベル印刷ToolStripMenuItem.Enabled = false;
                         シリアルラベル印刷プレビューToolStripMenuItem.Enabled = false;
                         バーコード印刷ToolStripMenuItem.Enabled = false;
@@ -255,8 +257,10 @@ namespace ProductDatabase {
                         SettingsLabelPro = new CSettingsLabelPro();
                         _strLabelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
 
-                        SerialPrintPostionNumericUpDown.Enabled = true;
-                        BarcodePrintPostionNumericUpDown.Enabled = false;
+                        SerialPrintPostionLabel.Visible = true;
+                        SerialPrintPostionNumericUpDown.Visible = true;
+                        BarcodePrintPostionLabel.Visible = false;
+                        BarcodePrintPostionNumericUpDown.Visible = false;
                         シリアルラベル印刷ToolStripMenuItem.Enabled = false;
                         シリアルラベル印刷プレビューToolStripMenuItem.Enabled = true;
                         バーコード印刷ToolStripMenuItem.Enabled = false;
@@ -268,8 +272,10 @@ namespace ProductDatabase {
                         SettingsBarcodePro = new CSettingsBarcodePro();
                         _strBarcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
 
-                        SerialPrintPostionNumericUpDown.Enabled = false;
-                        BarcodePrintPostionNumericUpDown.Enabled = true;
+                        SerialPrintPostionLabel.Visible = false;
+                        SerialPrintPostionNumericUpDown.Visible = false;
+                        BarcodePrintPostionLabel.Visible = true;
+                        BarcodePrintPostionNumericUpDown.Visible = true;
                         シリアルラベル印刷ToolStripMenuItem.Enabled = false;
                         シリアルラベル印刷プレビューToolStripMenuItem.Enabled = false;
                         バーコード印刷ToolStripMenuItem.Enabled = false;
@@ -283,8 +289,10 @@ namespace ProductDatabase {
                         SettingsBarcodePro = new CSettingsBarcodePro();
                         _strBarcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
 
-                        SerialPrintPostionNumericUpDown.Enabled = true;
-                        BarcodePrintPostionNumericUpDown.Enabled = true;
+                        SerialPrintPostionLabel.Visible = true;
+                        SerialPrintPostionNumericUpDown.Visible = true;
+                        BarcodePrintPostionLabel.Visible = true;
+                        BarcodePrintPostionNumericUpDown.Visible = true;
                         シリアルラベル印刷ToolStripMenuItem.Enabled = false;
                         シリアルラベル印刷プレビューToolStripMenuItem.Enabled = true;
                         バーコード印刷ToolStripMenuItem.Enabled = false;
@@ -293,8 +301,10 @@ namespace ProductDatabase {
                         バーコード印刷設定ToolStripMenuItem.Enabled = true;
                         break;
                     case 8:
-                        SerialPrintPostionNumericUpDown.Enabled = false;
-                        BarcodePrintPostionNumericUpDown.Enabled = false;
+                        SerialPrintPostionLabel.Visible = false;
+                        SerialPrintPostionNumericUpDown.Visible = false;
+                        BarcodePrintPostionLabel.Visible = false;
+                        BarcodePrintPostionNumericUpDown.Visible = false;
                         シリアルラベル印刷ToolStripMenuItem.Enabled = false;
                         シリアルラベル印刷プレビューToolStripMenuItem.Enabled = false;
                         バーコード印刷ToolStripMenuItem.Enabled = false;
@@ -1022,6 +1032,8 @@ namespace ProductDatabase {
                 double intervalY = 0;
                 var startLine = 0;
                 var labelProPageNum = 0;
+
+                _labelProNSerial = ProductInfo.SerialFirstNumber;
 
                 switch (_serialType) {
                     case "Label":
