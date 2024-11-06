@@ -985,6 +985,8 @@ namespace ProductDatabase {
             // PrintPageイベントハンドラの追加
             pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
+
+            _labelProNSerial = ProductInfo.SerialFirstNumber;
             _labelProNumLabelsToPrint = ProductInfo.Quantity;
             _serialUnderbar = false;
 
@@ -1032,8 +1034,6 @@ namespace ProductDatabase {
                 double intervalY = 0;
                 var startLine = 0;
                 var labelProPageNum = 0;
-
-                _labelProNSerial = ProductInfo.SerialFirstNumber;
 
                 switch (_serialType) {
                     case "Label":
