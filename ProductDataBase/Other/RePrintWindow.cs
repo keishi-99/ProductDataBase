@@ -308,9 +308,7 @@ namespace ProductDatabase {
                 Point headerPos = new(0, 0);
                 var headerString = String.Empty;
                 Font headerFooterFont = new("Arial", 6);
-                var intNumLabels = 0;
-                var intCountNumLabels = 0;
-
+                var serialCodePrintCopies = 0;
 
                 var maxX = 0;
                 var maxY = 0;
@@ -334,8 +332,7 @@ namespace ProductDatabase {
                         headerPos = SettingsLabelPro.LabelProPageSettings.HeaderPos;
                         headerString = ConvertHeaderFooterString(SettingsLabelPro.LabelProPageSettings.HeaderString);
                         headerFooterFont = SettingsLabelPro.LabelProPageSettings.HeaderFooterFont;
-                        intNumLabels = SettingsLabelPro.LabelProLabelSettings.NumLabels;
-                        intCountNumLabels = SettingsLabelPro.LabelProLabelSettings.NumLabels;
+                        serialCodePrintCopies = SettingsLabelPro.LabelProLabelSettings.NumLabels;
                         break;
                     case "Barcode":
                         if (SettingsBarcodePro == null) { throw new Exception("SettingsBarcodeProがnullです。"); }
@@ -350,8 +347,7 @@ namespace ProductDatabase {
                         headerPos = SettingsBarcodePro.BarcodeProPageSettings.HeaderPos;
                         headerString = ConvertHeaderFooterString(SettingsBarcodePro.BarcodeProPageSettings.HeaderString);
                         headerFooterFont = SettingsBarcodePro.BarcodeProPageSettings.HeaderFooterFont;
-                        intNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
-                        intCountNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
+                        serialCodePrintCopies = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
                         break;
                     default:
                         break;
@@ -383,7 +379,7 @@ namespace ProductDatabase {
                     : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
 
                 if (_labelProPageNum == 1) {
-                    _remainingCount = intCountNumLabels;
+                    _remainingCount = serialCodePrintCopies;
                     _labelProNSerial = _serialFirstNumber;
                 }
                 if (_labelProPageNum >= 2) { startLineBarcode = 0; }
@@ -431,7 +427,7 @@ namespace ProductDatabase {
                             }
                             _remainingCount--;
                             if (_remainingCount <= 0) {
-                                _remainingCount = intNumLabels;
+                                _remainingCount = serialCodePrintCopies;
                             }
                             else if (_remainingCount > 0) {
                                 _labelProNSerial -= x + 1;
