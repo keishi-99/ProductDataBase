@@ -434,7 +434,7 @@ namespace ProductDatabase {
 
                 var maxY = SettingsLabelSub.LabelSubPageSettings.NumLabelsY;
                 int y;
-                var intNumLabels = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
+                var serialCodePrintCopies = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
                 for (y = startLine; y < maxY; y++) {
 
                     var maxX = SettingsLabelSub.LabelSubPageSettings.NumLabelsX;
@@ -453,8 +453,8 @@ namespace ProductDatabase {
                         _labelSubNumLabelsToPrint--;
 
                         if (_labelSubNumLabelsToPrint <= 0) {
-                            intNumLabels--;
-                            if (intNumLabels <= 0) {
+                            serialCodePrintCopies--;
+                            if (serialCodePrintCopies <= 0) {
                                 e.HasMorePages = false;
                                 _labelSubPageNum = 0;
                                 var txtNumPublish = 0;
@@ -468,11 +468,11 @@ namespace ProductDatabase {
                         }
 
                         if (x >= maxX - 1) {
-                            intNumLabels--;
-                            if (intNumLabels <= 0) {
-                                intNumLabels = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
+                            serialCodePrintCopies--;
+                            if (serialCodePrintCopies <= 0) {
+                                serialCodePrintCopies = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
                             }
-                            else if (intNumLabels > 0) {
+                            else if (serialCodePrintCopies > 0) {
                                 _labelSubNumLabelsToPrint += x + 1;
                                 break;
                             }

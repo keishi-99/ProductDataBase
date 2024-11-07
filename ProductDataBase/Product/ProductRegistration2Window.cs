@@ -1019,8 +1019,7 @@ namespace ProductDatabase {
                 System.Drawing.Point headerPos = new(0, 0);
                 var headerString = String.Empty;
                 Font headerFooterFont = new("Arial", 6);
-                var intNumLabels = 0;
-                var intCountNumLabels = 0;
+                var serialCodePrintCopies = 0;
 
                 var maxX = 0;
                 var maxY = 0;
@@ -1047,8 +1046,7 @@ namespace ProductDatabase {
                         headerPos = SettingsLabelPro.LabelProPageSettings.HeaderPos;
                         headerString = ConvertHeaderFooterString(SettingsLabelPro.LabelProPageSettings.HeaderString);
                         headerFooterFont = SettingsLabelPro.LabelProPageSettings.HeaderFooterFont;
-                        intNumLabels = SettingsLabelPro.LabelProLabelSettings.NumLabels;
-                        intCountNumLabels = SettingsLabelPro.LabelProLabelSettings.NumLabels;
+                        serialCodePrintCopies = SettingsLabelPro.LabelProLabelSettings.NumLabels;
                         startLine = (int)SerialPrintPostionNumericUpDown.Value - 1;
                         break;
                     case "Barcode":
@@ -1064,8 +1062,7 @@ namespace ProductDatabase {
                         headerPos = SettingsBarcodePro.BarcodeProPageSettings.HeaderPos;
                         headerString = ConvertHeaderFooterString(SettingsBarcodePro.BarcodeProPageSettings.HeaderString);
                         headerFooterFont = SettingsBarcodePro.BarcodeProPageSettings.HeaderFooterFont;
-                        intNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
-                        intCountNumLabels = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
+                        serialCodePrintCopies = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
                         startLine = (int)BarcodePrintPostionNumericUpDown.Value - 1;
                         break;
                     default:
@@ -1096,7 +1093,7 @@ namespace ProductDatabase {
                 e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
 
                 if (_pageCnt == 1) {
-                    _remainingCount = intCountNumLabels;
+                    _remainingCount = serialCodePrintCopies;
                     _labelProNSerial = ProductInfo.SerialFirstNumber;
                 }
                 if (_pageCnt >= 2) { startLine = 0; }
@@ -1145,7 +1142,7 @@ namespace ProductDatabase {
                             }
                             _remainingCount--;
                             if (_remainingCount <= 0) {
-                                _remainingCount = intNumLabels;
+                                _remainingCount = serialCodePrintCopies;
                             }
                             else if (_remainingCount > 0) {
                                 _labelProNSerial -= x + 1;
