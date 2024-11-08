@@ -378,10 +378,6 @@ namespace ProductDatabase {
             } catch (Exception ex) {
                 MessageBox.Show($"設定ファイルの保存に失敗しました。{Environment.NewLine}{ex.Message}");
             } finally {
-                using (ProductRegistration1Window productRegistration1Window = new()) {
-                    productRegistration1Window.Close();
-                }
-                Dispose();
             }
         }
         // 登録処理
@@ -1564,9 +1560,9 @@ namespace ProductDatabase {
         private void ProductRegistration2Window_Load(object sender, EventArgs e) { LoadEvents(); }
         private void ProductRegistration2Window_FormClosing(object sender, FormClosingEventArgs e) { ClosingEvents(); }
         private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
-        private void CloseButton_Click(object sender, EventArgs e) { ClosingEvents(); }
+        private void CloseButton_Click(object sender, EventArgs e) { Close(); }
         private void SubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBox_CheckedChanged(sender, e); }
-        private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { ClosingEvents(); }
+        private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { Close(); }
         private void シリアルラベル印刷ToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Label";
             PrintBarcode(1);
