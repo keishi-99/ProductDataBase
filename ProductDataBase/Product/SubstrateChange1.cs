@@ -95,8 +95,8 @@ namespace ProductDatabase {
             ProductInfo.SerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells[11].Value);
             using SubstrateChange2 window = new();
             window.ProductInfo = ProductInfo;
+            window.Closed += (s, e) => this.Close();
             window.ShowDialog(this);
-            Close();
         }
 
         private void SubstrateChange1_Load(object sender, EventArgs e) { LoadEvents(); }

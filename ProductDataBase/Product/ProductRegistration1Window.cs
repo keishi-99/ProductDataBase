@@ -133,8 +133,8 @@ namespace ProductDatabase {
                 ProductInfo.SerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception("FirstSerialNumberTextBox.Text is null"));
                 using ProductRegistration2Window window = new();
                 window.ProductInfo = ProductInfo;
+                window.Closed += (s, e) => this.Close();
                 window.ShowDialog(this);
-                Close();
 
                 void CheckAndAdjustSerial(int threshold, int resetValue) {
 
