@@ -236,19 +236,6 @@ namespace ProductDatabase {
                 }
 
                 switch (ProductInfo.PrintType) {
-                    case 0:
-                        SerialPrintPostionLabel.Visible = false;
-                        SerialPrintPostionNumericUpDown.Visible = false;
-                        BarcodePrintPostionLabel.Visible = false;
-                        BarcodePrintPostionNumericUpDown.Visible = false;
-                        シリアルラベル印刷ToolStripMenuItem.Enabled = false;
-                        シリアルラベル印刷プレビューToolStripMenuItem.Enabled = false;
-                        バーコード印刷ToolStripMenuItem.Enabled = false;
-                        バーコード印刷プレビューToolStripMenuItem.Enabled = false;
-                        シリアルラベル印刷設定ToolStripMenuItem.Enabled = false;
-                        バーコード印刷設定ToolStripMenuItem.Enabled = false;
-
-                        break;
                     case 1:
                     case 4:
                     case 5:
@@ -312,7 +299,18 @@ namespace ProductDatabase {
                         シリアルラベル印刷設定ToolStripMenuItem.Enabled = true;
                         バーコード印刷設定ToolStripMenuItem.Enabled = false;
                         break;
+                    case 0:
                     default:
+                        SerialPrintPostionLabel.Visible = false;
+                        SerialPrintPostionNumericUpDown.Visible = false;
+                        BarcodePrintPostionLabel.Visible = false;
+                        BarcodePrintPostionNumericUpDown.Visible = false;
+                        シリアルラベル印刷ToolStripMenuItem.Enabled = false;
+                        シリアルラベル印刷プレビューToolStripMenuItem.Enabled = false;
+                        バーコード印刷ToolStripMenuItem.Enabled = false;
+                        バーコード印刷プレビューToolStripMenuItem.Enabled = false;
+                        シリアルラベル印刷設定ToolStripMenuItem.Enabled = false;
+                        バーコード印刷設定ToolStripMenuItem.Enabled = false;
                         break;
                 }
 

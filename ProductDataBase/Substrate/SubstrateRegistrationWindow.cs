@@ -614,7 +614,6 @@ namespace ProductDatabase {
         }
 
         private void SubstrateRegistrationWindow_Load(object sender, EventArgs e) { LoadEvents(); }
-        private void SubstrateRegistrationWindow_FormClosing(object sender, FormClosingEventArgs e) { ClosingEvents(); }
         private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
         private void PrintButton_Click(object sender, EventArgs e) { PrintBarcode(1); }
         private void SubstrateRegistrationPrintDocument_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) { PrintDocumentPrintPage(sender, e); }
