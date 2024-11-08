@@ -712,7 +712,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = FormStartPosition.CenterParent;
             this.Text = "基板登録";
-            this.FormClosing += this.SubstrateRegistrationWindow_FormClosing;
             this.Load += this.SubstrateRegistrationWindow_Load;
             this.SubstrateRegistrationMenuStrip.ResumeLayout(false);
             this.SubstrateRegistrationMenuStrip.PerformLayout();

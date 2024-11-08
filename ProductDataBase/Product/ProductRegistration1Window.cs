@@ -80,8 +80,6 @@ namespace ProductDatabase {
             } finally {
             }
         }
-        // クロージングイベント
-        private void ClosingEvents() { Dispose(); }
         // 登録チェック
         private void RegisterCheck() {
             try {
@@ -240,7 +238,6 @@ namespace ProductDatabase {
         }
 
         private void ProductRegistration1Window_Load(object sender, EventArgs e) { LoadEvents(); }
-        private void ProductRegistration1Window_FormClosing(object sender, FormClosingEventArgs e) { ClosingEvents(); }
         private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
         private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
         private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }

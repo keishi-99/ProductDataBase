@@ -107,21 +107,6 @@ namespace ProductDatabase {
             } finally {
             }
         }
-        // クロージングイベント
-        private static void ClosingEvents() {
-            //try {
-            //    StreamWriter? _sw = null;
-
-            //    _sw = new StreamWriter(StrSettingFilePath, false, new System.Text.UTF8Encoding(false));
-            //    System.Xml.Serialization.XmlSerializer _serializer = new(typeof(CSettingsLabelSub));
-            //    _serializer.Serialize(_sw, SettingsLabelSub);
-            //    _sw?.Close();
-            //} catch (Exception ex) {
-            //    MessageBox.Show($"設定ファイルの保存に失敗しました。{Environment.NewLine}{ex.Message}");
-            //} finally {
-            //    Dispose();
-            //}
-        }
         // 登録処理
         private void RegisterCheck() {
             try {

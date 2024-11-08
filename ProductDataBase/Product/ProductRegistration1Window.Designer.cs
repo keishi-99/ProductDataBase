@@ -607,7 +607,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = FormStartPosition.CenterParent;
             this.Text = "製品登録";
-            this.FormClosing += this.ProductRegistration1Window_FormClosing;
             this.Load += this.ProductRegistration1Window_Load;
             this.ProductRegistration1MenuStrip.ResumeLayout(false);
             this.ProductRegistration1MenuStrip.PerformLayout();
