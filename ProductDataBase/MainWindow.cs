@@ -94,7 +94,7 @@ namespace ProductDatabase {
         private string _strCategory13 = String.Empty;
         private string _strCategory14 = String.Empty;
 
-        private List<string> _userNames = [];
+        private bool _isAuthorizedUser = false;
         private static readonly string[] s_separator = ["//"];
 
         public MainWindow() {
@@ -129,15 +129,16 @@ namespace ProductDatabase {
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductDataTable); }
 
                 var userTextPath = "./Config/general/user.txt";
-                _userNames = File.ReadAllLines(userTextPath, Encoding.GetEncoding("UTF-8"))
+                var userNames = File.ReadAllLines(userTextPath, Encoding.GetEncoding("UTF-8"))
                    .Select(line => line.Trim())
                    .ToList();
 
+                _isAuthorizedUser = userNames.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase));
+
+                QRCodePanel.Enabled = _isAuthorizedUser;
+
                 RegisterButton.Enabled = false;
                 HistoryButton.Enabled = false;
-                if (!_userNames.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase))) {
-                    QRCodePanel.Enabled = false;
-                }
 
                 ActiveControl = QRCodeTextBox;
             } catch (Exception ex) {
@@ -394,13 +395,7 @@ namespace ProductDatabase {
         }
         private void CategoryListBox3Select() {
             try {
-                if (!_userNames.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase))) {
-                    RegisterButton.Enabled = false;
-                    QRCodePanel.Enabled = false;
-                }
-                else {
-                    RegisterButton.Enabled = true;
-                }
+                RegisterButton.Enabled = _isAuthorizedUser;
                 HistoryButton.Enabled = true;
 
                 switch (ProductInfo.RadioButtonFlg) {
