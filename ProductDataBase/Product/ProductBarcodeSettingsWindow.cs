@@ -1,12 +1,12 @@
 ﻿using ProductDatabase.Product;
 
 namespace ProductDatabase {
-    public partial class ProductBarcodePrintSettingsWindow : Form {
+    public partial class ProductBarcodeSettingsWindow : Form {
 
         private CBarcodeProLabelSettings _barcodeProLabelSettings;
         private CBarcodeProPageSettings _barcodeProPageSettings;
 
-        public ProductBarcodePrintSettingsWindow() {
+        public ProductBarcodeSettingsWindow() {
             InitializeComponent();
 
             _barcodeProLabelSettings = new CBarcodeProLabelSettings();

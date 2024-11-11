@@ -22,7 +22,7 @@ namespace ProductDatabase.Product {
         public double IntervalX { get; set; } = 4;
         public double IntervalY { get; set; } = 4;
         public string HeaderString { get; set; } = "%D 製番 %M 注番 %O %T 台数 %N 担当者 %U";
-        public string FooterString { get; set; } = string.Empty;
+        public string FooterString { get; set; } = String.Empty;
         public Point HeaderPos { get; set; } = Point.Empty;
         public Point FooterPos { get; set; } = Point.Empty;
 

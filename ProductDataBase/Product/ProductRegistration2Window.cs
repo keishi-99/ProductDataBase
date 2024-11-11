@@ -1086,6 +1086,8 @@ namespace ProductDatabase {
                 headerPos.Offset(offset);
                 e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
 
+                // タイプ4の場合、発行枚数+1
+                if (ProductInfo.PrintType == 4) { serialCodePrintCopies++; }
                 if (_pageCnt == 1) {
                     _remainingCount = serialCodePrintCopies;
                     _labelProNSerial = ProductInfo.SerialFirstNumber;
@@ -1096,18 +1098,15 @@ namespace ProductDatabase {
                 for (y = startLine; y < maxY; y++) {
                     var x = 0;
                     for (x = 0; x < maxX; x++) {
-                        var generatedCode = GenerateCode(_labelProNSerial);
                         var posX = (float)(offsetX + (x * (intervalX + sizeX)));
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
-                        e.Graphics.DrawImage(MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
 
-                        // アンダーバー付きを描画
-                        if (ProductInfo.PrintType == 4 && _remainingCount == 1) {
-                            _serialUnderbar = true;
-                            posY = (float)(offsetY + ((y + 1) * (intervalY + sizeY)));
-                            e.Graphics.DrawImage(MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
-                            _serialUnderbar = false;
-                        }
+                        // タイプ4の場合、最後のラベルに下線をつける
+                        _serialUnderbar = ProductInfo.PrintType == 4 && _remainingCount == 1;
+
+                        var generatedCode = GenerateCode(_labelProNSerial);
+                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1);
+                        e.Graphics.DrawImage(labelImage, posX, posY, sizeX, sizeY);
 
                         _labelProNSerial++;
                         _labelProNumLabelsToPrint--;
@@ -1131,9 +1130,6 @@ namespace ProductDatabase {
 
                         // 列の終わりの処理
                         if (x >= maxX - 1) {
-                            if (ProductInfo.PrintType == 4 && _remainingCount == 1) {
-                                y++;
-                            }
                             _remainingCount--;
                             if (_remainingCount <= 0) {
                                 _remainingCount = serialCodePrintCopies;
@@ -1578,11 +1574,11 @@ namespace ProductDatabase {
             PrintBarcode(2);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            ProductPrintSetting ls = new();
+            ProductLabelSettingsWindow ls = new();
             ls.ShowDialog(this);
         }
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            ProductBarcodePrintSettingsWindow ls = new();
+            ProductBarcodeSettingsWindow ls = new();
             ls.ShowDialog(this);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {

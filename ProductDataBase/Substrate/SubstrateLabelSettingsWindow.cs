@@ -1,12 +1,12 @@
 ﻿using ProductDatabase.Substrate;
 
 namespace ProductDatabase {
-    public partial class SubstratePrintSetting : Form {
+    public partial class SubstrateLabelSettingsWindow : Form {
 
         private CLabelSubLabelSettings _labelSubLabelSettings;
         private CLabelSubPageSettings _labelSubPageSettings;
 
-        public SubstratePrintSetting() {
+        public SubstrateLabelSettingsWindow() {
             InitializeComponent();
 
             _labelSubLabelSettings = new CLabelSubLabelSettings();

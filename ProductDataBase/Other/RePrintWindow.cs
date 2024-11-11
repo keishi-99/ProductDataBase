@@ -376,6 +376,7 @@ namespace ProductDatabase {
                     ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (startLineBarcode * (intervalY + sizeY))))
                     : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -0.254) + (0 * (intervalY + sizeY))));
 
+                if (ProductInfo.PrintType == 4) { serialCodePrintCopies++; }
                 if (_labelProPageNum == 1) {
                     _remainingCount = serialCodePrintCopies;
                     _labelProNSerial = _serialFirstNumber;
@@ -386,18 +387,14 @@ namespace ProductDatabase {
                 for (y = startLineBarcode; y < maxY; y++) {
                     var x = 0;
                     for (x = 0; x < maxX; x++) {
-                        var generatedCode = GenerateCode(_labelProNSerial);
                         var posX = (float)(offsetX + (x * (intervalX + sizeX)));
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
-                        e.Graphics.DrawImage(MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
 
-                        // アンダーバー付きを描画
-                        if (ProductInfo.PrintType == 4 && _remainingCount == 1) {
-                            _serialUnderbar = true;
-                            posY = (float)(offsetY + ((y + 1) * (intervalY + sizeY)));
-                            e.Graphics.DrawImage(MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
-                            _serialUnderbar = false;
-                        }
+                        _serialUnderbar = ProductInfo.PrintType == 4 && _remainingCount == 1;
+
+                        var generatedCode = GenerateCode(_labelProNSerial);
+                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1);
+                        e.Graphics.DrawImage(labelImage, posX, posY, sizeX, sizeY);
 
                         _labelProNSerial++;
                         _labelProNumLabelsToPrint--;
@@ -420,9 +417,6 @@ namespace ProductDatabase {
 
                         // 列の終わりの処理
                         if (x >= maxX - 1) {
-                            if (ProductInfo.PrintType == 4 && _remainingCount == 1) {
-                                y++;
-                            }
                             _remainingCount--;
                             if (_remainingCount <= 0) {
                                 _remainingCount = serialCodePrintCopies;

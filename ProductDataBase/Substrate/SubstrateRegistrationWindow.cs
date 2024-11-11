@@ -383,9 +383,11 @@ namespace ProductDatabase {
 
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
                 var startLine = (int)PrintPostionNumericUpDown.Value - 1;
+                var sizeX = (float)SettingsLabelSub.LabelSubPageSettings.SizeX;
                 var sizeY = (float)SettingsLabelSub.LabelSubPageSettings.SizeY;
                 var offsetX = SettingsLabelSub.LabelSubPageSettings.OffsetX;
                 var offsetY = SettingsLabelSub.LabelSubPageSettings.OffsetY;
+                var intervalX = SettingsLabelSub.LabelSubPageSettings.IntervalX;
                 var intervalY = SettingsLabelSub.LabelSubPageSettings.IntervalY;
                 var headerPos = SettingsLabelSub.LabelSubPageSettings.HeaderPos;
                 var offset = new Point(0, 0);
@@ -426,14 +428,12 @@ namespace ProductDatabase {
 
                     int x;
                     for (x = 0; x < maxX; x++) {
-                        var generatedCode = GenerateCode(_labelSubNSerial);
-
-                        var sizeX = (float)SettingsLabelSub.LabelSubPageSettings.SizeX;
-
-                        var intervalX = SettingsLabelSub.LabelSubPageSettings.IntervalX;
                         var posX = (float)(offsetX + (x * (intervalX + sizeX)));
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
-                        e.Graphics.DrawImage(MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1), posX, posY, sizeX, sizeY);
+
+                        var generatedCode = GenerateCode(_labelSubNSerial);
+                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1);
+                        e.Graphics.DrawImage(labelImage, posX, posY, sizeX, sizeY);
 
                         _labelSubNumLabelsToPrint--;
 
@@ -625,7 +625,7 @@ namespace ProductDatabase {
         private void 印刷ToolStripMenuItem_Click(object sender, EventArgs e) { PrintBarcode(1); }
         private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { PrintBarcode(2); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            SubstratePrintSetting ls = new();
+            SubstrateLabelSettingsWindow ls = new();
             ls.ShowDialog(this);
 
             try {

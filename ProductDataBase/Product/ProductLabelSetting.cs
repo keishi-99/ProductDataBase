@@ -1,18 +1,18 @@
 ﻿using System.ComponentModel;
 using System.Xml.Serialization;
 
-namespace ProductDatabase.Substrate {
-    public class CSettingsLabelSub {
-        public CLabelSubPageSettings LabelSubPageSettings { get; set; }
-        public CLabelSubLabelSettings LabelSubLabelSettings { get; set; }
+namespace ProductDatabase.Product {
+    public class CSettingsLabelPro {
+        public CLabelProPageSettings LabelProPageSettings { get; set; }
+        public CLabelProLabelSettings LabelProLabelSettings { get; set; }
 
-        public CSettingsLabelSub() {
-            LabelSubPageSettings = new CLabelSubPageSettings();
-            LabelSubLabelSettings = new CLabelSubLabelSettings();
+        public CSettingsLabelPro() {
+            LabelProPageSettings = new CLabelProPageSettings();
+            LabelProLabelSettings = new CLabelProLabelSettings();
         }
     }
 
-    public class CLabelSubPageSettings {
+    public class CLabelProPageSettings {
         public int NumLabelsX { get; set; } = 10;
         public int NumLabelsY { get; set; } = 31;
         public double SizeX { get; set; } = 15;
@@ -34,21 +34,21 @@ namespace ProductDatabase.Substrate {
             set => HeaderFooterFont = ConvertFromString<Font>(value);
         }
 
-        public static string ConvertToString<T>(T value) {
-            return TypeDescriptor.GetConverter(typeof(T)).ConvertToString(value)!;
+        public static string ConvertToString<tValue>(tValue value) {
+            return TypeDescriptor.GetConverter(typeof(tValue)).ConvertToString(value)!;
         }
 
-        public static T ConvertFromString<T>(string value) {
-            return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(value)!;
+        public static tValue ConvertFromString<tValue>(string value) {
+            return (tValue)TypeDescriptor.GetConverter(typeof(tValue)).ConvertFromString(value)!;
         }
     }
 
-    public class CLabelSubLabelSettings {
+    public class CLabelProLabelSettings {
         public double BarcodeHeight { get; set; } = 1;
         public double BarcodePosX { get; set; } = 4;
         public double BarcodePosY { get; set; } = 1;
         public double BarcodeMagnitude { get; set; } = 1.0;
-        public string Format { get; set; } = "%S";
+        public string Format { get; set; } = "%T%Y%MM%S%R";
         public double StringPosX { get; set; } = 4;
         public double StringPosY { get; set; } = 1;
         public bool AlignStringCenter { get; set; } = true;
@@ -63,12 +63,12 @@ namespace ProductDatabase.Substrate {
             set => Font = ConvertFromString<Font>(value);
         }
 
-        public static string ConvertToString<T>(T value) {
-            return TypeDescriptor.GetConverter(typeof(T)).ConvertToString(value)!;
+        public static string ConvertToString<tValue>(tValue value) {
+            return TypeDescriptor.GetConverter(typeof(tValue)).ConvertToString(value)!;
         }
 
-        public static T ConvertFromString<T>(string value) {
-            return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(value)!;
+        public static tValue ConvertFromString<tValue>(string value) {
+            return (tValue)TypeDescriptor.GetConverter(typeof(tValue)).ConvertFromString(value)!;
         }
     }
 }

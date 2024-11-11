@@ -1,12 +1,12 @@
 ﻿using ProductDatabase.Product;
 
 namespace ProductDatabase {
-    public partial class ProductPrintSetting : Form {
+    public partial class ProductLabelSettingsWindow : Form {
 
         private CLabelProLabelSettings _labelProLabelSettings;
         private CLabelProPageSettings _labelProPageSettings;
 
-        public ProductPrintSetting() {
+        public ProductLabelSettingsWindow() {
             InitializeComponent();
 
             _labelProLabelSettings = new CLabelProLabelSettings();
