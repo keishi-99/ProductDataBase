@@ -238,9 +238,9 @@ namespace ProductDatabase {
                         //cmd.Parameters.Add("@col_Flg", DbType.String).Value = 1;
                         cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = ProductInfo.SubstrateName;
                         cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ProductInfo.SubstrateModel;
-                        cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
-                        cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = OrderNumberTextBox.Text;
-                        cmd.Parameters.Add("@col_Stock", DbType.String).Value = QuantityTextBox.Text;
+                        cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
+                        cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = String.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? DBNull.Value : OrderNumberTextBox.Text;
+                        cmd.Parameters.Add("@col_Stock", DbType.String).Value = String.IsNullOrWhiteSpace(QuantityTextBox.Text) ? DBNull.Value : QuantityTextBox.Text;
 
                         cmd.ExecuteNonQuery();
                     }
@@ -248,7 +248,7 @@ namespace ProductDatabase {
                     else if (!QuantityCheckBox.Checked && DefectNumberCheckBox.Checked) {
                         using var cmd = con.CreateCommand();
                         cmd.CommandText = $"""SELECT col_Stock FROM "Stock_{ProductInfo.StockName}" WHERE col_Substrate_Num = @col_Substrate_Num""";
-                        cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
+                        cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
                         var intStock = Convert.ToInt32(cmd.ExecuteScalar());
 
                         if (intStock == 0) { throw new Exception("該当する製番の在庫がありません。"); }
@@ -272,7 +272,7 @@ namespace ProductDatabase {
                         //    WHERE
                         //        col_Substrate_Num = @col_Substrate_Num
                         //    """;
-                        cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
+                        cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
 
                         //cmd.Parameters.Add("@col_Flg", DbType.String).Value = intStockFlg;
                         cmd.Parameters.Add("@col_Stock", DbType.String).Value = intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text);
@@ -317,14 +317,14 @@ namespace ProductDatabase {
                     // チェックボックスにチェックがない場合はNullを
                     cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = ProductInfo.SubstrateName;
                     cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ProductInfo.SubstrateModel;
-                    cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
-                    cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = OrderNumberTextBox.Text;
+                    cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
+                    cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = String.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? DBNull.Value : OrderNumberTextBox.Text;
                     cmd.Parameters.Add("@col_Increase", DbType.String).Value = QuantityCheckBox.Checked ? QuantityTextBox.Text : DBNull.Value;
                     cmd.Parameters.Add("@col_Defect", DbType.String).Value = DefectNumberCheckBox.Checked ? DefectNumberTextBox.Text : DBNull.Value;
-                    cmd.Parameters.Add("@col_RegDate", DbType.String).Value = RegistrationDateMaskedTextBox.Text;
-                    cmd.Parameters.Add("@col_Person", DbType.String).Value = PersonComboBox.Text;
-                    cmd.Parameters.Add("@col_Revision", DbType.String).Value = RevisionTextBox.Text;
-                    cmd.Parameters.Add("@col_Comment", DbType.String).Value = CommentTextBox.Text;
+                    cmd.Parameters.Add("@col_RegDate", DbType.String).Value = String.IsNullOrWhiteSpace(RegistrationDateMaskedTextBox.Text) ? DBNull.Value : RegistrationDateMaskedTextBox.Text;
+                    cmd.Parameters.Add("@col_Person", DbType.String).Value = String.IsNullOrWhiteSpace(PersonComboBox.Text) ? DBNull.Value : PersonComboBox.Text;
+                    cmd.Parameters.Add("@col_Revision", DbType.String).Value = String.IsNullOrWhiteSpace(RevisionTextBox.Text) ? DBNull.Value : RevisionTextBox.Text;
+                    cmd.Parameters.Add("@col_Comment", DbType.String).Value = String.IsNullOrWhiteSpace(CommentTextBox.Text) ? DBNull.Value : CommentTextBox.Text;
 
                     cmd.ExecuteNonQuery();
                 }
