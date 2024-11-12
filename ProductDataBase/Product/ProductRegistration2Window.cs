@@ -30,10 +30,7 @@ namespace ProductDatabase {
 
         private int _labelProNSerial;
         private int _labelProNumLabelsToPrint;
-        private int _remainingCount;
 
-        private readonly decimal _displayResolution = 96.0m;
-        private readonly int _displayMagnitude = 3;
         private int _pageCnt = 1;
 
         private string _serialType = String.Empty;
@@ -41,7 +38,6 @@ namespace ProductDatabase {
         private string _serialLast = String.Empty;
         private string _totalSubstrate = String.Empty;
         private int _serialLastNumber;
-        private bool _serialUnderbar = false;
         private readonly List<string> _strSerial = [];
         private readonly List<string> _checkBoxNames = [
                         "Substrate1CheckBox", "Substrate2CheckBox", "Substrate3CheckBox", "Substrate4CheckBox","Substrate5CheckBox",
@@ -980,7 +976,6 @@ namespace ProductDatabase {
             pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
             _labelProNumLabelsToPrint = ProductInfo.Quantity;
-            _serialUnderbar = false;
 
             switch (printFlg) {
                 case 1:
@@ -1014,6 +1009,7 @@ namespace ProductDatabase {
                 var headerString = String.Empty;
                 Font headerFooterFont = new("Arial", 6);
                 var serialCodePrintCopies = 0;
+                var remainingCount = 0;
 
                 var maxX = 0;
                 var maxY = 0;
@@ -1089,7 +1085,7 @@ namespace ProductDatabase {
                 // タイプ4の場合、発行枚数+1
                 if (ProductInfo.PrintType == 4) { serialCodePrintCopies++; }
                 if (_pageCnt == 1) {
-                    _remainingCount = serialCodePrintCopies;
+                    remainingCount = serialCodePrintCopies;
                     _labelProNSerial = ProductInfo.SerialFirstNumber;
                 }
                 if (_pageCnt >= 2) { startLine = 0; }
@@ -1102,10 +1098,10 @@ namespace ProductDatabase {
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
 
                         // タイプ4の場合、最後のラベルに下線をつける
-                        _serialUnderbar = ProductInfo.PrintType == 4 && _remainingCount == 1;
+                        var fontUnderline = ProductInfo.PrintType == 4 && remainingCount == 1;
 
                         var generatedCode = GenerateCode(_labelProNSerial);
-                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1);
+                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)sizeX, (float)sizeY);
 
                         _labelProNSerial++;
@@ -1113,9 +1109,9 @@ namespace ProductDatabase {
 
                         // 印刷するラベルがなくなった場合の処理
                         if (_labelProNumLabelsToPrint <= 0) {
-                            _remainingCount--;
+                            remainingCount--;
 
-                            if (_remainingCount <= 0) {
+                            if (remainingCount <= 0) {
                                 e.HasMorePages = false;
                                 _pageCnt = 1;
                                 _labelProNumLabelsToPrint = 0;
@@ -1130,11 +1126,11 @@ namespace ProductDatabase {
 
                         // 列の終わりの処理
                         if (x >= maxX - 1) {
-                            _remainingCount--;
-                            if (_remainingCount <= 0) {
-                                _remainingCount = serialCodePrintCopies;
+                            remainingCount--;
+                            if (remainingCount <= 0) {
+                                remainingCount = serialCodePrintCopies;
                             }
-                            else if (_remainingCount > 0) {
+                            else if (remainingCount > 0) {
                                 _labelProNSerial -= x + 1;
                                 _labelProNumLabelsToPrint += x + 1;
                                 break;
@@ -1186,7 +1182,7 @@ namespace ProductDatabase {
                                     .Replace("%S", Convert.ToInt32(serialCode).ToString($"D{ProductInfo.SerialDigit}"));
             return outputCode;
         }
-        private Bitmap MakeLabelImage(string text, int resolution, int magnitude) {
+        private Bitmap MakeLabelImage(string text, int resolution, int magnitude, bool fontUnderline) {
             Bitmap labelImage = new(1, 1);
             Graphics g;
             SizeF stringSize;
@@ -1196,6 +1192,8 @@ namespace ProductDatabase {
             float stringPosX;
             float stringPosY;
             Font fnt;
+            var displayResolution = 96.0M;
+            var displayMagnitude = 3;
 
             // サイズとフォント情報の設定
             void SetLabelProperties(decimal labelWidth, decimal labelHeight, decimal posY, decimal fontPointSize, string fontName, bool underlined) {
@@ -1215,7 +1213,7 @@ namespace ProductDatabase {
                                         SettingsLabelPro.LabelProLabelSettings.StringPosY,
                                         (decimal)SettingsLabelPro.LabelProLabelSettings.Font.SizeInPoints,
                                         SettingsLabelPro.LabelProLabelSettings.Font.Name,
-                                        _serialUnderbar);
+                                        fontUnderline);
 
                     labelImage = new((int)sizeX, (int)sizeY);
                     g = Graphics.FromImage(labelImage);
@@ -1246,7 +1244,7 @@ namespace ProductDatabase {
 
                     g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
 
-                    var barWeight = resolution == _displayResolution ? 1 : (int)(1 * resolution / _displayResolution / _displayMagnitude);
+                    var barWeight = resolution == displayResolution ? 1 : (int)(1 * resolution / displayResolution / displayMagnitude);
 
                     using (var img = Code128Rendering.MakeBarcodeImage(text, barWeight, true)) {
                         var imageWidth = img.Width * SettingsBarcodePro.BarcodeProLabelSettings.BarcodeMagnitude;
