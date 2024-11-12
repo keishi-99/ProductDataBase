@@ -13,7 +13,6 @@ namespace ProductDatabase {
 
         private readonly string _settingFilePath = "./config/SubstrateConfig.xml";
 
-
         private string _labelSubNSerial = String.Empty;
 
         private int _labelSubPageNum;
