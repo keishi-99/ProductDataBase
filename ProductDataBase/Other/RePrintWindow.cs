@@ -241,18 +241,18 @@ namespace ProductDatabase {
                     """;
 
                 // チェックボックスにチェックがない場合はNullを
-                cmd.Parameters.Add("@col_Print_Type", DbType.String).Value = _serialType;
-                cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = _orderNumber;
-                cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = _productNumber;
-                cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = ProductInfo.ProductType;
-                cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = ProductInfo.ProductModel;
+                cmd.Parameters.Add("@col_Print_Type", DbType.String).Value = String.IsNullOrWhiteSpace(_serialType) ? DBNull.Value : _serialType;
+                cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = String.IsNullOrWhiteSpace(_orderNumber) ? DBNull.Value : _orderNumber;
+                cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = String.IsNullOrWhiteSpace(_productNumber) ? DBNull.Value : _productNumber;
+                cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
                 cmd.Parameters.Add("@col_Quantity", DbType.String).Value = _quantity;
-                cmd.Parameters.Add("@col_Person", DbType.String).Value = _person;
-                cmd.Parameters.Add("@col_RegDate", DbType.String).Value = _regDate;
-                cmd.Parameters.Add("@col_Revision", DbType.String).Value = _revision;
-                cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = _strSerialFirstNumber;
-                cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = _strSerialLastNumber;
-                cmd.Parameters.Add("@col_Comment", DbType.String).Value = _comment;
+                cmd.Parameters.Add("@col_Person", DbType.String).Value = String.IsNullOrWhiteSpace(_person) ? DBNull.Value : _person;
+                cmd.Parameters.Add("@col_RegDate", DbType.String).Value = String.IsNullOrWhiteSpace(_regDate) ? DBNull.Value : _regDate;
+                cmd.Parameters.Add("@col_Revision", DbType.String).Value = String.IsNullOrWhiteSpace(_revision) ? DBNull.Value : _revision;
+                cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = String.IsNullOrWhiteSpace(_strSerialFirstNumber) ? DBNull.Value : _strSerialFirstNumber;
+                cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = String.IsNullOrWhiteSpace(_strSerialLastNumber) ? DBNull.Value : _strSerialLastNumber;
+                cmd.Parameters.Add("@col_Comment", DbType.String).Value = String.IsNullOrWhiteSpace(_comment) ? DBNull.Value : _comment;
 
                 cmd.ExecuteNonQuery();
 
