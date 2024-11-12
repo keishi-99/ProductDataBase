@@ -1196,22 +1196,32 @@ namespace ProductDatabase {
             float stringPosX;
             float stringPosY;
             Font fnt;
+
+            // サイズとフォント情報の設定
+            void SetLabelProperties(decimal labelWidth, decimal labelHeight, decimal posY, decimal fontPointSize, string fontName, bool underlined) {
+                sizeX = labelWidth / 25.4M * resolution * magnitude;
+                sizeY = labelHeight / 25.4M * resolution * magnitude;
+                stringPosY = (float)(posY / 25.4M * resolution * magnitude);
+                fontSize = fontPointSize / 72.0M * resolution * magnitude;
+                var style = underlined ? FontStyle.Underline : FontStyle.Regular;
+                fnt = new Font(fontName, (float)fontSize, style);
+            }
+
             switch (_serialType) {
                 case "Label":
                     if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnull"); }
-                    sizeX = (decimal)SettingsLabelPro.LabelProPageSettings.SizeX / 25.4M * resolution * magnitude;
-                    sizeY = (decimal)SettingsLabelPro.LabelProPageSettings.SizeY / 25.4M * resolution * magnitude;
-                    fontSize = (decimal)SettingsLabelPro.LabelProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
-                    stringPosY = (int)((decimal)SettingsLabelPro.LabelProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
-                    var style = _serialUnderbar ? FontStyle.Underline : FontStyle.Regular;
-                    fnt = new Font(SettingsLabelPro.LabelProLabelSettings.Font.Name, (float)fontSize, style);
+                    SetLabelProperties((decimal)SettingsLabelPro.LabelProPageSettings.SizeX,
+                                        (decimal)SettingsLabelPro.LabelProPageSettings.SizeY,
+                                        (decimal)SettingsLabelPro.LabelProLabelSettings.StringPosY,
+                                        (decimal)SettingsLabelPro.LabelProLabelSettings.Font.SizeInPoints,
+                                        SettingsLabelPro.LabelProLabelSettings.Font.Name,
+                                        _serialUnderbar);
 
                     labelImage = new((int)sizeX, (int)sizeY);
                     g = Graphics.FromImage(labelImage);
-
                     stringSize = g.MeasureString(text, fnt);
 
-                    stringPosX = (int)((labelImage.Width / 2) - (stringSize.Width / 2));
+                    stringPosX = (float)((labelImage.Width / 2) - (stringSize.Width / 2));
 
                     g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
 
@@ -1219,44 +1229,42 @@ namespace ProductDatabase {
                     break;
                 case "Barcode":
                     if (SettingsBarcodePro == null) { throw new Exception("SettingsBarcodeProがnull"); }
-
-                    sizeX = (decimal)SettingsBarcodePro.BarcodeProPageSettings.SizeX / 25.4M * resolution * magnitude;
-                    sizeY = (decimal)SettingsBarcodePro.BarcodeProPageSettings.SizeY / 25.4M * resolution * magnitude;
-                    fontSize = (decimal)SettingsBarcodePro.BarcodeProLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
-                    fnt = new(SettingsBarcodePro.BarcodeProLabelSettings.Font.Name, (float)fontSize);
+                    SetLabelProperties((decimal)SettingsBarcodePro.BarcodeProPageSettings.SizeX,
+                                        (decimal)SettingsBarcodePro.BarcodeProPageSettings.SizeY,
+                                        (decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosY,
+                                        (decimal)SettingsBarcodePro.BarcodeProLabelSettings.Font.SizeInPoints,
+                                        SettingsBarcodePro.BarcodeProLabelSettings.Font.Name,
+                                        false);
 
                     labelImage = new((int)sizeX, (int)sizeY);
                     g = Graphics.FromImage(labelImage);
+                    stringSize = g.MeasureString(text, fnt);
 
-                    int barWeight;
-                    barWeight = resolution == _displayResolution ? 1 : (int)(1 * resolution / _displayResolution / _displayMagnitude);
+                    stringPosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignStringCenter
+                        ? (float)((labelImage.Width / 2) - (stringSize.Width / 2))
+                        : (float)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
+
+                    g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
+
+                    var barWeight = resolution == _displayResolution ? 1 : (int)(1 * resolution / _displayResolution / _displayMagnitude);
 
                     using (var img = Code128Rendering.MakeBarcodeImage(text, barWeight, true)) {
                         var imageWidth = (decimal)(img.Width * SettingsBarcodePro.BarcodeProLabelSettings.BarcodeMagnitude);
 
                         if (imageWidth > labelImage.Width) { MessageBox.Show($"バーコードの幅がラベル幅を超えています{imageWidth}>{labelImage.Width}"); }
 
-                        stringSize = g.MeasureString(text, fnt);
-
-                        stringPosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignStringCenter
-                            ? (float)((labelImage.Width / 2) - (stringSize.Width / 2))
-                            : (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
-
-                        stringPosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosY / 25.4M * resolution * magnitude);
-
                         var barCodePosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignBarcodeCenter
                             ? (float)((labelImage.Width / 2) - (imageWidth / 2))
-                            : (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
-                        float barCodePosY = (int)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.BarcodePosY / 25.4M * resolution * magnitude);
+                            : (float)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
+                        var barCodePosY = (float)((decimal)SettingsBarcodePro.BarcodeProLabelSettings.BarcodePosY / 25.4M * resolution * magnitude);
 
-                        g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
+                        var barcodeHeight = (float)(SettingsBarcodePro.BarcodeProLabelSettings.BarcodeHeight / 25.4F * resolution * magnitude);
 
-                        var barcodeHeight = (int)(SettingsBarcodePro.BarcodeProLabelSettings.BarcodeHeight / 25.4F * resolution * magnitude);
                         g.DrawImage(img, barCodePosX, barCodePosY, (float)imageWidth, barcodeHeight);
 
-                        g.Dispose();
                         img.Dispose();
                     }
+                    g.Dispose();
 
                     break;
                 default:
