@@ -456,7 +456,7 @@
             this.SubstrateModelLabel1.Name = "SubstrateModelLabel1";
             this.SubstrateModelLabel1.Size = new Size(66, 17);
             this.SubstrateModelLabel1.TabIndex = 45;
-            this.SubstrateModelLabel1.Text = "基板型式 :";
+            this.SubstrateModelLabel1.Text = "製品型式 :";
             this.SubstrateModelLabel1.TextAlign = ContentAlignment.MiddleRight;
             // 
             // ファイルToolStripMenuItem
