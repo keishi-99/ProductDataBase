@@ -545,25 +545,15 @@ namespace ProductDatabase {
                                                 $"""
                                                 UPDATE "Stock_{ProductInfo.StockName}" SET
                                                     Stock = @Stock,
-                                                    col_History = ifnull(col_History,'')|| @col_History
+                                                    History = ifnull(History,'')|| @History
                                                 WHERE
                                                     SubstrateNumber = @SubstrateNumber
                                                 """;
-                                            //cmd.CommandText =
-                                            //    $"""
-                                            //    UPDATE "Stock_{ProductInfo.StockName}" SET
-                                            //        col_Flg = @col_Flg,
-                                            //        Stock = @Stock,
-                                            //        col_History = ifnull(col_History,'')|| @col_History
-                                            //    WHERE
-                                            //        SubstrateNumber = @SubstrateNumber
-                                            //    """;
+
                                             cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
 
-                                            //cmd.Parameters.Add("@col_Flg", DbType.String).Value = stockValue - useValue == 0 ? 0 : (object)1;
-
                                             cmd.Parameters.Add("@Stock", DbType.String).Value = stockValue - useValue;
-                                            cmd.Parameters.Add("@col_History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue}),";
+                                            cmd.Parameters.Add("@History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue}),";
 
                                             cmd.ExecuteNonQuery();
 
@@ -589,10 +579,10 @@ namespace ProductDatabase {
                                                     SubstrateName,
                                                     SubstrateModel,
                                                     SubstrateNumber,
-                                                    col_Decrease,
-                                                    col_Use_P_Type,
-                                                    col_Use_P_Num,
-                                                    col_Use_O_Num,
+                                                    Decrease,
+                                                    UseProductType,
+                                                    UseProductNumber,
+                                                    UseOrderNumber,
                                                     Person,
                                                     RegDate,
                                                     Comment
@@ -602,10 +592,10 @@ namespace ProductDatabase {
                                                     @SubstrateName,
                                                     @SubstrateModel,
                                                     @SubstrateNumber,
-                                                    @col_Decrease,
-                                                    @col_Use_P_Type,
-                                                    @col_Use_P_Num,
-                                                    @col_Use_O_Num,
+                                                    @Decrease,
+                                                    @UseProductType,
+                                                    @UseProductNumber,
+                                                    @UseOrderNumber,
                                                     @Person,
                                                     @RegDate,
                                                     @Comment
@@ -615,10 +605,10 @@ namespace ProductDatabase {
                                             cmd.Parameters.Add("@SubstrateName", DbType.String).Value = string.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
                                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
                                             cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
-                                            cmd.Parameters.Add("@col_Decrease", DbType.String).Value = 0 - useValue;
-                                            cmd.Parameters.Add("@col_Use_P_Type", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                                            cmd.Parameters.Add("@col_Use_P_Num", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                                            cmd.Parameters.Add("@col_Use_O_Num", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                                            cmd.Parameters.Add("@Decrease", DbType.String).Value = 0 - useValue;
+                                            cmd.Parameters.Add("@UseProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                                            cmd.Parameters.Add("@UseProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+                                            cmd.Parameters.Add("@UseOrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
                                             cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
                                             cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
                                             cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
@@ -662,7 +652,7 @@ namespace ProductDatabase {
                                     SerialLast,
                                     SerialLastNumber,
                                     Comment,
-                                    col_Use_Substrate
+                                    UseSubstrate
                                     )
                                 VALUES
                                     (
@@ -678,7 +668,7 @@ namespace ProductDatabase {
                                     @SerialLast,
                                     @SerialLastNumber,
                                     @Comment,
-                                    @col_Use_Substrate
+                                    @UseSubstrate
                                     )
                                 """;
 
@@ -693,7 +683,7 @@ namespace ProductDatabase {
                             cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(_serialFirst) ? DBNull.Value : _serialFirst;
                             cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(_serialLast) ? DBNull.Value : _serialLast;
                             cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = _serialLastNumber;
-                            cmd.Parameters.Add("@col_Use_Substrate", DbType.String).Value = string.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
+                            cmd.Parameters.Add("@UseSubstrate", DbType.String).Value = string.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
                             cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                             cmd.ExecuteNonQuery();
