@@ -19,10 +19,10 @@ namespace ProductDatabase {
     public partial class ProductRegistration2Window : Form {
 
         public CSettingsLabelPro SettingsLabelPro { get; set; } = new CSettingsLabelPro();
-        private string _strLabelSettingFilePath = String.Empty;
+        private string _strLabelSettingFilePath = string.Empty;
 
         public CSettingsBarcodePro SettingsBarcodePro { get; set; } = new CSettingsBarcodePro();
-        private string _strBarcodeSettingFilePath = String.Empty;
+        private string _strBarcodeSettingFilePath = string.Empty;
 
         public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
 
@@ -33,10 +33,10 @@ namespace ProductDatabase {
 
         private int _pageCnt = 1;
 
-        private string _serialType = String.Empty;
-        private string _serialFirst = String.Empty;
-        private string _serialLast = String.Empty;
-        private string _totalSubstrate = String.Empty;
+        private string _serialType = string.Empty;
+        private string _serialFirst = string.Empty;
+        private string _serialLast = string.Empty;
+        private string _totalSubstrate = string.Empty;
         private int _serialLastNumber;
         private readonly List<string> _strSerial = [];
         private readonly List<string> _checkBoxNames = [
@@ -67,7 +67,7 @@ namespace ProductDatabase {
                 _serialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
 
                 var quantityFlg = false;
-                var strQuantity = String.Empty;
+                var strQuantity = string.Empty;
                 switch (ProductInfo.RegType) {
                     case 2:
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
@@ -90,12 +90,12 @@ namespace ProductDatabase {
 
                             using var cmd = con.CreateCommand();
                             // 使用基板表示
-                            cmd.CommandText = $"""SELECT col_Substrate_Name FROM "Stock_{ProductInfo.StockName}" WHERE col_Substrate_Model = @col_Substrate_Model""";
-                            cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _useSubstrate[i];
+                            cmd.CommandText = $"""SELECT SubstrateName FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateModel = @SubstrateModel""";
+                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using (var dr = cmd.ExecuteReader()) {
                                 if (dr.Read()) {
                                     if (objCbx != null) {
-                                        var substrateName = $"{dr["col_Substrate_Name"]}";
+                                        var substrateName = $"{dr["SubstrateName"]}";
                                         objCbx.Text = $"{substrateName} - {_useSubstrate[i]}";
                                     }
                                 }
@@ -103,13 +103,12 @@ namespace ProductDatabase {
 
                             // 在庫テーブルからデータ取得
                             var intQuantity = ProductInfo.Quantity;
-                            cmd.CommandText = $"""SELECT col_Substrate_num, col_Stock, col_Substrate_Name FROM "Stock_{ProductInfo.StockName}" WHERE col_Stock > 0 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC""";
-                            //cmd.CommandText = $"""SELECT col_Substrate_num, col_Stock, col_Substrate_Name FROM "Stock_{ProductInfo.StockName}" WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC""";
-                            cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _useSubstrate[i];
+                            cmd.CommandText = $"""SELECT SubstrateNumber, Stock, SubstrateName FROM "Stock_{ProductInfo.StockName}" WHERE Stock > 0 AND SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC""";
+                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using (var dr = cmd.ExecuteReader()) {
                                 while (dr.Read()) {
-                                    var strSubstrateNumber = $"{dr["col_Substrate_num"]}";
-                                    var intStock = Convert.ToInt32(dr["col_Stock"]);
+                                    var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
+                                    var intStock = Convert.ToInt32(dr["Stock"]);
                                     objDgv?.Rows.Add(strSubstrateNumber, intStock);
 
                                     if (intQuantity >= intStock) {
@@ -136,7 +135,7 @@ namespace ProductDatabase {
 
                                     if (intQuantity > 0) {
                                         quantityFlg = false;
-                                        var substrateName = $"{dr["col_Substrate_Name"]}";
+                                        var substrateName = $"{dr["SubstrateName"]}";
                                         strQuantity += $"[{substrateName}]{Environment.NewLine}";
                                     }
 
@@ -171,28 +170,27 @@ namespace ProductDatabase {
                             using SQLiteConnection con = new(GetConnectionString2());
                             con.Open();
                             using var cmd = con.CreateCommand();
-                            cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE col_Substrate_Model = @col_Substrate_Model""";
-                            cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _useSubstrate[i];
+                            cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateModel = @SubstrateModel""";
+                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using (var dr = cmd.ExecuteReader()) {
                                 while (dr.Read()) {
-                                    if (objCbx != null) { objCbx.Text = $"{dr["col_Substrate_Name"]} - {_useSubstrate[i]}"; }
+                                    if (objCbx != null) { objCbx.Text = $"{dr["SubstrateName"]} - {_useSubstrate[i]}"; }
                                 }
                             }
 
-                            cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE col_Stock > 0 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC""";
-                            //cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE col_flg = 1 AND col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC""";
-                            cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _useSubstrate[i];
+                            cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE Stock > 0 AND SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC""";
+                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using (var dr = cmd.ExecuteReader()) {
                                 while (dr.Read()) {
-                                    var strSubstrateName = String.Empty;
-                                    strSubstrateName = $"{dr["col_Substrate_Name"]}";
+                                    var strSubstrateName = string.Empty;
+                                    strSubstrateName = $"{dr["SubstrateName"]}";
 
-                                    var strSubstrateNumber = $"{dr["col_Substrate_Num"]}";
-                                    var intStock = Convert.ToInt32(dr["col_Stock"]);
+                                    var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
+                                    var intStock = Convert.ToInt32(dr["Stock"]);
                                     objDgv?.Rows.Add(strSubstrateNumber, intStock);
 
                                     var j = 0;
-                                    var strOrderNumber = $"{dr["col_Order_Num"]}";
+                                    var strOrderNumber = $"{dr["OrderNumber"]}";
                                     if (strOrderNumber == ProductInfo.OrderNumber) {
                                         if (objDgv != null) {
                                             var intQuantity = ProductInfo.Quantity;
@@ -317,13 +315,13 @@ namespace ProductDatabase {
         }
         private void LoadSettings(string strLabelSettingFilePath, string strBarcodeSettingFilePath) {
             try {
-                if (strLabelSettingFilePath != String.Empty) {
+                if (strLabelSettingFilePath != string.Empty) {
                     using StreamReader? srLabel = new(strLabelSettingFilePath, new System.Text.UTF8Encoding(false));
                     System.Xml.Serialization.XmlSerializer serializerLabel = new(typeof(CSettingsLabelPro));
                     if (serializerLabel.Deserialize(srLabel) is CSettingsLabelPro result) { SettingsLabelPro = result; }
                     srLabel?.Close();
                 }
-                if (strBarcodeSettingFilePath != String.Empty) {
+                if (strBarcodeSettingFilePath != string.Empty) {
                     using StreamReader? srBarcode = new(strBarcodeSettingFilePath, new System.Text.UTF8Encoding(false));
                     System.Xml.Serialization.XmlSerializer serializerBarcode = new(typeof(CSettingsBarcodePro));
                     if (serializerBarcode.Deserialize(srBarcode) is CSettingsBarcodePro result) { SettingsBarcodePro = result; }
@@ -386,30 +384,30 @@ namespace ProductDatabase {
                         $"""
                         INSERT INTO "Serial_{ProductInfo.ProductName}"
                             (
-                            col_Serial,
-                            col_Order_Num,
-                            col_Product_Num,
-                            col_Product_Type,
-                            col_Product_Model,
-                            col_RegDate
+                            Serial,
+                            OrderNumber,
+                            ProductNumber,
+                            ProductType,
+                            ProductModel,
+                            RegDate
                             )
                         VALUES
                             (
-                            @col_Serial,
-                            @col_Order_Num,
-                            @col_Product_Num,
-                            @col_Product_Type,
-                            @col_Product_Model,
-                            @col_RegDate
+                            @Serial,
+                            @OrderNumber,
+                            @ProductNumber,
+                            @ProductType,
+                            @ProductModel,
+                            @RegDate
                             )
                         """;
 
-                    cmd.Parameters.Add("@col_Serial", DbType.String).Value = b;
-                    cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                    cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
-                    cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-                    cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                    cmd.Parameters.Add("@col_RegDate", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                    cmd.Parameters.Add("@Serial", DbType.String).Value = b;
+                    cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                    cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
+                    cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                    cmd.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+                    cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
 
                     cmd.ExecuteNonQuery();
                 }
@@ -423,41 +421,41 @@ namespace ProductDatabase {
                         using var cmd = con.CreateCommand();
                         cmd.CommandText =
                             $"""
-                            INSERT INTO "Product_Reg_{ProductInfo.ProductName}"
+                            INSERT INTO "Product_{ProductInfo.ProductName}"
                                 (
-                                col_Order_Num,
-                                col_Product_Num,
-                                col_Product_Type,
-                                col_Product_Model,
-                                col_Quantity,
-                                col_Person,
-                                col_RegDate,
-                                col_Revision,
-                                col_Comment
+                                OrderNumber,
+                                ProductNumber,
+                                ProductType,
+                                ProductModel,
+                                Quantity,
+                                Person,
+                                RegDate,
+                                Revision,
+                                Comment
                                 )
                             VALUES
                                 (
-                                @col_Order_Num,
-                                @col_Product_Num,
-                                @col_Product_Type,
-                                @col_Product_Model,
-                                @col_Quantity,
-                                @col_Person,
-                                @col_RegDate,
-                                @col_Revision,
-                                @col_Comment
+                                @OrderNumber,
+                                @ProductNumber,
+                                @ProductType,
+                                @ProductModel,
+                                @Quantity,
+                                @Person,
+                                @RegDate,
+                                @Revision,
+                                @Comment
                                 )
                             """;
 
-                        cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                        cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
-                        cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-                        cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                        cmd.Parameters.Add("@col_Quantity", DbType.String).Value = ProductInfo.Quantity;
-                        cmd.Parameters.Add("@col_Person", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                        cmd.Parameters.Add("@col_RegDate", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                        cmd.Parameters.Add("@col_Revision", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
-                        cmd.Parameters.Add("@col_Comment", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                        cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                        cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
+                        cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                        cmd.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+                        cmd.Parameters.Add("@Quantity", DbType.String).Value = ProductInfo.Quantity;
+                        cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+                        cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                        cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
+                        cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                         cmd.ExecuteNonQuery();
                     }
@@ -470,50 +468,50 @@ namespace ProductDatabase {
                         using var cmd = con.CreateCommand();
                         cmd.CommandText =
                             $"""
-                            INSERT INTO "Product_Reg_{ProductInfo.ProductName}"
+                            INSERT INTO "Product_{ProductInfo.ProductName}"
                                 (
-                                col_Order_Num,
-                                col_Product_Num,
-                                col_Product_Type,
-                                col_Product_Model,
-                                col_Quantity,
-                                col_Person,
-                                col_RegDate,
-                                col_Revision,
-                                col_Serial_First,
-                                col_Serial_Last,
-                                col_Serial_LastNum,
-                                col_Comment
+                                OrderNumber,
+                                ProductNumber,
+                                ProductType,
+                                ProductModel,
+                                Quantity,
+                                Person,
+                                RegDate,
+                                Revision,
+                                SerialFirst,
+                                SerialLast,
+                                SerialLastNum,
+                                Comment
                                 )
                             VALUES
                                 (
-                                @col_Order_Num,
-                                @col_Product_Num,
-                                @col_Product_Type,
-                                @col_Product_Model,
-                                @col_Quantity,
-                                @col_Person,
-                                @col_RegDate,
-                                @col_Revision,
-                                @col_Serial_First,
-                                @col_Serial_Last,
-                                @col_Serial_LastNum,
-                                @col_Comment
+                                @OrderNumber,
+                                @ProductNumber,
+                                @ProductType,
+                                @ProductModel,
+                                @Quantity,
+                                @Person,
+                                @RegDate,
+                                @Revision,
+                                @SerialFirst,
+                                @SerialLast,
+                                @SerialLastNum,
+                                @Comment
                                 )
                             """;
 
-                        cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                        cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
-                        cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-                        cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                        cmd.Parameters.Add("@col_Quantity", DbType.String).Value = ProductInfo.Quantity;
-                        cmd.Parameters.Add("@col_Person", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                        cmd.Parameters.Add("@col_RegDate", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                        cmd.Parameters.Add("@col_Revision", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
-                        cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = String.IsNullOrWhiteSpace(_serialFirst) ? DBNull.Value : _serialFirst;
-                        cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = String.IsNullOrWhiteSpace(_serialLast) ? DBNull.Value : _serialLast;
-                        cmd.Parameters.Add("@col_Serial_LastNum", DbType.String).Value = _serialLastNumber;
-                        cmd.Parameters.Add("@col_Comment", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                        cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                        cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
+                        cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                        cmd.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+                        cmd.Parameters.Add("@Quantity", DbType.String).Value = ProductInfo.Quantity;
+                        cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+                        cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                        cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
+                        cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(_serialFirst) ? DBNull.Value : _serialFirst;
+                        cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(_serialLast) ? DBNull.Value : _serialLast;
+                        cmd.Parameters.Add("@SerialLastNum", DbType.String).Value = _serialLastNumber;
+                        cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                         cmd.ExecuteNonQuery();
                     }
@@ -531,14 +529,14 @@ namespace ProductDatabase {
                             if (objCbx.Checked) {
                                 var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
                                 var dgvRowCnt = objDgv.Rows.Count;
-                                var subTotalTemp = String.Empty;
+                                var subTotalTemp = string.Empty;
 
                                 for (var j = 0; j <= dgvRowCnt - 1; j++) {
                                     var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[3].Value);
                                     if (boolCbx) {
-                                        var substrateName = String.Empty;
-                                        var substrateModel = String.Empty;
-                                        var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? String.Empty;
+                                        var substrateName = string.Empty;
+                                        var substrateModel = string.Empty;
+                                        var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
                                         var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
                                         var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
 
@@ -546,84 +544,84 @@ namespace ProductDatabase {
                                             cmd.CommandText =
                                                 $"""
                                                 UPDATE "Stock_{ProductInfo.StockName}" SET
-                                                    col_Stock = @col_Stock,
+                                                    Stock = @Stock,
                                                     col_History = ifnull(col_History,'')|| @col_History
                                                 WHERE
-                                                    col_Substrate_Num = @col_Substrate_Num
+                                                    SubstrateNumber = @SubstrateNumber
                                                 """;
                                             //cmd.CommandText =
                                             //    $"""
                                             //    UPDATE "Stock_{ProductInfo.StockName}" SET
                                             //        col_Flg = @col_Flg,
-                                            //        col_Stock = @col_Stock,
+                                            //        Stock = @Stock,
                                             //        col_History = ifnull(col_History,'')|| @col_History
                                             //    WHERE
-                                            //        col_Substrate_Num = @col_Substrate_Num
+                                            //        SubstrateNumber = @SubstrateNumber
                                             //    """;
-                                            cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
+                                            cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
 
                                             //cmd.Parameters.Add("@col_Flg", DbType.String).Value = stockValue - useValue == 0 ? 0 : (object)1;
 
-                                            cmd.Parameters.Add("@col_Stock", DbType.String).Value = stockValue - useValue;
+                                            cmd.Parameters.Add("@Stock", DbType.String).Value = stockValue - useValue;
                                             cmd.Parameters.Add("@col_History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue}),";
 
                                             cmd.ExecuteNonQuery();
 
-                                            cmd.CommandText = $"SELECT * FROM Stock_{ProductInfo.StockName} WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ ASC";
-                                            cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = _useSubstrate[i];
+                                            cmd.CommandText = $"SELECT * FROM Stock_{ProductInfo.StockName} WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC";
+                                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
 
                                             using var dr = cmd.ExecuteReader();
                                             while (dr.Read()) {
-                                                substrateName = $"{dr["col_Substrate_Name"]}";
-                                                substrateModel = $"{dr["col_Substrate_Model"]}";
+                                                substrateName = $"{dr["SubstrateName"]}";
+                                                substrateModel = $"{dr["SubstrateModel"]}";
                                             }
                                         }
 
                                         if (useValue != 0) {
-                                            subTotalTemp = String.IsNullOrEmpty(subTotalTemp) ? $"{substrateNum}({useValue})" : $"{subTotalTemp},{substrateNum}({useValue})";
+                                            subTotalTemp = string.IsNullOrEmpty(subTotalTemp) ? $"{substrateNum}({useValue})" : $"{subTotalTemp},{substrateNum}({useValue})";
                                         }
 
                                         using (var cmd = con.CreateCommand()) {
                                             cmd.CommandText =
                                                 $"""
-                                                INSERT INTO "Substrate_Reg_{ProductInfo.StockName}"
+                                                INSERT INTO "Substrate_{ProductInfo.StockName}"
                                                     (
-                                                    col_Substrate_Name,
-                                                    col_Substrate_Model,
-                                                    col_Substrate_Num,
+                                                    SubstrateName,
+                                                    SubstrateModel,
+                                                    SubstrateNumber,
                                                     col_Decrease,
                                                     col_Use_P_Type,
                                                     col_Use_P_Num,
                                                     col_Use_O_Num,
-                                                    col_Person,
-                                                    col_RegDate,
-                                                    col_Comment
+                                                    Person,
+                                                    RegDate,
+                                                    Comment
                                                     )
                                                 VALUES
                                                     (
-                                                    @col_Substrate_Name,
-                                                    @col_Substrate_Model,
-                                                    @col_Substrate_Num,
+                                                    @SubstrateName,
+                                                    @SubstrateModel,
+                                                    @SubstrateNumber,
                                                     @col_Decrease,
                                                     @col_Use_P_Type,
                                                     @col_Use_P_Num,
                                                     @col_Use_O_Num,
-                                                    @col_Person,
-                                                    @col_RegDate,
-                                                    @col_Comment
+                                                    @Person,
+                                                    @RegDate,
+                                                    @Comment
                                                     )
                                                 """;
 
-                                            cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = String.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
-                                            cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = String.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
-                                            cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
+                                            cmd.Parameters.Add("@SubstrateName", DbType.String).Value = string.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
+                                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
+                                            cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
                                             cmd.Parameters.Add("@col_Decrease", DbType.String).Value = 0 - useValue;
-                                            cmd.Parameters.Add("@col_Use_P_Type", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                                            cmd.Parameters.Add("@col_Use_P_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                                            cmd.Parameters.Add("@col_Use_O_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-                                            cmd.Parameters.Add("@col_Person", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                                            cmd.Parameters.Add("@col_RegDate", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                                            cmd.Parameters.Add("@col_Comment", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                                            cmd.Parameters.Add("@col_Use_P_Type", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                                            cmd.Parameters.Add("@col_Use_P_Num", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+                                            cmd.Parameters.Add("@col_Use_O_Num", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                                            cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+                                            cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                                            cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                                             cmd.ExecuteNonQuery();
                                         }
@@ -640,63 +638,63 @@ namespace ProductDatabase {
                                         }
                                     }
                                 }
-                                _totalSubstrate = String.IsNullOrEmpty(_totalSubstrate)
+                                _totalSubstrate = string.IsNullOrEmpty(_totalSubstrate)
                                     ? $"[{_useSubstrate[i]}]{subTotalTemp}"
                                     : $"{_totalSubstrate},[{_useSubstrate[i]}]{subTotalTemp}";
-                                subTotalTemp = String.Empty;
+                                subTotalTemp = string.Empty;
                             }
                         }
 
                         using (var cmd = con.CreateCommand()) {
                             cmd.CommandText =
                                 $"""
-                                 INSERT INTO "Product_Reg_{ProductInfo.ProductName}"
+                                 INSERT INTO "Product_{ProductInfo.ProductName}"
                                     (
-                                    col_Order_Num,
-                                    col_Product_Num,
-                                    col_Product_Type,
-                                    col_Product_Model,
-                                    col_Quantity,
-                                    col_Person,
-                                    col_RegDate,
-                                    col_Revision,
-                                    col_Serial_First,
-                                    col_Serial_Last,
-                                    col_Serial_LastNum,
-                                    col_Comment,
+                                    OrderNumber,
+                                    ProductNumber,
+                                    ProductType,
+                                    ProductModel,
+                                    Quantity,
+                                    Person,
+                                    RegDate,
+                                    Revision,
+                                    SerialFirst,
+                                    SerialLast,
+                                    SerialLastNum,
+                                    Comment,
                                     col_Use_Substrate
                                     )
                                 VALUES
                                     (
-                                    @col_Order_Num,
-                                    @col_Product_Num,
-                                    @col_Product_Type,
-                                    @col_Product_Model,
-                                    @col_Quantity,
-                                    @col_Person,
-                                    @col_RegDate,
-                                    @col_Revision,
-                                    @col_Serial_First,
-                                    @col_Serial_Last,
-                                    @col_Serial_LastNum,
-                                    @col_Comment,
+                                    @OrderNumber,
+                                    @ProductNumber,
+                                    @ProductType,
+                                    @ProductModel,
+                                    @Quantity,
+                                    @Person,
+                                    @RegDate,
+                                    @Revision,
+                                    @SerialFirst,
+                                    @SerialLast,
+                                    @SerialLastNum,
+                                    @Comment,
                                     @col_Use_Substrate
                                     )
                                 """;
 
-                            cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                            cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
-                            cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-                            cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                            cmd.Parameters.Add("@col_Quantity", DbType.String).Value = ProductInfo.Quantity;
-                            cmd.Parameters.Add("@col_Person", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                            cmd.Parameters.Add("@col_RegDate", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                            cmd.Parameters.Add("@col_Revision", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
-                            cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = String.IsNullOrWhiteSpace(_serialFirst) ? DBNull.Value : _serialFirst;
-                            cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = String.IsNullOrWhiteSpace(_serialLast) ? DBNull.Value : _serialLast;
-                            cmd.Parameters.Add("@col_Serial_LastNum", DbType.String).Value = _serialLastNumber;
-                            cmd.Parameters.Add("@col_Use_Substrate", DbType.String).Value = String.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
-                            cmd.Parameters.Add("@col_Comment", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                            cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                            cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
+                            cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                            cmd.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+                            cmd.Parameters.Add("@Quantity", DbType.String).Value = ProductInfo.Quantity;
+                            cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+                            cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                            cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
+                            cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(_serialFirst) ? DBNull.Value : _serialFirst;
+                            cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(_serialLast) ? DBNull.Value : _serialLast;
+                            cmd.Parameters.Add("@SerialLastNum", DbType.String).Value = _serialLastNumber;
+                            cmd.Parameters.Add("@col_Use_Substrate", DbType.String).Value = string.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
+                            cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                             cmd.ExecuteNonQuery();
                         }
@@ -804,20 +802,20 @@ namespace ProductDatabase {
             using SQLiteConnection con = new(GetConnectionString2());
             con.Open();
 
-            var productModel = String.Empty;
+            var productModel = string.Empty;
 
             // 製番が新規かチェック
             using (var cmd = con.CreateCommand()) {
-                cmd.CommandText = $"""SELECT * FROM "Product_Reg_{ProductInfo.ProductName}" WHERE col_Product_Num = @col_Product_Num ORDER BY _rowid_ ASC LIMIT 1""";
-                cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = ProductInfo.ProductNumber;
+                cmd.CommandText = $"""SELECT * FROM "Product_{ProductInfo.ProductName}" WHERE ProductNumber = @ProductNumber ORDER BY _rowid_ ASC LIMIT 1""";
+                cmd.Parameters.Add("@ProductNumber", DbType.String).Value = ProductInfo.ProductNumber;
 
                 using var dr = cmd.ExecuteReader();
                 while (dr.Read()) {
-                    productModel = $"{dr["col_Product_Model"]}";
+                    productModel = $"{dr["ProductModel"]}";
                 }
             }
 
-            if (productModel != String.Empty) {
+            if (productModel != string.Empty) {
                 if (productModel == ProductInfo.ProductModel) {
                     Activate();
                     var result = MessageBox.Show($"製番[{ProductInfo.ProductNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
@@ -832,20 +830,20 @@ namespace ProductDatabase {
                 }
             }
 
-            productModel = String.Empty;
+            productModel = string.Empty;
 
             // 注文番号が新規かチェック
             using (var cmd = con.CreateCommand()) {
-                cmd.CommandText = $"""SELECT * FROM "Product_Reg_{ProductInfo.ProductName}" WHERE col_Order_Num = @col_Order_Num ORDER BY _rowid_ ASC LIMIT 1""";
-                cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = ProductInfo.OrderNumber;
+                cmd.CommandText = $"""SELECT * FROM "Product_{ProductInfo.ProductName}" WHERE OrderNumber = @OrderNumber ORDER BY _rowid_ ASC LIMIT 1""";
+                cmd.Parameters.Add("@OrderNumber", DbType.String).Value = ProductInfo.OrderNumber;
 
                 using var dr = cmd.ExecuteReader();
                 while (dr.Read()) {
-                    productModel = $"{dr["col_Product_Model"]}";
+                    productModel = $"{dr["ProductModel"]}";
                 }
             }
 
-            if (productModel != String.Empty) {
+            if (productModel != string.Empty) {
                 if (productModel == ProductInfo.ProductModel) {
                     Activate();
                     var result = MessageBox.Show($"注文番号[{ProductInfo.OrderNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
@@ -939,24 +937,24 @@ namespace ProductDatabase {
                         break;
                 }
 
-                var strSQLSerial = String.Join("','", _strSerial);
+                var strSQLSerial = string.Join("','", _strSerial);
 
                 List<string> strSerialDuplication = [];
                 using (SQLiteConnection con = new(GetConnectionString2())) {
                     con.Open();
 
                     using var cmd = con.CreateCommand();
-                    cmd.CommandText = $"""SELECT col_Serial FROM "Serial_{ProductInfo.ProductName}" WHERE col_Serial IN (@col_Serial)""";
-                    cmd.Parameters.Add("@col_Serial", DbType.String).Value = strSQLSerial;
+                    cmd.CommandText = $"""SELECT Serial FROM "Serial_{ProductInfo.ProductName}" WHERE Serial IN (@Serial)""";
+                    cmd.Parameters.Add("@Serial", DbType.String).Value = strSQLSerial;
 
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read()) {
-                        strSerialDuplication.Add($"{dr["col_Serial"]}");
+                        strSerialDuplication.Add($"{dr["Serial"]}");
                     }
                 }
 
                 if (strSerialDuplication.Count > 0) {
-                    var strSQLDuplication = String.Join($"{Environment.NewLine}", strSerialDuplication);
+                    var strSQLDuplication = string.Join($"{Environment.NewLine}", strSerialDuplication);
                     throw new Exception($"{strSQLDuplication}{Environment.NewLine}は既に使用されているシリアルです。");
                 }
 
@@ -1006,7 +1004,7 @@ namespace ProductDatabase {
 
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
                 System.Drawing.Point headerPos = new(0, 0);
-                var headerString = String.Empty;
+                var headerString = string.Empty;
                 Font headerFooterFont = new("Arial", 6);
                 var serialCodePrintCopies = 0;
                 var remainingCount = 0;
@@ -1171,14 +1169,14 @@ namespace ProductDatabase {
             var outputCode = _serialType switch {
                 "Label" => SettingsLabelPro.LabelProLabelSettings.Format,
                 "Barcode" => SettingsBarcodePro.BarcodeProLabelSettings.Format,
-                _ => String.Empty
+                _ => string.Empty
             };
 
             outputCode = outputCode.Replace("%Y", DateTime.Parse(ProductInfo.RegDate).ToString("yy"))
                                     .Replace("%MM", DateTime.Parse(ProductInfo.RegDate).ToString("MM"))
                                     .Replace("%T", ProductInfo.Initial)
                                     .Replace("%R", ProductInfo.Revision)
-                                    .Replace("%M", String.IsNullOrEmpty(monthCode) ? String.Empty : monthCode[^1..])
+                                    .Replace("%M", string.IsNullOrEmpty(monthCode) ? string.Empty : monthCode[^1..])
                                     .Replace("%S", Convert.ToInt32(serialCode).ToString($"D{ProductInfo.SerialDigit}"));
             return outputCode;
         }
@@ -1400,20 +1398,20 @@ namespace ProductDatabase {
         // リスト印刷
         private void ListPrint() {
             try {
-                var sheetName = String.Empty;
-                var productName = String.Empty;
-                var productModel = String.Empty;
+                var sheetName = string.Empty;
+                var productName = string.Empty;
+                var productModel = string.Empty;
 
-                var productNameRange = String.Empty;
-                var productNumberRange = String.Empty;
-                var orderNumberRange = String.Empty;
-                var regDateRange = String.Empty;
-                var productModelRange = String.Empty;
-                var quantityRange = String.Empty;
-                var serialFirstRange = String.Empty;
-                var serialLastRange = String.Empty;
-                var commentRange = String.Empty;
-                var qrCodeRange = String.Empty;
+                var productNameRange = string.Empty;
+                var productNumberRange = string.Empty;
+                var orderNumberRange = string.Empty;
+                var regDateRange = string.Empty;
+                var productModelRange = string.Empty;
+                var quantityRange = string.Empty;
+                var serialFirstRange = string.Empty;
+                var serialLastRange = string.Empty;
+                var commentRange = string.Empty;
+                var qrCodeRange = string.Empty;
 
                 using FileStream fileStream = new($"{Environment.CurrentDirectory}./config/Excel/ConfigList.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using XLWorkbook workBook = new(fileStream);
@@ -1483,8 +1481,8 @@ namespace ProductDatabase {
                     var mainCellValue = workSheetMain.Cell(findRow, findColumn + 1).Value.ToString();
                     var tempCellValue = workSheetTemp.Cell(mainCellValue).Value.ToString();
 
-                    if (mainCellValue != String.Empty) {
-                        if (tempCellValue == String.Empty) {
+                    if (mainCellValue != string.Empty) {
+                        if (tempCellValue == string.Empty) {
                             workSheetTemp.Cell(mainCellValue).Value = $"{_usedProductNumber[i]}({_usedQuantity[i]})";
                         }
                         else {
@@ -1494,7 +1492,7 @@ namespace ProductDatabase {
                 }
 
                 // QRコード
-                if (!String.IsNullOrEmpty(qrCodeRange)) {
+                if (!string.IsNullOrEmpty(qrCodeRange)) {
                     BarcodeWriter<PixelData> qr = new() {
                         Format = BarcodeFormat.QR_CODE,
                         Options = new QrCodeEncodingOptions {
@@ -1588,7 +1586,7 @@ namespace ProductDatabase {
             ls.ShowDialog(this);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
-            var message = String.Join(Environment.NewLine,
+            var message = string.Join(Environment.NewLine,
                 $"StrProductName\t\t[{ProductInfo.ProductName}]",
                 $"StrProductModel\t\t[{ProductInfo.ProductModel}]",
                 $"StrStockName\t\t[{ProductInfo.StockName}]",

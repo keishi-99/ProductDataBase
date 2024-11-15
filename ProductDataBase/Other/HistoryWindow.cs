@@ -24,9 +24,9 @@ namespace ProductDatabase {
                         using (SQLiteConnection con = new(GetConnectionString2())) {
                             _historyTable.Clear();
 
-                            var query = $"""SELECT _rowid_, * FROM "Substrate_Reg_{ProductInfo.ProductName}" WHERE col_Substrate_Model = @col_Substrate_Model ORDER BY _rowid_ DESC""";
+                            var query = $"""SELECT _rowid_, * FROM "Substrate_{ProductInfo.ProductName}" WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ DESC""";
                             using SQLiteCommand command = new(query, con);
-                            command.Parameters.AddWithValue("@col_Substrate_Model", ProductInfo.SubstrateModel);
+                            command.Parameters.AddWithValue("@SubstrateModel", ProductInfo.SubstrateModel);
                             // SQLiteDataAdapterのインスタンス化
                             using SQLiteDataAdapter adapter = new(command);
 
@@ -37,7 +37,7 @@ namespace ProductDatabase {
 
                             _listColFilter.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? String.Empty;
+                                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
                                 if (headerValue != null) { _listColFilter.Add(headerValue); }
                             }
 
@@ -82,7 +82,7 @@ namespace ProductDatabase {
 
                             CategoryComboBox.Items.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? String.Empty);
+                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? string.Empty);
                             }
                         }
                         break;
@@ -90,9 +90,9 @@ namespace ProductDatabase {
                         using (SQLiteConnection con = new(GetConnectionString2())) {
                             _historyTable.Clear();
 
-                            var query = $"""SELECT _rowid_, * FROM "Product_Reg_{ProductInfo.ProductName}" WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC""";
+                            var query = $"""SELECT _rowid_, * FROM "Product_{ProductInfo.ProductName}" WHERE ProductModel = @ProductModel ORDER BY _rowid_ DESC""";
                             using SQLiteCommand command = new(query, con);
-                            command.Parameters.AddWithValue("@col_Product_Model", ProductInfo.ProductModel);
+                            command.Parameters.AddWithValue("@ProductModel", ProductInfo.ProductModel);
                             // SQLiteDataAdapterのインスタンス化
                             using SQLiteDataAdapter adapter = new(command);
 
@@ -103,7 +103,7 @@ namespace ProductDatabase {
 
                             _listColFilter.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? String.Empty;
+                                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
                                 if (headerValue != null) { _listColFilter.Add(headerValue); }
                             }
 
@@ -147,7 +147,7 @@ namespace ProductDatabase {
 
                             CategoryComboBox.Items.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? String.Empty);
+                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? string.Empty);
                             }
                         }
                         break;
@@ -155,9 +155,9 @@ namespace ProductDatabase {
                         using (SQLiteConnection con = new(GetConnectionString2())) {
                             _historyTable.Clear();
 
-                            var query = $"""SELECT _rowid_, * FROM Reprint WHERE col_Product_Model = @col_Product_Model ORDER BY _rowid_ DESC""";
+                            var query = $"""SELECT _rowid_, * FROM Reprint WHERE ProductModel = @ProductModel ORDER BY _rowid_ DESC""";
                             using SQLiteCommand command = new(query, con);
-                            command.Parameters.AddWithValue("@col_Product_Model", ProductInfo.ProductModel);
+                            command.Parameters.AddWithValue("@ProductModel", ProductInfo.ProductModel);
                             // SQLiteDataAdapterのインスタンス化
                             using SQLiteDataAdapter adapter = new(command);
 
@@ -168,7 +168,7 @@ namespace ProductDatabase {
 
                             _listColFilter.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? String.Empty;
+                                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
                                 if (headerValue != null) { _listColFilter.Add(headerValue); }
                             }
 
@@ -208,7 +208,7 @@ namespace ProductDatabase {
 
                             CategoryComboBox.Items.Add("");
                             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? String.Empty);
+                                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? string.Empty);
                             }
                         }
                         break;
@@ -220,11 +220,11 @@ namespace ProductDatabase {
 
         private void HistoryTableFilter(object sender, EventArgs e) {
             try {
-                if (String.IsNullOrEmpty(FilterStringTextBox.Text) || CategoryComboBox.SelectedIndex == 0) {
+                if (string.IsNullOrEmpty(FilterStringTextBox.Text) || CategoryComboBox.SelectedIndex == 0) {
                     _historyTable.DefaultView.RowFilter = null;
                 }
                 else if (CategoryComboBox.Text == "ID") {
-                    if (Int32.TryParse(FilterStringTextBox.Text, out var id)) { _historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} = '{id}'"; }
+                    if (int.TryParse(FilterStringTextBox.Text, out var id)) { _historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} = '{id}'"; }
                 }
                 else if (CategoryComboBox.Text != "") {
                     _historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} LIKE '*{FilterStringTextBox.Text}*'";

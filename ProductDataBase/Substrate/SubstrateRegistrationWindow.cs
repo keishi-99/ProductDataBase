@@ -65,7 +65,7 @@ namespace ProductDatabase {
                     cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read()) {
-                        PersonComboBox.Items.Add($"{dr["col_Person_Name"]}");
+                        PersonComboBox.Items.Add($"{dr["PersonName"]}");
                     }
                 }
 
@@ -74,14 +74,14 @@ namespace ProductDatabase {
                     using SQLiteConnection con = new(GetConnectionString2());
                     con.Open();
                     using var cmd = con.CreateCommand();
-                    // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Stock]の合計を取得
-                    cmd.CommandText = $"""SELECT total(col_stock) FROM "Stock_{ProductInfo.StockName}" WHERE col_Substrate_Model = @col_Substrate_Model""";
-                    cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ProductInfo.SubstrateModel;
+                    // テーブル検索SQL - [Product_Name]_stockテーブルの[SubstrateModel]列の[Stock]の合計を取得
+                    cmd.CommandText = $"""SELECT total(Stock) FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateModel = @SubstrateModel""";
+                    cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                     StockLabel2.Text = cmd.ExecuteScalar().ToString();
 
-                    // テーブル検索SQL - [Substrate_Reg_[Product_Name]]テーブルの最新の[col_Revison]を取得
-                    cmd.CommandText = $"""SELECT col_Revision FROM "Substrate_Reg_{ProductInfo.StockName}" WHERE col_Substrate_Model = @col_Substrate_Model AND col_Revision IS NOT NULL ORDER BY _rowid_ DESC""";
-                    cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ProductInfo.SubstrateModel;
+                    // テーブル検索SQL - [Substrate_[Product_Name]]テーブルの最新の[col_Revison]を取得
+                    cmd.CommandText = $"""SELECT Revision FROM "Substrate_{ProductInfo.StockName}" WHERE SubstrateModel = @SubstrateModel AND Revision IS NOT NULL ORDER BY _rowid_ DESC""";
+                    cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
                 }
@@ -182,11 +182,11 @@ namespace ProductDatabase {
                 if (ProductInfo.RegType != 0) {
                     var substrateName = String.Empty;
                     using (var cmd = con.CreateCommand()) {
-                        cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE col_Substrate_Num = @col_Substrate_Num ORDER BY _rowid_ DESC LIMIT 1""";
-                        cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
+                        cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateNumber = @SubstrateNumber ORDER BY _rowid_ DESC LIMIT 1""";
+                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
                         using var dr = cmd.ExecuteReader();
                         while (dr.Read()) {
-                            substrateName = $"{dr["col_Substrate_Name"]}";
+                            substrateName = $"{dr["SubstrateName"]}";
                         }
                     }
 
@@ -209,45 +209,45 @@ namespace ProductDatabase {
                             $"""
                             INSERT INTO "Stock_{ProductInfo.StockName}"
                                 (
-                                col_Substrate_Name, col_Substrate_Model, col_Substrate_Num, col_Order_Num, col_Stock
+                                SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, Stock
                                 )
                             VALUES
                                 (
-                                @col_Substrate_Name, @col_Substrate_Model, @col_Substrate_Num, @col_Order_Num, @col_Stock
+                                @SubstrateName, @SubstrateModel, @SubstrateNumber, @OrderNumber, @Stock
                                 )
-                                on conflict(col_Substrate_Num)
+                                on conflict(SubstrateNumber)
                             DO UPDATE
-                                set col_Stock = col_Stock + excluded.col_Stock
+                                set Stock = Stock + excluded.Stock
                             """;
                         //cmd.CommandText =
                         //    $"""
                         //    INSERT INTO "Stock_{ProductInfo.StockName}"
                         //        (
-                        //        col_Flg, col_Substrate_Name, col_Substrate_Model, col_Substrate_Num, col_Order_Num, col_Stock
+                        //        col_Flg, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, Stock
                         //        )
                         //    VALUES
                         //        (
-                        //        @col_Flg, @col_Substrate_Name, @col_Substrate_Model, @col_Substrate_Num, @col_Order_Num, @col_Stock
+                        //        @col_Flg, @SubstrateName, @SubstrateModel, @SubstrateNumber, @OrderNumber, @Stock
                         //        )
-                        //        on conflict(col_Substrate_Num)
+                        //        on conflict(SubstrateNumber)
                         //    DO UPDATE
-                        //        set col_Flg = 1, col_Stock = col_Stock + excluded.col_Stock
+                        //        set col_Flg = 1, Stock = Stock + excluded.Stock
                         //    """;
 
                         //cmd.Parameters.Add("@col_Flg", DbType.String).Value = 1;
-                        cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = ProductInfo.SubstrateName;
-                        cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ProductInfo.SubstrateModel;
-                        cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
-                        cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = String.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? DBNull.Value : OrderNumberTextBox.Text;
-                        cmd.Parameters.Add("@col_Stock", DbType.String).Value = String.IsNullOrWhiteSpace(QuantityTextBox.Text) ? DBNull.Value : QuantityTextBox.Text;
+                        cmd.Parameters.Add("@SubstrateName", DbType.String).Value = ProductInfo.SubstrateName;
+                        cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
+                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
+                        cmd.Parameters.Add("@OrderNumber", DbType.String).Value = String.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? DBNull.Value : OrderNumberTextBox.Text;
+                        cmd.Parameters.Add("@Stock", DbType.String).Value = String.IsNullOrWhiteSpace(QuantityTextBox.Text) ? DBNull.Value : QuantityTextBox.Text;
 
                         cmd.ExecuteNonQuery();
                     }
                     //不良処理
                     else if (!QuantityCheckBox.Checked && DefectNumberCheckBox.Checked) {
                         using var cmd = con.CreateCommand();
-                        cmd.CommandText = $"""SELECT col_Stock FROM "Stock_{ProductInfo.StockName}" WHERE col_Substrate_Num = @col_Substrate_Num""";
-                        cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
+                        cmd.CommandText = $"""SELECT Stock FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateNumber = @SubstrateNumber""";
+                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
                         var intStock = Convert.ToInt32(cmd.ExecuteScalar());
 
                         if (intStock == 0) { throw new Exception("該当する製番の在庫がありません。"); }
@@ -258,23 +258,23 @@ namespace ProductDatabase {
                         cmd.CommandText =
                             $"""
                             UPDATE "Stock_{ProductInfo.StockName}" SET
-                                col_Stock = @col_Stock,
+                                Stock = @Stock,
                                 col_History = ifnull(col_History, '') || @col_History
                             WHERE
-                                col_Substrate_Num = @col_Substrate_Num
+                                SubstrateNumber = @SubstrateNumber
                             """;
                         //$"""
                         //    UPDATE "Stock_{ProductInfo.StockName}" SET
                         //        col_Flg = @col_Flg,
-                        //        col_Stock = @col_Stock,
+                        //        Stock = @Stock,
                         //        col_History = ifnull(col_History, '') || @col_History
                         //    WHERE
-                        //        col_Substrate_Num = @col_Substrate_Num
+                        //        SubstrateNumber = @SubstrateNumber
                         //    """;
-                        cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
+                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
 
                         //cmd.Parameters.Add("@col_Flg", DbType.String).Value = intStockFlg;
-                        cmd.Parameters.Add("@col_Stock", DbType.String).Value = intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text);
+                        cmd.Parameters.Add("@Stock", DbType.String).Value = intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text);
                         cmd.Parameters.Add("@col_History", DbType.String).Value = $"[不良]{ManufacturingNumberMaskedTextBox.Text}";
 
                         cmd.ExecuteNonQuery();
@@ -285,45 +285,45 @@ namespace ProductDatabase {
                 using (var cmd = con.CreateCommand()) {
                     cmd.CommandText =
                         $"""
-                        INSERT INTO "Substrate_Reg_{ProductInfo.ProductName}"
+                        INSERT INTO "Substrate_{ProductInfo.ProductName}"
                             (
-                            col_Substrate_Name,
-                            col_Substrate_Model,
-                            col_Substrate_Num,
-                            col_Order_Num,
+                            SubstrateName,
+                            SubstrateModel,
+                            SubstrateNumber,
+                            OrderNumber,
                             col_Increase,
                             col_Defect,
-                            col_Person,
-                            col_RegDate,
-                            col_Revision,
-                            col_Comment
+                            Person,
+                            RegDate,
+                            Revision,
+                            Comment
                             )
                         VALUES
                             (
-                            @col_Substrate_Name,
-                            @col_Substrate_Model,
-                            @col_Substrate_Num,
-                            @col_Order_Num,
+                            @SubstrateName,
+                            @SubstrateModel,
+                            @SubstrateNumber,
+                            @OrderNumber,
                             @col_Increase,
                             @col_Defect,
-                            @col_Person,
-                            @col_RegDate,
-                            @col_Revision,
-                            @col_Comment
+                            @Person,
+                            @RegDate,
+                            @Revision,
+                            @Comment
                             )
                         """;
 
                     // チェックボックスにチェックがない場合はNullを
-                    cmd.Parameters.Add("@col_Substrate_Name", DbType.String).Value = ProductInfo.SubstrateName;
-                    cmd.Parameters.Add("@col_Substrate_Model", DbType.String).Value = ProductInfo.SubstrateModel;
-                    cmd.Parameters.Add("@col_Substrate_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
-                    cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = String.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? DBNull.Value : OrderNumberTextBox.Text;
+                    cmd.Parameters.Add("@SubstrateName", DbType.String).Value = ProductInfo.SubstrateName;
+                    cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
+                    cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
+                    cmd.Parameters.Add("@OrderNumber", DbType.String).Value = String.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? DBNull.Value : OrderNumberTextBox.Text;
                     cmd.Parameters.Add("@col_Increase", DbType.String).Value = QuantityCheckBox.Checked ? QuantityTextBox.Text : DBNull.Value;
                     cmd.Parameters.Add("@col_Defect", DbType.String).Value = DefectNumberCheckBox.Checked ? DefectNumberTextBox.Text : DBNull.Value;
-                    cmd.Parameters.Add("@col_RegDate", DbType.String).Value = String.IsNullOrWhiteSpace(RegistrationDateMaskedTextBox.Text) ? DBNull.Value : RegistrationDateMaskedTextBox.Text;
-                    cmd.Parameters.Add("@col_Person", DbType.String).Value = String.IsNullOrWhiteSpace(PersonComboBox.Text) ? DBNull.Value : PersonComboBox.Text;
-                    cmd.Parameters.Add("@col_Revision", DbType.String).Value = String.IsNullOrWhiteSpace(RevisionTextBox.Text) ? DBNull.Value : RevisionTextBox.Text;
-                    cmd.Parameters.Add("@col_Comment", DbType.String).Value = String.IsNullOrWhiteSpace(CommentTextBox.Text) ? DBNull.Value : CommentTextBox.Text;
+                    cmd.Parameters.Add("@RegDate", DbType.String).Value = String.IsNullOrWhiteSpace(RegistrationDateMaskedTextBox.Text) ? DBNull.Value : RegistrationDateMaskedTextBox.Text;
+                    cmd.Parameters.Add("@Person", DbType.String).Value = String.IsNullOrWhiteSpace(PersonComboBox.Text) ? DBNull.Value : PersonComboBox.Text;
+                    cmd.Parameters.Add("@Revision", DbType.String).Value = String.IsNullOrWhiteSpace(RevisionTextBox.Text) ? DBNull.Value : RevisionTextBox.Text;
+                    cmd.Parameters.Add("@Comment", DbType.String).Value = String.IsNullOrWhiteSpace(CommentTextBox.Text) ? DBNull.Value : CommentTextBox.Text;
 
                     cmd.ExecuteNonQuery();
                 }

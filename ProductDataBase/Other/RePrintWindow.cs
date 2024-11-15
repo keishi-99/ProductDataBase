@@ -8,19 +8,19 @@ namespace ProductDatabase {
     public partial class RePrintWindow : Form {
 
         public CSettingsLabelPro SettingsLabelPro { get; set; } = new CSettingsLabelPro();
-        private string _labelSettingFilePath = String.Empty;
+        private string _labelSettingFilePath = string.Empty;
 
         public CSettingsBarcodePro SettingsBarcodePro { get; set; } = new CSettingsBarcodePro();
-        private string _barcodeSettingFilePath = String.Empty;
+        private string _barcodeSettingFilePath = string.Empty;
 
         public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
 
-        private string _orderNumber = String.Empty;
-        private string _productNumber = String.Empty;
-        private string _regDate = String.Empty;
-        private string _person = String.Empty;
-        private string _revision = String.Empty;
-        private string _comment = String.Empty;
+        private string _orderNumber = string.Empty;
+        private string _productNumber = string.Empty;
+        private string _regDate = string.Empty;
+        private string _person = string.Empty;
+        private string _revision = string.Empty;
+        private string _comment = string.Empty;
 
         private int _quantity;
         private int _serialFirstNumber;
@@ -35,9 +35,9 @@ namespace ProductDatabase {
         private readonly int _displayMagnitude = 3;
         private int _intPageCnt = 1;
 
-        private string _serialType = String.Empty;
-        private string _strSerialFirstNumber = String.Empty;
-        private string _strSerialLastNumber = String.Empty;
+        private string _serialType = string.Empty;
+        private string _strSerialFirstNumber = string.Empty;
+        private string _strSerialLastNumber = string.Empty;
         private bool _serialUnderbar = false;
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
@@ -117,7 +117,7 @@ namespace ProductDatabase {
                     cmd.CommandText = """SELECT * FROM Person ORDER BY _rowid_ ASC""";
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read()) {
-                        PersonComboBox.Items.Add($"{dr["col_Person_Name"]}");
+                        PersonComboBox.Items.Add($"{dr["PersonName"]}");
                     }
                 }
 
@@ -125,8 +125,8 @@ namespace ProductDatabase {
                 using (SQLiteConnection con = new(GetConnectionString2())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
-                    // テーブル検索SQL - [Product_Name]_stockテーブルの[col_Substrate_Model]列の[col_Revision]を取得
-                    cmd.CommandText = $"""SELECT col_Revision FROM "Product_Reg_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
+                    // テーブル検索SQL - [Product_Name]_stockテーブルの[SubstrateModel]列の[Revision]を取得
+                    cmd.CommandText = $"""SELECT Revision FROM "Product_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
                 }
@@ -140,13 +140,13 @@ namespace ProductDatabase {
         }
         private void LoadSettings(string strLabelSettingFilePath, string strBarcodeSettingFilePath) {
             try {
-                if (strLabelSettingFilePath != String.Empty) {
+                if (strLabelSettingFilePath != string.Empty) {
                     StreamReader? srLabel = new(strLabelSettingFilePath, new System.Text.UTF8Encoding(false));
                     System.Xml.Serialization.XmlSerializer serializerLabel = new(typeof(CSettingsLabelPro));
                     if (serializerLabel.Deserialize(srLabel) is CSettingsLabelPro result) { SettingsLabelPro = result; }
                     srLabel?.Close();
                 }
-                if (strBarcodeSettingFilePath != String.Empty) {
+                if (strBarcodeSettingFilePath != string.Empty) {
                     StreamReader? srBarcode = new(strBarcodeSettingFilePath, new System.Text.UTF8Encoding(false));
                     System.Xml.Serialization.XmlSerializer serializerBarcode = new(typeof(CSettingsBarcodePro));
                     if (serializerBarcode.Deserialize(srBarcode) is CSettingsBarcodePro result) { SettingsBarcodePro = result; }
@@ -168,7 +168,7 @@ namespace ProductDatabase {
                 foreach (Control control in Controls) {
                     if (control is TextBoxBase textBox && textBox.Enabled) {
                         anyTextBoxEnabled = true;
-                        if (String.IsNullOrWhiteSpace(textBox.Text)) {
+                        if (string.IsNullOrWhiteSpace(textBox.Text)) {
                             allTextBoxesFilled = false;
                             break;
                         }
@@ -179,7 +179,7 @@ namespace ProductDatabase {
 
                 if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
 
-                if (QuantityCheckBox.Checked && Int32.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
+                if (QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
 
                 result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) {
@@ -235,24 +235,24 @@ namespace ProductDatabase {
                 cmd.CommandText =
                     $"""
                     INSERT INTO Reprint
-                        (col_Print_Type, col_Order_Num, col_Product_Num, col_Product_Type, col_Product_Model, col_Quantity, col_Person, col_RegDate, col_Revision, col_Serial_First, col_Serial_Last, col_Comment)
+                        (PrintType, OrderNumber, ProductNumber, ProductType, ProductModel, Quantity, Person, RegDate, Revision, SerialFirst, SerialLast, Comment)
                     VALUES
-                        (@col_Print_Type, @col_Order_Num, @col_Product_Num, @col_Product_Type, @col_Product_Model, @col_Quantity, @col_Person, @col_RegDate, @col_Revision, @col_Serial_First, @col_Serial_Last, @col_Comment)
+                        (@PrintType, @OrderNumber, @ProductNumber, @ProductType, @ProductModel, @Quantity, @Person, @RegDate, @Revision, @SerialFirst, @SerialLast, @Comment)
                     """;
 
                 // チェックボックスにチェックがない場合はNullを
-                cmd.Parameters.Add("@col_Print_Type", DbType.String).Value = String.IsNullOrWhiteSpace(_serialType) ? DBNull.Value : _serialType;
-                cmd.Parameters.Add("@col_Order_Num", DbType.String).Value = String.IsNullOrWhiteSpace(_orderNumber) ? DBNull.Value : _orderNumber;
-                cmd.Parameters.Add("@col_Product_Num", DbType.String).Value = String.IsNullOrWhiteSpace(_productNumber) ? DBNull.Value : _productNumber;
-                cmd.Parameters.Add("@col_Product_Type", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                cmd.Parameters.Add("@col_Product_Model", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
-                cmd.Parameters.Add("@col_Quantity", DbType.String).Value = _quantity;
-                cmd.Parameters.Add("@col_Person", DbType.String).Value = String.IsNullOrWhiteSpace(_person) ? DBNull.Value : _person;
-                cmd.Parameters.Add("@col_RegDate", DbType.String).Value = String.IsNullOrWhiteSpace(_regDate) ? DBNull.Value : _regDate;
-                cmd.Parameters.Add("@col_Revision", DbType.String).Value = String.IsNullOrWhiteSpace(_revision) ? DBNull.Value : _revision;
-                cmd.Parameters.Add("@col_Serial_First", DbType.String).Value = String.IsNullOrWhiteSpace(_strSerialFirstNumber) ? DBNull.Value : _strSerialFirstNumber;
-                cmd.Parameters.Add("@col_Serial_Last", DbType.String).Value = String.IsNullOrWhiteSpace(_strSerialLastNumber) ? DBNull.Value : _strSerialLastNumber;
-                cmd.Parameters.Add("@col_Comment", DbType.String).Value = String.IsNullOrWhiteSpace(_comment) ? DBNull.Value : _comment;
+                cmd.Parameters.Add("@PrintType", DbType.String).Value = string.IsNullOrWhiteSpace(_serialType) ? DBNull.Value : _serialType;
+                cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(_orderNumber) ? DBNull.Value : _orderNumber;
+                cmd.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(_productNumber) ? DBNull.Value : _productNumber;
+                cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
+                cmd.Parameters.Add("@Quantity", DbType.String).Value = _quantity;
+                cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(_person) ? DBNull.Value : _person;
+                cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(_regDate) ? DBNull.Value : _regDate;
+                cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(_revision) ? DBNull.Value : _revision;
+                cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(_strSerialFirstNumber) ? DBNull.Value : _strSerialFirstNumber;
+                cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(_strSerialLastNumber) ? DBNull.Value : _strSerialLastNumber;
+                cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(_comment) ? DBNull.Value : _comment;
 
                 cmd.ExecuteNonQuery();
 
@@ -304,7 +304,7 @@ namespace ProductDatabase {
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
                 var startLineLabel = (int)PrintPostionNumericUpDown.Value - 1;
                 Point headerPos = new(0, 0);
-                var headerString = String.Empty;
+                var headerString = string.Empty;
                 Font headerFooterFont = new("Arial", 6);
                 var serialCodePrintCopies = 0;
 
@@ -464,7 +464,7 @@ namespace ProductDatabase {
             var outputCode = _serialType switch {
                 "Label" => SettingsLabelPro.LabelProLabelSettings.Format,
                 "Barcode" => SettingsBarcodePro.BarcodeProLabelSettings.Format,
-                _ => String.Empty
+                _ => string.Empty
             };
 
             outputCode = outputCode.Replace("%Y", DateTime.Parse(_regDate).ToString("yy"))
@@ -588,7 +588,6 @@ namespace ProductDatabase {
                     if (checkBox.Checked) {
                         MessageBox.Show("変更する場合は理由を記載して下さい。");
                     }
-
                     break;
                 case "ExtraCheckBox2":
                     ExtraTextBox3.Enabled = checkBox.Checked;
@@ -646,7 +645,7 @@ namespace ProductDatabase {
             Registeration();
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
-            var message = String.Join(Environment.NewLine,
+            var message = string.Join(Environment.NewLine,
                 $"StrProductName\t\t[{ProductInfo.ProductName}]",
                 $"StrProductModel\t\t[{ProductInfo.ProductModel}]",
                 $"StrProductType\t\t[{ProductInfo.ProductType}]",
