@@ -438,7 +438,7 @@
             // 
             this.SubstrateModelLabel2.AutoSize = true;
             this.SubstrateModelLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.SubstrateModelLabel2.Location = new Point(84, 85);
+            this.SubstrateModelLabel2.Location = new Point(90, 85);
             this.SubstrateModelLabel2.Margin = new Padding(4, 0, 4, 0);
             this.SubstrateModelLabel2.Name = "SubstrateModelLabel2";
             this.SubstrateModelLabel2.Size = new Size(24, 17);
@@ -454,9 +454,9 @@
             this.SubstrateModelLabel1.Location = new Point(16, 85);
             this.SubstrateModelLabel1.Margin = new Padding(4, 0, 4, 0);
             this.SubstrateModelLabel1.Name = "SubstrateModelLabel1";
-            this.SubstrateModelLabel1.Size = new Size(62, 17);
+            this.SubstrateModelLabel1.Size = new Size(66, 17);
             this.SubstrateModelLabel1.TabIndex = 45;
-            this.SubstrateModelLabel1.Text = "基板型式:";
+            this.SubstrateModelLabel1.Text = "基板型式 :";
             this.SubstrateModelLabel1.TextAlign = ContentAlignment.MiddleRight;
             // 
             // ファイルToolStripMenuItem
@@ -476,7 +476,7 @@
             // 
             this.ProductNameLabel2.AutoSize = true;
             this.ProductNameLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.ProductNameLabel2.Location = new Point(84, 39);
+            this.ProductNameLabel2.Location = new Point(90, 39);
             this.ProductNameLabel2.Margin = new Padding(4, 0, 4, 0);
             this.ProductNameLabel2.Name = "ProductNameLabel2";
             this.ProductNameLabel2.Size = new Size(24, 17);
@@ -506,9 +506,9 @@
             this.ProductNameLabel1.Location = new Point(28, 39);
             this.ProductNameLabel1.Margin = new Padding(4, 0, 4, 0);
             this.ProductNameLabel1.Name = "ProductNameLabel1";
-            this.ProductNameLabel1.Size = new Size(50, 17);
+            this.ProductNameLabel1.Size = new Size(54, 17);
             this.ProductNameLabel1.TabIndex = 43;
-            this.ProductNameLabel1.Text = "製品名:";
+            this.ProductNameLabel1.Text = "製品名 :";
             this.ProductNameLabel1.TextAlign = ContentAlignment.MiddleRight;
             // 
             // ProductRegistration1MenuStrip
@@ -525,7 +525,7 @@
             // 
             this.ProductTypeLabel2.AutoSize = true;
             this.ProductTypeLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.ProductTypeLabel2.Location = new Point(84, 62);
+            this.ProductTypeLabel2.Location = new Point(90, 62);
             this.ProductTypeLabel2.Margin = new Padding(4, 0, 4, 0);
             this.ProductTypeLabel2.Name = "ProductTypeLabel2";
             this.ProductTypeLabel2.Size = new Size(24, 17);
@@ -541,9 +541,9 @@
             this.ProductTypeLabel1.Location = new Point(38, 62);
             this.ProductTypeLabel1.Margin = new Padding(4, 0, 4, 0);
             this.ProductTypeLabel1.Name = "ProductTypeLabel1";
-            this.ProductTypeLabel1.Size = new Size(40, 17);
+            this.ProductTypeLabel1.Size = new Size(44, 17);
             this.ProductTypeLabel1.TabIndex = 82;
-            this.ProductTypeLabel1.Text = "タイプ:";
+            this.ProductTypeLabel1.Text = "タイプ :";
             this.ProductTypeLabel1.TextAlign = ContentAlignment.MiddleRight;
             // 
             // panelCommentTextBox
