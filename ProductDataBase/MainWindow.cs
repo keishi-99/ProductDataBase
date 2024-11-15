@@ -368,7 +368,7 @@ namespace ProductDatabase {
 
                 switch (ProductInfo.RadioButtonFlg) {
                     case 1:
-                        selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Substrate_Model ASC");
+                        selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Substrate_Name ASC");
                         HashSet<string> substrateNames = new(selectedRows.AsEnumerable()
                                                                                 .Select(x => x.Field<string>("col_Substrate_Name"))
                                                                                 .Where(x => x != null)
@@ -380,7 +380,7 @@ namespace ProductDatabase {
                     case 2:
                     case 3:
                     case 4:
-                        selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Product_Model ASC");
+                        selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Product_Name ASC");
                         HashSet<string> productTypes = new(selectedRows.AsEnumerable()
                                                                                 .Select(x => x.Field<string>("col_Product_Type"))
                                                                                 .Where(x => x != null)
