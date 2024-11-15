@@ -187,8 +187,7 @@ namespace ProductDatabase {
                 ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
                 ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["PrintType"] ?? throw new Exception("PrintType is null"));
                 ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
-                using SubstrateRegistrationWindow window = new();
-                window.ProductInfo = ProductInfo;
+                using SubstrateRegistrationWindow window = new(ProductInfo);
                 window.ShowDialog(this);
             }
         }
@@ -207,8 +206,7 @@ namespace ProductDatabase {
                 ProductInfo.UseSubstrate = selectedRows[0]["UseSubstrate"].ToString() ?? string.Empty;
                 ProductInfo.Initial = selectedRows[0]["Initial"].ToString() ?? string.Empty;
                 ProductInfo.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
-                using ProductRegistration1Window window = new();
-                window.ProductInfo = ProductInfo;
+                using ProductRegistration1Window window = new(ProductInfo);
                 window.ShowDialog(this);
             }
         }
@@ -225,8 +223,7 @@ namespace ProductDatabase {
                 ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
                 ProductInfo.Initial = selectedRows[0]["Initial"].ToString() ?? string.Empty;
                 ProductInfo.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
-                using RePrintWindow window = new();
-                window.ProductInfo = ProductInfo;
+                using RePrintWindow window = new(ProductInfo);
                 window.ShowDialog(this);
             }
         }
@@ -241,8 +238,7 @@ namespace ProductDatabase {
                 ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
                 ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
                 ProductInfo.UseSubstrate = selectedRows[0]["UseSubstrate"].ToString() ?? string.Empty;
-                using SubstrateChange1 window = new();
-                window.ProductInfo = ProductInfo;
+                using SubstrateChange1 window = new(ProductInfo);
                 window.ShowDialog(this);
             }
         }
@@ -279,8 +275,7 @@ namespace ProductDatabase {
                             break;
                     }
 
-                    using HistoryWindow window = new();
-                    window.ProductInfo = ProductInfo;
+                    using HistoryWindow window = new(ProductInfo);
                     window.ShowDialog(this);
                 }
             } catch (Exception ex) {
@@ -528,8 +523,7 @@ namespace ProductDatabase {
             ProductInfo.Category14.Add(category14);
         }
         private void ShowDialogWindowForMultipleItems() {
-            using SeveralDialogWindow window = new();
-            window.ProductInfo = ProductInfo;
+            using SeveralDialogWindow window = new(ProductInfo);
 
             if (window.ShowDialog(this) == DialogResult.OK) {
                 ListIndex = window.SelectedIndex;
@@ -569,8 +563,7 @@ namespace ProductDatabase {
             ProductInfo.RegType = Convert.ToInt32(substrateRet[0]["RegType"] ?? throw new Exception("RegType is null"));
             ProductInfo.PrintType = Convert.ToInt32(substrateRet[0]["PrintType"] ?? throw new Exception("PrintType is null"));
             ProductInfo.CheckBin = Convert.ToInt32(substrateRet[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
-            using SubstrateRegistrationWindow window = new();
-            window.ProductInfo = ProductInfo;
+            using SubstrateRegistrationWindow window = new(ProductInfo);
             window.ShowDialog(this);
         }
         private void HandleProductSelection() {
@@ -593,8 +586,7 @@ namespace ProductDatabase {
             ProductInfo.PrintType = Convert.ToInt32(productRet[0]["PrintType"] ?? throw new Exception("PrintType is null"));
             ProductInfo.CheckBin = Convert.ToInt32(productRet[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
             ProductInfo.SerialDigit = Convert.ToInt32(productRet[0]["SerialDigit"] ?? throw new Exception("SerialDigit is null"));
-            using ProductRegistration1Window window = new();
-            window.ProductInfo = ProductInfo;
+            using ProductRegistration1Window window = new(ProductInfo);
             window.ShowDialog(this);
         }
         private void CleanupAfterScan() {

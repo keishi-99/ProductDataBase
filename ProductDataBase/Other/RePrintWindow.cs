@@ -13,7 +13,7 @@ namespace ProductDatabase {
         public CSettingsBarcodePro SettingsBarcodePro { get; set; } = new CSettingsBarcodePro();
         private string _barcodeSettingFilePath = string.Empty;
 
-        public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
+        public ProductInfomation ProductInfo { get; }
 
         private string _orderNumber = string.Empty;
         private string _productNumber = string.Empty;
@@ -44,8 +44,9 @@ namespace ProductDatabase {
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
 
-        public RePrintWindow() {
+        public RePrintWindow(ProductInfomation productInfo) {
             InitializeComponent();
+            ProductInfo = productInfo;
         }
 
         // ロードイベント

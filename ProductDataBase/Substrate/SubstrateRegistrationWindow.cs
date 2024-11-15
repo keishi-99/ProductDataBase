@@ -7,7 +7,7 @@ using static ProductDatabase.MainWindow;
 namespace ProductDatabase {
     public partial class SubstrateRegistrationWindow : Form {
 
-        public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
+        public ProductInfomation ProductInfo { get; }
 
         public CSettingsLabelSub SettingsLabelSub { get; set; } = new CSettingsLabelSub();
 
@@ -24,8 +24,9 @@ namespace ProductDatabase {
                     "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
 
-        public SubstrateRegistrationWindow() {
+        public SubstrateRegistrationWindow(ProductInfomation productInfo) {
             InitializeComponent();
+            ProductInfo = productInfo;
         }
 
         // ロードイベント

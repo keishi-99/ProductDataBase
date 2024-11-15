@@ -4,7 +4,7 @@ using static ProductDatabase.MainWindow;
 namespace ProductDatabase {
     public partial class ProductRegistration1Window : Form {
 
-        public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
+        public ProductInfomation ProductInfo { get; }
 
         private int _serialLastNum;
 
@@ -13,8 +13,9 @@ namespace ProductDatabase {
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
 
-        public ProductRegistration1Window() {
+        public ProductRegistration1Window(ProductInfomation productInfo) {
             InitializeComponent();
+            ProductInfo = productInfo;
         }
 
         // ロードイベント

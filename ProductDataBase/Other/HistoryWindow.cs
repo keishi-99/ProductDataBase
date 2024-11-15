@@ -5,14 +5,15 @@ using static ProductDatabase.MainWindow;
 namespace ProductDatabase {
     public partial class HistoryWindow : Form {
 
-        public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
+        public ProductInfomation ProductInfo { get; }
 
         private readonly DataTable _historyTable = new();
 
         private readonly List<string> _listColFilter = [];
 
-        public HistoryWindow() {
+        public HistoryWindow(ProductInfomation productInfo) {
             InitializeComponent();
+            ProductInfo = productInfo;
         }
 
         private void LoadEvents() {
