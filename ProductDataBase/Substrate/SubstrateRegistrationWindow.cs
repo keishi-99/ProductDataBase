@@ -74,7 +74,7 @@ namespace ProductDatabase {
                     using SQLiteConnection con = new(GetConnectionRegistration());
                     con.Open();
                     using var cmd = con.CreateCommand();
-                    // テーブル検索SQL - [ProductName]_stockテーブルの[SubstrateModel]列の[Stock]の合計を取得
+                    // テーブル検索SQL - Stock_[ProductName]テーブルの[SubstrateModel]列の[Stock]の合計を取得
                     cmd.CommandText = $"""SELECT total(Stock) FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateModel = @SubstrateModel""";
                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                     StockLabel2.Text = cmd.ExecuteScalar().ToString();
