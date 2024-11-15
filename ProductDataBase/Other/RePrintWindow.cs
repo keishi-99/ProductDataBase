@@ -110,7 +110,7 @@ namespace ProductDatabase {
                 RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
 
                 // DB1へ接続し担当者取得
-                using (SQLiteConnection con = new(GetConnectionString1())) {
+                using (SQLiteConnection con = new(GetConnectionInfomation())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加
@@ -122,7 +122,7 @@ namespace ProductDatabase {
                 }
 
                 // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
-                using (SQLiteConnection con = new(GetConnectionString2())) {
+                using (SQLiteConnection con = new(GetConnectionRegistration())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [Product_Name]_stockテーブルの[SubstrateModel]列の[Revision]を取得
@@ -229,7 +229,7 @@ namespace ProductDatabase {
                 if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
 
                 // 再印刷登録テーブルへ追加
-                using SQLiteConnection con = new(GetConnectionString2());
+                using SQLiteConnection con = new(GetConnectionRegistration());
                 con.Open();
                 using var cmd = con.CreateCommand();
                 cmd.CommandText =

@@ -49,7 +49,7 @@ namespace ProductDatabase {
                 RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
 
                 // DB1へ接続し担当者取得
-                using (SQLiteConnection con = new(GetConnectionString1())) {
+                using (SQLiteConnection con = new(GetConnectionInfomation())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加
@@ -61,7 +61,7 @@ namespace ProductDatabase {
                 }
 
                 // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
-                using (SQLiteConnection con = new(GetConnectionString2())) {
+                using (SQLiteConnection con = new(GetConnectionRegistration())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [Product_[Product_Name]]テーブルの最新の[Revision]を取得

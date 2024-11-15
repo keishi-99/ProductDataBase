@@ -85,7 +85,7 @@ namespace ProductDatabase {
                                 objDgv.Columns[3].ReadOnly = false;
                             }
 
-                            using SQLiteConnection con = new(GetConnectionString2());
+                            using SQLiteConnection con = new(GetConnectionRegistration());
                             con.Open();
 
                             using var cmd = con.CreateCommand();
@@ -167,7 +167,7 @@ namespace ProductDatabase {
                                 objDgv.Columns[3].ReadOnly = false;
                             }
 
-                            using SQLiteConnection con = new(GetConnectionString2());
+                            using SQLiteConnection con = new(GetConnectionRegistration());
                             con.Open();
                             using var cmd = con.CreateCommand();
                             cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateModel = @SubstrateModel""";
@@ -375,7 +375,7 @@ namespace ProductDatabase {
         // 登録処理
         private bool Registration() {
             if (ProductInfo.RegType > 0) {
-                using SQLiteConnection con = new(GetConnectionString2());
+                using SQLiteConnection con = new(GetConnectionRegistration());
                 con.Open();
 
                 foreach (var b in _strSerial) {
@@ -415,7 +415,7 @@ namespace ProductDatabase {
 
             switch (ProductInfo.RegType) {
                 case 0:
-                    using (SQLiteConnection con = new(GetConnectionString2())) {
+                    using (SQLiteConnection con = new(GetConnectionRegistration())) {
                         con.Open();
 
                         using var cmd = con.CreateCommand();
@@ -462,7 +462,7 @@ namespace ProductDatabase {
                     break;
 
                 case 1:
-                    using (SQLiteConnection con = new(GetConnectionString2())) {
+                    using (SQLiteConnection con = new(GetConnectionRegistration())) {
                         con.Open();
 
                         using var cmd = con.CreateCommand();
@@ -519,7 +519,7 @@ namespace ProductDatabase {
 
                 case 2:
                 case 3:
-                    using (SQLiteConnection con = new(GetConnectionString2())) {
+                    using (SQLiteConnection con = new(GetConnectionRegistration())) {
                         con.Open();
                         if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
                         for (var i = 0; i <= _useSubstrate.Length; i++) {
@@ -789,7 +789,7 @@ namespace ProductDatabase {
             }
         }
         private bool NumberCheck() {
-            using SQLiteConnection con = new(GetConnectionString2());
+            using SQLiteConnection con = new(GetConnectionRegistration());
             con.Open();
 
             var productModel = string.Empty;
@@ -930,7 +930,7 @@ namespace ProductDatabase {
                 var strSQLSerial = string.Join("','", _strSerial);
 
                 List<string> strSerialDuplication = [];
-                using (SQLiteConnection con = new(GetConnectionString2())) {
+                using (SQLiteConnection con = new(GetConnectionRegistration())) {
                     con.Open();
 
                     using var cmd = con.CreateCommand();

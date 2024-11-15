@@ -48,7 +48,7 @@ namespace ProductDatabase {
                 CommentTextBox.Text = ProductInfo.Comment;
 
                 // DB1へ接続し担当者取得
-                using (SQLiteConnection con = new(GetConnectionString1())) {
+                using (SQLiteConnection con = new(GetConnectionInfomation())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加
@@ -85,7 +85,7 @@ namespace ProductDatabase {
                                 _objDgv.Columns[4].ReadOnly = false;
                             }
 
-                            using SQLiteConnection con = new(GetConnectionString2());
+                            using SQLiteConnection con = new(GetConnectionRegistration());
                             con.Open();
 
                             using var cmd = con.CreateCommand();
@@ -264,7 +264,7 @@ namespace ProductDatabase {
                 switch (ProductInfo.RegType) {
                     case 2:
                     case 3:
-                        using (SQLiteConnection con = new(GetConnectionString2())) {
+                        using (SQLiteConnection con = new(GetConnectionRegistration())) {
                             con.Open();
                             if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
                             for (var i = 0; i <= _useSubstrate.Length; i++) {
