@@ -89,7 +89,7 @@ namespace ProductDatabase {
                             con.Open();
 
                             using var cmd = con.CreateCommand();
-                            // テーブル検索SQL - [ProductName]_Stockテーブルを在庫数フラグ有&基板型式[Model]で抽出して取得
+                            // テーブル検索SQL - Stock_[ProductName]テーブルを在庫数フラグ有&基板型式[Model]で抽出して取得
                             cmd.CommandText = $"SELECT * FROM Stock_{ProductInfo.StockName} WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC";
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using var dr = cmd.ExecuteReader();
