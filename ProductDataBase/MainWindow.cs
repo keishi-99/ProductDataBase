@@ -175,35 +175,35 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateRegistration() {
-            var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND SubstrateName = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
-                ProductInfo.ProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
-                ProductInfo.StockName = selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
-                ProductInfo.SubstrateName = selectedRows[0]["col_Substrate_Name"].ToString() ?? string.Empty;
-                ProductInfo.SubstrateModel = selectedRows[0]["col_Substrate_Model"].ToString() ?? string.Empty;
-                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"] ?? throw new Exception("col_Reg_Type is null"));
-                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"] ?? throw new Exception("col_Print_Type is null"));
-                ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["col_Checkbox"].ToString() ?? throw new Exception("col_Checkbox is null"), 2);
+                ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
+                ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
+                ProductInfo.SubstrateName = selectedRows[0]["SubstrateName"].ToString() ?? string.Empty;
+                ProductInfo.SubstrateModel = selectedRows[0]["SubstrateModel"].ToString() ?? string.Empty;
+                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
+                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["PrintType"] ?? throw new Exception("PrintType is null"));
+                ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
                 using SubstrateRegistrationWindow window = new();
                 window.ProductInfo = ProductInfo;
                 window.ShowDialog(this);
             }
         }
         private void HandleProductRegistration1() {
-            var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
-                ProductInfo.ProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
-                ProductInfo.StockName = selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
-                ProductInfo.ProductType = selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
-                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"] ?? throw new Exception("col_Reg_Type is null"));
-                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"] ?? throw new Exception("col_Print_Type is null"));
-                ProductInfo.SerialDigit = Convert.ToInt32(selectedRows[0]["col_Serial_Digit"] ?? throw new Exception("col_Serial_Digit is null"));
-                ProductInfo.ProductModel = selectedRows[0]["col_Product_Model"].ToString() ?? string.Empty;
-                ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["col_Checkbox"].ToString() ?? throw new Exception("col_Checkbox is null"), 2);
-                ProductInfo.UseSubstrate = selectedRows[0]["col_Use_Substrate"].ToString() ?? string.Empty;
-                ProductInfo.Initial = selectedRows[0]["col_Initial"].ToString() ?? string.Empty;
+                ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
+                ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
+                ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
+                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
+                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["PrintType"] ?? throw new Exception("PrintType is null"));
+                ProductInfo.SerialDigit = Convert.ToInt32(selectedRows[0]["SerialDigit"] ?? throw new Exception("SerialDigit is null"));
+                ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
+                ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
+                ProductInfo.UseSubstrate = selectedRows[0]["UseSubstrate"].ToString() ?? string.Empty;
+                ProductInfo.Initial = selectedRows[0]["Initial"].ToString() ?? string.Empty;
                 ProductInfo.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
                 using ProductRegistration1Window window = new();
                 window.ProductInfo = ProductInfo;
@@ -211,17 +211,17 @@ namespace ProductDatabase {
             }
         }
         private void HandleRePrint() {
-            var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
-                ProductInfo.ProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
-                ProductInfo.ProductType = selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
-                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"] ?? throw new Exception("col_Reg_Type is null"));
-                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"] ?? throw new Exception("col_Print_Type is null"));
-                ProductInfo.SerialDigit = Convert.ToInt32(selectedRows[0]["col_Serial_Digit"] ?? throw new Exception("col_Serial_Digit is null"));
-                ProductInfo.ProductModel = selectedRows[0]["col_Product_Model"].ToString() ?? string.Empty;
-                ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["col_Checkbox"].ToString() ?? throw new Exception("col_Checkbox is null"), 2);
-                ProductInfo.Initial = selectedRows[0]["col_Initial"].ToString() ?? string.Empty;
+                ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
+                ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
+                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
+                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["PrintType"] ?? throw new Exception("PrintType is null"));
+                ProductInfo.SerialDigit = Convert.ToInt32(selectedRows[0]["SerialDigit"] ?? throw new Exception("SerialDigit is null"));
+                ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
+                ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
+                ProductInfo.Initial = selectedRows[0]["Initial"].ToString() ?? string.Empty;
                 ProductInfo.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
                 using RePrintWindow window = new();
                 window.ProductInfo = ProductInfo;
@@ -229,16 +229,16 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateChange1() {
-            var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
-                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["col_Print_Type"] ?? throw new Exception("col_Print_Type is null"));
-                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["col_Reg_Type"] ?? throw new Exception("col_Reg_Type is null"));
-                ProductInfo.ProductName = selectedRows[0]["col_Product_Name"].ToString() ?? string.Empty;
-                ProductInfo.StockName = selectedRows[0]["col_Stock_Name"].ToString() ?? string.Empty;
-                ProductInfo.ProductType = selectedRows[0]["col_Product_Type"].ToString() ?? string.Empty;
-                ProductInfo.ProductModel = selectedRows[0]["col_Product_Model"].ToString() ?? string.Empty;
-                ProductInfo.UseSubstrate = selectedRows[0]["col_Use_Substrate"].ToString() ?? string.Empty;
+                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["PrintType"] ?? throw new Exception("PrintType is null"));
+                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
+                ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
+                ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
+                ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
+                ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
+                ProductInfo.UseSubstrate = selectedRows[0]["UseSubstrate"].ToString() ?? string.Empty;
                 using SubstrateChange1 window = new();
                 window.ProductInfo = ProductInfo;
                 window.ShowDialog(this);
@@ -252,12 +252,12 @@ namespace ProductDatabase {
 
                 switch (ProductInfo.RadioButtonFlg) {
                     case 1:
-                        selectedRow = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Substrate_Name = '{CategoryListBox3.SelectedItem}'");
+                        selectedRow = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND SubstrateName = '{CategoryListBox3.SelectedItem}'");
                         break;
                     case 2:
                     case 3:
                     case 4:
-                        selectedRow = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}' AND col_Product_Type = '{CategoryListBox3.SelectedItem}'");
+                        selectedRow = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
                         break;
                 }
 
@@ -265,15 +265,15 @@ namespace ProductDatabase {
 
                     switch (ProductInfo.RadioButtonFlg) {
                         case 1:
-                            ProductInfo.ProductName = selectedRow[0]["col_Product_Name"].ToString() ?? string.Empty;
-                            ProductInfo.SubstrateName = selectedRow[0]["col_Substrate_Name"].ToString() ?? string.Empty;
-                            ProductInfo.SubstrateModel = selectedRow[0]["col_Substrate_Model"].ToString() ?? string.Empty;
+                            ProductInfo.ProductName = selectedRow[0]["ProductName"].ToString() ?? string.Empty;
+                            ProductInfo.SubstrateName = selectedRow[0]["SubstrateName"].ToString() ?? string.Empty;
+                            ProductInfo.SubstrateModel = selectedRow[0]["SubstrateModel"].ToString() ?? string.Empty;
                             break;
                         case 2:
                         case 3:
-                            ProductInfo.ProductName = selectedRow[0]["col_Product_Name"].ToString() ?? string.Empty;
-                            ProductInfo.ProductType = selectedRow[0]["col_Product_Type"].ToString() ?? string.Empty;
-                            ProductInfo.ProductModel = selectedRow[0]["col_Product_Model"].ToString() ?? string.Empty;
+                            ProductInfo.ProductName = selectedRow[0]["ProductName"].ToString() ?? string.Empty;
+                            ProductInfo.ProductType = selectedRow[0]["ProductType"].ToString() ?? string.Empty;
+                            ProductInfo.ProductModel = selectedRow[0]["ProductModel"].ToString() ?? string.Empty;
                             break;
                     }
 
@@ -313,7 +313,7 @@ namespace ProductDatabase {
                         break;
                     case "4":
                         ProductInfo.RadioButtonFlg = 4;
-                        strSqlQuery = """SELECT * FROM Product WHERE Visible = 1 AND (col_Print_Type = 5 OR col_Print_Type = 6);""";
+                        strSqlQuery = """SELECT * FROM Product WHERE Visible = 1 AND (PrintType = 5 OR PrintType = 6);""";
                         break;
                     default:
                         break;
@@ -345,10 +345,10 @@ namespace ProductDatabase {
 
                 HashSet<string> productNames = [];
 
-                var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}'", "col_Product_Name ASC");
+                var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}'", "ProductName ASC");
 
                 foreach (var row in selectedRows) {
-                    var productName = row["col_Product_Name"].ToString() ?? throw new Exception("col_Product_Name is null");
+                    var productName = row["ProductName"].ToString() ?? throw new Exception("ProductName is null");
                     productNames.Add(productName);
                 }
 
@@ -368,9 +368,9 @@ namespace ProductDatabase {
 
                 switch (ProductInfo.RadioButtonFlg) {
                     case 1:
-                        selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Substrate_Name ASC");
+                        selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "SubstrateName ASC");
                         HashSet<string> substrateNames = new(selectedRows.AsEnumerable()
-                                                                                .Select(x => x.Field<string>("col_Substrate_Name"))
+                                                                                .Select(x => x.Field<string>("SubstrateName"))
                                                                                 .Where(x => x != null)
                                                                                 .Select(x => x!));
 
@@ -380,9 +380,9 @@ namespace ProductDatabase {
                     case 2:
                     case 3:
                     case 4:
-                        selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND col_Product_Name = '{CategoryListBox2.SelectedItem}'", "col_Product_Name ASC");
+                        selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductName ASC");
                         HashSet<string> productTypes = new(selectedRows.AsEnumerable()
-                                                                                .Select(x => x.Field<string>("col_Product_Type"))
+                                                                                .Select(x => x.Field<string>("ProductType"))
                                                                                 .Where(x => x != null)
                                                                                 .Select(x => x!));
 
@@ -498,23 +498,23 @@ namespace ProductDatabase {
             using SQLiteConnection con = new(GetConnectionString1());
             con.Open();
             using var cmd = con.CreateCommand();
-            cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE col_SubItemNumber = @StrProness2 OR col_ProItemNumber = @StrProness2""";
+            cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber = @StrProness2 OR ProItemNumber = @StrProness2""";
             cmd.Parameters.Add("@StrProness2", DbType.String).Value = ProductInfo.Proness2;
             using var dr = cmd.ExecuteReader();
             if (!dr.HasRows) { throw new Exception($"品目番号が見つかりません。\n品目番号:[{ProductInfo.Proness2}]"); }
             while (dr.Read()) {
-                var colSubItemNumber = dr["col_SubItemNumber"].ToString() ?? string.Empty;
-                var colProItemNumber = dr["col_ProItemNumber"].ToString() ?? string.Empty;
+                var colSubItemNumber = dr["SubItemNumber"].ToString() ?? string.Empty;
+                var colProItemNumber = dr["ProItemNumber"].ToString() ?? string.Empty;
 
                 if (!string.IsNullOrEmpty(colSubItemNumber)) {
-                    var substrateName = dr["col_Substrate_Name"]?.ToString() ?? string.Empty;
-                    var productName = dr["col_Product_Name"]?.ToString() ?? string.Empty;
+                    var substrateName = dr["SubstrateName"]?.ToString() ?? string.Empty;
+                    var productName = dr["ProductName"]?.ToString() ?? string.Empty;
                     AddToLists(colSubItemNumber, substrateName, productName, "1");
                 }
 
                 if (!string.IsNullOrEmpty(colProItemNumber)) {
-                    var productType = dr["col_Product_Type"]?.ToString() ?? string.Empty;
-                    var productName = dr["col_Product_Name:1"]?.ToString() ?? string.Empty;
+                    var productType = dr["ProductType"]?.ToString() ?? string.Empty;
+                    var productName = dr["ProductName:1"]?.ToString() ?? string.Empty;
                     AddToLists(colProItemNumber, productType, productName, "2");
                 }
             }
@@ -555,18 +555,18 @@ namespace ProductDatabase {
                 adapter.Fill(ProductDataTable);
             }
 
-            var substrateRet = ProductDataTable.Select($"col_Product_Name = '{_strCategory13}' AND col_Substrate_Name = '{_strCategory12}'");
+            var substrateRet = ProductDataTable.Select($"ProductName = '{_strCategory13}' AND SubstrateName = '{_strCategory12}'");
             OpenSubstrateRegistrationWindow(substrateRet);
         }
         private void OpenSubstrateRegistrationWindow(DataRow[] substrateRet) {
-            ProductInfo.ProductName = substrateRet[0]["col_Product_Name"].ToString() ?? string.Empty;
-            ProductInfo.StockName = substrateRet[0]["col_Stock_Name"].ToString() ?? string.Empty;
-            ProductInfo.SubstrateName = substrateRet[0]["col_Substrate_Name"].ToString() ?? string.Empty;
-            ProductInfo.SubstrateModel = substrateRet[0]["col_Substrate_Model"].ToString() ?? string.Empty;
+            ProductInfo.ProductName = substrateRet[0]["ProductName"].ToString() ?? string.Empty;
+            ProductInfo.StockName = substrateRet[0]["StockName"].ToString() ?? string.Empty;
+            ProductInfo.SubstrateName = substrateRet[0]["SubstrateName"].ToString() ?? string.Empty;
+            ProductInfo.SubstrateModel = substrateRet[0]["SubstrateModel"].ToString() ?? string.Empty;
             ProductInfo.Initial = string.Empty;
-            ProductInfo.RegType = Convert.ToInt32(substrateRet[0]["col_Reg_Type"] ?? throw new Exception("col_Reg_Type is null"));
-            ProductInfo.PrintType = Convert.ToInt32(substrateRet[0]["col_Print_Type"] ?? throw new Exception("col_Print_Type is null"));
-            ProductInfo.CheckBin = Convert.ToInt32(substrateRet[0]["col_Checkbox"].ToString() ?? throw new Exception("col_Checkbox is null"), 2);
+            ProductInfo.RegType = Convert.ToInt32(substrateRet[0]["RegType"] ?? throw new Exception("RegType is null"));
+            ProductInfo.PrintType = Convert.ToInt32(substrateRet[0]["PrintType"] ?? throw new Exception("PrintType is null"));
+            ProductInfo.CheckBin = Convert.ToInt32(substrateRet[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
             using SubstrateRegistrationWindow window = new();
             window.ProductInfo = ProductInfo;
             window.ShowDialog(this);
@@ -577,20 +577,20 @@ namespace ProductDatabase {
                 adapter.Fill(ProductDataTable);
             }
 
-            var productRet = ProductDataTable.Select($"col_Product_Name = '{_strCategory13}' AND col_Product_Type = '{_strCategory12}'");
+            var productRet = ProductDataTable.Select($"ProductName = '{_strCategory13}' AND ProductType = '{_strCategory12}'");
             OpenProductRegistrationWindow(productRet);
         }
         private void OpenProductRegistrationWindow(DataRow[] productRet) {
-            ProductInfo.ProductName = productRet[0]["col_Product_Name"].ToString() ?? string.Empty;
-            ProductInfo.StockName = productRet[0]["col_Stock_Name"].ToString() ?? string.Empty;
-            ProductInfo.ProductType = productRet[0]["col_Product_Type"].ToString() ?? string.Empty;
-            ProductInfo.ProductModel = productRet[0]["col_Product_Model"].ToString() ?? string.Empty;
-            ProductInfo.UseSubstrate = productRet[0]["col_Use_Substrate"].ToString() ?? string.Empty;
-            ProductInfo.Initial = productRet[0]["col_Initial"].ToString() ?? string.Empty;
-            ProductInfo.RegType = Convert.ToInt32(productRet[0]["col_Reg_Type"] ?? throw new Exception("col_Reg_Type is null"));
-            ProductInfo.PrintType = Convert.ToInt32(productRet[0]["col_Print_Type"] ?? throw new Exception("col_Print_Type is null"));
-            ProductInfo.CheckBin = Convert.ToInt32(productRet[0]["col_Checkbox"].ToString() ?? throw new Exception("col_Checkbox is null"), 2);
-            ProductInfo.SerialDigit = Convert.ToInt32(productRet[0]["col_Serial_Digit"] ?? throw new Exception("col_Serial_Digit is null"));
+            ProductInfo.ProductName = productRet[0]["ProductName"].ToString() ?? string.Empty;
+            ProductInfo.StockName = productRet[0]["StockName"].ToString() ?? string.Empty;
+            ProductInfo.ProductType = productRet[0]["ProductType"].ToString() ?? string.Empty;
+            ProductInfo.ProductModel = productRet[0]["ProductModel"].ToString() ?? string.Empty;
+            ProductInfo.UseSubstrate = productRet[0]["UseSubstrate"].ToString() ?? string.Empty;
+            ProductInfo.Initial = productRet[0]["Initial"].ToString() ?? string.Empty;
+            ProductInfo.RegType = Convert.ToInt32(productRet[0]["RegType"] ?? throw new Exception("RegType is null"));
+            ProductInfo.PrintType = Convert.ToInt32(productRet[0]["PrintType"] ?? throw new Exception("PrintType is null"));
+            ProductInfo.CheckBin = Convert.ToInt32(productRet[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
+            ProductInfo.SerialDigit = Convert.ToInt32(productRet[0]["SerialDigit"] ?? throw new Exception("SerialDigit is null"));
             using ProductRegistration1Window window = new();
             window.ProductInfo = ProductInfo;
             window.ShowDialog(this);

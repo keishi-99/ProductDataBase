@@ -56,7 +56,7 @@ namespace ProductDatabase {
                     cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
                     using var dr = cmd.ExecuteReader();
                     while (dr.Read()) {
-                        PersonComboBox.Items.Add($"{dr["col_Person_Name"]}");
+                        PersonComboBox.Items.Add($"{dr["PersonName"]}");
                     }
                 }
 
@@ -64,13 +64,13 @@ namespace ProductDatabase {
                 using (SQLiteConnection con = new(GetConnectionString2())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
-                    // テーブル検索SQL - [Product_Reg_[Product_Name]]テーブルの最新の[col_Revision]を取得
-                    cmd.CommandText = $"""SELECT col_Revision FROM "Product_Reg_{ProductInfo.ProductName}" WHERE RevisionGroup = "{ProductInfo.RevisionGroup}" ORDER BY _rowid_ DESC""";
+                    // テーブル検索SQL - [Product_[Product_Name]]テーブルの最新の[Revision]を取得
+                    cmd.CommandText = $"""SELECT Revision FROM "Product_{ProductInfo.ProductName}" WHERE RevisionGroup = "{ProductInfo.RevisionGroup}" ORDER BY _rowid_ DESC""";
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
 
-                    // テーブル検索SQL - [Product_Reg_[Product_Name]]テーブルの最新の[col_Serial_LastNum]を取得
-                    cmd.CommandText = $"""SELECT col_Serial_LastNum FROM "Product_Reg_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
+                    // テーブル検索SQL - [Product_[Product_Name]]テーブルの最新の[SerialLastNum]を取得
+                    cmd.CommandText = $"""SELECT SerialLastNum FROM "Product_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
                     FirstSerialNumberTextBox.Text = int.TryParse(cmd.ExecuteScalar()?.ToString(), out _serialLastNum)
                         ? (_serialLastNum + 1).ToString("000")
                         : throw new Exception("シリアル番号の取得に失敗しました。");
