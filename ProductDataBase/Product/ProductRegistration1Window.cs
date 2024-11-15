@@ -69,8 +69,8 @@ namespace ProductDatabase {
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
 
-                    // テーブル検索SQL - [Product_[Product_Name]]テーブルの最新の[SerialLastNum]を取得
-                    cmd.CommandText = $"""SELECT SerialLastNum FROM "Product_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
+                    // テーブル検索SQL - [Product_[Product_Name]]テーブルの最新の[SerialLastNumber]を取得
+                    cmd.CommandText = $"""SELECT SerialLastNumber FROM "Product_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
                     FirstSerialNumberTextBox.Text = int.TryParse(cmd.ExecuteScalar()?.ToString(), out _serialLastNum)
                         ? (_serialLastNum + 1).ToString("000")
                         : throw new Exception("シリアル番号の取得に失敗しました。");
