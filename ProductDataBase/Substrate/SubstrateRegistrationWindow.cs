@@ -74,12 +74,12 @@ namespace ProductDatabase {
                     using SQLiteConnection con = new(GetConnectionRegistration());
                     con.Open();
                     using var cmd = con.CreateCommand();
-                    // テーブル検索SQL - [Product_Name]_stockテーブルの[SubstrateModel]列の[Stock]の合計を取得
+                    // テーブル検索SQL - [ProductName]_stockテーブルの[SubstrateModel]列の[Stock]の合計を取得
                     cmd.CommandText = $"""SELECT total(Stock) FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateModel = @SubstrateModel""";
                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                     StockLabel2.Text = cmd.ExecuteScalar().ToString();
 
-                    // テーブル検索SQL - [Substrate_[Product_Name]]テーブルの最新の[Revison]を取得
+                    // テーブル検索SQL - [Substrate_[ProductName]]テーブルの最新の[Revison]を取得
                     cmd.CommandText = $"""SELECT Revision FROM "Substrate_{ProductInfo.StockName}" WHERE SubstrateModel = @SubstrateModel AND Revision IS NOT NULL ORDER BY _rowid_ DESC""";
                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                     var result = cmd.ExecuteScalar();
