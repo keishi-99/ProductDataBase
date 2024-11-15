@@ -47,6 +47,9 @@ namespace ProductDatabase {
             public int SerialFirstNumber { get; set; }
             public int SerialLastNumber { get; set; }
 
+            public DataTable ProductDataTable { get; } = new();
+            public DataTable SubstrateDataTable { get; } = new();
+
             public void Reset() {
                 ProductName = string.Empty;
                 StockName = string.Empty;
@@ -87,8 +90,6 @@ namespace ProductDatabase {
 
         public ProductInfomation ProductInfo { get; set; } = new();
 
-        public DataTable ProductDataTable { get; } = new();
-
         private int ListIndex { get; set; }
 
         private string _strCategory12 = string.Empty;
@@ -127,7 +128,8 @@ namespace ProductDatabase {
                 }
 
                 using SQLiteConnection con = new(GetConnectionInfomation());
-                using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductDataTable); }
+                using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
+                using (SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con)) { adapter.Fill(ProductInfo.SubstrateDataTable); }
 
                 var userTextPath = "./Config/general/user.txt";
                 var userNames = File.ReadAllLines(userTextPath, Encoding.GetEncoding("UTF-8"))
@@ -175,7 +177,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateRegistration() {
-            var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND SubstrateName = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = ProductInfo.ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND SubstrateName = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
                 ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
@@ -191,7 +193,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleProductRegistration1() {
-            var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = ProductInfo.ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
                 ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
@@ -211,7 +213,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleRePrint() {
-            var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = ProductInfo.ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
                 ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
@@ -229,7 +231,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateChange1() {
-            var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = ProductInfo.ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
                 ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["PrintType"] ?? throw new Exception("PrintType is null"));
@@ -252,12 +254,12 @@ namespace ProductDatabase {
 
                 switch (ProductInfo.RadioButtonFlg) {
                     case 1:
-                        selectedRow = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND SubstrateName = '{CategoryListBox3.SelectedItem}'");
+                        selectedRow = ProductInfo.ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND SubstrateName = '{CategoryListBox3.SelectedItem}'");
                         break;
                     case 2:
                     case 3:
                     case 4:
-                        selectedRow = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
+                        selectedRow = ProductInfo.ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
                         break;
                 }
 
@@ -293,7 +295,7 @@ namespace ProductDatabase {
                 CategoryListBox1.Items.Clear();
                 CategoryListBox2.Items.Clear();
                 CategoryListBox3.Items.Clear();
-                ProductDataTable.Clear();
+                ProductInfo.ProductDataTable.Clear();
 
                 var selectedRadioButton = (RadioButton)sender;
                 var strSqlQuery = string.Empty;
@@ -321,10 +323,10 @@ namespace ProductDatabase {
 
                 using (SQLiteConnection con = new(GetConnectionInfomation()))
                 using (SQLiteDataAdapter adapter = new(strSqlQuery, con)) {
-                    adapter.Fill(ProductDataTable);
+                    adapter.Fill(ProductInfo.ProductDataTable);
                 }
 
-                var class001Set = new SortedSet<string>(ProductDataTable.AsEnumerable()
+                var class001Set = new SortedSet<string>(ProductInfo.ProductDataTable.AsEnumerable()
                     .Select(row => row.Field<string?>("class001"))
                     .Where(classVal => classVal != null)
                     .Cast<string>()
@@ -345,7 +347,7 @@ namespace ProductDatabase {
 
                 HashSet<string> productNames = [];
 
-                var selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}'", "ProductName ASC");
+                var selectedRows = ProductInfo.ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}'", "ProductName ASC");
 
                 foreach (var row in selectedRows) {
                     var productName = row["ProductName"].ToString() ?? throw new Exception("ProductName is null");
@@ -368,7 +370,7 @@ namespace ProductDatabase {
 
                 switch (ProductInfo.RadioButtonFlg) {
                     case 1:
-                        selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "SubstrateName ASC");
+                        selectedRows = ProductInfo.ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "SubstrateName ASC");
                         HashSet<string> substrateNames = new(selectedRows.AsEnumerable()
                                                                                 .Select(x => x.Field<string>("SubstrateName"))
                                                                                 .Where(x => x != null)
@@ -380,7 +382,7 @@ namespace ProductDatabase {
                     case 2:
                     case 3:
                     case 4:
-                        selectedRows = ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductName ASC");
+                        selectedRows = ProductInfo.ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductName ASC");
                         HashSet<string> productTypes = new(selectedRows.AsEnumerable()
                                                                                 .Select(x => x.Field<string>("ProductType"))
                                                                                 .Where(x => x != null)
@@ -552,10 +554,10 @@ namespace ProductDatabase {
         private void HandleSubstrateSelection() {
             using (SQLiteConnection con = new(GetConnectionInfomation())) {
                 using SQLiteDataAdapter adapter = new("""SELECT * FROM Substrate;""", con);
-                adapter.Fill(ProductDataTable);
+                adapter.Fill(ProductInfo.ProductDataTable);
             }
 
-            var substrateRet = ProductDataTable.Select($"ProductName = '{_strCategory13}' AND SubstrateName = '{_strCategory12}'");
+            var substrateRet = ProductInfo.ProductDataTable.Select($"ProductName = '{_strCategory13}' AND SubstrateName = '{_strCategory12}'");
             OpenSubstrateRegistrationWindow(substrateRet);
         }
         private void OpenSubstrateRegistrationWindow(DataRow[] substrateRet) {
@@ -574,10 +576,10 @@ namespace ProductDatabase {
         private void HandleProductSelection() {
             using (SQLiteConnection con = new(GetConnectionInfomation())) {
                 using SQLiteDataAdapter adapter = new("""SELECT * FROM Product;""", con);
-                adapter.Fill(ProductDataTable);
+                adapter.Fill(ProductInfo.ProductDataTable);
             }
 
-            var productRet = ProductDataTable.Select($"ProductName = '{_strCategory13}' AND ProductType = '{_strCategory12}'");
+            var productRet = ProductInfo.ProductDataTable.Select($"ProductName = '{_strCategory13}' AND ProductType = '{_strCategory12}'");
             OpenProductRegistrationWindow(productRet);
         }
         private void OpenProductRegistrationWindow(DataRow[] productRet) {

@@ -90,14 +90,11 @@ namespace ProductDatabase {
 
                             using var cmd = con.CreateCommand();
                             // 使用基板表示
-                            cmd.CommandText = $"""SELECT SubstrateName FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateModel = @SubstrateModel""";
-                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
-                            using (var dr = cmd.ExecuteReader()) {
-                                if (dr.Read()) {
-                                    if (objCbx != null) {
-                                        var substrateName = $"{dr["SubstrateName"]}";
-                                        objCbx.Text = $"{substrateName} - {_useSubstrate[i]}";
-                                    }
+                            var selectedRows = ProductInfo.SubstrateDataTable.Select($"SubstrateModel = '{_useSubstrate[i]}'");
+                            foreach (var row in selectedRows) {
+                                var productName = row["SubstrateName"].ToString() ?? throw new Exception("ProductName is null");
+                                if (objCbx != null) {
+                                    objCbx.Text = $"{productName} - {_useSubstrate[i]}";
                                 }
                             }
 
@@ -105,42 +102,41 @@ namespace ProductDatabase {
                             var intQuantity = ProductInfo.Quantity;
                             cmd.CommandText = $"""SELECT SubstrateNumber, Stock, SubstrateName FROM "Stock_{ProductInfo.StockName}" WHERE Stock > 0 AND SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC""";
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
-                            using (var dr = cmd.ExecuteReader()) {
-                                while (dr.Read()) {
-                                    var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
-                                    var intStock = Convert.ToInt32(dr["Stock"]);
-                                    objDgv?.Rows.Add(strSubstrateNumber, intStock);
+                            using var dr = cmd.ExecuteReader();
+                            while (dr.Read()) {
+                                var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
+                                var intStock = Convert.ToInt32(dr["Stock"]);
+                                objDgv?.Rows.Add(strSubstrateNumber, intStock);
 
-                                    if (intQuantity >= intStock) {
-                                        intQuantity -= intStock;
+                                if (intQuantity >= intStock) {
+                                    intQuantity -= intStock;
+                                    if (objDgv != null) {
+                                        objDgv.Rows[^1].Cells[2].Value = intStock;
+                                        objDgv.Rows[^1].Cells[3].Value = true;
+                                    }
+                                }
+                                else {
+                                    if (intQuantity == 0) {
                                         if (objDgv != null) {
-                                            objDgv.Rows[^1].Cells[2].Value = intStock;
-                                            objDgv.Rows[^1].Cells[3].Value = true;
+                                            objDgv.Rows[^1].Cells[2].Value = 0;
                                         }
                                     }
                                     else {
-                                        if (intQuantity == 0) {
-                                            if (objDgv != null) {
-                                                objDgv.Rows[^1].Cells[2].Value = 0;
-                                            }
-                                        }
-                                        else {
-                                            if (objDgv != null) {
-                                                objDgv.Rows[^1].Cells[2].Value = intQuantity;
-                                                objDgv.Rows[^1].Cells[3].Value = true;
-                                                intQuantity = 0;
-                                            }
+                                        if (objDgv != null) {
+                                            objDgv.Rows[^1].Cells[2].Value = intQuantity;
+                                            objDgv.Rows[^1].Cells[3].Value = true;
+                                            intQuantity = 0;
                                         }
                                     }
-
-                                    if (intQuantity > 0) {
-                                        quantityFlg = false;
-                                        var substrateName = $"{dr["SubstrateName"]}";
-                                        strQuantity += $"[{substrateName}]{Environment.NewLine}";
-                                    }
-
-                                    if (intQuantity == 0) { quantityFlg = true; }
                                 }
+
+                                if (intQuantity > 0) {
+                                    quantityFlg = false;
+                                    var substrateName = $"{dr["SubstrateName"]}";
+                                    strQuantity += $"[{substrateName}]{Environment.NewLine}";
+                                }
+
+                                if (intQuantity == 0) { quantityFlg = true; }
                             }
                         }
 
@@ -170,44 +166,45 @@ namespace ProductDatabase {
                             using SQLiteConnection con = new(GetConnectionRegistration());
                             con.Open();
                             using var cmd = con.CreateCommand();
-                            cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateModel = @SubstrateModel""";
-                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
-                            using (var dr = cmd.ExecuteReader()) {
-                                while (dr.Read()) {
-                                    if (objCbx != null) { objCbx.Text = $"{dr["SubstrateName"]} - {_useSubstrate[i]}"; }
+
+                            // 使用基板表示
+                            var selectedRows = ProductInfo.SubstrateDataTable.Select($"SubstrateModel = '{_useSubstrate[i]}'");
+                            foreach (var row in selectedRows) {
+                                var productName = row["SubstrateName"].ToString() ?? throw new Exception("ProductName is null");
+                                if (objCbx != null) {
+                                    objCbx.Text = $"{productName} - {_useSubstrate[i]}";
                                 }
                             }
 
                             cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE Stock > 0 AND SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC""";
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
-                            using (var dr = cmd.ExecuteReader()) {
-                                while (dr.Read()) {
-                                    var strSubstrateName = string.Empty;
-                                    strSubstrateName = $"{dr["SubstrateName"]}";
+                            using var dr = cmd.ExecuteReader();
+                            while (dr.Read()) {
+                                var strSubstrateName = string.Empty;
+                                strSubstrateName = $"{dr["SubstrateName"]}";
 
-                                    var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
-                                    var intStock = Convert.ToInt32(dr["Stock"]);
-                                    objDgv?.Rows.Add(strSubstrateNumber, intStock);
+                                var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
+                                var intStock = Convert.ToInt32(dr["Stock"]);
+                                objDgv?.Rows.Add(strSubstrateNumber, intStock);
 
-                                    var j = 0;
-                                    var strOrderNumber = $"{dr["OrderNumber"]}";
-                                    if (strOrderNumber == ProductInfo.OrderNumber) {
-                                        if (objDgv != null) {
-                                            var intQuantity = ProductInfo.Quantity;
-                                            var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
-                                            var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
-                                            objDgv.Rows[j].Cells[2].Value = intQuantity;
-                                            objDgv.Rows[j].Cells[3].Value = true;
-                                            // 必要数量分割り当てられたかチェック
-                                            if (intQuantity > stockValue) {
-                                                quantityFlg = false;
-                                                strQuantity = $"{strQuantity}[{strSubstrateName}]{Environment.NewLine}";
-                                            }
-                                            if (stockValue >= useValue) { quantityFlg = true; }
+                                var j = 0;
+                                var strOrderNumber = $"{dr["OrderNumber"]}";
+                                if (strOrderNumber == ProductInfo.OrderNumber) {
+                                    if (objDgv != null) {
+                                        var intQuantity = ProductInfo.Quantity;
+                                        var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
+                                        var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
+                                        objDgv.Rows[j].Cells[2].Value = intQuantity;
+                                        objDgv.Rows[j].Cells[3].Value = true;
+                                        // 必要数量分割り当てられたかチェック
+                                        if (intQuantity > stockValue) {
+                                            quantityFlg = false;
+                                            strQuantity = $"{strQuantity}[{strSubstrateName}]{Environment.NewLine}";
                                         }
+                                        if (stockValue >= useValue) { quantityFlg = true; }
                                     }
-                                    j++;
                                 }
+                                j++;
                             }
                         }
 
@@ -235,6 +232,7 @@ namespace ProductDatabase {
                     case 5:
                     case 6:
                     case 7:
+                    case 9:
                         SettingsLabelPro = new CSettingsLabelPro();
                         _strLabelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
 
@@ -346,6 +344,7 @@ namespace ProductDatabase {
                     case 5:
                     case 6:
                     case 7:
+                    case 9:
                         swLabel = new StreamWriter(_strLabelSettingFilePath, false, new System.Text.UTF8Encoding(false));
                         serializerLabel.Serialize(swLabel, SettingsLabelPro);
                         swLabel?.Close();
@@ -708,6 +707,7 @@ namespace ProductDatabase {
                     case 5:
                     case 6:
                     case 7:
+                    case 9:
                         MessageBox.Show("シリアルラベルを印刷します。");
                         _serialType = "Label";
                         if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
@@ -740,6 +740,7 @@ namespace ProductDatabase {
                     case 6:
                     case 7:
                     case 8:
+                    case 9:
                         _serialType = "Label";
                         _serialFirst = GenerateCode(ProductInfo.SerialFirstNumber);
                         _serialLast = GenerateCode(_serialLastNumber);
@@ -764,6 +765,7 @@ namespace ProductDatabase {
                     case 3:
                     case 4:
                     case 8:
+                    case 9:
                         Close();
                         break;
                     case 5:
@@ -912,6 +914,7 @@ namespace ProductDatabase {
                     case 6:
                     case 7:
                     case 8:
+                    case 9:
                         for (var i = 0; i < ProductInfo.Quantity; i++) {
                             _serialType = "Label";
                             _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
@@ -1071,7 +1074,7 @@ namespace ProductDatabase {
                 e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
 
                 // タイプ4の場合、発行枚数+1
-                if (ProductInfo.PrintType == 4) { serialCodePrintCopies++; }
+                if (ProductInfo.PrintType is 4 or 9) { serialCodePrintCopies++; }
                 if (_pageCnt == 1) {
                     remainingCount = serialCodePrintCopies;
                     _labelProNSerial = ProductInfo.SerialFirstNumber;
@@ -1085,11 +1088,16 @@ namespace ProductDatabase {
                         var posX = (float)(offsetX + (x * (intervalX + sizeX)));
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
 
+                        var generatedCode = GenerateCode(_labelProNSerial);
+
                         // タイプ4の場合、最後のラベルに下線をつける
                         var fontUnderline = ProductInfo.PrintType == 4 && remainingCount == 1;
 
-                        var generatedCode = GenerateCode(_labelProNSerial);
-                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
+                        // タイプ9かつ最終行の場合は型式下3桁を生成
+                        var labelImage = ProductInfo.PrintType != 9 || remainingCount != 1
+                            ? MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline)
+                            : MakeLabelImage(ProductInfo.ProductModel[^3..], (int)e.Graphics.DpiX, 1, fontUnderline);
+
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)sizeX, (float)sizeY);
 
                         _labelProNSerial++;
