@@ -1073,7 +1073,7 @@ namespace ProductDatabase {
                 headerPos.Offset(offset);
                 e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
 
-                // タイプ4の場合、発行枚数+1
+                // タイプ4か9の場合、発行枚数+1
                 if (ProductInfo.PrintType is 4 or 9) { serialCodePrintCopies++; }
                 if (_pageCnt == 1) {
                     remainingCount = serialCodePrintCopies;
@@ -1088,16 +1088,15 @@ namespace ProductDatabase {
                         var posX = (float)(offsetX + (x * (intervalX + sizeX)));
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
 
-                        var generatedCode = GenerateCode(_labelProNSerial);
-
                         // タイプ4の場合、最後のラベルに下線をつける
                         var fontUnderline = ProductInfo.PrintType == 4 && remainingCount == 1;
 
-                        // タイプ9かつ最終行の場合は型式下3桁を生成
-                        var labelImage = ProductInfo.PrintType != 9 || remainingCount != 1
-                            ? MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline)
-                            : MakeLabelImage(ProductInfo.ProductModel[^3..], (int)e.Graphics.DpiX, 1, fontUnderline);
+                        // タイプ9かつ最終行の場合はシリアルを型式下3桁に
+                        var generatedCode = ProductInfo.PrintType != 9 || remainingCount != 1
+                            ? GenerateCode(_labelProNSerial)
+                            : ProductInfo.ProductModel[^3..];
 
+                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)sizeX, (float)sizeY);
 
                         _labelProNSerial++;
