@@ -415,7 +415,7 @@ namespace ProductDatabase {
                                         RegDate = @RegDate,
                                         Revision = @Revision,
                                         SerialLast = @SerialLast,
-                                        SerialLastNum = @SerialLastNum,
+                                        SerialLastNumber = @SerialLastNumber,
                                         Comment = @Comment
                                         col_Use_Substrate = @col_Use_Substrate
                                     WHERE
@@ -434,7 +434,7 @@ namespace ProductDatabase {
                                 cmd.Parameters.Add("@Revision", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
                                 cmd.Parameters.Add("@SerialFirst", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.SerialFirst) ? DBNull.Value : ProductInfo.SerialFirst;
                                 cmd.Parameters.Add("@SerialLast", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
-                                cmd.Parameters.Add("@SerialLastNum", DbType.String).Value = ProductInfo.SerialLastNumber;
+                                cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = ProductInfo.SerialLastNumber;
                                 cmd.Parameters.Add("@col_Use_Substrate", DbType.String).Value = String.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
                                 cmd.Parameters.Add("@Comment", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
