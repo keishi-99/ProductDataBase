@@ -64,12 +64,12 @@ namespace ProductDatabase {
                 using (SQLiteConnection con = new(GetConnectionRegistration())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
-                    // テーブル検索SQL - [Product_[Product_Name]]テーブルの最新の[Revision]を取得
+                    // テーブル検索SQL - [Product_[ProductName]]テーブルの最新の[Revision]を取得
                     cmd.CommandText = $"""SELECT Revision FROM "Product_{ProductInfo.ProductName}" WHERE RevisionGroup = "{ProductInfo.RevisionGroup}" ORDER BY _rowid_ DESC""";
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
 
-                    // テーブル検索SQL - [Product_[Product_Name]]テーブルの最新の[SerialLastNumber]を取得
+                    // テーブル検索SQL - [Product_[ProductName]]テーブルの最新の[SerialLastNumber]を取得
                     cmd.CommandText = $"""SELECT SerialLastNumber FROM "Product_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
                     FirstSerialNumberTextBox.Text = int.TryParse(cmd.ExecuteScalar()?.ToString(), out _serialLastNum)
                         ? (_serialLastNum + 1).ToString("000")
