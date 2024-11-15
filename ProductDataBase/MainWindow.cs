@@ -102,10 +102,10 @@ namespace ProductDatabase {
             InitializeComponent();
         }
 
-        public static string GetConnectionString1() {
+        public static string GetConnectionInfomation() {
             return new SQLiteConnectionStringBuilder() { DataSource = "./db/information.db" }.ToString();
         }
-        public static string GetConnectionString2() {
+        public static string GetConnectionRegistration() {
             return new SQLiteConnectionStringBuilder() { DataSource = "./db/registration.db" }.ToString();
         }
         // ロードイベント
@@ -126,7 +126,7 @@ namespace ProductDatabase {
                     File.Copy(filepath, bakFilepath, true);
                 }
 
-                using SQLiteConnection con = new(GetConnectionString1());
+                using SQLiteConnection con = new(GetConnectionInfomation());
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductDataTable); }
 
                 var userTextPath = "./Config/general/user.txt";
@@ -319,7 +319,7 @@ namespace ProductDatabase {
                         break;
                 }
 
-                using (SQLiteConnection con = new(GetConnectionString1()))
+                using (SQLiteConnection con = new(GetConnectionInfomation()))
                 using (SQLiteDataAdapter adapter = new(strSqlQuery, con)) {
                     adapter.Fill(ProductDataTable);
                 }
@@ -495,7 +495,7 @@ namespace ProductDatabase {
                                                 .Replace("-DCGH", "-DC");
         }
         private void FetchDataFromSQLite() {
-            using SQLiteConnection con = new(GetConnectionString1());
+            using SQLiteConnection con = new(GetConnectionInfomation());
             con.Open();
             using var cmd = con.CreateCommand();
             cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber = @StrProness2 OR ProItemNumber = @StrProness2""";
@@ -550,7 +550,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateSelection() {
-            using (SQLiteConnection con = new(GetConnectionString1())) {
+            using (SQLiteConnection con = new(GetConnectionInfomation())) {
                 using SQLiteDataAdapter adapter = new("""SELECT * FROM Substrate;""", con);
                 adapter.Fill(ProductDataTable);
             }
@@ -572,7 +572,7 @@ namespace ProductDatabase {
             window.ShowDialog(this);
         }
         private void HandleProductSelection() {
-            using (SQLiteConnection con = new(GetConnectionString1())) {
+            using (SQLiteConnection con = new(GetConnectionInfomation())) {
                 using SQLiteDataAdapter adapter = new("""SELECT * FROM Product;""", con);
                 adapter.Fill(ProductDataTable);
             }

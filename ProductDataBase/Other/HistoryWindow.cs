@@ -21,7 +21,7 @@ namespace ProductDatabase {
 
                 switch (ProductInfo.RadioButtonFlg) {
                     case 1:
-                        using (SQLiteConnection con = new(GetConnectionString2())) {
+                        using (SQLiteConnection con = new(GetConnectionRegistration())) {
                             _historyTable.Clear();
 
                             var query = $"""SELECT _rowid_, * FROM "Substrate_{ProductInfo.ProductName}" WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ DESC""";
@@ -87,7 +87,7 @@ namespace ProductDatabase {
                         }
                         break;
                     case 2:
-                        using (SQLiteConnection con = new(GetConnectionString2())) {
+                        using (SQLiteConnection con = new(GetConnectionRegistration())) {
                             _historyTable.Clear();
 
                             var query = $"""SELECT _rowid_, * FROM "Product_{ProductInfo.ProductName}" WHERE ProductModel = @ProductModel ORDER BY _rowid_ DESC""";
@@ -152,7 +152,7 @@ namespace ProductDatabase {
                         }
                         break;
                     case 3:
-                        using (SQLiteConnection con = new(GetConnectionString2())) {
+                        using (SQLiteConnection con = new(GetConnectionRegistration())) {
                             _historyTable.Clear();
 
                             var query = $"""SELECT _rowid_, * FROM Reprint WHERE ProductModel = @ProductModel ORDER BY _rowid_ DESC""";
