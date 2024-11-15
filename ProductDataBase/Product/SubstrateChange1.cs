@@ -5,14 +5,15 @@ using static ProductDatabase.MainWindow;
 namespace ProductDatabase {
     public partial class SubstrateChange1 : Form {
 
-        public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
+        public ProductInfomation ProductInfo { get; }
 
         public DataTable HistoryTable { get; set; } = new();
 
         private readonly List<string> _colFilter = [];
 
-        public SubstrateChange1() {
+        public SubstrateChange1(ProductInfomation productInfo) {
             InitializeComponent();
+            ProductInfo = productInfo;
         }
 
         // ロードイベント
