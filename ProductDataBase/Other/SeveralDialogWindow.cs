@@ -20,7 +20,7 @@ namespace ProductDatabase {
             foreach (var category in ProductInfo.Category11) {
                 var type = (ProductInfo.Category14[j] == "1") ? "基板" : "製品";
 
-                if (!String.IsNullOrEmpty(ProductInfo.Category11[j])) {
+                if (!string.IsNullOrEmpty(ProductInfo.Category11[j])) {
                     var itemText = $"[{type}]  [{ProductInfo.Category13[j]}]  [{ProductInfo.Category12[j]}]  [{category}]";
 
                     // 重複チェック
@@ -30,13 +30,13 @@ namespace ProductDatabase {
                 }
                 j++;
             }
-
             SeveralListBox.SelectedIndex = 0;
         }
 
         private void SeveralDialogWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void OkButton_Click(object sender, EventArgs e) {
             SelectedIndex = SeveralListBox.SelectedIndex;
+            this.DialogResult = DialogResult.OK;
             Close();
         }
         private void SeveralListBox_KeyPress(object sender, KeyPressEventArgs e) {
