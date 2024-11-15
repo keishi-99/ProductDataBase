@@ -13,7 +13,7 @@ namespace ProductDatabase {
 
         private readonly string _settingFilePath = "./config/SubstrateConfig.xml";
 
-        private string _labelSubNSerial = String.Empty;
+        private string _labelSubNSerial = string.Empty;
 
         private int _labelSubPageNum;
         private int _labelSubNumLabelsToPrint;
@@ -38,8 +38,8 @@ namespace ProductDatabase {
                 SubstrateModelLabel2.Text = $"{ProductInfo.SubstrateName} - {ProductInfo.SubstrateModel}";
 
                 OrderNumberTextBox.Text = ProductInfo.Proness5;
-                ManufacturingNumberMaskedTextBox.Text = !String.IsNullOrEmpty(ProductInfo.Proness1) ? ProductInfo.Proness1 : ManufacturingNumberMaskedTextBox.Text;
-                QuantityTextBox.Text = (ProductInfo.Proness4 != 0) ? ProductInfo.Proness4.ToString() : String.Empty;
+                ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(ProductInfo.Proness1) ? ProductInfo.Proness1 : ManufacturingNumberMaskedTextBox.Text;
+                QuantityTextBox.Text = (ProductInfo.Proness4 != 0) ? ProductInfo.Proness4.ToString() : string.Empty;
 
                 RegisterButton.Enabled = true;
 
@@ -79,7 +79,7 @@ namespace ProductDatabase {
                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                     StockLabel2.Text = cmd.ExecuteScalar().ToString();
 
-                    // テーブル検索SQL - [Substrate_[Product_Name]]テーブルの最新の[col_Revison]を取得
+                    // テーブル検索SQL - [Substrate_[Product_Name]]テーブルの最新の[Revison]を取得
                     cmd.CommandText = $"""SELECT Revision FROM "Substrate_{ProductInfo.StockName}" WHERE SubstrateModel = @SubstrateModel AND Revision IS NOT NULL ORDER BY _rowid_ DESC""";
                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                     var result = cmd.ExecuteScalar();
@@ -119,7 +119,7 @@ namespace ProductDatabase {
                 foreach (Control control in Controls) {
                     if (control is TextBoxBase textBox && textBox.Enabled) {
                         anyTextBoxEnabled = true;
-                        if (String.IsNullOrWhiteSpace(textBox.Text)) {
+                        if (string.IsNullOrWhiteSpace(textBox.Text)) {
                             allTextBoxesFilled = false;
                             break;
                         }
@@ -130,13 +130,13 @@ namespace ProductDatabase {
 
                 if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
 
-                if (QuantityCheckBox.Checked && Int32.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
+                if (QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
 
-                if (DefectNumberCheckBox.Checked && Int32.Parse(DefectNumberTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
+                if (DefectNumberCheckBox.Checked && int.Parse(DefectNumberTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
 
                 if (!QuantityCheckBox.Checked && !DefectNumberCheckBox.Checked) { throw new Exception("数量か不良数を入力してください。"); }
 
-                if (!DefectNumberCheckBox.Checked && String.IsNullOrEmpty(PrintPostionNumericUpDown.Text)) { PrintPostionNumericUpDown.Text = "1"; }
+                if (!DefectNumberCheckBox.Checked && string.IsNullOrEmpty(PrintPostionNumericUpDown.Text)) { PrintPostionNumericUpDown.Text = "1"; }
 
                 var result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) {
@@ -180,7 +180,7 @@ namespace ProductDatabase {
 
                 // 製番が新規かチェック
                 if (ProductInfo.RegType != 0) {
-                    var substrateName = String.Empty;
+                    var substrateName = string.Empty;
                     using (var cmd = con.CreateCommand()) {
                         cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateNumber = @SubstrateNumber ORDER BY _rowid_ DESC LIMIT 1""";
                         cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
@@ -190,7 +190,7 @@ namespace ProductDatabase {
                         }
                     }
 
-                    if (substrateName != String.Empty) {
+                    if (substrateName != string.Empty) {
                         if (ProductInfo.SubstrateName == substrateName) {
                             var result = MessageBox.Show($"[{ManufacturingNumberMaskedTextBox.Text}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
                             if (result == DialogResult.No) { return false; }
@@ -219,27 +219,12 @@ namespace ProductDatabase {
                             DO UPDATE
                                 set Stock = Stock + excluded.Stock
                             """;
-                        //cmd.CommandText =
-                        //    $"""
-                        //    INSERT INTO "Stock_{ProductInfo.StockName}"
-                        //        (
-                        //        col_Flg, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, Stock
-                        //        )
-                        //    VALUES
-                        //        (
-                        //        @col_Flg, @SubstrateName, @SubstrateModel, @SubstrateNumber, @OrderNumber, @Stock
-                        //        )
-                        //        on conflict(SubstrateNumber)
-                        //    DO UPDATE
-                        //        set col_Flg = 1, Stock = Stock + excluded.Stock
-                        //    """;
 
-                        //cmd.Parameters.Add("@col_Flg", DbType.String).Value = 1;
                         cmd.Parameters.Add("@SubstrateName", DbType.String).Value = ProductInfo.SubstrateName;
                         cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
-                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
-                        cmd.Parameters.Add("@OrderNumber", DbType.String).Value = String.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? DBNull.Value : OrderNumberTextBox.Text;
-                        cmd.Parameters.Add("@Stock", DbType.String).Value = String.IsNullOrWhiteSpace(QuantityTextBox.Text) ? DBNull.Value : QuantityTextBox.Text;
+                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
+                        cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? DBNull.Value : OrderNumberTextBox.Text;
+                        cmd.Parameters.Add("@Stock", DbType.String).Value = string.IsNullOrWhiteSpace(QuantityTextBox.Text) ? DBNull.Value : QuantityTextBox.Text;
 
                         cmd.ExecuteNonQuery();
                     }
@@ -247,7 +232,7 @@ namespace ProductDatabase {
                     else if (!QuantityCheckBox.Checked && DefectNumberCheckBox.Checked) {
                         using var cmd = con.CreateCommand();
                         cmd.CommandText = $"""SELECT Stock FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateNumber = @SubstrateNumber""";
-                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
+                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
                         var intStock = Convert.ToInt32(cmd.ExecuteScalar());
 
                         if (intStock == 0) { throw new Exception("該当する製番の在庫がありません。"); }
@@ -259,23 +244,15 @@ namespace ProductDatabase {
                             $"""
                             UPDATE "Stock_{ProductInfo.StockName}" SET
                                 Stock = @Stock,
-                                col_History = ifnull(col_History, '') || @col_History
+                                History = ifnull(History, '') || @History
                             WHERE
                                 SubstrateNumber = @SubstrateNumber
                             """;
-                        //$"""
-                        //    UPDATE "Stock_{ProductInfo.StockName}" SET
-                        //        col_Flg = @col_Flg,
-                        //        Stock = @Stock,
-                        //        col_History = ifnull(col_History, '') || @col_History
-                        //    WHERE
-                        //        SubstrateNumber = @SubstrateNumber
-                        //    """;
-                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
 
-                        //cmd.Parameters.Add("@col_Flg", DbType.String).Value = intStockFlg;
+                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
+
                         cmd.Parameters.Add("@Stock", DbType.String).Value = intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text);
-                        cmd.Parameters.Add("@col_History", DbType.String).Value = $"[不良]{ManufacturingNumberMaskedTextBox.Text}";
+                        cmd.Parameters.Add("@History", DbType.String).Value = $"[不良]{ManufacturingNumberMaskedTextBox.Text}";
 
                         cmd.ExecuteNonQuery();
                     }
@@ -291,8 +268,8 @@ namespace ProductDatabase {
                             SubstrateModel,
                             SubstrateNumber,
                             OrderNumber,
-                            col_Increase,
-                            col_Defect,
+                            Increase,
+                            Defect,
                             Person,
                             RegDate,
                             Revision,
@@ -304,8 +281,8 @@ namespace ProductDatabase {
                             @SubstrateModel,
                             @SubstrateNumber,
                             @OrderNumber,
-                            @col_Increase,
-                            @col_Defect,
+                            @Increase,
+                            @Defect,
                             @Person,
                             @RegDate,
                             @Revision,
@@ -316,14 +293,14 @@ namespace ProductDatabase {
                     // チェックボックスにチェックがない場合はNullを
                     cmd.Parameters.Add("@SubstrateName", DbType.String).Value = ProductInfo.SubstrateName;
                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
-                    cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = String.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
-                    cmd.Parameters.Add("@OrderNumber", DbType.String).Value = String.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? DBNull.Value : OrderNumberTextBox.Text;
-                    cmd.Parameters.Add("@col_Increase", DbType.String).Value = QuantityCheckBox.Checked ? QuantityTextBox.Text : DBNull.Value;
-                    cmd.Parameters.Add("@col_Defect", DbType.String).Value = DefectNumberCheckBox.Checked ? DefectNumberTextBox.Text : DBNull.Value;
-                    cmd.Parameters.Add("@RegDate", DbType.String).Value = String.IsNullOrWhiteSpace(RegistrationDateMaskedTextBox.Text) ? DBNull.Value : RegistrationDateMaskedTextBox.Text;
-                    cmd.Parameters.Add("@Person", DbType.String).Value = String.IsNullOrWhiteSpace(PersonComboBox.Text) ? DBNull.Value : PersonComboBox.Text;
-                    cmd.Parameters.Add("@Revision", DbType.String).Value = String.IsNullOrWhiteSpace(RevisionTextBox.Text) ? DBNull.Value : RevisionTextBox.Text;
-                    cmd.Parameters.Add("@Comment", DbType.String).Value = String.IsNullOrWhiteSpace(CommentTextBox.Text) ? DBNull.Value : CommentTextBox.Text;
+                    cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
+                    cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? DBNull.Value : OrderNumberTextBox.Text;
+                    cmd.Parameters.Add("@Increase", DbType.String).Value = QuantityCheckBox.Checked ? QuantityTextBox.Text : DBNull.Value;
+                    cmd.Parameters.Add("@Defect", DbType.String).Value = DefectNumberCheckBox.Checked ? DefectNumberTextBox.Text : DBNull.Value;
+                    cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(RegistrationDateMaskedTextBox.Text) ? DBNull.Value : RegistrationDateMaskedTextBox.Text;
+                    cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(PersonComboBox.Text) ? DBNull.Value : PersonComboBox.Text;
+                    cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(RevisionTextBox.Text) ? DBNull.Value : RevisionTextBox.Text;
+                    cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(CommentTextBox.Text) ? DBNull.Value : CommentTextBox.Text;
 
                     cmd.ExecuteNonQuery();
                 }
@@ -343,7 +320,7 @@ namespace ProductDatabase {
                 //// PrintPageイベントハンドラの追加
                 pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
-                _labelSubNumLabelsToPrint = Int32.TryParse(QuantityTextBox.Text, out var quantity) ? quantity : 0;
+                _labelSubNumLabelsToPrint = int.TryParse(QuantityTextBox.Text, out var quantity) ? quantity : 0;
                 if (_labelSubNumLabelsToPrint == 0) {
                     throw new Exception("数量が入力されていません。");
                 }
@@ -501,7 +478,7 @@ namespace ProductDatabase {
                                     .Replace("%R", RevisionTextBox.Text)
                                     .Replace("%Y", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yy"))
                                     .Replace("%MM", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM"))
-                                    .Replace("%M", String.IsNullOrEmpty(monthCode) ? String.Empty : monthCode[^1..])
+                                    .Replace("%M", string.IsNullOrEmpty(monthCode) ? string.Empty : monthCode[^1..])
                                     .Replace("%S", serialCode);
 
             return outputCode;
@@ -532,7 +509,7 @@ namespace ProductDatabase {
         private void TemplateComment() {
             var templateWord = CommentComboBox.SelectedIndex switch {
                 0 => "[Rev.UP]変更点番号:",
-                _ => String.Empty
+                _ => string.Empty
             };
             CommentTextBox.Text = $"{CommentTextBox.Text}{templateWord}";
         }
@@ -642,7 +619,7 @@ namespace ProductDatabase {
             }
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
-            var message = String.Join(Environment.NewLine,
+            var message = string.Join(Environment.NewLine,
                 $"StrProness1\t\t[{ProductInfo.Proness1}]",
                 $"StrProness2\t\t[{ProductInfo.Proness2}]",
                 $"StrProness3\t\t[{ProductInfo.Proness3}]",

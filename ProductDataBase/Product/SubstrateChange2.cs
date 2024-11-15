@@ -9,7 +9,7 @@ namespace ProductDatabase {
 
         public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
 
-        private string _totalSubstrate = String.Empty;
+        private string _totalSubstrate = string.Empty;
 
         private string[] _useSubstrate = [];
         private string[] _usedSubstrate = [];
@@ -61,8 +61,8 @@ namespace ProductDatabase {
 
                 _useSubstrate = ProductInfo.UseSubstrate.Split(",");
                 _usedSubstrate = ProductInfo.UsedSubstrate.Split(",");
-                var strQuantity = String.Empty;
-                var strSubstrateName = String.Empty;
+                var strQuantity = string.Empty;
+                var strSubstrateName = string.Empty;
 
                 switch (ProductInfo.RegType) {
                     case 2:
@@ -95,14 +95,13 @@ namespace ProductDatabase {
                             using var dr = cmd.ExecuteReader();
                             var j = 0;
                             while (dr.Read()) {
-                                var strUsedSubNum = String.Empty;
-                                var strUsedQuantity = String.Empty;
+                                var strUsedSubNum = string.Empty;
+                                var strUsedQuantity = string.Empty;
                                 var intUsedQuantity = 0;
 
                                 // 抽出した行から製造番号,在庫取得
                                 var strSubstrateNum = $"{dr["SubstrateNumber"]}";
-                                var intStock = Int32.Parse($"{dr["Stock"]}");
-                                //var colFlg = Int32.Parse($"{dr["col_Flg"]}");
+                                var intStock = int.Parse($"{dr["Stock"]}");
                                 strSubstrateName = $"{dr["SubstrateName"]}";
                                 if (_objCbx != null) { _objCbx.Text = $"{strSubstrateName} - {_useSubstrate[i]}"; }
 
@@ -126,7 +125,7 @@ namespace ProductDatabase {
                                     strUsedQuantity = _usedSubstrate[subIndex];
                                     strUsedQuantity = strUsedQuantity[(strUsedQuantity.IndexOf('(') + 1)..];
                                     strUsedQuantity = strUsedQuantity[..strUsedQuantity.IndexOf(')')];
-                                    intUsedQuantity = Int32.Parse(strUsedQuantity);
+                                    intUsedQuantity = int.Parse(strUsedQuantity);
                                 }
 
                                 if (intStock > 0) {
@@ -260,7 +259,7 @@ namespace ProductDatabase {
             try {
                 ProductInfo.RegDate = RegistrationDateMaskedTextBox.Text;
                 ProductInfo.Person = PersonComboBox.Text;
-                if (String.IsNullOrEmpty(ProductInfo.Person)) { throw new Exception("担当者を選択してください。"); }
+                if (string.IsNullOrEmpty(ProductInfo.Person)) { throw new Exception("担当者を選択してください。"); }
 
                 switch (ProductInfo.RegType) {
                     case 2:
@@ -275,14 +274,14 @@ namespace ProductDatabase {
                                 if (objCbx.Checked) {
                                     var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
                                     var dgvRowCnt = objDgv.Rows.Count;
-                                    var subTotalTemp = String.Empty;
+                                    var subTotalTemp = string.Empty;
 
                                     for (var j = 0; j <= dgvRowCnt - 1; j++) {
                                         var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[4].Value);
                                         if (boolCbx) {
-                                            var substrateName = String.Empty;
-                                            var substrateModel = String.Empty;
-                                            var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? String.Empty;
+                                            var substrateName = string.Empty;
+                                            var substrateModel = string.Empty;
+                                            var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
                                             var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
                                             var usedValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value.ToString());
                                             var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[3].Value);
@@ -293,36 +292,14 @@ namespace ProductDatabase {
                                                     UPDATE Stock_{ProductInfo.StockName}
                                                     SET
                                                         Stock = @Stock,
-                                                        col_History = ifnull(col_History,'')|| @col_History
+                                                        History = ifnull(History,'')|| @History
                                                     WHERE
                                                         SubstrateNumber = @SubstrateNumber
                                                     """;
-                                                //cmd.CommandText =
-                                                //    $"""
-                                                //    UPDATE Stock_{ProductInfo.StockName}
-                                                //    SET
-                                                //        col_Flg = @col_Flg,
-                                                //        Stock = @Stock,
-                                                //        col_History = ifnull(col_History,'')|| @col_History
-                                                //    WHERE
-                                                //        SubstrateNumber = @SubstrateNumber
-                                                //    """;
                                                 cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNum;
 
-                                                //switch (useValue - usedValue) {
-                                                //    case int diff when diff > 0:
-                                                //        cmd.Parameters.Add("@col_Flg", DbType.String).Value = (stockValue - diff == 0) ? 0 : 1;
-                                                //        break;
-                                                //    case int diff when diff < 0:
-                                                //        cmd.Parameters.Add("@col_Flg", DbType.String).Value = 1;
-                                                //        break;
-                                                //    case int diff when diff == 0:
-                                                //        cmd.Parameters.Add("@col_Flg", DbType.String).Value = (stockValue == 0) ? 0 : 1;
-                                                //        break;
-                                                //}
-
                                                 cmd.Parameters.Add("@Stock", DbType.String).Value = stockValue + usedValue - useValue;
-                                                cmd.Parameters.Add("@col_History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue}),";
+                                                cmd.Parameters.Add("@History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue}),";
 
                                                 cmd.ExecuteNonQuery();
 
@@ -336,7 +313,7 @@ namespace ProductDatabase {
                                             }
 
                                             if (useValue != 0) {
-                                                subTotalTemp = String.IsNullOrEmpty(subTotalTemp) ? $"{substrateNum}({useValue})" : $"{subTotalTemp},{substrateNum}({useValue})";
+                                                subTotalTemp = string.IsNullOrEmpty(subTotalTemp) ? $"{substrateNum}({useValue})" : $"{subTotalTemp},{substrateNum}({useValue})";
                                             }
 
                                             // 基板テーブルへ追加
@@ -348,10 +325,10 @@ namespace ProductDatabase {
                                                         SubstrateName,
                                                         SubstrateModel,
                                                         SubstrateNumber,
-                                                        col_Decrease,
-                                                        col_Use_P_Type,
-                                                        col_Use_P_Num,
-                                                        col_Use_O_Num,
+                                                        Decrease,
+                                                        UseProductType,
+                                                        UseProductNumber,
+                                                        UseOrderNumber,
                                                         Person,
                                                         RegDate,
                                                         Comment
@@ -361,26 +338,26 @@ namespace ProductDatabase {
                                                         @SubstrateName,
                                                         @SubstrateModel,
                                                         @SubstrateNumber,
-                                                        @col_Decrease,
-                                                        @col_Use_P_Type,
-                                                        @col_Use_P_Num,
-                                                        @col_Use_O_Num,
+                                                        @Decrease,
+                                                        @UseProductType,
+                                                        @UseProductNumber,
+                                                        @UseOrderNumber,
                                                         @Person,
                                                         @RegDate,
                                                         @Comment
                                                         )
                                                     """;
 
-                                                cmd.Parameters.Add("@SubstrateName", DbType.String).Value = String.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
-                                                cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = String.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
-                                                cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = String.IsNullOrWhiteSpace(substrateNum) ? DBNull.Value : substrateNum;
-                                                cmd.Parameters.Add("@col_Decrease", DbType.String).Value = 0 - useValue;
-                                                cmd.Parameters.Add("@col_Use_P_Type", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                                                cmd.Parameters.Add("@col_Use_P_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                                                cmd.Parameters.Add("@col_Use_O_Num", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-                                                cmd.Parameters.Add("@Person", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                                                cmd.Parameters.Add("@RegDate", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                                                cmd.Parameters.Add("@Comment", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                                                cmd.Parameters.Add("@SubstrateName", DbType.String).Value = string.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
+                                                cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
+                                                cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(substrateNum) ? DBNull.Value : substrateNum;
+                                                cmd.Parameters.Add("@Decrease", DbType.String).Value = 0 - useValue;
+                                                cmd.Parameters.Add("@UseProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                                                cmd.Parameters.Add("@UseProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+                                                cmd.Parameters.Add("@UseOrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                                                cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+                                                cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                                                cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                                                 cmd.ExecuteNonQuery();
                                             }
@@ -397,10 +374,10 @@ namespace ProductDatabase {
                                             }
                                         }
                                     }
-                                    _totalSubstrate = String.IsNullOrEmpty(_totalSubstrate)
+                                    _totalSubstrate = string.IsNullOrEmpty(_totalSubstrate)
                                         ? $"[{_useSubstrate[i]}]{subTotalTemp}"
                                         : $"{_totalSubstrate},[{_useSubstrate[i]}]{subTotalTemp}";
-                                    subTotalTemp = String.Empty;
+                                    subTotalTemp = string.Empty;
                                 }
                             }
 
@@ -417,26 +394,26 @@ namespace ProductDatabase {
                                         SerialLast = @SerialLast,
                                         SerialLastNumber = @SerialLastNumber,
                                         Comment = @Comment
-                                        col_Use_Substrate = @col_Use_Substrate
+                                        UseSubstrate = @UseSubstrate
                                     WHERE
                                         ProductNumber = @ProductNumber
                                     AND
                                         SerialFirst = @SerialFirst
                                     """;
 
-                                cmd.Parameters.Add("@ProductType", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                                cmd.Parameters.Add("@ProductModel", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
-                                cmd.Parameters.Add("@OrderNumber", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-                                cmd.Parameters.Add("@ProductNumber", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+                                cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                                cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
+                                cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                                cmd.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
                                 cmd.Parameters.Add("@Quantity", DbType.String).Value = ProductInfo.Quantity;
-                                cmd.Parameters.Add("@Person", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                                cmd.Parameters.Add("@RegDate", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                                cmd.Parameters.Add("@Revision", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
-                                cmd.Parameters.Add("@SerialFirst", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.SerialFirst) ? DBNull.Value : ProductInfo.SerialFirst;
-                                cmd.Parameters.Add("@SerialLast", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
+                                cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+                                cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                                cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
+                                cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialFirst) ? DBNull.Value : ProductInfo.SerialFirst;
+                                cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
                                 cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = ProductInfo.SerialLastNumber;
-                                cmd.Parameters.Add("@col_Use_Substrate", DbType.String).Value = String.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
-                                cmd.Parameters.Add("@Comment", DbType.String).Value = String.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                                cmd.Parameters.Add("@UseSubstrate", DbType.String).Value = string.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
+                                cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                                 cmd.ExecuteNonQuery();
                             }
@@ -453,19 +430,19 @@ namespace ProductDatabase {
         // リスト印刷
         private void ListPrint() {
             try {
-                var sheetName = String.Empty;
-                var productName = String.Empty;
-                var productModel = String.Empty;
+                var sheetName = string.Empty;
+                var productName = string.Empty;
+                var productModel = string.Empty;
 
-                var productNameRange = String.Empty;
-                var productNumberRange = String.Empty;
-                var orderNumberRange = String.Empty;
-                var regDateRange = String.Empty;
-                var productModelRange = String.Empty;
-                var quantityRange = String.Empty;
-                var serialFirstRange = String.Empty;
-                var serialLastRange = String.Empty;
-                var commentRange = String.Empty;
+                var productNameRange = string.Empty;
+                var productNumberRange = string.Empty;
+                var orderNumberRange = string.Empty;
+                var regDateRange = string.Empty;
+                var productModelRange = string.Empty;
+                var quantityRange = string.Empty;
+                var serialFirstRange = string.Empty;
+                var serialLastRange = string.Empty;
+                var commentRange = string.Empty;
 
                 using FileStream fileStream = new($"{Environment.CurrentDirectory}./config/Excel/ConfigList.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using XLWorkbook workBook = new(fileStream);
@@ -534,8 +511,8 @@ namespace ProductDatabase {
                     var mainCellValue = workSheetMain.Cell(findRow, findColumn + 1).Value.ToString();
                     var tempCellValue = workSheetTemp.Cell(mainCellValue).Value.ToString();
 
-                    if (mainCellValue != String.Empty) {
-                        if (tempCellValue == String.Empty) {
+                    if (mainCellValue != string.Empty) {
+                        if (tempCellValue == string.Empty) {
                             workSheetTemp.Cell(mainCellValue).Value = $"{_listUsedProductNumber[i]}({_listUsedQuantity[i]})";
                         }
                         else {
