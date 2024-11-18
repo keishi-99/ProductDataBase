@@ -24,15 +24,18 @@ namespace ProductDatabase {
                         if (ProductInfo.RegType == 0) { CategoryRadioButton2.Visible = false; }
                         CategoryRadioButton2.Text = "在庫";
                         StockCheckBox.Visible = false;
+                        AllSubstrateCheckBox.Visible = false;
                         break;
                     case 2:
                         CategoryRadioButton2.Text = "シリアル";
                         StockCheckBox.Visible = false;
+                        AllSubstrateCheckBox.Visible = false;
                         break;
                     case 3:
                         CategoryRadioButton1.Visible = false;
                         CategoryRadioButton2.Visible = false;
                         StockCheckBox.Visible = false;
+                        AllSubstrateCheckBox.Visible = false;
                         break;
                 }
             } catch (Exception ex) {
@@ -42,6 +45,7 @@ namespace ProductDatabase {
 
         private void ViewSubstrateRegistrationLog() {
             StockCheckBox.Visible = false;
+            AllSubstrateCheckBox.Visible = false;
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new DataTable();
 
@@ -236,13 +240,25 @@ namespace ProductDatabase {
         }
         private void ViewSubstrateStockLog() {
             StockCheckBox.Visible = true;
+            AllSubstrateCheckBox.Visible = true;
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new DataTable();
 
-            var query = $"""SELECT _rowid_, * FROM "Stock_{ProductInfo.ProductName}" WHERE SubstrateModel = @SubstrateModel""";
-            if (StockCheckBox.Checked) {
-                query += " AND Stock > 0";
-            }
+            var query = $"""SELECT _rowid_, * FROM "Stock_{ProductInfo.ProductName}" """;
+
+            // 条件のリストを作成
+            List<string> conditions = [];
+
+            // AllSubstrateCheckBox がチェックされていない場合、SubstrateModel の条件を追加
+            if (!AllSubstrateCheckBox.Checked) { conditions.Add("SubstrateModel = @SubstrateModel"); }
+
+            // StockCheckBox がチェックされている場合、Stock > 0 の条件を追加
+            if (StockCheckBox.Checked) { conditions.Add("Stock > 0"); }
+
+            // 条件があれば WHERE 句を追加、なければクエリはそのまま
+            if (conditions.Count > 0) { query += "WHERE " + string.Join(" AND ", conditions); }
+
+            // 最後に ORDER BY を追加
             query += " ORDER BY _rowid_ DESC";
 
             using SQLiteCommand command = new(query, con);
@@ -390,5 +406,6 @@ namespace ProductDatabase {
         private void FilterStringTextBox_TextChanged(object sender, EventArgs e) { HistoryTableFilter(sender, e); }
         private void CategoryRadioButton_CheckedChanged(object sender, EventArgs e) { CategorySelect(sender); }
         private void StockCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }
+        private void AllSubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }
     }
 }

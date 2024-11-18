@@ -29,6 +29,7 @@
             this.CategoryRadioButton1 = new RadioButton();
             this.CategoryRadioButton2 = new RadioButton();
             this.StockCheckBox = new CheckBox();
+            this.AllSubstrateCheckBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).BeginInit();
             this.SuspendLayout();
             // 
@@ -106,11 +107,23 @@
             this.StockCheckBox.UseVisualStyleBackColor = true;
             this.StockCheckBox.CheckedChanged += this.StockCheckBox_CheckedChanged;
             // 
+            // AllSubstrateCheckBox
+            // 
+            this.AllSubstrateCheckBox.AutoSize = true;
+            this.AllSubstrateCheckBox.Location = new Point(546, 479);
+            this.AllSubstrateCheckBox.Name = "AllSubstrateCheckBox";
+            this.AllSubstrateCheckBox.Size = new Size(62, 19);
+            this.AllSubstrateCheckBox.TabIndex = 6;
+            this.AllSubstrateCheckBox.Text = "他基板";
+            this.AllSubstrateCheckBox.UseVisualStyleBackColor = true;
+            this.AllSubstrateCheckBox.CheckedChanged += this.AllSubstrateCheckBox_CheckedChanged;
+            // 
             // HistoryWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(1184, 511);
+            this.Controls.Add(this.AllSubstrateCheckBox);
             this.Controls.Add(this.StockCheckBox);
             this.Controls.Add(this.CategoryRadioButton2);
             this.Controls.Add(this.CategoryRadioButton1);
@@ -138,5 +151,6 @@
         private RadioButton CategoryRadioButton1;
         private RadioButton CategoryRadioButton2;
         private CheckBox StockCheckBox;
+        private CheckBox AllSubstrateCheckBox;
     }
 }
