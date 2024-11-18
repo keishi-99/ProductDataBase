@@ -58,6 +58,7 @@ namespace ProductDatabase {
             // データの取得とDataTableへの格納
             adapter.Fill(historyTable);
 
+            DataBaseDataGridView.Columns.Clear();
             DataBaseDataGridView.DataSource = historyTable;
 
             _listColFilter.Add("");
@@ -124,6 +125,7 @@ namespace ProductDatabase {
             // データの取得とDataTableへの格納
             adapter.Fill(historyTable);
 
+            DataBaseDataGridView.Columns.Clear();
             DataBaseDataGridView.DataSource = historyTable;
 
             _listColFilter.Add("");
@@ -190,6 +192,7 @@ namespace ProductDatabase {
             // データの取得とDataTableへの格納
             adapter.Fill(historyTable);
 
+            DataBaseDataGridView.Columns.Clear();
             DataBaseDataGridView.DataSource = historyTable;
 
             _listColFilter.Add("");
@@ -269,6 +272,7 @@ namespace ProductDatabase {
             // データの取得とDataTableへの格納
             adapter.Fill(historyTable);
 
+            DataBaseDataGridView.Columns.Clear();
             DataBaseDataGridView.DataSource = historyTable;
 
             _listColFilter.Add("");
@@ -320,6 +324,7 @@ namespace ProductDatabase {
             // データの取得とDataTableへの格納
             adapter.Fill(historyTable);
 
+            DataBaseDataGridView.Columns.Clear();
             DataBaseDataGridView.DataSource = historyTable;
 
             _listColFilter.Add("");
