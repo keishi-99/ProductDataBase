@@ -524,12 +524,11 @@ namespace ProductDatabase {
         }
         private void ShowDialogWindowForMultipleItems() {
             using SeveralDialogWindow window = new(ProductInfo);
-
-            if (window.ShowDialog(this) == DialogResult.OK) {
-                ListIndex = window.SelectedIndex;
-            }
+            window.ShowDialog(this);
+            ListIndex = window.SelectedIndex;
         }
         private void HandleSelectedItem() {
+            if (ListIndex == -1) { return; }
             _strCategory12 = ProductInfo.Category12[ListIndex];
             _strCategory13 = ProductInfo.Category13[ListIndex];
             _strCategory14 = ProductInfo.Category14[ListIndex];

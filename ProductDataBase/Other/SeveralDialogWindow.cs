@@ -5,7 +5,7 @@ namespace ProductDatabase {
 
         public ProductInfomation ProductInfo { get; }
 
-        public int SelectedIndex { get; private set; }
+        public int SelectedIndex { get; private set; } = -1;
 
         public SeveralDialogWindow(ProductInfomation productInfo) {
             InitializeComponent();
@@ -34,10 +34,11 @@ namespace ProductDatabase {
             SeveralListBox.SelectedIndex = 0;
         }
 
+        private void ReturnedIndex() { SelectedIndex = SeveralListBox.SelectedIndex; }
+
         private void SeveralDialogWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void OkButton_Click(object sender, EventArgs e) {
-            SelectedIndex = SeveralListBox.SelectedIndex;
-            this.DialogResult = DialogResult.OK;
+            ReturnedIndex();
             Close();
         }
         private void SeveralListBox_KeyPress(object sender, KeyPressEventArgs e) {
