@@ -272,7 +272,7 @@ namespace ProductDatabase {
                                 var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
 
                                 if (objCbx.Checked) {
-                                    var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
+                                    var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
                                     var dgvRowCnt = objDgv.Rows.Count;
                                     var subTotalTemp = string.Empty;
 
@@ -283,7 +283,7 @@ namespace ProductDatabase {
                                             var substrateModel = string.Empty;
                                             var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
                                             var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
-                                            var usedValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value.ToString());
+                                            var usedValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
                                             var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[3].Value);
 
                                             using (var cmd = con.CreateCommand()) {
