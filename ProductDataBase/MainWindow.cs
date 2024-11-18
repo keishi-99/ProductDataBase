@@ -90,14 +90,11 @@ namespace ProductDatabase {
 
         public ProductInfomation ProductInfo { get; set; } = new();
 
-        private int ListIndex { get; set; }
-
         private string _strCategory12 = string.Empty;
         private string _strCategory13 = string.Empty;
         private string _strCategory14 = string.Empty;
 
         private bool _isAuthorizedUser = false;
-        private static readonly string[] s_separator = ["//"];
 
         public MainWindow() {
             InitializeComponent();
@@ -432,11 +429,13 @@ namespace ProductDatabase {
                 ProcessCategoryItemData();
                 FetchDataFromSQLite();
 
+                var listIndex = -1;
                 if (ProductInfo.Category11.Count >= 2) {
-                    ShowDialogWindowForMultipleItems();
+                    listIndex = ShowDialogWindowForMultipleItems();
                 }
 
-                HandleSelectedItem();
+                if (listIndex == -1) { return; }
+                HandleSelectedItem(listIndex);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
@@ -456,7 +455,8 @@ namespace ProductDatabase {
         }
         private void ParseQRCodeInput() {
             try {
-                var arr = QRCodeTextBox.Text.Split(s_separator, StringSplitOptions.None);
+                string[] separator = ["//"];
+                var arr = QRCodeTextBox.Text.Split(separator, StringSplitOptions.None);
                 if (arr.Length != 4) { throw new Exception("QRコードが正しくありません。"); }
                 if (arr != null) {
                     ProductInfo.Proness1 = arr[0];
@@ -522,16 +522,15 @@ namespace ProductDatabase {
             ProductInfo.Category13.Add(category13);
             ProductInfo.Category14.Add(category14);
         }
-        private void ShowDialogWindowForMultipleItems() {
+        private int ShowDialogWindowForMultipleItems() {
             using SeveralDialogWindow window = new(ProductInfo);
             window.ShowDialog(this);
-            ListIndex = window.SelectedIndex;
+            return window.SelectedIndex;
         }
-        private void HandleSelectedItem() {
-            if (ListIndex == -1) { return; }
-            _strCategory12 = ProductInfo.Category12[ListIndex];
-            _strCategory13 = ProductInfo.Category13[ListIndex];
-            _strCategory14 = ProductInfo.Category14[ListIndex];
+        private void HandleSelectedItem(int listIndex) {
+            _strCategory12 = ProductInfo.Category12[listIndex];
+            _strCategory13 = ProductInfo.Category13[listIndex];
+            _strCategory14 = ProductInfo.Category14[listIndex];
 
             switch (_strCategory14) {
                 case "1":

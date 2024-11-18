@@ -6,8 +6,6 @@ namespace ProductDatabase {
 
         public ProductInfomation ProductInfo { get; }
 
-        private int _serialLastNum;
-
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
@@ -72,8 +70,8 @@ namespace ProductDatabase {
 
                     // テーブル検索SQL - [Product_[ProductName]]テーブルの最新の[SerialLastNumber]を取得
                     cmd.CommandText = $"""SELECT SerialLastNumber FROM "Product_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
-                    FirstSerialNumberTextBox.Text = int.TryParse(cmd.ExecuteScalar()?.ToString(), out _serialLastNum)
-                        ? (_serialLastNum + 1).ToString("000")
+                    FirstSerialNumberTextBox.Text = int.TryParse(cmd.ExecuteScalar()?.ToString(), out var serialLastNum)
+                        ? (serialLastNum + 1).ToString("000")
                         : throw new Exception("シリアル番号の取得に失敗しました。");
                 }
             } catch (Exception ex) {
