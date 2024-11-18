@@ -30,8 +30,8 @@ namespace ProductDatabase {
                         StockCheckBox.Visible = false;
                         break;
                     case 3:
-                        CategoryRadioButton1.Enabled = false;
-                        CategoryRadioButton2.Enabled = false;
+                        CategoryRadioButton1.Visible = false;
+                        CategoryRadioButton2.Visible = false;
                         StockCheckBox.Visible = false;
                         break;
                 }
