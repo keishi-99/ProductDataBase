@@ -238,9 +238,8 @@ namespace ProductDatabase {
 
                         if (intStock == 0) { throw new Exception("該当する製番の在庫がありません。"); }
 
-                        var intStockFlg = (intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text)) > 0
-                            ? 1
-                            : (intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text)) == 0 ? 0 : throw new Exception("不良数が在庫より多く入力されています。");
+                        if (intStock < Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text)) { throw new Exception("不良数が在庫より多く入力されています。"); }
+
                         cmd.CommandText =
                             $"""
                             UPDATE "Stock_{ProductInfo.StockName}" SET
