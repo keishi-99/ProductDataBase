@@ -70,6 +70,7 @@
             // 
             // CategoryRadioButton1
             // 
+            this.CategoryRadioButton1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.CategoryRadioButton1.Appearance = Appearance.Button;
             this.CategoryRadioButton1.Location = new Point(261, 474);
             this.CategoryRadioButton1.Name = "CategoryRadioButton1";
@@ -84,6 +85,7 @@
             // 
             // CategoryRadioButton2
             // 
+            this.CategoryRadioButton2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.CategoryRadioButton2.Appearance = Appearance.Button;
             this.CategoryRadioButton2.Location = new Point(359, 474);
             this.CategoryRadioButton2.Name = "CategoryRadioButton2";
@@ -98,6 +100,7 @@
             // 
             // StockCheckBox
             // 
+            this.StockCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.StockCheckBox.AutoSize = true;
             this.StockCheckBox.Location = new Point(457, 479);
             this.StockCheckBox.Name = "StockCheckBox";
@@ -109,6 +112,7 @@
             // 
             // AllSubstrateCheckBox
             // 
+            this.AllSubstrateCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.AllSubstrateCheckBox.AutoSize = true;
             this.AllSubstrateCheckBox.Location = new Point(546, 479);
             this.AllSubstrateCheckBox.Name = "AllSubstrateCheckBox";
