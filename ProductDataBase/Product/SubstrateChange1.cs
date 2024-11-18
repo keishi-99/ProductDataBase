@@ -63,13 +63,14 @@ namespace ProductDatabase {
                 SubstrateChangeDataGridView.Columns[7].Width = 80;
                 SubstrateChangeDataGridView.Columns[8].HeaderCell.Value = "Rev";
                 SubstrateChangeDataGridView.Columns[8].Width = 40;
-                SubstrateChangeDataGridView.Columns[9].HeaderCell.Value = "シリアル先頭";
-                SubstrateChangeDataGridView.Columns[10].HeaderCell.Value = "シリアル末尾";
-                SubstrateChangeDataGridView.Columns[11].HeaderCell.Value = "末番";
-                SubstrateChangeDataGridView.Columns[11].Width = 40;
-                SubstrateChangeDataGridView.Columns[12].HeaderCell.Value = "コメント";
-                SubstrateChangeDataGridView.Columns[13].HeaderCell.Value = "使用基板";
-                SubstrateChangeDataGridView.Columns[13].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+                SubstrateChangeDataGridView.Columns[9].HeaderCell.Value = "RevisionGroup";
+                SubstrateChangeDataGridView.Columns[10].HeaderCell.Value = "シリアル先頭";
+                SubstrateChangeDataGridView.Columns[11].HeaderCell.Value = "シリアル末尾";
+                SubstrateChangeDataGridView.Columns[12].HeaderCell.Value = "末番";
+                SubstrateChangeDataGridView.Columns[12].Width = 40;
+                SubstrateChangeDataGridView.Columns[13].HeaderCell.Value = "コメント";
+                SubstrateChangeDataGridView.Columns[14].HeaderCell.Value = "使用基板";
+                SubstrateChangeDataGridView.Columns[14].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
                 //SubstrateChangeDataGridView.Columns[13].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
 
             } catch (Exception ex) {

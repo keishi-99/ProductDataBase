@@ -156,13 +156,14 @@ namespace ProductDatabase {
             DataBaseDataGridView.Columns[7].Width = 80;
             DataBaseDataGridView.Columns[8].HeaderCell.Value = "Rev";
             DataBaseDataGridView.Columns[8].Width = 40;
-            DataBaseDataGridView.Columns[9].HeaderCell.Value = "シリアル先頭";
-            DataBaseDataGridView.Columns[10].HeaderCell.Value = "シリアル末尾";
-            DataBaseDataGridView.Columns[11].HeaderCell.Value = "末番";
-            DataBaseDataGridView.Columns[11].Width = 40;
-            DataBaseDataGridView.Columns[12].HeaderCell.Value = "コメント";
-            DataBaseDataGridView.Columns[13].HeaderCell.Value = "使用基板";
-            DataBaseDataGridView.Columns[13].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            DataBaseDataGridView.Columns[9].HeaderCell.Value = "RevisionGroup";
+            DataBaseDataGridView.Columns[10].HeaderCell.Value = "シリアル先頭";
+            DataBaseDataGridView.Columns[11].HeaderCell.Value = "シリアル末尾";
+            DataBaseDataGridView.Columns[12].HeaderCell.Value = "末番";
+            DataBaseDataGridView.Columns[12].Width = 40;
+            DataBaseDataGridView.Columns[13].HeaderCell.Value = "コメント";
+            DataBaseDataGridView.Columns[14].HeaderCell.Value = "使用基板";
+            DataBaseDataGridView.Columns[14].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
             //DataBaseDataGridView.Columns[13].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
 
             CategoryComboBox.Items.Clear();
