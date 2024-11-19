@@ -61,6 +61,7 @@ namespace ProductDatabase {
             DataBaseDataGridView.Columns.Clear();
             DataBaseDataGridView.DataSource = historyTable;
 
+            _listColFilter.Clear();
             _listColFilter.Add("");
             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
                 var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
@@ -128,6 +129,7 @@ namespace ProductDatabase {
             DataBaseDataGridView.Columns.Clear();
             DataBaseDataGridView.DataSource = historyTable;
 
+            _listColFilter.Clear();
             _listColFilter.Add("");
             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
                 var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
@@ -195,6 +197,7 @@ namespace ProductDatabase {
             DataBaseDataGridView.Columns.Clear();
             DataBaseDataGridView.DataSource = historyTable;
 
+            _listColFilter.Clear();
             _listColFilter.Add("");
             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
                 var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
@@ -275,6 +278,7 @@ namespace ProductDatabase {
             DataBaseDataGridView.Columns.Clear();
             DataBaseDataGridView.DataSource = historyTable;
 
+            _listColFilter.Clear();
             _listColFilter.Add("");
             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
                 var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
@@ -327,6 +331,7 @@ namespace ProductDatabase {
             DataBaseDataGridView.Columns.Clear();
             DataBaseDataGridView.DataSource = historyTable;
 
+            _listColFilter.Clear();
             _listColFilter.Add("");
             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
                 var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
@@ -352,8 +357,9 @@ namespace ProductDatabase {
             DataBaseDataGridView.Columns[1].HeaderCell.Value = "シリアル";
             DataBaseDataGridView.Columns[2].HeaderCell.Value = "注文番号";
             DataBaseDataGridView.Columns[3].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns[4].HeaderCell.Value = "製品型式";
-            DataBaseDataGridView.Columns[5].HeaderCell.Value = "登録日";
+            DataBaseDataGridView.Columns[4].HeaderCell.Value = "製品名";
+            DataBaseDataGridView.Columns[5].HeaderCell.Value = "製品型式";
+            DataBaseDataGridView.Columns[6].HeaderCell.Value = "登録日";
 
             CategoryComboBox.Items.Clear();
             CategoryComboBox.Items.Add("");
