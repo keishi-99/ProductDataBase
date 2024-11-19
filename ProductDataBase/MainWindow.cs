@@ -431,7 +431,7 @@ namespace ProductDatabase {
                 ProcessCategoryItemData();
                 FetchDataFromSQLite();
 
-                var listIndex = -1;
+                var listIndex = 0;
                 if (ProductInfo.Category11.Count >= 2) {
                     listIndex = ShowDialogWindowForMultipleItems();
                 }
