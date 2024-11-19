@@ -303,7 +303,7 @@ namespace ProductDatabase {
 
                                                 cmd.ExecuteNonQuery();
 
-                                                cmd.CommandText = $@"SELECT * FROM Stock_{ProductInfo.StockName} WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC";
+                                                cmd.CommandText = $"""SELECT * FROM Stock_{ProductInfo.StockName} WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC""";
                                                 cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                                                 using var dr = cmd.ExecuteReader();
                                                 while (dr.Read()) {

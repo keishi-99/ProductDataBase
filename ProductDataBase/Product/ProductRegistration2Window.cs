@@ -1325,7 +1325,7 @@ namespace ProductDatabase {
                 //List<string> _orderFirstSerialRange = new();
                 //List<string> _orderLastSerialRange = new();
 
-                //using FileStream _fileStream = new($@"{Environment.CurrentDirectory}./config/Excel/ConfigCheckSheet.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                //using FileStream _fileStream = new($"""{Environment.CurrentDirectory}./config/Excel/ConfigCheckSheet.xlsx""", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 //using XLWorkbook _workBook = new(_fileStream);
                 //IXLWorksheet _workSheet = _workBook.Worksheet("Sheet1");
 
@@ -1351,7 +1351,7 @@ namespace ProductDatabase {
                 //// 見つかった品目番号の数だけ印刷
                 //for (int _i = 0; _i < _filePath.Count; _i++) {
                 //    // チェックシート作成
-                //    using FileStream _fileStream2 = new($@"{_filePath[_i]}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                //    using FileStream _fileStream2 = new($"""{_filePath[_i]}""", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 //    using XLWorkbook _workBook2 = new(_fileStream2);
                 //    IXLWorksheet _workSheet2 = _workBook2.Worksheet(_sheetName[_i]);
 
@@ -1369,7 +1369,7 @@ namespace ProductDatabase {
 
                 //    // ワークブックを開く。
                 //    Excel.Workbooks _xlBooks = _xlApp.Workbooks;
-                //    Excel.Workbook _xlBook = _xlBooks.Open($@"{System.Environment.CurrentDirectory}./config/Excel/temporarily_{_i}.xlsx");
+                //    Excel.Workbook _xlBook = _xlBooks.Open($"""{System.Environment.CurrentDirectory}./config/Excel/temporarily_{_i}.xlsx""");
 
                 //    // ワークシートを選択
                 //    Excel.Sheets _xlSheets = _xlBook.Sheets;

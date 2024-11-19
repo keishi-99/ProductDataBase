@@ -250,22 +250,15 @@ namespace ProductDatabase {
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new DataTable();
 
-            var query = $"""SELECT _rowid_, * FROM "Stock_{ProductInfo.ProductName}" """;
+            var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
+            var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
 
-            // 条件のリストを作成
-            List<string> conditions = [];
-
-            // AllSubstrateCheckBox がチェックされていない場合、SubstrateModel の条件を追加
-            if (!AllSubstrateCheckBox.Checked) { conditions.Add("SubstrateModel = @SubstrateModel"); }
-
-            // StockCheckBox がチェックされている場合、Stock > 0 の条件を追加
-            if (StockCheckBox.Checked) { conditions.Add("Stock > 0"); }
-
-            // 条件があれば WHERE 句を追加、なければクエリはそのまま
-            if (conditions.Count > 0) { query += "WHERE " + string.Join(" AND ", conditions); }
-
-            // 最後に ORDER BY を追加
-            query += " ORDER BY _rowid_ DESC";
+            var query = $"""
+                        SELECT _rowid_, *
+                         FROM "Stock_{ProductInfo.ProductName}"
+                         WHERE 1=1{otherSubstrate}{inStock}
+                         ORDER BY _rowid_ DESC
+                        """;
 
             using SQLiteCommand command = new(query, con);
             command.Parameters.AddWithValue("@SubstrateModel", ProductInfo.SubstrateModel);
@@ -319,7 +312,6 @@ namespace ProductDatabase {
             var historyTable = new DataTable();
 
             var query = $"""SELECT _rowid_, * FROM "Serial_{ProductInfo.ProductName}" WHERE ProductModel = @ProductModel ORDER BY _rowid_ DESC""";
-            //var query = $"""SELECT _rowid_, * FROM "Stock_{ProductInfo.ProductName}" WHERE SubstrateModel = @SubstrateModel AND Stock > 0 ORDER BY _rowid_ DESC""";
             using SQLiteCommand command = new(query, con);
             command.Parameters.AddWithValue("@ProductModel", ProductInfo.ProductModel);
             // SQLiteDataAdapterのインスタンス化
