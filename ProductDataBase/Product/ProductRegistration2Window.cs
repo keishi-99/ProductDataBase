@@ -1583,25 +1583,31 @@ namespace ProductDatabase {
             ls.ShowDialog(this);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
+            var entries = new[]
+                {
+                    ("StrProductName", $"{ProductInfo.ProductName}"),
+                    ("StrProductModel", $"{ProductInfo.ProductModel}"),
+                    ("StrStockName", $"{ProductInfo.StockName}"),
+                    ("StrProductType", $"{ProductInfo.ProductType}"),
+                    ("StrOrderNumber", $"{ProductInfo.OrderNumber}"),
+                    ("StrProductNumber", $"{ProductInfo.ProductNumber}"),
+                    ("StrRevision", $"{ProductInfo.Revision}"),
+                    ("StrRegDate", $"{ProductInfo.RegDate}"),
+                    ("StrPerson", $"{ProductInfo.Person}"),
+                    ("IntQuantity", $"{ProductInfo.Quantity}"),
+                    ("IntSerialFirstNumber", $"{ProductInfo.SerialFirstNumber}"),
+                    ("IntSerialLastNumber", $"{_serialLastNumber}"),
+                    ("StrInitial", $"{ProductInfo.Initial}"),
+                    ("IntRegType", $"{ProductInfo.RegType}"),
+                    ("IntPrintType", $"{ProductInfo.PrintType}"),
+                    ("IntSerialDigit", $"{ProductInfo.SerialDigit}")
+                };
+
+            const int ColumnWidth = 15;
             var message = string.Join(Environment.NewLine,
-                $"StrProductName\t\t[{ProductInfo.ProductName}]",
-                $"StrProductModel\t\t[{ProductInfo.ProductModel}]",
-                $"StrStockName\t\t[{ProductInfo.StockName}]",
-                $"StrProductType\t\t[{ProductInfo.ProductType}]",
-                $"StrOrderNumber\t\t[{ProductInfo.OrderNumber}]",
-                $"StrProductNumber\t\t[{ProductInfo.ProductNumber}]",
-                $"StrRevision\t\t[{ProductInfo.Revision}]",
-                $"StrRegDate\t\t[{ProductInfo.RegDate}]",
-                $"StrPerson\t\t\t[{ProductInfo.Person}]",
-                $"IntQuantity\t\t[{ProductInfo.Quantity}]",
-                $"IntSerialFirstNumber\t[{ProductInfo.SerialFirstNumber}]",
-                $"IntSerialLastNumber\t\t[{_serialLastNumber}]",
-                $"StrInitial\t\t\t[{ProductInfo.Initial}]",
-                $"IntRegType\t\t[{ProductInfo.RegType}]",
-                $"IntPrintType\t\t[{ProductInfo.PrintType}]",
-                $"IntSerialDigit\t\t[{ProductInfo.SerialDigit}]"
-            );
-            MessageBox.Show(message, "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                entries.Select(entry => $"{entry.Item1,-ColumnWidth}[{entry.Item2}]"));
+
+            MessageBox.Show(message, "取得情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         private void SubstrateListPrintButton_Click(object sender, EventArgs e) { ListPrint(); }
         private void CheckSheetPrintButton_Click(object sender, EventArgs e) { CheckSheetPrint(); }
