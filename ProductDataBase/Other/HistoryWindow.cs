@@ -83,28 +83,19 @@ namespace ProductDatabase {
             DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
             DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns[0].Width = 40;
             DataBaseDataGridView.Columns[1].HeaderCell.Value = "基板名";
             DataBaseDataGridView.Columns[2].HeaderCell.Value = "基板型式";
             DataBaseDataGridView.Columns[3].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns[3].Width = 130;
             DataBaseDataGridView.Columns[4].HeaderCell.Value = "注文番号";
             DataBaseDataGridView.Columns[5].HeaderCell.Value = "追加量";
-            DataBaseDataGridView.Columns[5].Width = 70;
             DataBaseDataGridView.Columns[6].HeaderCell.Value = "減少量";
-            DataBaseDataGridView.Columns[6].Width = 70;
             DataBaseDataGridView.Columns[7].HeaderCell.Value = "不良";
-            DataBaseDataGridView.Columns[7].Width = 40;
             DataBaseDataGridView.Columns[8].HeaderCell.Value = "使用製品名";
             DataBaseDataGridView.Columns[9].HeaderCell.Value = "使用製番";
-            DataBaseDataGridView.Columns[9].Width = 130;
             DataBaseDataGridView.Columns[10].HeaderCell.Value = "使用注番";
             DataBaseDataGridView.Columns[11].HeaderCell.Value = "Rev";
-            DataBaseDataGridView.Columns[11].Width = 40;
             DataBaseDataGridView.Columns[12].HeaderCell.Value = "担当者";
-            DataBaseDataGridView.Columns[12].Width = 70;
             DataBaseDataGridView.Columns[13].HeaderCell.Value = "登録日";
-            DataBaseDataGridView.Columns[13].Width = 80;
             DataBaseDataGridView.Columns[14].HeaderCell.Value = "コメント";
 
             CategoryComboBox.Items.Clear();
@@ -151,29 +142,21 @@ namespace ProductDatabase {
             DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
             DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns[0].Width = 40;
             DataBaseDataGridView.Columns[1].HeaderCell.Value = "注文番号";
             DataBaseDataGridView.Columns[2].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns[2].Width = 130;
             DataBaseDataGridView.Columns[3].HeaderCell.Value = "製品名";
             DataBaseDataGridView.Columns[4].HeaderCell.Value = "製品型式";
             DataBaseDataGridView.Columns[5].HeaderCell.Value = "数量";
-            DataBaseDataGridView.Columns[5].Width = 40;
             DataBaseDataGridView.Columns[6].HeaderCell.Value = "担当者";
-            DataBaseDataGridView.Columns[6].Width = 70;
             DataBaseDataGridView.Columns[7].HeaderCell.Value = "登録日";
-            DataBaseDataGridView.Columns[7].Width = 80;
             DataBaseDataGridView.Columns[8].HeaderCell.Value = "Rev";
-            DataBaseDataGridView.Columns[8].Width = 40;
             DataBaseDataGridView.Columns[9].HeaderCell.Value = "RevisionGroup";
             DataBaseDataGridView.Columns[10].HeaderCell.Value = "シリアル先頭";
             DataBaseDataGridView.Columns[11].HeaderCell.Value = "シリアル末尾";
             DataBaseDataGridView.Columns[12].HeaderCell.Value = "末番";
-            DataBaseDataGridView.Columns[12].Width = 40;
             DataBaseDataGridView.Columns[13].HeaderCell.Value = "コメント";
             DataBaseDataGridView.Columns[14].HeaderCell.Value = "使用基板";
             DataBaseDataGridView.Columns[14].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            //DataBaseDataGridView.Columns[13].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
 
             CategoryComboBox.Items.Clear();
             CategoryComboBox.Items.Add("");
@@ -219,21 +202,15 @@ namespace ProductDatabase {
             DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
             DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns[0].Width = 40;
             DataBaseDataGridView.Columns[1].HeaderCell.Value = "印刷対象";
             DataBaseDataGridView.Columns[2].HeaderCell.Value = "注文番号";
             DataBaseDataGridView.Columns[3].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns[3].Width = 130;
             DataBaseDataGridView.Columns[4].HeaderCell.Value = "製品名";
             DataBaseDataGridView.Columns[5].HeaderCell.Value = "製品型式";
             DataBaseDataGridView.Columns[6].HeaderCell.Value = "数量";
-            DataBaseDataGridView.Columns[6].Width = 70;
             DataBaseDataGridView.Columns[7].HeaderCell.Value = "担当者";
-            DataBaseDataGridView.Columns[7].Width = 70;
             DataBaseDataGridView.Columns[8].HeaderCell.Value = "登録日";
-            DataBaseDataGridView.Columns[8].Width = 80;
             DataBaseDataGridView.Columns[9].HeaderCell.Value = "Rev";
-            DataBaseDataGridView.Columns[9].Width = 40;
             DataBaseDataGridView.Columns[10].HeaderCell.Value = "シリアル末尾";
             DataBaseDataGridView.Columns[11].HeaderCell.Value = "末番";
             DataBaseDataGridView.Columns[12].HeaderCell.Value = "コメント";
@@ -293,7 +270,6 @@ namespace ProductDatabase {
             DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
             DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns[0].Width = 40;
             DataBaseDataGridView.Columns[1].HeaderCell.Value = "基板名";
             DataBaseDataGridView.Columns[2].HeaderCell.Value = "基板型式";
             DataBaseDataGridView.Columns[3].HeaderCell.Value = "製造番号";
@@ -345,7 +321,6 @@ namespace ProductDatabase {
             DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
             DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns[0].Width = 40;
             DataBaseDataGridView.Columns[1].HeaderCell.Value = "シリアル";
             DataBaseDataGridView.Columns[2].HeaderCell.Value = "注文番号";
             DataBaseDataGridView.Columns[3].HeaderCell.Value = "製造番号";
