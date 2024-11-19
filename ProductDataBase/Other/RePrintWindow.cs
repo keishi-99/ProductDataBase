@@ -646,24 +646,30 @@ namespace ProductDatabase {
             Registeration();
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
+            var entries = new[]
+                {
+                    ("StrProductName", $"{ProductInfo.ProductName}"),
+                    ("StrProductModel", $"{ProductInfo.ProductModel}"),
+                    ("StrProductType", $"{ProductInfo.ProductType}"),
+                    ("StrOrderNumber", $"{_orderNumber}"),
+                    ("StrProductNumber", $"{_productNumber}"),
+                    ("StrRevision", $"{_revision}"),
+                    ("IntRegType", $"{ProductInfo.RegType}"),
+                    ("StrRegDate", $"{_regDate}"),
+                    ("StrPerson", $"{_person}"),
+                    ("IntQuantity", $"{_quantity}"),
+                    ("IntSerialFirstNumber", $"{_serialFirstNumber}"),
+                    ("IntSerialLastNumber", $"{_serialLastNumber}"),
+                    ("StrInitial", $"{ProductInfo.Initial}"),
+                    ("IntPrintType", $"{ProductInfo.PrintType}"),
+                    ("IntSerialDigit", $"{ProductInfo.SerialDigit}")
+                };
+
+            const int ColumnWidth = 15;
             var message = string.Join(Environment.NewLine,
-                $"StrProductName\t\t[{ProductInfo.ProductName}]",
-                $"StrProductModel\t\t[{ProductInfo.ProductModel}]",
-                $"StrProductType\t\t[{ProductInfo.ProductType}]",
-                $"StrOrderNumber\t\t[{_orderNumber}]",
-                $"StrProductNumber\t\t[{_productNumber}]",
-                $"StrRevision\t\t[{_revision}]",
-                $"IntRegType\t\t[{ProductInfo.RegType}]",
-                $"StrRegDate\t\t[{_regDate}]",
-                $"StrPerson\t\t\t[{_person}]",
-                $"IntQuantity\t\t[{_quantity}]",
-                $"IntSerialFirstNumber\t[{_serialFirstNumber}]",
-                $"IntSerialLastNumber\t\t[{_serialLastNumber}]",
-                $"StrInitial\t\t\t[{ProductInfo.Initial}]",
-                $"IntPrintType\t\t[{ProductInfo.PrintType}]",
-                $"IntSerialDigit\t\t[{ProductInfo.SerialDigit}]"
-            );
-            MessageBox.Show(message, "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                entries.Select(entry => $"{entry.Item1,-ColumnWidth}[{entry.Item2}]"));
+
+            MessageBox.Show(message, "取得情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }
