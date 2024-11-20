@@ -167,6 +167,7 @@
             this.CategoryListBox3.Size = new Size(350, 259);
             this.CategoryListBox3.TabIndex = 7;
             this.CategoryListBox3.SelectedIndexChanged += this.CategoryListBox3_SelectedIndexChanged;
+            this.CategoryListBox3.KeyDown += this.CategoryListBox3_KeyDown;
             // 
             // HistoryButton
             // 
