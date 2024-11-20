@@ -17,15 +17,17 @@ namespace ProductDatabase {
                 var w = Screen.PrimaryScreen.Bounds.Width;
                 DataBaseDataGridView.MaximumSize = new Size(w, h);
             }
+            DataBaseDataGridView.AllowUserToAddRows = false;
+            DataBaseDataGridView.AllowUserToDeleteRows = false;
+            DataBaseDataGridView.AllowUserToResizeRows = false;
+            DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Lavender;
+            DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(DataBaseDataGridView.Font, FontStyle.Bold);
+            DataBaseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            DataBaseDataGridView.ReadOnly = true;
+            DataBaseDataGridView.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             DataBaseDataGridView.RowTemplate.DefaultCellStyle.Padding = new Padding(5);
             DataBaseDataGridView.RowTemplate.Height += 10;
-            DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(DataBaseDataGridView.Font, FontStyle.Bold);
-            DataBaseDataGridView.RowHeadersVisible = true;
-            DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Lavender;
-            //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
-            DataBaseDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-            DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
         }
 
         private void LoadEvents() {
@@ -98,6 +100,7 @@ namespace ProductDatabase {
             DataBaseDataGridView.Columns[12].HeaderCell.Value = "担当者";
             DataBaseDataGridView.Columns[13].HeaderCell.Value = "登録日";
             DataBaseDataGridView.Columns[14].HeaderCell.Value = "コメント";
+            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
 
             CategoryComboBox.Items.Clear();
             CategoryComboBox.Items.Add("");
@@ -144,6 +147,7 @@ namespace ProductDatabase {
             DataBaseDataGridView.Columns[13].HeaderCell.Value = "コメント";
             DataBaseDataGridView.Columns[14].HeaderCell.Value = "使用基板";
             DataBaseDataGridView.Columns[14].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
 
             CategoryComboBox.Items.Clear();
             CategoryComboBox.Items.Add("");
@@ -187,6 +191,7 @@ namespace ProductDatabase {
             DataBaseDataGridView.Columns[10].HeaderCell.Value = "シリアル末尾";
             DataBaseDataGridView.Columns[11].HeaderCell.Value = "末番";
             DataBaseDataGridView.Columns[12].HeaderCell.Value = "コメント";
+            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
 
             CategoryComboBox.Items.Clear();
             CategoryComboBox.Items.Add("");
@@ -235,6 +240,7 @@ namespace ProductDatabase {
             DataBaseDataGridView.Columns[4].HeaderCell.Value = "注文番号";
             DataBaseDataGridView.Columns[5].HeaderCell.Value = "残数";
             DataBaseDataGridView.Columns[6].HeaderCell.Value = "使用履歴";
+            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
 
             CategoryComboBox.Items.Clear();
             CategoryComboBox.Items.Add("");
@@ -272,6 +278,7 @@ namespace ProductDatabase {
             DataBaseDataGridView.Columns[4].HeaderCell.Value = "製品名";
             DataBaseDataGridView.Columns[5].HeaderCell.Value = "製品型式";
             DataBaseDataGridView.Columns[6].HeaderCell.Value = "登録日";
+            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
 
             CategoryComboBox.Items.Clear();
             CategoryComboBox.Items.Add("");

@@ -35,15 +35,9 @@
             // 
             // DataBaseDataGridView
             // 
-            this.DataBaseDataGridView.AllowUserToAddRows = false;
-            this.DataBaseDataGridView.AllowUserToDeleteRows = false;
-            this.DataBaseDataGridView.AllowUserToResizeRows = false;
             this.DataBaseDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            this.DataBaseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.DataBaseDataGridView.Location = new Point(0, 0);
             this.DataBaseDataGridView.Name = "DataBaseDataGridView";
-            this.DataBaseDataGridView.ReadOnly = true;
-            this.DataBaseDataGridView.RowHeadersVisible = false;
             this.DataBaseDataGridView.Size = new Size(1184, 468);
             this.DataBaseDataGridView.TabIndex = 0;
             // 
