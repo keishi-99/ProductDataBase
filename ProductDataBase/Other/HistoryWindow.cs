@@ -11,6 +11,21 @@ namespace ProductDatabase {
         public HistoryWindow(ProductInfomation productInfo) {
             InitializeComponent();
             ProductInfo = productInfo;
+            // 最大サイズをディスプレイサイズに合わせる
+            if (Screen.PrimaryScreen != null) {
+                var h = Screen.PrimaryScreen.Bounds.Height;
+                var w = Screen.PrimaryScreen.Bounds.Width;
+                DataBaseDataGridView.MaximumSize = new Size(w, h);
+            }
+            DataBaseDataGridView.RowTemplate.DefaultCellStyle.Padding = new Padding(5);
+            DataBaseDataGridView.RowTemplate.Height += 10;
+            DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(DataBaseDataGridView.Font, FontStyle.Bold);
+            DataBaseDataGridView.RowHeadersVisible = true;
+            DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Lavender;
+            //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
+            DataBaseDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
         }
 
         private void LoadEvents() {
@@ -68,20 +83,6 @@ namespace ProductDatabase {
                 if (headerValue != null) { _listColFilter.Add(headerValue); }
             }
 
-            //最大サイズをディスプレイサイズに合わせる
-            if (Screen.PrimaryScreen != null) {
-                var h = Screen.PrimaryScreen.Bounds.Height;
-                var w = Screen.PrimaryScreen.Bounds.Width;
-                DataBaseDataGridView.MaximumSize = new Size(w, h);
-            }
-            DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(DataBaseDataGridView.Font, FontStyle.Bold);
-            DataBaseDataGridView.RowHeadersVisible = true;
-            DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
-            //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
-            DataBaseDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-            DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-
             DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
             DataBaseDataGridView.Columns[1].HeaderCell.Value = "基板名";
             DataBaseDataGridView.Columns[2].HeaderCell.Value = "基板型式";
@@ -127,20 +128,6 @@ namespace ProductDatabase {
                 if (headerValue != null) { _listColFilter.Add(headerValue); }
             }
 
-            // 最大サイズをディスプレイサイズに合わせる
-            if (Screen.PrimaryScreen != null) {
-                var h = Screen.PrimaryScreen.Bounds.Height;
-                var w = Screen.PrimaryScreen.Bounds.Width;
-                DataBaseDataGridView.MaximumSize = new Size(w, h);
-            }
-            DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(DataBaseDataGridView.Font, FontStyle.Bold);
-            DataBaseDataGridView.RowHeadersVisible = true;
-            DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
-            //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
-            DataBaseDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-            DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-
             DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
             DataBaseDataGridView.Columns[1].HeaderCell.Value = "注文番号";
             DataBaseDataGridView.Columns[2].HeaderCell.Value = "製造番号";
@@ -150,7 +137,7 @@ namespace ProductDatabase {
             DataBaseDataGridView.Columns[6].HeaderCell.Value = "担当者";
             DataBaseDataGridView.Columns[7].HeaderCell.Value = "登録日";
             DataBaseDataGridView.Columns[8].HeaderCell.Value = "Rev";
-            DataBaseDataGridView.Columns[9].HeaderCell.Value = "RevisionGroup";
+            DataBaseDataGridView.Columns[9].HeaderCell.Value = "Group";
             DataBaseDataGridView.Columns[10].HeaderCell.Value = "シリアル先頭";
             DataBaseDataGridView.Columns[11].HeaderCell.Value = "シリアル末尾";
             DataBaseDataGridView.Columns[12].HeaderCell.Value = "末番";
@@ -186,20 +173,6 @@ namespace ProductDatabase {
                 var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
                 if (headerValue != null) { _listColFilter.Add(headerValue); }
             }
-
-            // 最大サイズをディスプレイサイズに合わせる
-            if (Screen.PrimaryScreen != null) {
-                var h = Screen.PrimaryScreen.Bounds.Height;
-                var w = Screen.PrimaryScreen.Bounds.Width;
-                DataBaseDataGridView.MaximumSize = new Size(w, h);
-            }
-            DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(DataBaseDataGridView.Font, FontStyle.Bold);
-            DataBaseDataGridView.RowHeadersVisible = true;
-            DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
-            //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
-            DataBaseDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-            DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
             DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
             DataBaseDataGridView.Columns[1].HeaderCell.Value = "印刷対象";
@@ -255,20 +228,6 @@ namespace ProductDatabase {
                 if (headerValue != null) { _listColFilter.Add(headerValue); }
             }
 
-            // 最大サイズをディスプレイサイズに合わせる
-            if (Screen.PrimaryScreen != null) {
-                var h = Screen.PrimaryScreen.Bounds.Height;
-                var w = Screen.PrimaryScreen.Bounds.Width;
-                DataBaseDataGridView.MaximumSize = new Size(w, h);
-            }
-            DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(DataBaseDataGridView.Font, FontStyle.Bold);
-            DataBaseDataGridView.RowHeadersVisible = true;
-            DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
-            //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
-            DataBaseDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-            DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-
             DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
             DataBaseDataGridView.Columns[1].HeaderCell.Value = "基板名";
             DataBaseDataGridView.Columns[2].HeaderCell.Value = "基板型式";
@@ -305,20 +264,6 @@ namespace ProductDatabase {
                 var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
                 if (headerValue != null) { _listColFilter.Add(headerValue); }
             }
-
-            // 最大サイズをディスプレイサイズに合わせる
-            if (Screen.PrimaryScreen != null) {
-                var h = Screen.PrimaryScreen.Bounds.Height;
-                var w = Screen.PrimaryScreen.Bounds.Width;
-                DataBaseDataGridView.MaximumSize = new Size(w, h);
-            }
-            DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(DataBaseDataGridView.Font, FontStyle.Bold);
-            DataBaseDataGridView.RowHeadersVisible = true;
-            DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
-            //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
-            DataBaseDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-            DataBaseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
             DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
             DataBaseDataGridView.Columns[1].HeaderCell.Value = "シリアル";
