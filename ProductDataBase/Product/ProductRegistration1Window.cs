@@ -71,7 +71,7 @@ namespace ProductDatabase {
                     // テーブル検索SQL - [Product_[ProductName]]テーブルの最新の[SerialLastNumber]を取得
                     cmd.CommandText = $"""SELECT SerialLastNumber FROM "Product_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
                     FirstSerialNumberTextBox.Text = int.TryParse(cmd.ExecuteScalar()?.ToString(), out var serialLastNum)
-                        ? (serialLastNum + 1).ToString("000")
+                        ? (serialLastNum + 1).ToString()
                         : throw new Exception("シリアル番号の取得に失敗しました。");
                 }
             } catch (Exception ex) {
