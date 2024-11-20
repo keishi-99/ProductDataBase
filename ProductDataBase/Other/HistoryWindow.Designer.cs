@@ -44,7 +44,6 @@
             this.DataBaseDataGridView.Name = "DataBaseDataGridView";
             this.DataBaseDataGridView.ReadOnly = true;
             this.DataBaseDataGridView.RowHeadersVisible = false;
-            this.DataBaseDataGridView.RowTemplate.Height = 21;
             this.DataBaseDataGridView.Size = new Size(1184, 468);
             this.DataBaseDataGridView.TabIndex = 0;
             // 
