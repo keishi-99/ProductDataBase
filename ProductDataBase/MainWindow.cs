@@ -153,6 +153,7 @@ namespace ProductDatabase {
             try {
                 ResetFields();
 
+                if (CategoryListBox3.SelectedIndex == -1) { return; }
                 switch (ProductInfo.RadioButtonFlg) {
                     case 1:
                         HandleSubstrateRegistration();
@@ -419,6 +420,7 @@ namespace ProductDatabase {
         // QRコード読み取り
         private void CodeScan() {
             try {
+                if (string.IsNullOrWhiteSpace(QRCodeTextBox.Text)) { return; }
                 ResetFieldsForCodeScan();
 
                 if (RadioButtonQR.Checked) {
@@ -626,9 +628,12 @@ namespace ProductDatabase {
         private void CategoryListBox3_SelectedIndexChanged(object sender, EventArgs e) { CategoryListBox3Select(); }
         private void CategoryRadioButton_CheckedChanged(object sender, EventArgs e) { CategorySelect(sender); }
         private void FontSize_CheckedChanged(object sender, EventArgs e) { FontChange(sender); }
+        private void CategoryListBox3_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode != Keys.Enter) { return; }
+            Registration();
+        }
         private void QRCodeTextBox_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode != Keys.Enter) { return; }
-            if (string.IsNullOrWhiteSpace(QRCodeTextBox.Text)) { return; }
             CodeScan();
         }
         private void QRCodeButton_Click(object sender, EventArgs e) { CodeScan(); }
