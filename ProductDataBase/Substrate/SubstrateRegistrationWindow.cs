@@ -238,7 +238,7 @@ namespace ProductDatabase {
 
                         if (intStock == 0) { throw new Exception("該当する製番の在庫がありません。"); }
 
-                        if (intStock < Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text)) { throw new Exception("不良数が在庫より多く入力されています。"); }
+                        if (intStock < Convert.ToInt32(QuantityTextBox.Text)) { throw new Exception("不良数が在庫より多く入力されています。"); }
 
                         cmd.CommandText =
                             $"""
@@ -251,8 +251,8 @@ namespace ProductDatabase {
 
                         cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
 
-                        cmd.Parameters.Add("@Stock", DbType.String).Value = intStock - Convert.ToInt32(ManufacturingNumberMaskedTextBox.Text);
-                        cmd.Parameters.Add("@History", DbType.String).Value = $"[不良]{ManufacturingNumberMaskedTextBox.Text}";
+                        cmd.Parameters.Add("@Stock", DbType.String).Value = intStock - Convert.ToInt32(QuantityTextBox.Text);
+                        cmd.Parameters.Add("@History", DbType.String).Value = $"[不良]{QuantityTextBox.Text}";
 
                         cmd.ExecuteNonQuery();
                     }
