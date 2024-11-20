@@ -193,8 +193,10 @@ namespace ProductDatabase {
 
                     if (substrateName != string.Empty) {
                         if (ProductInfo.SubstrateName == substrateName) {
-                            var result = MessageBox.Show($"[{ManufacturingNumberMaskedTextBox.Text}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
-                            if (result == DialogResult.No) { return false; }
+                            if (QuantityCheckBox.Checked && !DefectNumberCheckBox.Checked) {
+                                var result = MessageBox.Show($"[{ManufacturingNumberMaskedTextBox.Text}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
+                                if (result == DialogResult.No) { return false; }
+                            }
                         }
                         else { throw new Exception($"[{ManufacturingNumberMaskedTextBox.Text}]は[{substrateName}]として在庫があります。確認してください。"); }
                     }
@@ -238,21 +240,24 @@ namespace ProductDatabase {
 
                         if (intStock == 0) { throw new Exception("該当する製番の在庫がありません。"); }
 
-                        if (intStock < Convert.ToInt32(QuantityTextBox.Text)) { throw new Exception("不良数が在庫より多く入力されています。"); }
+                        if (intStock < Convert.ToInt32(DefectNumberTextBox.Text)) { throw new Exception("不良数が在庫より多く入力されています。"); }
 
                         cmd.CommandText =
                             $"""
                             UPDATE "Stock_{ProductInfo.StockName}" SET
                                 Stock = @Stock,
-                                History = ifnull(History, '') || @History
+                                History = CASE
+                                              WHEN ifnull(History, '') = '' THEN @History
+                                              ELSE History || ',' || @History
+                                          END
                             WHERE
                                 SubstrateNumber = @SubstrateNumber
                             """;
 
                         cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
 
-                        cmd.Parameters.Add("@Stock", DbType.String).Value = intStock - Convert.ToInt32(QuantityTextBox.Text);
-                        cmd.Parameters.Add("@History", DbType.String).Value = $"[不良]{QuantityTextBox.Text}";
+                        cmd.Parameters.Add("@Stock", DbType.String).Value = intStock - Convert.ToInt32(DefectNumberTextBox.Text);
+                        cmd.Parameters.Add("@History", DbType.String).Value = $"[不良]{DefectNumberTextBox.Text}";
 
                         cmd.ExecuteNonQuery();
                     }
@@ -296,7 +301,7 @@ namespace ProductDatabase {
                     cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
                     cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? DBNull.Value : OrderNumberTextBox.Text;
                     cmd.Parameters.Add("@Increase", DbType.String).Value = QuantityCheckBox.Checked ? QuantityTextBox.Text : DBNull.Value;
-                    cmd.Parameters.Add("@Defect", DbType.String).Value = DefectNumberCheckBox.Checked ? DefectNumberTextBox.Text : DBNull.Value;
+                    cmd.Parameters.Add("@Defect", DbType.String).Value = DefectNumberCheckBox.Checked ? $"-{DefectNumberTextBox.Text}" : DBNull.Value;
                     cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(RegistrationDateMaskedTextBox.Text) ? DBNull.Value : RegistrationDateMaskedTextBox.Text;
                     cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(PersonComboBox.Text) ? DBNull.Value : PersonComboBox.Text;
                     cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(RevisionTextBox.Text) ? DBNull.Value : RevisionTextBox.Text;

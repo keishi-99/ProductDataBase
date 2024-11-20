@@ -544,7 +544,10 @@ namespace ProductDatabase {
                                                 $"""
                                                 UPDATE "Stock_{ProductInfo.StockName}" SET
                                                     Stock = @Stock,
-                                                    History = ifnull(History,'')|| @History
+                                                    History = CASE
+                                                                  WHEN ifnull(History, '') = '' THEN @History
+                                                                  ELSE History || ',' || @History
+                                                              END
                                                 WHERE
                                                     SubstrateNumber = @SubstrateNumber
                                                 """;
@@ -552,7 +555,7 @@ namespace ProductDatabase {
                                             cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
 
                                             cmd.Parameters.Add("@Stock", DbType.String).Value = stockValue - useValue;
-                                            cmd.Parameters.Add("@History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue}),";
+                                            cmd.Parameters.Add("@History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue})";
 
                                             cmd.ExecuteNonQuery();
 

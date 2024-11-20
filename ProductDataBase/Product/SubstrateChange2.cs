@@ -292,7 +292,10 @@ namespace ProductDatabase {
                                                     UPDATE Stock_{ProductInfo.StockName}
                                                     SET
                                                         Stock = @Stock,
-                                                        History = ifnull(History,'')|| @History
+                                                        History = CASE
+                                                                      WHEN ifnull(History, '') = '' THEN @History
+                                                                      ELSE History || ',' || @History
+                                                                  END
                                                     WHERE
                                                         SubstrateNumber = @SubstrateNumber
                                                     """;
