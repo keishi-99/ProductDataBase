@@ -127,7 +127,7 @@ namespace ProductDatabase {
                     }
                 }
                 if (!anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
-                if (!allTextBoxesFilled) { throw new Exception("空欄があります。"); }
+                if (!allTextBoxesFilled || (PersonCheckBox.Checked && string.IsNullOrWhiteSpace(PersonComboBox.Text))) { throw new Exception("空欄があります。"); }
 
                 if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
 
@@ -176,6 +176,15 @@ namespace ProductDatabase {
         }
         private bool Registration() {
             try {
+                var substrateNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
+                var orderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
+                var quantity = string.IsNullOrWhiteSpace(QuantityTextBox.Text) ? 0 : Convert.ToInt32(QuantityTextBox.Text);
+                var defectNumber = string.IsNullOrWhiteSpace(DefectNumberTextBox.Text) ? 0 : Convert.ToInt32(DefectNumberTextBox);
+                var registrationDate = RegistrationDateCheckBox.Checked ? RegistrationDateMaskedTextBox.Text : string.Empty;
+                var person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
+                var revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
+                var comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
+
                 using SQLiteConnection con = new(GetConnectionRegistration());
                 con.Open();
 
@@ -184,7 +193,7 @@ namespace ProductDatabase {
                     var substrateName = string.Empty;
                     using (var cmd = con.CreateCommand()) {
                         cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateNumber = @SubstrateNumber ORDER BY _rowid_ DESC LIMIT 1""";
-                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = ManufacturingNumberMaskedTextBox.Text;
+                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNumber;
                         using var dr = cmd.ExecuteReader();
                         while (dr.Read()) {
                             substrateName = $"{dr["SubstrateName"]}";
@@ -194,11 +203,11 @@ namespace ProductDatabase {
                     if (substrateName != string.Empty) {
                         if (ProductInfo.SubstrateName == substrateName) {
                             if (QuantityCheckBox.Checked && !DefectNumberCheckBox.Checked) {
-                                var result = MessageBox.Show($"[{ManufacturingNumberMaskedTextBox.Text}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
+                                var result = MessageBox.Show($"[{substrateNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
                                 if (result == DialogResult.No) { return false; }
                             }
                         }
-                        else { throw new Exception($"[{ManufacturingNumberMaskedTextBox.Text}]は[{substrateName}]として在庫があります。確認してください。"); }
+                        else { throw new Exception($"[{substrateNumber}]は[{substrateName}]として在庫があります。確認してください。"); }
                     }
                 }
 
@@ -225,9 +234,9 @@ namespace ProductDatabase {
 
                         cmd.Parameters.Add("@SubstrateName", DbType.String).Value = ProductInfo.SubstrateName;
                         cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
-                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
-                        cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? DBNull.Value : OrderNumberTextBox.Text;
-                        cmd.Parameters.Add("@Stock", DbType.String).Value = string.IsNullOrWhiteSpace(QuantityTextBox.Text) ? DBNull.Value : QuantityTextBox.Text;
+                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber;
+                        cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(orderNumber) ? DBNull.Value : orderNumber;
+                        cmd.Parameters.Add("@Stock", DbType.String).Value = quantity;
 
                         cmd.ExecuteNonQuery();
                     }
@@ -235,12 +244,12 @@ namespace ProductDatabase {
                     else if (!QuantityCheckBox.Checked && DefectNumberCheckBox.Checked) {
                         using var cmd = con.CreateCommand();
                         cmd.CommandText = $"""SELECT Stock FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateNumber = @SubstrateNumber""";
-                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
+                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber;
                         var intStock = Convert.ToInt32(cmd.ExecuteScalar());
 
                         if (intStock == 0) { throw new Exception("該当する製番の在庫がありません。"); }
 
-                        if (intStock < Convert.ToInt32(DefectNumberTextBox.Text)) { throw new Exception("不良数が在庫より多く入力されています。"); }
+                        if (intStock < defectNumber) { throw new Exception("不良数が在庫より多く入力されています。"); }
 
                         cmd.CommandText =
                             $"""
@@ -254,10 +263,10 @@ namespace ProductDatabase {
                                 SubstrateNumber = @SubstrateNumber
                             """;
 
-                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
+                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber;
 
-                        cmd.Parameters.Add("@Stock", DbType.String).Value = intStock - Convert.ToInt32(DefectNumberTextBox.Text);
-                        cmd.Parameters.Add("@History", DbType.String).Value = $"[不良]{DefectNumberTextBox.Text}";
+                        cmd.Parameters.Add("@Stock", DbType.String).Value = intStock - defectNumber;
+                        cmd.Parameters.Add("@History", DbType.String).Value = $"[不良]{defectNumber}";
 
                         cmd.ExecuteNonQuery();
                     }
@@ -298,14 +307,14 @@ namespace ProductDatabase {
                     // チェックボックスにチェックがない場合はNullを
                     cmd.Parameters.Add("@SubstrateName", DbType.String).Value = ProductInfo.SubstrateName;
                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
-                    cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ManufacturingNumberMaskedTextBox.Text) ? DBNull.Value : ManufacturingNumberMaskedTextBox.Text;
-                    cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? DBNull.Value : OrderNumberTextBox.Text;
-                    cmd.Parameters.Add("@Increase", DbType.String).Value = QuantityCheckBox.Checked ? QuantityTextBox.Text : DBNull.Value;
-                    cmd.Parameters.Add("@Defect", DbType.String).Value = DefectNumberCheckBox.Checked ? $"-{DefectNumberTextBox.Text}" : DBNull.Value;
-                    cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(RegistrationDateMaskedTextBox.Text) ? DBNull.Value : RegistrationDateMaskedTextBox.Text;
-                    cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(PersonComboBox.Text) ? DBNull.Value : PersonComboBox.Text;
-                    cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(RevisionTextBox.Text) ? DBNull.Value : RevisionTextBox.Text;
-                    cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(CommentTextBox.Text) ? DBNull.Value : CommentTextBox.Text;
+                    cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber;
+                    cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(orderNumber) ? DBNull.Value : orderNumber;
+                    cmd.Parameters.Add("@Increase", DbType.String).Value = QuantityCheckBox.Checked ? quantity : DBNull.Value;
+                    cmd.Parameters.Add("@Defect", DbType.String).Value = DefectNumberCheckBox.Checked ? $"-{defectNumber}" : DBNull.Value;
+                    cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(registrationDate) ? DBNull.Value : registrationDate;
+                    cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(person) ? DBNull.Value : person;
+                    cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(revision) ? DBNull.Value : revision;
+                    cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(comment) ? DBNull.Value : comment;
 
                     cmd.ExecuteNonQuery();
                 }
@@ -371,7 +380,7 @@ namespace ProductDatabase {
                 var intervalX = SettingsLabelSub.LabelSubPageSettings.IntervalX;
                 var intervalY = SettingsLabelSub.LabelSubPageSettings.IntervalY;
                 var headerPos = SettingsLabelSub.LabelSubPageSettings.HeaderPos;
-                var offset = new Point(0, 0);
+                var offset = new System.Drawing.Point(0, 0);
                 const double MM_PER_HUNDREDTH_INCH = 0.254;
 
                 var pd = (PrintDocument)sender;
@@ -381,11 +390,11 @@ namespace ProductDatabase {
                     offsetX -= e.PageSettings.HardMarginX * 0.254;
                     offsetY -= e.PageSettings.HardMarginY * 0.254;
                     offset = _labelSubPageNum == 0
-                        ? new Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
-                        : new Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
+                        ? new System.Drawing.Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
+                        : new System.Drawing.Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
                 else {
-                    offset = new Point(0, 0);
+                    offset = new System.Drawing.Point(0, 0);
                 }
 
                 e.PageSettings.Margins.Left = 0;

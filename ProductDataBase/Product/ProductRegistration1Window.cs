@@ -96,7 +96,7 @@ namespace ProductDatabase {
                     }
                 }
                 if (!anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
-                if (!allTextBoxesFilled) { throw new Exception("空欄があります。"); }
+                if (!allTextBoxesFilled || (PersonCheckBox.Checked && string.IsNullOrWhiteSpace(PersonComboBox.Text))) { throw new Exception("空欄があります。"); }
 
                 if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
 
@@ -120,12 +120,12 @@ namespace ProductDatabase {
 
                 RegisterButton.Enabled = false;
 
-                ProductInfo.OrderNumber = OrderNumberTextBox.Text;
-                ProductInfo.ProductNumber = ManufacturingNumberMaskedTextBox.Text;
-                ProductInfo.RegDate = RegistrationDateMaskedTextBox.Text;
-                ProductInfo.Person = PersonComboBox.Text;
-                ProductInfo.Revision = RevisionTextBox.Text;
-                ProductInfo.Comment = CommentTextBox.Text;
+                ProductInfo.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
+                ProductInfo.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
+                ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateMaskedTextBox.Text : string.Empty;
+                ProductInfo.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
+                ProductInfo.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
+                ProductInfo.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
                 ProductInfo.Quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception("QuantityTextBox.Text is null"));
                 ProductInfo.SerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception("FirstSerialNumberTextBox.Text is null"));
                 using ProductRegistration2Window window = new();
@@ -172,21 +172,15 @@ namespace ProductDatabase {
                     if (checkBox.Checked) {
                         ExtraCheckBox1.Checked = false;
                     }
-
                     break;
                 case "DefectNumberCheckBox":
                     ExtraTextBox1.Enabled = checkBox.Checked;
                     if (checkBox.Checked) {
                         QuantityCheckBox.Checked = false;
                     }
-
                     break;
                 case "RevisionCheckBox":
                     RevisionTextBox.Enabled = checkBox.Checked;
-                    if (checkBox.Checked) {
-                        MessageBox.Show("変更する場合は理由を記載して下さい。");
-                    }
-
                     break;
                 case "ExtraCheckBox1":
                     ExtraTextBox2.Enabled = checkBox.Checked;
