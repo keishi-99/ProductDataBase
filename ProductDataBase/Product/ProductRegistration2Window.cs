@@ -430,6 +430,7 @@ namespace ProductDatabase {
                                 Person,
                                 RegDate,
                                 Revision,
+                                RevisionGroup,
                                 Comment
                                 )
                             VALUES
@@ -442,6 +443,7 @@ namespace ProductDatabase {
                                 @Person,
                                 @RegDate,
                                 @Revision,
+                                @RevisionGroup,
                                 @Comment
                                 )
                             """;
@@ -454,6 +456,7 @@ namespace ProductDatabase {
                         cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
                         cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
                         cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
+                        cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
                         cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                         cmd.ExecuteNonQuery();
@@ -477,6 +480,7 @@ namespace ProductDatabase {
                                 Person,
                                 RegDate,
                                 Revision,
+                                RevisionGroup,
                                 SerialFirst,
                                 SerialLast,
                                 SerialLastNumber,
@@ -492,6 +496,7 @@ namespace ProductDatabase {
                                 @Person,
                                 @RegDate,
                                 @Revision,
+                                @RevisionGroup,
                                 @SerialFirst,
                                 @SerialLast,
                                 @SerialLastNumber,
@@ -507,6 +512,7 @@ namespace ProductDatabase {
                         cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
                         cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
                         cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
+                        cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
                         cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(_serialFirst) ? DBNull.Value : _serialFirst;
                         cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(_serialLast) ? DBNull.Value : _serialLast;
                         cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = _serialLastNumber;
@@ -650,6 +656,7 @@ namespace ProductDatabase {
                                     Person,
                                     RegDate,
                                     Revision,
+                                    RevisionGroup,
                                     SerialFirst,
                                     SerialLast,
                                     SerialLastNumber,
@@ -666,6 +673,7 @@ namespace ProductDatabase {
                                     @Person,
                                     @RegDate,
                                     @Revision,
+                                    @RevisionGroup
                                     @SerialFirst,
                                     @SerialLast,
                                     @SerialLastNumber,
@@ -682,6 +690,7 @@ namespace ProductDatabase {
                             cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
                             cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
                             cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
+                            cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
                             cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(_serialFirst) ? DBNull.Value : _serialFirst;
                             cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(_serialLast) ? DBNull.Value : _serialLast;
                             cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = _serialLastNumber;

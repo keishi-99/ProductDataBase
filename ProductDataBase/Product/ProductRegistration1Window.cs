@@ -253,6 +253,7 @@ namespace ProductDatabase {
                     ("StrProductName", $"{ProductInfo.ProductName}"),
                     ("StrStockName", $"{ProductInfo.StockName}"),
                     ("StrProductModel", $"{ProductInfo.ProductModel}"),
+                    ("RevisionGroup", $"{ProductInfo.RevisionGroup}"),
                     ("StrInitial", $"{ProductInfo.Initial}"),
                     ("IntRegType", $"{ProductInfo.RegType}"),
                     ("IntPrintType", $"{ProductInfo.PrintType}"),
