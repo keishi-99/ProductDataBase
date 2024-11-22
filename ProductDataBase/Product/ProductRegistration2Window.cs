@@ -644,6 +644,7 @@ namespace ProductDatabase {
                         }
 
                         using (var cmd = con.CreateCommand()) {
+                            MessageBox.Show(_serialFirst);
                             cmd.CommandText =
                                 $"""
                                  INSERT INTO "Product_{ProductInfo.ProductName}"
@@ -673,7 +674,7 @@ namespace ProductDatabase {
                                     @Person,
                                     @RegDate,
                                     @Revision,
-                                    @RevisionGroup
+                                    @RevisionGroup,
                                     @SerialFirst,
                                     @SerialLast,
                                     @SerialLastNumber,
@@ -682,9 +683,9 @@ namespace ProductDatabase {
                                     )
                                 """;
 
+                            cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
                             cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
                             cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
-                            cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
                             cmd.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
                             cmd.Parameters.Add("@Quantity", DbType.String).Value = ProductInfo.Quantity;
                             cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
@@ -694,8 +695,8 @@ namespace ProductDatabase {
                             cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(_serialFirst) ? DBNull.Value : _serialFirst;
                             cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(_serialLast) ? DBNull.Value : _serialLast;
                             cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = _serialLastNumber;
-                            cmd.Parameters.Add("@UseSubstrate", DbType.String).Value = string.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
                             cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                            cmd.Parameters.Add("@UseSubstrate", DbType.String).Value = string.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
 
                             cmd.ExecuteNonQuery();
                         }
