@@ -644,7 +644,6 @@ namespace ProductDatabase {
                         }
 
                         using (var cmd = con.CreateCommand()) {
-                            MessageBox.Show(_serialFirst);
                             cmd.CommandText =
                                 $"""
                                  INSERT INTO "Product_{ProductInfo.ProductName}"
