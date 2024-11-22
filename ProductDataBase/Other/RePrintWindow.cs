@@ -127,7 +127,7 @@ namespace ProductDatabase {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [ProductName]テーブルの[SubstrateModel]列の[Revision]を取得
-                    cmd.CommandText = $"""SELECT Revision FROM "Product_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
+                    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.ProductName}_Product" ORDER BY _rowid_ DESC""";
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
                 }

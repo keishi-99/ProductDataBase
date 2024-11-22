@@ -63,13 +63,13 @@ namespace ProductDatabase {
                 using (SQLiteConnection con = new(GetConnectionRegistration())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
-                    // テーブル検索SQL - [Product_[ProductName]]テーブルの最新の[Revision]を取得
-                    cmd.CommandText = $"""SELECT Revision FROM "Product_{ProductInfo.ProductName}" WHERE RevisionGroup = "{ProductInfo.RevisionGroup}" ORDER BY _rowid_ DESC""";
+                    // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
+                    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.ProductName}_Product" WHERE RevisionGroup = "{ProductInfo.RevisionGroup}" ORDER BY _rowid_ DESC""";
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
 
-                    // テーブル検索SQL - [Product_[ProductName]]テーブルの最新の[SerialLastNumber]を取得
-                    cmd.CommandText = $"""SELECT SerialLastNumber FROM "Product_{ProductInfo.ProductName}" ORDER BY _rowid_ DESC""";
+                    // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[SerialLastNumber]を取得
+                    cmd.CommandText = $"""SELECT SerialLastNumber FROM "{ProductInfo.ProductName}_Product" ORDER BY _rowid_ DESC""";
                     FirstSerialNumberTextBox.Text = int.TryParse(cmd.ExecuteScalar()?.ToString(), out var serialLastNum)
                         ? (serialLastNum + 1).ToString()
                         : throw new Exception("シリアル番号の取得に失敗しました。");

@@ -23,7 +23,7 @@ namespace ProductDatabase {
 
                 using SQLiteConnection con = new(GetConnectionRegistration());
                 HistoryTable.Clear();
-                using SQLiteDataAdapter adapter = new($"SELECT _rowid_, * FROM Product_{ProductInfo.ProductName} WHERE ProductModel = '{ProductInfo.ProductModel}' ORDER BY _rowid_ DESC", con);
+                using SQLiteDataAdapter adapter = new($"SELECT _rowid_, * FROM {ProductInfo.ProductName}_Product WHERE ProductModel = '{ProductInfo.ProductModel}' ORDER BY _rowid_ DESC", con);
                 adapter.Fill(HistoryTable);
 
                 SubstrateChangeDataGridView.DataSource = HistoryTable;

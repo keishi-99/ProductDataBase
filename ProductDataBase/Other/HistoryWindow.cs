@@ -66,7 +66,7 @@ namespace ProductDatabase {
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new DataTable();
 
-            var query = $"""SELECT _rowid_, * FROM "Substrate_{ProductInfo.ProductName}" WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ DESC""";
+            var query = $"""SELECT _rowid_, * FROM "{ProductInfo.ProductName}_Substrate" WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ DESC""";
             using SQLiteCommand command = new(query, con);
             command.Parameters.AddWithValue("@SubstrateModel", ProductInfo.SubstrateModel);
             // SQLiteDataAdapterのインスタンス化
@@ -112,7 +112,7 @@ namespace ProductDatabase {
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new DataTable();
 
-            var query = $"""SELECT _rowid_, * FROM "Product_{ProductInfo.ProductName}" WHERE ProductModel = @ProductModel ORDER BY _rowid_ DESC""";
+            var query = $"""SELECT _rowid_, * FROM "{ProductInfo.ProductName}_Product" WHERE ProductModel = @ProductModel ORDER BY _rowid_ DESC""";
             using SQLiteCommand command = new(query, con);
             command.Parameters.AddWithValue("@ProductModel", ProductInfo.ProductModel);
             // SQLiteDataAdapterのインスタンス化
@@ -210,7 +210,7 @@ namespace ProductDatabase {
 
             var query = $"""
                         SELECT _rowid_, *
-                         FROM "Stock_{ProductInfo.ProductName}"
+                         FROM "{ProductInfo.ProductName}_Stock"
                          WHERE 1=1{otherSubstrate}{inStock}
                          ORDER BY _rowid_ DESC
                         """;
@@ -252,7 +252,7 @@ namespace ProductDatabase {
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new DataTable();
 
-            var query = $"""SELECT _rowid_, * FROM "Serial_{ProductInfo.ProductName}" WHERE ProductModel = @ProductModel ORDER BY _rowid_ DESC""";
+            var query = $"""SELECT _rowid_, * FROM "{ProductInfo.ProductName}_Serial" WHERE ProductModel = @ProductModel ORDER BY _rowid_ DESC""";
             using SQLiteCommand command = new(query, con);
             command.Parameters.AddWithValue("@ProductModel", ProductInfo.ProductModel);
             // SQLiteDataAdapterのインスタンス化
