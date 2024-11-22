@@ -38,7 +38,6 @@ namespace ProductDatabase {
         private string _serialType = string.Empty;
         private string _strSerialFirstNumber = string.Empty;
         private string _strSerialLastNumber = string.Empty;
-        private bool _serialUnderbar = false;
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
@@ -271,7 +270,6 @@ namespace ProductDatabase {
 
             _labelProNumLabelsToPrint = _quantity;
             _labelProPageNum = 1;
-            _serialUnderbar = false;
 
             switch (printFlg) {
                 case 1:
@@ -393,10 +391,15 @@ namespace ProductDatabase {
                         var posX = (float)(offsetX + (x * (intervalX + sizeX)));
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
 
-                        _serialUnderbar = ProductInfo.PrintType == 4 && _remainingCount == 1;
+                        // タイプ4の場合、最後のラベルに下線をつける
+                        var fontUnderline = ProductInfo.PrintType == 4 && _remainingCount == 1;
 
-                        var generatedCode = GenerateCode(_labelProNSerial);
-                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1);
+                        // タイプ9かつ最終行の場合はシリアルを型式下3桁に
+                        var generatedCode = ProductInfo.PrintType != 9 || _remainingCount != 1
+                            ? GenerateCode(_labelProNSerial)
+                            : ProductInfo.ProductModel[^4..];
+
+                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)sizeX, (float)sizeY);
 
                         _labelProNSerial++;
@@ -477,7 +480,7 @@ namespace ProductDatabase {
 
             return outputCode;
         }
-        private Bitmap MakeLabelImage(string text, int resolution, int magnitude) {
+        private Bitmap MakeLabelImage(string text, int resolution, int magnitude, bool fontUnderline) {
             Bitmap labelImage = new(1, 1);
             Graphics g;
             SizeF stringSize;
@@ -506,7 +509,7 @@ namespace ProductDatabase {
                                         SettingsLabelPro.LabelProLabelSettings.StringPosY,
                                         (decimal)SettingsLabelPro.LabelProLabelSettings.Font.SizeInPoints,
                                         SettingsLabelPro.LabelProLabelSettings.Font.Name,
-                                        _serialUnderbar);
+                                        fontUnderline);
 
                     labelImage = new((int)sizeX, (int)sizeY);
                     g = Graphics.FromImage(labelImage);
