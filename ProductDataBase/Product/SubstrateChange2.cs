@@ -89,8 +89,8 @@ namespace ProductDatabase {
                             con.Open();
 
                             using var cmd = con.CreateCommand();
-                            // テーブル検索SQL - Stock_[ProductName]テーブルを在庫数フラグ有&基板型式[Model]で抽出して取得
-                            cmd.CommandText = $"SELECT * FROM Stock_{ProductInfo.StockName} WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC";
+                            // テーブル検索SQL - [[ProductName]_Stock] テーブルを在庫数フラグ有&基板型式[Model]で抽出して取得
+                            cmd.CommandText = $"SELECT * FROM {ProductInfo.StockName}_Stock WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC";
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using var dr = cmd.ExecuteReader();
                             var j = 0;
@@ -289,7 +289,7 @@ namespace ProductDatabase {
                                             using (var cmd = con.CreateCommand()) {
                                                 cmd.CommandText =
                                                     $"""
-                                                    UPDATE Stock_{ProductInfo.StockName}
+                                                    UPDATE {ProductInfo.StockName}_Stock
                                                     SET
                                                         Stock = @Stock,
                                                         History = CASE
@@ -306,7 +306,7 @@ namespace ProductDatabase {
 
                                                 cmd.ExecuteNonQuery();
 
-                                                cmd.CommandText = $"""SELECT * FROM Stock_{ProductInfo.StockName} WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC""";
+                                                cmd.CommandText = $"""SELECT * FROM {ProductInfo.StockName}_Stock WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC""";
                                                 cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                                                 using var dr = cmd.ExecuteReader();
                                                 while (dr.Read()) {
@@ -323,7 +323,7 @@ namespace ProductDatabase {
                                             using (var cmd = con.CreateCommand()) {
                                                 cmd.CommandText =
                                                     $"""
-                                                    INSERT INTO Substrate_{ProductInfo.StockName}
+                                                    INSERT INTO {ProductInfo.StockName}_Substrate
                                                         (
                                                         SubstrateName,
                                                         SubstrateModel,
@@ -388,7 +388,7 @@ namespace ProductDatabase {
                             using (var cmd = con.CreateCommand()) {
                                 cmd.CommandText =
                                     $"""
-                                    UPDATE Product_{ProductInfo.ProductName}
+                                    UPDATE {ProductInfo.ProductName}_Product
                                     SET
                                         Quantity = @Quantity,
                                         Person = @Person,

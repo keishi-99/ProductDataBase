@@ -75,13 +75,13 @@ namespace ProductDatabase {
                     using SQLiteConnection con = new(GetConnectionRegistration());
                     con.Open();
                     using var cmd = con.CreateCommand();
-                    // テーブル検索SQL - Stock_[ProductName]テーブルの[SubstrateModel]列の[Stock]の合計を取得
-                    cmd.CommandText = $"""SELECT total(Stock) FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateModel = @SubstrateModel""";
+                    // テーブル検索SQL - [[ProductName]_Stock]テーブルの[SubstrateModel]列の[Stock]の合計を取得
+                    cmd.CommandText = $"""SELECT total(Stock) FROM "{ProductInfo.StockName}_Stock" WHERE SubstrateModel = @SubstrateModel""";
                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                     StockLabel2.Text = cmd.ExecuteScalar().ToString();
 
-                    // テーブル検索SQL - [Substrate_[ProductName]]テーブルの最新の[Revison]を取得
-                    cmd.CommandText = $"""SELECT Revision FROM "Substrate_{ProductInfo.StockName}" WHERE SubstrateModel = @SubstrateModel AND Revision IS NOT NULL ORDER BY _rowid_ DESC""";
+                    // テーブル検索SQL - [[ProductName]_Substrate]テーブルの最新の[Revison]を取得
+                    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.StockName}_Substrate" WHERE SubstrateModel = @SubstrateModel AND Revision IS NOT NULL ORDER BY _rowid_ DESC""";
                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
@@ -192,7 +192,7 @@ namespace ProductDatabase {
                 if (ProductInfo.RegType != 0) {
                     var substrateName = string.Empty;
                     using (var cmd = con.CreateCommand()) {
-                        cmd.CommandText = $"""SELECT * FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateNumber = @SubstrateNumber ORDER BY _rowid_ DESC LIMIT 1""";
+                        cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_Stock" WHERE SubstrateNumber = @SubstrateNumber ORDER BY _rowid_ DESC LIMIT 1""";
                         cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNumber;
                         using var dr = cmd.ExecuteReader();
                         while (dr.Read()) {
@@ -219,7 +219,7 @@ namespace ProductDatabase {
                         using var cmd = con.CreateCommand();
                         cmd.CommandText =
                             $"""
-                            INSERT INTO "Stock_{ProductInfo.StockName}"
+                            INSERT INTO "{ProductInfo.StockName}_Stock"
                                 (
                                 SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, Stock
                                 )
@@ -243,7 +243,7 @@ namespace ProductDatabase {
                     //不良処理
                     else if (!QuantityCheckBox.Checked && DefectNumberCheckBox.Checked) {
                         using var cmd = con.CreateCommand();
-                        cmd.CommandText = $"""SELECT Stock FROM "Stock_{ProductInfo.StockName}" WHERE SubstrateNumber = @SubstrateNumber""";
+                        cmd.CommandText = $"""SELECT Stock FROM "{ProductInfo.StockName}_Stock" WHERE SubstrateNumber = @SubstrateNumber""";
                         cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber;
                         var intStock = Convert.ToInt32(cmd.ExecuteScalar());
 
@@ -253,7 +253,7 @@ namespace ProductDatabase {
 
                         cmd.CommandText =
                             $"""
-                            UPDATE "Stock_{ProductInfo.StockName}" SET
+                            UPDATE "{ProductInfo.StockName}_Stock" SET
                                 Stock = @Stock,
                                 History = CASE
                                               WHEN ifnull(History, '') = '' THEN @History
@@ -276,7 +276,7 @@ namespace ProductDatabase {
                 using (var cmd = con.CreateCommand()) {
                     cmd.CommandText =
                         $"""
-                        INSERT INTO "Substrate_{ProductInfo.ProductName}"
+                        INSERT INTO "{ProductInfo.ProductName}_Substrate"
                             (
                             SubstrateName,
                             SubstrateModel,
