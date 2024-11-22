@@ -1106,7 +1106,7 @@ namespace ProductDatabase {
                         // タイプ9かつ最終行の場合はシリアルを型式下3桁に
                         var generatedCode = ProductInfo.PrintType != 9 || remainingCount != 1
                             ? GenerateCode(_labelProNSerial)
-                            : ProductInfo.ProductModel[^3..];
+                            : ProductInfo.ProductModel[^4..];
 
                         var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)sizeX, (float)sizeY);
