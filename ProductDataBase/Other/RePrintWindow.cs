@@ -394,7 +394,7 @@ namespace ProductDatabase {
                         // タイプ4の場合、最後のラベルに下線をつける
                         var fontUnderline = ProductInfo.PrintType == 4 && _remainingCount == 1;
 
-                        // タイプ9かつ最終行の場合はシリアルを型式下3桁に
+                        // タイプ9かつ最終行の場合はシリアルを型式下4桁に
                         var generatedCode = ProductInfo.PrintType != 9 || _remainingCount != 1
                             ? GenerateCode(_labelProNSerial)
                             : ProductInfo.ProductModel[^4..];
