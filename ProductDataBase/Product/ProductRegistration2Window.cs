@@ -582,7 +582,7 @@ namespace ProductDatabase {
                                         using (var cmd = con.CreateCommand()) {
                                             cmd.CommandText =
                                                 $"""
-                                                INSERT INTO ""
+                                                INSERT INTO "{ProductInfo.StockName}_Substrate"
                                                     (
                                                     SubstrateName,
                                                     SubstrateModel,
