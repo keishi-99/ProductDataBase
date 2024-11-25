@@ -79,6 +79,7 @@ namespace ProductDatabase {
                             _objDgv = Controls[_dataGridViewNames[i]] as DataGridView;
                             if (_objDgv != null) {
                                 _objDgv.RowHeadersWidth = 30;
+                                _objDgv.Columns[1].DefaultCellStyle.BackColor = Color.LightGray;
                                 _objDgv.Columns[2].DefaultCellStyle.BackColor = Color.LightGray;
                                 _objDgv.Columns[2].ReadOnly = true;
                                 _objDgv.Columns[3].ReadOnly = false;
