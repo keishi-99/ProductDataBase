@@ -23,80 +23,79 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            SubstrateChangeDataGridView = new DataGridView();
-            label1 = new Label();
-            FilterStringTextBox = new TextBox();
-            OKButton = new Button();
-            ((System.ComponentModel.ISupportInitialize)SubstrateChangeDataGridView).BeginInit();
-            SuspendLayout();
+            this.SubstrateChangeDataGridView = new DataGridView();
+            this.label1 = new Label();
+            this.FilterStringTextBox = new TextBox();
+            this.OKButton = new Button();
+            ((System.ComponentModel.ISupportInitialize)this.SubstrateChangeDataGridView).BeginInit();
+            this.SuspendLayout();
             // 
             // SubstrateChangeDataGridView
             // 
-            SubstrateChangeDataGridView.AllowUserToAddRows = false;
-            SubstrateChangeDataGridView.AllowUserToDeleteRows = false;
-            SubstrateChangeDataGridView.AllowUserToResizeRows = false;
-            SubstrateChangeDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            SubstrateChangeDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            SubstrateChangeDataGridView.Location = new Point(0, 0);
-            SubstrateChangeDataGridView.MultiSelect = false;
-            SubstrateChangeDataGridView.Name = "SubstrateChangeDataGridView";
-            SubstrateChangeDataGridView.ReadOnly = true;
-            SubstrateChangeDataGridView.RowHeadersVisible = false;
-            SubstrateChangeDataGridView.RowTemplate.Height = 21;
-            SubstrateChangeDataGridView.Size = new Size(1184, 300);
-            SubstrateChangeDataGridView.TabIndex = 1;
+            this.SubstrateChangeDataGridView.AllowUserToAddRows = false;
+            this.SubstrateChangeDataGridView.AllowUserToDeleteRows = false;
+            this.SubstrateChangeDataGridView.AllowUserToResizeRows = false;
+            this.SubstrateChangeDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            this.SubstrateChangeDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.SubstrateChangeDataGridView.Location = new Point(0, 0);
+            this.SubstrateChangeDataGridView.MultiSelect = false;
+            this.SubstrateChangeDataGridView.Name = "SubstrateChangeDataGridView";
+            this.SubstrateChangeDataGridView.ReadOnly = true;
+            this.SubstrateChangeDataGridView.RowHeadersVisible = false;
+            this.SubstrateChangeDataGridView.RowTemplate.Height = 21;
+            this.SubstrateChangeDataGridView.Size = new Size(1184, 300);
+            this.SubstrateChangeDataGridView.TabIndex = 1;
             // 
             // label1
             // 
-            label1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            label1.AutoSize = true;
-            label1.Location = new Point(10, 315);
-            label1.Name = "label1";
-            label1.Size = new Size(98, 15);
-            label1.TabIndex = 2;
-            label1.Text = "製造番号フィルター";
+            this.label1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            this.label1.AutoSize = true;
+            this.label1.Location = new Point(10, 315);
+            this.label1.Name = "label1";
+            this.label1.Size = new Size(98, 15);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "製造番号フィルター";
             // 
             // FilterStringTextBox
             // 
-            FilterStringTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            FilterStringTextBox.Location = new Point(12, 330);
-            FilterStringTextBox.MaxLength = 50;
-            FilterStringTextBox.Name = "FilterStringTextBox";
-            FilterStringTextBox.Size = new Size(100, 23);
-            FilterStringTextBox.TabIndex = 3;
+            this.FilterStringTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            this.FilterStringTextBox.Location = new Point(12, 330);
+            this.FilterStringTextBox.MaxLength = 50;
+            this.FilterStringTextBox.Name = "FilterStringTextBox";
+            this.FilterStringTextBox.Size = new Size(100, 23);
+            this.FilterStringTextBox.TabIndex = 3;
             // 
             // OKButton
             // 
-            OKButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            OKButton.Location = new Point(118, 328);
-            OKButton.Name = "OKButton";
-            OKButton.Size = new Size(75, 25);
-            OKButton.TabIndex = 4;
-            OKButton.Text = "OK";
-            OKButton.UseVisualStyleBackColor = true;
-            OKButton.Click += OKButton_Click;
+            this.OKButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            this.OKButton.Location = new Point(118, 328);
+            this.OKButton.Name = "OKButton";
+            this.OKButton.Size = new Size(75, 25);
+            this.OKButton.TabIndex = 4;
+            this.OKButton.Text = "OK";
+            this.OKButton.UseVisualStyleBackColor = true;
+            this.OKButton.Click += this.OKButton_Click;
             // 
             // SubstrateChange1
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1184, 361);
-            Controls.Add(OKButton);
-            Controls.Add(FilterStringTextBox);
-            Controls.Add(label1);
-            Controls.Add(SubstrateChangeDataGridView);
-            Font = new Font("Meiryo UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            MaximizeBox = false;
-            MinimizeBox = false;
-            Name = "SubstrateChange1";
-            ShowIcon = false;
-            ShowInTaskbar = false;
-            StartPosition = FormStartPosition.CenterParent;
-            Text = "変更候補";
-            Load += SubstrateChange1_Load;
-            ((System.ComponentModel.ISupportInitialize)SubstrateChangeDataGridView).EndInit();
-            ResumeLayout(false);
-            PerformLayout();
+            this.AutoScaleDimensions = new SizeF(7F, 15F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.ClientSize = new Size(1184, 361);
+            this.Controls.Add(this.OKButton);
+            this.Controls.Add(this.FilterStringTextBox);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.SubstrateChangeDataGridView);
+            this.Font = new Font("Meiryo UI", 9F);
+            this.MinimizeBox = false;
+            this.Name = "SubstrateChange1";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
+            this.StartPosition = FormStartPosition.CenterParent;
+            this.Text = "変更候補";
+            this.Load += this.SubstrateChange1_Load;
+            ((System.ComponentModel.ISupportInitialize)this.SubstrateChangeDataGridView).EndInit();
+            this.ResumeLayout(false);
+            this.PerformLayout();
         }
 
         #endregion
