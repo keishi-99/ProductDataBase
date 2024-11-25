@@ -377,7 +377,7 @@ namespace ProductDatabase {
                     case 2:
                     case 3:
                     case 4:
-                        selectedRows = ProductInfo.ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductName ASC");
+                        selectedRows = ProductInfo.ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductType ASC");
                         HashSet<string> productTypes = new(selectedRows.AsEnumerable()
                                                                                 .Select(x => x.Field<string>("ProductType"))
                                                                                 .Where(x => x != null)
