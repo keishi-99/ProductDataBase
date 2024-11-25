@@ -87,9 +87,9 @@ namespace ProductDatabase {
 
                             using SQLiteConnection con = new(GetConnectionRegistration());
                             con.Open();
-
                             using var cmd = con.CreateCommand();
-                            // テーブル検索SQL - [[ProductName]_Stock] テーブルを基板型式[Model]で抽出して取得
+
+                            // テーブル検索SQL - [[StockName]_Stock]テーブルから基板型式[Model]で在庫基板を抽出
                             cmd.CommandText = $"SELECT * FROM {ProductInfo.StockName}_Stock WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC";
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using var dr = cmd.ExecuteReader();
@@ -398,7 +398,7 @@ namespace ProductDatabase {
                                         SerialLast = @SerialLast,
                                         SerialLastNumber = @SerialLastNumber,
                                         Comment = @Comment
-                                        UseSubstrate = @UseSubstrate
+                                        UsedSubstrate = @UsedSubstrate
                                     WHERE
                                         ProductNumber = @ProductNumber
                                     AND
@@ -417,7 +417,7 @@ namespace ProductDatabase {
                                 cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialFirst) ? DBNull.Value : ProductInfo.SerialFirst;
                                 cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
                                 cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = ProductInfo.SerialLastNumber;
-                                cmd.Parameters.Add("@UseSubstrate", DbType.String).Value = string.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
+                                cmd.Parameters.Add("@UsedSubstrate", DbType.String).Value = string.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
                                 cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                                 cmd.ExecuteNonQuery();

@@ -661,7 +661,7 @@ namespace ProductDatabase {
                                     SerialLast,
                                     SerialLastNumber,
                                     Comment,
-                                    UseSubstrate
+                                    UsedSubstrate
                                     )
                                 VALUES
                                     (
@@ -678,7 +678,7 @@ namespace ProductDatabase {
                                     @SerialLast,
                                     @SerialLastNumber,
                                     @Comment,
-                                    @UseSubstrate
+                                    @UsedSubstrate
                                     )
                                 """;
 
@@ -695,7 +695,7 @@ namespace ProductDatabase {
                             cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(_serialLast) ? DBNull.Value : _serialLast;
                             cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = _serialLastNumber;
                             cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
-                            cmd.Parameters.Add("@UseSubstrate", DbType.String).Value = string.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
+                            cmd.Parameters.Add("@UsedSubstrate", DbType.String).Value = string.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
 
                             cmd.ExecuteNonQuery();
                         }
