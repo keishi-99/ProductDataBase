@@ -88,6 +88,17 @@ namespace ProductDatabase {
                 }
                 else { StockLabel2.Text = "---"; }
 
+                switch (ProductInfo.PrintType) {
+                    case 0:
+                        PrintRowLabel.Visible = false;
+                        PrintPostionNumericUpDown.Visible = false;
+                        PrintOnlyCheckBox.Visible = false;
+                        PrintButton.Visible = false;
+                        break;
+                    default:
+                        break;
+                }
+
                 if (File.Exists(_settingFilePath) == false) { throw new Exception("設定ファイルが見つかりませんでした"); }
                 SettingsLabelSub = new CSettingsLabelSub();
                 LoadSettings(_settingFilePath);
