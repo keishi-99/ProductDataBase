@@ -229,6 +229,24 @@ namespace ProductDatabase {
 
                 switch (ProductInfo.PrintType) {
                     case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 8:
+                    case 9:
+                        SubstrateListPrintButton.Visible = false;
+                        CheckSheetPrintButton.Visible = false;
+                        break;
+                    case 5:
+                        CheckSheetPrintButton.Visible = false;
+                        break;
+                    case 7:
+                        SubstrateListPrintButton.Visible = false;
+                        break;
+                }
+
+                switch (ProductInfo.PrintType) {
+                    case 1:
                     case 4:
                     case 5:
                     case 6:
@@ -237,6 +255,7 @@ namespace ProductDatabase {
                         SettingsLabelPro = new CSettingsLabelPro();
                         _strLabelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
 
+                        if (ProductInfo.PrintType == 1) { SubstrateListPrintButton.Visible = false; }
                         SerialPrintPostionLabel.Visible = true;
                         SerialPrintPostionNumericUpDown.Visible = true;
                         BarcodePrintPostionLabel.Visible = false;
