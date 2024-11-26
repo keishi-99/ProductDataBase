@@ -559,7 +559,6 @@ namespace ProductDatabase {
                     break;
                 case "RevisionCheckBox":
                     RevisionTextBox.Enabled = checkBox.Checked;
-                    if (checkBox.Checked) { MessageBox.Show("変更する場合は理由を記載して下さい。"); }
                     break;
                 case "ExtraCheckBox1":
                     ExtraTextBox1.Enabled = checkBox.Checked;
