@@ -809,57 +809,61 @@ namespace ProductDatabase {
 
             var productModel = string.Empty;
 
-            // 製番が新規かチェック
-            using (var cmd = con.CreateCommand()) {
-                cmd.CommandText = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE ProductNumber = @ProductNumber ORDER BY _rowid_ ASC LIMIT 1""";
-                cmd.Parameters.Add("@ProductNumber", DbType.String).Value = ProductInfo.ProductNumber;
+            if (!string.IsNullOrEmpty(ProductInfo.ProductNumber)) {
+                // 製番が新規かチェック
+                using (var cmd = con.CreateCommand()) {
+                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE ProductNumber = @ProductNumber ORDER BY _rowid_ ASC LIMIT 1""";
+                    cmd.Parameters.Add("@ProductNumber", DbType.String).Value = ProductInfo.ProductNumber;
 
-                using var dr = cmd.ExecuteReader();
-                while (dr.Read()) {
-                    productModel = $"{dr["ProductModel"]}";
-                }
-            }
-
-            if (productModel != string.Empty) {
-                if (productModel == ProductInfo.ProductModel) {
-                    Activate();
-                    var result = MessageBox.Show($"製番[{ProductInfo.ProductNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
-                    if (result == DialogResult.No) {
-                        return false;
+                    using var dr = cmd.ExecuteReader();
+                    while (dr.Read()) {
+                        productModel = $"{dr["ProductModel"]}";
                     }
                 }
-                else {
-                    Activate();
-                    MessageBox.Show($"[{ProductInfo.ProductNumber}]は[{productModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
+
+                if (productModel != string.Empty) {
+                    if (productModel == ProductInfo.ProductModel) {
+                        Activate();
+                        var result = MessageBox.Show($"製番[{ProductInfo.ProductNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
+                        if (result == DialogResult.No) {
+                            return false;
+                        }
+                    }
+                    else {
+                        Activate();
+                        MessageBox.Show($"[{ProductInfo.ProductNumber}]は[{productModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return false;
+                    }
                 }
             }
 
             productModel = string.Empty;
 
-            // 注文番号が新規かチェック
-            using (var cmd = con.CreateCommand()) {
-                cmd.CommandText = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE OrderNumber = @OrderNumber ORDER BY _rowid_ ASC LIMIT 1""";
-                cmd.Parameters.Add("@OrderNumber", DbType.String).Value = ProductInfo.OrderNumber;
+            if (!string.IsNullOrEmpty(ProductInfo.OrderNumber)) {
+                // 注文番号が新規かチェック
+                using (var cmd = con.CreateCommand()) {
+                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE OrderNumber = @OrderNumber ORDER BY _rowid_ ASC LIMIT 1""";
+                    cmd.Parameters.Add("@OrderNumber", DbType.String).Value = ProductInfo.OrderNumber;
 
-                using var dr = cmd.ExecuteReader();
-                while (dr.Read()) {
-                    productModel = $"{dr["ProductModel"]}";
-                }
-            }
-
-            if (productModel != string.Empty) {
-                if (productModel == ProductInfo.ProductModel) {
-                    Activate();
-                    var result = MessageBox.Show($"注文番号[{ProductInfo.OrderNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
-                    if (result == DialogResult.No) {
-                        return false;
+                    using var dr = cmd.ExecuteReader();
+                    while (dr.Read()) {
+                        productModel = $"{dr["ProductModel"]}";
                     }
                 }
-                else {
-                    Activate();
-                    MessageBox.Show($"[{ProductInfo.OrderNumber}]は[{productModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
+
+                if (productModel != string.Empty) {
+                    if (productModel == ProductInfo.ProductModel) {
+                        Activate();
+                        var result = MessageBox.Show($"注文番号[{ProductInfo.OrderNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
+                        if (result == DialogResult.No) {
+                            return false;
+                        }
+                    }
+                    else {
+                        Activate();
+                        MessageBox.Show($"[{ProductInfo.OrderNumber}]は[{productModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return false;
+                    }
                 }
             }
 
