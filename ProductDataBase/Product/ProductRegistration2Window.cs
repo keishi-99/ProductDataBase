@@ -1034,7 +1034,7 @@ namespace ProductDatabase {
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
                 System.Drawing.Point headerPos = new(0, 0);
                 var headerString = string.Empty;
-                Font headerFooterFont = new("Arial", 6);
+                Font headerFooterFont = new("ＭＳ Ｐ明朝", 5.25F);
                 var serialCodePrintCopies = 0;
                 var remainingCount = 0;
 
