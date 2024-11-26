@@ -323,7 +323,7 @@ namespace ProductDatabase {
                 var startLineLabel = (int)PrintPostionNumericUpDown.Value - 1;
                 Point headerPos = new(0, 0);
                 var headerString = string.Empty;
-                Font headerFooterFont = new("Arial", 6);
+                Font headerFooterFont = new("ＭＳ Ｐ明朝", 5.25F);
                 var serialCodePrintCopies = 0;
 
                 var maxX = 0;
