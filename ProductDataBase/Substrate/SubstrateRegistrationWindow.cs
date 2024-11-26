@@ -90,6 +90,7 @@ namespace ProductDatabase {
 
                 switch (ProductInfo.PrintType) {
                     case 0:
+                        RevisionCheckBox.Visible = false;
                         PrintRowLabel.Visible = false;
                         PrintPostionNumericUpDown.Visible = false;
                         PrintOnlyCheckBox.Visible = false;
