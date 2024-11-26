@@ -330,9 +330,9 @@ namespace ProductDatabase {
                                                         SubstrateModel,
                                                         SubstrateNumber,
                                                         Decrease,
-                                                        UseProductType,
-                                                        UseProductNumber,
-                                                        UseOrderNumber,
+                                                        UsedProductType,
+                                                        UsedProductNumber,
+                                                        UsedOrderNumber,
                                                         Person,
                                                         RegDate,
                                                         Comment
@@ -343,9 +343,9 @@ namespace ProductDatabase {
                                                         @SubstrateModel,
                                                         @SubstrateNumber,
                                                         @Decrease,
-                                                        @UseProductType,
-                                                        @UseProductNumber,
-                                                        @UseOrderNumber,
+                                                        @UsedProductType,
+                                                        @UsedProductNumber,
+                                                        @UsedOrderNumber,
                                                         @Person,
                                                         @RegDate,
                                                         @Comment
@@ -356,9 +356,9 @@ namespace ProductDatabase {
                                                 cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
                                                 cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(substrateNum) ? DBNull.Value : substrateNum;
                                                 cmd.Parameters.Add("@Decrease", DbType.String).Value = 0 - useValue;
-                                                cmd.Parameters.Add("@UseProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                                                cmd.Parameters.Add("@UseProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                                                cmd.Parameters.Add("@UseOrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                                                cmd.Parameters.Add("@UsedProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                                                cmd.Parameters.Add("@UsedProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+                                                cmd.Parameters.Add("@UsedOrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
                                                 cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
                                                 cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
                                                 cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
