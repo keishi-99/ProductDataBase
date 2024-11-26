@@ -553,7 +553,7 @@ namespace ProductDatabase {
                                                     Stock = @Stock,
                                                     History = CASE
                                                                   WHEN ifnull(History, '') = '' THEN @History
-                                                                  ELSE History || ',' || @History
+                                                                  ELSE History || ',' || char(10) || @History
                                                               END
                                                 WHERE
                                                     SubstrateNumber = @SubstrateNumber
@@ -562,7 +562,7 @@ namespace ProductDatabase {
                                             cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
 
                                             cmd.Parameters.Add("@Stock", DbType.String).Value = stockValue - useValue;
-                                            cmd.Parameters.Add("@History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue})";
+                                            cmd.Parameters.Add("@History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue}){Environment.NewLine}";
 
                                             cmd.ExecuteNonQuery();
 
@@ -639,7 +639,7 @@ namespace ProductDatabase {
                                 }
                                 _totalSubstrate = string.IsNullOrEmpty(_totalSubstrate)
                                     ? $"[{_useSubstrate[i]}]{subTotalTemp}"
-                                    : $"{_totalSubstrate},[{_useSubstrate[i]}]{subTotalTemp}";
+                                    : $"{_totalSubstrate},{Environment.NewLine}[{_useSubstrate[i]}]{subTotalTemp}";
                                 subTotalTemp = string.Empty;
                             }
                         }

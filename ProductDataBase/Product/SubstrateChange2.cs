@@ -295,7 +295,7 @@ namespace ProductDatabase {
                                                         Stock = @Stock,
                                                         History = CASE
                                                                       WHEN ifnull(History, '') = '' THEN @History
-                                                                      ELSE History || ',' || @History
+                                                                      ELSE History || ',' || char(10) || @History
                                                                   END
                                                     WHERE
                                                         SubstrateNumber = @SubstrateNumber
@@ -380,7 +380,7 @@ namespace ProductDatabase {
                                     }
                                     _totalSubstrate = string.IsNullOrEmpty(_totalSubstrate)
                                         ? $"[{_useSubstrate[i]}]{subTotalTemp}"
-                                        : $"{_totalSubstrate},[{_useSubstrate[i]}]{subTotalTemp}";
+                                        : $"{_totalSubstrate},{Environment.NewLine}[{_useSubstrate[i]}]{subTotalTemp}";
                                     subTotalTemp = string.Empty;
                                 }
                             }
