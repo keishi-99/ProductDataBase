@@ -67,25 +67,23 @@ namespace ProductDatabase {
                 }
 
                 switch (ProductInfo.PrintType) {
-                    case 0:
-                        LabelPrintButton.Enabled = false;
-                        BarcodePrintButton.Enabled = false;
-                        break;
                     case 1:
                     case 4:
                     case 5:
                     case 6:
                     case 7:
+                        バーコード印刷設定ToolStripMenuItem.Enabled = false;
+                        バーコード印刷プレビューToolStripMenuItem.Enabled = false;
                         SettingsLabelPro = new CSettingsLabelPro();
                         _labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
-                        LabelPrintButton.Enabled = true;
-                        BarcodePrintButton.Enabled = false;
+                        BarcodePrintButton.Visible = false;
                         break;
                     case 2:
+                        シリアルラベル印刷設定ToolStripMenuItem.Enabled = false;
+                        シリアルラベル印刷プレビューToolStripMenuItem.Enabled = false;
                         SettingsBarcodePro = new CSettingsBarcodePro();
                         _barcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
-                        LabelPrintButton.Enabled = false;
-                        BarcodePrintButton.Enabled = true;
+                        LabelPrintButton.Visible = false;
                         break;
                     case 3:
                         SettingsLabelPro = new CSettingsLabelPro();
@@ -96,12 +94,20 @@ namespace ProductDatabase {
                         BarcodePrintButton.Enabled = true;
                         break;
                     case 8:
+                        バーコード印刷設定ToolStripMenuItem.Enabled = false;
+                        バーコード印刷プレビューToolStripMenuItem.Enabled = false;
                         SettingsLabelPro = new CSettingsLabelPro();
                         _labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
-                        LabelPrintButton.Enabled = false;
-                        BarcodePrintButton.Enabled = false;
+                        LabelPrintButton.Visible = false;
+                        BarcodePrintButton.Visible = false;
                         break;
                     default:
+                        LabelPrintButton.Visible = false;
+                        BarcodePrintButton.Visible = false;
+                        シリアルラベル印刷設定ToolStripMenuItem.Enabled = false;
+                        シリアルラベル印刷プレビューToolStripMenuItem.Enabled = false;
+                        バーコード印刷設定ToolStripMenuItem.Enabled = false;
+                        バーコード印刷プレビューToolStripMenuItem.Enabled = false;
                         break;
                 }
 
@@ -160,71 +166,15 @@ namespace ProductDatabase {
         // 登録処理
         private void Registeration() {
             try {
-                // 入力フォームのチェック
-                var anyTextBoxEnabled = false;
-                var allTextBoxesFilled = true;
+                if (!FormCheck()) { return; };
+                if (!DataCheck()) { return; };
+
                 DialogResult result;
-
-                foreach (Control control in Controls) {
-                    if (control is TextBoxBase textBox && textBox.Enabled) {
-                        anyTextBoxEnabled = true;
-                        if (string.IsNullOrWhiteSpace(textBox.Text)) {
-                            allTextBoxesFilled = false;
-                            break;
-                        }
-                    }
-                }
-                if (!anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
-                if (!allTextBoxesFilled) { throw new Exception("空欄があります。"); }
-
-                if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
-
-                if (QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
-
                 result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                if (result == DialogResult.Cancel) {
-                    return;
-                }
-
-                var quantity = Convert.ToInt32(QuantityTextBox.Text);
-                if (quantity == 0) { throw new Exception("1以上入力してください。"); }
-                var firstSerial = Convert.ToInt32(FirstSerialNumberTextBox.Text);
-                if (firstSerial == 0) { throw new Exception("シリアル開始番号を入力してください。"); }
-
-                switch (ProductInfo.SerialDigit) {
-                    case 3:
-                        CheckAndAdjustSerial(999, 1);
-                        break;
-                    case 4:
-                        CheckAndAdjustSerial(9999, 1);
-                        break;
-                    default:
-                        break;
-                }
-
-                void CheckAndAdjustSerial(int threshold, int resetValue) {
-                    if (quantity + firstSerial >= threshold) {
-                        MessageBox.Show($"シリアルが{threshold}を超えるので{resetValue.ToString().PadLeft(ProductInfo.SerialDigit, '0')}から開始します。");
-                        FirstSerialNumberTextBox.Text = resetValue.ToString();
-                    }
-                }
+                if (result == DialogResult.Cancel) { return; }
 
                 result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) { return; }
-
-                _orderNumber = OrderNumberTextBox.Text;
-                _productNumber = ManufacturingNumberMaskedTextBox.Text;
-                _quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
-                _person = PersonComboBox.Text;
-                _regDate = RegistrationDateMaskedTextBox.Text;
-                _revision = RevisionTextBox.Text;
-                _comment = CommentTextBox.Text;
-
-                _serialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text);
-                _serialLastNumber = _serialFirstNumber + _quantity - 1;
-
-                _strSerialFirstNumber = GenerateCode(_serialFirstNumber);
-                _strSerialLastNumber = GenerateCode(_serialLastNumber);
 
                 if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
 
@@ -260,41 +210,110 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        // 印刷処理
-        private bool PrintBarcode(int printFlg) {
-            // PrintDocumentオブジェクトの作成
-            using System.Drawing.Printing.PrintDocument pd = new();
+        private bool FormCheck() {
+            // 入力フォームのチェック
+            var anyTextBoxEnabled = false;
+            var allTextBoxesFilled = true;
 
-            // PrintPageイベントハンドラの追加
-            pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
-
-            _labelProNumLabelsToPrint = _quantity;
-            _labelProPageNum = 1;
-
-            switch (printFlg) {
-                case 1:
-                    RePrintPrintDialog.Document = pd;
-                    var r = RePrintPrintDialog.ShowDialog();
-
-                    if (r == DialogResult.OK) {
-                        RePrintPrintDialog.Document.Print();
-
-                        if (_intPageCnt >= 2) {
-                            MessageBox.Show($"{_intPageCnt}枚印刷されます。2枚目以降は1行目から印刷されます。");
-                        }
+            foreach (Control control in Controls) {
+                if (control is TextBoxBase textBox && textBox.Enabled) {
+                    anyTextBoxEnabled = true;
+                    if (string.IsNullOrWhiteSpace(textBox.Text)) {
+                        allTextBoxesFilled = false;
+                        break;
                     }
-                    else {
-                        return false;
-                    }
+                }
+            }
+            return !anyTextBoxEnabled
+                ? throw new Exception("何も入力されていません")
+                : !allTextBoxesFilled
+                ? throw new Exception("空欄があります。")
+                : ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15
+                ? throw new Exception("製番を10桁+4桁で入力して下さい。")
+                : QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0 ? throw new Exception("1台以上入力して下さい。") : true;
+        }
+        private bool DataCheck() {
+            var quantity = Convert.ToInt32(QuantityTextBox.Text);
+            if (quantity == 0) { throw new Exception("1以上入力してください。"); }
+            var firstSerial = Convert.ToInt32(FirstSerialNumberTextBox.Text);
+            if (firstSerial == 0) { throw new Exception("シリアル開始番号を入力してください。"); }
+
+            switch (ProductInfo.SerialDigit) {
+                case 3:
+                    CheckAndAdjustSerial(999, 1);
                     break;
-                case 2:
-                    RePrintPrintPreviewDialog.Document = pd;
-                    RePrintPrintPreviewDialog.ShowDialog();
+                case 4:
+                    CheckAndAdjustSerial(9999, 1);
                     break;
                 default:
                     break;
             }
+
+            void CheckAndAdjustSerial(int threshold, int resetValue) {
+                if (quantity + firstSerial >= threshold) {
+                    MessageBox.Show($"シリアルが{threshold}を超えるので{resetValue.ToString().PadLeft(ProductInfo.SerialDigit, '0')}から開始します。");
+                    FirstSerialNumberTextBox.Text = resetValue.ToString();
+                }
+            }
+
+            _orderNumber = OrderNumberTextBox.Text;
+            _productNumber = ManufacturingNumberMaskedTextBox.Text;
+            _quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
+            _person = PersonComboBox.Text;
+            _regDate = RegistrationDateMaskedTextBox.Text;
+            _revision = RevisionTextBox.Text;
+            _comment = CommentTextBox.Text;
+
+            _serialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text);
+            _serialLastNumber = _serialFirstNumber + _quantity - 1;
+
+            _strSerialFirstNumber = GenerateCode(_serialFirstNumber);
+            _strSerialLastNumber = GenerateCode(_serialLastNumber);
             return true;
+        }
+        // 印刷処理
+        private bool PrintBarcode(int printFlg) {
+            try {
+                // PrintDocumentオブジェクトの作成
+                using System.Drawing.Printing.PrintDocument pd = new();
+
+                // PrintPageイベントハンドラの追加
+                pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
+
+                _labelProNumLabelsToPrint = _quantity;
+                _labelProPageNum = 1;
+
+                switch (printFlg) {
+                    case 1:
+                        RePrintPrintDialog.Document = pd;
+                        var r = RePrintPrintDialog.ShowDialog();
+
+                        if (r == DialogResult.OK) {
+                            RePrintPrintDialog.Document.Print();
+
+                            if (_intPageCnt >= 2) {
+                                MessageBox.Show($"{_intPageCnt}枚印刷されます。2枚目以降は1行目から印刷されます。");
+                            }
+                        }
+                        else {
+                            return false;
+                        }
+                        break;
+                    case 2:
+                        FormCheck();
+                        DataCheck();
+
+                        RePrintPrintPreviewDialog.Document = pd;
+                        RePrintPrintPreviewDialog.ShowDialog();
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
         }
         private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
             try {
@@ -582,16 +601,12 @@ namespace ProductDatabase {
                     if (checkBox.Checked) {
                         ExtraCheckBox1.Checked = false;
                     }
-
                     break;
                 case "ExtraCheckBox1":
                     ExtraTextBox2.Enabled = checkBox.Checked;
                     break;
                 case "RevisionCheckBox":
                     RevisionTextBox.Enabled = checkBox.Checked;
-                    if (checkBox.Checked) {
-                        MessageBox.Show("変更する場合は理由を記載して下さい。");
-                    }
                     break;
                 case "ExtraCheckBox2":
                     ExtraTextBox3.Enabled = checkBox.Checked;
@@ -673,6 +688,26 @@ namespace ProductDatabase {
                 entries.Select(entry => $"{entry.Item1,-ColumnWidth}[{entry.Item2}]"));
 
             MessageBox.Show(message, "取得情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
+            ProductLabelSettingsWindow ls = new();
+            ls.ShowDialog(this);
+        }
+        private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
+            ProductBarcodeSettingsWindow ls = new();
+            ls.ShowDialog(this);
+        }
+        private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
+            _serialType = "Label";
+            PrintBarcode(2);
+        }
+        private void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
+            _serialType = "Barcode";
+            PrintBarcode(2);
+        }
+        private void ProductRegistration2PrintPreviewDialog_Load(object sender, EventArgs e) {
+            var tool = (ToolStrip)RePrintPrintPreviewDialog.Controls[1];
+            tool.Items[0].Visible = false;
         }
     }
 }
