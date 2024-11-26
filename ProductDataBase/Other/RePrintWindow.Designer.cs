@@ -60,7 +60,12 @@
             this.ProductNameLabel1 = new Label();
             this.RePrintMenuStrip = new MenuStrip();
             this.ファイルToolStripMenuItem = new ToolStripMenuItem();
+            this.シリアルラベル印刷プレビューToolStripMenuItem = new ToolStripMenuItem();
+            this.バーコード印刷プレビューToolStripMenuItem = new ToolStripMenuItem();
             this.終了ToolStripMenuItem = new ToolStripMenuItem();
+            this.設定ToolStripMenuItem = new ToolStripMenuItem();
+            this.シリアルラベル印刷設定ToolStripMenuItem = new ToolStripMenuItem();
+            this.バーコード印刷設定ToolStripMenuItem = new ToolStripMenuItem();
             this.ヘルプToolStripMenuItem = new ToolStripMenuItem();
             this.取得情報ToolStripMenuItem = new ToolStripMenuItem();
             this.BarcodePrintButton = new Button();
@@ -479,7 +484,7 @@
             // RePrintMenuStrip
             // 
             this.RePrintMenuStrip.Font = new Font("Meiryo UI", 9F);
-            this.RePrintMenuStrip.Items.AddRange(new ToolStripItem[] { this.ファイルToolStripMenuItem, this.ヘルプToolStripMenuItem });
+            this.RePrintMenuStrip.Items.AddRange(new ToolStripItem[] { this.ファイルToolStripMenuItem, this.設定ToolStripMenuItem, this.ヘルプToolStripMenuItem });
             this.RePrintMenuStrip.Location = new Point(0, 0);
             this.RePrintMenuStrip.Name = "RePrintMenuStrip";
             this.RePrintMenuStrip.Size = new Size(630, 24);
@@ -488,16 +493,51 @@
             // 
             // ファイルToolStripMenuItem
             // 
-            this.ファイルToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.終了ToolStripMenuItem });
+            this.ファイルToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.シリアルラベル印刷プレビューToolStripMenuItem, this.バーコード印刷プレビューToolStripMenuItem, this.終了ToolStripMenuItem });
             this.ファイルToolStripMenuItem.Name = "ファイルToolStripMenuItem";
             this.ファイルToolStripMenuItem.Size = new Size(53, 20);
             this.ファイルToolStripMenuItem.Text = "ファイル";
             // 
+            // シリアルラベル印刷プレビューToolStripMenuItem
+            // 
+            this.シリアルラベル印刷プレビューToolStripMenuItem.Name = "シリアルラベル印刷プレビューToolStripMenuItem";
+            this.シリアルラベル印刷プレビューToolStripMenuItem.Size = new Size(206, 22);
+            this.シリアルラベル印刷プレビューToolStripMenuItem.Text = "シリアルラベル印刷プレビュー";
+            this.シリアルラベル印刷プレビューToolStripMenuItem.Click += this.シリアルラベル印刷プレビューToolStripMenuItem_Click;
+            // 
+            // バーコード印刷プレビューToolStripMenuItem
+            // 
+            this.バーコード印刷プレビューToolStripMenuItem.Name = "バーコード印刷プレビューToolStripMenuItem";
+            this.バーコード印刷プレビューToolStripMenuItem.Size = new Size(206, 22);
+            this.バーコード印刷プレビューToolStripMenuItem.Text = "バーコード印刷プレビュー";
+            this.バーコード印刷プレビューToolStripMenuItem.Click += this.バーコード印刷プレビューToolStripMenuItem_Click;
+            // 
             // 終了ToolStripMenuItem
             // 
             this.終了ToolStripMenuItem.Name = "終了ToolStripMenuItem";
-            this.終了ToolStripMenuItem.Size = new Size(98, 22);
+            this.終了ToolStripMenuItem.Size = new Size(206, 22);
             this.終了ToolStripMenuItem.Text = "終了";
+            // 
+            // 設定ToolStripMenuItem
+            // 
+            this.設定ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.シリアルラベル印刷設定ToolStripMenuItem, this.バーコード印刷設定ToolStripMenuItem });
+            this.設定ToolStripMenuItem.Name = "設定ToolStripMenuItem";
+            this.設定ToolStripMenuItem.Size = new Size(43, 20);
+            this.設定ToolStripMenuItem.Text = "設定";
+            // 
+            // シリアルラベル印刷設定ToolStripMenuItem
+            // 
+            this.シリアルラベル印刷設定ToolStripMenuItem.Name = "シリアルラベル印刷設定ToolStripMenuItem";
+            this.シリアルラベル印刷設定ToolStripMenuItem.Size = new Size(186, 22);
+            this.シリアルラベル印刷設定ToolStripMenuItem.Text = "シリアルラベル印刷設定";
+            this.シリアルラベル印刷設定ToolStripMenuItem.Click += this.シリアルラベル印刷設定ToolStripMenuItem_Click;
+            // 
+            // バーコード印刷設定ToolStripMenuItem
+            // 
+            this.バーコード印刷設定ToolStripMenuItem.Name = "バーコード印刷設定ToolStripMenuItem";
+            this.バーコード印刷設定ToolStripMenuItem.Size = new Size(186, 22);
+            this.バーコード印刷設定ToolStripMenuItem.Text = "バーコード印刷設定";
+            this.バーコード印刷設定ToolStripMenuItem.Click += this.バーコード印刷設定ToolStripMenuItem_Click;
             // 
             // ヘルプToolStripMenuItem
             // 
@@ -570,6 +610,7 @@
             this.RePrintPrintPreviewDialog.Icon = (Icon)resources.GetObject("RePrintPrintPreviewDialog.Icon");
             this.RePrintPrintPreviewDialog.Name = "RePrintPrintPreviewDialog";
             this.RePrintPrintPreviewDialog.Visible = false;
+            this.RePrintPrintPreviewDialog.Load += this.ProductRegistration2PrintPreviewDialog_Load;
             // 
             // panel1
             // 
@@ -691,5 +732,10 @@
         private System.Drawing.Printing.PrintDocument RePrintPrintDocument;
         private PrintPreviewDialog RePrintPrintPreviewDialog;
         private Panel panel1;
+        private ToolStripMenuItem 設定ToolStripMenuItem;
+        private ToolStripMenuItem シリアルラベル印刷設定ToolStripMenuItem;
+        private ToolStripMenuItem バーコード印刷設定ToolStripMenuItem;
+        private ToolStripMenuItem シリアルラベル印刷プレビューToolStripMenuItem;
+        private ToolStripMenuItem バーコード印刷プレビューToolStripMenuItem;
     }
 }
