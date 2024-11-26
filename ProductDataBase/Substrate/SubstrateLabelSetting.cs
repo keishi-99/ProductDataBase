@@ -22,12 +22,12 @@ namespace ProductDatabase.Substrate {
         public double IntervalX { get; set; } = 4;
         public double IntervalY { get; set; } = 4;
         public string HeaderString { get; set; } = "%D 製番 %M 注番 %O %T 台数 %N 担当者 %U";
-        public string FooterString { get; set; } = String.Empty;
+        public string FooterString { get; set; } = string.Empty;
         public Point HeaderPos { get; set; } = Point.Empty;
         public Point FooterPos { get; set; } = Point.Empty;
 
         [XmlIgnore]
-        public Font HeaderFooterFont { get; set; } = new Font("Arial", 6);
+        public Font HeaderFooterFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
 
         public string FontAsString {
             get => ConvertToString(HeaderFooterFont);
@@ -55,7 +55,7 @@ namespace ProductDatabase.Substrate {
         public bool AlignBarcodeCenter { get; set; } = true;
         public int NumLabels { get; set; } = 1;
         [XmlIgnore]
-        public Font Font { get; set; } = new Font("Arial", 6);
+        public Font Font { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
 
         [Browsable(false)]
         public string FontAsString {
