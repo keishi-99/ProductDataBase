@@ -1192,7 +1192,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = FormStartPosition.CenterParent;
             this.Text = "基板選択";
-            this.FormClosing += this.ProductRegistration2Window_FormClosing;
             this.Load += this.ProductRegistration2Window_Load;
             this.ProductRegistration2MenuStrip.ResumeLayout(false);
             this.ProductRegistration2MenuStrip.PerformLayout();

@@ -3,6 +3,7 @@ using GenCode128;
 using ProductDatabase.Product;
 using System.Data;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Drawing.Printing;
 using ZXing;
@@ -19,10 +20,10 @@ namespace ProductDatabase {
     public partial class ProductRegistration2Window : Form {
 
         public CSettingsLabelPro SettingsLabelPro { get; set; } = new CSettingsLabelPro();
-        private string _strLabelSettingFilePath = string.Empty;
+        public string labelSettingFilePath = string.Empty;
 
         public CSettingsBarcodePro SettingsBarcodePro { get; set; } = new CSettingsBarcodePro();
-        private string _strBarcodeSettingFilePath = string.Empty;
+        public string barcodeSettingFilePath = string.Empty;
 
         public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
 
@@ -253,7 +254,7 @@ namespace ProductDatabase {
                     case 7:
                     case 9:
                         SettingsLabelPro = new CSettingsLabelPro();
-                        _strLabelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+                        labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
 
                         if (ProductInfo.PrintType == 1) { SubstrateListPrintButton.Visible = false; }
                         SerialPrintPostionLabel.Visible = true;
@@ -269,7 +270,7 @@ namespace ProductDatabase {
                         break;
                     case 2:
                         SettingsBarcodePro = new CSettingsBarcodePro();
-                        _strBarcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+                        barcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
 
                         SerialPrintPostionLabel.Visible = false;
                         SerialPrintPostionNumericUpDown.Visible = false;
@@ -284,9 +285,9 @@ namespace ProductDatabase {
                         break;
                     case 3:
                         SettingsLabelPro = new CSettingsLabelPro();
-                        _strLabelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+                        labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
                         SettingsBarcodePro = new CSettingsBarcodePro();
-                        _strBarcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+                        barcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
 
                         SerialPrintPostionLabel.Visible = true;
                         SerialPrintPostionNumericUpDown.Visible = true;
@@ -326,68 +327,28 @@ namespace ProductDatabase {
                         break;
                 }
 
-                LoadSettings(_strLabelSettingFilePath, _strBarcodeSettingFilePath);
+                LoadSettings(labelSettingFilePath, barcodeSettingFilePath);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void LoadSettings(string strLabelSettingFilePath, string strBarcodeSettingFilePath) {
+        private void LoadSettings(string labelSettingFilePath, string barcodeSettingFilePath) {
             try {
-                if (strLabelSettingFilePath != string.Empty) {
-                    using StreamReader? srLabel = new(strLabelSettingFilePath, new System.Text.UTF8Encoding(false));
+                if (labelSettingFilePath != string.Empty) {
+                    using StreamReader? srLabel = new(labelSettingFilePath, new System.Text.UTF8Encoding(false));
                     System.Xml.Serialization.XmlSerializer serializerLabel = new(typeof(CSettingsLabelPro));
                     if (serializerLabel.Deserialize(srLabel) is CSettingsLabelPro result) { SettingsLabelPro = result; }
                     srLabel?.Close();
                 }
-                if (strBarcodeSettingFilePath != string.Empty) {
-                    using StreamReader? srBarcode = new(strBarcodeSettingFilePath, new System.Text.UTF8Encoding(false));
+                Debug.Print(barcodeSettingFilePath);
+                if (barcodeSettingFilePath != string.Empty) {
+                    using StreamReader? srBarcode = new(barcodeSettingFilePath, new System.Text.UTF8Encoding(false));
                     System.Xml.Serialization.XmlSerializer serializerBarcode = new(typeof(CSettingsBarcodePro));
                     if (serializerBarcode.Deserialize(srBarcode) is CSettingsBarcodePro result) { SettingsBarcodePro = result; }
                     srBarcode?.Close();
                 }
             } catch (Exception ex) {
                 MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } finally {
-            }
-        }
-        // クロージングイベント
-        private void ClosingEvents() {
-            try {
-                System.Xml.Serialization.XmlSerializer serializerLabel = new(typeof(CSettingsLabelPro));
-                StreamWriter? swLabel = null;
-                System.Xml.Serialization.XmlSerializer serializerBarcode = new(typeof(CSettingsBarcodePro));
-                StreamWriter? swBarcode = null;
-
-                switch (ProductInfo.PrintType) {
-                    case 1:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 9:
-                        swLabel = new StreamWriter(_strLabelSettingFilePath, false, new System.Text.UTF8Encoding(false));
-                        serializerLabel.Serialize(swLabel, SettingsLabelPro);
-                        swLabel?.Close();
-                        break;
-                    case 2:
-                        swBarcode = new StreamWriter(_strBarcodeSettingFilePath, false, new System.Text.UTF8Encoding(false));
-                        serializerBarcode.Serialize(swBarcode, SettingsBarcodePro);
-                        swBarcode?.Close();
-                        break;
-                    case 3:
-                        swLabel = new StreamWriter(_strLabelSettingFilePath, false, new System.Text.UTF8Encoding(false));
-                        serializerLabel.Serialize(swLabel, SettingsLabelPro);
-                        swLabel?.Close();
-                        swBarcode = new StreamWriter(_strBarcodeSettingFilePath, false, new System.Text.UTF8Encoding(false));
-                        serializerBarcode.Serialize(swBarcode, SettingsBarcodePro);
-                        swBarcode?.Close();
-                        break;
-                    case 8:
-                    default:
-                        break;
-                }
-            } catch (Exception ex) {
-                MessageBox.Show($"設定ファイルの保存に失敗しました。{Environment.NewLine}{ex.Message}");
             } finally {
             }
         }
@@ -1589,7 +1550,6 @@ namespace ProductDatabase {
         }
 
         private void ProductRegistration2Window_Load(object sender, EventArgs e) { LoadEvents(); }
-        private void ProductRegistration2Window_FormClosing(object sender, FormClosingEventArgs e) { ClosingEvents(); }
         private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
         private void SubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBox_CheckedChanged(sender, e); }
@@ -1613,10 +1573,12 @@ namespace ProductDatabase {
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             ProductLabelSettingsWindow ls = new();
             ls.ShowDialog(this);
+            LoadSettings(labelSettingFilePath, barcodeSettingFilePath);
         }
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             ProductBarcodeSettingsWindow ls = new();
             ls.ShowDialog(this);
+            LoadSettings(labelSettingFilePath, barcodeSettingFilePath);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
             var entries = new[]

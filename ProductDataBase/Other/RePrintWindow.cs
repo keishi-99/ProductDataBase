@@ -8,10 +8,10 @@ namespace ProductDatabase {
     public partial class RePrintWindow : Form {
 
         public CSettingsLabelPro SettingsLabelPro { get; set; } = new CSettingsLabelPro();
-        private string _labelSettingFilePath = string.Empty;
+        public string labelSettingFilePath = string.Empty;
 
         public CSettingsBarcodePro SettingsBarcodePro { get; set; } = new CSettingsBarcodePro();
-        private string _barcodeSettingFilePath = string.Empty;
+        public string barcodeSettingFilePath = string.Empty;
 
         public ProductInfomation ProductInfo { get; }
 
@@ -75,21 +75,21 @@ namespace ProductDatabase {
                         バーコード印刷設定ToolStripMenuItem.Enabled = false;
                         バーコード印刷プレビューToolStripMenuItem.Enabled = false;
                         SettingsLabelPro = new CSettingsLabelPro();
-                        _labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+                        labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
                         BarcodePrintButton.Visible = false;
                         break;
                     case 2:
                         シリアルラベル印刷設定ToolStripMenuItem.Enabled = false;
                         シリアルラベル印刷プレビューToolStripMenuItem.Enabled = false;
                         SettingsBarcodePro = new CSettingsBarcodePro();
-                        _barcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+                        barcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
                         LabelPrintButton.Visible = false;
                         break;
                     case 3:
                         SettingsLabelPro = new CSettingsLabelPro();
-                        _labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+                        labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
                         SettingsBarcodePro = new CSettingsBarcodePro();
-                        _barcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+                        barcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
                         LabelPrintButton.Enabled = true;
                         BarcodePrintButton.Enabled = true;
                         break;
@@ -97,7 +97,7 @@ namespace ProductDatabase {
                         バーコード印刷設定ToolStripMenuItem.Enabled = false;
                         バーコード印刷プレビューToolStripMenuItem.Enabled = false;
                         SettingsLabelPro = new CSettingsLabelPro();
-                        _labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+                        labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
                         LabelPrintButton.Visible = false;
                         BarcodePrintButton.Visible = false;
                         break;
@@ -138,22 +138,22 @@ namespace ProductDatabase {
                 }
 
                 FirstSerialNumberCheckBox.Checked = true;
-                LoadSettings(_labelSettingFilePath, _barcodeSettingFilePath);
+                LoadSettings(labelSettingFilePath, barcodeSettingFilePath);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void LoadSettings(string strLabelSettingFilePath, string strBarcodeSettingFilePath) {
+        private void LoadSettings(string labelSettingFilePath, string barcodeSettingFilePath) {
             try {
-                if (strLabelSettingFilePath != string.Empty) {
-                    StreamReader? srLabel = new(strLabelSettingFilePath, new System.Text.UTF8Encoding(false));
+                if (labelSettingFilePath != string.Empty) {
+                    StreamReader? srLabel = new(labelSettingFilePath, new System.Text.UTF8Encoding(false));
                     System.Xml.Serialization.XmlSerializer serializerLabel = new(typeof(CSettingsLabelPro));
                     if (serializerLabel.Deserialize(srLabel) is CSettingsLabelPro result) { SettingsLabelPro = result; }
                     srLabel?.Close();
                 }
-                if (strBarcodeSettingFilePath != string.Empty) {
-                    StreamReader? srBarcode = new(strBarcodeSettingFilePath, new System.Text.UTF8Encoding(false));
+                if (barcodeSettingFilePath != string.Empty) {
+                    StreamReader? srBarcode = new(barcodeSettingFilePath, new System.Text.UTF8Encoding(false));
                     System.Xml.Serialization.XmlSerializer serializerBarcode = new(typeof(CSettingsBarcodePro));
                     if (serializerBarcode.Deserialize(srBarcode) is CSettingsBarcodePro result) { SettingsBarcodePro = result; }
                     srBarcode?.Close();
@@ -689,14 +689,6 @@ namespace ProductDatabase {
 
             MessageBox.Show(message, "取得情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-        private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            ProductLabelSettingsWindow ls = new();
-            ls.ShowDialog(this);
-        }
-        private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            ProductBarcodeSettingsWindow ls = new();
-            ls.ShowDialog(this);
-        }
         private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Label";
             PrintBarcode(2);
@@ -704,6 +696,16 @@ namespace ProductDatabase {
         private void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Barcode";
             PrintBarcode(2);
+        }
+        private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
+            ProductLabelSettingsWindow ls = new();
+            ls.ShowDialog(this);
+            LoadSettings(labelSettingFilePath, barcodeSettingFilePath);
+        }
+        private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
+            ProductBarcodeSettingsWindow ls = new();
+            ls.ShowDialog(this);
+            LoadSettings(labelSettingFilePath, barcodeSettingFilePath);
         }
         private void ProductRegistration2PrintPreviewDialog_Load(object sender, EventArgs e) {
             var tool = (ToolStrip)RePrintPrintPreviewDialog.Controls[1];
