@@ -555,7 +555,6 @@
             // 
             // BarcodePrintButton
             // 
-            this.BarcodePrintButton.Enabled = false;
             this.BarcodePrintButton.Location = new Point(450, 404);
             this.BarcodePrintButton.Margin = new Padding(0);
             this.BarcodePrintButton.Name = "BarcodePrintButton";
@@ -609,6 +608,7 @@
             this.RePrintPrintPreviewDialog.Enabled = true;
             this.RePrintPrintPreviewDialog.Icon = (Icon)resources.GetObject("RePrintPrintPreviewDialog.Icon");
             this.RePrintPrintPreviewDialog.Name = "RePrintPrintPreviewDialog";
+            this.RePrintPrintPreviewDialog.ShowIcon = false;
             this.RePrintPrintPreviewDialog.Visible = false;
             this.RePrintPrintPreviewDialog.Load += this.ProductRegistration2PrintPreviewDialog_Load;
             // 
