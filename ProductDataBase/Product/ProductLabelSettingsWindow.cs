@@ -13,6 +13,9 @@ namespace ProductDatabase {
             _labelProPageSettings = new CLabelProPageSettings();
         }
 
+        public CSettingsLabelPro SettingsLabelPro { get; set; } = new CSettingsLabelPro();
+        private string _labelSettingFilePath = string.Empty;
+
         private void PageSettingsLabelLoad(object sender, EventArgs e) {
             if (Owner is ProductRegistration2Window productWindow) {
                 LoadSettingsFromProductRegistration2Window(productWindow);
@@ -28,6 +31,7 @@ namespace ProductDatabase {
         private void LoadSettingsFromProductRegistration2Window(ProductRegistration2Window window) {
             var pageSettings = window.SettingsLabelPro.LabelProPageSettings;
             var labelSettings = window.SettingsLabelPro.LabelProLabelSettings;
+            _labelSettingFilePath = window.labelSettingFilePath;
 
             SetPageSettings(pageSettings);
             SetLabelSettings(labelSettings);
@@ -35,6 +39,7 @@ namespace ProductDatabase {
         private void LoadSettingsFromRePaintWindow(RePrintWindow window) {
             var pageSettings = window.SettingsLabelPro.LabelProPageSettings;
             var labelSettings = window.SettingsLabelPro.LabelProLabelSettings;
+            _labelSettingFilePath = window.labelSettingFilePath;
 
             SetPageSettings(pageSettings);
             SetLabelSettings(labelSettings);
@@ -124,6 +129,19 @@ namespace ProductDatabase {
             _labelProLabelSettings.StringPosY = stringPosY;
             _labelProLabelSettings.AlignStringCenter = BarcodeCenterCheckBox.Checked;
             _labelProLabelSettings.NumLabels = int.Parse(PrintTextQuantityTextBox.Text);
+
+            SettingsLabelPro.LabelProPageSettings = _labelProPageSettings;
+            SettingsLabelPro.LabelProLabelSettings = _labelProLabelSettings;
+
+            try {
+                using var swBarcode = new StreamWriter(_labelSettingFilePath, false, new System.Text.UTF8Encoding(false));
+                var serializerBarcode = new System.Xml.Serialization.XmlSerializer(typeof(CSettingsBarcodePro));
+                serializerBarcode.Serialize(swBarcode, SettingsLabelPro);
+            } catch (Exception ex) {
+                MessageBox.Show($"設定の保存中にエラーが発生しました。{Environment.NewLine}{ex.Message}");
+                DialogResult = DialogResult.None;
+                return;
+            }
 
             DialogResult = DialogResult.OK;
             Close();

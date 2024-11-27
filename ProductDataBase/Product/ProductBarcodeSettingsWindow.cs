@@ -13,6 +13,9 @@ namespace ProductDatabase {
             _barcodeProPageSettings = new CBarcodeProPageSettings();
         }
 
+        public CSettingsBarcodePro SettingsBarcodePro { get; set; } = new CSettingsBarcodePro();
+        private string _barcodeSettingFilePath = string.Empty;
+
         private void PageSettingsBarcodeLoad(object sender, EventArgs e) {
             if (Owner is ProductRegistration2Window productWindow) {
                 LoadSettingsFromProductRegistration2Window(productWindow);
@@ -28,6 +31,7 @@ namespace ProductDatabase {
         private void LoadSettingsFromProductRegistration2Window(ProductRegistration2Window window) {
             var pageSettings = window.SettingsBarcodePro.BarcodeProPageSettings;
             var labelSettings = window.SettingsBarcodePro.BarcodeProLabelSettings;
+            _barcodeSettingFilePath = window.barcodeSettingFilePath;
 
             SetPageSettings(pageSettings);
             SetLabelSettings(labelSettings);
@@ -35,6 +39,7 @@ namespace ProductDatabase {
         private void LoadSettingsFromRePaintWindow(RePrintWindow window) {
             var pageSettings = window.SettingsBarcodePro.BarcodeProPageSettings;
             var labelSettings = window.SettingsBarcodePro.BarcodeProLabelSettings;
+            _barcodeSettingFilePath = window.barcodeSettingFilePath;
 
             SetPageSettings(pageSettings);
             SetLabelSettings(labelSettings);
@@ -50,11 +55,15 @@ namespace ProductDatabase {
                 BarcodeFontTextBox.Text = $"{BarcodeFontDialog.Font.Name} {BarcodeFontDialog.Font.SizeInPoints}pt";
             }
 
-            BarcodePostionXTextBox.Text = labelSettings.StringPosX.ToString();
-            BarcodePostionYTextBox.Text = labelSettings.StringPosY.ToString();
-            BarcodeCenterCheckBox.Checked = labelSettings.AlignStringCenter;
-
+            BarcodePostionXTextBox.Text = labelSettings.BarcodePosX.ToString();
+            BarcodePostionYTextBox.Text = labelSettings.BarcodePosY.ToString();
+            BarcodeCenterCheckBox.Checked = labelSettings.AlignBarcodeCenter;
             BarcodePostionXTextBox.Enabled = !BarcodeCenterCheckBox.Checked;
+
+            FontPostionXTextBox.Text = labelSettings.StringPosX.ToString();
+            FontPostionYTextBox.Text = labelSettings.StringPosY.ToString();
+            FontCenterCheckBox.Checked = labelSettings.AlignStringCenter;
+            FontPostionXTextBox.Enabled = !FontCenterCheckBox.Checked;
         }
         private void SetPageSettings(CBarcodeProPageSettings pageSettings) {
             BarcodeLabelWidthTextBox.Text = pageSettings.SizeX.ToString();
@@ -129,6 +138,19 @@ namespace ProductDatabase {
             _barcodeProLabelSettings.AlignStringCenter = FontCenterCheckBox.Checked;
             _barcodeProLabelSettings.NumLabels = int.Parse(BarcodeQuantityTextBox.Text);
 
+            SettingsBarcodePro.BarcodeProPageSettings = _barcodeProPageSettings;
+            SettingsBarcodePro.BarcodeProLabelSettings = _barcodeProLabelSettings;
+
+            try {
+                using var swBarcode = new StreamWriter(_barcodeSettingFilePath, false, new System.Text.UTF8Encoding(false));
+                var serializerBarcode = new System.Xml.Serialization.XmlSerializer(typeof(CSettingsBarcodePro));
+                serializerBarcode.Serialize(swBarcode, SettingsBarcodePro);
+            } catch (Exception ex) {
+                MessageBox.Show($"設定の保存中にエラーが発生しました。{Environment.NewLine}{ex.Message}");
+                DialogResult = DialogResult.None;
+                return;
+            }
+
             DialogResult = DialogResult.OK;
             Close();
         }
@@ -141,7 +163,6 @@ namespace ProductDatabase {
 
             BarcodeHeaderFooterFontTextBox.Text = $"{BarcodeHeaderFontDialog.Font.Name} {BarcodeHeaderFontDialog.Font.SizeInPoints}pt";
         }
-
         private void BtnBarcodeFont_Click(object sender, EventArgs e) {
             var r = BarcodeFontDialog.ShowDialog();
             if (r == DialogResult.Cancel) {
@@ -150,15 +171,11 @@ namespace ProductDatabase {
 
             BarcodeFontTextBox.Text = $"{BarcodeFontDialog.Font.Name} {BarcodeFontDialog.Font.SizeInPoints}pt";
         }
-
         private void BarcodeCenterCheckBox_CheckedChanged(object sender, EventArgs e) {
             BarcodePostionXTextBox.Enabled = !BarcodeCenterCheckBox.Checked;
         }
-
         private void ProductBarcodePrintSetting_Load(object sender, EventArgs e) { PageSettingsBarcodeLoad(sender, e); }
-
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
-
         private void FontCenterCheckBox_CheckedChanged(object sender, EventArgs e) {
             FontPostionXTextBox.Enabled = !FontCenterCheckBox.Checked;
 

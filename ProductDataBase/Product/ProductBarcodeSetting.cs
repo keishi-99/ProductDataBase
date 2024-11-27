@@ -13,18 +13,18 @@ namespace ProductDatabase.Product {
     }
 
     public class CBarcodeProPageSettings {
-        public int NumLabelsX { get; set; } = 10;
-        public int NumLabelsY { get; set; } = 31;
-        public decimal SizeX { get; set; } = 15;
-        public decimal SizeY { get; set; } = 5;
-        public decimal OffsetX { get; set; } = 12;
-        public decimal OffsetY { get; set; } = 11;
-        public decimal IntervalX { get; set; } = 4;
-        public decimal IntervalY { get; set; } = 4;
-        public string HeaderString { get; set; } = "%D 製番 %M 注番 %O %T 台数 %N 担当者 %U";
+        public int NumLabelsX { get; set; }
+        public int NumLabelsY { get; set; }
+        public decimal SizeX { get; set; }
+        public decimal SizeY { get; set; }
+        public decimal OffsetX { get; set; }
+        public decimal OffsetY { get; set; }
+        public decimal IntervalX { get; set; }
+        public decimal IntervalY { get; set; }
+        public string HeaderString { get; set; } = string.Empty;
         public string FooterString { get; set; } = string.Empty;
-        public Point HeaderPos { get; set; } = Point.Empty;
-        public Point FooterPos { get; set; } = Point.Empty;
+        public Point HeaderPos { get; set; }
+        public Point FooterPos { get; set; }
 
         [XmlIgnore]
         public Font HeaderFooterFont { get; set; } = new Font("Arial", 5.25F);
@@ -44,16 +44,16 @@ namespace ProductDatabase.Product {
     }
 
     public class CBarcodeProLabelSettings {
-        public decimal BarcodeHeight { get; set; } = 1;
-        public decimal BarcodePosX { get; set; } = 4;
-        public decimal BarcodePosY { get; set; } = 1;
-        public decimal BarcodeMagnitude { get; set; } = 1.0M;
-        public string Format { get; set; } = "%T%Y%MM%S%R";
-        public decimal StringPosX { get; set; } = 4;
-        public decimal StringPosY { get; set; } = 1;
-        public bool AlignStringCenter { get; set; } = true;
-        public bool AlignBarcodeCenter { get; set; } = true;
-        public int NumLabels { get; set; } = 1;
+        public decimal BarcodeHeight { get; set; }
+        public decimal BarcodePosX { get; set; }
+        public decimal BarcodePosY { get; set; }
+        public decimal BarcodeMagnitude { get; set; }
+        public string Format { get; set; } = string.Empty;
+        public decimal StringPosX { get; set; }
+        public decimal StringPosY { get; set; }
+        public bool AlignStringCenter { get; set; }
+        public bool AlignBarcodeCenter { get; set; }
+        public int NumLabels { get; set; }
         [XmlIgnore]
         public Font Font { get; set; } = new Font("Arial", 5.25F);
 
