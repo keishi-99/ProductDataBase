@@ -166,9 +166,6 @@ namespace ProductDatabase {
         // 登録処理
         private void Registeration() {
             try {
-                if (!FormCheck()) { return; };
-                if (!DataCheck()) { return; };
-
                 DialogResult result;
                 result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) { return; }
@@ -274,6 +271,8 @@ namespace ProductDatabase {
         // 印刷処理
         private bool PrintBarcode(int printFlg) {
             try {
+                if (!FormCheck()) { return false; };
+                if (!DataCheck()) { return false; };
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
 
@@ -300,9 +299,12 @@ namespace ProductDatabase {
                         }
                         break;
                     case 2:
-                        FormCheck();
-                        DataCheck();
-
+                        // 最大で表示
+                        RePrintPrintPreviewDialog.Shown += (sender, e) => {
+                            if (sender is Form form) {
+                                form.WindowState = FormWindowState.Maximized;
+                            }
+                        };
                         RePrintPrintPreviewDialog.Document = pd;
                         RePrintPrintPreviewDialog.ShowDialog();
                         break;

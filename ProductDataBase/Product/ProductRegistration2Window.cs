@@ -982,6 +982,12 @@ namespace ProductDatabase {
                     }
                     break;
                 case 2:
+                    // 最大で表示
+                    ProductRegistration2PrintPreviewDialog.Shown += (sender, e) => {
+                        if (sender is Form form) {
+                            form.WindowState = FormWindowState.Maximized;
+                        }
+                    };
                     ProductRegistration2PrintPreviewDialog.Document = pd;
                     ProductRegistration2PrintPreviewDialog.ShowDialog();
                     break;
