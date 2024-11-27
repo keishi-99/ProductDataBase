@@ -27,7 +27,7 @@ namespace ProductDatabase.Product {
         public Point FooterPos { get; set; } = Point.Empty;
 
         [XmlIgnore]
-        public Font HeaderFooterFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
+        public Font HeaderFooterFont { get; set; } = new Font("Arial", 5.25F);
 
         public string FontAsString {
             get => ConvertToString(HeaderFooterFont);
@@ -55,7 +55,7 @@ namespace ProductDatabase.Product {
         public bool AlignBarcodeCenter { get; set; } = true;
         public int NumLabels { get; set; } = 1;
         [XmlIgnore]
-        public Font Font { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
+        public Font Font { get; set; } = new Font("Arial", 5.25F);
 
         [Browsable(false)]
         public string FontAsString {
