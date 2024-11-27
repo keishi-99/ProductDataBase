@@ -26,20 +26,20 @@ namespace ProductDatabase {
             }
         }
         private void LoadSettingsFromProductRegistration2Window(ProductRegistration2Window window) {
-            var pageSettings = window.SettingsLabelPro.LabelProPageSettings;
-            var labelSettings = window.SettingsLabelPro.LabelProLabelSettings;
+            var pageSettings = window.SettingsBarcodePro.BarcodeProPageSettings;
+            var labelSettings = window.SettingsBarcodePro.BarcodeProLabelSettings;
 
             SetPageSettings(pageSettings);
             SetLabelSettings(labelSettings);
         }
         private void LoadSettingsFromRePaintWindow(RePrintWindow window) {
-            var pageSettings = window.SettingsLabelPro.LabelProPageSettings;
-            var labelSettings = window.SettingsLabelPro.LabelProLabelSettings;
+            var pageSettings = window.SettingsBarcodePro.BarcodeProPageSettings;
+            var labelSettings = window.SettingsBarcodePro.BarcodeProLabelSettings;
 
             SetPageSettings(pageSettings);
             SetLabelSettings(labelSettings);
         }
-        private void SetLabelSettings(CLabelProLabelSettings labelSettings) {
+        private void SetLabelSettings(CBarcodeProLabelSettings labelSettings) {
             BarcodeHeightTextBox.Text = labelSettings.BarcodeHeight.ToString();
             BarcodeMagnitudeTextBox.Text = labelSettings.BarcodeMagnitude.ToString();
             BarcodeQuantityTextBox.Text = labelSettings.NumLabels.ToString();
@@ -56,7 +56,7 @@ namespace ProductDatabase {
 
             BarcodePostionXTextBox.Enabled = !BarcodeCenterCheckBox.Checked;
         }
-        private void SetPageSettings(CLabelProPageSettings pageSettings) {
+        private void SetPageSettings(CBarcodeProPageSettings pageSettings) {
             BarcodeLabelWidthTextBox.Text = pageSettings.SizeX.ToString();
             BarcodeLabelHeightTextBox.Text = pageSettings.SizeY.ToString();
             BarcodeQuantityXTextBox.Text = pageSettings.NumLabelsX.ToString();
