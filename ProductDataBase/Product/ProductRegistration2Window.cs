@@ -1476,18 +1476,18 @@ namespace ProductDatabase {
 
                 // ワークシートのセルから値を取得
                 sheetName = ProductInfo.ProductModel;
-                productName = workSheetMain.Cell(findRow, 2).Value.ToString();
-                productNameRange = workSheetMain.Cell(findRow, 3).Value.ToString();
-                productNumberRange = workSheetMain.Cell(findRow, 4).Value.ToString();
-                orderNumberRange = workSheetMain.Cell(findRow, 5).Value.ToString();
-                regDateRange = workSheetMain.Cell(findRow, 6).Value.ToString();
-                productModel = workSheetMain.Cell(findRow, 7).Value.ToString();
-                productModelRange = workSheetMain.Cell(findRow, 8).Value.ToString();
-                quantityRange = workSheetMain.Cell(findRow, 9).Value.ToString();
-                serialFirstRange = workSheetMain.Cell(findRow, 10).Value.ToString();
-                serialLastRange = workSheetMain.Cell(findRow, 11).Value.ToString();
-                commentRange = workSheetMain.Cell(findRow, 12).Value.ToString();
-                qrCodeRange = workSheetMain.Cell(findRow, 13).Value.ToString();
+                productName = workSheetMain.Cell(findRow, 3).Value.ToString();
+                productNameRange = workSheetMain.Cell(findRow, 4).Value.ToString();
+                productNumberRange = workSheetMain.Cell(findRow, 5).Value.ToString();
+                orderNumberRange = workSheetMain.Cell(findRow, 6).Value.ToString();
+                regDateRange = workSheetMain.Cell(findRow, 7).Value.ToString();
+                productModel = workSheetMain.Cell(findRow, 8).Value.ToString();
+                productModelRange = workSheetMain.Cell(findRow, 9).Value.ToString();
+                quantityRange = workSheetMain.Cell(findRow, 10).Value.ToString();
+                serialFirstRange = workSheetMain.Cell(findRow, 11).Value.ToString();
+                serialLastRange = workSheetMain.Cell(findRow, 12).Value.ToString();
+                commentRange = workSheetMain.Cell(findRow, 13).Value.ToString();
+                qrCodeRange = workSheetMain.Cell(findRow, 14).Value.ToString();
 
                 var workSheetTemp = workBook.Worksheet(sheetName);
                 workSheetTemp.Cell(productNameRange).Value = productName;

@@ -1,6 +1,11 @@
 ﻿using ClosedXML.Excel;
 using System.Data;
 using System.Data.SQLite;
+using System.Drawing.Imaging;
+using ZXing;
+using ZXing.QrCode;
+using ZXing.QrCode.Internal;
+using ZXing.Rendering;
 using static ProductDatabase.MainWindow;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -287,6 +292,7 @@ namespace ProductDatabase {
             try {
                 ProductInfo.RegDate = RegistrationDateMaskedTextBox.Text;
                 ProductInfo.Person = PersonComboBox.Text;
+                ProductInfo.Comment = CommentTextBox.Text;
                 if (string.IsNullOrEmpty(ProductInfo.Person)) { throw new Exception("担当者を選択してください。"); }
 
                 switch (ProductInfo.RegType) {
@@ -425,7 +431,7 @@ namespace ProductDatabase {
                                         RevisionGroup = @RevisionGroup,
                                         SerialLast = @SerialLast,
                                         SerialLastNumber = @SerialLastNumber,
-                                        Comment = @Comment
+                                        Comment = @Comment,
                                         UsedSubstrate = @UsedSubstrate
                                     WHERE
                                         ProductNumber = @ProductNumber
@@ -476,6 +482,7 @@ namespace ProductDatabase {
                 var serialFirstRange = string.Empty;
                 var serialLastRange = string.Empty;
                 var commentRange = string.Empty;
+                var qrCodeRange = string.Empty;
 
                 using FileStream fileStream = new($"{Environment.CurrentDirectory}./config/Excel/ConfigList.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using XLWorkbook workBook = new(fileStream);
@@ -492,18 +499,19 @@ namespace ProductDatabase {
                 }
 
                 // ワークシートのセルから値を取得
-                sheetName = ProductInfo.ProductModel;
-                productName = workSheetMain.Cell(findRow, 2).Value.ToString();
-                productNameRange = workSheetMain.Cell(findRow, 3).Value.ToString();
-                productNumberRange = workSheetMain.Cell(findRow, 4).Value.ToString();
-                orderNumberRange = workSheetMain.Cell(findRow, 5).Value.ToString();
-                regDateRange = workSheetMain.Cell(findRow, 6).Value.ToString();
-                productModel = workSheetMain.Cell(findRow, 7).Value.ToString();
-                productModelRange = workSheetMain.Cell(findRow, 8).Value.ToString();
-                quantityRange = workSheetMain.Cell(findRow, 9).Value.ToString();
-                serialFirstRange = workSheetMain.Cell(findRow, 10).Value.ToString();
-                serialLastRange = workSheetMain.Cell(findRow, 11).Value.ToString();
-                commentRange = workSheetMain.Cell(findRow, 12).Value.ToString();
+                sheetName = workSheetMain.Cell(findRow, 2).Value.ToString();
+                productName = workSheetMain.Cell(findRow, 3).Value.ToString();
+                productNameRange = workSheetMain.Cell(findRow, 4).Value.ToString();
+                productNumberRange = workSheetMain.Cell(findRow, 5).Value.ToString();
+                orderNumberRange = workSheetMain.Cell(findRow, 6).Value.ToString();
+                regDateRange = workSheetMain.Cell(findRow, 7).Value.ToString();
+                productModel = workSheetMain.Cell(findRow, 8).Value.ToString();
+                productModelRange = workSheetMain.Cell(findRow, 9).Value.ToString();
+                quantityRange = workSheetMain.Cell(findRow, 10).Value.ToString();
+                serialFirstRange = workSheetMain.Cell(findRow, 11).Value.ToString();
+                serialLastRange = workSheetMain.Cell(findRow, 12).Value.ToString();
+                commentRange = workSheetMain.Cell(findRow, 13).Value.ToString();
+                qrCodeRange = workSheetMain.Cell(findRow, 14).Value.ToString();
 
                 var workSheetTemp = workBook.Worksheet(sheetName);
                 workSheetTemp.Cell(productNameRange).Value = productName;
@@ -520,7 +528,7 @@ namespace ProductDatabase {
                 var findColumn = 0;
                 for (i = 0; i <= _listUsedSubstrate.Count - 1; i++) {
 
-                    var searchRange = workSheetMain.Range(findRow, 1, findRow, 28);
+                    var searchRange = workSheetMain.Range(findRow, 1, findRow, 44);
                     var searchValue = $"{_listUsedSubstrate[i]}";
                     var foundCell = searchRange.CellsUsed(c => c.Value.ToString() == searchValue).FirstOrDefault();
 
@@ -552,6 +560,36 @@ namespace ProductDatabase {
                             workSheetTemp.Cell(mainCellValue).Value += $"    {_listUsedProductNumber[i]}({_listUsedQuantity[i]})";
                         }
                     }
+                }
+
+                // QRコード
+                if (!string.IsNullOrEmpty(qrCodeRange)) {
+                    BarcodeWriter<PixelData> qr = new() {
+                        Format = BarcodeFormat.QR_CODE,
+                        Options = new QrCodeEncodingOptions {
+                            ErrorCorrection = ErrorCorrectionLevel.L,
+                            CharacterSet = "Shift_JIS",
+                            Width = 100,
+                            Height = 100,
+                        },
+                        Renderer = new PixelDataRenderer {
+                            Foreground = new(Color.Gray.ToArgb()),
+                            Background = new(Color.White.ToArgb()),
+                        },
+                    };
+
+                    var pixelData = qr.Write($"{ProductInfo.OrderNumber};{ProductInfo.ProductNumber};{productModel};{ProductInfo.Quantity};{ProductInfo.SerialFirst};{ProductInfo.SerialLast}");
+
+                    // PixelData を Bitmap に変換
+                    using var bitmap = new Bitmap(pixelData.Width, pixelData.Height, PixelFormat.Format32bppArgb);
+                    var bmpData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bmpData.Scan0, pixelData.Pixels.Length);
+                    bitmap.UnlockBits(bmpData);
+                    using MemoryStream stream = new();
+                    bitmap.Save(stream, ImageFormat.Bmp);
+
+                    var image = workSheetTemp.AddPicture(stream);
+                    image.MoveTo(workSheetTemp.Cell(qrCodeRange));
                 }
 
                 //引数に保存先パスを指定
