@@ -68,11 +68,45 @@ namespace ProductDatabase {
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
 
-                    // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[SerialLastNumber]を取得
-                    cmd.CommandText = $"""SELECT SerialLastNumber FROM "{ProductInfo.ProductName}_Product" ORDER BY _rowid_ DESC""";
-                    FirstSerialNumberTextBox.Text = int.TryParse(cmd.ExecuteScalar()?.ToString(), out var serialLastNum)
-                        ? (serialLastNum + 1).ToString()
-                        : throw new Exception("シリアル番号の取得に失敗しました。");
+                    // シリアル番号の最後を取得する共通メソッド
+                    int GetLastSerialNumber(SQLiteCommand cmd, string productName) {
+                        cmd.CommandText = $"""SELECT SerialLastNumber FROM "{productName}_Product" ORDER BY _rowid_ DESC""";
+                        return int.TryParse(cmd.ExecuteScalar()?.ToString(), out var serialLastNum)
+                            ? serialLastNum
+                            : throw new Exception("シリアル番号の取得に失敗しました。");
+                    }
+
+                    // 登録日を取得して年月を返す共通メソッド
+                    string GetLastRegistrationYearMonth(SQLiteCommand cmd, string productName) {
+                        cmd.CommandText = $"""SELECT RegDate FROM "{productName}_Product" ORDER BY _rowid_ DESC""";
+                        var lastRegDate = cmd.ExecuteScalar()?.ToString() ?? string.Empty;
+                        var splitRegDate = lastRegDate.Split("/");
+                        return splitRegDate.Length >= 2 ? $"{splitRegDate[0]}/{splitRegDate[1]}" : throw new Exception("登録日の取得に失敗しました。");
+                    }
+                    // メイン処理
+                    switch (ProductInfo.SerialDigit) {
+                        case 93:
+                        case 94: {
+                                // 登録日の年月と現在の年月を比較
+                                var lastYearMonth = GetLastRegistrationYearMonth(cmd, ProductInfo.ProductName);
+                                var currentYearMonth = string.Join("/", ProductInfo.RegDate.Split("/").Take(2)); // 現在の年月
+
+                                if (lastYearMonth != currentYearMonth) {
+                                    // 月が異なる場合はシリアル番号をリセット
+                                    FirstSerialNumberTextBox.Text = "1";
+                                }
+                                else {
+                                    // 月が同じ場合は最後のシリアル番号を取得して +1
+                                    FirstSerialNumberTextBox.Text = (GetLastSerialNumber(cmd, ProductInfo.ProductName) + 1).ToString();
+                                }
+                                break;
+                            }
+                        default: {
+                                // 他の場合は単純に最後のシリアル番号を取得して +1
+                                FirstSerialNumberTextBox.Text = (GetLastSerialNumber(cmd, ProductInfo.ProductName) + 1).ToString();
+                                break;
+                            }
+                    }
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
