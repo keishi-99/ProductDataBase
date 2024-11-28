@@ -89,8 +89,6 @@ namespace ProductDatabase {
             _labelSubPageSettings.HeaderFooterFont = HeaderFontDialog.Font;
 
             _labelSubLabelSettings.StringHeight = barcodeHeight;
-            _labelSubLabelSettings.BarcodePosX = 0;
-            _labelSubLabelSettings.BarcodePosY = 0;
             _labelSubLabelSettings.StringMagnitude = barcodeMagnitude;
             _labelSubLabelSettings.Format = PrintTextFormatTextBox.Text;
             _labelSubLabelSettings.Font = TextFontDialog.Font;
