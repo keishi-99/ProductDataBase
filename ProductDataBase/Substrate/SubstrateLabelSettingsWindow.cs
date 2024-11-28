@@ -49,7 +49,7 @@ namespace ProductDatabase {
         }
 
         private void BtnOK_Click(object sender, EventArgs e) {
-            double sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, barcodeHeight, barcodeMagnitude, stringPosX, stringPosY;
+            double sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, stringPosX, stringPosY;
             int numLabelsX, numLabelsY, headerPosX, headerPosY, numLabels;
 
             try {
@@ -64,10 +64,8 @@ namespace ProductDatabase {
                 headerPosX = int.Parse(HeaderPostionXTextBox.Text);
                 headerPosY = int.Parse(HeaderPostionYTextBox.Text);
 
-                barcodeHeight = double.Parse(PrintTextHeightTextBox.Text);
                 stringPosX = double.Parse(PrintTextPostionXTextBox.Text);
                 stringPosY = double.Parse(PrintTextPostionYTextBox.Text);
-                barcodeMagnitude = double.Parse(PrintTextMagnitudeTextBox.Text);
                 numLabels = int.Parse(PrintTextQuantityTextBox.Text);
             } catch (Exception ex) {
                 MessageBox.Show($"入力値が不正です。{Environment.NewLine}{ex.Message}");

@@ -79,7 +79,7 @@ namespace ProductDatabase {
         }
 
         private void BtnOK_Click(object sender, EventArgs e) {
-            decimal sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, stringHeight, stringMagnitude, stringPosX, stringPosY;
+            decimal sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, stringPosX, stringPosY;
             int numLabelsX, numLabelsY, headerPosX, headerPosY, numLabels;
 
             try {
@@ -94,10 +94,8 @@ namespace ProductDatabase {
                 headerPosX = int.Parse(HeaderPostionXTextBox.Text);
                 headerPosY = int.Parse(HeaderPostionYTextBox.Text);
 
-                stringHeight = decimal.Parse(PrintTextHeightTextBox.Text);
                 stringPosX = decimal.Parse(PrintTextPostionXTextBox.Text);
                 stringPosY = decimal.Parse(PrintTextPostionYTextBox.Text);
-                stringMagnitude = decimal.Parse(PrintTextMagnitudeTextBox.Text);
                 numLabels = int.Parse(PrintTextQuantityTextBox.Text);
             } catch (Exception ex) {
                 MessageBox.Show($"入力値が不正です。{Environment.NewLine}{ex.Message}");
