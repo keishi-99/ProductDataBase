@@ -43,8 +43,6 @@ namespace ProductDatabase.Product {
 
     public class CLabelProLabelSettings {
         public string Format { get; set; } = string.Empty;
-        public decimal StringHeight { get; set; }
-        public decimal StringMagnitude { get; set; }
         public decimal StringPosX { get; set; }
         public decimal StringPosY { get; set; }
         public bool AlignStringCenter { get; set; }

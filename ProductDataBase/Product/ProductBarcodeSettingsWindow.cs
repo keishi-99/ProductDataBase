@@ -153,7 +153,6 @@ namespace ProductDatabase {
             DialogResult = DialogResult.OK;
             Close();
         }
-
         private void BtnHeaderFooterFont_Click(object sender, EventArgs e) {
             var r = BarcodeHeaderFontDialog.ShowDialog();
             if (r == DialogResult.Cancel) {

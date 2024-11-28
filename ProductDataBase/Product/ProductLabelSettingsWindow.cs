@@ -45,8 +45,6 @@ namespace ProductDatabase {
             SetLabelSettings(labelSettings);
         }
         private void SetLabelSettings(CLabelProLabelSettings labelSettings) {
-            PrintTextHeightTextBox.Text = labelSettings.StringHeight.ToString();
-            PrintTextMagnitudeTextBox.Text = labelSettings.StringMagnitude.ToString();
             PrintTextQuantityTextBox.Text = labelSettings.NumLabels.ToString();
             PrintTextFormatTextBox.Text = labelSettings.Format;
 
@@ -79,6 +77,7 @@ namespace ProductDatabase {
                 HeaderFooterFontTextBox.Text = $"{HeaderFontDialog.Font.Name} {HeaderFontDialog.Font.SizeInPoints}pt";
             }
         }
+
         private void BtnOK_Click(object sender, EventArgs e) {
             decimal sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, stringHeight, stringMagnitude, stringPosX, stringPosY;
             int numLabelsX, numLabelsY, headerPosX, headerPosY, numLabels;
@@ -120,8 +119,6 @@ namespace ProductDatabase {
 
             _labelProLabelSettings.Format = PrintTextFormatTextBox.Text;
             _labelProLabelSettings.Font = TextFontDialog.Font;
-            _labelProLabelSettings.StringHeight = stringHeight;
-            _labelProLabelSettings.StringMagnitude = stringMagnitude;
             _labelProLabelSettings.StringPosX = stringPosX;
             _labelProLabelSettings.StringPosY = stringPosY;
             _labelProLabelSettings.AlignStringCenter = TextCenterCheckBox.Checked;
@@ -143,7 +140,6 @@ namespace ProductDatabase {
             DialogResult = DialogResult.OK;
             Close();
         }
-
         private void BtnHeaderFooterFont_Click(object sender, EventArgs e) {
             var r = HeaderFontDialog.ShowDialog();
             if (r == DialogResult.Cancel) {
@@ -152,7 +148,6 @@ namespace ProductDatabase {
 
             HeaderFooterFontTextBox.Text = $"{HeaderFontDialog.Font.Name} {HeaderFontDialog.Font.SizeInPoints}pt";
         }
-
         private void PrintTextFontButton_Click(object sender, EventArgs e) {
             var r = TextFontDialog.ShowDialog();
             if (r == DialogResult.Cancel) {
@@ -161,13 +156,10 @@ namespace ProductDatabase {
 
             PrintTextFontTextBox.Text = $"{TextFontDialog.Font.Name} {TextFontDialog.Font.SizeInPoints}pt";
         }
-
         private void TextCenterCheckBox_CheckedChanged(object sender, EventArgs e) {
             PrintTextPostionXTextBox.Enabled = !TextCenterCheckBox.Checked;
         }
-
         private void ProductPrintSetting_Load(object sender, EventArgs e) { PageSettingsLabelLoad(sender, e); }
-
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
     }
 }

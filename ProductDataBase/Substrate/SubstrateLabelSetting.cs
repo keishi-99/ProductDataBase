@@ -43,8 +43,6 @@ namespace ProductDatabase.Substrate {
 
     public class CLabelSubLabelSettings {
         public string Format { get; set; } = "%S";
-        public double StringHeight { get; set; } = 1;
-        public double StringMagnitude { get; set; } = 1.0;
         public double StringPosX { get; set; } = 4;
         public double StringPosY { get; set; } = 1;
         public bool AlignStringCenter { get; set; } = true;

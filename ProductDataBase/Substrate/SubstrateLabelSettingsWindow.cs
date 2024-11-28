@@ -33,8 +33,6 @@ namespace ProductDatabase {
             }
 
             _labelSubLabelSettings = ((SubstrateRegistrationWindow)Owner).SettingsLabelSub!.LabelSubLabelSettings;
-            PrintTextHeightTextBox.Text = _labelSubLabelSettings.StringHeight.ToString();
-            PrintTextMagnitudeTextBox.Text = _labelSubLabelSettings.StringMagnitude.ToString();
             PrintTextQuantityTextBox.Text = _labelSubLabelSettings.NumLabels.ToString();
             PrintTextFormatTextBox.Text = _labelSubLabelSettings.Format;
 
@@ -49,6 +47,7 @@ namespace ProductDatabase {
 
             PrintTextPostionXTextBox.Enabled = !PrintTextCenterCheckBox.Checked;
         }
+
         private void BtnOK_Click(object sender, EventArgs e) {
             double sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, barcodeHeight, barcodeMagnitude, stringPosX, stringPosY;
             int numLabelsX, numLabelsY, headerPosX, headerPosY, numLabels;
@@ -88,8 +87,6 @@ namespace ProductDatabase {
             _labelSubPageSettings.HeaderString = HeaderStringTextBox.Text;
             _labelSubPageSettings.HeaderFooterFont = HeaderFontDialog.Font;
 
-            _labelSubLabelSettings.StringHeight = barcodeHeight;
-            _labelSubLabelSettings.StringMagnitude = barcodeMagnitude;
             _labelSubLabelSettings.Format = PrintTextFormatTextBox.Text;
             _labelSubLabelSettings.Font = TextFontDialog.Font;
             _labelSubLabelSettings.StringPosX = stringPosX;
