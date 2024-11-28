@@ -42,11 +42,11 @@ namespace ProductDatabase.Substrate {
     }
 
     public class CLabelSubLabelSettings {
-        public string Format { get; set; } = "%S";
-        public double StringPosX { get; set; } = 4;
-        public double StringPosY { get; set; } = 1;
-        public bool AlignStringCenter { get; set; } = true;
-        public int NumLabels { get; set; } = 1;
+        public string Format { get; set; }
+        public double StringPosX { get; set; }
+        public double StringPosY { get; set; }
+        public bool AlignStringCenter { get; set; }
+        public int NumLabels { get; set; }
         [XmlIgnore]
         public Font Font { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
 
