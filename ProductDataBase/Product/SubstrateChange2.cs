@@ -19,11 +19,13 @@ namespace ProductDatabase {
         private readonly List<int> _listUsedQuantity = [];
         private readonly List<string> _checkBoxNames = [
                         "Substrate1CheckBox", "Substrate2CheckBox", "Substrate3CheckBox", "Substrate4CheckBox","Substrate5CheckBox",
-                        "Substrate6CheckBox", "Substrate7CheckBox", "Substrate8CheckBox", "Substrate9CheckBox","Substrate10CheckBox"
+                        "Substrate6CheckBox", "Substrate7CheckBox", "Substrate8CheckBox", "Substrate9CheckBox","Substrate10CheckBox",
+                        "Substrate11CheckBox", "Substrate12CheckBox", "Substrate13CheckBox", "Substrate14CheckBox","Substrate15CheckBox"
                         ];
         private readonly List<string> _dataGridViewNames = [
                         "Substrate1DataGridView", "Substrate2DataGridView", "Substrate3DataGridView", "Substrate4DataGridView","Substrate5DataGridView",
-                        "Substrate6DataGridView", "Substrate7DataGridView", "Substrate8DataGridView", "Substrate9DataGridView","Substrate10DataGridView"
+                        "Substrate6DataGridView", "Substrate7DataGridView", "Substrate8DataGridView", "Substrate9DataGridView","Substrate10DataGridView",
+                        "Substrate11DataGridView", "Substrate12DataGridView", "Substrate13DataGridView", "Substrate14DataGridView","Substrate15DataGridView"
                         ];
         private CheckBox? _objCbx;
         private DataGridView? _objDgv;
@@ -78,12 +80,37 @@ namespace ProductDatabase {
 
                             _objDgv = Controls[_dataGridViewNames[i]] as DataGridView;
                             if (_objDgv != null) {
-                                _objDgv.RowHeadersWidth = 30;
                                 _objDgv.Columns[1].DefaultCellStyle.BackColor = Color.LightGray;
                                 _objDgv.Columns[2].DefaultCellStyle.BackColor = Color.LightGray;
                                 _objDgv.Columns[2].ReadOnly = true;
                                 _objDgv.Columns[3].ReadOnly = false;
                                 _objDgv.Columns[4].ReadOnly = false;
+                                switch (Font.Size) {
+                                    case 9:
+                                        _objDgv.RowTemplate.Height = 24;
+                                        _objDgv.Columns[0].Width = 130;
+                                        _objDgv.Columns[1].Width = 30;
+                                        _objDgv.Columns[2].Width = 30;
+                                        _objDgv.Columns[3].Width = 30;
+                                        _objDgv.Columns[4].Width = 24;
+                                        break;
+                                    case 12:
+                                        _objDgv.RowTemplate.Height = 24;
+                                        _objDgv.Columns[0].Width = 220;
+                                        _objDgv.Columns[1].Width = 40;
+                                        _objDgv.Columns[2].Width = 40;
+                                        _objDgv.Columns[3].Width = 40;
+                                        _objDgv.Columns[4].Width = 24;
+                                        break;
+                                    case 14:
+                                        _objDgv.RowTemplate.Height = 25;
+                                        _objDgv.Columns[0].Width = 230;
+                                        _objDgv.Columns[1].Width = 60;
+                                        _objDgv.Columns[2].Width = 60;
+                                        _objDgv.Columns[3].Width = 60;
+                                        _objDgv.Columns[4].Width = 25;
+                                        break;
+                                }
                             }
 
                             using SQLiteConnection con = new(GetConnectionRegistration());
