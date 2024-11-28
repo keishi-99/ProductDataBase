@@ -86,7 +86,7 @@ namespace ProductDatabase {
 
         private void BtnOK_Click(object sender, EventArgs e) {
             decimal sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, barcodePosX, barcodePosY, barcodeHeight, barcodeMagnitude, stringPosX, stringPosY;
-            int numLabelsX, numLabelsY, headerPosX, headerPosY, footerPosX = 0, footerPosY = 0, numLabels;
+            int numLabelsX, numLabelsY, headerPosX, headerPosY, numLabels;
 
             try {
                 sizeX = decimal.Parse(BarcodeLabelWidthTextBox.Text);
@@ -122,7 +122,6 @@ namespace ProductDatabase {
             _barcodeProPageSettings.IntervalX = intervalX;
             _barcodeProPageSettings.IntervalY = intervalY;
             _barcodeProPageSettings.HeaderPos = new Point(headerPosX, headerPosY);
-            _barcodeProPageSettings.FooterPos = new Point(footerPosX, footerPosY);
             _barcodeProPageSettings.HeaderString = BarcodeHeaderStringTextBox.Text;
             _barcodeProPageSettings.HeaderFooterFont = BarcodeHeaderFontDialog.Font;
 

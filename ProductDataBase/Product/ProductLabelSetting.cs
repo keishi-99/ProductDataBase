@@ -22,9 +22,7 @@ namespace ProductDatabase.Product {
         public decimal IntervalX { get; set; }
         public decimal IntervalY { get; set; }
         public string HeaderString { get; set; } = string.Empty;
-        public string FooterString { get; set; } = string.Empty;
         public Point HeaderPos { get; set; }
-        public Point FooterPos { get; set; }
 
         [XmlIgnore]
         public Font HeaderFooterFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);

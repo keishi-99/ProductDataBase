@@ -33,8 +33,8 @@ namespace ProductDatabase {
             }
 
             _labelSubLabelSettings = ((SubstrateRegistrationWindow)Owner).SettingsLabelSub!.LabelSubLabelSettings;
-            PrintTextHeightTextBox.Text = _labelSubLabelSettings.BarcodeHeight.ToString();
-            PrintTextMagnitudeTextBox.Text = _labelSubLabelSettings.BarcodeMagnitude.ToString();
+            PrintTextHeightTextBox.Text = _labelSubLabelSettings.StringHeight.ToString();
+            PrintTextMagnitudeTextBox.Text = _labelSubLabelSettings.StringMagnitude.ToString();
             PrintTextQuantityTextBox.Text = _labelSubLabelSettings.NumLabels.ToString();
             PrintTextFormatTextBox.Text = _labelSubLabelSettings.Format;
 
@@ -49,28 +49,27 @@ namespace ProductDatabase {
 
             PrintTextPostionXTextBox.Enabled = !PrintTextCenterCheckBox.Checked;
         }
-
         private void BtnOK_Click(object sender, EventArgs e) {
             double sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, barcodeHeight, barcodeMagnitude, stringPosX, stringPosY;
-            int numLabelsX, numLabelsY, headerPosX, headerPosY, footerPosX = 0, footerPosY = 0, numLabels;
+            int numLabelsX, numLabelsY, headerPosX, headerPosY, numLabels;
 
             try {
-                sizeX = Double.Parse(LabelWidthTextBox.Text);
-                sizeY = Double.Parse(LabelHeightTextBox.Text);
-                numLabelsX = Int32.Parse(QuantityXTextBox.Text);
-                numLabelsY = Int32.Parse(QuantityYTextBox.Text);
-                offsetX = Double.Parse(PageOffsetXTextBox.Text);
-                offsetY = Double.Parse(PageOffsetYTextBox.Text);
-                intervalX = Double.Parse(LabelIntervalXTextBox.Text);
-                intervalY = Double.Parse(LabelIntervalYTextBox.Text);
-                headerPosX = Int32.Parse(HeaderPostionXTextBox.Text);
-                headerPosY = Int32.Parse(HeaderPostionYTextBox.Text);
+                sizeX = double.Parse(LabelWidthTextBox.Text);
+                sizeY = double.Parse(LabelHeightTextBox.Text);
+                numLabelsX = int.Parse(QuantityXTextBox.Text);
+                numLabelsY = int.Parse(QuantityYTextBox.Text);
+                offsetX = double.Parse(PageOffsetXTextBox.Text);
+                offsetY = double.Parse(PageOffsetYTextBox.Text);
+                intervalX = double.Parse(LabelIntervalXTextBox.Text);
+                intervalY = double.Parse(LabelIntervalYTextBox.Text);
+                headerPosX = int.Parse(HeaderPostionXTextBox.Text);
+                headerPosY = int.Parse(HeaderPostionYTextBox.Text);
 
-                barcodeHeight = Double.Parse(PrintTextHeightTextBox.Text);
-                stringPosX = Double.Parse(PrintTextPostionXTextBox.Text);
-                stringPosY = Double.Parse(PrintTextPostionYTextBox.Text);
-                barcodeMagnitude = Double.Parse(PrintTextMagnitudeTextBox.Text);
-                numLabels = Int32.Parse(PrintTextQuantityTextBox.Text);
+                barcodeHeight = double.Parse(PrintTextHeightTextBox.Text);
+                stringPosX = double.Parse(PrintTextPostionXTextBox.Text);
+                stringPosY = double.Parse(PrintTextPostionYTextBox.Text);
+                barcodeMagnitude = double.Parse(PrintTextMagnitudeTextBox.Text);
+                numLabels = int.Parse(PrintTextQuantityTextBox.Text);
             } catch (Exception ex) {
                 MessageBox.Show($"入力値が不正です。{Environment.NewLine}{ex.Message}");
                 DialogResult = DialogResult.None;
@@ -86,25 +85,23 @@ namespace ProductDatabase {
             _labelSubPageSettings.IntervalX = intervalX;
             _labelSubPageSettings.IntervalY = intervalY;
             _labelSubPageSettings.HeaderPos = new Point(headerPosX, headerPosY);
-            _labelSubPageSettings.FooterPos = new Point(footerPosX, footerPosY);
             _labelSubPageSettings.HeaderString = HeaderStringTextBox.Text;
             _labelSubPageSettings.HeaderFooterFont = HeaderFontDialog.Font;
 
-            _labelSubLabelSettings.BarcodeHeight = barcodeHeight;
+            _labelSubLabelSettings.StringHeight = barcodeHeight;
             _labelSubLabelSettings.BarcodePosX = 0;
             _labelSubLabelSettings.BarcodePosY = 0;
-            _labelSubLabelSettings.BarcodeMagnitude = barcodeMagnitude;
+            _labelSubLabelSettings.StringMagnitude = barcodeMagnitude;
             _labelSubLabelSettings.Format = PrintTextFormatTextBox.Text;
             _labelSubLabelSettings.Font = TextFontDialog.Font;
             _labelSubLabelSettings.StringPosX = stringPosX;
             _labelSubLabelSettings.StringPosY = stringPosY;
             _labelSubLabelSettings.AlignStringCenter = PrintTextCenterCheckBox.Checked;
-            _labelSubLabelSettings.NumLabels = Int32.Parse(PrintTextQuantityTextBox.Text);
+            _labelSubLabelSettings.NumLabels = int.Parse(PrintTextQuantityTextBox.Text);
 
             DialogResult = DialogResult.OK;
             Close();
         }
-
         private void BtnHeaderFooterFont_Click(object sender, EventArgs e) {
             var r = HeaderFontDialog.ShowDialog();
             if (r == DialogResult.Cancel) {
@@ -113,8 +110,7 @@ namespace ProductDatabase {
 
             HeaderFooterFontTextBox.Text = $"{HeaderFontDialog.Font.Name} {HeaderFontDialog.Font.SizeInPoints}pt";
         }
-
-        private void BtnBarcodeFont_Click(object sender, EventArgs e) {
+        private void PrintTextFontButton_Click(object sender, EventArgs e) {
             var r = TextFontDialog.ShowDialog();
             if (r == DialogResult.Cancel) {
                 return;
@@ -122,13 +118,10 @@ namespace ProductDatabase {
 
             PrintTextFontTextBox.Text = $"{TextFontDialog.Font.Name} {TextFontDialog.Font.SizeInPoints}pt";
         }
-
-        private void BarcodeCenterCheckBox_CheckedChanged(object sender, EventArgs e) {
+        private void PrintTextCenterCheckBox_CheckedChanged(object sender, EventArgs e) {
             PrintTextPostionXTextBox.Enabled = !PrintTextCenterCheckBox.Checked;
         }
-
         private void SubstratePrintSetting_Load(object sender, EventArgs e) { PageSettingsLabelLoad(sender, e); }
-
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
     }
 }
