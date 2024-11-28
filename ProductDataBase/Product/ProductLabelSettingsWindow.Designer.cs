@@ -34,15 +34,11 @@
             this.Label36 = new Label();
             this.PrintTextQuantityTextBox = new TextBox();
             this.Label35 = new Label();
-            this.PrintTextMagnitudeTextBox = new TextBox();
-            this.Label34 = new Label();
             this.TextCenterCheckBox = new CheckBox();
             this.PrintTextPostionYTextBox = new TextBox();
             this.Label33 = new Label();
             this.PrintTextPostionXTextBox = new TextBox();
             this.Label32 = new Label();
-            this.PrintTextHeightTextBox = new TextBox();
-            this.Label31 = new Label();
             this.WhiteSpaceGroupBox = new GroupBox();
             this.Label11 = new Label();
             this.Label10 = new Label();
@@ -117,15 +113,11 @@
             this.PrintTextGroupBox.Controls.Add(this.Label36);
             this.PrintTextGroupBox.Controls.Add(this.PrintTextQuantityTextBox);
             this.PrintTextGroupBox.Controls.Add(this.Label35);
-            this.PrintTextGroupBox.Controls.Add(this.PrintTextMagnitudeTextBox);
-            this.PrintTextGroupBox.Controls.Add(this.Label34);
             this.PrintTextGroupBox.Controls.Add(this.TextCenterCheckBox);
             this.PrintTextGroupBox.Controls.Add(this.PrintTextPostionYTextBox);
             this.PrintTextGroupBox.Controls.Add(this.Label33);
             this.PrintTextGroupBox.Controls.Add(this.PrintTextPostionXTextBox);
             this.PrintTextGroupBox.Controls.Add(this.Label32);
-            this.PrintTextGroupBox.Controls.Add(this.PrintTextHeightTextBox);
-            this.PrintTextGroupBox.Controls.Add(this.Label31);
             this.PrintTextGroupBox.Location = new Point(27, 309);
             this.PrintTextGroupBox.Name = "PrintTextGroupBox";
             this.PrintTextGroupBox.Size = new Size(600, 170);
@@ -197,7 +189,7 @@
             // 
             // PrintTextQuantityTextBox
             // 
-            this.PrintTextQuantityTextBox.Location = new Point(104, 92);
+            this.PrintTextQuantityTextBox.Location = new Point(22, 92);
             this.PrintTextQuantityTextBox.MaxLength = 5;
             this.PrintTextQuantityTextBox.Name = "PrintTextQuantityTextBox";
             this.PrintTextQuantityTextBox.Size = new Size(52, 23);
@@ -206,28 +198,11 @@
             // Label35
             // 
             this.Label35.AutoSize = true;
-            this.Label35.Location = new Point(101, 77);
+            this.Label35.Location = new Point(20, 77);
             this.Label35.Name = "Label35";
             this.Label35.Size = new Size(55, 15);
             this.Label35.TabIndex = 9;
             this.Label35.Text = "発行枚数";
-            // 
-            // PrintTextMagnitudeTextBox
-            // 
-            this.PrintTextMagnitudeTextBox.Location = new Point(22, 92);
-            this.PrintTextMagnitudeTextBox.MaxLength = 5;
-            this.PrintTextMagnitudeTextBox.Name = "PrintTextMagnitudeTextBox";
-            this.PrintTextMagnitudeTextBox.Size = new Size(52, 23);
-            this.PrintTextMagnitudeTextBox.TabIndex = 8;
-            // 
-            // Label34
-            // 
-            this.Label34.AutoSize = true;
-            this.Label34.Location = new Point(20, 77);
-            this.Label34.Name = "Label34";
-            this.Label34.Size = new Size(31, 15);
-            this.Label34.TabIndex = 7;
-            this.Label34.Text = "倍率";
             // 
             // TextCenterCheckBox
             // 
@@ -242,7 +217,7 @@
             // 
             // PrintTextPostionYTextBox
             // 
-            this.PrintTextPostionYTextBox.Location = new Point(194, 30);
+            this.PrintTextPostionYTextBox.Location = new Point(112, 30);
             this.PrintTextPostionYTextBox.MaxLength = 5;
             this.PrintTextPostionYTextBox.Name = "PrintTextPostionYTextBox";
             this.PrintTextPostionYTextBox.Size = new Size(68, 23);
@@ -251,7 +226,7 @@
             // Label33
             // 
             this.Label33.AutoSize = true;
-            this.Label33.Location = new Point(191, 15);
+            this.Label33.Location = new Point(110, 15);
             this.Label33.Name = "Label33";
             this.Label33.Size = new Size(43, 15);
             this.Label33.TabIndex = 4;
@@ -259,7 +234,7 @@
             // 
             // PrintTextPostionXTextBox
             // 
-            this.PrintTextPostionXTextBox.Location = new Point(104, 30);
+            this.PrintTextPostionXTextBox.Location = new Point(22, 30);
             this.PrintTextPostionXTextBox.MaxLength = 5;
             this.PrintTextPostionXTextBox.Name = "PrintTextPostionXTextBox";
             this.PrintTextPostionXTextBox.Size = new Size(68, 23);
@@ -268,28 +243,11 @@
             // Label32
             // 
             this.Label32.AutoSize = true;
-            this.Label32.Location = new Point(101, 15);
+            this.Label32.Location = new Point(20, 15);
             this.Label32.Name = "Label32";
             this.Label32.Size = new Size(43, 15);
             this.Label32.TabIndex = 2;
             this.Label32.Text = "横位置";
-            // 
-            // PrintTextHeightTextBox
-            // 
-            this.PrintTextHeightTextBox.Location = new Point(22, 30);
-            this.PrintTextHeightTextBox.MaxLength = 5;
-            this.PrintTextHeightTextBox.Name = "PrintTextHeightTextBox";
-            this.PrintTextHeightTextBox.Size = new Size(52, 23);
-            this.PrintTextHeightTextBox.TabIndex = 1;
-            // 
-            // Label31
-            // 
-            this.Label31.AutoSize = true;
-            this.Label31.Location = new Point(20, 15);
-            this.Label31.Name = "Label31";
-            this.Label31.Size = new Size(27, 15);
-            this.Label31.TabIndex = 1;
-            this.Label31.Text = "高さ";
             // 
             // WhiteSpaceGroupBox
             // 
@@ -757,15 +715,11 @@
         private Label Label36;
         private TextBox PrintTextQuantityTextBox;
         private Label Label35;
-        private TextBox PrintTextMagnitudeTextBox;
-        private Label Label34;
         private CheckBox TextCenterCheckBox;
         private TextBox PrintTextPostionYTextBox;
         private Label Label33;
         private TextBox PrintTextPostionXTextBox;
         private Label Label32;
-        private TextBox PrintTextHeightTextBox;
-        private Label Label31;
         private GroupBox WhiteSpaceGroupBox;
         private Label Label11;
         private Label Label10;
