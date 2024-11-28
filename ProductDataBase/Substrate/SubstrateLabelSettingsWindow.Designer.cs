@@ -139,7 +139,7 @@
             PrintTextFontButton.TabIndex = 24;
             PrintTextFontButton.Text = "フォント選択";
             PrintTextFontButton.UseVisualStyleBackColor = true;
-            PrintTextFontButton.Click += BtnBarcodeFont_Click;
+            PrintTextFontButton.Click += PrintTextFontButton_Click;
             // 
             // PrintTextFontTextBox
             // 
@@ -201,7 +201,7 @@
             PrintTextCenterCheckBox.TabIndex = 6;
             PrintTextCenterCheckBox.Text = "横位置を中心に合わせる";
             PrintTextCenterCheckBox.UseVisualStyleBackColor = true;
-            PrintTextCenterCheckBox.CheckedChanged += BarcodeCenterCheckBox_CheckedChanged;
+            PrintTextCenterCheckBox.CheckedChanged += PrintTextCenterCheckBox_CheckedChanged;
             // 
             // PrintTextPostionYTextBox
             // 

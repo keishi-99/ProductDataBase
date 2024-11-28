@@ -81,7 +81,7 @@ namespace ProductDatabase {
         }
         private void BtnOK_Click(object sender, EventArgs e) {
             decimal sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, stringHeight, stringMagnitude, stringPosX, stringPosY;
-            int numLabelsX, numLabelsY, headerPosX, headerPosY, footerPosX = 0, footerPosY = 0, numLabels;
+            int numLabelsX, numLabelsY, headerPosX, headerPosY, numLabels;
 
             try {
                 sizeX = decimal.Parse(LabelWidthTextBox.Text);
@@ -115,7 +115,6 @@ namespace ProductDatabase {
             _labelProPageSettings.IntervalX = intervalX;
             _labelProPageSettings.IntervalY = intervalY;
             _labelProPageSettings.HeaderPos = new Point(headerPosX, headerPosY);
-            _labelProPageSettings.FooterPos = new Point(footerPosX, footerPosY);
             _labelProPageSettings.HeaderString = HeaderStringTextBox.Text;
             _labelProPageSettings.HeaderFooterFont = HeaderFontDialog.Font;
 
