@@ -608,8 +608,8 @@ namespace ProductDatabase {
                 case "FontSize12RadioButton":
                     fontSize = 12;
                     break;
-                case "FontSize16RadioButton":
-                    fontSize = 16;
+                case "FontSize14RadioButton":
+                    fontSize = 14;
                     break;
                 default:
                     return;

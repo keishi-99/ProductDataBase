@@ -37,7 +37,7 @@
             this.HistoryButton = new Button();
             this.RegisterButton = new Button();
             this.FontSizePanel = new Panel();
-            this.FontSize16RadioButton = new RadioButton();
+            this.FontSize14RadioButton = new RadioButton();
             this.FontSize12RadioButton = new RadioButton();
             this.FontSize9RadioButton = new RadioButton();
             this.FontSizeLabel = new Label();
@@ -194,7 +194,7 @@
             // FontSizePanel
             // 
             this.FontSizePanel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            this.FontSizePanel.Controls.Add(this.FontSize16RadioButton);
+            this.FontSizePanel.Controls.Add(this.FontSize14RadioButton);
             this.FontSizePanel.Controls.Add(this.FontSize12RadioButton);
             this.FontSizePanel.Controls.Add(this.FontSize9RadioButton);
             this.FontSizePanel.Controls.Add(this.FontSizeLabel);
@@ -203,17 +203,17 @@
             this.FontSizePanel.Size = new Size(125, 55);
             this.FontSizePanel.TabIndex = 600;
             // 
-            // FontSize16RadioButton
+            // FontSize14RadioButton
             // 
-            this.FontSize16RadioButton.Appearance = Appearance.Button;
-            this.FontSize16RadioButton.Location = new Point(82, 19);
-            this.FontSize16RadioButton.Name = "FontSize16RadioButton";
-            this.FontSize16RadioButton.Size = new Size(30, 22);
-            this.FontSize16RadioButton.TabIndex = 604;
-            this.FontSize16RadioButton.Text = "16";
-            this.FontSize16RadioButton.TextAlign = ContentAlignment.MiddleCenter;
-            this.FontSize16RadioButton.UseVisualStyleBackColor = true;
-            this.FontSize16RadioButton.CheckedChanged += this.FontSize_CheckedChanged;
+            this.FontSize14RadioButton.Appearance = Appearance.Button;
+            this.FontSize14RadioButton.Location = new Point(82, 19);
+            this.FontSize14RadioButton.Name = "FontSize14RadioButton";
+            this.FontSize14RadioButton.Size = new Size(30, 22);
+            this.FontSize14RadioButton.TabIndex = 604;
+            this.FontSize14RadioButton.Text = "14";
+            this.FontSize14RadioButton.TextAlign = ContentAlignment.MiddleCenter;
+            this.FontSize14RadioButton.UseVisualStyleBackColor = true;
+            this.FontSize14RadioButton.CheckedChanged += this.FontSize_CheckedChanged;
             // 
             // FontSize12RadioButton
             // 
@@ -384,7 +384,7 @@
         private Panel FontSizePanel;
         private RadioButton FontSize9RadioButton;
         private Label FontSizeLabel;
-        private RadioButton FontSize16RadioButton;
+        private RadioButton FontSize14RadioButton;
         private RadioButton FontSize12RadioButton;
         private Panel QRCodePanel;
         private TextBox QRCodeTextBox;

@@ -23,46 +23,6 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            var dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle4 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle5 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle6 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle7 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle8 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle9 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle10 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle11 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle12 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle13 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle14 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle15 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle16 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle17 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle18 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle19 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle20 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle21 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle22 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle23 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle24 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle25 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle26 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle27 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle28 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle29 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle30 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle31 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle32 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle33 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle34 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle35 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle36 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle37 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle38 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle39 = new DataGridViewCellStyle();
-            var dataGridViewCellStyle40 = new DataGridViewCellStyle();
             var resources = new System.ComponentModel.ComponentResourceManager(typeof(ProductRegistration2Window));
             this.ProductRegistration2MenuStrip = new MenuStrip();
             this.ファイルToolStripMenuItem = new ToolStripMenuItem();
@@ -78,63 +38,23 @@
             this.取得情報ToolStripMenuItem = new ToolStripMenuItem();
             this.Substrate1CheckBox = new CheckBox();
             this.Substrate1DataGridView = new DataGridView();
-            this.dataGridViewTextBoxColumn0101 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0102 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0103 = new DataGridViewTextBoxColumn();
-            this.dataGridViewCheckBoxColumn0101 = new DataGridViewCheckBoxColumn();
             this.Substrate2DataGridView = new DataGridView();
-            this.dataGridViewTextBoxColumn0201 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0202 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0203 = new DataGridViewTextBoxColumn();
-            this.dataGridViewCheckBoxColumn0201 = new DataGridViewCheckBoxColumn();
             this.Substrate2CheckBox = new CheckBox();
             this.Substrate3DataGridView = new DataGridView();
-            this.dataGridViewTextBoxColumn0301 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0302 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0303 = new DataGridViewTextBoxColumn();
-            this.dataGridViewCheckBoxColumn0301 = new DataGridViewCheckBoxColumn();
             this.Substrate3CheckBox = new CheckBox();
             this.Substrate4DataGridView = new DataGridView();
-            this.dataGridViewTextBoxColumn0401 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0402 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0403 = new DataGridViewTextBoxColumn();
-            this.dataGridViewCheckBoxColumn0401 = new DataGridViewCheckBoxColumn();
             this.Substrate4CheckBox = new CheckBox();
             this.Substrate5DataGridView = new DataGridView();
-            this.dataGridViewTextBoxColumn0501 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0502 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0503 = new DataGridViewTextBoxColumn();
-            this.dataGridViewCheckBoxColumn0501 = new DataGridViewCheckBoxColumn();
             this.Substrate5CheckBox = new CheckBox();
             this.Substrate6DataGridView = new DataGridView();
-            this.dataGridViewTextBoxColumn0601 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0602 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0603 = new DataGridViewTextBoxColumn();
-            this.dataGridViewCheckBoxColumn0601 = new DataGridViewCheckBoxColumn();
             this.Substrate6CheckBox = new CheckBox();
             this.Substrate7DataGridView = new DataGridView();
-            this.dataGridViewTextBoxColumn0701 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0702 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0703 = new DataGridViewTextBoxColumn();
-            this.dataGridViewCheckBoxColumn0701 = new DataGridViewCheckBoxColumn();
             this.Substrate7CheckBox = new CheckBox();
             this.Substrate8DataGridView = new DataGridView();
-            this.dataGridViewTextBoxColumn0801 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0802 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0803 = new DataGridViewTextBoxColumn();
-            this.dataGridViewCheckBoxColumn0801 = new DataGridViewCheckBoxColumn();
             this.Substrate8CheckBox = new CheckBox();
             this.Substrate9DataGridView = new DataGridView();
-            this.dataGridViewTextBoxColumn0901 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0902 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn0903 = new DataGridViewTextBoxColumn();
-            this.dataGridViewCheckBoxColumn0901 = new DataGridViewCheckBoxColumn();
             this.Substrate9CheckBox = new CheckBox();
             this.Substrate10DataGridView = new DataGridView();
-            this.dataGridViewTextBoxColumn1001 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn1002 = new DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn1003 = new DataGridViewTextBoxColumn();
-            this.dataGridViewCheckBoxColumn1001 = new DataGridViewCheckBoxColumn();
             this.Substrate10CheckBox = new CheckBox();
             this.SerialPrintPostionLabel = new Label();
             this.SerialPrintPostionNumericUpDown = new NumericUpDown();
@@ -147,6 +67,76 @@
             this.ProductRegistration2PrintDialog = new PrintDialog();
             this.ProductRegistration2PrintDocument = new System.Drawing.Printing.PrintDocument();
             this.ProductRegistration2PrintPreviewDialog = new PrintPreviewDialog();
+            this.Substrate15DataGridView = new DataGridView();
+            this.Substrate15CheckBox = new CheckBox();
+            this.Substrate14DataGridView = new DataGridView();
+            this.Substrate14CheckBox = new CheckBox();
+            this.Substrate13DataGridView = new DataGridView();
+            this.Substrate13CheckBox = new CheckBox();
+            this.Substrate12DataGridView = new DataGridView();
+            this.Substrate12CheckBox = new CheckBox();
+            this.Substrate11DataGridView = new DataGridView();
+            this.Substrate11CheckBox = new CheckBox();
+            this.dataGridViewTextBoxColumn0101 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0102 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0103 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn0101 = new DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn0201 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0202 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0203 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn0201 = new DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn0301 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0302 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0303 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn0301 = new DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn0401 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0402 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0403 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn0401 = new DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn0501 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0502 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0503 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn0501 = new DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn0601 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0602 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0603 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn0601 = new DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn0701 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0702 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0703 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn0701 = new DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn0801 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0802 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0803 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn0801 = new DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn0901 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0902 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn0903 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn0901 = new DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn1001 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn1002 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn1003 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn1001 = new DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn13 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn14 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn15 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn5 = new DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn10 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn11 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn12 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn4 = new DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn7 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn8 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn9 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn3 = new DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn4 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn5 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn6 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn2 = new DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn3 = new DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn1 = new DataGridViewCheckBoxColumn();
             this.ProductRegistration2MenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.Substrate1DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate2DataGridView).BeginInit();
@@ -160,6 +150,11 @@
             ((System.ComponentModel.ISupportInitialize)this.Substrate10DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.SerialPrintPostionNumericUpDown).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.BarcodePrintPostionNumericUpDown).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)this.Substrate15DataGridView).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)this.Substrate14DataGridView).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)this.Substrate13DataGridView).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)this.Substrate12DataGridView).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)this.Substrate11DataGridView).BeginInit();
             this.SuspendLayout();
             // 
             // ProductRegistration2MenuStrip
@@ -167,7 +162,7 @@
             this.ProductRegistration2MenuStrip.Items.AddRange(new ToolStripItem[] { this.ファイルToolStripMenuItem, this.設定ToolStripMenuItem, this.ヘルプToolStripMenuItem });
             this.ProductRegistration2MenuStrip.Location = new Point(0, 0);
             this.ProductRegistration2MenuStrip.Name = "ProductRegistration2MenuStrip";
-            this.ProductRegistration2MenuStrip.Size = new Size(784, 24);
+            this.ProductRegistration2MenuStrip.Size = new Size(934, 24);
             this.ProductRegistration2MenuStrip.TabIndex = 0;
             this.ProductRegistration2MenuStrip.Text = "menuStrip1";
             // 
@@ -252,7 +247,7 @@
             // 
             this.Substrate1CheckBox.AutoSize = true;
             this.Substrate1CheckBox.Enabled = false;
-            this.Substrate1CheckBox.Location = new Point(54, 27);
+            this.Substrate1CheckBox.Location = new Point(44, 27);
             this.Substrate1CheckBox.Name = "Substrate1CheckBox";
             this.Substrate1CheckBox.Size = new Size(31, 19);
             this.Substrate1CheckBox.TabIndex = 1;
@@ -272,60 +267,13 @@
             this.Substrate1DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0101, this.dataGridViewTextBoxColumn0102, this.dataGridViewTextBoxColumn0103, this.dataGridViewCheckBoxColumn0101 });
             this.Substrate1DataGridView.Enabled = false;
             this.Substrate1DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate1DataGridView.Location = new Point(54, 50);
+            this.Substrate1DataGridView.Location = new Point(44, 50);
             this.Substrate1DataGridView.MultiSelect = false;
             this.Substrate1DataGridView.Name = "Substrate1DataGridView";
+            this.Substrate1DataGridView.RowHeadersVisible = false;
             this.Substrate1DataGridView.RowTemplate.Height = 21;
-            this.Substrate1DataGridView.Size = new Size(300, 74);
+            this.Substrate1DataGridView.Size = new Size(250, 74);
             this.Substrate1DataGridView.TabIndex = 2;
-            // 
-            // dataGridViewTextBoxColumn0101
-            // 
-            dataGridViewCellStyle1.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0101.DefaultCellStyle = dataGridViewCellStyle1;
-            this.dataGridViewTextBoxColumn0101.HeaderText = "Column1";
-            this.dataGridViewTextBoxColumn0101.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0101.Name = "dataGridViewTextBoxColumn0101";
-            this.dataGridViewTextBoxColumn0101.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0101.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0101.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0101.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn0102
-            // 
-            dataGridViewCellStyle2.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0102.DefaultCellStyle = dataGridViewCellStyle2;
-            this.dataGridViewTextBoxColumn0102.HeaderText = "Column2";
-            this.dataGridViewTextBoxColumn0102.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0102.Name = "dataGridViewTextBoxColumn0102";
-            this.dataGridViewTextBoxColumn0102.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0102.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0102.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0102.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn0103
-            // 
-            dataGridViewCellStyle3.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0103.DefaultCellStyle = dataGridViewCellStyle3;
-            this.dataGridViewTextBoxColumn0103.HeaderText = "Column3";
-            this.dataGridViewTextBoxColumn0103.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0103.Name = "dataGridViewTextBoxColumn0103";
-            this.dataGridViewTextBoxColumn0103.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0103.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0103.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0103.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn0101
-            // 
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle4.Font = new Font("Meiryo UI", 9F);
-            dataGridViewCellStyle4.NullValue = false;
-            this.dataGridViewCheckBoxColumn0101.DefaultCellStyle = dataGridViewCellStyle4;
-            this.dataGridViewCheckBoxColumn0101.HeaderText = "Column4";
-            this.dataGridViewCheckBoxColumn0101.Name = "dataGridViewCheckBoxColumn0101";
-            this.dataGridViewCheckBoxColumn0101.ReadOnly = true;
-            this.dataGridViewCheckBoxColumn0101.Resizable = DataGridViewTriState.False;
-            this.dataGridViewCheckBoxColumn0101.Width = 35;
             // 
             // Substrate2DataGridView
             // 
@@ -339,66 +287,19 @@
             this.Substrate2DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0201, this.dataGridViewTextBoxColumn0202, this.dataGridViewTextBoxColumn0203, this.dataGridViewCheckBoxColumn0201 });
             this.Substrate2DataGridView.Enabled = false;
             this.Substrate2DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate2DataGridView.Location = new Point(54, 151);
+            this.Substrate2DataGridView.Location = new Point(44, 151);
             this.Substrate2DataGridView.MultiSelect = false;
             this.Substrate2DataGridView.Name = "Substrate2DataGridView";
+            this.Substrate2DataGridView.RowHeadersVisible = false;
             this.Substrate2DataGridView.RowTemplate.Height = 21;
-            this.Substrate2DataGridView.Size = new Size(300, 74);
+            this.Substrate2DataGridView.Size = new Size(250, 74);
             this.Substrate2DataGridView.TabIndex = 4;
-            // 
-            // dataGridViewTextBoxColumn0201
-            // 
-            dataGridViewCellStyle5.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0201.DefaultCellStyle = dataGridViewCellStyle5;
-            this.dataGridViewTextBoxColumn0201.HeaderText = "Column1";
-            this.dataGridViewTextBoxColumn0201.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0201.Name = "dataGridViewTextBoxColumn0201";
-            this.dataGridViewTextBoxColumn0201.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0201.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0201.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0201.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn0202
-            // 
-            dataGridViewCellStyle6.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0202.DefaultCellStyle = dataGridViewCellStyle6;
-            this.dataGridViewTextBoxColumn0202.HeaderText = "Column2";
-            this.dataGridViewTextBoxColumn0202.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0202.Name = "dataGridViewTextBoxColumn0202";
-            this.dataGridViewTextBoxColumn0202.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0202.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0202.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0202.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn0203
-            // 
-            dataGridViewCellStyle7.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0203.DefaultCellStyle = dataGridViewCellStyle7;
-            this.dataGridViewTextBoxColumn0203.HeaderText = "Column3";
-            this.dataGridViewTextBoxColumn0203.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0203.Name = "dataGridViewTextBoxColumn0203";
-            this.dataGridViewTextBoxColumn0203.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0203.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0203.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0203.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn0201
-            // 
-            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle8.Font = new Font("Meiryo UI", 9F);
-            dataGridViewCellStyle8.NullValue = false;
-            this.dataGridViewCheckBoxColumn0201.DefaultCellStyle = dataGridViewCellStyle8;
-            this.dataGridViewCheckBoxColumn0201.HeaderText = "Column4";
-            this.dataGridViewCheckBoxColumn0201.Name = "dataGridViewCheckBoxColumn0201";
-            this.dataGridViewCheckBoxColumn0201.ReadOnly = true;
-            this.dataGridViewCheckBoxColumn0201.Resizable = DataGridViewTriState.False;
-            this.dataGridViewCheckBoxColumn0201.Width = 35;
             // 
             // Substrate2CheckBox
             // 
             this.Substrate2CheckBox.AutoSize = true;
             this.Substrate2CheckBox.Enabled = false;
-            this.Substrate2CheckBox.Location = new Point(54, 128);
+            this.Substrate2CheckBox.Location = new Point(44, 128);
             this.Substrate2CheckBox.Name = "Substrate2CheckBox";
             this.Substrate2CheckBox.Size = new Size(31, 19);
             this.Substrate2CheckBox.TabIndex = 3;
@@ -419,66 +320,19 @@
             this.Substrate3DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0301, this.dataGridViewTextBoxColumn0302, this.dataGridViewTextBoxColumn0303, this.dataGridViewCheckBoxColumn0301 });
             this.Substrate3DataGridView.Enabled = false;
             this.Substrate3DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate3DataGridView.Location = new Point(54, 252);
+            this.Substrate3DataGridView.Location = new Point(44, 252);
             this.Substrate3DataGridView.MultiSelect = false;
             this.Substrate3DataGridView.Name = "Substrate3DataGridView";
+            this.Substrate3DataGridView.RowHeadersVisible = false;
             this.Substrate3DataGridView.RowTemplate.Height = 21;
-            this.Substrate3DataGridView.Size = new Size(300, 74);
+            this.Substrate3DataGridView.Size = new Size(250, 74);
             this.Substrate3DataGridView.TabIndex = 6;
-            // 
-            // dataGridViewTextBoxColumn0301
-            // 
-            dataGridViewCellStyle9.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0301.DefaultCellStyle = dataGridViewCellStyle9;
-            this.dataGridViewTextBoxColumn0301.HeaderText = "Column1";
-            this.dataGridViewTextBoxColumn0301.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0301.Name = "dataGridViewTextBoxColumn0301";
-            this.dataGridViewTextBoxColumn0301.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0301.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0301.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0301.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn0302
-            // 
-            dataGridViewCellStyle10.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0302.DefaultCellStyle = dataGridViewCellStyle10;
-            this.dataGridViewTextBoxColumn0302.HeaderText = "Column2";
-            this.dataGridViewTextBoxColumn0302.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0302.Name = "dataGridViewTextBoxColumn0302";
-            this.dataGridViewTextBoxColumn0302.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0302.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0302.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0302.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn0303
-            // 
-            dataGridViewCellStyle11.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0303.DefaultCellStyle = dataGridViewCellStyle11;
-            this.dataGridViewTextBoxColumn0303.HeaderText = "Column3";
-            this.dataGridViewTextBoxColumn0303.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0303.Name = "dataGridViewTextBoxColumn0303";
-            this.dataGridViewTextBoxColumn0303.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0303.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0303.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0303.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn0301
-            // 
-            dataGridViewCellStyle12.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle12.Font = new Font("Meiryo UI", 9F);
-            dataGridViewCellStyle12.NullValue = false;
-            this.dataGridViewCheckBoxColumn0301.DefaultCellStyle = dataGridViewCellStyle12;
-            this.dataGridViewCheckBoxColumn0301.HeaderText = "Column4";
-            this.dataGridViewCheckBoxColumn0301.Name = "dataGridViewCheckBoxColumn0301";
-            this.dataGridViewCheckBoxColumn0301.ReadOnly = true;
-            this.dataGridViewCheckBoxColumn0301.Resizable = DataGridViewTriState.False;
-            this.dataGridViewCheckBoxColumn0301.Width = 35;
             // 
             // Substrate3CheckBox
             // 
             this.Substrate3CheckBox.AutoSize = true;
             this.Substrate3CheckBox.Enabled = false;
-            this.Substrate3CheckBox.Location = new Point(54, 229);
+            this.Substrate3CheckBox.Location = new Point(44, 229);
             this.Substrate3CheckBox.Name = "Substrate3CheckBox";
             this.Substrate3CheckBox.Size = new Size(31, 19);
             this.Substrate3CheckBox.TabIndex = 5;
@@ -499,66 +353,19 @@
             this.Substrate4DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0401, this.dataGridViewTextBoxColumn0402, this.dataGridViewTextBoxColumn0403, this.dataGridViewCheckBoxColumn0401 });
             this.Substrate4DataGridView.Enabled = false;
             this.Substrate4DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate4DataGridView.Location = new Point(54, 353);
+            this.Substrate4DataGridView.Location = new Point(44, 353);
             this.Substrate4DataGridView.MultiSelect = false;
             this.Substrate4DataGridView.Name = "Substrate4DataGridView";
+            this.Substrate4DataGridView.RowHeadersVisible = false;
             this.Substrate4DataGridView.RowTemplate.Height = 21;
-            this.Substrate4DataGridView.Size = new Size(300, 74);
+            this.Substrate4DataGridView.Size = new Size(250, 74);
             this.Substrate4DataGridView.TabIndex = 8;
-            // 
-            // dataGridViewTextBoxColumn0401
-            // 
-            dataGridViewCellStyle13.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0401.DefaultCellStyle = dataGridViewCellStyle13;
-            this.dataGridViewTextBoxColumn0401.HeaderText = "Column1";
-            this.dataGridViewTextBoxColumn0401.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0401.Name = "dataGridViewTextBoxColumn0401";
-            this.dataGridViewTextBoxColumn0401.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0401.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0401.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0401.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn0402
-            // 
-            dataGridViewCellStyle14.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0402.DefaultCellStyle = dataGridViewCellStyle14;
-            this.dataGridViewTextBoxColumn0402.HeaderText = "Column2";
-            this.dataGridViewTextBoxColumn0402.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0402.Name = "dataGridViewTextBoxColumn0402";
-            this.dataGridViewTextBoxColumn0402.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0402.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0402.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0402.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn0403
-            // 
-            dataGridViewCellStyle15.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0403.DefaultCellStyle = dataGridViewCellStyle15;
-            this.dataGridViewTextBoxColumn0403.HeaderText = "Column3";
-            this.dataGridViewTextBoxColumn0403.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0403.Name = "dataGridViewTextBoxColumn0403";
-            this.dataGridViewTextBoxColumn0403.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0403.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0403.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0403.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn0401
-            // 
-            dataGridViewCellStyle16.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle16.Font = new Font("Meiryo UI", 9F);
-            dataGridViewCellStyle16.NullValue = false;
-            this.dataGridViewCheckBoxColumn0401.DefaultCellStyle = dataGridViewCellStyle16;
-            this.dataGridViewCheckBoxColumn0401.HeaderText = "Column4";
-            this.dataGridViewCheckBoxColumn0401.Name = "dataGridViewCheckBoxColumn0401";
-            this.dataGridViewCheckBoxColumn0401.ReadOnly = true;
-            this.dataGridViewCheckBoxColumn0401.Resizable = DataGridViewTriState.False;
-            this.dataGridViewCheckBoxColumn0401.Width = 35;
             // 
             // Substrate4CheckBox
             // 
             this.Substrate4CheckBox.AutoSize = true;
             this.Substrate4CheckBox.Enabled = false;
-            this.Substrate4CheckBox.Location = new Point(54, 330);
+            this.Substrate4CheckBox.Location = new Point(44, 330);
             this.Substrate4CheckBox.Name = "Substrate4CheckBox";
             this.Substrate4CheckBox.Size = new Size(31, 19);
             this.Substrate4CheckBox.TabIndex = 7;
@@ -579,66 +386,19 @@
             this.Substrate5DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0501, this.dataGridViewTextBoxColumn0502, this.dataGridViewTextBoxColumn0503, this.dataGridViewCheckBoxColumn0501 });
             this.Substrate5DataGridView.Enabled = false;
             this.Substrate5DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate5DataGridView.Location = new Point(54, 454);
+            this.Substrate5DataGridView.Location = new Point(44, 454);
             this.Substrate5DataGridView.MultiSelect = false;
             this.Substrate5DataGridView.Name = "Substrate5DataGridView";
+            this.Substrate5DataGridView.RowHeadersVisible = false;
             this.Substrate5DataGridView.RowTemplate.Height = 21;
-            this.Substrate5DataGridView.Size = new Size(300, 74);
+            this.Substrate5DataGridView.Size = new Size(250, 74);
             this.Substrate5DataGridView.TabIndex = 10;
-            // 
-            // dataGridViewTextBoxColumn0501
-            // 
-            dataGridViewCellStyle17.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0501.DefaultCellStyle = dataGridViewCellStyle17;
-            this.dataGridViewTextBoxColumn0501.HeaderText = "Column1";
-            this.dataGridViewTextBoxColumn0501.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0501.Name = "dataGridViewTextBoxColumn0501";
-            this.dataGridViewTextBoxColumn0501.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0501.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0501.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0501.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn0502
-            // 
-            dataGridViewCellStyle18.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0502.DefaultCellStyle = dataGridViewCellStyle18;
-            this.dataGridViewTextBoxColumn0502.HeaderText = "Column2";
-            this.dataGridViewTextBoxColumn0502.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0502.Name = "dataGridViewTextBoxColumn0502";
-            this.dataGridViewTextBoxColumn0502.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0502.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0502.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0502.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn0503
-            // 
-            dataGridViewCellStyle19.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0503.DefaultCellStyle = dataGridViewCellStyle19;
-            this.dataGridViewTextBoxColumn0503.HeaderText = "Column3";
-            this.dataGridViewTextBoxColumn0503.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0503.Name = "dataGridViewTextBoxColumn0503";
-            this.dataGridViewTextBoxColumn0503.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0503.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0503.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0503.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn0501
-            // 
-            dataGridViewCellStyle20.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle20.Font = new Font("Meiryo UI", 9F);
-            dataGridViewCellStyle20.NullValue = false;
-            this.dataGridViewCheckBoxColumn0501.DefaultCellStyle = dataGridViewCellStyle20;
-            this.dataGridViewCheckBoxColumn0501.HeaderText = "Column4";
-            this.dataGridViewCheckBoxColumn0501.Name = "dataGridViewCheckBoxColumn0501";
-            this.dataGridViewCheckBoxColumn0501.ReadOnly = true;
-            this.dataGridViewCheckBoxColumn0501.Resizable = DataGridViewTriState.False;
-            this.dataGridViewCheckBoxColumn0501.Width = 35;
             // 
             // Substrate5CheckBox
             // 
             this.Substrate5CheckBox.AutoSize = true;
             this.Substrate5CheckBox.Enabled = false;
-            this.Substrate5CheckBox.Location = new Point(54, 431);
+            this.Substrate5CheckBox.Location = new Point(44, 431);
             this.Substrate5CheckBox.Name = "Substrate5CheckBox";
             this.Substrate5CheckBox.Size = new Size(31, 19);
             this.Substrate5CheckBox.TabIndex = 9;
@@ -659,66 +419,19 @@
             this.Substrate6DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0601, this.dataGridViewTextBoxColumn0602, this.dataGridViewTextBoxColumn0603, this.dataGridViewCheckBoxColumn0601 });
             this.Substrate6DataGridView.Enabled = false;
             this.Substrate6DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate6DataGridView.Location = new Point(441, 50);
+            this.Substrate6DataGridView.Location = new Point(342, 50);
             this.Substrate6DataGridView.MultiSelect = false;
             this.Substrate6DataGridView.Name = "Substrate6DataGridView";
+            this.Substrate6DataGridView.RowHeadersVisible = false;
             this.Substrate6DataGridView.RowTemplate.Height = 21;
-            this.Substrate6DataGridView.Size = new Size(300, 74);
+            this.Substrate6DataGridView.Size = new Size(250, 74);
             this.Substrate6DataGridView.TabIndex = 12;
-            // 
-            // dataGridViewTextBoxColumn0601
-            // 
-            dataGridViewCellStyle21.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0601.DefaultCellStyle = dataGridViewCellStyle21;
-            this.dataGridViewTextBoxColumn0601.HeaderText = "Column1";
-            this.dataGridViewTextBoxColumn0601.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0601.Name = "dataGridViewTextBoxColumn0601";
-            this.dataGridViewTextBoxColumn0601.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0601.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0601.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0601.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn0602
-            // 
-            dataGridViewCellStyle22.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0602.DefaultCellStyle = dataGridViewCellStyle22;
-            this.dataGridViewTextBoxColumn0602.HeaderText = "Column2";
-            this.dataGridViewTextBoxColumn0602.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0602.Name = "dataGridViewTextBoxColumn0602";
-            this.dataGridViewTextBoxColumn0602.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0602.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0602.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0602.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn0603
-            // 
-            dataGridViewCellStyle23.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0603.DefaultCellStyle = dataGridViewCellStyle23;
-            this.dataGridViewTextBoxColumn0603.HeaderText = "Column3";
-            this.dataGridViewTextBoxColumn0603.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0603.Name = "dataGridViewTextBoxColumn0603";
-            this.dataGridViewTextBoxColumn0603.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0603.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0603.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0603.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn0601
-            // 
-            dataGridViewCellStyle24.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle24.Font = new Font("Meiryo UI", 9F);
-            dataGridViewCellStyle24.NullValue = false;
-            this.dataGridViewCheckBoxColumn0601.DefaultCellStyle = dataGridViewCellStyle24;
-            this.dataGridViewCheckBoxColumn0601.HeaderText = "Column4";
-            this.dataGridViewCheckBoxColumn0601.Name = "dataGridViewCheckBoxColumn0601";
-            this.dataGridViewCheckBoxColumn0601.ReadOnly = true;
-            this.dataGridViewCheckBoxColumn0601.Resizable = DataGridViewTriState.False;
-            this.dataGridViewCheckBoxColumn0601.Width = 35;
             // 
             // Substrate6CheckBox
             // 
             this.Substrate6CheckBox.AutoSize = true;
             this.Substrate6CheckBox.Enabled = false;
-            this.Substrate6CheckBox.Location = new Point(441, 27);
+            this.Substrate6CheckBox.Location = new Point(342, 27);
             this.Substrate6CheckBox.Name = "Substrate6CheckBox";
             this.Substrate6CheckBox.Size = new Size(31, 19);
             this.Substrate6CheckBox.TabIndex = 11;
@@ -738,66 +451,19 @@
             this.Substrate7DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0701, this.dataGridViewTextBoxColumn0702, this.dataGridViewTextBoxColumn0703, this.dataGridViewCheckBoxColumn0701 });
             this.Substrate7DataGridView.Enabled = false;
             this.Substrate7DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate7DataGridView.Location = new Point(441, 151);
+            this.Substrate7DataGridView.Location = new Point(342, 151);
             this.Substrate7DataGridView.MultiSelect = false;
             this.Substrate7DataGridView.Name = "Substrate7DataGridView";
+            this.Substrate7DataGridView.RowHeadersVisible = false;
             this.Substrate7DataGridView.RowTemplate.Height = 21;
-            this.Substrate7DataGridView.Size = new Size(300, 74);
+            this.Substrate7DataGridView.Size = new Size(250, 74);
             this.Substrate7DataGridView.TabIndex = 14;
-            // 
-            // dataGridViewTextBoxColumn0701
-            // 
-            dataGridViewCellStyle25.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0701.DefaultCellStyle = dataGridViewCellStyle25;
-            this.dataGridViewTextBoxColumn0701.HeaderText = "Column1";
-            this.dataGridViewTextBoxColumn0701.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0701.Name = "dataGridViewTextBoxColumn0701";
-            this.dataGridViewTextBoxColumn0701.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0701.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0701.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0701.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn0702
-            // 
-            dataGridViewCellStyle26.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0702.DefaultCellStyle = dataGridViewCellStyle26;
-            this.dataGridViewTextBoxColumn0702.HeaderText = "Column2";
-            this.dataGridViewTextBoxColumn0702.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0702.Name = "dataGridViewTextBoxColumn0702";
-            this.dataGridViewTextBoxColumn0702.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0702.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0702.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0702.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn0703
-            // 
-            dataGridViewCellStyle27.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0703.DefaultCellStyle = dataGridViewCellStyle27;
-            this.dataGridViewTextBoxColumn0703.HeaderText = "Column3";
-            this.dataGridViewTextBoxColumn0703.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0703.Name = "dataGridViewTextBoxColumn0703";
-            this.dataGridViewTextBoxColumn0703.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0703.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0703.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0703.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn0701
-            // 
-            dataGridViewCellStyle28.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle28.Font = new Font("Meiryo UI", 9F);
-            dataGridViewCellStyle28.NullValue = false;
-            this.dataGridViewCheckBoxColumn0701.DefaultCellStyle = dataGridViewCellStyle28;
-            this.dataGridViewCheckBoxColumn0701.HeaderText = "Column4";
-            this.dataGridViewCheckBoxColumn0701.Name = "dataGridViewCheckBoxColumn0701";
-            this.dataGridViewCheckBoxColumn0701.ReadOnly = true;
-            this.dataGridViewCheckBoxColumn0701.Resizable = DataGridViewTriState.False;
-            this.dataGridViewCheckBoxColumn0701.Width = 35;
             // 
             // Substrate7CheckBox
             // 
             this.Substrate7CheckBox.AutoSize = true;
             this.Substrate7CheckBox.Enabled = false;
-            this.Substrate7CheckBox.Location = new Point(441, 128);
+            this.Substrate7CheckBox.Location = new Point(342, 128);
             this.Substrate7CheckBox.Name = "Substrate7CheckBox";
             this.Substrate7CheckBox.Size = new Size(31, 19);
             this.Substrate7CheckBox.TabIndex = 13;
@@ -817,66 +483,19 @@
             this.Substrate8DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0801, this.dataGridViewTextBoxColumn0802, this.dataGridViewTextBoxColumn0803, this.dataGridViewCheckBoxColumn0801 });
             this.Substrate8DataGridView.Enabled = false;
             this.Substrate8DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate8DataGridView.Location = new Point(441, 252);
+            this.Substrate8DataGridView.Location = new Point(342, 252);
             this.Substrate8DataGridView.MultiSelect = false;
             this.Substrate8DataGridView.Name = "Substrate8DataGridView";
+            this.Substrate8DataGridView.RowHeadersVisible = false;
             this.Substrate8DataGridView.RowTemplate.Height = 21;
-            this.Substrate8DataGridView.Size = new Size(300, 74);
+            this.Substrate8DataGridView.Size = new Size(250, 74);
             this.Substrate8DataGridView.TabIndex = 16;
-            // 
-            // dataGridViewTextBoxColumn0801
-            // 
-            dataGridViewCellStyle29.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0801.DefaultCellStyle = dataGridViewCellStyle29;
-            this.dataGridViewTextBoxColumn0801.HeaderText = "Column1";
-            this.dataGridViewTextBoxColumn0801.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0801.Name = "dataGridViewTextBoxColumn0801";
-            this.dataGridViewTextBoxColumn0801.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0801.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0801.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0801.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn0802
-            // 
-            dataGridViewCellStyle30.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0802.DefaultCellStyle = dataGridViewCellStyle30;
-            this.dataGridViewTextBoxColumn0802.HeaderText = "Column2";
-            this.dataGridViewTextBoxColumn0802.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0802.Name = "dataGridViewTextBoxColumn0802";
-            this.dataGridViewTextBoxColumn0802.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0802.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0802.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0802.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn0803
-            // 
-            dataGridViewCellStyle31.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0803.DefaultCellStyle = dataGridViewCellStyle31;
-            this.dataGridViewTextBoxColumn0803.HeaderText = "Column3";
-            this.dataGridViewTextBoxColumn0803.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0803.Name = "dataGridViewTextBoxColumn0803";
-            this.dataGridViewTextBoxColumn0803.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0803.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0803.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0803.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn0801
-            // 
-            dataGridViewCellStyle32.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle32.Font = new Font("Meiryo UI", 9F);
-            dataGridViewCellStyle32.NullValue = false;
-            this.dataGridViewCheckBoxColumn0801.DefaultCellStyle = dataGridViewCellStyle32;
-            this.dataGridViewCheckBoxColumn0801.HeaderText = "Column4";
-            this.dataGridViewCheckBoxColumn0801.Name = "dataGridViewCheckBoxColumn0801";
-            this.dataGridViewCheckBoxColumn0801.ReadOnly = true;
-            this.dataGridViewCheckBoxColumn0801.Resizable = DataGridViewTriState.False;
-            this.dataGridViewCheckBoxColumn0801.Width = 35;
             // 
             // Substrate8CheckBox
             // 
             this.Substrate8CheckBox.AutoSize = true;
             this.Substrate8CheckBox.Enabled = false;
-            this.Substrate8CheckBox.Location = new Point(441, 229);
+            this.Substrate8CheckBox.Location = new Point(342, 229);
             this.Substrate8CheckBox.Name = "Substrate8CheckBox";
             this.Substrate8CheckBox.Size = new Size(31, 19);
             this.Substrate8CheckBox.TabIndex = 15;
@@ -896,66 +515,19 @@
             this.Substrate9DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0901, this.dataGridViewTextBoxColumn0902, this.dataGridViewTextBoxColumn0903, this.dataGridViewCheckBoxColumn0901 });
             this.Substrate9DataGridView.Enabled = false;
             this.Substrate9DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate9DataGridView.Location = new Point(441, 353);
+            this.Substrate9DataGridView.Location = new Point(342, 353);
             this.Substrate9DataGridView.MultiSelect = false;
             this.Substrate9DataGridView.Name = "Substrate9DataGridView";
+            this.Substrate9DataGridView.RowHeadersVisible = false;
             this.Substrate9DataGridView.RowTemplate.Height = 21;
-            this.Substrate9DataGridView.Size = new Size(300, 74);
+            this.Substrate9DataGridView.Size = new Size(250, 74);
             this.Substrate9DataGridView.TabIndex = 18;
-            // 
-            // dataGridViewTextBoxColumn0901
-            // 
-            dataGridViewCellStyle33.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0901.DefaultCellStyle = dataGridViewCellStyle33;
-            this.dataGridViewTextBoxColumn0901.HeaderText = "Column1";
-            this.dataGridViewTextBoxColumn0901.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0901.Name = "dataGridViewTextBoxColumn0901";
-            this.dataGridViewTextBoxColumn0901.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0901.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0901.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0901.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn0902
-            // 
-            dataGridViewCellStyle34.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0902.DefaultCellStyle = dataGridViewCellStyle34;
-            this.dataGridViewTextBoxColumn0902.HeaderText = "Column2";
-            this.dataGridViewTextBoxColumn0902.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0902.Name = "dataGridViewTextBoxColumn0902";
-            this.dataGridViewTextBoxColumn0902.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0902.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0902.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0902.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn0903
-            // 
-            dataGridViewCellStyle35.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn0903.DefaultCellStyle = dataGridViewCellStyle35;
-            this.dataGridViewTextBoxColumn0903.HeaderText = "Column3";
-            this.dataGridViewTextBoxColumn0903.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn0903.Name = "dataGridViewTextBoxColumn0903";
-            this.dataGridViewTextBoxColumn0903.ReadOnly = true;
-            this.dataGridViewTextBoxColumn0903.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn0903.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn0903.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn0901
-            // 
-            dataGridViewCellStyle36.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle36.Font = new Font("Meiryo UI", 9F);
-            dataGridViewCellStyle36.NullValue = false;
-            this.dataGridViewCheckBoxColumn0901.DefaultCellStyle = dataGridViewCellStyle36;
-            this.dataGridViewCheckBoxColumn0901.HeaderText = "Column4";
-            this.dataGridViewCheckBoxColumn0901.Name = "dataGridViewCheckBoxColumn0901";
-            this.dataGridViewCheckBoxColumn0901.ReadOnly = true;
-            this.dataGridViewCheckBoxColumn0901.Resizable = DataGridViewTriState.False;
-            this.dataGridViewCheckBoxColumn0901.Width = 35;
             // 
             // Substrate9CheckBox
             // 
             this.Substrate9CheckBox.AutoSize = true;
             this.Substrate9CheckBox.Enabled = false;
-            this.Substrate9CheckBox.Location = new Point(441, 330);
+            this.Substrate9CheckBox.Location = new Point(342, 330);
             this.Substrate9CheckBox.Name = "Substrate9CheckBox";
             this.Substrate9CheckBox.Size = new Size(31, 19);
             this.Substrate9CheckBox.TabIndex = 17;
@@ -975,66 +547,19 @@
             this.Substrate10DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn1001, this.dataGridViewTextBoxColumn1002, this.dataGridViewTextBoxColumn1003, this.dataGridViewCheckBoxColumn1001 });
             this.Substrate10DataGridView.Enabled = false;
             this.Substrate10DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate10DataGridView.Location = new Point(441, 454);
+            this.Substrate10DataGridView.Location = new Point(342, 454);
             this.Substrate10DataGridView.MultiSelect = false;
             this.Substrate10DataGridView.Name = "Substrate10DataGridView";
+            this.Substrate10DataGridView.RowHeadersVisible = false;
             this.Substrate10DataGridView.RowTemplate.Height = 21;
-            this.Substrate10DataGridView.Size = new Size(300, 74);
+            this.Substrate10DataGridView.Size = new Size(250, 74);
             this.Substrate10DataGridView.TabIndex = 20;
-            // 
-            // dataGridViewTextBoxColumn1001
-            // 
-            dataGridViewCellStyle37.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn1001.DefaultCellStyle = dataGridViewCellStyle37;
-            this.dataGridViewTextBoxColumn1001.HeaderText = "Column1";
-            this.dataGridViewTextBoxColumn1001.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn1001.Name = "dataGridViewTextBoxColumn1001";
-            this.dataGridViewTextBoxColumn1001.ReadOnly = true;
-            this.dataGridViewTextBoxColumn1001.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn1001.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn1001.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn1002
-            // 
-            dataGridViewCellStyle38.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn1002.DefaultCellStyle = dataGridViewCellStyle38;
-            this.dataGridViewTextBoxColumn1002.HeaderText = "Column2";
-            this.dataGridViewTextBoxColumn1002.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn1002.Name = "dataGridViewTextBoxColumn1002";
-            this.dataGridViewTextBoxColumn1002.ReadOnly = true;
-            this.dataGridViewTextBoxColumn1002.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn1002.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn1002.Width = 35;
-            // 
-            // dataGridViewTextBoxColumn1003
-            // 
-            dataGridViewCellStyle39.Font = new Font("Meiryo UI", 9F);
-            this.dataGridViewTextBoxColumn1003.DefaultCellStyle = dataGridViewCellStyle39;
-            this.dataGridViewTextBoxColumn1003.HeaderText = "Column3";
-            this.dataGridViewTextBoxColumn1003.MaxInputLength = 100;
-            this.dataGridViewTextBoxColumn1003.Name = "dataGridViewTextBoxColumn1003";
-            this.dataGridViewTextBoxColumn1003.ReadOnly = true;
-            this.dataGridViewTextBoxColumn1003.Resizable = DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn1003.SortMode = DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn1003.Width = 35;
-            // 
-            // dataGridViewCheckBoxColumn1001
-            // 
-            dataGridViewCellStyle40.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle40.Font = new Font("Meiryo UI", 9F);
-            dataGridViewCellStyle40.NullValue = false;
-            this.dataGridViewCheckBoxColumn1001.DefaultCellStyle = dataGridViewCellStyle40;
-            this.dataGridViewCheckBoxColumn1001.HeaderText = "Column4";
-            this.dataGridViewCheckBoxColumn1001.Name = "dataGridViewCheckBoxColumn1001";
-            this.dataGridViewCheckBoxColumn1001.ReadOnly = true;
-            this.dataGridViewCheckBoxColumn1001.Resizable = DataGridViewTriState.False;
-            this.dataGridViewCheckBoxColumn1001.Width = 35;
             // 
             // Substrate10CheckBox
             // 
             this.Substrate10CheckBox.AutoSize = true;
             this.Substrate10CheckBox.Enabled = false;
-            this.Substrate10CheckBox.Location = new Point(441, 431);
+            this.Substrate10CheckBox.Location = new Point(342, 431);
             this.Substrate10CheckBox.Name = "Substrate10CheckBox";
             this.Substrate10CheckBox.Size = new Size(31, 19);
             this.Substrate10CheckBox.TabIndex = 19;
@@ -1046,7 +571,7 @@
             // 
             this.SerialPrintPostionLabel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             this.SerialPrintPostionLabel.AutoSize = true;
-            this.SerialPrintPostionLabel.Location = new Point(299, 549);
+            this.SerialPrintPostionLabel.Location = new Point(449, 549);
             this.SerialPrintPostionLabel.Name = "SerialPrintPostionLabel";
             this.SerialPrintPostionLabel.Size = new Size(79, 30);
             this.SerialPrintPostionLabel.TabIndex = 21;
@@ -1055,7 +580,7 @@
             // SerialPrintPostionNumericUpDown
             // 
             this.SerialPrintPostionNumericUpDown.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            this.SerialPrintPostionNumericUpDown.Location = new Point(287, 580);
+            this.SerialPrintPostionNumericUpDown.Location = new Point(437, 580);
             this.SerialPrintPostionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
             this.SerialPrintPostionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             this.SerialPrintPostionNumericUpDown.Name = "SerialPrintPostionNumericUpDown";
@@ -1067,7 +592,7 @@
             // BarcodePrintPostionNumericUpDown
             // 
             this.BarcodePrintPostionNumericUpDown.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            this.BarcodePrintPostionNumericUpDown.Location = new Point(426, 580);
+            this.BarcodePrintPostionNumericUpDown.Location = new Point(576, 580);
             this.BarcodePrintPostionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
             this.BarcodePrintPostionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             this.BarcodePrintPostionNumericUpDown.Name = "BarcodePrintPostionNumericUpDown";
@@ -1080,7 +605,7 @@
             // 
             this.BarcodePrintPostionLabel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             this.BarcodePrintPostionLabel.AutoSize = true;
-            this.BarcodePrintPostionLabel.Location = new Point(438, 549);
+            this.BarcodePrintPostionLabel.Location = new Point(588, 549);
             this.BarcodePrintPostionLabel.Name = "BarcodePrintPostionLabel";
             this.BarcodePrintPostionLabel.Size = new Size(79, 30);
             this.BarcodePrintPostionLabel.TabIndex = 23;
@@ -1090,7 +615,7 @@
             // 
             this.SubstrateListPrintButton.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             this.SubstrateListPrintButton.Enabled = false;
-            this.SubstrateListPrintButton.Location = new Point(566, 544);
+            this.SubstrateListPrintButton.Location = new Point(716, 544);
             this.SubstrateListPrintButton.Name = "SubstrateListPrintButton";
             this.SubstrateListPrintButton.Size = new Size(100, 25);
             this.SubstrateListPrintButton.TabIndex = 25;
@@ -1102,7 +627,7 @@
             // 
             this.CheckSheetPrintButton.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             this.CheckSheetPrintButton.Enabled = false;
-            this.CheckSheetPrintButton.Location = new Point(672, 544);
+            this.CheckSheetPrintButton.Location = new Point(822, 544);
             this.CheckSheetPrintButton.Name = "CheckSheetPrintButton";
             this.CheckSheetPrintButton.Size = new Size(100, 25);
             this.CheckSheetPrintButton.TabIndex = 26;
@@ -1114,7 +639,7 @@
             // 
             this.RegisterButton.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             this.RegisterButton.Enabled = false;
-            this.RegisterButton.Location = new Point(566, 577);
+            this.RegisterButton.Location = new Point(716, 577);
             this.RegisterButton.Name = "RegisterButton";
             this.RegisterButton.Size = new Size(100, 25);
             this.RegisterButton.TabIndex = 27;
@@ -1125,7 +650,7 @@
             // CloseButton
             // 
             this.CloseButton.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            this.CloseButton.Location = new Point(672, 577);
+            this.CloseButton.Location = new Point(822, 577);
             this.CloseButton.Name = "CloseButton";
             this.CloseButton.Size = new Size(100, 25);
             this.CloseButton.TabIndex = 28;
@@ -1148,11 +673,686 @@
             this.ProductRegistration2PrintPreviewDialog.Visible = false;
             this.ProductRegistration2PrintPreviewDialog.Load += this.ProductRegistration2PrintPreviewDialog_Load;
             // 
+            // Substrate15DataGridView
+            // 
+            this.Substrate15DataGridView.AllowUserToAddRows = false;
+            this.Substrate15DataGridView.AllowUserToDeleteRows = false;
+            this.Substrate15DataGridView.AllowUserToResizeColumns = false;
+            this.Substrate15DataGridView.AllowUserToResizeRows = false;
+            this.Substrate15DataGridView.BackgroundColor = SystemColors.AppWorkspace;
+            this.Substrate15DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Substrate15DataGridView.ColumnHeadersVisible = false;
+            this.Substrate15DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn1, this.dataGridViewTextBoxColumn2, this.dataGridViewTextBoxColumn3, this.dataGridViewCheckBoxColumn1 });
+            this.Substrate15DataGridView.Enabled = false;
+            this.Substrate15DataGridView.GridColor = SystemColors.ControlDark;
+            this.Substrate15DataGridView.Location = new Point(640, 454);
+            this.Substrate15DataGridView.MultiSelect = false;
+            this.Substrate15DataGridView.Name = "Substrate15DataGridView";
+            this.Substrate15DataGridView.RowHeadersVisible = false;
+            this.Substrate15DataGridView.RowTemplate.Height = 21;
+            this.Substrate15DataGridView.Size = new Size(250, 74);
+            this.Substrate15DataGridView.TabIndex = 38;
+            // 
+            // Substrate15CheckBox
+            // 
+            this.Substrate15CheckBox.AutoSize = true;
+            this.Substrate15CheckBox.Enabled = false;
+            this.Substrate15CheckBox.Location = new Point(640, 431);
+            this.Substrate15CheckBox.Name = "Substrate15CheckBox";
+            this.Substrate15CheckBox.Size = new Size(31, 19);
+            this.Substrate15CheckBox.TabIndex = 37;
+            this.Substrate15CheckBox.Text = "-";
+            this.Substrate15CheckBox.UseVisualStyleBackColor = true;
+            // 
+            // Substrate14DataGridView
+            // 
+            this.Substrate14DataGridView.AllowUserToAddRows = false;
+            this.Substrate14DataGridView.AllowUserToDeleteRows = false;
+            this.Substrate14DataGridView.AllowUserToResizeColumns = false;
+            this.Substrate14DataGridView.AllowUserToResizeRows = false;
+            this.Substrate14DataGridView.BackgroundColor = SystemColors.AppWorkspace;
+            this.Substrate14DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Substrate14DataGridView.ColumnHeadersVisible = false;
+            this.Substrate14DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn4, this.dataGridViewTextBoxColumn5, this.dataGridViewTextBoxColumn6, this.dataGridViewCheckBoxColumn2 });
+            this.Substrate14DataGridView.Enabled = false;
+            this.Substrate14DataGridView.GridColor = SystemColors.ControlDark;
+            this.Substrate14DataGridView.Location = new Point(640, 353);
+            this.Substrate14DataGridView.MultiSelect = false;
+            this.Substrate14DataGridView.Name = "Substrate14DataGridView";
+            this.Substrate14DataGridView.RowHeadersVisible = false;
+            this.Substrate14DataGridView.RowTemplate.Height = 21;
+            this.Substrate14DataGridView.Size = new Size(250, 74);
+            this.Substrate14DataGridView.TabIndex = 36;
+            // 
+            // Substrate14CheckBox
+            // 
+            this.Substrate14CheckBox.AutoSize = true;
+            this.Substrate14CheckBox.Enabled = false;
+            this.Substrate14CheckBox.Location = new Point(640, 330);
+            this.Substrate14CheckBox.Name = "Substrate14CheckBox";
+            this.Substrate14CheckBox.Size = new Size(31, 19);
+            this.Substrate14CheckBox.TabIndex = 35;
+            this.Substrate14CheckBox.Text = "-";
+            this.Substrate14CheckBox.UseVisualStyleBackColor = true;
+            // 
+            // Substrate13DataGridView
+            // 
+            this.Substrate13DataGridView.AllowUserToAddRows = false;
+            this.Substrate13DataGridView.AllowUserToDeleteRows = false;
+            this.Substrate13DataGridView.AllowUserToResizeColumns = false;
+            this.Substrate13DataGridView.AllowUserToResizeRows = false;
+            this.Substrate13DataGridView.BackgroundColor = SystemColors.AppWorkspace;
+            this.Substrate13DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Substrate13DataGridView.ColumnHeadersVisible = false;
+            this.Substrate13DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn7, this.dataGridViewTextBoxColumn8, this.dataGridViewTextBoxColumn9, this.dataGridViewCheckBoxColumn3 });
+            this.Substrate13DataGridView.Enabled = false;
+            this.Substrate13DataGridView.GridColor = SystemColors.ControlDark;
+            this.Substrate13DataGridView.Location = new Point(640, 252);
+            this.Substrate13DataGridView.MultiSelect = false;
+            this.Substrate13DataGridView.Name = "Substrate13DataGridView";
+            this.Substrate13DataGridView.RowHeadersVisible = false;
+            this.Substrate13DataGridView.RowTemplate.Height = 21;
+            this.Substrate13DataGridView.Size = new Size(250, 74);
+            this.Substrate13DataGridView.TabIndex = 34;
+            // 
+            // Substrate13CheckBox
+            // 
+            this.Substrate13CheckBox.AutoSize = true;
+            this.Substrate13CheckBox.Enabled = false;
+            this.Substrate13CheckBox.Location = new Point(640, 229);
+            this.Substrate13CheckBox.Name = "Substrate13CheckBox";
+            this.Substrate13CheckBox.Size = new Size(31, 19);
+            this.Substrate13CheckBox.TabIndex = 33;
+            this.Substrate13CheckBox.Text = "-";
+            this.Substrate13CheckBox.UseVisualStyleBackColor = true;
+            // 
+            // Substrate12DataGridView
+            // 
+            this.Substrate12DataGridView.AllowUserToAddRows = false;
+            this.Substrate12DataGridView.AllowUserToDeleteRows = false;
+            this.Substrate12DataGridView.AllowUserToResizeColumns = false;
+            this.Substrate12DataGridView.AllowUserToResizeRows = false;
+            this.Substrate12DataGridView.BackgroundColor = SystemColors.AppWorkspace;
+            this.Substrate12DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Substrate12DataGridView.ColumnHeadersVisible = false;
+            this.Substrate12DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn10, this.dataGridViewTextBoxColumn11, this.dataGridViewTextBoxColumn12, this.dataGridViewCheckBoxColumn4 });
+            this.Substrate12DataGridView.Enabled = false;
+            this.Substrate12DataGridView.GridColor = SystemColors.ControlDark;
+            this.Substrate12DataGridView.Location = new Point(640, 151);
+            this.Substrate12DataGridView.MultiSelect = false;
+            this.Substrate12DataGridView.Name = "Substrate12DataGridView";
+            this.Substrate12DataGridView.RowHeadersVisible = false;
+            this.Substrate12DataGridView.RowTemplate.Height = 21;
+            this.Substrate12DataGridView.Size = new Size(250, 74);
+            this.Substrate12DataGridView.TabIndex = 32;
+            // 
+            // Substrate12CheckBox
+            // 
+            this.Substrate12CheckBox.AutoSize = true;
+            this.Substrate12CheckBox.Enabled = false;
+            this.Substrate12CheckBox.Location = new Point(640, 128);
+            this.Substrate12CheckBox.Name = "Substrate12CheckBox";
+            this.Substrate12CheckBox.Size = new Size(31, 19);
+            this.Substrate12CheckBox.TabIndex = 31;
+            this.Substrate12CheckBox.Text = "-";
+            this.Substrate12CheckBox.UseVisualStyleBackColor = true;
+            // 
+            // Substrate11DataGridView
+            // 
+            this.Substrate11DataGridView.AllowUserToAddRows = false;
+            this.Substrate11DataGridView.AllowUserToDeleteRows = false;
+            this.Substrate11DataGridView.AllowUserToResizeColumns = false;
+            this.Substrate11DataGridView.AllowUserToResizeRows = false;
+            this.Substrate11DataGridView.BackgroundColor = SystemColors.AppWorkspace;
+            this.Substrate11DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Substrate11DataGridView.ColumnHeadersVisible = false;
+            this.Substrate11DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn13, this.dataGridViewTextBoxColumn14, this.dataGridViewTextBoxColumn15, this.dataGridViewCheckBoxColumn5 });
+            this.Substrate11DataGridView.Enabled = false;
+            this.Substrate11DataGridView.GridColor = SystemColors.ControlDark;
+            this.Substrate11DataGridView.Location = new Point(640, 50);
+            this.Substrate11DataGridView.MultiSelect = false;
+            this.Substrate11DataGridView.Name = "Substrate11DataGridView";
+            this.Substrate11DataGridView.RowHeadersVisible = false;
+            this.Substrate11DataGridView.RowTemplate.Height = 21;
+            this.Substrate11DataGridView.Size = new Size(250, 74);
+            this.Substrate11DataGridView.TabIndex = 30;
+            // 
+            // Substrate11CheckBox
+            // 
+            this.Substrate11CheckBox.AutoSize = true;
+            this.Substrate11CheckBox.Enabled = false;
+            this.Substrate11CheckBox.Location = new Point(640, 27);
+            this.Substrate11CheckBox.Name = "Substrate11CheckBox";
+            this.Substrate11CheckBox.Size = new Size(31, 19);
+            this.Substrate11CheckBox.TabIndex = 29;
+            this.Substrate11CheckBox.Text = "-";
+            this.Substrate11CheckBox.UseVisualStyleBackColor = true;
+            // 
+            // dataGridViewTextBoxColumn0101
+            // 
+            this.dataGridViewTextBoxColumn0101.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn0101.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn0101.Name = "dataGridViewTextBoxColumn0101";
+            this.dataGridViewTextBoxColumn0101.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0101.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0101.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0102
+            // 
+            this.dataGridViewTextBoxColumn0102.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn0102.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0102.Name = "dataGridViewTextBoxColumn0102";
+            this.dataGridViewTextBoxColumn0102.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0102.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0102.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0103
+            // 
+            this.dataGridViewTextBoxColumn0103.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn0103.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0103.Name = "dataGridViewTextBoxColumn0103";
+            this.dataGridViewTextBoxColumn0103.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0103.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0103.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn0101
+            // 
+            this.dataGridViewCheckBoxColumn0101.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn0101.Name = "dataGridViewCheckBoxColumn0101";
+            this.dataGridViewCheckBoxColumn0101.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn0101.Resizable = DataGridViewTriState.False;
+            // 
+            // dataGridViewTextBoxColumn0201
+            // 
+            this.dataGridViewTextBoxColumn0201.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn0201.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn0201.Name = "dataGridViewTextBoxColumn0201";
+            this.dataGridViewTextBoxColumn0201.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0201.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0201.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0202
+            // 
+            this.dataGridViewTextBoxColumn0202.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn0202.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0202.Name = "dataGridViewTextBoxColumn0202";
+            this.dataGridViewTextBoxColumn0202.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0202.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0202.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0203
+            // 
+            this.dataGridViewTextBoxColumn0203.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn0203.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0203.Name = "dataGridViewTextBoxColumn0203";
+            this.dataGridViewTextBoxColumn0203.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0203.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0203.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn0201
+            // 
+            this.dataGridViewCheckBoxColumn0201.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn0201.Name = "dataGridViewCheckBoxColumn0201";
+            this.dataGridViewCheckBoxColumn0201.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn0201.Resizable = DataGridViewTriState.False;
+            // 
+            // dataGridViewTextBoxColumn0301
+            // 
+            this.dataGridViewTextBoxColumn0301.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn0301.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn0301.Name = "dataGridViewTextBoxColumn0301";
+            this.dataGridViewTextBoxColumn0301.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0301.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0301.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0302
+            // 
+            this.dataGridViewTextBoxColumn0302.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn0302.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0302.Name = "dataGridViewTextBoxColumn0302";
+            this.dataGridViewTextBoxColumn0302.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0302.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0302.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0303
+            // 
+            this.dataGridViewTextBoxColumn0303.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn0303.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0303.Name = "dataGridViewTextBoxColumn0303";
+            this.dataGridViewTextBoxColumn0303.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0303.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0303.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn0301
+            // 
+            this.dataGridViewCheckBoxColumn0301.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn0301.Name = "dataGridViewCheckBoxColumn0301";
+            this.dataGridViewCheckBoxColumn0301.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn0301.Resizable = DataGridViewTriState.False;
+            // 
+            // dataGridViewTextBoxColumn0401
+            // 
+            this.dataGridViewTextBoxColumn0401.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn0401.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn0401.Name = "dataGridViewTextBoxColumn0401";
+            this.dataGridViewTextBoxColumn0401.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0401.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0401.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0402
+            // 
+            this.dataGridViewTextBoxColumn0402.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn0402.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0402.Name = "dataGridViewTextBoxColumn0402";
+            this.dataGridViewTextBoxColumn0402.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0402.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0402.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0403
+            // 
+            this.dataGridViewTextBoxColumn0403.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn0403.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0403.Name = "dataGridViewTextBoxColumn0403";
+            this.dataGridViewTextBoxColumn0403.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0403.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0403.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn0401
+            // 
+            this.dataGridViewCheckBoxColumn0401.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn0401.Name = "dataGridViewCheckBoxColumn0401";
+            this.dataGridViewCheckBoxColumn0401.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn0401.Resizable = DataGridViewTriState.False;
+            // 
+            // dataGridViewTextBoxColumn0501
+            // 
+            this.dataGridViewTextBoxColumn0501.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn0501.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn0501.Name = "dataGridViewTextBoxColumn0501";
+            this.dataGridViewTextBoxColumn0501.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0501.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0501.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0502
+            // 
+            this.dataGridViewTextBoxColumn0502.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn0502.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0502.Name = "dataGridViewTextBoxColumn0502";
+            this.dataGridViewTextBoxColumn0502.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0502.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0502.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0503
+            // 
+            this.dataGridViewTextBoxColumn0503.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn0503.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0503.Name = "dataGridViewTextBoxColumn0503";
+            this.dataGridViewTextBoxColumn0503.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0503.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0503.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn0501
+            // 
+            this.dataGridViewCheckBoxColumn0501.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn0501.Name = "dataGridViewCheckBoxColumn0501";
+            this.dataGridViewCheckBoxColumn0501.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn0501.Resizable = DataGridViewTriState.False;
+            // 
+            // dataGridViewTextBoxColumn0601
+            // 
+            this.dataGridViewTextBoxColumn0601.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn0601.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn0601.Name = "dataGridViewTextBoxColumn0601";
+            this.dataGridViewTextBoxColumn0601.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0601.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0601.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0602
+            // 
+            this.dataGridViewTextBoxColumn0602.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn0602.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0602.Name = "dataGridViewTextBoxColumn0602";
+            this.dataGridViewTextBoxColumn0602.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0602.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0602.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0603
+            // 
+            this.dataGridViewTextBoxColumn0603.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn0603.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0603.Name = "dataGridViewTextBoxColumn0603";
+            this.dataGridViewTextBoxColumn0603.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0603.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0603.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn0601
+            // 
+            this.dataGridViewCheckBoxColumn0601.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn0601.Name = "dataGridViewCheckBoxColumn0601";
+            this.dataGridViewCheckBoxColumn0601.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn0601.Resizable = DataGridViewTriState.False;
+            // 
+            // dataGridViewTextBoxColumn0701
+            // 
+            this.dataGridViewTextBoxColumn0701.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn0701.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn0701.Name = "dataGridViewTextBoxColumn0701";
+            this.dataGridViewTextBoxColumn0701.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0701.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0701.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0702
+            // 
+            this.dataGridViewTextBoxColumn0702.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn0702.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0702.Name = "dataGridViewTextBoxColumn0702";
+            this.dataGridViewTextBoxColumn0702.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0702.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0702.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0703
+            // 
+            this.dataGridViewTextBoxColumn0703.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn0703.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0703.Name = "dataGridViewTextBoxColumn0703";
+            this.dataGridViewTextBoxColumn0703.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0703.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0703.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn0701
+            // 
+            this.dataGridViewCheckBoxColumn0701.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn0701.Name = "dataGridViewCheckBoxColumn0701";
+            this.dataGridViewCheckBoxColumn0701.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn0701.Resizable = DataGridViewTriState.False;
+            // 
+            // dataGridViewTextBoxColumn0801
+            // 
+            this.dataGridViewTextBoxColumn0801.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn0801.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn0801.Name = "dataGridViewTextBoxColumn0801";
+            this.dataGridViewTextBoxColumn0801.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0801.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0801.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0802
+            // 
+            this.dataGridViewTextBoxColumn0802.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn0802.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0802.Name = "dataGridViewTextBoxColumn0802";
+            this.dataGridViewTextBoxColumn0802.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0802.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0802.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0803
+            // 
+            this.dataGridViewTextBoxColumn0803.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn0803.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0803.Name = "dataGridViewTextBoxColumn0803";
+            this.dataGridViewTextBoxColumn0803.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0803.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0803.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn0801
+            // 
+            this.dataGridViewCheckBoxColumn0801.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn0801.Name = "dataGridViewCheckBoxColumn0801";
+            this.dataGridViewCheckBoxColumn0801.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn0801.Resizable = DataGridViewTriState.False;
+            // 
+            // dataGridViewTextBoxColumn0901
+            // 
+            this.dataGridViewTextBoxColumn0901.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn0901.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn0901.Name = "dataGridViewTextBoxColumn0901";
+            this.dataGridViewTextBoxColumn0901.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0901.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0901.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0902
+            // 
+            this.dataGridViewTextBoxColumn0902.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn0902.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0902.Name = "dataGridViewTextBoxColumn0902";
+            this.dataGridViewTextBoxColumn0902.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0902.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0902.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn0903
+            // 
+            this.dataGridViewTextBoxColumn0903.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn0903.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn0903.Name = "dataGridViewTextBoxColumn0903";
+            this.dataGridViewTextBoxColumn0903.ReadOnly = true;
+            this.dataGridViewTextBoxColumn0903.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn0903.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn0901
+            // 
+            this.dataGridViewCheckBoxColumn0901.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn0901.Name = "dataGridViewCheckBoxColumn0901";
+            this.dataGridViewCheckBoxColumn0901.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn0901.Resizable = DataGridViewTriState.False;
+            // 
+            // dataGridViewTextBoxColumn1001
+            // 
+            this.dataGridViewTextBoxColumn1001.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn1001.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn1001.Name = "dataGridViewTextBoxColumn1001";
+            this.dataGridViewTextBoxColumn1001.ReadOnly = true;
+            this.dataGridViewTextBoxColumn1001.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn1001.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn1002
+            // 
+            this.dataGridViewTextBoxColumn1002.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn1002.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn1002.Name = "dataGridViewTextBoxColumn1002";
+            this.dataGridViewTextBoxColumn1002.ReadOnly = true;
+            this.dataGridViewTextBoxColumn1002.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn1002.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn1003
+            // 
+            this.dataGridViewTextBoxColumn1003.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn1003.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn1003.Name = "dataGridViewTextBoxColumn1003";
+            this.dataGridViewTextBoxColumn1003.ReadOnly = true;
+            this.dataGridViewTextBoxColumn1003.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn1003.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn1001
+            // 
+            this.dataGridViewCheckBoxColumn1001.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn1001.Name = "dataGridViewCheckBoxColumn1001";
+            this.dataGridViewCheckBoxColumn1001.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn1001.Resizable = DataGridViewTriState.False;
+            // 
+            // dataGridViewTextBoxColumn13
+            // 
+            this.dataGridViewTextBoxColumn13.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn13.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn13.Name = "dataGridViewTextBoxColumn13";
+            this.dataGridViewTextBoxColumn13.ReadOnly = true;
+            this.dataGridViewTextBoxColumn13.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn13.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn14
+            // 
+            this.dataGridViewTextBoxColumn14.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn14.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn14.Name = "dataGridViewTextBoxColumn14";
+            this.dataGridViewTextBoxColumn14.ReadOnly = true;
+            this.dataGridViewTextBoxColumn14.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn14.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn15
+            // 
+            this.dataGridViewTextBoxColumn15.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn15.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn15.Name = "dataGridViewTextBoxColumn15";
+            this.dataGridViewTextBoxColumn15.ReadOnly = true;
+            this.dataGridViewTextBoxColumn15.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn15.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn5
+            // 
+            this.dataGridViewCheckBoxColumn5.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn5.Name = "dataGridViewCheckBoxColumn5";
+            this.dataGridViewCheckBoxColumn5.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn5.Resizable = DataGridViewTriState.False;
+            // 
+            // dataGridViewTextBoxColumn10
+            // 
+            this.dataGridViewTextBoxColumn10.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn10.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn10.Name = "dataGridViewTextBoxColumn10";
+            this.dataGridViewTextBoxColumn10.ReadOnly = true;
+            this.dataGridViewTextBoxColumn10.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn10.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn11
+            // 
+            this.dataGridViewTextBoxColumn11.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn11.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn11.Name = "dataGridViewTextBoxColumn11";
+            this.dataGridViewTextBoxColumn11.ReadOnly = true;
+            this.dataGridViewTextBoxColumn11.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn11.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn12
+            // 
+            this.dataGridViewTextBoxColumn12.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn12.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn12.Name = "dataGridViewTextBoxColumn12";
+            this.dataGridViewTextBoxColumn12.ReadOnly = true;
+            this.dataGridViewTextBoxColumn12.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn12.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn4
+            // 
+            this.dataGridViewCheckBoxColumn4.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn4.Name = "dataGridViewCheckBoxColumn4";
+            this.dataGridViewCheckBoxColumn4.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn4.Resizable = DataGridViewTriState.False;
+            // 
+            // dataGridViewTextBoxColumn7
+            // 
+            this.dataGridViewTextBoxColumn7.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn7.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn7.Name = "dataGridViewTextBoxColumn7";
+            this.dataGridViewTextBoxColumn7.ReadOnly = true;
+            this.dataGridViewTextBoxColumn7.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn7.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn8
+            // 
+            this.dataGridViewTextBoxColumn8.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn8.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn8.Name = "dataGridViewTextBoxColumn8";
+            this.dataGridViewTextBoxColumn8.ReadOnly = true;
+            this.dataGridViewTextBoxColumn8.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn8.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn9
+            // 
+            this.dataGridViewTextBoxColumn9.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn9.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn9.Name = "dataGridViewTextBoxColumn9";
+            this.dataGridViewTextBoxColumn9.ReadOnly = true;
+            this.dataGridViewTextBoxColumn9.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn9.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn3
+            // 
+            this.dataGridViewCheckBoxColumn3.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn3.Name = "dataGridViewCheckBoxColumn3";
+            this.dataGridViewCheckBoxColumn3.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn3.Resizable = DataGridViewTriState.False;
+            // 
+            // dataGridViewTextBoxColumn4
+            // 
+            this.dataGridViewTextBoxColumn4.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn4.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
+            this.dataGridViewTextBoxColumn4.ReadOnly = true;
+            this.dataGridViewTextBoxColumn4.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn4.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn5
+            // 
+            this.dataGridViewTextBoxColumn5.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn5.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn5.Name = "dataGridViewTextBoxColumn5";
+            this.dataGridViewTextBoxColumn5.ReadOnly = true;
+            this.dataGridViewTextBoxColumn5.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn5.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn6
+            // 
+            this.dataGridViewTextBoxColumn6.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn6.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
+            this.dataGridViewTextBoxColumn6.ReadOnly = true;
+            this.dataGridViewTextBoxColumn6.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn6.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn2
+            // 
+            this.dataGridViewCheckBoxColumn2.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn2.Name = "dataGridViewCheckBoxColumn2";
+            this.dataGridViewCheckBoxColumn2.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn2.Resizable = DataGridViewTriState.False;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn1.MaxInputLength = 30;
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            this.dataGridViewTextBoxColumn1.ReadOnly = true;
+            this.dataGridViewTextBoxColumn1.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn1.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            this.dataGridViewTextBoxColumn2.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn2.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            this.dataGridViewTextBoxColumn2.ReadOnly = true;
+            this.dataGridViewTextBoxColumn2.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn2.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewTextBoxColumn3
+            // 
+            this.dataGridViewTextBoxColumn3.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn3.MaxInputLength = 3;
+            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            this.dataGridViewTextBoxColumn3.ReadOnly = true;
+            this.dataGridViewTextBoxColumn3.Resizable = DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn3.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dataGridViewCheckBoxColumn1
+            // 
+            this.dataGridViewCheckBoxColumn1.HeaderText = "Column4";
+            this.dataGridViewCheckBoxColumn1.Name = "dataGridViewCheckBoxColumn1";
+            this.dataGridViewCheckBoxColumn1.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn1.Resizable = DataGridViewTriState.False;
+            // 
             // ProductRegistration2Window
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(784, 611);
+            this.ClientSize = new Size(934, 611);
+            this.Controls.Add(this.Substrate15DataGridView);
+            this.Controls.Add(this.Substrate15CheckBox);
+            this.Controls.Add(this.Substrate14DataGridView);
+            this.Controls.Add(this.Substrate14CheckBox);
+            this.Controls.Add(this.Substrate13DataGridView);
+            this.Controls.Add(this.Substrate13CheckBox);
+            this.Controls.Add(this.Substrate12DataGridView);
+            this.Controls.Add(this.Substrate12CheckBox);
+            this.Controls.Add(this.Substrate11DataGridView);
+            this.Controls.Add(this.Substrate11CheckBox);
             this.Controls.Add(this.CloseButton);
             this.Controls.Add(this.RegisterButton);
             this.Controls.Add(this.CheckSheetPrintButton);
@@ -1207,6 +1407,11 @@
             ((System.ComponentModel.ISupportInitialize)this.Substrate10DataGridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)this.SerialPrintPostionNumericUpDown).EndInit();
             ((System.ComponentModel.ISupportInitialize)this.BarcodePrintPostionNumericUpDown).EndInit();
+            ((System.ComponentModel.ISupportInitialize)this.Substrate15DataGridView).EndInit();
+            ((System.ComponentModel.ISupportInitialize)this.Substrate14DataGridView).EndInit();
+            ((System.ComponentModel.ISupportInitialize)this.Substrate13DataGridView).EndInit();
+            ((System.ComponentModel.ISupportInitialize)this.Substrate12DataGridView).EndInit();
+            ((System.ComponentModel.ISupportInitialize)this.Substrate11DataGridView).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -1256,6 +1461,16 @@
         private PrintDialog ProductRegistration2PrintDialog;
         private System.Drawing.Printing.PrintDocument ProductRegistration2PrintDocument;
         private PrintPreviewDialog ProductRegistration2PrintPreviewDialog;
+        private DataGridView Substrate15DataGridView;
+        private CheckBox Substrate15CheckBox;
+        private DataGridView Substrate14DataGridView;
+        private CheckBox Substrate14CheckBox;
+        private DataGridView Substrate13DataGridView;
+        private CheckBox Substrate13CheckBox;
+        private DataGridView Substrate12DataGridView;
+        private CheckBox Substrate12CheckBox;
+        private DataGridView Substrate11DataGridView;
+        private CheckBox Substrate11CheckBox;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0101;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0102;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn0103;
@@ -1296,5 +1511,25 @@
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1002;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1003;
         private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn1001;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn1;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn5;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn2;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn7;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn8;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn9;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn3;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn10;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn11;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn12;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn4;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn13;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn14;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn15;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn5;
     }
 }
