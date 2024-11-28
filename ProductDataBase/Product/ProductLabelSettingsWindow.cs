@@ -45,8 +45,8 @@ namespace ProductDatabase {
             SetLabelSettings(labelSettings);
         }
         private void SetLabelSettings(CLabelProLabelSettings labelSettings) {
-            PrintTextHeightTextBox.Text = labelSettings.BarcodeHeight.ToString();
-            PrintTextMagnitudeTextBox.Text = labelSettings.BarcodeMagnitude.ToString();
+            PrintTextHeightTextBox.Text = labelSettings.StringHeight.ToString();
+            PrintTextMagnitudeTextBox.Text = labelSettings.StringMagnitude.ToString();
             PrintTextQuantityTextBox.Text = labelSettings.NumLabels.ToString();
             PrintTextFormatTextBox.Text = labelSettings.Format;
 
@@ -57,9 +57,9 @@ namespace ProductDatabase {
 
             PrintTextPostionXTextBox.Text = labelSettings.StringPosX.ToString();
             PrintTextPostionYTextBox.Text = labelSettings.StringPosY.ToString();
-            BarcodeCenterCheckBox.Checked = labelSettings.AlignStringCenter;
+            TextCenterCheckBox.Checked = labelSettings.AlignStringCenter;
 
-            PrintTextPostionXTextBox.Enabled = !BarcodeCenterCheckBox.Checked;
+            PrintTextPostionXTextBox.Enabled = !TextCenterCheckBox.Checked;
         }
         private void SetPageSettings(CLabelProPageSettings pageSettings) {
             LabelWidthTextBox.Text = pageSettings.SizeX.ToString();
@@ -80,7 +80,7 @@ namespace ProductDatabase {
             }
         }
         private void BtnOK_Click(object sender, EventArgs e) {
-            decimal sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, barcodeHeight, barcodeMagnitude, stringPosX, stringPosY;
+            decimal sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, stringHeight, stringMagnitude, stringPosX, stringPosY;
             int numLabelsX, numLabelsY, headerPosX, headerPosY, footerPosX = 0, footerPosY = 0, numLabels;
 
             try {
@@ -95,10 +95,10 @@ namespace ProductDatabase {
                 headerPosX = int.Parse(HeaderPostionXTextBox.Text);
                 headerPosY = int.Parse(HeaderPostionYTextBox.Text);
 
-                barcodeHeight = decimal.Parse(PrintTextHeightTextBox.Text);
+                stringHeight = decimal.Parse(PrintTextHeightTextBox.Text);
                 stringPosX = decimal.Parse(PrintTextPostionXTextBox.Text);
                 stringPosY = decimal.Parse(PrintTextPostionYTextBox.Text);
-                barcodeMagnitude = decimal.Parse(PrintTextMagnitudeTextBox.Text);
+                stringMagnitude = decimal.Parse(PrintTextMagnitudeTextBox.Text);
                 numLabels = int.Parse(PrintTextQuantityTextBox.Text);
             } catch (Exception ex) {
                 MessageBox.Show($"入力値が不正です。{Environment.NewLine}{ex.Message}");
@@ -119,15 +119,13 @@ namespace ProductDatabase {
             _labelProPageSettings.HeaderString = HeaderStringTextBox.Text;
             _labelProPageSettings.HeaderFooterFont = HeaderFontDialog.Font;
 
-            _labelProLabelSettings.BarcodeHeight = barcodeHeight;
-            _labelProLabelSettings.BarcodePosX = 0;
-            _labelProLabelSettings.BarcodePosY = 0;
-            _labelProLabelSettings.BarcodeMagnitude = barcodeMagnitude;
             _labelProLabelSettings.Format = PrintTextFormatTextBox.Text;
             _labelProLabelSettings.Font = TextFontDialog.Font;
+            _labelProLabelSettings.StringHeight = stringHeight;
+            _labelProLabelSettings.StringMagnitude = stringMagnitude;
             _labelProLabelSettings.StringPosX = stringPosX;
             _labelProLabelSettings.StringPosY = stringPosY;
-            _labelProLabelSettings.AlignStringCenter = BarcodeCenterCheckBox.Checked;
+            _labelProLabelSettings.AlignStringCenter = TextCenterCheckBox.Checked;
             _labelProLabelSettings.NumLabels = int.Parse(PrintTextQuantityTextBox.Text);
 
             SettingsLabelPro.LabelProPageSettings = _labelProPageSettings;
@@ -156,7 +154,7 @@ namespace ProductDatabase {
             HeaderFooterFontTextBox.Text = $"{HeaderFontDialog.Font.Name} {HeaderFontDialog.Font.SizeInPoints}pt";
         }
 
-        private void BtnBarcodeFont_Click(object sender, EventArgs e) {
+        private void PrintTextFontButton_Click(object sender, EventArgs e) {
             var r = TextFontDialog.ShowDialog();
             if (r == DialogResult.Cancel) {
                 return;
@@ -165,8 +163,8 @@ namespace ProductDatabase {
             PrintTextFontTextBox.Text = $"{TextFontDialog.Font.Name} {TextFontDialog.Font.SizeInPoints}pt";
         }
 
-        private void BarcodeCenterCheckBox_CheckedChanged(object sender, EventArgs e) {
-            PrintTextPostionXTextBox.Enabled = !BarcodeCenterCheckBox.Checked;
+        private void TextCenterCheckBox_CheckedChanged(object sender, EventArgs e) {
+            PrintTextPostionXTextBox.Enabled = !TextCenterCheckBox.Checked;
         }
 
         private void ProductPrintSetting_Load(object sender, EventArgs e) { PageSettingsLabelLoad(sender, e); }
