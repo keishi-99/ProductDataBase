@@ -134,9 +134,9 @@ namespace ProductDatabase {
             SettingsLabelPro.LabelProLabelSettings = _labelProLabelSettings;
 
             try {
-                using var swBarcode = new StreamWriter(_labelSettingFilePath, false, new System.Text.UTF8Encoding(false));
-                var serializerBarcode = new System.Xml.Serialization.XmlSerializer(typeof(CSettingsBarcodePro));
-                serializerBarcode.Serialize(swBarcode, SettingsLabelPro);
+                using var swLabel = new StreamWriter(_labelSettingFilePath, false, new System.Text.UTF8Encoding(false));
+                var serializerLabel = new System.Xml.Serialization.XmlSerializer(typeof(CSettingsLabelPro));
+                serializerLabel.Serialize(swLabel, SettingsLabelPro);
             } catch (Exception ex) {
                 MessageBox.Show($"設定の保存中にエラーが発生しました。{Environment.NewLine}{ex.Message}");
                 DialogResult = DialogResult.None;
