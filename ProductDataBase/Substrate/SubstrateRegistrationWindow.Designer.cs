@@ -78,6 +78,9 @@
             this.SubstrateRegistrationPrintDocument = new System.Drawing.Printing.PrintDocument();
             this.SubstrateRegistrationPrintPreviewDialog = new PrintPreviewDialog();
             this.panelCommentTexrBox = new Panel();
+            this.label1 = new Label();
+            this.QrCodeButton = new Button();
+            this.QrCodeTextBox = new TextBox();
             this.SubstrateRegistrationMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPostionNumericUpDown).BeginInit();
             this.panelCommentTexrBox.SuspendLayout();
@@ -655,11 +658,40 @@
             this.panelCommentTexrBox.Size = new Size(150, 175);
             this.panelCommentTexrBox.TabIndex = 42;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new Point(298, 24);
+            this.label1.Name = "label1";
+            this.label1.Size = new Size(86, 15);
+            this.label1.TabIndex = 90;
+            this.label1.Text = "QRコード入力用";
+            // 
+            // QrCodeButton
+            // 
+            this.QrCodeButton.Location = new Point(543, 68);
+            this.QrCodeButton.Name = "QrCodeButton";
+            this.QrCodeButton.Size = new Size(75, 23);
+            this.QrCodeButton.TabIndex = 89;
+            this.QrCodeButton.Text = "入力";
+            this.QrCodeButton.UseVisualStyleBackColor = true;
+            this.QrCodeButton.Click += this.QrCodeButton_Click;
+            // 
+            // QrCodeTextBox
+            // 
+            this.QrCodeTextBox.Location = new Point(298, 39);
+            this.QrCodeTextBox.Name = "QrCodeTextBox";
+            this.QrCodeTextBox.Size = new Size(320, 23);
+            this.QrCodeTextBox.TabIndex = 88;
+            // 
             // SubstrateRegistrationWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.QrCodeButton);
+            this.Controls.Add(this.QrCodeTextBox);
             this.Controls.Add(this.PrintButton);
             this.Controls.Add(this.PrintOnlyCheckBox);
             this.Controls.Add(this.RegisterButton);
@@ -778,5 +810,8 @@
         private System.Drawing.Printing.PrintDocument SubstrateRegistrationPrintDocument;
         private PrintPreviewDialog SubstrateRegistrationPrintPreviewDialog;
         private Panel panelCommentTexrBox;
+        private Label label1;
+        private Button QrCodeButton;
+        private TextBox QrCodeTextBox;
     }
 }

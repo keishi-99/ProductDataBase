@@ -66,6 +66,9 @@
             this.ProductTypeLabel2 = new Label();
             this.ProductTypeLabel1 = new Label();
             this.panelCommentTextBox = new Panel();
+            this.QrCodeTextBox = new TextBox();
+            this.QrCodeButton = new Button();
+            this.label1 = new Label();
             this.ProductRegistration1MenuStrip.SuspendLayout();
             this.panelCommentTextBox.SuspendLayout();
             this.SuspendLayout();
@@ -554,11 +557,40 @@
             this.panelCommentTextBox.Size = new Size(150, 175);
             this.panelCommentTextBox.TabIndex = 84;
             // 
+            // QrCodeTextBox
+            // 
+            this.QrCodeTextBox.Location = new Point(298, 39);
+            this.QrCodeTextBox.Name = "QrCodeTextBox";
+            this.QrCodeTextBox.Size = new Size(320, 23);
+            this.QrCodeTextBox.TabIndex = 85;
+            // 
+            // QrCodeButton
+            // 
+            this.QrCodeButton.Location = new Point(543, 68);
+            this.QrCodeButton.Name = "QrCodeButton";
+            this.QrCodeButton.Size = new Size(75, 23);
+            this.QrCodeButton.TabIndex = 86;
+            this.QrCodeButton.Text = "入力";
+            this.QrCodeButton.UseVisualStyleBackColor = true;
+            this.QrCodeButton.Click += this.QrCodeButton_Click;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new Point(298, 24);
+            this.label1.Name = "label1";
+            this.label1.Size = new Size(86, 15);
+            this.label1.TabIndex = 87;
+            this.label1.Text = "QRコード入力用";
+            // 
             // ProductRegistration1Window
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.QrCodeButton);
+            this.Controls.Add(this.QrCodeTextBox);
             this.Controls.Add(this.ProductTypeLabel2);
             this.Controls.Add(this.ProductTypeLabel1);
             this.Controls.Add(this.RegisterButton);
@@ -661,5 +693,8 @@
         private Label ProductTypeLabel2;
         private Label ProductTypeLabel1;
         private Panel panelCommentTextBox;
+        private TextBox QrCodeTextBox;
+        private Button QrCodeButton;
+        private Label label1;
     }
 }
