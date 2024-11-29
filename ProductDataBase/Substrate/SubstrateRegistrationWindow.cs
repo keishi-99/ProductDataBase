@@ -132,7 +132,7 @@ namespace ProductDatabase {
                 foreach (Control control in Controls) {
                     if (control is TextBoxBase textBox && textBox.Enabled) {
                         anyTextBoxEnabled = true;
-                        if (string.IsNullOrWhiteSpace(textBox.Text)) {
+                        if (string.IsNullOrWhiteSpace(textBox.Text) && textBox.Name != "QrCodeTextBox") {
                             allTextBoxesFilled = false;
                             break;
                         }
