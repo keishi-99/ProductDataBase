@@ -172,6 +172,7 @@
             // HistoryButton
             // 
             this.HistoryButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            this.HistoryButton.Font = new Font("Meiryo UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 128);
             this.HistoryButton.Location = new Point(307, 389);
             this.HistoryButton.Name = "HistoryButton";
             this.HistoryButton.Size = new Size(96, 54);
@@ -183,6 +184,7 @@
             // RegisterButton
             // 
             this.RegisterButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            this.RegisterButton.Font = new Font("Meiryo UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 128);
             this.RegisterButton.Location = new Point(478, 389);
             this.RegisterButton.Name = "RegisterButton";
             this.RegisterButton.Size = new Size(96, 54);
@@ -258,9 +260,9 @@
             this.QRCodePanel.Controls.Add(this.RadioButtonQR);
             this.QRCodePanel.Controls.Add(this.QRCodeButton);
             this.QRCodePanel.Controls.Add(this.QRCodeTextBox);
-            this.QRCodePanel.Location = new Point(12, 397);
+            this.QRCodePanel.Location = new Point(20, 463);
             this.QRCodePanel.Name = "QRCodePanel";
-            this.QRCodePanel.Size = new Size(218, 56);
+            this.QRCodePanel.Size = new Size(841, 56);
             this.QRCodePanel.TabIndex = 500;
             // 
             // RadioButtonBarcode
@@ -288,7 +290,7 @@
             // QRCodeButton
             // 
             this.QRCodeButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            this.QRCodeButton.Location = new Point(124, 28);
+            this.QRCodeButton.Location = new Point(761, 28);
             this.QRCodeButton.Name = "QRCodeButton";
             this.QRCodeButton.Size = new Size(75, 23);
             this.QRCodeButton.TabIndex = 602;
@@ -301,7 +303,7 @@
             this.QRCodeTextBox.Location = new Point(18, 28);
             this.QRCodeTextBox.MaxLength = 50;
             this.QRCodeTextBox.Name = "QRCodeTextBox";
-            this.QRCodeTextBox.Size = new Size(100, 23);
+            this.QRCodeTextBox.Size = new Size(737, 23);
             this.QRCodeTextBox.TabIndex = 601;
             this.QRCodeTextBox.KeyDown += this.QRCodeTextBox_KeyDown;
             // 
@@ -333,7 +335,7 @@
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(880, 465);
+            this.ClientSize = new Size(880, 531);
             this.Controls.Add(this.QRCodePanel);
             this.Controls.Add(this.FontSizePanel);
             this.Controls.Add(this.RegisterButton);
