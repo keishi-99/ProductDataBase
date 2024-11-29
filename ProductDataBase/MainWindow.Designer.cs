@@ -257,9 +257,9 @@
             this.QRCodePanel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.QRCodePanel.BorderStyle = BorderStyle.FixedSingle;
             this.QRCodePanel.Controls.Add(this.RadioButtonBarcode);
-            this.QRCodePanel.Controls.Add(this.RadioButtonQR);
-            this.QRCodePanel.Controls.Add(this.QRCodeButton);
             this.QRCodePanel.Controls.Add(this.QRCodeTextBox);
+            this.QRCodePanel.Controls.Add(this.QRCodeButton);
+            this.QRCodePanel.Controls.Add(this.RadioButtonQR);
             this.QRCodePanel.Location = new Point(20, 463);
             this.QRCodePanel.Name = "QRCodePanel";
             this.QRCodePanel.Size = new Size(841, 56);
@@ -268,7 +268,7 @@
             // RadioButtonBarcode
             // 
             this.RadioButtonBarcode.AutoSize = true;
-            this.RadioButtonBarcode.Location = new Point(97, 3);
+            this.RadioButtonBarcode.Location = new Point(739, 32);
             this.RadioButtonBarcode.Name = "RadioButtonBarcode";
             this.RadioButtonBarcode.Size = new Size(97, 19);
             this.RadioButtonBarcode.TabIndex = 606;
@@ -279,7 +279,7 @@
             // 
             this.RadioButtonQR.AutoSize = true;
             this.RadioButtonQR.Checked = true;
-            this.RadioButtonQR.Location = new Point(23, 3);
+            this.RadioButtonQR.Location = new Point(665, 32);
             this.RadioButtonQR.Name = "RadioButtonQR";
             this.RadioButtonQR.Size = new Size(68, 19);
             this.RadioButtonQR.TabIndex = 605;
@@ -290,7 +290,7 @@
             // QRCodeButton
             // 
             this.QRCodeButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            this.QRCodeButton.Location = new Point(761, 28);
+            this.QRCodeButton.Location = new Point(3, 28);
             this.QRCodeButton.Name = "QRCodeButton";
             this.QRCodeButton.Size = new Size(75, 23);
             this.QRCodeButton.TabIndex = 602;
@@ -300,10 +300,10 @@
             // 
             // QRCodeTextBox
             // 
-            this.QRCodeTextBox.Location = new Point(18, 28);
+            this.QRCodeTextBox.Location = new Point(3, 3);
             this.QRCodeTextBox.MaxLength = 50;
             this.QRCodeTextBox.Name = "QRCodeTextBox";
-            this.QRCodeTextBox.Size = new Size(737, 23);
+            this.QRCodeTextBox.Size = new Size(833, 23);
             this.QRCodeTextBox.TabIndex = 601;
             this.QRCodeTextBox.KeyDown += this.QRCodeTextBox_KeyDown;
             // 
