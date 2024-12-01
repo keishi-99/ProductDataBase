@@ -163,6 +163,7 @@ namespace ProductDatabase {
                 switch (ProductInfo.PrintType) {
                     case 0:
                         MessageBox.Show("登録完了");
+                        Close();
                         break;
                     case 1:
                         if (QuantityCheckBox.Checked) {
@@ -173,6 +174,7 @@ namespace ProductDatabase {
                         }
                         if (DefectNumberCheckBox.Checked) {
                             MessageBox.Show("登録完了");
+                            Close();
                             break;
                         }
                         break;
@@ -363,6 +365,7 @@ namespace ProductDatabase {
                             if (_intPageCnt >= 2) {
                                 MessageBox.Show($"{_intPageCnt}枚印刷されます。2枚目以降は1行目から印刷されます。");
                             }
+                            Close();
                         }
                         else {
                             return;
