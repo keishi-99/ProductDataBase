@@ -43,12 +43,13 @@
             this.FontSizeLabel = new Label();
             this.QRCodePanel = new Panel();
             this.RadioButtonBarcode = new RadioButton();
-            this.RadioButtonQR = new RadioButton();
-            this.QRCodeButton = new Button();
             this.QRCodeTextBox = new TextBox();
+            this.QRCodeButton = new Button();
+            this.RadioButtonQR = new RadioButton();
             this.panelCategory1 = new Panel();
             this.panelCategory2 = new Panel();
             this.panelCategory3 = new Panel();
+            this.textToUpperCheckBox = new CheckBox();
             this.MainWindowMenuStrip.SuspendLayout();
             this.FontSizePanel.SuspendLayout();
             this.QRCodePanel.SuspendLayout();
@@ -256,6 +257,7 @@
             // 
             this.QRCodePanel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.QRCodePanel.BorderStyle = BorderStyle.FixedSingle;
+            this.QRCodePanel.Controls.Add(this.textToUpperCheckBox);
             this.QRCodePanel.Controls.Add(this.RadioButtonBarcode);
             this.QRCodePanel.Controls.Add(this.QRCodeTextBox);
             this.QRCodePanel.Controls.Add(this.QRCodeButton);
@@ -275,17 +277,14 @@
             this.RadioButtonBarcode.Text = "手配管理番号";
             this.RadioButtonBarcode.UseVisualStyleBackColor = true;
             // 
-            // RadioButtonQR
+            // QRCodeTextBox
             // 
-            this.RadioButtonQR.AutoSize = true;
-            this.RadioButtonQR.Checked = true;
-            this.RadioButtonQR.Location = new Point(665, 32);
-            this.RadioButtonQR.Name = "RadioButtonQR";
-            this.RadioButtonQR.Size = new Size(68, 19);
-            this.RadioButtonQR.TabIndex = 605;
-            this.RadioButtonQR.TabStop = true;
-            this.RadioButtonQR.Text = "QRコード";
-            this.RadioButtonQR.UseVisualStyleBackColor = true;
+            this.QRCodeTextBox.Location = new Point(3, 3);
+            this.QRCodeTextBox.MaxLength = 50;
+            this.QRCodeTextBox.Name = "QRCodeTextBox";
+            this.QRCodeTextBox.Size = new Size(833, 23);
+            this.QRCodeTextBox.TabIndex = 601;
+            this.QRCodeTextBox.KeyDown += this.QRCodeTextBox_KeyDown;
             // 
             // QRCodeButton
             // 
@@ -298,14 +297,17 @@
             this.QRCodeButton.UseVisualStyleBackColor = true;
             this.QRCodeButton.Click += this.QRCodeButton_Click;
             // 
-            // QRCodeTextBox
+            // RadioButtonQR
             // 
-            this.QRCodeTextBox.Location = new Point(3, 3);
-            this.QRCodeTextBox.MaxLength = 50;
-            this.QRCodeTextBox.Name = "QRCodeTextBox";
-            this.QRCodeTextBox.Size = new Size(833, 23);
-            this.QRCodeTextBox.TabIndex = 601;
-            this.QRCodeTextBox.KeyDown += this.QRCodeTextBox_KeyDown;
+            this.RadioButtonQR.AutoSize = true;
+            this.RadioButtonQR.Checked = true;
+            this.RadioButtonQR.Location = new Point(665, 32);
+            this.RadioButtonQR.Name = "RadioButtonQR";
+            this.RadioButtonQR.Size = new Size(68, 19);
+            this.RadioButtonQR.TabIndex = 605;
+            this.RadioButtonQR.TabStop = true;
+            this.RadioButtonQR.Text = "QRコード";
+            this.RadioButtonQR.UseVisualStyleBackColor = true;
             // 
             // panelCategory1
             // 
@@ -330,6 +332,18 @@
             this.panelCategory3.Name = "panelCategory3";
             this.panelCategory3.Size = new Size(350, 259);
             this.panelCategory3.TabIndex = 603;
+            // 
+            // textToUpperCheckBox
+            // 
+            this.textToUpperCheckBox.AutoSize = true;
+            this.textToUpperCheckBox.Checked = true;
+            this.textToUpperCheckBox.CheckState = CheckState.Checked;
+            this.textToUpperCheckBox.Location = new Point(100, 31);
+            this.textToUpperCheckBox.Name = "textToUpperCheckBox";
+            this.textToUpperCheckBox.Size = new Size(140, 19);
+            this.textToUpperCheckBox.TabIndex = 607;
+            this.textToUpperCheckBox.Text = "小文字を大文字に変換";
+            this.textToUpperCheckBox.UseVisualStyleBackColor = true;
             // 
             // MainWindow
             // 
@@ -396,5 +410,6 @@
         private Panel panelCategory1;
         private Panel panelCategory2;
         private Panel panelCategory3;
+        private CheckBox textToUpperCheckBox;
     }
 }
