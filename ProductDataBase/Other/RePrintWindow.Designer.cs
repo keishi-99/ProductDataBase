@@ -76,6 +76,11 @@
             this.RePrintPrintDocument = new System.Drawing.Printing.PrintDocument();
             this.RePrintPrintPreviewDialog = new PrintPreviewDialog();
             this.panel1 = new Panel();
+            this.QrCodeTextBox = new TextBox();
+            this.ProductTypeLabel2 = new Label();
+            this.ProductTypeLabel1 = new Label();
+            this.label1 = new Label();
+            this.QrCodeButton = new Button();
             this.RePrintMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPostionNumericUpDown).BeginInit();
             this.panel1.SuspendLayout();
@@ -84,7 +89,7 @@
             // TemplateButton
             // 
             this.TemplateButton.Enabled = false;
-            this.TemplateButton.Location = new Point(539, 349);
+            this.TemplateButton.Location = new Point(539, 347);
             this.TemplateButton.Name = "TemplateButton";
             this.TemplateButton.Size = new Size(75, 25);
             this.TemplateButton.TabIndex = 116;
@@ -97,7 +102,7 @@
             this.CommentComboBox.DropDownWidth = 150;
             this.CommentComboBox.Enabled = false;
             this.CommentComboBox.FormattingEnabled = true;
-            this.CommentComboBox.Location = new Point(464, 322);
+            this.CommentComboBox.Location = new Point(464, 320);
             this.CommentComboBox.Name = "CommentComboBox";
             this.CommentComboBox.Size = new Size(150, 23);
             this.CommentComboBox.TabIndex = 115;
@@ -116,7 +121,7 @@
             // 
             // CommentCheckBox
             // 
-            this.CommentCheckBox.Location = new Point(464, 120);
+            this.CommentCheckBox.Location = new Point(464, 118);
             this.CommentCheckBox.Margin = new Padding(0);
             this.CommentCheckBox.Name = "CommentCheckBox";
             this.CommentCheckBox.Size = new Size(59, 19);
@@ -129,7 +134,7 @@
             // ExtraTextBox6
             // 
             this.ExtraTextBox6.Enabled = false;
-            this.ExtraTextBox6.Location = new Point(313, 243);
+            this.ExtraTextBox6.Location = new Point(313, 241);
             this.ExtraTextBox6.Margin = new Padding(0);
             this.ExtraTextBox6.MaxLength = 20;
             this.ExtraTextBox6.Name = "ExtraTextBox6";
@@ -139,7 +144,7 @@
             // 
             // ExtraCheckBox6
             // 
-            this.ExtraCheckBox6.Location = new Point(313, 220);
+            this.ExtraCheckBox6.Location = new Point(313, 218);
             this.ExtraCheckBox6.Margin = new Padding(0);
             this.ExtraCheckBox6.Name = "ExtraCheckBox6";
             this.ExtraCheckBox6.Size = new Size(50, 19);
@@ -153,7 +158,7 @@
             // ExtraTextBox5
             // 
             this.ExtraTextBox5.Enabled = false;
-            this.ExtraTextBox5.Location = new Point(313, 193);
+            this.ExtraTextBox5.Location = new Point(313, 191);
             this.ExtraTextBox5.Margin = new Padding(0);
             this.ExtraTextBox5.MaxLength = 20;
             this.ExtraTextBox5.Name = "ExtraTextBox5";
@@ -163,7 +168,7 @@
             // 
             // ExtraCheckBox5
             // 
-            this.ExtraCheckBox5.Location = new Point(313, 170);
+            this.ExtraCheckBox5.Location = new Point(313, 168);
             this.ExtraCheckBox5.Margin = new Padding(0);
             this.ExtraCheckBox5.Name = "ExtraCheckBox5";
             this.ExtraCheckBox5.Size = new Size(50, 19);
@@ -177,7 +182,7 @@
             // ExtraTextBox4
             // 
             this.ExtraTextBox4.Enabled = false;
-            this.ExtraTextBox4.Location = new Point(313, 143);
+            this.ExtraTextBox4.Location = new Point(313, 141);
             this.ExtraTextBox4.Margin = new Padding(0);
             this.ExtraTextBox4.MaxLength = 20;
             this.ExtraTextBox4.Name = "ExtraTextBox4";
@@ -187,7 +192,7 @@
             // 
             // ExtraCheckBox4
             // 
-            this.ExtraCheckBox4.Location = new Point(313, 120);
+            this.ExtraCheckBox4.Location = new Point(313, 118);
             this.ExtraCheckBox4.Margin = new Padding(0);
             this.ExtraCheckBox4.Name = "ExtraCheckBox4";
             this.ExtraCheckBox4.Size = new Size(50, 19);
@@ -203,14 +208,14 @@
             this.PersonComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             this.PersonComboBox.Enabled = false;
             this.PersonComboBox.FormattingEnabled = true;
-            this.PersonComboBox.Location = new Point(166, 343);
+            this.PersonComboBox.Location = new Point(166, 341);
             this.PersonComboBox.Name = "PersonComboBox";
             this.PersonComboBox.Size = new Size(121, 23);
             this.PersonComboBox.TabIndex = 106;
             // 
             // PersonCheckBox
             // 
-            this.PersonCheckBox.Location = new Point(166, 320);
+            this.PersonCheckBox.Location = new Point(166, 318);
             this.PersonCheckBox.Margin = new Padding(0);
             this.PersonCheckBox.Name = "PersonCheckBox";
             this.PersonCheckBox.Size = new Size(62, 19);
@@ -222,7 +227,7 @@
             // 
             // RegistrationDateMaskedTextBox
             // 
-            this.RegistrationDateMaskedTextBox.Location = new Point(166, 293);
+            this.RegistrationDateMaskedTextBox.Location = new Point(166, 291);
             this.RegistrationDateMaskedTextBox.Mask = "0000/00/00";
             this.RegistrationDateMaskedTextBox.Name = "RegistrationDateMaskedTextBox";
             this.RegistrationDateMaskedTextBox.PromptChar = '*';
@@ -233,7 +238,7 @@
             // 
             // RegistrationDateCheckBox
             // 
-            this.RegistrationDateCheckBox.Location = new Point(166, 270);
+            this.RegistrationDateCheckBox.Location = new Point(166, 268);
             this.RegistrationDateCheckBox.Margin = new Padding(0);
             this.RegistrationDateCheckBox.Name = "RegistrationDateCheckBox";
             this.RegistrationDateCheckBox.Size = new Size(62, 19);
@@ -246,7 +251,7 @@
             // FirstSerialNumberTextBox
             // 
             this.FirstSerialNumberTextBox.Enabled = false;
-            this.FirstSerialNumberTextBox.Location = new Point(166, 243);
+            this.FirstSerialNumberTextBox.Location = new Point(166, 241);
             this.FirstSerialNumberTextBox.Margin = new Padding(0);
             this.FirstSerialNumberTextBox.MaxLength = 20;
             this.FirstSerialNumberTextBox.Name = "FirstSerialNumberTextBox";
@@ -256,7 +261,7 @@
             // 
             // FirstSerialNumberCheckBox
             // 
-            this.FirstSerialNumberCheckBox.Location = new Point(166, 220);
+            this.FirstSerialNumberCheckBox.Location = new Point(166, 218);
             this.FirstSerialNumberCheckBox.Margin = new Padding(0);
             this.FirstSerialNumberCheckBox.Name = "FirstSerialNumberCheckBox";
             this.FirstSerialNumberCheckBox.Size = new Size(110, 19);
@@ -269,7 +274,7 @@
             // ExtraTextBox3
             // 
             this.ExtraTextBox3.Enabled = false;
-            this.ExtraTextBox3.Location = new Point(166, 193);
+            this.ExtraTextBox3.Location = new Point(166, 191);
             this.ExtraTextBox3.Margin = new Padding(0);
             this.ExtraTextBox3.MaxLength = 20;
             this.ExtraTextBox3.Name = "ExtraTextBox3";
@@ -279,7 +284,7 @@
             // 
             // ExtraCheckBox3
             // 
-            this.ExtraCheckBox3.Location = new Point(166, 170);
+            this.ExtraCheckBox3.Location = new Point(166, 168);
             this.ExtraCheckBox3.Margin = new Padding(0);
             this.ExtraCheckBox3.Name = "ExtraCheckBox3";
             this.ExtraCheckBox3.Size = new Size(50, 19);
@@ -293,7 +298,7 @@
             // ExtraTextBox2
             // 
             this.ExtraTextBox2.Enabled = false;
-            this.ExtraTextBox2.Location = new Point(166, 143);
+            this.ExtraTextBox2.Location = new Point(166, 141);
             this.ExtraTextBox2.Margin = new Padding(0);
             this.ExtraTextBox2.MaxLength = 20;
             this.ExtraTextBox2.Name = "ExtraTextBox2";
@@ -303,7 +308,7 @@
             // 
             // ExtraCheckBox2
             // 
-            this.ExtraCheckBox2.Location = new Point(166, 120);
+            this.ExtraCheckBox2.Location = new Point(166, 118);
             this.ExtraCheckBox2.Margin = new Padding(0);
             this.ExtraCheckBox2.Name = "ExtraCheckBox2";
             this.ExtraCheckBox2.Size = new Size(50, 19);
@@ -317,7 +322,7 @@
             // RevisionTextBox
             // 
             this.RevisionTextBox.Enabled = false;
-            this.RevisionTextBox.Location = new Point(19, 343);
+            this.RevisionTextBox.Location = new Point(19, 341);
             this.RevisionTextBox.Margin = new Padding(0);
             this.RevisionTextBox.MaxLength = 4;
             this.RevisionTextBox.Name = "RevisionTextBox";
@@ -327,7 +332,7 @@
             // 
             // RevisionCheckBox
             // 
-            this.RevisionCheckBox.Location = new Point(19, 320);
+            this.RevisionCheckBox.Location = new Point(19, 318);
             this.RevisionCheckBox.Margin = new Padding(0);
             this.RevisionCheckBox.Name = "RevisionCheckBox";
             this.RevisionCheckBox.Size = new Size(68, 19);
@@ -340,7 +345,7 @@
             // ExtraTextBox1
             // 
             this.ExtraTextBox1.Enabled = false;
-            this.ExtraTextBox1.Location = new Point(19, 293);
+            this.ExtraTextBox1.Location = new Point(19, 291);
             this.ExtraTextBox1.Margin = new Padding(0);
             this.ExtraTextBox1.MaxLength = 4;
             this.ExtraTextBox1.Name = "ExtraTextBox1";
@@ -350,7 +355,7 @@
             // 
             // ExtraCheckBox1
             // 
-            this.ExtraCheckBox1.Location = new Point(19, 270);
+            this.ExtraCheckBox1.Location = new Point(19, 268);
             this.ExtraCheckBox1.Margin = new Padding(0);
             this.ExtraCheckBox1.Name = "ExtraCheckBox1";
             this.ExtraCheckBox1.Size = new Size(62, 19);
@@ -364,7 +369,7 @@
             // QuantityTextBox
             // 
             this.QuantityTextBox.Enabled = false;
-            this.QuantityTextBox.Location = new Point(19, 243);
+            this.QuantityTextBox.Location = new Point(19, 241);
             this.QuantityTextBox.Margin = new Padding(0);
             this.QuantityTextBox.MaxLength = 4;
             this.QuantityTextBox.Name = "QuantityTextBox";
@@ -375,7 +380,7 @@
             // 
             // QuantityCheckBox
             // 
-            this.QuantityCheckBox.Location = new Point(19, 220);
+            this.QuantityCheckBox.Location = new Point(19, 218);
             this.QuantityCheckBox.Margin = new Padding(0);
             this.QuantityCheckBox.Name = "QuantityCheckBox";
             this.QuantityCheckBox.Size = new Size(50, 19);
@@ -387,7 +392,7 @@
             // 
             // ManufacturingNumberMaskedTextBox
             // 
-            this.ManufacturingNumberMaskedTextBox.Location = new Point(19, 193);
+            this.ManufacturingNumberMaskedTextBox.Location = new Point(19, 191);
             this.ManufacturingNumberMaskedTextBox.Mask = "LA00L00000-0000";
             this.ManufacturingNumberMaskedTextBox.Name = "ManufacturingNumberMaskedTextBox";
             this.ManufacturingNumberMaskedTextBox.PromptChar = '*';
@@ -398,7 +403,7 @@
             // 
             // ManufacturingNumberCheckBox
             // 
-            this.ManufacturingNumberCheckBox.Location = new Point(19, 170);
+            this.ManufacturingNumberCheckBox.Location = new Point(19, 168);
             this.ManufacturingNumberCheckBox.Margin = new Padding(0);
             this.ManufacturingNumberCheckBox.Name = "ManufacturingNumberCheckBox";
             this.ManufacturingNumberCheckBox.Size = new Size(74, 19);
@@ -411,7 +416,7 @@
             // OrderNumberTextBox
             // 
             this.OrderNumberTextBox.Enabled = false;
-            this.OrderNumberTextBox.Location = new Point(19, 143);
+            this.OrderNumberTextBox.Location = new Point(19, 141);
             this.OrderNumberTextBox.Margin = new Padding(0);
             this.OrderNumberTextBox.MaxLength = 20;
             this.OrderNumberTextBox.Name = "OrderNumberTextBox";
@@ -421,7 +426,7 @@
             // 
             // OrderNumberCheckBox
             // 
-            this.OrderNumberCheckBox.Location = new Point(19, 120);
+            this.OrderNumberCheckBox.Location = new Point(19, 118);
             this.OrderNumberCheckBox.Margin = new Padding(0);
             this.OrderNumberCheckBox.Name = "OrderNumberCheckBox";
             this.OrderNumberCheckBox.Size = new Size(74, 19);
@@ -435,7 +440,7 @@
             // 
             this.SubstrateModelLabel2.AutoSize = true;
             this.SubstrateModelLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.SubstrateModelLabel2.Location = new Point(90, 67);
+            this.SubstrateModelLabel2.Location = new Point(90, 85);
             this.SubstrateModelLabel2.Margin = new Padding(4, 0, 4, 0);
             this.SubstrateModelLabel2.Name = "SubstrateModelLabel2";
             this.SubstrateModelLabel2.Size = new Size(24, 17);
@@ -448,7 +453,7 @@
             this.SubstrateModelLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             this.SubstrateModelLabel1.AutoSize = true;
             this.SubstrateModelLabel1.BorderStyle = BorderStyle.Fixed3D;
-            this.SubstrateModelLabel1.Location = new Point(16, 67);
+            this.SubstrateModelLabel1.Location = new Point(16, 85);
             this.SubstrateModelLabel1.Margin = new Padding(4, 0, 4, 0);
             this.SubstrateModelLabel1.Name = "SubstrateModelLabel1";
             this.SubstrateModelLabel1.Size = new Size(66, 17);
@@ -460,7 +465,7 @@
             // 
             this.ProductNameLabel2.AutoSize = true;
             this.ProductNameLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.ProductNameLabel2.Location = new Point(90, 45);
+            this.ProductNameLabel2.Location = new Point(90, 39);
             this.ProductNameLabel2.Margin = new Padding(4, 0, 4, 0);
             this.ProductNameLabel2.Name = "ProductNameLabel2";
             this.ProductNameLabel2.Size = new Size(24, 17);
@@ -473,7 +478,7 @@
             this.ProductNameLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             this.ProductNameLabel1.AutoSize = true;
             this.ProductNameLabel1.BorderStyle = BorderStyle.Fixed3D;
-            this.ProductNameLabel1.Location = new Point(28, 45);
+            this.ProductNameLabel1.Location = new Point(28, 39);
             this.ProductNameLabel1.Margin = new Padding(4, 0, 4, 0);
             this.ProductNameLabel1.Name = "ProductNameLabel1";
             this.ProductNameLabel1.Size = new Size(54, 17);
@@ -615,16 +620,73 @@
             // panel1
             // 
             this.panel1.Controls.Add(this.CommentTextBox);
-            this.panel1.Location = new Point(464, 143);
+            this.panel1.Location = new Point(464, 141);
             this.panel1.Name = "panel1";
             this.panel1.Size = new Size(150, 175);
             this.panel1.TabIndex = 122;
+            // 
+            // QrCodeTextBox
+            // 
+            this.QrCodeTextBox.Location = new Point(298, 39);
+            this.QrCodeTextBox.MaxLength = 100;
+            this.QrCodeTextBox.Name = "QrCodeTextBox";
+            this.QrCodeTextBox.Size = new Size(320, 23);
+            this.QrCodeTextBox.TabIndex = 123;
+            // 
+            // ProductTypeLabel2
+            // 
+            this.ProductTypeLabel2.AutoSize = true;
+            this.ProductTypeLabel2.BorderStyle = BorderStyle.Fixed3D;
+            this.ProductTypeLabel2.Location = new Point(90, 62);
+            this.ProductTypeLabel2.Margin = new Padding(4, 0, 4, 0);
+            this.ProductTypeLabel2.Name = "ProductTypeLabel2";
+            this.ProductTypeLabel2.Size = new Size(24, 17);
+            this.ProductTypeLabel2.TabIndex = 125;
+            this.ProductTypeLabel2.Text = "---";
+            this.ProductTypeLabel2.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // ProductTypeLabel1
+            // 
+            this.ProductTypeLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.ProductTypeLabel1.AutoSize = true;
+            this.ProductTypeLabel1.BorderStyle = BorderStyle.Fixed3D;
+            this.ProductTypeLabel1.Location = new Point(38, 62);
+            this.ProductTypeLabel1.Margin = new Padding(4, 0, 4, 0);
+            this.ProductTypeLabel1.Name = "ProductTypeLabel1";
+            this.ProductTypeLabel1.Size = new Size(44, 17);
+            this.ProductTypeLabel1.TabIndex = 124;
+            this.ProductTypeLabel1.Text = "タイプ :";
+            this.ProductTypeLabel1.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new Point(298, 24);
+            this.label1.Name = "label1";
+            this.label1.Size = new Size(86, 15);
+            this.label1.TabIndex = 126;
+            this.label1.Text = "QRコード入力用";
+            // 
+            // QrCodeButton
+            // 
+            this.QrCodeButton.Location = new Point(543, 68);
+            this.QrCodeButton.Name = "QrCodeButton";
+            this.QrCodeButton.Size = new Size(75, 23);
+            this.QrCodeButton.TabIndex = 127;
+            this.QrCodeButton.Text = "入力";
+            this.QrCodeButton.UseVisualStyleBackColor = true;
+            this.QrCodeButton.Click += this.QrCodeButton_Click;
             // 
             // RePrintWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.QrCodeButton);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.ProductTypeLabel2);
+            this.Controls.Add(this.ProductTypeLabel1);
+            this.Controls.Add(this.QrCodeTextBox);
             this.Controls.Add(this.BarcodePrintButton);
             this.Controls.Add(this.LabelPrintButton);
             this.Controls.Add(this.PrintPostionNumericUpDown);
@@ -737,5 +799,10 @@
         private ToolStripMenuItem バーコード印刷設定ToolStripMenuItem;
         private ToolStripMenuItem シリアルラベル印刷プレビューToolStripMenuItem;
         private ToolStripMenuItem バーコード印刷プレビューToolStripMenuItem;
+        private TextBox QrCodeTextBox;
+        private Label ProductTypeLabel2;
+        private Label ProductTypeLabel1;
+        private Label label1;
+        private Button QrCodeButton;
     }
 }
