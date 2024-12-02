@@ -424,6 +424,7 @@ namespace ProductDatabase {
                 ResetFieldsForCodeScan();
 
                 if (RadioButtonQR.Checked) {
+                    if (textToUpperCheckBox.Checked) { QRCodeTextBox.Text = QRCodeTextBox.Text.ToUpper(); }
                     ParseQRCodeInput();
                 }
                 else if (RadioButtonBarcode.Checked) {
@@ -592,7 +593,7 @@ namespace ProductDatabase {
             window.ShowDialog(this);
         }
         private void CleanupAfterScan() {
-            QRCodeTextBox.Text = string.Empty;
+            //QRCodeTextBox.Text = string.Empty;
             Enabled = true;
             QRCodeTextBox.Focus();
         }
