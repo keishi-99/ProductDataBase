@@ -560,6 +560,7 @@
             // QrCodeTextBox
             // 
             this.QrCodeTextBox.Location = new Point(298, 39);
+            this.QrCodeTextBox.MaxLength = 100;
             this.QrCodeTextBox.Name = "QrCodeTextBox";
             this.QrCodeTextBox.Size = new Size(320, 23);
             this.QrCodeTextBox.TabIndex = 85;

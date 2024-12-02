@@ -166,6 +166,9 @@ namespace ProductDatabase {
         // 登録処理
         private void Registeration() {
             try {
+                FormCheck();
+                DataCheck();
+
                 DialogResult result;
                 result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) { return; }
@@ -215,7 +218,7 @@ namespace ProductDatabase {
             foreach (Control control in Controls) {
                 if (control is TextBoxBase textBox && textBox.Enabled) {
                     anyTextBoxEnabled = true;
-                    if (string.IsNullOrWhiteSpace(textBox.Text)) {
+                    if (string.IsNullOrWhiteSpace(textBox.Text) && textBox.Name != "QrCodeTextBox") {
                         allTextBoxesFilled = false;
                         break;
                     }
@@ -271,8 +274,6 @@ namespace ProductDatabase {
         // 印刷処理
         private bool PrintBarcode(int printFlg) {
             try {
-                if (!FormCheck()) { return false; };
-                if (!DataCheck()) { return false; };
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
 
@@ -299,6 +300,8 @@ namespace ProductDatabase {
                         }
                         break;
                     case 2:
+                        if (!FormCheck()) { return false; };
+                        if (!DataCheck()) { return false; };
                         // 最大で表示
                         RePrintPrintPreviewDialog.Shown += (sender, e) => {
                             if (sender is Form form) {
@@ -600,9 +603,6 @@ namespace ProductDatabase {
                     break;
                 case "QuantityCheckBox":
                     QuantityTextBox.Enabled = checkBox.Checked;
-                    if (checkBox.Checked) {
-                        ExtraCheckBox1.Checked = false;
-                    }
                     break;
                 case "ExtraCheckBox1":
                     ExtraTextBox2.Enabled = checkBox.Checked;
@@ -655,8 +655,32 @@ namespace ProductDatabase {
                 RegistrationDateMaskedTextBox.Focus();
             }
         }
+        // QR入力処理
+        private void QrInput() {
+            try {
+                if (string.IsNullOrWhiteSpace(QrCodeTextBox.Text)) { return; }
+                string[] separator = ["//"];
+                var arr = QrCodeTextBox.Text.Split(separator, StringSplitOptions.None);
+                if (arr.Length != 4) {
+                    MessageBox.Show("QRコードが正しくありません。");
+                    return;
+                }
+                if (arr != null) {
+                    ProductInfo.Proness1 = arr[0];
+                    ProductInfo.Proness2 = arr[1];
+                    ProductInfo.Proness4 = Convert.ToInt32(arr[2] ?? throw new Exception());
+                    ProductInfo.Proness5 = arr[3];
+                }
+                OrderNumberTextBox.Text = ProductInfo.Proness5;
+                ManufacturingNumberMaskedTextBox.Text = ProductInfo.Proness1;
+                QuantityTextBox.Text = ProductInfo.Proness4.ToString();
+            } catch (Exception ex) {
+                throw new Exception($"{ex.Message}");
+            }
+        }
 
         private void RePrintWindow_Load(object sender, EventArgs e) { LoadEvents(); }
+        private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
         private void LabelPrintButton_Click(object sender, EventArgs e) {
             _serialType = "Label";
             Registeration();
