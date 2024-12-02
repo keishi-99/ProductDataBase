@@ -176,6 +176,9 @@ namespace ProductDatabase {
                 result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) { return; }
 
+                // バックアップ作成
+                System.IO.File.Copy(@"./db/registration.db", "./db/registration_bak.db", true);
+
                 if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
 
                 // 再印刷登録テーブルへ追加

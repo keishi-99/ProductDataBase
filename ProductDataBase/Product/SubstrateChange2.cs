@@ -211,6 +211,10 @@ namespace ProductDatabase {
         private void ChangeRegistration() {
             try {
                 if (!QuantityCheck()) { return; }
+
+                // バックアップ作成
+                System.IO.File.Copy(@"./db/registration.db", "./db/registration_bak.db", true);
+
                 if (!Registration()) { throw new Exception("登録失敗しました。"); }
 
                 MessageBox.Show("登録完了");

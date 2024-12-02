@@ -739,6 +739,10 @@ namespace ProductDatabase {
                 if (!NumberCheck()) { return; }
                 if (!QuantityCheck()) { return; }
                 if (!SerialCheck()) { return; }
+
+                // バックアップ作成
+                System.IO.File.Copy(@"./db/registration.db", "./db/registration_bak.db", true);
+
                 // ラベル印刷
                 switch (ProductInfo.PrintType) {
                     case 1:
