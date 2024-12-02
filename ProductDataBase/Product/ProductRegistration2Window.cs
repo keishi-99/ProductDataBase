@@ -740,9 +740,6 @@ namespace ProductDatabase {
                 if (!QuantityCheck()) { return; }
                 if (!SerialCheck()) { return; }
 
-                // バックアップ作成
-                CreateBackup();
-
                 // ラベル印刷
                 switch (ProductInfo.PrintType) {
                     case 1:
@@ -801,6 +798,9 @@ namespace ProductDatabase {
                 if (!Registration()) { throw new Exception("登録失敗しました。"); }
 
                 MessageBox.Show("登録完了");
+
+                // バックアップ作成
+                CreateBackup();
 
                 switch (ProductInfo.PrintType) {
                     case 0:

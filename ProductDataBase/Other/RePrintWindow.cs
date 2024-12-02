@@ -164,7 +164,7 @@ namespace ProductDatabase {
             }
         }
         // 登録処理
-        private void Registeration() {
+        private void RegisterCheck() {
             try {
                 FormCheck();
                 DataCheck();
@@ -176,11 +176,18 @@ namespace ProductDatabase {
                 result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) { return; }
 
-                // バックアップ作成
-                CreateBackup();
-
                 if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
 
+                Registeration();
+
+                // バックアップ作成
+                CreateBackup();
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private void Registeration() {
+            try {
                 // 再印刷登録テーブルへ追加
                 using SQLiteConnection con = new(GetConnectionRegistration());
                 con.Open();
@@ -721,11 +728,11 @@ namespace ProductDatabase {
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
         private void LabelPrintButton_Click(object sender, EventArgs e) {
             _serialType = "Label";
-            Registeration();
+            RegisterCheck();
         }
         private void BarcodePrintButton_Click(object sender, EventArgs e) {
             _serialType = "Barcode";
-            Registeration();
+            RegisterCheck();
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
             var entries = new[]

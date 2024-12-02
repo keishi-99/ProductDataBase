@@ -212,12 +212,12 @@ namespace ProductDatabase {
             try {
                 if (!QuantityCheck()) { return; }
 
-                // バックアップ作成
-                CreateBackup();
-
                 if (!Registration()) { throw new Exception("登録失敗しました。"); }
 
                 MessageBox.Show("登録完了");
+
+                // バックアップ作成
+                CreateBackup();
 
                 // フォームを編集不可にする
                 RegistrationDateMaskedTextBox.Enabled = false;
