@@ -158,6 +158,9 @@ namespace ProductDatabase {
 
                 RegisterButton.Enabled = false;
 
+                // バックアップ作成
+                System.IO.File.Copy(@"./db/registration.db", "./db/registration_bak.db", true);
+
                 if (!Registration()) { return; }
 
                 switch (ProductInfo.PrintType) {
