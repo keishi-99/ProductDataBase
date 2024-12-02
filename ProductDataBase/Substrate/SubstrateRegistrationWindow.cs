@@ -159,7 +159,7 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = false;
 
                 // バックアップ作成
-                System.IO.File.Copy(@"./db/registration.db", "./db/registration_bak.db", true);
+                CreateBackup();
 
                 if (!Registration()) { return; }
 
@@ -640,6 +640,41 @@ namespace ProductDatabase {
                 QuantityTextBox.Text = ProductInfo.Proness4.ToString();
             } catch (Exception ex) {
                 throw new Exception($"{ex.Message}");
+            }
+        }
+        // バックアップ作成
+        public static void CreateBackup() {
+            const string BackupDirectory = "./db/backups"; // バックアップを保存するディレクトリ
+            const string OriginalFilePath = "./db/registration.db"; // 元ファイルパス
+            const int MaxBackupFiles = 10; // 最大バックアップファイル数
+            // バックアップ用ディレクトリが存在しない場合は作成
+            if (!Directory.Exists(BackupDirectory)) {
+                Directory.CreateDirectory(BackupDirectory);
+            }
+
+            // 日付と時間をファイル名に付加
+            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            var backupFileName = $"registration_{timestamp}.db";
+            var backupFilePath = Path.Combine(BackupDirectory, backupFileName);
+
+            // 元ファイルをバックアップにコピー
+            File.Copy(OriginalFilePath, backupFilePath, true);
+
+            // バックアップファイルを管理
+            ManageBackupFiles(BackupDirectory, MaxBackupFiles);
+
+            static void ManageBackupFiles(string backupDirectory, int maxBackupFiles) {
+                // バックアップディレクトリ内のファイルを取得
+                var backupFiles = Directory.GetFiles(backupDirectory, "registration_*.db")
+                                           .OrderBy(f => File.GetCreationTime(f)) // 作成日時順に並べる
+                                           .ToList();
+
+                // バックアップが最大数を超えている場合は古いものを削除
+                while (backupFiles.Count > maxBackupFiles) {
+                    var oldestFile = backupFiles.First();
+                    File.Delete(oldestFile);
+                    backupFiles.RemoveAt(0);
+                }
             }
         }
 
