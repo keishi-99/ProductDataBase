@@ -158,9 +158,6 @@ namespace ProductDatabase {
 
                 RegisterButton.Enabled = false;
 
-                // バックアップ作成
-                CreateBackup();
-
                 if (!Registration()) { return; }
 
                 switch (ProductInfo.PrintType) {
@@ -184,6 +181,9 @@ namespace ProductDatabase {
                     default:
                         break;
                 }
+
+                // バックアップ作成
+                CreateBackup();
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
