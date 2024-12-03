@@ -1480,7 +1480,7 @@ namespace ProductDatabase {
                 }
 
                 // ワークシートのセルから値を取得
-                sheetName = ProductInfo.ProductModel;
+                sheetName = workSheetMain.Cell(findRow, 2).Value.ToString();
                 productName = workSheetMain.Cell(findRow, 3).Value.ToString();
                 productNameRange = workSheetMain.Cell(findRow, 4).Value.ToString();
                 productNumberRange = workSheetMain.Cell(findRow, 5).Value.ToString();
