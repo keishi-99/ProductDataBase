@@ -653,14 +653,15 @@ namespace ProductDatabase {
                     if (!Directory.Exists(s_logDirectory)) {
                         Directory.CreateDirectory(s_logDirectory);
                     }
-                    // 年と月を含むログファイル名を生成
-                    var currentMonth = DateTime.Now.ToString("yyyyMM");
-                    var logFileName = $"log_{currentMonth}.txt";
+
+                    //// 年と月を含むログファイル名を生成
+                    var logFileName = $"log_{DateTime.Now:yyyyMM}.txt";
                     var logFilePath = Path.Combine(s_logDirectory, logFileName);
-                    // ログ内容をファイルの末尾に追記
-                    using var writer = new StreamWriter(logFilePath, append: true);
+
                     var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}";
-                    writer.WriteLine(logEntry);
+                    //// ログ内容をファイルの末尾に追記
+                    File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
+
                 } catch (Exception ex) {
                     Console.WriteLine($"ログの書き込み中にエラーが発生しました: {ex.Message}");
                 }
