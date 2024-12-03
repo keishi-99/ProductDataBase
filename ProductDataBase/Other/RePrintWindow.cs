@@ -218,7 +218,7 @@ namespace ProductDatabase {
                 var backupManager = new BackupManager();
                 backupManager.CreateBackup();
                 // ログ出力
-                Logger.AppendLog($"{DateTime.Now:yyyyMMdd_HHmmss}_基板登録_注文番号[{_orderNumber}]_製造番号[{_productNumber}]_製品名[{ProductInfo.ProductType}]_型式[{ProductInfo.ProductModel}]_数量[{_quantity}]_シリアル先頭[{_strSerialFirstNumber}]_シリアル末尾_[{_strSerialLastNumber}]_Revision[{_revision}]_登録日[{_regDate}]_担当者[{_person}]");
+                Logger.AppendLog($"[再印刷]_注文番号[{_orderNumber}]_製造番号[{_productNumber}]_製品名[{ProductInfo.ProductType}]_型式[{ProductInfo.ProductModel}]_数量[{_quantity}]_シリアル先頭[{_strSerialFirstNumber}]_シリアル末尾_[{_strSerialLastNumber}]_Revision[{_revision}]_登録日[{_regDate}]_担当者[{_person}]");
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);

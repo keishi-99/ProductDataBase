@@ -649,6 +649,12 @@ namespace ProductDatabase {
             /// <param name="message">記録する作業内容</param>
             public static void AppendLog(string message) {
                 try {
+                    // ディレクトリパスを取得
+                    var logDirectory = Path.GetDirectoryName(s_logFilePath);
+                    // ログ用ディレクトリが存在しない場合は作成
+                    if (!string.IsNullOrEmpty(logDirectory) && !Directory.Exists(logDirectory)) {
+                        Directory.CreateDirectory(logDirectory);
+                    }
                     // ログ内容をファイルの末尾に追記
                     using var writer = new StreamWriter(s_logFilePath, append: true);
                     var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}";
