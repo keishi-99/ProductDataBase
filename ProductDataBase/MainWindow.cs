@@ -639,9 +639,9 @@ namespace ProductDatabase {
         }
         private void QRCodeButton_Click(object sender, EventArgs e) { CodeScan(); }
 
-
+        // ログ作成
         public class Logger {
-            private static readonly string s_logFilePath = "./logs/log.txt"; // ログファイルのパス
+            private static readonly string s_logDirectory = "./logs"; // ログを保存するディレクトリ
 
             /// <summary>
             /// 作業ログを追記します。
@@ -649,14 +649,16 @@ namespace ProductDatabase {
             /// <param name="message">記録する作業内容</param>
             public static void AppendLog(string message) {
                 try {
-                    // ディレクトリパスを取得
-                    var logDirectory = Path.GetDirectoryName(s_logFilePath);
-                    // ログ用ディレクトリが存在しない場合は作成
-                    if (!string.IsNullOrEmpty(logDirectory) && !Directory.Exists(logDirectory)) {
-                        Directory.CreateDirectory(logDirectory);
+                    // ディレクトリが存在しない場合は作成
+                    if (!Directory.Exists(s_logDirectory)) {
+                        Directory.CreateDirectory(s_logDirectory);
                     }
+                    // 年と月を含むログファイル名を生成
+                    var currentMonth = DateTime.Now.ToString("yyyyMM");
+                    var logFileName = $"log_{currentMonth}.txt";
+                    var logFilePath = Path.Combine(s_logDirectory, logFileName);
                     // ログ内容をファイルの末尾に追記
-                    using var writer = new StreamWriter(s_logFilePath, append: true);
+                    using var writer = new StreamWriter(logFilePath, append: true);
                     var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}";
                     writer.WriteLine(logEntry);
                 } catch (Exception ex) {
