@@ -73,6 +73,7 @@ namespace ProductDatabase {
 
                 switch (ProductInfo.RegType) {
                     case 2:
+                    case 3:
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
                             var quantity = ProductInfo.Quantity;
 
