@@ -688,7 +688,7 @@ namespace ProductDatabase {
                                             cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
 
                                             cmd.Parameters.Add("@Stock", DbType.String).Value = stockValue - useValue;
-                                            cmd.Parameters.Add("@History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue}){Environment.NewLine}";
+                                            cmd.Parameters.Add("@History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue})";
 
                                             cmd.ExecuteNonQuery();
 
