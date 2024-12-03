@@ -241,10 +241,11 @@ namespace ProductDatabase {
                                 var strOrderNumber = $"{dr["OrderNumber"]}";
                                 if (strOrderNumber == ProductInfo.OrderNumber) {
                                     if (objDgv != null) {
+                                        quantityFlg = false;
                                         var intQuantity = ProductInfo.Quantity;
                                         var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
-                                        var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
-                                        objDgv.Rows[j].Cells[2].Value = intQuantity;
+                                        var useValue = intQuantity;
+                                        objDgv.Rows[j].Cells[2].Value = ProductInfo.Quantity;
                                         objDgv.Rows[j].Cells[3].Value = true;
                                         // 必要数量分割り当てられたかチェック
                                         if (intQuantity > stockValue) {
@@ -260,7 +261,7 @@ namespace ProductDatabase {
 
                         if (quantityFlg == false) {
                             Activate();
-                            MessageBox.Show($"[{strSubstrateName}]の注文番号[{ProductInfo.OrderNumber}]の在庫が足りません。{Environment.NewLine}{strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show($"[{ProductInfo.OrderNumber}]の在庫が足りません。{Environment.NewLine}{strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                         break;
                     default:
