@@ -400,6 +400,105 @@ namespace ProductDatabase {
             }
         }
         // 登録処理
+        private void RegisterCheck() {
+            try {
+                _strSerial.Clear();
+
+                if (!NumberCheck()) { return; }
+                if (!QuantityCheck()) { return; }
+                if (!SerialCheck()) { return; }
+
+                // ラベル印刷
+                switch (ProductInfo.PrintType) {
+                    case 1:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 9:
+                        MessageBox.Show("シリアルラベルを印刷します。");
+                        _serialType = "Label";
+                        if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
+                        break;
+                    default:
+                        break;
+                }
+                // バーコード印刷
+                switch (ProductInfo.PrintType) {
+                    case 2:
+                    case 3:
+                        MessageBox.Show("バーコードラベルを印刷します。");
+                        _serialType = "Barcode";
+                        if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
+                        break;
+                    default:
+                        break;
+                }
+
+                RegisterButton.Enabled = false;
+                SerialPrintPostionNumericUpDown.Enabled = false;
+                BarcodePrintPostionNumericUpDown.Enabled = false;
+
+                // シリアル先頭と末尾を生成
+                switch (ProductInfo.PrintType) {
+                    case 1:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 9:
+                        _serialType = "Label";
+                        _serialFirst = GenerateCode(ProductInfo.SerialFirstNumber);
+                        _serialLast = GenerateCode(_serialLastNumber);
+                        break;
+                    case 2:
+                        _serialType = "Barcode";
+                        _serialFirst = GenerateCode(ProductInfo.SerialFirstNumber);
+                        _serialLast = GenerateCode(_serialLastNumber);
+                        break;
+                    default:
+                        break;
+                }
+
+                if (!Registration()) { throw new Exception("登録失敗しました。"); }
+
+                MessageBox.Show("登録完了");
+
+                switch (ProductInfo.PrintType) {
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 8:
+                    case 9:
+                        Close();
+                        break;
+                    case 5:
+                    case 6:
+                    case 7:
+                        foreach (Control control in Controls) {
+                            if (control is DataGridView dataGridView) {
+                                dataGridView.Enabled = false;
+                            }
+                            if (control is System.Windows.Forms.CheckBox checkBox) {
+                                checkBox.Enabled = false;
+                            }
+                        }
+                        if (ProductInfo.PrintType is 5 or 6) { SubstrateListPrintButton.Enabled = true; }
+                        if (ProductInfo.PrintType is 6 or 7) { CheckSheetPrintButton.Enabled = true; ; }
+                        break;
+                    default:
+                        break;
+                }
+
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
         private bool Registration() {
             if (ProductInfo.RegType > 0) {
                 using SQLiteConnection con = new(GetConnectionRegistration());
@@ -730,109 +829,12 @@ namespace ProductDatabase {
                     }
                     break;
             }
+            // バックアップ作成
+            var backupManager = new BackupManager();
+            backupManager.CreateBackup();
+            // ログ出力
+            Logger.AppendLog($"{DateTime.Now:yyyyMMdd_HHmmss}_基板登録_注文番号[{ProductInfo.OrderNumber}]_製造番号[{ProductInfo.ProductNumber}]_製品名[{ProductInfo.ProductType}]_型式[{ProductInfo.ProductModel}]_数量[{ProductInfo.Quantity}]_シリアル先頭[{ProductInfo.SerialFirst}]_シリアル末尾_[{ProductInfo.SerialLast}]_Revision[{ProductInfo.Revision}]_登録日[{ProductInfo.RegDate}]_担当者[{ProductInfo.Person}]");
             return true;
-        }
-        private void RegisterCheck() {
-            try {
-                _strSerial.Clear();
-
-                if (!NumberCheck()) { return; }
-                if (!QuantityCheck()) { return; }
-                if (!SerialCheck()) { return; }
-
-                // ラベル印刷
-                switch (ProductInfo.PrintType) {
-                    case 1:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 9:
-                        MessageBox.Show("シリアルラベルを印刷します。");
-                        _serialType = "Label";
-                        if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
-                        break;
-                    default:
-                        break;
-                }
-                // バーコード印刷
-                switch (ProductInfo.PrintType) {
-                    case 2:
-                    case 3:
-                        MessageBox.Show("バーコードラベルを印刷します。");
-                        _serialType = "Barcode";
-                        if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
-                        break;
-                    default:
-                        break;
-                }
-
-                RegisterButton.Enabled = false;
-                SerialPrintPostionNumericUpDown.Enabled = false;
-                BarcodePrintPostionNumericUpDown.Enabled = false;
-
-                // シリアル先頭と末尾を生成
-                switch (ProductInfo.PrintType) {
-                    case 1:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 8:
-                    case 9:
-                        _serialType = "Label";
-                        _serialFirst = GenerateCode(ProductInfo.SerialFirstNumber);
-                        _serialLast = GenerateCode(_serialLastNumber);
-                        break;
-                    case 2:
-                        _serialType = "Barcode";
-                        _serialFirst = GenerateCode(ProductInfo.SerialFirstNumber);
-                        _serialLast = GenerateCode(_serialLastNumber);
-                        break;
-                    default:
-                        break;
-                }
-
-                if (!Registration()) { throw new Exception("登録失敗しました。"); }
-
-                MessageBox.Show("登録完了");
-
-                // バックアップ作成
-                CreateBackup();
-
-                switch (ProductInfo.PrintType) {
-                    case 0:
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 8:
-                    case 9:
-                        Close();
-                        break;
-                    case 5:
-                    case 6:
-                    case 7:
-                        foreach (Control control in Controls) {
-                            if (control is DataGridView dataGridView) {
-                                dataGridView.Enabled = false;
-                            }
-                            if (control is System.Windows.Forms.CheckBox checkBox) {
-                                checkBox.Enabled = false;
-                            }
-                        }
-                        if (ProductInfo.PrintType is 5 or 6) { SubstrateListPrintButton.Enabled = true; }
-                        if (ProductInfo.PrintType is 6 or 7) { CheckSheetPrintButton.Enabled = true; ; }
-                        break;
-                    default:
-                        break;
-                }
-
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
         private bool NumberCheck() {
             using SQLiteConnection con = new(GetConnectionRegistration());
@@ -1603,42 +1605,6 @@ namespace ProductDatabase {
 
             } catch (Exception ex) {
                 MessageBox.Show($"{ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        // バックアップ作成
-        public static void CreateBackup() {
-            const string BackupDirectory = "./db/backups"; // バックアップを保存するディレクトリ
-            const string OriginalFilePath = "./db/registration.db"; // 元ファイルパス
-            const int MaxBackupFiles = 10; // 最大バックアップファイル数
-            // バックアップ用ディレクトリが存在しない場合は作成
-            if (!Directory.Exists(BackupDirectory)) {
-                Directory.CreateDirectory(BackupDirectory);
-            }
-
-            // 日付と時間をファイル名に付加
-            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            var backupFileName = $"registration_{timestamp}.db";
-            var backupFilePath = Path.Combine(BackupDirectory, backupFileName);
-
-            // 元ファイルをバックアップにコピー
-            File.Copy(OriginalFilePath, backupFilePath, true);
-
-            // バックアップファイルを管理
-            ManageBackupFiles(BackupDirectory, MaxBackupFiles);
-
-            static void ManageBackupFiles(string backupDirectory, int maxBackupFiles) {
-                // バックアップディレクトリ内のファイルを取得
-                var backupFiles = Directory.GetFiles(backupDirectory, "registration_*.db")
-                                           .OrderBy(f => File.GetCreationTime(f)) // 作成日時順に並べる
-                                           .ToList();
-
-                // バックアップが最大数を超えている場合は古いものを削除
-                while (backupFiles.Count > maxBackupFiles) {
-                    var oldestFile = backupFiles.First();
-                    File.Delete(oldestFile);
-                    backupFiles.RemoveAt(0);
-                }
             }
         }
 
