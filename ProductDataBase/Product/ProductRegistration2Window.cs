@@ -174,6 +174,7 @@ namespace ProductDatabase {
                         break;
                     case 3:
                         if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
+                        var strSubstrateName = string.Empty;
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
                             var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox;
 
@@ -229,7 +230,7 @@ namespace ProductDatabase {
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using var dr = cmd.ExecuteReader();
                             while (dr.Read()) {
-                                var strSubstrateName = string.Empty;
+                                strSubstrateName = string.Empty;
                                 strSubstrateName = $"{dr["SubstrateName"]}";
 
                                 var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
@@ -259,7 +260,7 @@ namespace ProductDatabase {
 
                         if (quantityFlg == false) {
                             Activate();
-                            MessageBox.Show($"在庫が足りません。{Environment.NewLine}{strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show($"[{strSubstrateName}]の注文番号[{ProductInfo.OrderNumber}]の在庫が足りません。{Environment.NewLine}{strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                         break;
                     default:
