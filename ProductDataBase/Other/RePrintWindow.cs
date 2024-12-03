@@ -180,8 +180,6 @@ namespace ProductDatabase {
 
                 Registeration();
 
-                // バックアップ作成
-                CreateBackup();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -215,6 +213,12 @@ namespace ProductDatabase {
                 cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(_comment) ? DBNull.Value : _comment;
 
                 cmd.ExecuteNonQuery();
+
+                // バックアップ作成
+                var backupManager = new BackupManager();
+                backupManager.CreateBackup();
+                // ログ出力
+                Logger.AppendLog($"{DateTime.Now:yyyyMMdd_HHmmss}_基板登録_注文番号[{_orderNumber}]_製造番号[{_productNumber}]_製品名[{ProductInfo.ProductType}]_型式[{ProductInfo.ProductModel}]_数量[{_quantity}]_シリアル先頭[{_strSerialFirstNumber}]_シリアル末尾_[{_strSerialLastNumber}]_Revision[{_revision}]_登録日[{_regDate}]_担当者[{_person}]");
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -686,41 +690,6 @@ namespace ProductDatabase {
                 QuantityTextBox.Text = ProductInfo.Proness4.ToString();
             } catch (Exception ex) {
                 throw new Exception($"{ex.Message}");
-            }
-        }
-        // バックアップ作成
-        public static void CreateBackup() {
-            const string BackupDirectory = "./db/backups"; // バックアップを保存するディレクトリ
-            const string OriginalFilePath = "./db/registration.db"; // 元ファイルパス
-            const int MaxBackupFiles = 10; // 最大バックアップファイル数
-            // バックアップ用ディレクトリが存在しない場合は作成
-            if (!Directory.Exists(BackupDirectory)) {
-                Directory.CreateDirectory(BackupDirectory);
-            }
-
-            // 日付と時間をファイル名に付加
-            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            var backupFileName = $"registration_{timestamp}.db";
-            var backupFilePath = Path.Combine(BackupDirectory, backupFileName);
-
-            // 元ファイルをバックアップにコピー
-            File.Copy(OriginalFilePath, backupFilePath, true);
-
-            // バックアップファイルを管理
-            ManageBackupFiles(BackupDirectory, MaxBackupFiles);
-
-            static void ManageBackupFiles(string backupDirectory, int maxBackupFiles) {
-                // バックアップディレクトリ内のファイルを取得
-                var backupFiles = Directory.GetFiles(backupDirectory, "registration_*.db")
-                                           .OrderBy(f => File.GetCreationTime(f)) // 作成日時順に並べる
-                                           .ToList();
-
-                // バックアップが最大数を超えている場合は古いものを削除
-                while (backupFiles.Count > maxBackupFiles) {
-                    var oldestFile = backupFiles.First();
-                    File.Delete(oldestFile);
-                    backupFiles.RemoveAt(0);
-                }
             }
         }
 

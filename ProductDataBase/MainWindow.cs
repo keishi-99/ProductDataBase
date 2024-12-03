@@ -638,5 +638,75 @@ namespace ProductDatabase {
             CodeScan();
         }
         private void QRCodeButton_Click(object sender, EventArgs e) { CodeScan(); }
+
+
+        public class Logger {
+            private static readonly string s_logFilePath = "./logs/log.txt"; // ログファイルのパス
+
+            /// <summary>
+            /// 作業ログを追記します。
+            /// </summary>
+            /// <param name="message">記録する作業内容</param>
+            public static void AppendLog(string message) {
+                try {
+                    // ログ内容をファイルの末尾に追記
+                    using var writer = new StreamWriter(s_logFilePath, append: true);
+                    var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}";
+                    writer.WriteLine(logEntry);
+                } catch (Exception ex) {
+                    Console.WriteLine($"ログの書き込み中にエラーが発生しました: {ex.Message}");
+                }
+            }
+        }
+        // バックアップ作成
+        public class BackupManager {
+            private readonly string _backupDirectory = "./db/backups"; // バックアップを保存するディレクトリ;
+            private readonly string _originalFilePath = "./db/registration.db"; // 元ファイルパス;
+            private readonly int _maxBackupFiles = 10; // 最大バックアップファイル数;
+
+            /// <summary>
+            /// バックアップ管理クラスを初期化します。
+            /// </summary>
+            /// <param name="backupDirectory">バックアップディレクトリのパス</param>
+            /// <param name="originalFilePath">元ファイルのパス</param>
+            /// <param name="maxBackupFiles">保持するバックアップの最大数</param>
+            public BackupManager() {
+                // バックアップ用ディレクトリが存在しない場合は作成
+                if (!Directory.Exists(_backupDirectory)) {
+                    Directory.CreateDirectory(_backupDirectory);
+                }
+            }
+
+            /// <summary>
+            /// バックアップを作成します。
+            /// </summary>
+            public void CreateBackup() {
+                // 日付と時間をファイル名に付加
+                var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                var backupFileName = $"registration_{timestamp}.db";
+                var backupFilePath = Path.Combine(_backupDirectory, backupFileName);
+
+                // 元ファイルをバックアップにコピー
+                File.Copy(_originalFilePath, backupFilePath, true);
+
+                // バックアップファイルを管理
+                ManageBackupFiles();
+            }
+
+            /// <summary>
+            /// 古いバックアップファイルを削除します。
+            /// </summary>
+            private void ManageBackupFiles() {
+                var backupFiles = Directory.GetFiles(_backupDirectory, "registration_*.db")
+                                           .OrderBy(File.GetCreationTime) // 作成日時順に並べる
+                                           .ToList();
+
+                while (backupFiles.Count > _maxBackupFiles) {
+                    var oldestFile = backupFiles.First();
+                    File.Delete(oldestFile);
+                    backupFiles.RemoveAt(0);
+                }
+            }
+        }
     }
 }
