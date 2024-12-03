@@ -89,10 +89,10 @@ namespace ProductDatabase {
                                 switch (Font.Size) {
                                     case 9:
                                         objDgv.RowTemplate.Height = 24;
-                                        objDgv.Columns[0].Width = 140;
+                                        objDgv.Columns[0].Width = 130;
                                         objDgv.Columns[1].Width = 35;
                                         objDgv.Columns[2].Width = 35;
-                                        objDgv.Columns[3].Width = 35;
+                                        objDgv.Columns[3].Width = 24;
                                         break;
                                     case 12:
                                         objDgv.RowTemplate.Height = 24;
@@ -190,10 +190,10 @@ namespace ProductDatabase {
                                 switch (Font.Size) {
                                     case 9:
                                         objDgv.RowTemplate.Height = 24;
-                                        objDgv.Columns[0].Width = 140;
+                                        objDgv.Columns[0].Width = 130;
                                         objDgv.Columns[1].Width = 35;
                                         objDgv.Columns[2].Width = 35;
-                                        objDgv.Columns[3].Width = 35;
+                                        objDgv.Columns[3].Width = 24;
                                         break;
                                     case 12:
                                         objDgv.RowTemplate.Height = 24;
