@@ -640,7 +640,7 @@ namespace ProductDatabase {
         private void QRCodeButton_Click(object sender, EventArgs e) { CodeScan(); }
 
         // ログ作成
-        public class Logger {
+        public static class Logger {
             private static readonly string s_logDirectory = "./logs"; // ログを保存するディレクトリ
 
             /// <summary>
