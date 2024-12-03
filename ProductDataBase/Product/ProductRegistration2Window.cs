@@ -830,8 +830,7 @@ namespace ProductDatabase {
                     break;
             }
             // バックアップ作成
-            var backupManager = new BackupManager();
-            backupManager.CreateBackup();
+            BackupManager.CreateBackup();
             // ログ出力
             Logger.AppendLog($"[製品登録]_注文番号[{ProductInfo.OrderNumber}]_製造番号[{ProductInfo.ProductNumber}]_製品名[{ProductInfo.ProductType}]_型式[{ProductInfo.ProductModel}]_数量[{ProductInfo.Quantity}]_シリアル先頭[{ProductInfo.SerialFirst}]_シリアル末尾_[{ProductInfo.SerialLast}]_Revision[{ProductInfo.Revision}]_登録日[{ProductInfo.RegDate}]_担当者[{ProductInfo.Person}]");
             return true;

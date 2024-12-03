@@ -215,8 +215,7 @@ namespace ProductDatabase {
                 cmd.ExecuteNonQuery();
 
                 // バックアップ作成
-                var backupManager = new BackupManager();
-                backupManager.CreateBackup();
+                BackupManager.CreateBackup();
                 // ログ出力
                 Logger.AppendLog($"[再印刷]_注文番号[{_orderNumber}]_製造番号[{_productNumber}]_製品名[{ProductInfo.ProductType}]_型式[{ProductInfo.ProductModel}]_数量[{_quantity}]_シリアル先頭[{_strSerialFirstNumber}]_シリアル末尾_[{_strSerialLastNumber}]_Revision[{_revision}]_登録日[{_regDate}]_担当者[{_person}]");
 

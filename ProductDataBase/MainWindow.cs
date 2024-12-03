@@ -667,52 +667,55 @@ namespace ProductDatabase {
             }
         }
         // バックアップ作成
-        public class BackupManager {
-            private readonly string _backupDirectory = "./db/backups"; // バックアップを保存するディレクトリ;
-            private readonly string _originalFilePath = "./db/registration.db"; // 元ファイルパス;
-            private readonly int _maxBackupFiles = 10; // 最大バックアップファイル数;
-
-            /// <summary>
-            /// バックアップ管理クラスを初期化します。
-            /// </summary>
-            /// <param name="backupDirectory">バックアップディレクトリのパス</param>
-            /// <param name="originalFilePath">元ファイルのパス</param>
-            /// <param name="maxBackupFiles">保持するバックアップの最大数</param>
-            public BackupManager() {
-                // バックアップ用ディレクトリが存在しない場合は作成
-                if (!Directory.Exists(_backupDirectory)) {
-                    Directory.CreateDirectory(_backupDirectory);
-                }
-            }
+        public static class BackupManager {
+            private static readonly string s_backupDirectory = "./db/backups"; // バックアップを保存するディレクトリ
+            private static readonly string s_originalFilePath = "./db/registration.db"; // 元ファイルパス
+            private static readonly int s_maxBackupFiles = 10; // 最大バックアップファイル数
+            private static readonly object s_lock = new(); // スレッドセーフ用ロック
 
             /// <summary>
             /// バックアップを作成します。
             /// </summary>
-            public void CreateBackup() {
-                // 日付と時間をファイル名に付加
-                var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                var backupFileName = $"registration_{timestamp}.db";
-                var backupFilePath = Path.Combine(_backupDirectory, backupFileName);
+            public static void CreateBackup() {
+                lock (s_lock) {
+                    try {
+                        // バックアップ用ディレクトリが存在しない場合は作成
+                        if (!Directory.Exists(s_backupDirectory)) {
+                            Directory.CreateDirectory(s_backupDirectory);
+                        }
 
-                // 元ファイルをバックアップにコピー
-                File.Copy(_originalFilePath, backupFilePath, true);
+                        // 日付と時間をファイル名に付加
+                        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                        var backupFileName = $"registration_{timestamp}.db";
+                        var backupFilePath = Path.Combine(s_backupDirectory, backupFileName);
 
-                // バックアップファイルを管理
-                ManageBackupFiles();
+                        // 元ファイルをバックアップにコピー
+                        File.Copy(s_originalFilePath, backupFilePath, true);
+
+                        // バックアップファイルを管理
+                        ManageBackupFiles();
+                    } catch (Exception ex) {
+                        Console.WriteLine($"バックアップの作成中にエラーが発生しました: {ex.Message}");
+                    }
+                }
             }
 
             /// <summary>
             /// 古いバックアップファイルを削除します。
             /// </summary>
-            private void ManageBackupFiles() {
-                var backupFiles = Directory.GetFiles(_backupDirectory, "registration_*.db")
-                                           .OrderBy(File.GetCreationTime) // 作成日時順に並べる
-                                           .ToList();
+            private static void ManageBackupFiles() {
+                try {
+                    var backupFiles = Directory.GetFiles(s_backupDirectory, "registration_*.db")
+                                               .OrderBy(File.GetCreationTime) // 作成日時順に並べる
+                                               .ToList();
 
-                while (backupFiles.Count > _maxBackupFiles) {
-                    var oldestFile = backupFiles.First();
-                    File.Delete(oldestFile);
-                    backupFiles.RemoveAt(0);
+                    while (backupFiles.Count > s_maxBackupFiles) {
+                        var oldestFile = backupFiles.First();
+                        File.Delete(oldestFile);
+                        backupFiles.RemoveAt(0);
+                    }
+                } catch (Exception ex) {
+                    Console.WriteLine($"バックアップ管理中にエラーが発生しました: {ex.Message}");
                 }
             }
         }
