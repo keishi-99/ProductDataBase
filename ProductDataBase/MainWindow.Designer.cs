@@ -42,6 +42,7 @@
             this.FontSize9RadioButton = new RadioButton();
             this.FontSizeLabel = new Label();
             this.QRCodePanel = new Panel();
+            this.textToUpperCheckBox = new CheckBox();
             this.RadioButtonBarcode = new RadioButton();
             this.QRCodeTextBox = new TextBox();
             this.QRCodeButton = new Button();
@@ -49,7 +50,7 @@
             this.panelCategory1 = new Panel();
             this.panelCategory2 = new Panel();
             this.panelCategory3 = new Panel();
-            this.textToUpperCheckBox = new CheckBox();
+            this.ReloadToolStripMenuItem = new ToolStripMenuItem();
             this.MainWindowMenuStrip.SuspendLayout();
             this.FontSizePanel.SuspendLayout();
             this.QRCodePanel.SuspendLayout();
@@ -69,7 +70,7 @@
             // 
             // ファイルToolStripMenuItem
             // 
-            this.ファイルToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.終了ToolStripMenuItem });
+            this.ファイルToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.ReloadToolStripMenuItem, this.終了ToolStripMenuItem });
             this.ファイルToolStripMenuItem.Name = "ファイルToolStripMenuItem";
             this.ファイルToolStripMenuItem.Size = new Size(53, 20);
             this.ファイルToolStripMenuItem.Text = "ファイル";
@@ -77,7 +78,7 @@
             // 終了ToolStripMenuItem
             // 
             this.終了ToolStripMenuItem.Name = "終了ToolStripMenuItem";
-            this.終了ToolStripMenuItem.Size = new Size(98, 22);
+            this.終了ToolStripMenuItem.Size = new Size(180, 22);
             this.終了ToolStripMenuItem.Text = "終了";
             this.終了ToolStripMenuItem.Click += this.終了ToolStripMenuItem_Click;
             // 
@@ -267,6 +268,18 @@
             this.QRCodePanel.Size = new Size(841, 56);
             this.QRCodePanel.TabIndex = 500;
             // 
+            // textToUpperCheckBox
+            // 
+            this.textToUpperCheckBox.AutoSize = true;
+            this.textToUpperCheckBox.Checked = true;
+            this.textToUpperCheckBox.CheckState = CheckState.Checked;
+            this.textToUpperCheckBox.Location = new Point(100, 31);
+            this.textToUpperCheckBox.Name = "textToUpperCheckBox";
+            this.textToUpperCheckBox.Size = new Size(140, 19);
+            this.textToUpperCheckBox.TabIndex = 607;
+            this.textToUpperCheckBox.Text = "小文字を大文字に変換";
+            this.textToUpperCheckBox.UseVisualStyleBackColor = true;
+            // 
             // RadioButtonBarcode
             // 
             this.RadioButtonBarcode.AutoSize = true;
@@ -333,17 +346,12 @@
             this.panelCategory3.Size = new Size(350, 259);
             this.panelCategory3.TabIndex = 603;
             // 
-            // textToUpperCheckBox
+            // ReloadToolStripMenuItem
             // 
-            this.textToUpperCheckBox.AutoSize = true;
-            this.textToUpperCheckBox.Checked = true;
-            this.textToUpperCheckBox.CheckState = CheckState.Checked;
-            this.textToUpperCheckBox.Location = new Point(100, 31);
-            this.textToUpperCheckBox.Name = "textToUpperCheckBox";
-            this.textToUpperCheckBox.Size = new Size(140, 19);
-            this.textToUpperCheckBox.TabIndex = 607;
-            this.textToUpperCheckBox.Text = "小文字を大文字に変換";
-            this.textToUpperCheckBox.UseVisualStyleBackColor = true;
+            this.ReloadToolStripMenuItem.Name = "ReloadToolStripMenuItem";
+            this.ReloadToolStripMenuItem.Size = new Size(180, 22);
+            this.ReloadToolStripMenuItem.Text = "再読み込み";
+            this.ReloadToolStripMenuItem.Click += this.ReloadToolStripMenuItem_Click;
             // 
             // MainWindow
             // 
@@ -411,5 +419,6 @@
         private Panel panelCategory2;
         private Panel panelCategory3;
         private CheckBox textToUpperCheckBox;
+        private ToolStripMenuItem ReloadToolStripMenuItem;
     }
 }
