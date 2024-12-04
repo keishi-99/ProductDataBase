@@ -9,6 +9,7 @@ namespace ProductDatabase {
         // ログ作成
         public static class Logger {
             private static readonly string s_logDirectory = "./logs"; // ログを保存するディレクトリ
+            private static readonly object s_lockObject = new();
 
             /// <summary>
             /// 作業ログを追記します。
@@ -16,19 +17,20 @@ namespace ProductDatabase {
             /// <param name="message">記録する作業内容</param>
             public static void AppendLog(string message) {
                 try {
-                    // ディレクトリが存在しない場合は作成
-                    if (!Directory.Exists(s_logDirectory)) {
-                        Directory.CreateDirectory(s_logDirectory);
+                    lock (s_lockObject) {
+                        // ディレクトリが存在しない場合は作成
+                        if (!Directory.Exists(s_logDirectory)) {
+                            Directory.CreateDirectory(s_logDirectory);
+                        }
+
+                        //// 年と月を含むログファイル名を生成
+                        var logFileName = $"log_{DateTime.Now:yyyyMM}.txt";
+                        var logFilePath = Path.Combine(s_logDirectory, logFileName);
+
+                        var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}";
+                        //// ログ内容をファイルの末尾に追記
+                        File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
                     }
-
-                    //// 年と月を含むログファイル名を生成
-                    var logFileName = $"log_{DateTime.Now:yyyyMM}.txt";
-                    var logFilePath = Path.Combine(s_logDirectory, logFileName);
-
-                    var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}";
-                    //// ログ内容をファイルの末尾に追記
-                    File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
-
                 } catch (Exception ex) {
                     MessageBox.Show($"ログの書き込み中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -39,27 +41,30 @@ namespace ProductDatabase {
             private static readonly string s_backupDirectory = "./db/backups"; // バックアップを保存するディレクトリ
             private static readonly string s_originalFilePath = "./db/registration.db"; // 元ファイルパス
             private static readonly int s_maxBackupFiles = 10; // 最大バックアップファイル数
+            private static readonly object s_lockObject = new();
 
             /// <summary>
             /// バックアップを作成します。
             /// </summary>
             public static void CreateBackup() {
                 try {
-                    // バックアップ用ディレクトリが存在しない場合は作成
-                    if (!Directory.Exists(s_backupDirectory)) {
-                        Directory.CreateDirectory(s_backupDirectory);
+                    lock (s_lockObject) {
+                        // バックアップ用ディレクトリが存在しない場合は作成
+                        if (!Directory.Exists(s_backupDirectory)) {
+                            Directory.CreateDirectory(s_backupDirectory);
+                        }
+
+                        // 日付と時間をファイル名に付加
+                        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                        var backupFileName = $"registration_{timestamp}.db";
+                        var backupFilePath = Path.Combine(s_backupDirectory, backupFileName);
+
+                        // 元ファイルをバックアップにコピー
+                        File.Copy(s_originalFilePath, backupFilePath, true);
+
+                        // バックアップファイルを管理
+                        ManageBackupFiles();
                     }
-
-                    // 日付と時間をファイル名に付加
-                    var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                    var backupFileName = $"registration_{timestamp}.db";
-                    var backupFilePath = Path.Combine(s_backupDirectory, backupFileName);
-
-                    // 元ファイルをバックアップにコピー
-                    File.Copy(s_originalFilePath, backupFilePath, true);
-
-                    // バックアップファイルを管理
-                    ManageBackupFiles();
                 } catch (Exception ex) {
                     MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
