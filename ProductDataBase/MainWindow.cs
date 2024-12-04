@@ -6,6 +6,85 @@ using System.Text;
 namespace ProductDatabase {
     public partial class MainWindow : Form {
 
+        // ログ作成
+        public static class Logger {
+            private static readonly string s_logDirectory = "./logs"; // ログを保存するディレクトリ
+
+            /// <summary>
+            /// 作業ログを追記します。
+            /// </summary>
+            /// <param name="message">記録する作業内容</param>
+            public static void AppendLog(string message) {
+                try {
+                    // ディレクトリが存在しない場合は作成
+                    if (!Directory.Exists(s_logDirectory)) {
+                        Directory.CreateDirectory(s_logDirectory);
+                    }
+
+                    //// 年と月を含むログファイル名を生成
+                    var logFileName = $"log_{DateTime.Now:yyyyMM}.txt";
+                    var logFilePath = Path.Combine(s_logDirectory, logFileName);
+
+                    var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}";
+                    //// ログ内容をファイルの末尾に追記
+                    File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
+
+                } catch (Exception ex) {
+                    Console.WriteLine($"ログの書き込み中にエラーが発生しました: {ex.Message}");
+                }
+            }
+        }
+        // バックアップ作成
+        public static class BackupManager {
+            private static readonly string s_backupDirectory = "./db/backups"; // バックアップを保存するディレクトリ
+            private static readonly string s_originalFilePath = "./db/registration.db"; // 元ファイルパス
+            private static readonly int s_maxBackupFiles = 10; // 最大バックアップファイル数
+
+            /// <summary>
+            /// バックアップを作成します。
+            /// </summary>
+            public static void CreateBackup() {
+                try {
+                    // バックアップ用ディレクトリが存在しない場合は作成
+                    if (!Directory.Exists(s_backupDirectory)) {
+                        Directory.CreateDirectory(s_backupDirectory);
+                    }
+
+                    // 日付と時間をファイル名に付加
+                    var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                    var backupFileName = $"registration_{timestamp}.db";
+                    var backupFilePath = Path.Combine(s_backupDirectory, backupFileName);
+
+                    // 元ファイルをバックアップにコピー
+                    File.Copy(s_originalFilePath, backupFilePath, true);
+
+                    // バックアップファイルを管理
+                    ManageBackupFiles();
+                } catch (Exception ex) {
+                    Console.WriteLine($"バックアップの作成中にエラーが発生しました: {ex.Message}");
+                }
+            }
+
+            /// <summary>
+            /// 古いバックアップファイルを削除します。
+            /// </summary>
+            private static void ManageBackupFiles() {
+                try {
+                    var backupFiles = Directory.GetFiles(s_backupDirectory, "registration_*.db")
+                                               .OrderBy(File.GetCreationTime) // 作成日時順に並べる
+                                               .ToList();
+
+                    while (backupFiles.Count > s_maxBackupFiles) {
+                        var oldestFile = backupFiles.First();
+                        File.Delete(oldestFile);
+                        backupFiles.RemoveAt(0);
+                    }
+                } catch (Exception ex) {
+                    Console.WriteLine($"バックアップ管理中にエラーが発生しました: {ex.Message}");
+                }
+            }
+        }
+
         public class ProductInfomation {
             public string ProductName { get; set; } = string.Empty;
             public string StockName { get; set; } = string.Empty;
@@ -638,84 +717,5 @@ namespace ProductDatabase {
             CodeScan();
         }
         private void QRCodeButton_Click(object sender, EventArgs e) { CodeScan(); }
-
-        // ログ作成
-        public static class Logger {
-            private static readonly string s_logDirectory = "./logs"; // ログを保存するディレクトリ
-
-            /// <summary>
-            /// 作業ログを追記します。
-            /// </summary>
-            /// <param name="message">記録する作業内容</param>
-            public static void AppendLog(string message) {
-                try {
-                    // ディレクトリが存在しない場合は作成
-                    if (!Directory.Exists(s_logDirectory)) {
-                        Directory.CreateDirectory(s_logDirectory);
-                    }
-
-                    //// 年と月を含むログファイル名を生成
-                    var logFileName = $"log_{DateTime.Now:yyyyMM}.txt";
-                    var logFilePath = Path.Combine(s_logDirectory, logFileName);
-
-                    var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}";
-                    //// ログ内容をファイルの末尾に追記
-                    File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
-
-                } catch (Exception ex) {
-                    Console.WriteLine($"ログの書き込み中にエラーが発生しました: {ex.Message}");
-                }
-            }
-        }
-        // バックアップ作成
-        public static class BackupManager {
-            private static readonly string s_backupDirectory = "./db/backups"; // バックアップを保存するディレクトリ
-            private static readonly string s_originalFilePath = "./db/registration.db"; // 元ファイルパス
-            private static readonly int s_maxBackupFiles = 10; // 最大バックアップファイル数
-
-            /// <summary>
-            /// バックアップを作成します。
-            /// </summary>
-            public static void CreateBackup() {
-                try {
-                    // バックアップ用ディレクトリが存在しない場合は作成
-                    if (!Directory.Exists(s_backupDirectory)) {
-                        Directory.CreateDirectory(s_backupDirectory);
-                    }
-
-                    // 日付と時間をファイル名に付加
-                    var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                    var backupFileName = $"registration_{timestamp}.db";
-                    var backupFilePath = Path.Combine(s_backupDirectory, backupFileName);
-
-                    // 元ファイルをバックアップにコピー
-                    File.Copy(s_originalFilePath, backupFilePath, true);
-
-                    // バックアップファイルを管理
-                    ManageBackupFiles();
-                } catch (Exception ex) {
-                    Console.WriteLine($"バックアップの作成中にエラーが発生しました: {ex.Message}");
-                }
-            }
-
-            /// <summary>
-            /// 古いバックアップファイルを削除します。
-            /// </summary>
-            private static void ManageBackupFiles() {
-                try {
-                    var backupFiles = Directory.GetFiles(s_backupDirectory, "registration_*.db")
-                                               .OrderBy(File.GetCreationTime) // 作成日時順に並べる
-                                               .ToList();
-
-                    while (backupFiles.Count > s_maxBackupFiles) {
-                        var oldestFile = backupFiles.First();
-                        File.Delete(oldestFile);
-                        backupFiles.RemoveAt(0);
-                    }
-                } catch (Exception ex) {
-                    Console.WriteLine($"バックアップ管理中にエラーが発生しました: {ex.Message}");
-                }
-            }
-        }
     }
 }
