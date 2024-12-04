@@ -672,32 +672,29 @@ namespace ProductDatabase {
             private static readonly string s_backupDirectory = "./db/backups"; // バックアップを保存するディレクトリ
             private static readonly string s_originalFilePath = "./db/registration.db"; // 元ファイルパス
             private static readonly int s_maxBackupFiles = 10; // 最大バックアップファイル数
-            private static readonly object s_lock = new(); // スレッドセーフ用ロック
 
             /// <summary>
             /// バックアップを作成します。
             /// </summary>
             public static void CreateBackup() {
-                lock (s_lock) {
-                    try {
-                        // バックアップ用ディレクトリが存在しない場合は作成
-                        if (!Directory.Exists(s_backupDirectory)) {
-                            Directory.CreateDirectory(s_backupDirectory);
-                        }
-
-                        // 日付と時間をファイル名に付加
-                        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                        var backupFileName = $"registration_{timestamp}.db";
-                        var backupFilePath = Path.Combine(s_backupDirectory, backupFileName);
-
-                        // 元ファイルをバックアップにコピー
-                        File.Copy(s_originalFilePath, backupFilePath, true);
-
-                        // バックアップファイルを管理
-                        ManageBackupFiles();
-                    } catch (Exception ex) {
-                        Console.WriteLine($"バックアップの作成中にエラーが発生しました: {ex.Message}");
+                try {
+                    // バックアップ用ディレクトリが存在しない場合は作成
+                    if (!Directory.Exists(s_backupDirectory)) {
+                        Directory.CreateDirectory(s_backupDirectory);
                     }
+
+                    // 日付と時間をファイル名に付加
+                    var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                    var backupFileName = $"registration_{timestamp}.db";
+                    var backupFilePath = Path.Combine(s_backupDirectory, backupFileName);
+
+                    // 元ファイルをバックアップにコピー
+                    File.Copy(s_originalFilePath, backupFilePath, true);
+
+                    // バックアップファイルを管理
+                    ManageBackupFiles();
+                } catch (Exception ex) {
+                    Console.WriteLine($"バックアップの作成中にエラーが発生しました: {ex.Message}");
                 }
             }
 
