@@ -69,7 +69,6 @@ namespace ProductDatabase {
                 _labelProNSerial = ProductInfo.SerialFirstNumber;
                 _serialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
 
-                var quantityFlg = false;
                 var strQuantity = string.Empty;
                 switch (ProductInfo.RegType) {
                     case 2:
@@ -126,47 +125,40 @@ namespace ProductDatabase {
 
                             // 在庫テーブルからデータ取得
                             var intQuantity = ProductInfo.Quantity;
+                            var substrateName = string.Empty;
                             cmd.CommandText = $"""SELECT SubstrateNumber, Stock, SubstrateName FROM "{ProductInfo.StockName}_Stock" WHERE Stock > 0 AND SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC""";
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using var dr = cmd.ExecuteReader();
                             while (dr.Read()) {
                                 var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
                                 var intStock = Convert.ToInt32(dr["Stock"]);
+                                if (!string.IsNullOrEmpty($"{dr["substrateName"]}")) { substrateName = $"{dr["substrateName"]}"; }
                                 objDgv?.Rows.Add(strSubstrateNumber, intStock);
 
-                                if (intQuantity >= intStock) {
-                                    intQuantity -= intStock;
-                                    if (objDgv != null) {
+                                if (objDgv != null) {
+                                    if (intQuantity >= intStock) {
+                                        intQuantity -= intStock;
                                         objDgv.Rows[^1].Cells[2].Value = intStock;
                                         objDgv.Rows[^1].Cells[3].Value = true;
                                     }
-                                }
-                                else {
-                                    if (intQuantity == 0) {
-                                        if (objDgv != null) {
+                                    else {
+                                        if (intQuantity == 0) {
                                             objDgv.Rows[^1].Cells[2].Value = 0;
                                         }
-                                    }
-                                    else {
-                                        if (objDgv != null) {
+                                        else {
                                             objDgv.Rows[^1].Cells[2].Value = intQuantity;
                                             objDgv.Rows[^1].Cells[3].Value = true;
                                             intQuantity = 0;
                                         }
                                     }
                                 }
-
-                                if (intQuantity > 0) {
-                                    quantityFlg = false;
-                                    var substrateName = $"{dr["SubstrateName"]}";
-                                    strQuantity += $"[{substrateName}]{Environment.NewLine}";
-                                }
-
-                                if (intQuantity == 0) { quantityFlg = true; }
+                            }
+                            if (intQuantity > 0) {
+                                strQuantity += $"[{substrateName}]{Environment.NewLine}";
                             }
                         }
 
-                        if (quantityFlg == false) {
+                        if (!string.IsNullOrEmpty(strQuantity)) {
                             Activate();
                             MessageBox.Show($"在庫が足りません。{Environment.NewLine}{strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
@@ -174,7 +166,6 @@ namespace ProductDatabase {
                         break;
                     case 3:
                         if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
-                        var strSubstrateName = string.Empty;
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
                             var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox;
 
@@ -230,18 +221,16 @@ namespace ProductDatabase {
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using var dr = cmd.ExecuteReader();
                             while (dr.Read()) {
-                                strSubstrateName = string.Empty;
-                                strSubstrateName = $"{dr["SubstrateName"]}";
-
+                                var substrateName = string.Empty;
                                 var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
                                 var intStock = Convert.ToInt32(dr["Stock"]);
+                                if (!string.IsNullOrEmpty($"{dr["substrateName"]}")) { substrateName = $"{dr["substrateName"]}"; }
                                 objDgv?.Rows.Add(strSubstrateNumber, intStock);
 
                                 var j = 0;
                                 var strOrderNumber = $"{dr["OrderNumber"]}";
                                 if (strOrderNumber == ProductInfo.OrderNumber) {
                                     if (objDgv != null) {
-                                        quantityFlg = false;
                                         var intQuantity = ProductInfo.Quantity;
                                         var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
                                         var useValue = intQuantity;
@@ -249,17 +238,15 @@ namespace ProductDatabase {
                                         objDgv.Rows[j].Cells[3].Value = true;
                                         // 必要数量分割り当てられたかチェック
                                         if (intQuantity > stockValue) {
-                                            quantityFlg = false;
-                                            strQuantity = $"{strQuantity}[{strSubstrateName}]{Environment.NewLine}";
+                                            strQuantity += $"[{strOrderNumber}][{substrateName}]{Environment.NewLine}";
                                         }
-                                        if (stockValue >= useValue) { quantityFlg = true; }
                                     }
                                 }
                                 j++;
                             }
                         }
 
-                        if (quantityFlg == false) {
+                        if (!string.IsNullOrEmpty(strQuantity)) {
                             Activate();
                             MessageBox.Show($"[{ProductInfo.OrderNumber}]の在庫が足りません。{Environment.NewLine}{strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
