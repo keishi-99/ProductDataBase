@@ -30,7 +30,7 @@ namespace ProductDatabase {
                     File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
 
                 } catch (Exception ex) {
-                    Console.WriteLine($"ログの書き込み中にエラーが発生しました: {ex.Message}");
+                    MessageBox.Show($"ログの書き込み中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -61,7 +61,7 @@ namespace ProductDatabase {
                     // バックアップファイルを管理
                     ManageBackupFiles();
                 } catch (Exception ex) {
-                    Console.WriteLine($"バックアップの作成中にエラーが発生しました: {ex.Message}");
+                    MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
 
@@ -80,7 +80,7 @@ namespace ProductDatabase {
                         backupFiles.RemoveAt(0);
                     }
                 } catch (Exception ex) {
-                    Console.WriteLine($"バックアップ管理中にエラーが発生しました: {ex.Message}");
+                    MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -218,6 +218,11 @@ namespace ProductDatabase {
 
                 RegisterButton.Enabled = false;
                 HistoryButton.Enabled = false;
+
+                CategoryListBox1.Items.Clear();
+                CategoryListBox2.Items.Clear();
+                CategoryListBox3.Items.Clear();
+                ProductInfo.ProductDataTable.Clear();
 
                 ActiveControl = QRCodeTextBox;
             } catch (Exception ex) {
@@ -700,6 +705,7 @@ namespace ProductDatabase {
         }
 
         private void MainWindow_Load(object sender, EventArgs e) { LoadEvents(); }
+        private void ReloadToolStripMenuItem_Click(object sender, EventArgs e) { LoadEvents(); }
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { Close(); }
         private void RegisterButton_Click(object sender, EventArgs e) { Registration(); }
         private void HistoryButton_Click(object sender, EventArgs e) { History(); }
