@@ -54,6 +54,16 @@ namespace ProductDatabase {
         private readonly List<string> _usedProductNumber = [];
         private readonly List<int> _usedQuantity = [];
 
+        // プロパティ設定
+        private bool IsLabelPrint => ProductInfo.PrintType is 1 or 3 or 4 or 5 or 6 or 7 or 9;
+        private bool IsBarcodePrint => ProductInfo.PrintType is 2 or 3;
+        private bool IsSerialGeneration => ProductInfo.PrintType is not 0 and not 10;
+        private bool RequiresClosing => ProductInfo.PrintType is 0 or 1 or 2 or 3 or 4 or 8 or 9;
+        private bool IsListPrint => ProductInfo.PrintType is 5 or 6;
+        private bool IsCheckSheetPrint => ProductInfo.PrintType is 6 or 7;
+        private bool IsUnderlinePrint => ProductInfo.PrintType is 4;
+
+
         public ProductRegistration2Window() {
             InitializeComponent();
         }
@@ -264,104 +274,8 @@ namespace ProductDatabase {
                         break;
                 }
 
-                switch (ProductInfo.PrintType) {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 8:
-                    case 9:
-                        SubstrateListPrintButton.Visible = false;
-                        CheckSheetPrintButton.Visible = false;
-                        break;
-                    case 5:
-                        CheckSheetPrintButton.Visible = false;
-                        break;
-                    case 7:
-                        SubstrateListPrintButton.Visible = false;
-                        break;
-                }
-
-                switch (ProductInfo.PrintType) {
-                    case 1:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 9:
-                        SettingsLabelPro = new CSettingsLabelPro();
-                        labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
-
-                        if (ProductInfo.PrintType == 1) { SubstrateListPrintButton.Visible = false; }
-                        SerialPrintPostionLabel.Visible = true;
-                        SerialPrintPostionNumericUpDown.Visible = true;
-                        BarcodePrintPostionLabel.Visible = false;
-                        BarcodePrintPostionNumericUpDown.Visible = false;
-                        シリアルラベル印刷ToolStripMenuItem.Enabled = false;
-                        シリアルラベル印刷プレビューToolStripMenuItem.Enabled = true;
-                        バーコード印刷ToolStripMenuItem.Enabled = false;
-                        バーコード印刷プレビューToolStripMenuItem.Enabled = false;
-                        シリアルラベル印刷設定ToolStripMenuItem.Enabled = true;
-                        バーコード印刷設定ToolStripMenuItem.Enabled = false;
-                        break;
-                    case 2:
-                        SettingsBarcodePro = new CSettingsBarcodePro();
-                        barcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
-
-                        SerialPrintPostionLabel.Visible = false;
-                        SerialPrintPostionNumericUpDown.Visible = false;
-                        BarcodePrintPostionLabel.Visible = true;
-                        BarcodePrintPostionNumericUpDown.Visible = true;
-                        シリアルラベル印刷ToolStripMenuItem.Enabled = false;
-                        シリアルラベル印刷プレビューToolStripMenuItem.Enabled = false;
-                        バーコード印刷ToolStripMenuItem.Enabled = false;
-                        バーコード印刷プレビューToolStripMenuItem.Enabled = true;
-                        シリアルラベル印刷設定ToolStripMenuItem.Enabled = false;
-                        バーコード印刷設定ToolStripMenuItem.Enabled = true;
-                        break;
-                    case 3:
-                        SettingsLabelPro = new CSettingsLabelPro();
-                        labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
-                        SettingsBarcodePro = new CSettingsBarcodePro();
-                        barcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
-
-                        SerialPrintPostionLabel.Visible = true;
-                        SerialPrintPostionNumericUpDown.Visible = true;
-                        BarcodePrintPostionLabel.Visible = true;
-                        BarcodePrintPostionNumericUpDown.Visible = true;
-                        シリアルラベル印刷ToolStripMenuItem.Enabled = false;
-                        シリアルラベル印刷プレビューToolStripMenuItem.Enabled = true;
-                        バーコード印刷ToolStripMenuItem.Enabled = false;
-                        バーコード印刷プレビューToolStripMenuItem.Enabled = true;
-                        シリアルラベル印刷設定ToolStripMenuItem.Enabled = true;
-                        バーコード印刷設定ToolStripMenuItem.Enabled = true;
-                        break;
-                    case 8:
-                        SerialPrintPostionLabel.Visible = false;
-                        SerialPrintPostionNumericUpDown.Visible = false;
-                        BarcodePrintPostionLabel.Visible = false;
-                        BarcodePrintPostionNumericUpDown.Visible = false;
-                        シリアルラベル印刷ToolStripMenuItem.Enabled = false;
-                        シリアルラベル印刷プレビューToolStripMenuItem.Enabled = false;
-                        バーコード印刷ToolStripMenuItem.Enabled = false;
-                        バーコード印刷プレビューToolStripMenuItem.Enabled = false;
-                        シリアルラベル印刷設定ToolStripMenuItem.Enabled = true;
-                        バーコード印刷設定ToolStripMenuItem.Enabled = false;
-                        break;
-                    case 0:
-                    default:
-                        SerialPrintPostionLabel.Visible = false;
-                        SerialPrintPostionNumericUpDown.Visible = false;
-                        BarcodePrintPostionLabel.Visible = false;
-                        BarcodePrintPostionNumericUpDown.Visible = false;
-                        シリアルラベル印刷ToolStripMenuItem.Enabled = false;
-                        シリアルラベル印刷プレビューToolStripMenuItem.Enabled = false;
-                        バーコード印刷ToolStripMenuItem.Enabled = false;
-                        バーコード印刷プレビューToolStripMenuItem.Enabled = false;
-                        シリアルラベル印刷設定ToolStripMenuItem.Enabled = false;
-                        バーコード印刷設定ToolStripMenuItem.Enabled = false;
-                        break;
-                }
+                // 印刷UI設定
+                ConfigurePrintSettings();
 
                 LoadSettings(labelSettingFilePath, barcodeSettingFilePath);
             } catch (Exception ex) {
@@ -388,102 +302,65 @@ namespace ProductDatabase {
             } finally {
             }
         }
+        // 印刷UI設定
+        private void ConfigurePrintSettings() {
+            SubstrateListPrintButton.Visible = IsListPrint;
+            SerialPrintPostionLabel.Visible = IsLabelPrint;
+            SerialPrintPostionNumericUpDown.Visible = IsLabelPrint;
+
+            CheckSheetPrintButton.Visible = IsCheckSheetPrint;
+            BarcodePrintPostionLabel.Visible = IsCheckSheetPrint;
+            BarcodePrintPostionNumericUpDown.Visible = IsCheckSheetPrint;
+
+            ConfigureUI();
+        }
+        private void ConfigureUI() {
+            if (IsLabelPrint) { ConfigureSerialLabelSettings(); }
+            if (IsBarcodePrint) { ConfigureBarcodeSettings(); }
+            SetMenuOptions();
+        }
+        private void ConfigureSerialLabelSettings() {
+            SettingsLabelPro = new CSettingsLabelPro();
+            labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+        }
+        private void ConfigureBarcodeSettings() {
+            SettingsBarcodePro = new CSettingsBarcodePro();
+            barcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+        }
+        private void SetMenuOptions() {
+            シリアルラベル印刷ToolStripMenuItem.Enabled = IsLabelPrint;
+            シリアルラベル印刷プレビューToolStripMenuItem.Enabled = IsLabelPrint;
+            シリアルラベル印刷設定ToolStripMenuItem.Enabled = IsLabelPrint;
+            バーコード印刷ToolStripMenuItem.Enabled = IsBarcodePrint;
+            バーコード印刷プレビューToolStripMenuItem.Enabled = IsBarcodePrint;
+            バーコード印刷設定ToolStripMenuItem.Enabled = IsBarcodePrint;
+        }
         // 登録処理
         private void RegisterCheck() {
             try {
                 _strSerial.Clear();
 
-                if (!NumberCheck()) { return; }
-                if (!QuantityCheck()) { return; }
-                if (!SerialCheck()) { return; }
-
-                // ラベル印刷
-                switch (ProductInfo.PrintType) {
-                    case 1:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 9:
-                        MessageBox.Show("シリアルラベルを印刷します。");
-                        _serialType = "Label";
-                        if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
-                        break;
-                    default:
-                        break;
-                }
-                // バーコード印刷
-                switch (ProductInfo.PrintType) {
-                    case 2:
-                    case 3:
-                        MessageBox.Show("バーコードラベルを印刷します。");
-                        _serialType = "Barcode";
-                        if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
-                        break;
-                    default:
-                        break;
+                if (!NumberCheck() || !QuantityCheck() || !SerialCheck()) {
+                    return;
                 }
 
-                RegisterButton.Enabled = false;
-                SerialPrintPostionNumericUpDown.Enabled = false;
-                BarcodePrintPostionNumericUpDown.Enabled = false;
+                HandleLabelPrinting();
+                HandleBarcodePrinting();
+                DisableControls();
+                GenerateSerialCodes();
 
-                // シリアル先頭と末尾を生成
-                switch (ProductInfo.PrintType) {
-                    case 1:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 8:
-                    case 9:
-                        _serialType = "Label";
-                        _serialFirst = GenerateCode(ProductInfo.SerialFirstNumber);
-                        _serialLast = GenerateCode(_serialLastNumber);
-                        break;
-                    case 2:
-                        _serialType = "Barcode";
-                        _serialFirst = GenerateCode(ProductInfo.SerialFirstNumber);
-                        _serialLast = GenerateCode(_serialLastNumber);
-                        break;
-                    default:
-                        break;
+                if (!Registration()) {
+                    throw new Exception("登録失敗しました。");
                 }
-
-                if (!Registration()) { throw new Exception("登録失敗しました。"); }
 
                 MessageBox.Show("登録完了");
 
-                switch (ProductInfo.PrintType) {
-                    case 0:
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 8:
-                    case 9:
-                        Close();
-                        break;
-                    case 5:
-                    case 6:
-                    case 7:
-                        foreach (Control control in Controls) {
-                            if (control is DataGridView dataGridView) {
-                                dataGridView.Enabled = false;
-                            }
-                            if (control is System.Windows.Forms.CheckBox checkBox) {
-                                checkBox.Enabled = false;
-                            }
-                        }
-                        if (ProductInfo.PrintType is 5 or 6) { SubstrateListPrintButton.Enabled = true; }
-                        if (ProductInfo.PrintType is 6 or 7) { CheckSheetPrintButton.Enabled = true; ; }
-                        break;
-                    default:
-                        break;
+                if (RequiresClosing) {
+                    Close();
                 }
-
+                else {
+                    HandlePostRegistration();
+                }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -740,15 +617,10 @@ namespace ProductDatabase {
                                             cmd.ExecuteNonQuery();
                                         }
 
-                                        switch (ProductInfo.PrintType) {
-                                            case 5:
-                                            case 6:
-                                                _usedSubstrate.Add(_useSubstrate[i]);
-                                                if (substrateNum != null) { _usedProductNumber.Add(substrateNum); }
-                                                _usedQuantity.Add(useValue);
-                                                break;
-                                            default:
-                                                break;
+                                        if (IsLabelPrint) {
+                                            _usedSubstrate.Add(_useSubstrate[i]);
+                                            if (substrateNum != null) { _usedProductNumber.Add(substrateNum); }
+                                            _usedQuantity.Add(useValue);
                                         }
                                     }
                                 }
@@ -944,28 +816,17 @@ namespace ProductDatabase {
         }
         private bool SerialCheck() {
             try {
-                switch (ProductInfo.PrintType) {
-                    case 1:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 8:
-                    case 9:
-                        for (var i = 0; i < ProductInfo.Quantity; i++) {
-                            _serialType = "Label";
-                            _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
-                        }
-                        break;
-                    case 2:
-                        for (var i = 0; i < ProductInfo.Quantity; i++) {
-                            _serialType = "Barcode";
-                            _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
-                        }
-                        break;
-                    default:
-                        break;
+                if (IsLabelPrint) {
+                    for (var i = 0; i < ProductInfo.Quantity; i++) {
+                        _serialType = "Label";
+                        _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
+                    }
+                }
+                else if (IsBarcodePrint) {
+                    for (var i = 0; i < ProductInfo.Quantity; i++) {
+                        _serialType = "Barcode";
+                        _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
+                    }
                 }
 
                 var strSQLSerial = string.Join("','", _strSerial);
@@ -994,6 +855,52 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+        }
+        private void HandleLabelPrinting() {
+            if (IsLabelPrint) {
+                MessageBox.Show("シリアルラベルを印刷します。");
+                _serialType = "Label";
+
+                if (!PrintBarcode(1)) {
+                    throw new OperationCanceledException("キャンセルしました。");
+                }
+            }
+        }
+        private void HandleBarcodePrinting() {
+            if (IsBarcodePrint) {
+                MessageBox.Show("バーコードラベルを印刷します。");
+                _serialType = "Barcode";
+
+                if (!PrintBarcode(1)) {
+                    throw new OperationCanceledException("キャンセルしました。");
+                }
+            }
+        }
+        private void DisableControls() {
+            RegisterButton.Enabled = false;
+            SerialPrintPostionNumericUpDown.Enabled = false;
+            BarcodePrintPostionNumericUpDown.Enabled = false;
+        }
+        private void GenerateSerialCodes() {
+            if (IsSerialGeneration) {
+                _serialType = IsBarcodePrint ? "Barcode" : "Label";
+                _serialFirst = GenerateCode(ProductInfo.SerialFirstNumber);
+                _serialLast = GenerateCode(_serialLastNumber);
+            }
+        }
+        private void HandlePostRegistration() {
+            foreach (Control control in Controls) {
+                switch (control) {
+                    case DataGridView dgv:
+                        dgv.Enabled = false;
+                        break;
+                    case System.Windows.Forms.CheckBox chk:
+                        chk.Enabled = false;
+                        break;
+                }
+            }
+            SubstrateListPrintButton.Enabled = IsListPrint;
+            CheckSheetPrintButton.Enabled = IsCheckSheetPrint;
         }
 
         // 印刷処理
@@ -1133,12 +1040,16 @@ namespace ProductDatabase {
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
 
                         // タイプ4の場合、最後のラベルに下線をつける
-                        var fontUnderline = ProductInfo.PrintType == 4 && remainingCount == 1;
+                        var fontUnderline = IsUnderlinePrint && remainingCount == 1;
 
-                        // タイプ9かつ最終行の場合はシリアルを型式下4桁に
-                        var generatedCode = ProductInfo.PrintType != 9 || remainingCount != 1
-                            ? GenerateCode(_labelProNSerial)
-                            : ProductInfo.ProductModel[^4..];
+                        // シリアル生成、PrintTypeが9かつ最終行の場合は型式下4桁、それ以外はシリアルを生成
+                        string generatedCode;
+                        if (ProductInfo.PrintType != 9 || remainingCount != 1) {
+                            generatedCode = GenerateCode(_labelProNSerial); // シリアルコードを生成
+                        }
+                        else {
+                            generatedCode = ProductInfo.ProductModel[^4..]; // 型式の下4桁を使用
+                        }
 
                         var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)sizeX, (float)sizeY);
