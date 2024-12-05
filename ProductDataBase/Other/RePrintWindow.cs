@@ -46,7 +46,6 @@ namespace ProductDatabase {
         // プロパティ設定
         private bool IsLabelPrint => ProductInfo.PrintType is 1 or 3 or 4 or 5 or 6 or 7 or 9;
         private bool IsBarcodePrint => ProductInfo.PrintType is 2 or 3;
-        private bool IsSerialGeneration => ProductInfo.PrintType is not 0 and not 10;
         private bool IsUnderlinePrint => ProductInfo.PrintType is 4;
 
         public RePrintWindow(ProductInfomation productInfo) {
@@ -204,7 +203,7 @@ namespace ProductDatabase {
                 // バックアップ作成
                 BackupManager.CreateBackup();
                 // ログ出力
-                Logger.AppendLog($"[再印刷]_注文番号[{_orderNumber}]_製造番号[{_productNumber}]_製品名[{ProductInfo.ProductType}]_型式[{ProductInfo.ProductModel}]_数量[{_quantity}]_シリアル先頭[{_strSerialFirstNumber}]_シリアル末尾_[{_strSerialLastNumber}]_Revision[{_revision}]_登録日[{_regDate}]_担当者[{_person}]");
+                Logger.AppendLog($";[再印刷];注文番号[{_orderNumber}];製造番号[{_productNumber}];製品名[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{_quantity}];シリアル先頭[{_strSerialFirstNumber}];シリアル末尾[{_strSerialLastNumber}];Revision[{_revision}];登録日[{_regDate}];担当者[{_person}];");
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
