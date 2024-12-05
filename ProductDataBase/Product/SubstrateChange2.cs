@@ -618,11 +618,11 @@ namespace ProductDatabase {
                 Excel.Worksheet xlSheet = xlSheets[sheetName];
 
                 // ワークシート印刷
-                xlSheet.PrintOut(Preview: true);
+                xlSheet.Activate();
 
                 // ワークブックを閉じてExcelを終了
-                xlBook.Close(false);
-                xlApp.Quit();
+                //xlBook.Close(false);
+                //xlApp.Quit();
 
                 _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
                 _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);

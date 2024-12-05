@@ -1487,12 +1487,12 @@ namespace ProductDatabase {
                 var xlSheets = xlBook.Sheets;
                 Excel.Worksheet xlSheet = xlSheets[sheetName];
 
-                // ワークシート印刷
-                xlSheet.PrintOut(Preview: true);
+                // ワークシート表示
+                xlSheet.Activate();
 
                 // ワークブックを閉じてExcelを終了
-                xlBook.Close(false);
-                xlApp.Quit();
+                //xlBook.Close(false);
+                //xlApp.Quit();
 
                 _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
                 _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
