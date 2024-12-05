@@ -467,7 +467,7 @@ namespace ProductDatabase {
                 // バックアップ作成
                 BackupManager.CreateBackup();
                 // ログ出力
-                Logger.AppendLog($"[基板変更]_注文番号[{ProductInfo.OrderNumber}]_製造番号[{ProductInfo.ProductNumber}]_製品名[{ProductInfo.ProductName}]_タイプ[{ProductInfo.ProductType}]_型式[{ProductInfo.ProductModel}]_数量[{ProductInfo.Quantity}]_シリアル先頭[{ProductInfo.SerialFirst}]_シリアル末尾_[{ProductInfo.SerialLast}]_Revision[{ProductInfo.Revision}]_登録日[{ProductInfo.RegDate}]_担当者[{ProductInfo.Person}]");
+                Logger.AppendLog($";[基板変更];注文番号[{ProductInfo.OrderNumber}];製造番号[{ProductInfo.ProductNumber}];製品名[{ProductInfo.ProductName}];タイプ[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{ProductInfo.Quantity}];シリアル先頭[{ProductInfo.SerialFirst}];シリアル末尾[{ProductInfo.SerialLast}];Revision[{ProductInfo.Revision}];登録日[{ProductInfo.RegDate}];担当者[{ProductInfo.Person}];");
                 return true;
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);

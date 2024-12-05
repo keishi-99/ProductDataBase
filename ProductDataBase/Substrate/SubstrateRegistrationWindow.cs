@@ -332,7 +332,7 @@ namespace ProductDatabase {
                 //var backupManager = new BackupManager();
                 //backupManager.CreateBackup();
                 // ログ出力
-                Logger.AppendLog($"[基板登録]_注文番号[{orderNumber}]_製造番号[{substrateNumber}]_製品名[{ProductInfo.ProductName}]_基板名_[{ProductInfo.SubstrateName}]_型式[{ProductInfo.SubstrateModel}]_数量[{quantity}]_Revision[{revision}]_登録日[{registrationDate}]_担当者[{person}]");
+                Logger.AppendLog($";[基板登録];注文番号[{orderNumber}];製造番号[{substrateNumber}];製品名[{ProductInfo.ProductName}];基板名[{ProductInfo.SubstrateName}];型式[{ProductInfo.SubstrateModel}];数量[{quantity}];Revision[{revision}];登録日[{registrationDate}];担当者[{person}];");
 
                 return true;
             } catch (Exception ex) {

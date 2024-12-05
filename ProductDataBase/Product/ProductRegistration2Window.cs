@@ -693,7 +693,7 @@ namespace ProductDatabase {
             // バックアップ作成
             BackupManager.CreateBackup();
             // ログ出力
-            Logger.AppendLog($"[製品登録]_注文番号[{ProductInfo.OrderNumber}]_製造番号[{ProductInfo.ProductNumber}]_製品名[{ProductInfo.ProductName}]_タイプ[{ProductInfo.ProductType}]_型式[{ProductInfo.ProductModel}]_数量[{ProductInfo.Quantity}]_シリアル先頭[{_serialFirst}]_シリアル末尾_[{_serialLast}]_Revision[{ProductInfo.Revision}]_登録日[{ProductInfo.RegDate}]_担当者[{ProductInfo.Person}]");
+            Logger.AppendLog($";[製品登録];注文番号[{ProductInfo.OrderNumber}];製造番号[{ProductInfo.ProductNumber}];製品名[{ProductInfo.ProductName}];タイプ[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{ProductInfo.Quantity}];シリアル先頭[{_serialFirst}];シリアル末尾[{_serialLast}];Revision[{ProductInfo.Revision}];登録日[{ProductInfo.RegDate}];担当者[{ProductInfo.Person}];");
             return true;
         }
         private bool NumberCheck() {
