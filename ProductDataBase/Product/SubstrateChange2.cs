@@ -35,6 +35,15 @@ namespace ProductDatabase {
         private CheckBox? _objCbx;
         private DataGridView? _objDgv;
 
+        // プロパティ設定
+        private bool IsLabelPrint => ProductInfo.PrintType is 1 or 3 or 4 or 5 or 6 or 7 or 9;
+        private bool IsBarcodePrint => ProductInfo.PrintType is 2 or 3;
+        private bool IsSerialGeneration => ProductInfo.PrintType is not 0 and not 10;
+        private bool RequiresClosing => ProductInfo.PrintType is 0 or 1 or 2 or 3 or 4 or 8 or 9;
+        private bool IsListPrint => ProductInfo.PrintType is 5 or 6;
+        private bool IsCheckSheetPrint => ProductInfo.PrintType is 6 or 7;
+        private bool IsUnderlinePrint => ProductInfo.PrintType is 4;
+
         public SubstrateChange2() {
             InitializeComponent();
         }
@@ -233,9 +242,7 @@ namespace ProductDatabase {
                     }
                 }
                 // リスト印刷ボタンを有効に
-                if (ProductInfo.PrintType is 5 or 6) {
-                    SubstrateListPrintButton.Enabled = true;
-                }
+                if (IsListPrint) { SubstrateListPrintButton.Enabled = true; }
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -401,15 +408,10 @@ namespace ProductDatabase {
                                                 cmd.ExecuteNonQuery();
                                             }
 
-                                            switch (ProductInfo.PrintType) {
-                                                case 5:
-                                                case 6:
-                                                    _listUsedSubstrate.Add(_useSubstrate[i]);
-                                                    if (substrateNum != null) { _listUsedProductNumber.Add(substrateNum); }
-                                                    _listUsedQuantity.Add(useValue);
-                                                    break;
-                                                default:
-                                                    break;
+                                            if (IsListPrint) {
+                                                _listUsedSubstrate.Add(_useSubstrate[i]);
+                                                if (substrateNum != null) { _listUsedProductNumber.Add(substrateNum); }
+                                                _listUsedQuantity.Add(useValue);
                                             }
                                         }
                                     }

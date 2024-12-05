@@ -24,6 +24,10 @@ namespace ProductDatabase {
                     "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
 
+        // プロパティ設定
+        private bool IsLabelPrint => ProductInfo.PrintType is 1;
+        private bool IsRegistration => ProductInfo.RegType is 1;
+
         public SubstrateRegistrationWindow(ProductInfomation productInfo) {
             InitializeComponent();
             ProductInfo = productInfo;
@@ -71,7 +75,7 @@ namespace ProductDatabase {
                 }
 
                 // 在庫管理する基板はDB2へ接続し対象製品の在庫取得
-                if (ProductInfo.RegType != 0) {
+                if (IsRegistration) {
                     using SQLiteConnection con = new(GetConnectionRegistration());
                     con.Open();
                     using var cmd = con.CreateCommand();
@@ -88,16 +92,13 @@ namespace ProductDatabase {
                 }
                 else { StockLabel2.Text = "---"; }
 
-                switch (ProductInfo.PrintType) {
-                    case 0:
-                        RevisionCheckBox.Visible = false;
-                        PrintRowLabel.Visible = false;
-                        PrintPostionNumericUpDown.Visible = false;
-                        PrintOnlyCheckBox.Visible = false;
-                        PrintButton.Visible = false;
-                        break;
-                    default:
-                        break;
+                // 印刷しない場合は関連コントロール非表示に
+                if (IsLabelPrint == false) {
+                    RevisionCheckBox.Visible = false;
+                    PrintRowLabel.Visible = false;
+                    PrintPostionNumericUpDown.Visible = false;
+                    PrintOnlyCheckBox.Visible = false;
+                    PrintButton.Visible = false;
                 }
 
                 if (File.Exists(_settingFilePath) == false) { throw new Exception("設定ファイルが見つかりませんでした"); }
@@ -160,26 +161,20 @@ namespace ProductDatabase {
 
                 if (!Registration()) { return; }
 
-                switch (ProductInfo.PrintType) {
-                    case 0:
+                if (IsLabelPrint) {
+                    if (QuantityCheckBox.Checked) {
+                        MessageBox.Show("登録完了 続けて印刷します。");
+                        PrintBarcode(1);
+                        PrintButton.Enabled = true;
+                    }
+                    if (DefectNumberCheckBox.Checked) {
                         MessageBox.Show("登録完了");
                         Close();
-                        break;
-                    case 1:
-                        if (QuantityCheckBox.Checked) {
-                            MessageBox.Show("登録完了 続けて印刷します。");
-                            PrintBarcode(1);
-                            PrintButton.Enabled = true;
-                            break;
-                        }
-                        if (DefectNumberCheckBox.Checked) {
-                            MessageBox.Show("登録完了");
-                            Close();
-                            break;
-                        }
-                        break;
-                    default:
-                        break;
+                    }
+                }
+                else {
+                    MessageBox.Show("登録完了");
+                    Close();
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -202,7 +197,7 @@ namespace ProductDatabase {
                 con.Open();
 
                 // 製番が新規かチェック
-                if (ProductInfo.RegType != 0) {
+                if (IsRegistration) {
                     var substrateName = string.Empty;
                     using (var cmd = con.CreateCommand()) {
                         cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_Stock" WHERE SubstrateNumber = @SubstrateNumber ORDER BY _rowid_ DESC LIMIT 1""";
@@ -225,7 +220,7 @@ namespace ProductDatabase {
                 }
 
                 // 在庫管理する基板のみ
-                if (ProductInfo.RegType != 0) {
+                if (IsRegistration) {
                     //在庫追加
                     if (QuantityCheckBox.Checked && !DefectNumberCheckBox.Checked) {
                         // 基板在庫テーブルへ追加_製番が一致した行を更新する、製番がない場合は新規追加
