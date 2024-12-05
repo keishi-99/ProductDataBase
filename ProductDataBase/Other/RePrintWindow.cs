@@ -279,11 +279,10 @@ namespace ProductDatabase {
                 // PrintPageイベントハンドラの追加
                 pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
-                _labelProNumLabelsToPrint = _quantity;
-                _labelProPageNum = 1;
-
                 switch (printFlg) {
                     case 1:
+                        _labelProNumLabelsToPrint = _quantity;
+                        _labelProPageNum = 1;
                         RePrintPrintDialog.Document = pd;
                         var r = RePrintPrintDialog.ShowDialog();
 
@@ -301,6 +300,8 @@ namespace ProductDatabase {
                     case 2:
                         if (!FormCheck()) { return false; };
                         if (!DataCheck()) { return false; };
+                        _labelProNumLabelsToPrint = _quantity;
+                        _labelProPageNum = 1;
                         // 最大で表示
                         RePrintPrintPreviewDialog.Shown += (sender, e) => {
                             if (sender is Form form) {
@@ -320,24 +321,24 @@ namespace ProductDatabase {
             }
         }
         private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
+            Point headerPos = new(0, 0);
+            var headerString = string.Empty;
+            Font headerFooterFont = new("ＭＳ Ｐ明朝", 5.25F);
+            var serialCodePrintCopies = 0;
+
+            var maxX = 0;
+            var maxY = 0;
+            decimal sizeX = 0;
+            decimal sizeY = 0;
+            decimal offsetX = 0;
+            decimal offsetY = 0;
+            decimal intervalX = 0;
+            decimal intervalY = 0;
             try {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
 
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
-                var startLineLabel = (int)PrintPostionNumericUpDown.Value - 1;
-                Point headerPos = new(0, 0);
-                var headerString = string.Empty;
-                Font headerFooterFont = new("ＭＳ Ｐ明朝", 5.25F);
-                var serialCodePrintCopies = 0;
 
-                var maxX = 0;
-                var maxY = 0;
-                decimal sizeX = 0;
-                decimal sizeY = 0;
-                decimal offsetX = 0;
-                decimal offsetY = 0;
-                decimal intervalX = 0;
-                decimal intervalY = 0;
                 switch (_serialType) {
                     case "Label":
                         if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnullです。"); }
@@ -426,39 +427,21 @@ namespace ProductDatabase {
                             generatedCode = ProductInfo.ProductModel[^4..]; // 型式の下4桁を使用
                         }
 
-                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
+                        using var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)sizeX, (float)sizeY);
 
-                        _labelProNSerial++;
-                        _labelProNumLabelsToPrint--;
-
-                        if (_labelProNumLabelsToPrint <= 0) {
-                            _remainingCount--;
-
-                            if (_remainingCount <= 0) {
+                        _remainingCount--;
+                        if (_remainingCount <= 0) {
+                            _labelProNSerial++;
+                            _labelProNumLabelsToPrint--;
+                            //印刷するラベルがなくなった場合の処理
+                            if (_labelProNumLabelsToPrint <= 0) {
                                 e.HasMorePages = false;
                                 _labelProPageNum = 1;
                                 _labelProNumLabelsToPrint = 0;
                                 return;
                             }
-                            else {
-                                _labelProNSerial -= x + 1;
-                                _labelProNumLabelsToPrint += x + 1;
-                                break;
-                            }
-                        }
-
-                        // 列の終わりの処理
-                        if (x >= maxX - 1) {
-                            _remainingCount--;
-                            if (_remainingCount <= 0) {
-                                _remainingCount = serialCodePrintCopies;
-                            }
-                            else if (_remainingCount > 0) {
-                                _labelProNSerial -= x + 1;
-                                _labelProNumLabelsToPrint += x + 1;
-                                break;
-                            }
+                            _remainingCount = serialCodePrintCopies;
                         }
                     }
                 }
@@ -470,6 +453,9 @@ namespace ProductDatabase {
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            } finally {
+                // 明示的にFontを解放
+                headerFooterFont.Dispose();
             }
         }
         private string ConvertHeaderFooterString(string s) {

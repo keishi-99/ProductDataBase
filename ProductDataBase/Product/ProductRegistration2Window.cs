@@ -328,10 +328,10 @@ namespace ProductDatabase {
             barcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
         }
         private void SetMenuOptions() {
-            シリアルラベル印刷ToolStripMenuItem.Enabled = IsLabelPrint;
+            シリアルラベル印刷ToolStripMenuItem.Enabled = false;
             シリアルラベル印刷プレビューToolStripMenuItem.Enabled = IsLabelPrint;
             シリアルラベル印刷設定ToolStripMenuItem.Enabled = IsLabelPrint;
-            バーコード印刷ToolStripMenuItem.Enabled = IsBarcodePrint;
+            バーコード印刷ToolStripMenuItem.Enabled = false;
             バーコード印刷プレビューToolStripMenuItem.Enabled = IsBarcodePrint;
             バーコード印刷設定ToolStripMenuItem.Enabled = IsBarcodePrint;
         }
@@ -941,26 +941,26 @@ namespace ProductDatabase {
             return true;
         }
         private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
+            System.Drawing.Point headerPos = new(0, 0);
+            var headerString = string.Empty;
+            var headerFooterFont = new Font("ＭＳ Ｐ明朝", 5.25F);
+            var serialCodePrintCopies = 0;
+            var remainingCount = 0;
+
+            var maxX = 0;
+            var maxY = 0;
+            decimal sizeX = 0;
+            decimal sizeY = 0;
+            decimal offsetX = 0;
+            decimal offsetY = 0;
+            decimal intervalX = 0;
+            decimal intervalY = 0;
+            var startLine = 0;
+            var labelProPageNum = 0;
             try {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
 
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
-                System.Drawing.Point headerPos = new(0, 0);
-                var headerString = string.Empty;
-                Font headerFooterFont = new("ＭＳ Ｐ明朝", 5.25F);
-                var serialCodePrintCopies = 0;
-                var remainingCount = 0;
-
-                var maxX = 0;
-                var maxY = 0;
-                decimal sizeX = 0;
-                decimal sizeY = 0;
-                decimal offsetX = 0;
-                decimal offsetY = 0;
-                decimal intervalX = 0;
-                decimal intervalY = 0;
-                var startLine = 0;
-                var labelProPageNum = 0;
 
                 switch (_serialType) {
                     case "Label":
@@ -1049,40 +1049,21 @@ namespace ProductDatabase {
                             generatedCode = ProductInfo.ProductModel[^4..]; // 型式の下4桁を使用
                         }
 
-                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
+                        using var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)sizeX, (float)sizeY);
 
-                        _labelProNSerial++;
-                        _labelProNumLabelsToPrint--;
-
-                        // 印刷するラベルがなくなった場合の処理
-                        if (_labelProNumLabelsToPrint <= 0) {
-                            remainingCount--;
-
-                            if (remainingCount <= 0) {
+                        remainingCount--;
+                        if (remainingCount == 0) {
+                            _labelProNSerial++;
+                            _labelProNumLabelsToPrint--;
+                            //印刷するラベルがなくなった場合の処理
+                            if (_labelProNumLabelsToPrint <= 0) {
                                 e.HasMorePages = false;
                                 _pageCnt = 1;
                                 _labelProNumLabelsToPrint = 0;
                                 return;
                             }
-                            else {
-                                _labelProNSerial -= x + 1;
-                                _labelProNumLabelsToPrint += x + 1;
-                                break;
-                            }
-                        }
-
-                        // 列の終わりの処理
-                        if (x >= maxX - 1) {
-                            remainingCount--;
-                            if (remainingCount <= 0) {
-                                remainingCount = serialCodePrintCopies;
-                            }
-                            else if (remainingCount > 0) {
-                                _labelProNSerial -= x + 1;
-                                _labelProNumLabelsToPrint += x + 1;
-                                break;
-                            }
+                            remainingCount = serialCodePrintCopies;
                         }
                     }
                 }
@@ -1094,6 +1075,8 @@ namespace ProductDatabase {
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
+                // 明示的にFontを解放
+                headerFooterFont.Dispose();
             }
         }
         private string ConvertHeaderFooterString(string s) {
