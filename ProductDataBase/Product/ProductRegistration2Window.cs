@@ -774,8 +774,6 @@ namespace ProductDatabase {
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
 
                             var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxがnullです。");
-                            objCbx.Enabled = true;
-                            objCbx.Checked = true;
 
                             var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
                             objDgv.Columns[2].ReadOnly = false;
