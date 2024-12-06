@@ -118,6 +118,7 @@
             // 
             // GenerationReportButton
             // 
+            this.GenerationReportButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             this.GenerationReportButton.Location = new Point(1080, 474);
             this.GenerationReportButton.Name = "GenerationReportButton";
             this.GenerationReportButton.Size = new Size(92, 25);
