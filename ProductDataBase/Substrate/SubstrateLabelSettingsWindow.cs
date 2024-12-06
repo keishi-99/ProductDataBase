@@ -68,7 +68,7 @@ namespace ProductDatabase {
                 stringPosY = double.Parse(PrintTextPostionYTextBox.Text);
                 numLabels = int.Parse(PrintTextQuantityTextBox.Text);
             } catch (Exception ex) {
-                MessageBox.Show($"入力値が不正です。{Environment.NewLine}{ex.Message}");
+                MessageBox.Show($"入力値が不正です。{Environment.NewLine}{ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 DialogResult = DialogResult.None;
                 return;
             }

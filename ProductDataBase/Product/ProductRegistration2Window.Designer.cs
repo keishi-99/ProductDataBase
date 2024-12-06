@@ -912,7 +912,7 @@
             // 
             this.SerialPrintPostionLabel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             this.SerialPrintPostionLabel.AutoSize = true;
-            this.SerialPrintPostionLabel.Location = new Point(499, 549);
+            this.SerialPrintPostionLabel.Location = new Point(400, 549);
             this.SerialPrintPostionLabel.Name = "SerialPrintPostionLabel";
             this.SerialPrintPostionLabel.Size = new Size(79, 30);
             this.SerialPrintPostionLabel.TabIndex = 21;
@@ -921,7 +921,7 @@
             // SerialPrintPostionNumericUpDown
             // 
             this.SerialPrintPostionNumericUpDown.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            this.SerialPrintPostionNumericUpDown.Location = new Point(487, 580);
+            this.SerialPrintPostionNumericUpDown.Location = new Point(388, 580);
             this.SerialPrintPostionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
             this.SerialPrintPostionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             this.SerialPrintPostionNumericUpDown.Name = "SerialPrintPostionNumericUpDown";
@@ -933,7 +933,7 @@
             // BarcodePrintPostionNumericUpDown
             // 
             this.BarcodePrintPostionNumericUpDown.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            this.BarcodePrintPostionNumericUpDown.Location = new Point(626, 580);
+            this.BarcodePrintPostionNumericUpDown.Location = new Point(527, 580);
             this.BarcodePrintPostionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
             this.BarcodePrintPostionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             this.BarcodePrintPostionNumericUpDown.Name = "BarcodePrintPostionNumericUpDown";
@@ -946,7 +946,7 @@
             // 
             this.BarcodePrintPostionLabel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             this.BarcodePrintPostionLabel.AutoSize = true;
-            this.BarcodePrintPostionLabel.Location = new Point(638, 549);
+            this.BarcodePrintPostionLabel.Location = new Point(539, 549);
             this.BarcodePrintPostionLabel.Name = "BarcodePrintPostionLabel";
             this.BarcodePrintPostionLabel.Size = new Size(79, 30);
             this.BarcodePrintPostionLabel.TabIndex = 23;
@@ -1342,11 +1342,11 @@
             // GenerationReportButton
             // 
             this.GenerationReportButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            this.GenerationReportButton.Location = new Point(39, 580);
+            this.GenerationReportButton.Location = new Point(660, 577);
             this.GenerationReportButton.Name = "GenerationReportButton";
             this.GenerationReportButton.Size = new Size(100, 25);
             this.GenerationReportButton.TabIndex = 39;
-            this.GenerationReportButton.Text = "未設定";
+            this.GenerationReportButton.Text = "成績書作成";
             this.GenerationReportButton.UseVisualStyleBackColor = true;
             this.GenerationReportButton.Click += this.GenerationReportButton_Click;
             // 

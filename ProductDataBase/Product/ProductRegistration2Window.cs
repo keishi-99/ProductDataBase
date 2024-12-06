@@ -278,7 +278,7 @@ namespace ProductDatabase {
 
                 LoadSettings(labelSettingFilePath, barcodeSettingFilePath);
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void LoadSettings(string labelSettingFilePath, string barcodeSettingFilePath) {
@@ -296,7 +296,7 @@ namespace ProductDatabase {
                     srBarcode?.Close();
                 }
             } catch (Exception ex) {
-                MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
             }
         }
@@ -319,11 +319,11 @@ namespace ProductDatabase {
         }
         private void ConfigureSerialLabelSettings() {
             SettingsLabelPro = new CSettingsLabelPro();
-            labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+            labelSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", ProductInfo.ProductName, $"SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml");
         }
         private void ConfigureBarcodeSettings() {
             SettingsBarcodePro = new CSettingsBarcodePro();
-            barcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+            barcodeSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", ProductInfo.ProductName, $"BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml");
         }
         private void SetMenuOptions() {
             シリアルラベル印刷ToolStripMenuItem.Enabled = false;
@@ -361,7 +361,7 @@ namespace ProductDatabase {
                 //    HandlePostRegistration();
                 //}
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "[RegisterCheck]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private bool Registration() {
@@ -807,7 +807,7 @@ namespace ProductDatabase {
                 }
                 return true;
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "[QuantityCheck]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -849,7 +849,7 @@ namespace ProductDatabase {
 
                 return true;
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "[SerialCheck]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -1071,7 +1071,7 @@ namespace ProductDatabase {
                     e.HasMorePages = true;
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "[PrintDocumentPrintPage]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
             }
         }
@@ -1257,7 +1257,7 @@ namespace ProductDatabase {
                 //List<string> _orderFirstSerialRange = new();
                 //List<string> _orderLastSerialRange = new();
 
-                //using FileStream _fileStream = new($"""{Environment.CurrentDirectory}./config/Excel/ConfigCheckSheet.xlsx""", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                //using FileStream _fileStream =
                 //using XLWorkbook _workBook = new(_fileStream);
                 //IXLWorksheet _workSheet = _workBook.Worksheet("Sheet1");
 
@@ -1301,7 +1301,7 @@ namespace ProductDatabase {
 
                 //    // ワークブックを開く。
                 //    Excel.Workbooks _xlBooks = _xlApp.Workbooks;
-                //    Excel.Workbook _xlBook = _xlBooks.Open($"""{System.Environment.CurrentDirectory}./config/Excel/temporarily_{_i}.xlsx""");
+                //    Excel.Workbook _xlBook = _
 
                 //    // ワークシートを選択
                 //    Excel.Sheets _xlSheets = _xlBook.Sheets;
@@ -1321,40 +1321,35 @@ namespace ProductDatabase {
                 //}
 
             } catch (Exception ex) {
-                MessageBox.Show($"{ex.Message}", "[PrintCheckSheet]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         // リスト印刷
         private void PrintList() {
             try {
-                using FileStream fileStream = new($"{Environment.CurrentDirectory}./config/Excel/ConfigList.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigList.xlsx");
+                using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using XLWorkbook workBook = new(fileStream);
                 var workSheetMain = workBook.Worksheet("Sheet1");
 
-                var findRow = 0;
                 // セル検索
-                foreach (var cell in workSheetMain.Search(ProductInfo.ProductModel)) {
-                    findRow = cell.Address.RowNumber;
-                }
-
-                if (findRow == 0) {
-                    throw new Exception($"Configに品目番号:{ProductInfo.ProductModel}が見つかりません。");
-                }
+                var productModelCell = workSheetMain.Search(ProductInfo.ProductModel).FirstOrDefault() ?? throw new Exception($"Configに品目番号:[{ProductInfo.ProductModel}]が見つかりません。");
+                var findRow = productModelCell.Address.RowNumber;
 
                 // ワークシートのセルから値を取得
-                var sheetName = workSheetMain.Cell(findRow, 2).Value.ToString();
-                var productName = workSheetMain.Cell(findRow, 3).Value.ToString();
-                var productNameRange = workSheetMain.Cell(findRow, 4).Value.ToString();
-                var productNumberRange = workSheetMain.Cell(findRow, 5).Value.ToString();
-                var orderNumberRange = workSheetMain.Cell(findRow, 6).Value.ToString();
-                var regDateRange = workSheetMain.Cell(findRow, 7).Value.ToString();
-                var productModel = workSheetMain.Cell(findRow, 8).Value.ToString();
-                var productModelRange = workSheetMain.Cell(findRow, 9).Value.ToString();
-                var quantityRange = workSheetMain.Cell(findRow, 10).Value.ToString();
-                var serialFirstRange = workSheetMain.Cell(findRow, 11).Value.ToString();
-                var serialLastRange = workSheetMain.Cell(findRow, 12).Value.ToString();
-                var commentRange = workSheetMain.Cell(findRow, 13).Value.ToString();
-                var qrCodeRange = workSheetMain.Cell(findRow, 14).Value.ToString();
+                var sheetName = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 2, 0);
+                var productName = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 3, 0);
+                var productNameRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 4, 0);
+                var productNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 5, 2);
+                var orderNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 6, 0);
+                var regDateRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 7, 0);
+                var productModel = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 8, 0);
+                var productModelRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 9, 0);
+                var quantityRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 10, 0);
+                var serialFirstRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 11, 0);
+                var serialLastRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 12, 0);
+                var commentRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 13, 0);
+                var qrCodeRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 14, 0);
 
                 var workSheetTemp = workBook.Worksheet(sheetName);
                 workSheetTemp.Cell(productNameRange).Value = productName;
@@ -1435,7 +1430,8 @@ namespace ProductDatabase {
                 }
 
                 //引数に保存先パスを指定
-                workBook.SaveAs($"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
+                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "temporarily.xlsx");
+                workBook.SaveAs(temporarilyPath);
 
                 // 印刷
                 Excel.Application xlApp = new() {
@@ -1444,7 +1440,7 @@ namespace ProductDatabase {
 
                 // ワークブック開く
                 var xlBooks = xlApp.Workbooks;
-                var xlBook = xlBooks.Open($"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
+                var xlBook = xlBooks.Open(temporarilyPath);
 
                 // ワークシート選択
                 var xlSheets = xlBook.Sheets;
@@ -1464,7 +1460,7 @@ namespace ProductDatabase {
                 _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
 
             } catch (Exception ex) {
-                MessageBox.Show($"{ex.Message}", "[PrintList]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         // 成績書作成
@@ -1475,39 +1471,25 @@ namespace ProductDatabase {
                 using XLWorkbook workBookConfig = new(fileStreamConfig);
                 var workSheetMain = workBookConfig.Worksheet("Sheet1");
 
-                var findRow = 0;
                 // セル検索
-                foreach (var cell in workSheetMain.Search(ProductInfo.ProductModel)) {
-                    findRow = cell.Address.RowNumber;
-                    break;
-                }
-
-                if (findRow == 0) {
-                    throw new Exception($"Configに品目番号:{ProductInfo.ProductModel}が見つかりません。");
-                }
+                var cell = workSheetMain.Search(ProductInfo.ProductModel).FirstOrDefault() ?? throw new Exception($"Configに品目番号:[{ProductInfo.ProductModel}]が見つかりません。");
+                var findRow = cell.Address.RowNumber;
 
                 // ワークシートのセルから値を取得
                 var filePath = workSheetMain.Cell(findRow, 3).GetString()?.Trim('"');
-                var sheetName = workSheetMain.Cell(findRow, 4).GetString();
-                var productNumberRange = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 5).GetString())
-                    ? workSheetMain.Cell(findRow, 5).GetString()
-                    : workSheetMain.Cell(2, 5).GetString();
-                var orderNumberRange = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 6).GetString())
-                    ? workSheetMain.Cell(findRow, 6).Value.ToString()
-                    : workSheetMain.Cell(2, 6).GetString();
-                var quantityRange = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 7).GetString())
-                    ? workSheetMain.Cell(findRow, 7).Value.ToString()
-                    : workSheetMain.Cell(2, 7).GetString();
-                var serialFirstRange = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 8).GetString())
-                    ? workSheetMain.Cell(findRow, 8).Value.ToString()
-                    : workSheetMain.Cell(2, 8).GetString();
-                var serialLastRange = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 9).GetString())
-                    ? workSheetMain.Cell(findRow, 9).Value.ToString()
-                    : workSheetMain.Cell(2, 9).GetString();
+                if (string.IsNullOrWhiteSpace(filePath)) { throw new Exception("Configのファイルパスが無効です。"); }
+                if (!File.Exists(filePath)) { throw new FileNotFoundException($"指定されたファイルが存在しません: {filePath}"); }
+                var fileExtension = Path.GetExtension(filePath).ToLower(); // 開いたファイルの拡張子取得
 
-                if (string.IsNullOrWhiteSpace(filePath) || string.IsNullOrWhiteSpace(sheetName)) {
-                    throw new Exception("Configの必須項目が不足しています。");
-                }
+                var sheetName = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 4).GetString())
+                    ? workSheetMain.Cell(findRow, 4).GetString()
+                    : throw new Exception("シート名がありません。");
+                var productNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 5, 2);
+                var orderNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 6, 2);
+                var quantityRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 7, 2);
+                var serialFirstRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 8, 2);
+                var serialLastRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 9, 2);
+
                 using FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using XLWorkbook workBookReport = new(fileStreamReport);
 
@@ -1519,12 +1501,27 @@ namespace ProductDatabase {
                 workSheetTemp.Cell(serialFirstRange).Value = _serialFirst;
                 workSheetTemp.Cell(serialLastRange).Value = _serialLast;
 
-                //引数に保存先パスを指定
-                var outputPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", $"{ProductInfo.ProductNumber}.xlsx");
-                workBookReport.SaveAs(outputPath);
-
+                // ダイアログで保存先を選択
+                using SaveFileDialog saveFileDialog = new() {
+                    Filter = $"Excel Files (*{fileExtension})|*{fileExtension}|All Files (*.*)|*.*",
+                    FileName = $"{ProductInfo.ProductNumber}{fileExtension}",
+                    Title = "保存先を選択してください",
+                    InitialDirectory = ""
+                };
+                if (saveFileDialog.ShowDialog() == DialogResult.OK) {
+                    var outputPath = saveFileDialog.FileName;
+                    workBookReport.SaveAs(outputPath);
+                }
+                //}
             } catch (Exception ex) {
-                MessageBox.Show($"{ex.Message}", "[GenerationReport]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        public static class ExcelHelper {
+            public static string GetCellValueOrDefault(IXLWorksheet sheet, int rowIndex, int colIndex, int defaultRow) {
+                if (defaultRow == 0) { return string.Empty; }
+                var value = sheet.Cell(rowIndex, colIndex).GetString();
+                return !string.IsNullOrEmpty(value) ? value : sheet.Cell(defaultRow, colIndex).GetString();
             }
         }
 

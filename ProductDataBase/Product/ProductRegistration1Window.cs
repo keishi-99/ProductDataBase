@@ -109,7 +109,7 @@ namespace ProductDatabase {
                     }
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
             }
         }
@@ -177,7 +177,7 @@ namespace ProductDatabase {
                     }
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
                 RegisterButton.Enabled = true;
             }
@@ -283,7 +283,7 @@ namespace ProductDatabase {
                 ManufacturingNumberMaskedTextBox.Text = ProductInfo.Proness1;
                 QuantityTextBox.Text = ProductInfo.Proness4.ToString();
             } catch (Exception ex) {
-                throw new Exception($"{ex.Message}");
+                throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}");
             }
         }
 

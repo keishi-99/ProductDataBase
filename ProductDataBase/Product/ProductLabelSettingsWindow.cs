@@ -98,7 +98,7 @@ namespace ProductDatabase {
                 stringPosY = decimal.Parse(PrintTextPostionYTextBox.Text);
                 numLabels = int.Parse(PrintTextQuantityTextBox.Text);
             } catch (Exception ex) {
-                MessageBox.Show($"入力値が不正です。{Environment.NewLine}{ex.Message}");
+                MessageBox.Show($"入力値が不正です。{Environment.NewLine}{ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 DialogResult = DialogResult.None;
                 return;
             }
@@ -130,7 +130,7 @@ namespace ProductDatabase {
                 var serializerLabel = new System.Xml.Serialization.XmlSerializer(typeof(CSettingsLabelPro));
                 serializerLabel.Serialize(swLabel, SettingsLabelPro);
             } catch (Exception ex) {
-                MessageBox.Show($"設定の保存中にエラーが発生しました。{Environment.NewLine}{ex.Message}");
+                MessageBox.Show($"設定の保存中にエラーが発生しました。{Environment.NewLine}{ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 DialogResult = DialogResult.None;
                 return;
             }

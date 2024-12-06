@@ -8,7 +8,7 @@ namespace ProductDatabase {
 
         // ログ作成
         public static class Logger {
-            private static readonly string s_logDirectory = "./logs"; // ログを保存するディレクトリ
+            private static readonly string s_logDirectory = Path.Combine(Environment.CurrentDirectory, "logs"); // ログを保存するディレクトリ
             private static readonly object s_lockObject = new();
 
             /// <summary>
@@ -32,14 +32,14 @@ namespace ProductDatabase {
                         File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
                     }
                 } catch (Exception ex) {
-                    MessageBox.Show($"ログの書き込み中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"ログの書き込み中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
         // バックアップ作成
         public static class BackupManager {
-            private static readonly string s_backupDirectory = "./db/backups"; // バックアップを保存するディレクトリ
-            private static readonly string s_originalFilePath = "./db/registration.db"; // 元ファイルパス
+            private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backups"); // バックアップを保存するディレクトリ
+            private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db"); // 元ファイルパス
             private static readonly int s_maxBackupFiles = 10; // 最大バックアップファイル数
             private static readonly object s_lockObject = new();
 
@@ -66,7 +66,7 @@ namespace ProductDatabase {
                         ManageBackupFiles();
                     }
                 } catch (Exception ex) {
-                    MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
 
@@ -85,7 +85,7 @@ namespace ProductDatabase {
                         backupFiles.RemoveAt(0);
                     }
                 } catch (Exception ex) {
-                    MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -185,34 +185,30 @@ namespace ProductDatabase {
         }
 
         public static string GetConnectionInfomation() {
-            return new SQLiteConnectionStringBuilder() { DataSource = "./db/information.db" }.ToString();
+            var informationPath = Path.Combine(Environment.CurrentDirectory, "db", "information.db");
+            return new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
         }
         public static string GetConnectionRegistration() {
-            return new SQLiteConnectionStringBuilder() { DataSource = "./db/registration.db" }.ToString();
+            var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
+            return new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
         }
         // ロードイベント
         private void LoadEvents() {
             try {
                 // その日のbakファイルがない場合バックアップ作成
                 var d = DateTime.Now;
-                var bakFilepath = $".\\bak\\{d.Year}\\{d.Month:00}\\_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db";
+                var bakDir = Path.Combine(Environment.CurrentDirectory, "bak", $"{d.Year}", $"{d.Month:00}");
+                var bakFilepath = Path.Combine(Environment.CurrentDirectory, "bak", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
+                var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
 
-                if (!File.Exists(bakFilepath)) {
-                    var filepath = "./db/registration.db";
-
-                    //コピー先のフォルダーが存在するか確認し、なければ作成します。
-                    var targetFolder = Path.GetDirectoryName(bakFilepath) ?? throw new ArgumentNullException(nameof(bakFilepath));
-                    if (!Directory.Exists(targetFolder)) {
-                        Directory.CreateDirectory(targetFolder);
-                    }
-                    File.Copy(filepath, bakFilepath, true);
-                }
+                Directory.CreateDirectory(bakDir);  // ディレクトリが存在しない場合に作成
+                File.Copy(registrationPath, bakFilepath, true);
 
                 using SQLiteConnection con = new(GetConnectionInfomation());
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con)) { adapter.Fill(ProductInfo.SubstrateDataTable); }
 
-                var userTextPath = "./Config/general/user.txt";
+                var userTextPath = Path.Combine(Environment.CurrentDirectory, "Config", "general", "user.txt");
                 var userNames = File.ReadAllLines(userTextPath, Encoding.GetEncoding("UTF-8"))
                    .Select(line => line.Trim())
                    .ToList();
@@ -231,7 +227,7 @@ namespace ProductDatabase {
 
                 ActiveControl = QRCodeTextBox;
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void ResetFields() {
@@ -260,7 +256,7 @@ namespace ProductDatabase {
                         break;
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void HandleSubstrateRegistration() {
@@ -368,7 +364,7 @@ namespace ProductDatabase {
                     window.ShowDialog(this);
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         // 処理カテゴリセレクト
@@ -418,7 +414,7 @@ namespace ProductDatabase {
 
                 CategoryListBox1.Items.AddRange([.. class001Set]);
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         // 製品カテゴリセレクト
@@ -441,7 +437,7 @@ namespace ProductDatabase {
                 CategoryListBox2.Items.AddRange([.. productNames]);
 
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void CategoryListBox2Select() {
@@ -479,7 +475,7 @@ namespace ProductDatabase {
                         break;
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void CategoryListBox3Select() {
@@ -503,7 +499,7 @@ namespace ProductDatabase {
                         break;
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         // QRコード読み取り
@@ -531,7 +527,7 @@ namespace ProductDatabase {
                 if (listIndex == -1) { return; }
                 HandleSelectedItem(listIndex);
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
                 CleanupAfterScan();
             }
@@ -559,7 +555,7 @@ namespace ProductDatabase {
                     ProductInfo.Proness5 = arr[3];
                 }
             } catch (Exception ex) {
-                throw new Exception($"{ex.Message}");
+                throw new Exception($"{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}");
             }
         }
         private void BarcodeInput() {
@@ -706,11 +702,33 @@ namespace ProductDatabase {
             }
 
             ProductInfo.FontSize = fontSize;
-            Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
+            Font = new System.Drawing.Font(ProductInfo.FontName, ProductInfo.FontSize);
+        }
+        // excel
+        private void OpenExcel(string filePath) {
+            //Excel実行ファイルの場所を取得
+            var xlApp = new Microsoft.Office.Interop.Excel.Application();
+            var excelFullPath = System.IO.Path.Combine(xlApp.Path, "EXCEL.EXE");   //フルパス作成
+            xlApp.Quit();
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
+            // ファイルを実行
+            System.Diagnostics.Process.Start(excelFullPath, filePath);
         }
 
         private void MainWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void ReloadToolStripMenuItem_Click(object sender, EventArgs e) { LoadEvents(); }
+        private void ReportConfigToolStripMenuItem_Click(object sender, EventArgs e) {
+            var reportConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigReport.xlsx");
+            OpenExcel(reportConfigPath);
+        }
+        private void ListConfigToolStripMenuItem_Click(object sender, EventArgs e) {
+            var listConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigList.xlsx");
+            OpenExcel(listConfigPath);
+        }
+        private void CheckSheetConfigToolStripMenuItem_Click(object sender, EventArgs e) {
+            var checkSheetConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigCheckSheet.xlsx");
+            OpenExcel(checkSheetConfigPath);
+        }
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { Close(); }
         private void RegisterButton_Click(object sender, EventArgs e) { Registration(); }
         private void HistoryButton_Click(object sender, EventArgs e) { History(); }

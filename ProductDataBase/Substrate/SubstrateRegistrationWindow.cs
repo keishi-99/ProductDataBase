@@ -11,7 +11,7 @@ namespace ProductDatabase {
 
         public CSettingsLabelSub SettingsLabelSub { get; set; } = new CSettingsLabelSub();
 
-        private readonly string _settingFilePath = "./config/SubstrateConfig.xml";
+        private readonly string _settingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "SubstrateConfig.xml");
 
         private string _labelSubNSerial = string.Empty;
 
@@ -105,7 +105,7 @@ namespace ProductDatabase {
                 SettingsLabelSub = new CSettingsLabelSub();
                 LoadSettings(_settingFilePath);
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
             }
         }
@@ -116,7 +116,7 @@ namespace ProductDatabase {
                 if (serializer.Deserialize(sr) is CSettingsLabelSub result) { SettingsLabelSub = result; }
                 sr.Close();
             } catch (Exception ex) {
-                MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"設定ファイルの読み込みに失敗しました。{Environment.NewLine}{ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
             }
         }
@@ -177,7 +177,7 @@ namespace ProductDatabase {
                     Close();
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
                 RegisterButton.Enabled = true;
             }
@@ -336,7 +336,7 @@ namespace ProductDatabase {
 
                 return true;
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -380,7 +380,7 @@ namespace ProductDatabase {
                         break;
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
@@ -478,7 +478,7 @@ namespace ProductDatabase {
                 }
 
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
             }
         }
@@ -637,7 +637,7 @@ namespace ProductDatabase {
                 ManufacturingNumberMaskedTextBox.Text = ProductInfo.Proness1;
                 QuantityTextBox.Text = ProductInfo.Proness4.ToString();
             } catch (Exception ex) {
-                throw new Exception($"{ex.Message}");
+                throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}");
             }
         }
 
@@ -667,7 +667,7 @@ namespace ProductDatabase {
 
                 LoadSettings(_settingFilePath);
             } catch (Exception ex) {
-                MessageBox.Show($"設定ファイルの保存に失敗しました。{Environment.NewLine}{ex.Message}");
+                MessageBox.Show($"設定ファイルの保存に失敗しました。{Environment.NewLine}{ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
             }
         }

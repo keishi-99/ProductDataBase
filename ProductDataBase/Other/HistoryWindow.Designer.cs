@@ -30,6 +30,7 @@
             this.CategoryRadioButton2 = new RadioButton();
             this.StockCheckBox = new CheckBox();
             this.AllSubstrateCheckBox = new CheckBox();
+            this.GenerationReportButton = new Button();
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).BeginInit();
             this.SuspendLayout();
             // 
@@ -54,7 +55,7 @@
             // FilterStringTextBox
             // 
             this.FilterStringTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            this.FilterStringTextBox.Location = new Point(139, 477);
+            this.FilterStringTextBox.Location = new Point(139, 476);
             this.FilterStringTextBox.MaxLength = 50;
             this.FilterStringTextBox.Name = "FilterStringTextBox";
             this.FilterStringTextBox.Size = new Size(100, 23);
@@ -95,7 +96,7 @@
             // 
             this.StockCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.StockCheckBox.AutoSize = true;
-            this.StockCheckBox.Location = new Point(457, 479);
+            this.StockCheckBox.Location = new Point(457, 480);
             this.StockCheckBox.Name = "StockCheckBox";
             this.StockCheckBox.Size = new Size(83, 19);
             this.StockCheckBox.TabIndex = 5;
@@ -107,7 +108,7 @@
             // 
             this.AllSubstrateCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.AllSubstrateCheckBox.AutoSize = true;
-            this.AllSubstrateCheckBox.Location = new Point(546, 479);
+            this.AllSubstrateCheckBox.Location = new Point(546, 480);
             this.AllSubstrateCheckBox.Name = "AllSubstrateCheckBox";
             this.AllSubstrateCheckBox.Size = new Size(62, 19);
             this.AllSubstrateCheckBox.TabIndex = 6;
@@ -115,11 +116,22 @@
             this.AllSubstrateCheckBox.UseVisualStyleBackColor = true;
             this.AllSubstrateCheckBox.CheckedChanged += this.AllSubstrateCheckBox_CheckedChanged;
             // 
+            // GenerationReportButton
+            // 
+            this.GenerationReportButton.Location = new Point(1080, 474);
+            this.GenerationReportButton.Name = "GenerationReportButton";
+            this.GenerationReportButton.Size = new Size(92, 25);
+            this.GenerationReportButton.TabIndex = 7;
+            this.GenerationReportButton.Text = "成績書作成";
+            this.GenerationReportButton.UseVisualStyleBackColor = true;
+            this.GenerationReportButton.Click += this.GenerationReportButton_Click;
+            // 
             // HistoryWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(1184, 511);
+            this.Controls.Add(this.GenerationReportButton);
             this.Controls.Add(this.AllSubstrateCheckBox);
             this.Controls.Add(this.StockCheckBox);
             this.Controls.Add(this.CategoryRadioButton2);
@@ -149,5 +161,6 @@
         private RadioButton CategoryRadioButton2;
         private CheckBox StockCheckBox;
         private CheckBox AllSubstrateCheckBox;
+        private Button GenerationReportButton;
     }
 }

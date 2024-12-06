@@ -26,7 +26,12 @@
             var resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.MainWindowMenuStrip = new MenuStrip();
             this.ファイルToolStripMenuItem = new ToolStripMenuItem();
+            this.ReloadToolStripMenuItem = new ToolStripMenuItem();
             this.終了ToolStripMenuItem = new ToolStripMenuItem();
+            this.設定ToolStripMenuItem = new ToolStripMenuItem();
+            this.ReportConfigToolStripMenuItem = new ToolStripMenuItem();
+            this.ListConfigToolStripMenuItem = new ToolStripMenuItem();
+            this.CheckSheetConfigToolStripMenuItem = new ToolStripMenuItem();
             this.CategoryRadioButton1 = new RadioButton();
             this.CategoryRadioButton2 = new RadioButton();
             this.CategoryRadioButton3 = new RadioButton();
@@ -50,7 +55,6 @@
             this.panelCategory1 = new Panel();
             this.panelCategory2 = new Panel();
             this.panelCategory3 = new Panel();
-            this.ReloadToolStripMenuItem = new ToolStripMenuItem();
             this.MainWindowMenuStrip.SuspendLayout();
             this.FontSizePanel.SuspendLayout();
             this.QRCodePanel.SuspendLayout();
@@ -61,7 +65,7 @@
             // 
             // MainWindowMenuStrip
             // 
-            this.MainWindowMenuStrip.Items.AddRange(new ToolStripItem[] { this.ファイルToolStripMenuItem });
+            this.MainWindowMenuStrip.Items.AddRange(new ToolStripItem[] { this.ファイルToolStripMenuItem, this.設定ToolStripMenuItem });
             this.MainWindowMenuStrip.Location = new Point(0, 0);
             this.MainWindowMenuStrip.Name = "MainWindowMenuStrip";
             this.MainWindowMenuStrip.Size = new Size(880, 24);
@@ -75,12 +79,47 @@
             this.ファイルToolStripMenuItem.Size = new Size(53, 20);
             this.ファイルToolStripMenuItem.Text = "ファイル";
             // 
+            // ReloadToolStripMenuItem
+            // 
+            this.ReloadToolStripMenuItem.Name = "ReloadToolStripMenuItem";
+            this.ReloadToolStripMenuItem.Size = new Size(132, 22);
+            this.ReloadToolStripMenuItem.Text = "再読み込み";
+            this.ReloadToolStripMenuItem.Click += this.ReloadToolStripMenuItem_Click;
+            // 
             // 終了ToolStripMenuItem
             // 
             this.終了ToolStripMenuItem.Name = "終了ToolStripMenuItem";
-            this.終了ToolStripMenuItem.Size = new Size(180, 22);
+            this.終了ToolStripMenuItem.Size = new Size(132, 22);
             this.終了ToolStripMenuItem.Text = "終了";
             this.終了ToolStripMenuItem.Click += this.終了ToolStripMenuItem_Click;
+            // 
+            // 設定ToolStripMenuItem
+            // 
+            this.設定ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.ReportConfigToolStripMenuItem, this.ListConfigToolStripMenuItem, this.CheckSheetConfigToolStripMenuItem });
+            this.設定ToolStripMenuItem.Name = "設定ToolStripMenuItem";
+            this.設定ToolStripMenuItem.Size = new Size(43, 20);
+            this.設定ToolStripMenuItem.Text = "設定";
+            // 
+            // ReportConfigToolStripMenuItem
+            // 
+            this.ReportConfigToolStripMenuItem.Name = "ReportConfigToolStripMenuItem";
+            this.ReportConfigToolStripMenuItem.Size = new Size(180, 22);
+            this.ReportConfigToolStripMenuItem.Text = "成績書設定";
+            this.ReportConfigToolStripMenuItem.Click += this.ReportConfigToolStripMenuItem_Click;
+            // 
+            // ListConfigToolStripMenuItem
+            // 
+            this.ListConfigToolStripMenuItem.Name = "ListConfigToolStripMenuItem";
+            this.ListConfigToolStripMenuItem.Size = new Size(180, 22);
+            this.ListConfigToolStripMenuItem.Text = "基板リスト設定";
+            this.ListConfigToolStripMenuItem.Click += this.ListConfigToolStripMenuItem_Click;
+            // 
+            // CheckSheetConfigToolStripMenuItem
+            // 
+            this.CheckSheetConfigToolStripMenuItem.Name = "CheckSheetConfigToolStripMenuItem";
+            this.CheckSheetConfigToolStripMenuItem.Size = new Size(180, 22);
+            this.CheckSheetConfigToolStripMenuItem.Text = "チェックシート設定";
+            this.CheckSheetConfigToolStripMenuItem.Click += this.CheckSheetConfigToolStripMenuItem_Click;
             // 
             // CategoryRadioButton1
             // 
@@ -346,13 +385,6 @@
             this.panelCategory3.Size = new Size(350, 259);
             this.panelCategory3.TabIndex = 603;
             // 
-            // ReloadToolStripMenuItem
-            // 
-            this.ReloadToolStripMenuItem.Name = "ReloadToolStripMenuItem";
-            this.ReloadToolStripMenuItem.Size = new Size(180, 22);
-            this.ReloadToolStripMenuItem.Text = "再読み込み";
-            this.ReloadToolStripMenuItem.Click += this.ReloadToolStripMenuItem_Click;
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
@@ -420,5 +452,9 @@
         private Panel panelCategory3;
         private CheckBox textToUpperCheckBox;
         private ToolStripMenuItem ReloadToolStripMenuItem;
+        private ToolStripMenuItem 設定ToolStripMenuItem;
+        private ToolStripMenuItem ReportConfigToolStripMenuItem;
+        private ToolStripMenuItem ListConfigToolStripMenuItem;
+        private ToolStripMenuItem CheckSheetConfigToolStripMenuItem;
     }
 }
