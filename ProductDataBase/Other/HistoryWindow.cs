@@ -393,9 +393,23 @@ namespace ProductDatabase {
             }
         }
         public static class ExcelHelper {
-            public static string GetCellValueOrDefault(IXLWorksheet sheet, int rowIndex, int colIndex, int defaultRow) {
+            public static string GetCellValueOrDefault(IXLWorksheet sheet, int rowIndex, int colIndex, int? defaultRow = null) {
+                // 対象セルの値を取得
                 var value = sheet.Cell(rowIndex, colIndex).GetString();
-                return !string.IsNullOrEmpty(value) ? value : sheet.Cell(defaultRow, colIndex).GetString();
+
+                // 値が存在しない場合の処理
+                if (string.IsNullOrEmpty(value)) {
+                    // デフォルト行が指定されていない場合は空文字を返す
+                    if (defaultRow is null or 0) {
+                        return string.Empty;
+                    }
+
+                    // デフォルト行の値を取得
+                    return sheet.Cell(defaultRow.Value, colIndex).GetString();
+                }
+
+                // 値が存在すればその値を返す
+                return value;
             }
 
             public static string GetCellValue(DataGridView gridView, int rowIndex, int colIndex) {

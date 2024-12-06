@@ -1337,19 +1337,19 @@ namespace ProductDatabase {
                 var findRow = productModelCell.Address.RowNumber;
 
                 // ワークシートのセルから値を取得
-                var sheetName = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 2, 0);
-                var productName = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 3, 0);
-                var productNameRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 4, 0);
-                var productNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 5, 2);
-                var orderNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 6, 0);
-                var regDateRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 7, 0);
-                var productModel = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 8, 0);
-                var productModelRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 9, 0);
-                var quantityRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 10, 0);
-                var serialFirstRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 11, 0);
-                var serialLastRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 12, 0);
-                var commentRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 13, 0);
-                var qrCodeRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 14, 0);
+                var sheetName = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 2, null);
+                var productName = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 3, null);
+                var productNameRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 4, null);
+                var productNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 5, null);
+                var orderNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 6, null);
+                var regDateRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 7, null);
+                var productModel = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 8, null);
+                var productModelRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 9, null);
+                var quantityRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 10, null);
+                var serialFirstRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 11, null);
+                var serialLastRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 12, null);
+                var commentRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 13, null);
+                var qrCodeRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 14, null);
 
                 var workSheetTemp = workBook.Worksheet(sheetName);
                 workSheetTemp.Cell(productNameRange).Value = productName;
@@ -1518,10 +1518,23 @@ namespace ProductDatabase {
             }
         }
         public static class ExcelHelper {
-            public static string GetCellValueOrDefault(IXLWorksheet sheet, int rowIndex, int colIndex, int defaultRow) {
-                if (defaultRow == 0) { return string.Empty; }
+            public static string GetCellValueOrDefault(IXLWorksheet sheet, int rowIndex, int colIndex, int? defaultRow = null) {
+                // 対象セルの値を取得
                 var value = sheet.Cell(rowIndex, colIndex).GetString();
-                return !string.IsNullOrEmpty(value) ? value : sheet.Cell(defaultRow, colIndex).GetString();
+
+                // 値が存在しない場合の処理
+                if (string.IsNullOrEmpty(value)) {
+                    // デフォルト行が指定されていない場合は空文字を返す
+                    if (defaultRow is null or 0) {
+                        return string.Empty;
+                    }
+
+                    // デフォルト行の値を取得
+                    return sheet.Cell(defaultRow.Value, colIndex).GetString();
+                }
+
+                // 値が存在すればその値を返す
+                return value;
             }
         }
 
