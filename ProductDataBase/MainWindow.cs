@@ -185,13 +185,12 @@ namespace ProductDatabase {
         }
 
         public static string GetConnectionInfomation() {
-            var informationPath = Path.Combine(Environment.CurrentDirectory, "db", "information.db");
-            return new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
+            return new SQLiteConnectionStringBuilder() { DataSource = "./db/information.db" }.ToString();
         }
         public static string GetConnectionRegistration() {
-            var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
-            return new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
+            return new SQLiteConnectionStringBuilder() { DataSource = "./db/registration.db" }.ToString();
         }
+
         // ロードイベント
         private void LoadEvents() {
             try {
