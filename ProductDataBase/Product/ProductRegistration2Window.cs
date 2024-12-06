@@ -353,12 +353,13 @@ namespace ProductDatabase {
 
                 MessageBox.Show("登録完了");
 
-                if (RequiresClosing) {
-                    Close();
-                }
-                else {
-                    HandlePostRegistration();
-                }
+                HandlePostRegistration();
+                //if (RequiresClosing) {
+                //    Close();
+                //}
+                //else {
+                //    HandlePostRegistration();
+                //}
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "[RegisterCheck]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -1469,14 +1470,16 @@ namespace ProductDatabase {
         // 成績書作成
         private void GenerationReport() {
             try {
-                using FileStream fileStream = new($"{Environment.CurrentDirectory}./config/Excel/ConfigReport.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using XLWorkbook workBook = new(fileStream);
-                var workSheetMain = workBook.Worksheet("Sheet1");
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigReport.xlsx");
+                using FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using XLWorkbook workBookConfig = new(fileStreamConfig);
+                var workSheetMain = workBookConfig.Worksheet("Sheet1");
 
                 var findRow = 0;
                 // セル検索
                 foreach (var cell in workSheetMain.Search(ProductInfo.ProductModel)) {
                     findRow = cell.Address.RowNumber;
+                    break;
                 }
 
                 if (findRow == 0) {
@@ -1484,14 +1487,32 @@ namespace ProductDatabase {
                 }
 
                 // ワークシートのセルから値を取得
-                var sheetName = workSheetMain.Cell(findRow, 2).Value.ToString();
-                var productNumberRange = workSheetMain.Cell(findRow, 5).Value.ToString();
-                var orderNumberRange = workSheetMain.Cell(findRow, 6).Value.ToString();
-                var quantityRange = workSheetMain.Cell(findRow, 10).Value.ToString();
-                var serialFirstRange = workSheetMain.Cell(findRow, 11).Value.ToString();
-                var serialLastRange = workSheetMain.Cell(findRow, 12).Value.ToString();
+                var filePath = workSheetMain.Cell(findRow, 3).GetString()?.Trim('"');
+                var sheetName = workSheetMain.Cell(findRow, 4).GetString();
+                var productNumberRange = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 5).GetString())
+                    ? workSheetMain.Cell(findRow, 5).GetString()
+                    : workSheetMain.Cell(2, 5).GetString();
+                var orderNumberRange = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 6).GetString())
+                    ? workSheetMain.Cell(findRow, 6).Value.ToString()
+                    : workSheetMain.Cell(2, 6).GetString();
+                var quantityRange = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 7).GetString())
+                    ? workSheetMain.Cell(findRow, 7).Value.ToString()
+                    : workSheetMain.Cell(2, 7).GetString();
+                var serialFirstRange = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 8).GetString())
+                    ? workSheetMain.Cell(findRow, 8).Value.ToString()
+                    : workSheetMain.Cell(2, 8).GetString();
+                var serialLastRange = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 9).GetString())
+                    ? workSheetMain.Cell(findRow, 9).Value.ToString()
+                    : workSheetMain.Cell(2, 9).GetString();
 
-                var workSheetTemp = workBook.Worksheet(sheetName);
+                if (string.IsNullOrWhiteSpace(filePath) || string.IsNullOrWhiteSpace(sheetName)) {
+                    throw new Exception("Configの必須項目が不足しています。");
+                }
+                using FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using XLWorkbook workBookReport = new(fileStreamReport);
+
+                // セルに値を挿入
+                var workSheetTemp = workBookReport.Worksheet(sheetName);
                 workSheetTemp.Cell(productNumberRange).Value = ProductInfo.ProductNumber;
                 workSheetTemp.Cell(orderNumberRange).Value = ProductInfo.OrderNumber;
                 workSheetTemp.Cell(quantityRange).Value = ProductInfo.Quantity;
@@ -1499,7 +1520,8 @@ namespace ProductDatabase {
                 workSheetTemp.Cell(serialLastRange).Value = _serialLast;
 
                 //引数に保存先パスを指定
-                workBook.SaveAs($"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
+                var outputPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", $"{ProductInfo.ProductNumber}.xlsx");
+                workBookReport.SaveAs(outputPath);
 
             } catch (Exception ex) {
                 MessageBox.Show($"{ex.Message}", "[GenerationReport]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1507,6 +1529,7 @@ namespace ProductDatabase {
         }
 
         private void ProductRegistration2Window_Load(object sender, EventArgs e) { LoadEvents(); }
+        private void GenerationReportButton_Click(object sender, EventArgs e) { GenerationReport(); }
         private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
         private void SubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBox_CheckedChanged(sender, e); }
@@ -1570,5 +1593,6 @@ namespace ProductDatabase {
             var tool = (ToolStrip)ProductRegistration2PrintPreviewDialog.Controls[1];
             tool.Items[0].Visible = false;
         }
+
     }
 }
