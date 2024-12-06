@@ -43,6 +43,7 @@ namespace ProductDatabase {
                         CategoryRadioButton2.Text = "在庫";
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
+                        GenerationReportButton.Visible = false;
                         break;
                     case 2:
                         CategoryRadioButton2.Text = "シリアル";
@@ -54,6 +55,7 @@ namespace ProductDatabase {
                         CategoryRadioButton2.Visible = false;
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
+                        GenerationReportButton.Visible = false;
                         break;
                 }
             } catch (Exception ex) {
@@ -110,6 +112,9 @@ namespace ProductDatabase {
             }
         }
         private void ViewProductRegistrationLog() {
+
+            GenerationReportButton.Visible = true;
+
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new DataTable();
 
@@ -250,6 +255,9 @@ namespace ProductDatabase {
             }
         }
         private void ViewSerialLog() {
+
+            GenerationReportButton.Visible = false;
+
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new DataTable();
 
