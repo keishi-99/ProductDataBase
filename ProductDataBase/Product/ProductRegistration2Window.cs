@@ -3,7 +3,6 @@ using GenCode128;
 using ProductDatabase.Product;
 using System.Data;
 using System.Data.SQLite;
-using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Drawing.Printing;
 using ZXing;
@@ -290,7 +289,6 @@ namespace ProductDatabase {
                     if (serializerLabel.Deserialize(srLabel) is CSettingsLabelPro result) { SettingsLabelPro = result; }
                     srLabel?.Close();
                 }
-                Debug.Print(barcodeSettingFilePath);
                 if (barcodeSettingFilePath != string.Empty) {
                     using StreamReader? srBarcode = new(barcodeSettingFilePath, new System.Text.UTF8Encoding(false));
                     System.Xml.Serialization.XmlSerializer serializerBarcode = new(typeof(CSettingsBarcodePro));
@@ -362,7 +360,7 @@ namespace ProductDatabase {
                     HandlePostRegistration();
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "[RegisterCheck]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private bool Registration() {
@@ -808,7 +806,7 @@ namespace ProductDatabase {
                 }
                 return true;
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "[QuantityCheck]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -850,7 +848,7 @@ namespace ProductDatabase {
 
                 return true;
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "[SerialCheck]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -910,6 +908,7 @@ namespace ProductDatabase {
             pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
             _labelProNumLabelsToPrint = ProductInfo.Quantity;
+            _pageCnt = 1;
 
             switch (printFlg) {
                 case 1:
@@ -944,6 +943,7 @@ namespace ProductDatabase {
             System.Drawing.Point headerPos = new(0, 0);
             var headerString = string.Empty;
             var headerFooterFont = new Font("ＭＳ Ｐ明朝", 5.25F);
+            Point offset;
             var serialCodePrintCopies = 0;
             var remainingCount = 0;
 
@@ -999,7 +999,6 @@ namespace ProductDatabase {
                         break;
                 }
 
-                var offset = new System.Drawing.Point(0, 0);
                 const decimal MM_PER_HUNDREDTH_INCH = 0.254M;
 
                 var pd = (PrintDocument)sender;
@@ -1013,7 +1012,7 @@ namespace ProductDatabase {
                         : new System.Drawing.Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
                 else {
-                    offset = new System.Drawing.Point(0, 0);
+                    offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
 
                 e.PageSettings.Margins.Left = 0;
@@ -1030,10 +1029,8 @@ namespace ProductDatabase {
                 }
                 if (_pageCnt >= 2) { startLine = 0; }
 
-                var y = 0;
-                for (y = startLine; y < maxY; y++) {
-                    var x = 0;
-                    for (x = 0; x < maxX; x++) {
+                for (var y = startLine; y < maxY; y++) {
+                    for (var x = 0; x < maxX; x++) {
                         var posX = (float)(offsetX + (x * (intervalX + sizeX)));
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
 
@@ -1073,10 +1070,8 @@ namespace ProductDatabase {
                     e.HasMorePages = true;
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "[PrintDocumentPrintPage]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
-                // 明示的にFontを解放
-                headerFooterFont.Dispose();
             }
         }
         private string ConvertHeaderFooterString(string s) {
@@ -1249,7 +1244,7 @@ namespace ProductDatabase {
             }
         }
         // チェックシート印刷
-        private static void CheckSheetPrint() {
+        private static void PrintCheckSheet() {
             try {
                 //List<string> _filePath = new();
                 //List<string> _sheetName = new();
@@ -1325,27 +1320,12 @@ namespace ProductDatabase {
                 //}
 
             } catch (Exception ex) {
-                MessageBox.Show($"{ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"{ex.Message}", "[PrintCheckSheet]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         // リスト印刷
-        private void ListPrint() {
+        private void PrintList() {
             try {
-                var sheetName = string.Empty;
-                var productName = string.Empty;
-                var productModel = string.Empty;
-
-                var productNameRange = string.Empty;
-                var productNumberRange = string.Empty;
-                var orderNumberRange = string.Empty;
-                var regDateRange = string.Empty;
-                var productModelRange = string.Empty;
-                var quantityRange = string.Empty;
-                var serialFirstRange = string.Empty;
-                var serialLastRange = string.Empty;
-                var commentRange = string.Empty;
-                var qrCodeRange = string.Empty;
-
                 using FileStream fileStream = new($"{Environment.CurrentDirectory}./config/Excel/ConfigList.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using XLWorkbook workBook = new(fileStream);
                 var workSheetMain = workBook.Worksheet("Sheet1");
@@ -1361,19 +1341,19 @@ namespace ProductDatabase {
                 }
 
                 // ワークシートのセルから値を取得
-                sheetName = workSheetMain.Cell(findRow, 2).Value.ToString();
-                productName = workSheetMain.Cell(findRow, 3).Value.ToString();
-                productNameRange = workSheetMain.Cell(findRow, 4).Value.ToString();
-                productNumberRange = workSheetMain.Cell(findRow, 5).Value.ToString();
-                orderNumberRange = workSheetMain.Cell(findRow, 6).Value.ToString();
-                regDateRange = workSheetMain.Cell(findRow, 7).Value.ToString();
-                productModel = workSheetMain.Cell(findRow, 8).Value.ToString();
-                productModelRange = workSheetMain.Cell(findRow, 9).Value.ToString();
-                quantityRange = workSheetMain.Cell(findRow, 10).Value.ToString();
-                serialFirstRange = workSheetMain.Cell(findRow, 11).Value.ToString();
-                serialLastRange = workSheetMain.Cell(findRow, 12).Value.ToString();
-                commentRange = workSheetMain.Cell(findRow, 13).Value.ToString();
-                qrCodeRange = workSheetMain.Cell(findRow, 14).Value.ToString();
+                var sheetName = workSheetMain.Cell(findRow, 2).Value.ToString();
+                var productName = workSheetMain.Cell(findRow, 3).Value.ToString();
+                var productNameRange = workSheetMain.Cell(findRow, 4).Value.ToString();
+                var productNumberRange = workSheetMain.Cell(findRow, 5).Value.ToString();
+                var orderNumberRange = workSheetMain.Cell(findRow, 6).Value.ToString();
+                var regDateRange = workSheetMain.Cell(findRow, 7).Value.ToString();
+                var productModel = workSheetMain.Cell(findRow, 8).Value.ToString();
+                var productModelRange = workSheetMain.Cell(findRow, 9).Value.ToString();
+                var quantityRange = workSheetMain.Cell(findRow, 10).Value.ToString();
+                var serialFirstRange = workSheetMain.Cell(findRow, 11).Value.ToString();
+                var serialLastRange = workSheetMain.Cell(findRow, 12).Value.ToString();
+                var commentRange = workSheetMain.Cell(findRow, 13).Value.ToString();
+                var qrCodeRange = workSheetMain.Cell(findRow, 14).Value.ToString();
 
                 var workSheetTemp = workBook.Worksheet(sheetName);
                 workSheetTemp.Cell(productNameRange).Value = productName;
@@ -1386,9 +1366,8 @@ namespace ProductDatabase {
                 workSheetTemp.Cell(serialLastRange).Value = _serialLast;
                 workSheetTemp.Cell(commentRange).Value = ProductInfo.Comment;
 
-                var i = 0;
                 var findColumn = 0;
-                for (i = 0; i <= _usedSubstrate.Count - 1; i++) {
+                for (var i = 0; i <= _usedSubstrate.Count - 1; i++) {
 
                     var searchRange = workSheetMain.Range(findRow, 1, findRow, 28);
                     var searchValue = $"{_usedSubstrate[i]}";
@@ -1484,7 +1463,46 @@ namespace ProductDatabase {
                 _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
 
             } catch (Exception ex) {
-                MessageBox.Show($"{ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"{ex.Message}", "[PrintList]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        // 成績書作成
+        private void GenerationReport() {
+            try {
+                using FileStream fileStream = new($"{Environment.CurrentDirectory}./config/Excel/ConfigReport.xlsx", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using XLWorkbook workBook = new(fileStream);
+                var workSheetMain = workBook.Worksheet("Sheet1");
+
+                var findRow = 0;
+                // セル検索
+                foreach (var cell in workSheetMain.Search(ProductInfo.ProductModel)) {
+                    findRow = cell.Address.RowNumber;
+                }
+
+                if (findRow == 0) {
+                    throw new Exception($"Configに品目番号:{ProductInfo.ProductModel}が見つかりません。");
+                }
+
+                // ワークシートのセルから値を取得
+                var sheetName = workSheetMain.Cell(findRow, 2).Value.ToString();
+                var productNumberRange = workSheetMain.Cell(findRow, 5).Value.ToString();
+                var orderNumberRange = workSheetMain.Cell(findRow, 6).Value.ToString();
+                var quantityRange = workSheetMain.Cell(findRow, 10).Value.ToString();
+                var serialFirstRange = workSheetMain.Cell(findRow, 11).Value.ToString();
+                var serialLastRange = workSheetMain.Cell(findRow, 12).Value.ToString();
+
+                var workSheetTemp = workBook.Worksheet(sheetName);
+                workSheetTemp.Cell(productNumberRange).Value = ProductInfo.ProductNumber;
+                workSheetTemp.Cell(orderNumberRange).Value = ProductInfo.OrderNumber;
+                workSheetTemp.Cell(quantityRange).Value = ProductInfo.Quantity;
+                workSheetTemp.Cell(serialFirstRange).Value = _serialFirst;
+                workSheetTemp.Cell(serialLastRange).Value = _serialLast;
+
+                //引数に保存先パスを指定
+                workBook.SaveAs($"{Environment.CurrentDirectory}./config/Excel/temporarily.xlsx");
+
+            } catch (Exception ex) {
+                MessageBox.Show($"{ex.Message}", "[GenerationReport]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -1546,8 +1564,8 @@ namespace ProductDatabase {
 
             MessageBox.Show(message, "取得情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-        private void SubstrateListPrintButton_Click(object sender, EventArgs e) { ListPrint(); }
-        private void CheckSheetPrintButton_Click(object sender, EventArgs e) { CheckSheetPrint(); }
+        private void SubstrateListPrintButton_Click(object sender, EventArgs e) { PrintList(); }
+        private void CheckSheetPrintButton_Click(object sender, EventArgs e) { PrintCheckSheet(); }
         private void ProductRegistration2PrintPreviewDialog_Load(object sender, EventArgs e) {
             var tool = (ToolStrip)ProductRegistration2PrintPreviewDialog.Controls[1];
             tool.Items[0].Visible = false;

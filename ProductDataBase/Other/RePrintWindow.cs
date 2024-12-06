@@ -279,6 +279,8 @@ namespace ProductDatabase {
                 // PrintPageイベントハンドラの追加
                 pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
+                _intPageCnt = 1;
+
                 switch (printFlg) {
                     case 1:
                         _labelProNumLabelsToPrint = _quantity;
@@ -324,6 +326,7 @@ namespace ProductDatabase {
             Point headerPos = new(0, 0);
             var headerString = string.Empty;
             Font headerFooterFont = new("ＭＳ Ｐ明朝", 5.25F);
+            Point offset;
             var serialCodePrintCopies = 0;
 
             var maxX = 0;
@@ -376,7 +379,6 @@ namespace ProductDatabase {
 
                 var startLineBarcode = (int)PrintPostionNumericUpDown.Value - 1;
 
-                Point offset;
                 const decimal MM_PER_HUNDREDTH_INCH = 0.254M;
 
                 if (!RePrintPrintDocument.PrintController.IsPreview) {
@@ -454,8 +456,6 @@ namespace ProductDatabase {
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
-                // 明示的にFontを解放
-                headerFooterFont.Dispose();
             }
         }
         private string ConvertHeaderFooterString(string s) {
