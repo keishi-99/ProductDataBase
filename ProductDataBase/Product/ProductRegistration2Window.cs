@@ -62,7 +62,6 @@ namespace ProductDatabase {
         private bool IsCheckSheetPrint => ProductInfo.PrintType is 6 or 7;
         private bool IsUnderlinePrint => ProductInfo.PrintType is 4;
 
-
         public ProductRegistration2Window() {
             InitializeComponent();
         }
@@ -303,12 +302,13 @@ namespace ProductDatabase {
         // 印刷UI設定
         private void ConfigurePrintSettings() {
             SubstrateListPrintButton.Visible = IsListPrint;
+            CheckSheetPrintButton.Visible = IsCheckSheetPrint;
+
             SerialPrintPostionLabel.Visible = IsLabelPrint;
             SerialPrintPostionNumericUpDown.Visible = IsLabelPrint;
 
-            CheckSheetPrintButton.Visible = IsCheckSheetPrint;
-            BarcodePrintPostionLabel.Visible = IsCheckSheetPrint;
-            BarcodePrintPostionNumericUpDown.Visible = IsCheckSheetPrint;
+            BarcodePrintPostionLabel.Visible = IsBarcodePrint;
+            BarcodePrintPostionNumericUpDown.Visible = IsBarcodePrint;
 
             ConfigureUI();
         }
