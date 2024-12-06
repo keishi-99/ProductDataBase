@@ -104,7 +104,7 @@ namespace ProductDatabase {
                 LoadSettings(labelSettingFilePath, barcodeSettingFilePath);
 
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void LoadSettings(string labelSettingFilePath, string barcodeSettingFilePath) {
@@ -122,7 +122,7 @@ namespace ProductDatabase {
                     srBarcode?.Close();
                 }
             } catch (Exception ex) {
-                MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
             }
         }
@@ -137,11 +137,11 @@ namespace ProductDatabase {
         }
         private void ConfigureSerialLabelSettings() {
             SettingsLabelPro = new CSettingsLabelPro();
-            labelSettingFilePath = $"./config/{ProductInfo.ProductName}/SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+            labelSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", ProductInfo.ProductName, $"SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml");
         }
         private void ConfigureBarcodeSettings() {
             SettingsBarcodePro = new CSettingsBarcodePro();
-            barcodeSettingFilePath = $"./config/{ProductInfo.ProductName}/BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml";
+            barcodeSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", ProductInfo.ProductName, $"BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml");
         }
         private void SetMenuOptions() {
             シリアルラベル印刷プレビューToolStripMenuItem.Enabled = IsLabelPrint;
@@ -167,7 +167,7 @@ namespace ProductDatabase {
                 Registeration();
 
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void Registeration() {
@@ -206,7 +206,7 @@ namespace ProductDatabase {
                 Logger.AppendLog($";[再印刷];注文番号[{_orderNumber}];製造番号[{_productNumber}];製品名[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{_quantity}];シリアル先頭[{_strSerialFirstNumber}];シリアル末尾[{_strSerialLastNumber}];Revision[{_revision}];登録日[{_regDate}];担当者[{_person}];");
 
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private bool FormCheck() {
@@ -318,7 +318,7 @@ namespace ProductDatabase {
                 }
                 return true;
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -454,7 +454,7 @@ namespace ProductDatabase {
                     e.HasMorePages = true;
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
             }
         }
@@ -664,7 +664,7 @@ namespace ProductDatabase {
                 ManufacturingNumberMaskedTextBox.Text = ProductInfo.Proness1;
                 QuantityTextBox.Text = ProductInfo.Proness4.ToString();
             } catch (Exception ex) {
-                throw new Exception($"{ex.Message}");
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

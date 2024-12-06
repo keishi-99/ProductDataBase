@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using ClosedXML.Excel;
+using System.Data;
 using System.Data.SQLite;
 using static ProductDatabase.MainWindow;
 
@@ -56,7 +57,7 @@ namespace ProductDatabase {
                         break;
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -306,7 +307,7 @@ namespace ProductDatabase {
                 action();
             }
             else {
-                MessageBox.Show("無効な選択です。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("無効な選択です。", "[CategorySelect]エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         private void HistoryTableFilter(object sender, EventArgs e) {
@@ -328,11 +329,82 @@ namespace ProductDatabase {
                     historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} LIKE '*{FilterStringTextBox.Text}*'";
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        // 成績書作成
+        private void GenerationReport() {
+            try {
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigReport.xlsx");
+                using FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using XLWorkbook workBookConfig = new(fileStreamConfig);
+                var workSheetMain = workBookConfig.Worksheet("Sheet1");
+
+                // セル検索
+                var cell = workSheetMain.Search(ProductInfo.ProductModel).FirstOrDefault() ?? throw new Exception($"Configに品目番号:[{ProductInfo.ProductModel}]が見つかりません。");
+                var findRow = cell.Address.RowNumber;
+
+                // ワークシートのセルから値を取得
+                var filePath = workSheetMain.Cell(findRow, 3).GetString()?.Trim('"');
+                if (string.IsNullOrWhiteSpace(filePath)) { throw new Exception("Configのファイルパスが無効です。"); }
+                if (!File.Exists(filePath)) { throw new FileNotFoundException($"指定されたファイルが存在しません: {filePath}"); }
+                var fileExtension = Path.GetExtension(filePath).ToLower(); // 開いたファイルの拡張子取得
+
+                var sheetName = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 4).GetString())
+                    ? workSheetMain.Cell(findRow, 4).GetString()
+                    : throw new Exception("シート名がありません。");
+                var productNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 5, 2);
+                var orderNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 6, 2);
+                var quantityRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 7, 2);
+                var serialFirstRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 8, 2);
+                var serialLastRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 9, 2);
+
+                using FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using XLWorkbook workBookReport = new(fileStreamReport);
+
+                var selectRow = DataBaseDataGridView.CurrentCell.RowIndex;
+                var productNumber = ExcelHelper.GetCellValue(DataBaseDataGridView, selectRow, 2);
+                var orderNumber = ExcelHelper.GetCellValue(DataBaseDataGridView, selectRow, 1);
+                var quantity = ExcelHelper.GetCellValue(DataBaseDataGridView, selectRow, 5);
+                var serialFirst = ExcelHelper.GetCellValue(DataBaseDataGridView, selectRow, 10);
+                var serialLast = ExcelHelper.GetCellValue(DataBaseDataGridView, selectRow, 11);
+
+                // セルに値を挿入
+                var workSheetTemp = workBookReport.Worksheet(sheetName);
+                workSheetTemp.Cell(productNumberRange).Value = productNumber;
+                workSheetTemp.Cell(orderNumberRange).Value = orderNumber;
+                workSheetTemp.Cell(quantityRange).Value = quantity;
+                workSheetTemp.Cell(serialFirstRange).Value = serialFirst;
+                workSheetTemp.Cell(serialLastRange).Value = serialLast;
+
+                // ダイアログで保存先を選択
+                using SaveFileDialog saveFileDialog = new() {
+                    Filter = $"Excel Files (*{fileExtension})|*{fileExtension}|All Files (*.*)|*.*",
+                    FileName = $"{productNumber}{fileExtension}",
+                    Title = "保存先を選択してください",
+                    InitialDirectory = ""
+                };
+                if (saveFileDialog.ShowDialog() == DialogResult.OK) {
+                    var outputPath = saveFileDialog.FileName;
+                    workBookReport.SaveAs(outputPath);
+                }
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        public static class ExcelHelper {
+            public static string GetCellValueOrDefault(IXLWorksheet sheet, int rowIndex, int colIndex, int defaultRow) {
+                var value = sheet.Cell(rowIndex, colIndex).GetString();
+                return !string.IsNullOrEmpty(value) ? value : sheet.Cell(defaultRow, colIndex).GetString();
+            }
+
+            public static string GetCellValue(DataGridView gridView, int rowIndex, int colIndex) {
+                return gridView.Rows[rowIndex].Cells[colIndex].Value?.ToString() ?? string.Empty;
             }
         }
 
         private void HistoryWindow_Load(object sender, EventArgs e) { LoadEvents(); }
+        private void GenerationReportButton_Click(object sender, EventArgs e) { GenerationReport(); }
         private void FilterStringTextBox_TextChanged(object sender, EventArgs e) { HistoryTableFilter(sender, e); }
         private void CategoryRadioButton_CheckedChanged(object sender, EventArgs e) { CategorySelect(sender); }
         private void StockCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }
