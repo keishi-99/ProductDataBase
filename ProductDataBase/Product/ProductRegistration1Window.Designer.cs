@@ -394,7 +394,7 @@
             // 
             this.ManufacturingNumberMaskedTextBox.Enabled = false;
             this.ManufacturingNumberMaskedTextBox.Location = new Point(19, 191);
-            this.ManufacturingNumberMaskedTextBox.Mask = "LA00L00000-0000";
+            this.ManufacturingNumberMaskedTextBox.Mask = ">LA00L00000-0000";
             this.ManufacturingNumberMaskedTextBox.Name = "ManufacturingNumberMaskedTextBox";
             this.ManufacturingNumberMaskedTextBox.PromptChar = '*';
             this.ManufacturingNumberMaskedTextBox.Size = new Size(120, 23);
