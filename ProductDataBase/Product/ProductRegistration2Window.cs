@@ -1022,8 +1022,6 @@ namespace ProductDatabase {
                 headerPos.Offset(offset);
                 e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
 
-                // タイプ4か9の場合、発行枚数+1
-                if (ProductInfo.PrintType is 4 or 9) { serialCodePrintCopies++; }
                 if (_pageCnt == 1) {
                     remainingCount = serialCodePrintCopies;
                     _labelProNSerial = ProductInfo.SerialFirstNumber;
@@ -1035,7 +1033,7 @@ namespace ProductDatabase {
                         var posX = (float)(offsetX + (x * (intervalX + sizeX)));
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
 
-                        // タイプ4の場合、最後のラベルに下線をつける
+                        // タイプ4で残り1の場合、最後のラベルに下線をつける
                         var fontUnderline = IsUnderlinePrint && remainingCount == 1;
 
                         // シリアル生成、PrintTypeが9かつ最終行の場合は型式下4桁、それ以外はシリアルを生成
