@@ -254,6 +254,8 @@ namespace ProductDatabase {
                     default:
                         break;
                 }
+
+                QRCodeTextBox.Text = string.Empty;
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -525,6 +527,7 @@ namespace ProductDatabase {
 
                 if (listIndex == -1) { return; }
                 HandleSelectedItem(listIndex);
+                QRCodeTextBox.Text = string.Empty;
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
@@ -677,7 +680,6 @@ namespace ProductDatabase {
             window.ShowDialog(this);
         }
         private void CleanupAfterScan() {
-            //QRCodeTextBox.Text = string.Empty;
             Enabled = true;
             QRCodeTextBox.Focus();
         }
