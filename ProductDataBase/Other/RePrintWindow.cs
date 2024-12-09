@@ -403,7 +403,6 @@ namespace ProductDatabase {
                     ? new Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLineBarcode * (intervalY + sizeY))))
                     : new Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
 
-                if (ProductInfo.PrintType is 4 or 9) { serialCodePrintCopies++; }
                 if (_labelProPageNum == 1) {
                     _remainingCount = serialCodePrintCopies;
                     _labelProNSerial = _serialFirstNumber;
@@ -417,7 +416,7 @@ namespace ProductDatabase {
                         var posX = (float)(offsetX + (x * (intervalX + sizeX)));
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
 
-                        // タイプ4の場合、最後のラベルに下線をつける
+                        // タイプ4で残り1の場合、最後のラベルに下線をつける
                         var fontUnderline = IsUnderlinePrint && _remainingCount == 1;
 
                         // シリアル生成、PrintTypeが9かつ最終行の場合は型式下4桁、それ以外はシリアルを生成
