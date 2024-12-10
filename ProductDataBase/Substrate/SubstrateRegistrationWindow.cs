@@ -79,10 +79,6 @@ namespace ProductDatabase {
                     using SQLiteConnection con = new(GetConnectionRegistration());
                     con.Open();
                     using var cmd = con.CreateCommand();
-                    // テーブル検索SQL - [[ProductName]_Stock]テーブルの[SubstrateModel]列の[Stock]の合計を取得
-                    cmd.CommandText = $"""SELECT total(Stock) FROM "{ProductInfo.StockName}_Stock" WHERE SubstrateModel = @SubstrateModel""";
-                    cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
-                    StockLabel2.Text = cmd.ExecuteScalar().ToString();
 
                     // テーブル検索SQL - [[ProductName]_Substrate]テーブルの最新の[Revison]を取得
                     cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.StockName}_Substrate" WHERE SubstrateModel = @SubstrateModel AND Revision IS NOT NULL ORDER BY _rowid_ DESC""";
@@ -90,7 +86,6 @@ namespace ProductDatabase {
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
                 }
-                else { StockLabel2.Text = "---"; }
 
                 // 印刷しない場合は関連コントロール非表示に
                 if (IsLabelPrint == false) {
