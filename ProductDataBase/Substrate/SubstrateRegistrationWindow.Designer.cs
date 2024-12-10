@@ -37,8 +37,6 @@
             this.ProductNameLabel2 = new Label();
             this.SubstrateModelLabel1 = new Label();
             this.SubstrateModelLabel2 = new Label();
-            this.StockLabel1 = new Label();
-            this.StockLabel2 = new Label();
             this.OrderNumberCheckBox = new CheckBox();
             this.OrderNumberTextBox = new TextBox();
             this.ManufacturingNumberCheckBox = new CheckBox();
@@ -200,31 +198,6 @@
             this.SubstrateModelLabel2.TabIndex = 4;
             this.SubstrateModelLabel2.Text = "---";
             this.SubstrateModelLabel2.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // StockLabel1
-            // 
-            this.StockLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            this.StockLabel1.AutoSize = true;
-            this.StockLabel1.BorderStyle = BorderStyle.Fixed3D;
-            this.StockLabel1.Location = new Point(40, 85);
-            this.StockLabel1.Margin = new Padding(4, 0, 4, 0);
-            this.StockLabel1.Name = "StockLabel1";
-            this.StockLabel1.Size = new Size(42, 17);
-            this.StockLabel1.TabIndex = 5;
-            this.StockLabel1.Text = "在庫 :";
-            this.StockLabel1.TextAlign = ContentAlignment.MiddleRight;
-            // 
-            // StockLabel2
-            // 
-            this.StockLabel2.AutoSize = true;
-            this.StockLabel2.BorderStyle = BorderStyle.Fixed3D;
-            this.StockLabel2.Location = new Point(90, 85);
-            this.StockLabel2.Margin = new Padding(4, 0, 4, 0);
-            this.StockLabel2.Name = "StockLabel2";
-            this.StockLabel2.Size = new Size(24, 17);
-            this.StockLabel2.TabIndex = 6;
-            this.StockLabel2.Text = "---";
-            this.StockLabel2.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // OrderNumberCheckBox
             // 
@@ -727,8 +700,6 @@
             this.Controls.Add(this.ManufacturingNumberCheckBox);
             this.Controls.Add(this.OrderNumberTextBox);
             this.Controls.Add(this.OrderNumberCheckBox);
-            this.Controls.Add(this.StockLabel2);
-            this.Controls.Add(this.StockLabel1);
             this.Controls.Add(this.SubstrateModelLabel2);
             this.Controls.Add(this.SubstrateModelLabel1);
             this.Controls.Add(this.ProductNameLabel2);
@@ -770,8 +741,6 @@
         private Label ProductNameLabel2;
         private Label SubstrateModelLabel1;
         private Label SubstrateModelLabel2;
-        private Label StockLabel1;
-        private Label StockLabel2;
         private CheckBox OrderNumberCheckBox;
         private TextBox OrderNumberTextBox;
         private CheckBox ManufacturingNumberCheckBox;
