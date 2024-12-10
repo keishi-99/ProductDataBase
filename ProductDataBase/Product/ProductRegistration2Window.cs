@@ -533,6 +533,7 @@ namespace ProductDatabase {
                                     if (boolCbx) {
                                         var substrateName = string.Empty;
                                         var substrateModel = string.Empty;
+                                        var orderNum = string.Empty;
                                         var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
                                         var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
                                         var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
@@ -564,6 +565,7 @@ namespace ProductDatabase {
                                             while (dr.Read()) {
                                                 substrateName = $"{dr["SubstrateName"]}";
                                                 substrateModel = $"{dr["SubstrateModel"]}";
+                                                orderNum = $"{dr["OrderNumber"]}";
                                             }
                                         }
 
@@ -579,6 +581,7 @@ namespace ProductDatabase {
                                                     SubstrateName,
                                                     SubstrateModel,
                                                     SubstrateNumber,
+                                                    OrderNumber,
                                                     Decrease,
                                                     UsedProductType,
                                                     UsedProductNumber,
@@ -592,6 +595,7 @@ namespace ProductDatabase {
                                                     @SubstrateName,
                                                     @SubstrateModel,
                                                     @SubstrateNumber,
+                                                    @OrderNumber,
                                                     @Decrease,
                                                     @UsedProductType,
                                                     @UsedProductNumber,
@@ -605,6 +609,7 @@ namespace ProductDatabase {
                                             cmd.Parameters.Add("@SubstrateName", DbType.String).Value = string.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
                                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
                                             cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
+                                            cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(orderNum) ? DBNull.Value : orderNum;
                                             cmd.Parameters.Add("@Decrease", DbType.String).Value = 0 - useValue;
                                             cmd.Parameters.Add("@UsedProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
                                             cmd.Parameters.Add("@UsedProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
