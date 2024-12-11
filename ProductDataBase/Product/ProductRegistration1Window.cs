@@ -1,4 +1,5 @@
-﻿using System.Data.SQLite;
+﻿using System.Data;
+using System.Data.SQLite;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
@@ -64,7 +65,8 @@ namespace ProductDatabase {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
-                    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.ProductName}_Product" WHERE RevisionGroup = "{ProductInfo.RevisionGroup}" ORDER BY _rowid_ DESC""";
+                    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.ProductName}_Product" WHERE RevisionGroup = @RevisionGroup ORDER BY _rowid_ DESC""";
+                    cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
 
