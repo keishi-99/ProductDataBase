@@ -118,7 +118,7 @@ namespace ProductDatabase {
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new DataTable();
 
-            var query = $"""SELECT _rowid_, * FROM "{ProductInfo.ProductName}_Product" WHERE ProductModel = @ProductModel ORDER BY _rowid_ DESC""";
+            var query = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE ProductModel = @ProductModel ORDER BY ID DESC""";
             using SQLiteCommand command = new(query, con);
             command.Parameters.AddWithValue("@ProductModel", ProductInfo.ProductModel);
             // SQLiteDataAdapterのインスタンス化
@@ -215,10 +215,9 @@ namespace ProductDatabase {
             var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
 
             var query = $"""
-                        SELECT _rowid_, *
-                         FROM "{ProductInfo.ProductName}_Stock"
+                        SELECT *
+                         FROM "{ProductInfo.ProductName}_StockView"
                          WHERE 1=1{otherSubstrate}{inStock}
-                         ORDER BY _rowid_ DESC
                         """;
 
             using SQLiteCommand command = new(query, con);

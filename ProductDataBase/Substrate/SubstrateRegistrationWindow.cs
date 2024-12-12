@@ -195,7 +195,7 @@ namespace ProductDatabase {
                 if (IsRegistration) {
                     var substrateName = string.Empty;
                     using (var cmd = con.CreateCommand()) {
-                        cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_Stock" WHERE SubstrateNumber = @SubstrateNumber ORDER BY _rowid_ DESC LIMIT 1""";
+                        cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateNumber = @SubstrateNumber LIMIT 1""";
                         cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNumber;
                         using var dr = cmd.ExecuteReader();
                         while (dr.Read()) {
@@ -211,67 +211,6 @@ namespace ProductDatabase {
                             }
                         }
                         else { throw new Exception($"[{substrateNumber}]は[{substrateName}]として在庫があります。確認してください。"); }
-                    }
-                }
-
-                // 在庫管理する基板のみ
-                if (IsRegistration) {
-                    //在庫追加
-                    if (QuantityCheckBox.Checked && !DefectNumberCheckBox.Checked) {
-                        // 基板在庫テーブルへ追加_製番が一致した行を更新する、製番がない場合は新規追加
-                        using var cmd = con.CreateCommand();
-                        cmd.CommandText =
-                            $"""
-                            INSERT INTO "{ProductInfo.StockName}_Stock"
-                                (
-                                SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, Stock
-                                )
-                            VALUES
-                                (
-                                @SubstrateName, @SubstrateModel, @SubstrateNumber, @OrderNumber, @Stock
-                                )
-                                on conflict(SubstrateNumber)
-                            DO UPDATE
-                                set Stock = Stock + excluded.Stock
-                            """;
-
-                        cmd.Parameters.Add("@SubstrateName", DbType.String).Value = ProductInfo.SubstrateName;
-                        cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
-                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber;
-                        cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(orderNumber) ? DBNull.Value : orderNumber;
-                        cmd.Parameters.Add("@Stock", DbType.String).Value = quantity;
-
-                        cmd.ExecuteNonQuery();
-                    }
-                    //不良処理
-                    else if (!QuantityCheckBox.Checked && DefectNumberCheckBox.Checked) {
-                        using var cmd = con.CreateCommand();
-                        cmd.CommandText = $"""SELECT Stock FROM "{ProductInfo.StockName}_Stock" WHERE SubstrateNumber = @SubstrateNumber""";
-                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber;
-                        var intStock = Convert.ToInt32(cmd.ExecuteScalar());
-
-                        if (intStock == 0) { throw new Exception("該当する製番の在庫がありません。"); }
-
-                        if (intStock < defectNumber) { throw new Exception("不良数が在庫より多く入力されています。"); }
-
-                        cmd.CommandText =
-                            $"""
-                            UPDATE "{ProductInfo.StockName}_Stock" SET
-                                Stock = @Stock,
-                                History = CASE
-                                              WHEN ifnull(History, '') = '' THEN @History
-                                              ELSE History || ',' || @History
-                                          END
-                            WHERE
-                                SubstrateNumber = @SubstrateNumber
-                            """;
-
-                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber;
-
-                        cmd.Parameters.Add("@Stock", DbType.String).Value = intStock - defectNumber;
-                        cmd.Parameters.Add("@History", DbType.String).Value = $"[不良]{defectNumber}";
-
-                        cmd.ExecuteNonQuery();
                     }
                 }
 

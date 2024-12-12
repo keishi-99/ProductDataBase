@@ -65,14 +65,14 @@ namespace ProductDatabase {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
-                    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.ProductName}_Product" WHERE RevisionGroup = @RevisionGroup ORDER BY _rowid_ DESC""";
+                    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.ProductName}_Product" WHERE RevisionGroup = @RevisionGroup ORDER BY "ID" DESC""";
                     cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
 
                     // シリアル番号の最後を取得する共通メソッド
                     int GetLastSerialNumber(SQLiteCommand cmd, string productName) {
-                        cmd.CommandText = $"""SELECT SerialLastNumber FROM "{productName}_Product" ORDER BY _rowid_ DESC""";
+                        cmd.CommandText = $"""SELECT SerialLastNumber FROM "{productName}_Product" ORDER BY "ID" DESC""";
                         return int.TryParse(cmd.ExecuteScalar()?.ToString(), out var serialLastNum)
                             ? serialLastNum
                             : throw new Exception("シリアル番号の取得に失敗しました。");
@@ -80,7 +80,7 @@ namespace ProductDatabase {
 
                     // 登録日を取得して年月を返す共通メソッド
                     string GetLastRegistrationYearMonth(SQLiteCommand cmd, string productName) {
-                        cmd.CommandText = $"""SELECT RegDate FROM "{productName}_Product" ORDER BY _rowid_ DESC""";
+                        cmd.CommandText = $"""SELECT RegDate FROM "{productName}_Product" ORDER BY "ID" DESC""";
                         var lastRegDate = cmd.ExecuteScalar()?.ToString() ?? string.Empty;
                         var splitRegDate = lastRegDate.Split("/");
                         return splitRegDate.Length >= 2 ? $"{splitRegDate[0]}/{splitRegDate[1]}" : throw new Exception("登録日の取得に失敗しました。");

@@ -134,7 +134,7 @@ namespace ProductDatabase {
                             // 在庫テーブルからデータ取得
                             var intQuantity = ProductInfo.Quantity;
                             var substrateName = string.Empty;
-                            cmd.CommandText = $"""SELECT SubstrateNumber, Stock, SubstrateName FROM "{ProductInfo.StockName}_Stock" WHERE Stock > 0 AND SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC""";
+                            cmd.CommandText = $"""SELECT SubstrateNumber, Stock, SubstrateName FROM "{ProductInfo.StockName}_StockView" WHERE Stock > 0 AND SubstrateModel = @SubstrateModel""";
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using var dr = cmd.ExecuteReader();
                             while (dr.Read()) {
@@ -225,7 +225,7 @@ namespace ProductDatabase {
                                 }
                             }
 
-                            cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_Stock" WHERE Stock > 0 AND SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC""";
+                            cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE Stock > 0 AND SubstrateModel = @SubstrateModel""";
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using var dr = cmd.ExecuteReader();
                             while (dr.Read()) {
@@ -518,6 +518,9 @@ namespace ProductDatabase {
                 case 3:
                     using (SQLiteConnection con = new(GetConnectionRegistration())) {
                         con.Open();
+                        using var transaction = con.BeginTransaction();
+
+                        string productRowId;
                         if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
                         for (var i = 0; i <= _useSubstrate.Length; i++) {
 
@@ -539,26 +542,7 @@ namespace ProductDatabase {
                                         var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
 
                                         using (var cmd = con.CreateCommand()) {
-                                            cmd.CommandText =
-                                                $"""
-                                                UPDATE "{ProductInfo.StockName}_Stock" SET
-                                                    Stock = @Stock,
-                                                    History = CASE
-                                                                  WHEN ifnull(History, '') = '' THEN @History
-                                                                  ELSE History || ',' || char(10) || @History
-                                                              END
-                                                WHERE
-                                                    SubstrateNumber = @SubstrateNumber
-                                                """;
-
-                                            cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
-
-                                            cmd.Parameters.Add("@Stock", DbType.String).Value = stockValue - useValue;
-                                            cmd.Parameters.Add("@History", DbType.String).Value = $"{ProductInfo.ProductNumber}({useValue})";
-
-                                            cmd.ExecuteNonQuery();
-
-                                            cmd.CommandText = $"SELECT * FROM {ProductInfo.StockName}_Stock WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ ASC";
+                                            cmd.CommandText = $"SELECT * FROM {ProductInfo.StockName}_StockView WHERE SubstrateModel = @SubstrateModel";
                                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
 
                                             using var dr = cmd.ExecuteReader();
@@ -573,10 +557,11 @@ namespace ProductDatabase {
                                             subTotalTemp = string.IsNullOrEmpty(subTotalTemp) ? $"{substrateNum}({useValue})" : $"{subTotalTemp},{substrateNum}({useValue})";
                                         }
 
+                                        // 一時テーブルに登録
                                         using (var cmd = con.CreateCommand()) {
                                             cmd.CommandText =
                                                 $"""
-                                                INSERT INTO "{ProductInfo.StockName}_Substrate"
+                                                INSERT INTO "TempSubstrateReduction"
                                                     (
                                                     SubstrateName,
                                                     SubstrateModel,
@@ -635,6 +620,7 @@ namespace ProductDatabase {
                             }
                         }
 
+                        // 製品テーブルに追加
                         using (var cmd = con.CreateCommand()) {
                             cmd.CommandText =
                                 $"""
@@ -690,7 +676,31 @@ namespace ProductDatabase {
                             cmd.Parameters.Add("@UsedSubstrate", DbType.String).Value = string.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
 
                             cmd.ExecuteNonQuery();
+
+                            // 製品ROWIDの取得
+                            cmd.CommandText = "SELECT last_insert_rowid()";
+                            productRowId = cmd.ExecuteScalar().ToString() ?? string.Empty;
                         }
+
+                        // 一時テーブルから基板テーブルにコピー
+                        using (var cmd = con.CreateCommand()) {
+                            cmd.CommandText =
+                                $"""
+                                INSERT INTO "{ProductInfo.StockName}_Substrate" (
+                                    SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, Decrease, UsedProductType, UsedProductNumber, UsedOrderNumber, Person, RegDate, Comment, UseID
+                                )
+                                SELECT
+                                    tsr.SubstrateName, tsr.SubstrateModel, tsr.SubstrateNumber, tsr.OrderNumber, tsr.Decrease, tsr.UsedProductType, tsr.UsedProductNumber, tsr.UsedOrderNumber, tsr.Person, tsr.RegDate, tsr.Comment, @productRowId
+                                FROM TempSubstrateReduction tsr
+                                """;
+                            cmd.Parameters.Add("@productRowId", DbType.String).Value = int.Parse(productRowId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // 一時テーブルの内容を削除
+                        using var command = new SQLiteCommand("DELETE FROM TempSubstrateReduction", con, transaction);
+                        command.ExecuteNonQuery();
+                        transaction.Commit();
                     }
                     break;
             }
@@ -709,7 +719,7 @@ namespace ProductDatabase {
             if (!string.IsNullOrEmpty(ProductInfo.ProductNumber)) {
                 // 製番が新規かチェック
                 using (var cmd = con.CreateCommand()) {
-                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE ProductNumber = @ProductNumber ORDER BY _rowid_ ASC LIMIT 1""";
+                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE ProductNumber = @ProductNumber ORDER BY "ID" ASC LIMIT 1""";
                     cmd.Parameters.Add("@ProductNumber", DbType.String).Value = ProductInfo.ProductNumber;
 
                     using var dr = cmd.ExecuteReader();
@@ -739,7 +749,7 @@ namespace ProductDatabase {
             if (!string.IsNullOrEmpty(ProductInfo.OrderNumber)) {
                 // 注文番号が新規かチェック
                 using (var cmd = con.CreateCommand()) {
-                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE OrderNumber = @OrderNumber ORDER BY _rowid_ ASC LIMIT 1""";
+                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE OrderNumber = @OrderNumber ORDER BY "ID" ASC LIMIT 1""";
                     cmd.Parameters.Add("@OrderNumber", DbType.String).Value = ProductInfo.OrderNumber;
 
                     using var dr = cmd.ExecuteReader();
@@ -1606,6 +1616,5 @@ namespace ProductDatabase {
             var tool = (ToolStrip)ProductRegistration2PrintPreviewDialog.Controls[1];
             tool.Items[0].Visible = false;
         }
-
     }
 }
