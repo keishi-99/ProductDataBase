@@ -91,6 +91,7 @@ namespace ProductDatabase {
         }
 
         public class ProductInfomation {
+            public int ProductID { get; set; }
             public string ProductName { get; set; } = string.Empty;
             public string StockName { get; set; } = string.Empty;
             public string ProductType { get; set; } = string.Empty;
@@ -135,6 +136,7 @@ namespace ProductDatabase {
             public DataTable SubstrateDataTable { get; } = new();
 
             public void Reset() {
+                ProductID = 0;
                 ProductName = string.Empty;
                 StockName = string.Empty;
                 ProductType = string.Empty;
