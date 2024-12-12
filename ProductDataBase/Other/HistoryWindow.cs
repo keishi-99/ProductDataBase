@@ -238,13 +238,11 @@ namespace ProductDatabase {
                 if (headerValue != null) { _listColFilter.Add(headerValue); }
             }
 
-            DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns[1].HeaderCell.Value = "基板名";
-            DataBaseDataGridView.Columns[2].HeaderCell.Value = "基板型式";
-            DataBaseDataGridView.Columns[3].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns[4].HeaderCell.Value = "注文番号";
-            DataBaseDataGridView.Columns[5].HeaderCell.Value = "残数";
-            DataBaseDataGridView.Columns[6].HeaderCell.Value = "使用履歴";
+            DataBaseDataGridView.Columns[0].HeaderCell.Value = "基板名";
+            DataBaseDataGridView.Columns[1].HeaderCell.Value = "基板型式";
+            DataBaseDataGridView.Columns[2].HeaderCell.Value = "製造番号";
+            DataBaseDataGridView.Columns[3].HeaderCell.Value = "注文番号";
+            DataBaseDataGridView.Columns[4].HeaderCell.Value = "残数";
             DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
 
             CategoryComboBox.Items.Clear();
