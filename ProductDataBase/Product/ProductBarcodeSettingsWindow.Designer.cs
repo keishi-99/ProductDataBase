@@ -238,6 +238,7 @@
             this.BarcodeFontTextBox.Location = new Point(320, 30);
             this.BarcodeFontTextBox.MaxLength = 50;
             this.BarcodeFontTextBox.Name = "BarcodeFontTextBox";
+            this.BarcodeFontTextBox.ReadOnly = true;
             this.BarcodeFontTextBox.Size = new Size(135, 23);
             this.BarcodeFontTextBox.TabIndex = 24;
             // 
@@ -671,6 +672,7 @@
             this.BarcodeHeaderFooterFontTextBox.Location = new Point(27, 36);
             this.BarcodeHeaderFooterFontTextBox.MaxLength = 50;
             this.BarcodeHeaderFooterFontTextBox.Name = "BarcodeHeaderFooterFontTextBox";
+            this.BarcodeHeaderFooterFontTextBox.ReadOnly = true;
             this.BarcodeHeaderFooterFontTextBox.Size = new Size(135, 23);
             this.BarcodeHeaderFooterFontTextBox.TabIndex = 2;
             // 
