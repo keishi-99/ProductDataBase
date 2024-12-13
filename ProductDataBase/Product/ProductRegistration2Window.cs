@@ -768,8 +768,12 @@ namespace ProductDatabase {
                     }
                     else {
                         Activate();
-                        MessageBox.Show($"[{ProductInfo.OrderNumber}]は[{productModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return false;
+                        var result = MessageBox.Show($"[{ProductInfo.OrderNumber}]は[{productModel}]として登録があります。登録しますか？", "", MessageBoxButtons.YesNo);
+                        if (result == DialogResult.No) {
+                            return false;
+                        }
+                        //MessageBox.Show($"[{ProductInfo.OrderNumber}]は[{productModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        //return false;
                     }
                 }
             }
