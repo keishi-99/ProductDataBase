@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using GenCode128;
+using ProductDatabase.Other;
 using ProductDatabase.Product;
 using System.Data;
 using System.Data.SQLite;
@@ -260,7 +261,7 @@ namespace ProductDatabase {
                         }
                         break;
                     default:
-                        for (var i = 0; i <= 9; i++) {
+                        for (var i = 0; i <= 14; i++) {
                             if (Controls[_checkBoxNames[i]] is CheckBox objCbx) {
                                 objCbx.Visible = false;
                             }
@@ -936,11 +937,20 @@ namespace ProductDatabase {
                     var r = ProductRegistration2PrintDialog.ShowDialog();
 
                     if (r == DialogResult.OK) {
-                        ProductRegistration2PrintDialog.Document.Print();
+                        // ローディング画面の表示
+                        using var loadingForm = new LoadingForm();
+                        // 別スレッドで印刷処理を実行
+                        Task.Run(() => {
+                            try {
+                                ProductRegistration2PrintDialog.Document.Print();
+                            } finally {
+                                // 印刷が終了したらローディング画面を閉じる
+                                loadingForm.Invoke(new Action(() => loadingForm.Close()));
+                            }
+                        });
 
-                        if (_pageCnt >= 2) {
-                            MessageBox.Show($"{_pageCnt}枚印刷されます。2枚目以降は1行目から印刷されます。");
-                        }
+                        // ローディング画面をモーダルとして表示
+                        loadingForm.ShowDialog();
                     }
                     else {
                         return false;
