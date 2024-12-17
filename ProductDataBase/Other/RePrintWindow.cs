@@ -1,4 +1,5 @@
 ﻿using GenCode128;
+using ProductDatabase.Other;
 using ProductDatabase.Product;
 using System.Data;
 using System.Data.SQLite;
@@ -162,6 +163,7 @@ namespace ProductDatabase {
                 result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) { return; }
 
+                ProductInfo.Person = PersonComboBox.Text;
                 if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
 
                 Registeration();
@@ -289,11 +291,20 @@ namespace ProductDatabase {
                         var r = RePrintPrintDialog.ShowDialog();
 
                         if (r == DialogResult.OK) {
-                            RePrintPrintDialog.Document.Print();
+                            // ローディング画面の表示
+                            using var loadingForm = new LoadingForm();
+                            // 別スレッドで印刷処理を実行
+                            Task.Run(() => {
+                                try {
+                                    RePrintPrintDialog.Document.Print();
+                                } finally {
+                                    // 印刷が終了したらローディング画面を閉じる
+                                    loadingForm.Invoke(new Action(() => loadingForm.Close()));
+                                }
+                            });
 
-                            if (_intPageCnt >= 2) {
-                                MessageBox.Show($"{_intPageCnt}枚印刷されます。2枚目以降は1行目から印刷されます。");
-                            }
+                            // ローディング画面をモーダルとして表示
+                            loadingForm.ShowDialog();
                         }
                         else {
                             return false;
@@ -464,7 +475,7 @@ namespace ProductDatabase {
                  .Replace("%M", _productNumber)
                  .Replace("%O", _orderNumber)
                  .Replace("%N", _quantity.ToString())
-                 .Replace("%U", "");
+                 .Replace("%U", ProductInfo.Person);
             return s;
         }
         private string GenerateCode(int serialCode) {

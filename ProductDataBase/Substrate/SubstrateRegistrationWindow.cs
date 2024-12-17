@@ -1,4 +1,5 @@
-﻿using ProductDatabase.Substrate;
+﻿using ProductDatabase.Other;
+using ProductDatabase.Substrate;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing.Printing;
@@ -156,11 +157,14 @@ namespace ProductDatabase {
 
                 if (!Registration()) { return; }
 
+                ProductInfo.Person = PersonComboBox.Text;
+
                 if (IsLabelPrint) {
                     if (QuantityCheckBox.Checked) {
                         MessageBox.Show("登録完了 続けて印刷します。");
                         PrintBarcode(1);
-                        PrintButton.Enabled = true;
+                        MessageBox.Show("印刷完了");
+                        Close();
                     }
                     if (DefectNumberCheckBox.Checked) {
                         MessageBox.Show("登録完了");
@@ -295,12 +299,20 @@ namespace ProductDatabase {
                         var r = SubstrateRegistrationPrintDialog.ShowDialog();
 
                         if (r == DialogResult.OK) {
-                            SubstrateRegistrationPrintDialog.Document.Print();
+                            // ローディング画面の表示
+                            using var loadingForm = new LoadingForm();
+                            // 別スレッドで印刷処理を実行
+                            Task.Run(() => {
+                                try {
+                                    SubstrateRegistrationPrintDialog.Document.Print();
+                                } finally {
+                                    // 印刷が終了したらローディング画面を閉じる
+                                    loadingForm.Invoke(new Action(() => loadingForm.Close()));
+                                }
+                            });
 
-                            if (_intPageCnt >= 2) {
-                                MessageBox.Show($"{_intPageCnt}枚印刷されます。2枚目以降は1行目から印刷されます。");
-                            }
-                            Close();
+                            // ローディング画面をモーダルとして表示
+                            loadingForm.ShowDialog();
                         }
                         else {
                             return;
@@ -423,7 +435,7 @@ namespace ProductDatabase {
                  .Replace("%M", ManufacturingNumberMaskedTextBox.Text)
                  .Replace("%O", OrderNumberTextBox.Text)
                  .Replace("%N", QuantityTextBox.Text)
-                 .Replace("%U", PersonComboBox.Text);
+                 .Replace("%U", ProductInfo.Person);
             return s;
         }
         private string GenerateCode(string serial) {
