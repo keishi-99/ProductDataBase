@@ -342,15 +342,15 @@ namespace ProductDatabase {
                 if (!NumberCheck() || !QuantityCheck() || !SerialCheck()) {
                     return;
                 }
-
-                HandleLabelPrinting();
-                HandleBarcodePrinting();
                 DisableControls();
                 GenerateSerialCodes();
 
                 if (!Registration()) {
                     throw new Exception("登録失敗しました。");
                 }
+
+                HandleLabelPrinting();
+                HandleBarcodePrinting();
 
                 MessageBox.Show("登録完了");
 
