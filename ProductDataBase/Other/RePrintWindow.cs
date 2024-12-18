@@ -164,7 +164,7 @@ namespace ProductDatabase {
                 if (result == DialogResult.Cancel) { return; }
 
                 ProductInfo.Person = PersonComboBox.Text;
-                Registeration();
+                if (!Registeration()) { throw new Exception("登録できませんでした。"); }
 
                 if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
 
@@ -172,7 +172,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void Registeration() {
+        private bool Registeration() {
             try {
                 // 再印刷登録テーブルへ追加
                 using SQLiteConnection con = new(GetConnectionRegistration());
@@ -207,8 +207,10 @@ namespace ProductDatabase {
                 // ログ出力
                 Logger.AppendLog($";[再印刷];注文番号[{_orderNumber}];製造番号[{_productNumber}];製品名[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{_quantity}];シリアル先頭[{_strSerialFirstNumber}];シリアル末尾[{_strSerialLastNumber}];Revision[{_revision}];登録日[{_regDate}];担当者[{_person}];");
 
+                return true;
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
         private bool FormCheck() {
