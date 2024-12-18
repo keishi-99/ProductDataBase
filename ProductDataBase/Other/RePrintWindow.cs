@@ -164,9 +164,9 @@ namespace ProductDatabase {
                 if (result == DialogResult.Cancel) { return; }
 
                 ProductInfo.Person = PersonComboBox.Text;
-                if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
-
                 Registeration();
+
+                if (!PrintBarcode(1)) { throw new Exception("キャンセルしました。"); }
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
