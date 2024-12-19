@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Data.Odbc;
 using System.Data.SQLite;
+using System.Net.NetworkInformation;
 using System.Text;
 
 namespace ProductDatabase {
@@ -188,11 +189,15 @@ namespace ProductDatabase {
 
         public static string GetConnectionInfomation() {
             var informationPath = Path.Combine("db", "information.db");
-            return new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
+            return !NetworkInterface.GetIsNetworkAvailable()
+                ? throw new Exception("ネットワーク接続がありません。処理を中断します。")
+                : new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
         }
         public static string GetConnectionRegistration() {
             var registrationPath = Path.Combine("db", "registration.db");
-            return new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
+            return !NetworkInterface.GetIsNetworkAvailable()
+                ? throw new Exception("ネットワーク接続がありません。処理を中断します。")
+                : new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
         }
 
         // ロードイベント
