@@ -189,14 +189,26 @@ namespace ProductDatabase {
 
         public static string GetConnectionInfomation() {
             var informationPath = Path.Combine("db", "information.db");
-            return !NetworkInterface.GetIsNetworkAvailable()
-                ? throw new Exception("ネットワーク接続がありません。処理を中断します。")
+
+            if (!NetworkInterface.GetIsNetworkAvailable()) {
+                throw new Exception("ネットワーク接続がありません。処理を中断します。");
+            }
+
+            // ファイルが存在するか確認
+            return !File.Exists(informationPath)
+                ? throw new FileNotFoundException("データベースファイルが見つかりません。", informationPath)
                 : new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
         }
         public static string GetConnectionRegistration() {
             var registrationPath = Path.Combine("db", "registration.db");
-            return !NetworkInterface.GetIsNetworkAvailable()
-                ? throw new Exception("ネットワーク接続がありません。処理を中断します。")
+
+            if (!NetworkInterface.GetIsNetworkAvailable()) {
+                throw new Exception("ネットワーク接続がありません。処理を中断します。");
+            }
+
+            // ファイルが存在するか確認
+            return !File.Exists(registrationPath)
+                ? throw new FileNotFoundException("データベースファイルが見つかりません。", registrationPath)
                 : new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
         }
 
