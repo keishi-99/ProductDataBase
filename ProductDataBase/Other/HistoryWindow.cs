@@ -5,11 +5,11 @@ using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
     public partial class HistoryWindow : Form {
-        public ProductInfomation ProductInfo { get; }
+        public ProductInformation ProductInfo { get; }
 
         private readonly List<string> _listColFilter = [];
 
-        public HistoryWindow(ProductInfomation productInfo) {
+        public HistoryWindow(ProductInformation productInfo) {
             InitializeComponent();
             ProductInfo = productInfo;
             // 最大サイズをディスプレイサイズに合わせる

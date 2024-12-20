@@ -91,7 +91,7 @@ namespace ProductDatabase {
             }
         }
 
-        public class ProductInfomation {
+        public class ProductInformation {
             public int ProductID { get; set; }
             public string ProductName { get; set; } = string.Empty;
             public string StockName { get; set; } = string.Empty;
@@ -175,7 +175,7 @@ namespace ProductDatabase {
             }
         }
 
-        public ProductInfomation ProductInfo { get; set; } = new();
+        public ProductInformation ProductInfo { get; set; } = new();
 
         private string _strCategory12 = string.Empty;
         private string _strCategory13 = string.Empty;
@@ -187,7 +187,7 @@ namespace ProductDatabase {
             InitializeComponent();
         }
 
-        public static string GetConnectionInfomation() {
+        public static string GetConnectionInformation() {
             var informationPath = Path.Combine("db", "information.db");
 
             if (!NetworkInterface.GetIsNetworkAvailable()) {
@@ -224,7 +224,7 @@ namespace ProductDatabase {
                 Directory.CreateDirectory(bakDir);  // ディレクトリが存在しない場合に作成
                 File.Copy(registrationPath, bakFilepath, true);
 
-                using SQLiteConnection con = new(GetConnectionInfomation());
+                using SQLiteConnection con = new(GetConnectionInformation());
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con)) { adapter.Fill(ProductInfo.SubstrateDataTable); }
 
@@ -423,7 +423,7 @@ namespace ProductDatabase {
                         break;
                 }
 
-                using (SQLiteConnection con = new(GetConnectionInfomation()))
+                using (SQLiteConnection con = new(GetConnectionInformation()))
                 using (SQLiteDataAdapter adapter = new(strSqlQuery, con)) {
                     adapter.Fill(ProductInfo.ProductDataTable);
                 }
@@ -605,7 +605,7 @@ namespace ProductDatabase {
                                                 .Replace("-DCGH", "-DC");
         }
         private void FetchDataFromSQLite() {
-            using SQLiteConnection con = new(GetConnectionInfomation());
+            using SQLiteConnection con = new(GetConnectionInformation());
             con.Open();
             using var cmd = con.CreateCommand();
             cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber = @StrProness2 OR ProItemNumber = @StrProness2""";
@@ -657,7 +657,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateSelection() {
-            using (SQLiteConnection con = new(GetConnectionInfomation())) {
+            using (SQLiteConnection con = new(GetConnectionInformation())) {
                 using SQLiteDataAdapter adapter = new("""SELECT * FROM Substrate;""", con);
                 adapter.Fill(ProductInfo.ProductDataTable);
             }
@@ -678,7 +678,7 @@ namespace ProductDatabase {
             window.ShowDialog(this);
         }
         private void HandleProductSelection() {
-            using (SQLiteConnection con = new(GetConnectionInfomation())) {
+            using (SQLiteConnection con = new(GetConnectionInformation())) {
                 using SQLiteDataAdapter adapter = new("""SELECT * FROM Product;""", con);
                 adapter.Fill(ProductInfo.ProductDataTable);
             }
