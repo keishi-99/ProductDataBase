@@ -12,7 +12,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 namespace ProductDatabase {
     public partial class SubstrateChange2 : Form {
 
-        public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
+        public ProductInformation ProductInfo { get; set; } = new ProductInformation();
 
         private string _totalSubstrate = string.Empty;
 
@@ -64,7 +64,7 @@ namespace ProductDatabase {
                 CommentTextBox.Text = ProductInfo.Comment;
 
                 // DB1へ接続し担当者取得
-                using (SQLiteConnection con = new(GetConnectionInfomation())) {
+                using (SQLiteConnection con = new(GetConnectionInformation())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加

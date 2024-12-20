@@ -5,14 +5,14 @@ using static ProductDatabase.MainWindow;
 namespace ProductDatabase {
     public partial class ProductRegistration1Window : Form {
 
-        public ProductInfomation ProductInfo { get; }
+        public ProductInformation ProductInfo { get; }
 
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
 
-        public ProductRegistration1Window(ProductInfomation productInfo) {
+        public ProductRegistration1Window(ProductInformation productInfo) {
             InitializeComponent();
             ProductInfo = productInfo;
         }
@@ -49,7 +49,7 @@ namespace ProductDatabase {
                 RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
 
                 // DB1へ接続し担当者取得
-                using (SQLiteConnection con = new(GetConnectionInfomation())) {
+                using (SQLiteConnection con = new(GetConnectionInformation())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加

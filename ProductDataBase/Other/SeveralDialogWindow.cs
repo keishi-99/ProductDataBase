@@ -3,11 +3,11 @@
 namespace ProductDatabase {
     public partial class SeveralDialogWindow : Form {
 
-        public ProductInfomation ProductInfo { get; }
+        public ProductInformation ProductInfo { get; }
 
         public int SelectedIndex { get; private set; } = -1;
 
-        public SeveralDialogWindow(ProductInfomation productInfo) {
+        public SeveralDialogWindow(ProductInformation productInfo) {
             InitializeComponent();
             ProductInfo = productInfo;
         }

@@ -14,7 +14,7 @@ namespace ProductDatabase {
         public CSettingsBarcodePro SettingsBarcodePro { get; set; } = new CSettingsBarcodePro();
         public string barcodeSettingFilePath = string.Empty;
 
-        public ProductInfomation ProductInfo { get; }
+        public ProductInformation ProductInfo { get; }
 
         private string _orderNumber = string.Empty;
         private string _productNumber = string.Empty;
@@ -49,7 +49,7 @@ namespace ProductDatabase {
         private bool IsBarcodePrint => ProductInfo.PrintType is 2 or 3;
         private bool IsUnderlinePrint => ProductInfo.PrintType is 4;
 
-        public RePrintWindow(ProductInfomation productInfo) {
+        public RePrintWindow(ProductInformation productInfo) {
             InitializeComponent();
             ProductInfo = productInfo;
         }
@@ -80,7 +80,7 @@ namespace ProductDatabase {
                 RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
 
                 // DB1へ接続し担当者取得
-                using (SQLiteConnection con = new(GetConnectionInfomation())) {
+                using (SQLiteConnection con = new(GetConnectionInformation())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - 担当者をComboboxへ追加

@@ -25,7 +25,7 @@ namespace ProductDatabase {
         public CSettingsBarcodePro SettingsBarcodePro { get; set; } = new CSettingsBarcodePro();
         public string barcodeSettingFilePath = string.Empty;
 
-        public ProductInfomation ProductInfo { get; set; } = new ProductInfomation();
+        public ProductInformation ProductInfo { get; set; } = new ProductInformation();
 
         private string[] _useSubstrate = [];
 
