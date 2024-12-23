@@ -79,8 +79,8 @@ namespace ProductDatabase {
         }
         // バックアップ作成
         public static class BackupManager {
-            private static readonly string s_backupDirectory = Path.Combine(s_networkPath, "db", "backup"); // バックアップを保存するディレクトリ
-            private static readonly string s_originalFilePath = Path.Combine(s_networkPath, "db", "registration.db"); // 元ファイルパス
+            private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup"); // バックアップを保存するディレクトリ
+            private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db"); // 元ファイルパス
             private static readonly int s_maxBackupFiles = 10; // 最大バックアップファイル数
             private static readonly object s_lockObject = new();
 
@@ -256,8 +256,8 @@ namespace ProductDatabase {
 
                 // その日のbackupファイルがない場合バックアップ作成
                 var d = DateTime.Now;
-                var backupDir = Path.Combine(s_networkPath, "backup", $"{d.Year}", $"{d.Month:00}");
-                var backupFilepath = Path.Combine(s_networkPath, "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
+                var backupDir = Path.Combine(s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}");
+                var backupFilepath = Path.Combine(s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
                 var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
 
                 Directory.CreateDirectory(backupDir);  // ディレクトリが存在しない場合に作成
