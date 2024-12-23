@@ -267,8 +267,6 @@ namespace ProductDatabase {
 
                 // バックアップ作成
                 BackupManager.CreateBackup();
-                //var backupManager = new BackupManager();
-                //backupManager.CreateBackup();
                 // ログ出力
                 Logger.AppendLog($";[基板登録];注文番号[{orderNumber}];製造番号[{substrateNumber}];製品名[{ProductInfo.ProductName}];基板名[{ProductInfo.SubstrateName}];型式[{ProductInfo.SubstrateModel}];数量[{quantity}];Revision[{revision}];登録日[{registrationDate}];担当者[{person}];");
 
