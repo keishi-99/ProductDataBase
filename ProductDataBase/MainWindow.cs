@@ -8,6 +8,7 @@ namespace ProductDatabase {
     public partial class MainWindow : Form {
 
         private static readonly string? s_clonePath; // ClonePathを保持する静的変数
+        private static readonly string[]? s_userNames = []; // ClonePathを保持する静的変数
         // 静的コンストラクタでClonePathを読み込む
         static MainWindow() {
             try {
@@ -31,6 +32,8 @@ namespace ProductDatabase {
                 if (!Directory.Exists(s_clonePath)) {
                     throw new DirectoryNotFoundException($"クローンフォルダ '{s_clonePath}' が見つかりません。");
                 }
+
+                s_userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];
 
             } catch (Exception ex) {
                 MessageBox.Show($"設定の読み込み中にエラーが発生しました: {ex.Message}", "設定エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -61,6 +64,11 @@ namespace ProductDatabase {
                         var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}";
                         //// ログ内容をファイルの末尾に追記
                         File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
+
+                        if (!string.IsNullOrEmpty(s_clonePath)) {
+                            var cloneFilePath = Path.Combine(s_clonePath, "logs", logFileName);
+                            File.Copy(logFilePath, cloneFilePath, true);
+                        }
                     }
                 } catch (Exception ex) {
                     MessageBox.Show($"ログの書き込み中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -93,7 +101,7 @@ namespace ProductDatabase {
                         // 元ファイルをバックアップにコピー
                         File.Copy(s_originalFilePath, backupFilePath, true);
                         if (!string.IsNullOrEmpty(s_clonePath)) {
-                            var cloneFilePath = Path.Combine(s_clonePath, "registration.db");
+                            var cloneFilePath = Path.Combine(s_clonePath, "db", "registration.db");
                             File.Copy(s_originalFilePath, cloneFilePath, true);
                         }
 
@@ -249,26 +257,13 @@ namespace ProductDatabase {
         // ロードイベント
         private void LoadEvents() {
             try {
-                // JSONファイルのパス
-                var jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "general", "appsettings.json");
-
-                // パスのディレクトリ部分を取得
-                var basePath = Path.GetDirectoryName(jsonFilePath);
-                if (string.IsNullOrEmpty(basePath) || !Directory.Exists(basePath)) {
-                    throw new DirectoryNotFoundException($"The directory '{basePath}' does not exist.");
-                }
-
-                // JSONファイルを読み込む
-                var config = new ConfigurationBuilder()
-                    .SetBasePath(basePath)
-                    .AddJsonFile(Path.GetFileName(jsonFilePath), optional: false, reloadOnChange: true)
-                    .Build();
 
                 // その日のbakファイルがない場合バックアップ作成
                 var d = DateTime.Now;
-                var bakDir = Path.Combine(Environment.CurrentDirectory, "bak", $"{d.Year}", $"{d.Month:00}");
-                var bakFilepath = Path.Combine(Environment.CurrentDirectory, "bak", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
-                var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
+                if (string.IsNullOrEmpty(s_clonePath)) { throw new InvalidOperationException("s_clonePath is null"); }
+                var bakDir = Path.Combine(s_clonePath, "bak", $"{d.Year}", $"{d.Month:00}");
+                var bakFilepath = Path.Combine(s_clonePath, "bak", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
+                var registrationPath = Path.Combine(s_clonePath, "db", "registration.db");
 
                 Directory.CreateDirectory(bakDir);  // ディレクトリが存在しない場合に作成
                 File.Copy(registrationPath, bakFilepath, true);
@@ -277,11 +272,8 @@ namespace ProductDatabase {
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con)) { adapter.Fill(ProductInfo.SubstrateDataTable); }
 
-                // ユーザーリストを取得// JSONからデータを取得
-                var userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];
-
                 // 現在のユーザー名がリストに含まれるかチェック
-                _isAuthorizedUser = userNames.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase));
+                _isAuthorizedUser = s_userNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
 
                 QRCodePanel.Enabled = _isAuthorizedUser;
 
