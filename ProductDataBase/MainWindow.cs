@@ -234,7 +234,12 @@ namespace ProductDatabase {
         }
 
         public static string GetConnectionInformation() {
-            var informationPath = Path.Combine("db", "information.db");
+            var informationPath = Path.Combine(s_networkPath, "db", "information.db");
+            var u = new Uri(informationPath);
+            if (u.IsUnc) {
+                // UNCパス
+                informationPath = @"\" + informationPath;
+            }
 
             // ファイルが存在するか確認
             return !File.Exists(informationPath)
@@ -243,6 +248,11 @@ namespace ProductDatabase {
         }
         public static string GetConnectionRegistration() {
             var registrationPath = Path.Combine("db", "registration.db");
+            var u = new Uri(registrationPath);
+            if (u.IsUnc) {
+                // UNCパス
+                registrationPath = @"\" + registrationPath;
+            }
 
             // ファイルが存在するか確認
             return !File.Exists(registrationPath)
