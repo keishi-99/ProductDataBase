@@ -42,7 +42,7 @@ namespace ProductDatabase {
 
         // ログ作成
         public static class Logger {
-            private static readonly string s_logDirectory = Path.Combine(s_networkPath, "db", "logs"); // ログを保存するディレクトリ
+            private static readonly string s_logDirectory = Path.Combine(Environment.CurrentDirectory, "db", "logs"); // ログを保存するディレクトリ
             private static readonly object s_lockObject = new();
 
             /// <summary>
@@ -81,6 +81,7 @@ namespace ProductDatabase {
         public static class BackupManager {
             private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup"); // バックアップを保存するディレクトリ
             private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db"); // 元ファイルパス
+            //private static readonly string s_originalFilePath = Path.Combine(s_networkPath, "db", "registration.db"); // 元ファイルパス
             private static readonly int s_maxBackupFiles = 10; // 最大バックアップファイル数
             private static readonly object s_lockObject = new();
 
@@ -102,11 +103,9 @@ namespace ProductDatabase {
 
                         // 元ファイルをバックアップにコピー
                         File.Copy(s_originalFilePath, backupFilePath, true);
-                        if (!string.IsNullOrEmpty(s_networkPath)) {
-                            var cloneFilePath = Path.Combine(s_networkPath, "db", "registration.db");
-                            if (Environment.CurrentDirectory != s_networkPath) {
-                                File.Copy(s_originalFilePath, cloneFilePath, true);
-                            }
+                        var networkFilePath = Path.Combine(s_networkPath, "db", "registration.db");
+                        if (Environment.CurrentDirectory != s_networkPath) {
+                            File.Copy(s_originalFilePath, networkFilePath, true);
                         }
 
                         // バックアップファイルを管理
@@ -234,26 +233,30 @@ namespace ProductDatabase {
         }
 
         public static string GetConnectionInformation() {
-            var informationPath = Path.Combine(s_networkPath, "db", "information.db");
-            if (!File.Exists(informationPath)) { throw new FileNotFoundException("データベースファイルが見つかりません。", informationPath); }
-            var u = new Uri(informationPath);
-            if (u.IsUnc) {
-                // UNCパス
-                informationPath = @"\" + informationPath;
-            }
-
-            return new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
+            //var informationPath = Path.Combine(s_networkPath, "db", "information.db");
+            //if (!File.Exists(informationPath)) { throw new FileNotFoundException("データベースファイルが見つかりません。", informationPath); }
+            //var u = new Uri(informationPath);
+            //if (u.IsUnc) {
+            //    // UNCパス
+            //    informationPath = @"\" + informationPath;
+            //}
+            var informationPath = Path.Combine(Environment.CurrentDirectory, "db", "information.db");
+            return !File.Exists(informationPath)
+                ? throw new FileNotFoundException("データベースファイルが見つかりません。", informationPath)
+                : new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
         }
         public static string GetConnectionRegistration() {
-            var registrationPath = Path.Combine(s_networkPath, "db", "registration.db");
-            if (!File.Exists(registrationPath)) { throw new FileNotFoundException("データベースファイルが見つかりません。", registrationPath); }
-            var u = new Uri(registrationPath);
-            if (u.IsUnc) {
-                // UNCパス
-                registrationPath = @"\" + registrationPath;
-            }
-
-            return new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
+            //var registrationPath = Path.Combine(s_networkPath, "db", "registration.db");
+            //if (!File.Exists(registrationPath)) { throw new FileNotFoundException("データベースファイルが見つかりません。", registrationPath); }
+            //var u = new Uri(registrationPath);
+            //if (u.IsUnc) {
+            //    // UNCパス
+            //    registrationPath = @"\" + registrationPath;
+            //}
+            var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
+            return !File.Exists(registrationPath)
+                ? throw new FileNotFoundException("データベースファイルが見つかりません。", registrationPath)
+                : new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
         }
 
         // ロードイベント
