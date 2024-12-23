@@ -27,7 +27,7 @@ namespace ProductDatabase {
                     .Build();
 
                 // CloneFolderPathを取得
-                s_networkPath = config["CloneFolderPath"] ?? throw new Exception("フォルダが設定されてません。");
+                s_networkPath = config["NetworkFolderPath"] ?? throw new Exception("フォルダが設定されてません。");
                 if (string.IsNullOrEmpty(s_networkPath)) { throw new Exception("フォルダが設定されてません。"); }
                 if (!Directory.Exists(s_networkPath)) {
                     throw new DirectoryNotFoundException($"フォルダ '{s_networkPath}' が見つかりません。");
