@@ -104,7 +104,7 @@ namespace ProductDatabase {
                         File.Copy(s_originalFilePath, backupFilePath, true);
                         if (!string.IsNullOrEmpty(s_clonePath)) {
                             var cloneFilePath = Path.Combine(s_clonePath, "registration.db");
-                            if (cloneFilePath != backupFilePath) {
+                            if (Path.Combine(Environment.CurrentDirectory, "db") != s_clonePath) {
                                 File.Copy(s_originalFilePath, cloneFilePath, true);
                             }
                         }
