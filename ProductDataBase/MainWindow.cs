@@ -245,8 +245,8 @@ namespace ProductDatabase {
                 // その日のbackupファイルがない場合バックアップ作成
                 var d = DateTime.Now;
                 if (string.IsNullOrEmpty(s_databasePath)) { throw new InvalidOperationException("s_clonePath is null"); }
-                var backupDir = Path.Combine(s_databasePath, "backup", $"{d.Year}", $"{d.Month:00}");
-                var backupFilepath = Path.Combine(s_databasePath, "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
+                var backupDir = Path.Combine(s_databasePath, "db", "backup", $"{d.Year}", $"{d.Month:00}");
+                var backupFilepath = Path.Combine(s_databasePath, "db", "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
                 var registrationPath = Path.Combine(s_databasePath, "db", "registration.db");
 
                 Directory.CreateDirectory(backupDir);  // ディレクトリが存在しない場合に作成
