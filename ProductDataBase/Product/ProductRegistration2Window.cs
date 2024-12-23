@@ -1171,9 +1171,12 @@ namespace ProductDatabase {
 
                     labelImage = new((int)sizeX, (int)sizeY);
                     g = Graphics.FromImage(labelImage);
-                    stringSize = g.MeasureString(text, fnt);
+                    //stringSize = g.MeasureString(text, fnt);
+                    stringSize = TextRenderer.MeasureText(text, fnt);
 
-                    stringPosX = (float)((labelImage.Width / 2) - (stringSize.Width / 2));
+                    stringPosX = SettingsLabelPro.LabelProLabelSettings.AlignStringCenter
+                        ? (float)((labelImage.Width / 2f) - (stringSize.Width / 2f))
+                        : (float)(SettingsLabelPro.LabelProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
 
                     g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
 
@@ -1190,10 +1193,11 @@ namespace ProductDatabase {
 
                     labelImage = new((int)sizeX, (int)sizeY);
                     g = Graphics.FromImage(labelImage);
-                    stringSize = g.MeasureString(text, fnt);
+                    //stringSize = g.MeasureString(text, fnt);
+                    stringSize = TextRenderer.MeasureText(text, fnt);
 
                     stringPosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignStringCenter
-                        ? (float)((labelImage.Width / 2) - (stringSize.Width / 2))
+                        ? (float)((labelImage.Width / 2f) - (stringSize.Width / 2f))
                         : (float)(SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
 
                     g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
