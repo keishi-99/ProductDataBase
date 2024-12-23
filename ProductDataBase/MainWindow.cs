@@ -7,7 +7,7 @@ using System.Net.NetworkInformation;
 namespace ProductDatabase {
     public partial class MainWindow : Form {
 
-        private static readonly string s_clonePath; // ClonePathを保持する静的変数
+        private static readonly string? s_clonePath; // ClonePathを保持する静的変数
         // 静的コンストラクタでClonePathを読み込む
         static MainWindow() {
             try {
@@ -92,7 +92,9 @@ namespace ProductDatabase {
 
                         // 元ファイルをバックアップにコピー
                         File.Copy(s_originalFilePath, backupFilePath, true);
-                        File.Copy(s_originalFilePath, s_clonePath, true);
+                        if (!string.IsNullOrEmpty(s_clonePath)) {
+                            File.Copy(s_originalFilePath, s_clonePath, true);
+                        }
 
                         // バックアップファイルを管理
                         ManageBackupFiles();
