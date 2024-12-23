@@ -214,7 +214,7 @@ namespace ProductDatabase {
                                 if (result == DialogResult.No) { return false; }
                             }
                         }
-                        else { throw new Exception($"[{substrateNumber}]は[{substrateName}]として在庫があります。確認してください。"); }
+                        //else { throw new Exception($"[{substrateNumber}]は[{substrateName}]として在庫があります。確認してください。"); }
                     }
                 }
 
@@ -466,9 +466,10 @@ namespace ProductDatabase {
             using (var g = Graphics.FromImage(labelImage)) {
                 var fontSize = (decimal)SettingsLabelSub.LabelSubLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
                 using (Font fnt = new(SettingsLabelSub.LabelSubLabelSettings.Font.Name, (float)fontSize)) {
-                    var stringSize = g.MeasureString(text, fnt);
+                    //var stringSize = g.MeasureString(text, fnt);
+                    var stringSize = TextRenderer.MeasureText(text, fnt);
 
-                    var stringPosX = (int)((labelImage.Width / 2) - (stringSize.Width / 2));
+                    var stringPosX = (labelImage.Width / 2f) - (stringSize.Width / 2f);
                     var stringPosY = (int)((decimal)SettingsLabelSub.LabelSubLabelSettings.StringPosY / 25.4M * resolution * magnitude);
 
                     g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
