@@ -42,7 +42,7 @@ namespace ProductDatabase {
 
         // ログ作成
         public static class Logger {
-            private static readonly string s_logDirectory = Path.Combine(Environment.CurrentDirectory, "logs"); // ログを保存するディレクトリ
+            private static readonly string s_logDirectory = Path.Combine(Environment.CurrentDirectory, "db", "logs"); // ログを保存するディレクトリ
             private static readonly object s_lockObject = new();
 
             /// <summary>
@@ -67,7 +67,9 @@ namespace ProductDatabase {
 
                         if (!string.IsNullOrEmpty(s_clonePath)) {
                             var cloneFilePath = Path.Combine(s_clonePath, "logs", logFileName);
-                            File.Copy(logFilePath, cloneFilePath, true);
+                            if (cloneFilePath != logFilePath) {
+                                File.Copy(logFilePath, cloneFilePath, true);
+                            }
                         }
                     }
                 } catch (Exception ex) {
@@ -77,7 +79,7 @@ namespace ProductDatabase {
         }
         // バックアップ作成
         public static class BackupManager {
-            private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backups"); // バックアップを保存するディレクトリ
+            private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup"); // バックアップを保存するディレクトリ
             private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db"); // 元ファイルパス
             private static readonly int s_maxBackupFiles = 10; // 最大バックアップファイル数
             private static readonly object s_lockObject = new();
@@ -101,8 +103,10 @@ namespace ProductDatabase {
                         // 元ファイルをバックアップにコピー
                         File.Copy(s_originalFilePath, backupFilePath, true);
                         if (!string.IsNullOrEmpty(s_clonePath)) {
-                            var cloneFilePath = Path.Combine(s_clonePath, "db", "registration.db");
-                            File.Copy(s_originalFilePath, cloneFilePath, true);
+                            var cloneFilePath = Path.Combine(s_clonePath, "registration.db");
+                            if (cloneFilePath != backupFilePath) {
+                                File.Copy(s_originalFilePath, cloneFilePath, true);
+                            }
                         }
 
                         // バックアップファイルを管理
@@ -258,15 +262,15 @@ namespace ProductDatabase {
         private void LoadEvents() {
             try {
 
-                // その日のbakファイルがない場合バックアップ作成
+                // その日のbackupファイルがない場合バックアップ作成
                 var d = DateTime.Now;
                 if (string.IsNullOrEmpty(s_clonePath)) { throw new InvalidOperationException("s_clonePath is null"); }
-                var bakDir = Path.Combine(s_clonePath, "bak", $"{d.Year}", $"{d.Month:00}");
-                var bakFilepath = Path.Combine(s_clonePath, "bak", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
-                var registrationPath = Path.Combine(s_clonePath, "db", "registration.db");
+                var backupDir = Path.Combine(s_clonePath, "backup", $"{d.Year}", $"{d.Month:00}");
+                var backupFilepath = Path.Combine(s_clonePath, "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
+                var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
 
-                Directory.CreateDirectory(bakDir);  // ディレクトリが存在しない場合に作成
-                File.Copy(registrationPath, bakFilepath, true);
+                Directory.CreateDirectory(backupDir);  // ディレクトリが存在しない場合に作成
+                File.Copy(registrationPath, backupFilepath, true);
 
                 using SQLiteConnection con = new(GetConnectionInformation());
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
