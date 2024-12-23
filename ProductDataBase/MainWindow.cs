@@ -42,7 +42,7 @@ namespace ProductDatabase {
 
         // ログ作成
         public static class Logger {
-            private static readonly string s_logDirectory = Path.Combine(s_databasePath, "db", "logs"); // ログを保存するディレクトリ
+            private static readonly string s_logDirectory = Path.Combine(s_networkPath, "db", "logs"); // ログを保存するディレクトリ
             private static readonly object s_lockObject = new();
 
             /// <summary>
@@ -79,8 +79,8 @@ namespace ProductDatabase {
         }
         // バックアップ作成
         public static class BackupManager {
-            private static readonly string s_backupDirectory = Path.Combine(s_databasePath, "db", "backup"); // バックアップを保存するディレクトリ
-            private static readonly string s_originalFilePath = Path.Combine(s_databasePath, "db", "registration.db"); // 元ファイルパス
+            private static readonly string s_backupDirectory = Path.Combine(s_networkPath, "db", "backup"); // バックアップを保存するディレクトリ
+            private static readonly string s_originalFilePath = Path.Combine(s_networkPath, "db", "registration.db"); // 元ファイルパス
             private static readonly int s_maxBackupFiles = 10; // 最大バックアップファイル数
             private static readonly object s_lockObject = new();
 
@@ -236,10 +236,6 @@ namespace ProductDatabase {
         public static string GetConnectionInformation() {
             var informationPath = Path.Combine("db", "information.db");
 
-            if (!NetworkInterface.GetIsNetworkAvailable()) {
-                throw new Exception("ネットワーク接続がありません。処理を中断します。");
-            }
-
             // ファイルが存在するか確認
             return !File.Exists(informationPath)
                 ? throw new FileNotFoundException("データベースファイルが見つかりません。", informationPath)
@@ -247,10 +243,6 @@ namespace ProductDatabase {
         }
         public static string GetConnectionRegistration() {
             var registrationPath = Path.Combine("db", "registration.db");
-
-            if (!NetworkInterface.GetIsNetworkAvailable()) {
-                throw new Exception("ネットワーク接続がありません。処理を中断します。");
-            }
 
             // ファイルが存在するか確認
             return !File.Exists(registrationPath)
@@ -264,9 +256,8 @@ namespace ProductDatabase {
 
                 // その日のbackupファイルがない場合バックアップ作成
                 var d = DateTime.Now;
-                if (string.IsNullOrEmpty(s_clonePath)) { throw new InvalidOperationException("s_clonePath is null"); }
-                var backupDir = Path.Combine(s_clonePath, "backup", $"{d.Year}", $"{d.Month:00}");
-                var backupFilepath = Path.Combine(s_clonePath, "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
+                var backupDir = Path.Combine(s_networkPath, "backup", $"{d.Year}", $"{d.Month:00}");
+                var backupFilepath = Path.Combine(s_networkPath, "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
                 var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
 
                 Directory.CreateDirectory(backupDir);  // ディレクトリが存在しない場合に作成
