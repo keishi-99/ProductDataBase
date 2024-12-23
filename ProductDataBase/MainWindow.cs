@@ -1,11 +1,41 @@
-﻿using System.Data;
+﻿using Microsoft.Extensions.Configuration;
+using System.Data;
 using System.Data.Odbc;
 using System.Data.SQLite;
 using System.Net.NetworkInformation;
-using System.Text;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
+
+        private static readonly string s_clonePath; // ClonePathを保持する静的変数
+        // 静的コンストラクタでClonePathを読み込む
+        static MainWindow() {
+            try {
+                // JSONファイルのパス
+                var jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "general", "appsettings.json");
+
+                // パスのディレクトリ部分を取得
+                var basePath = Path.GetDirectoryName(jsonFilePath);
+                if (string.IsNullOrEmpty(basePath) || !Directory.Exists(basePath)) {
+                    throw new DirectoryNotFoundException($"The directory '{basePath}' does not exist.");
+                }
+
+                // JSONファイルを読み込む
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(basePath)
+                    .AddJsonFile(Path.GetFileName(jsonFilePath), optional: false, reloadOnChange: true)
+                    .Build();
+
+                // CloneFolderPathを取得
+                s_clonePath = config["CloneFolderPath"] ?? throw new Exception("クローンフォルダが設定されてません。");
+                if (!Directory.Exists(s_clonePath)) {
+                    throw new DirectoryNotFoundException($"クローンフォルダ '{s_clonePath}' が見つかりません。");
+                }
+
+            } catch (Exception ex) {
+                MessageBox.Show($"設定の読み込み中にエラーが発生しました: {ex.Message}", "設定エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         // ログ作成
         public static class Logger {
@@ -62,6 +92,7 @@ namespace ProductDatabase {
 
                         // 元ファイルをバックアップにコピー
                         File.Copy(s_originalFilePath, backupFilePath, true);
+                        File.Copy(s_originalFilePath, s_clonePath, true);
 
                         // バックアップファイルを管理
                         ManageBackupFiles();
@@ -215,6 +246,21 @@ namespace ProductDatabase {
         // ロードイベント
         private void LoadEvents() {
             try {
+                // JSONファイルのパス
+                var jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "general", "appsettings.json");
+
+                // パスのディレクトリ部分を取得
+                var basePath = Path.GetDirectoryName(jsonFilePath);
+                if (string.IsNullOrEmpty(basePath) || !Directory.Exists(basePath)) {
+                    throw new DirectoryNotFoundException($"The directory '{basePath}' does not exist.");
+                }
+
+                // JSONファイルを読み込む
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(basePath)
+                    .AddJsonFile(Path.GetFileName(jsonFilePath), optional: false, reloadOnChange: true)
+                    .Build();
+
                 // その日のbakファイルがない場合バックアップ作成
                 var d = DateTime.Now;
                 var bakDir = Path.Combine(Environment.CurrentDirectory, "bak", $"{d.Year}", $"{d.Month:00}");
@@ -228,11 +274,10 @@ namespace ProductDatabase {
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con)) { adapter.Fill(ProductInfo.SubstrateDataTable); }
 
-                var userTextPath = Path.Combine(Environment.CurrentDirectory, "Config", "general", "user.txt");
-                var userNames = File.ReadAllLines(userTextPath, Encoding.GetEncoding("UTF-8"))
-                   .Select(line => line.Trim())
-                   .ToList();
+                // ユーザーリストを取得// JSONからデータを取得
+                var userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];
 
+                // 現在のユーザー名がリストに含まれるかチェック
                 _isAuthorizedUser = userNames.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase));
 
                 QRCodePanel.Enabled = _isAuthorizedUser;

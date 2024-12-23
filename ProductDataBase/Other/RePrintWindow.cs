@@ -205,7 +205,7 @@ namespace ProductDatabase {
                 // バックアップ作成
                 BackupManager.CreateBackup();
                 // ログ出力
-                Logger.AppendLog($";[再印刷];注文番号[{_orderNumber}];製造番号[{_productNumber}];製品名[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{_quantity}];シリアル先頭[{_strSerialFirstNumber}];シリアル末尾[{_strSerialLastNumber}];Revision[{_revision}];登録日[{_regDate}];担当者[{_person}];");
+                Logger.AppendLog($";[再印刷];注文番号[{_orderNumber}];製造番号[{_productNumber}];製品名[{ProductInfo.ProductName}];タイプ[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{_quantity}];シリアル先頭[{_strSerialFirstNumber}];シリアル末尾[{_strSerialLastNumber}];Revision[{_revision}];登録日[{_regDate}];担当者[{_person}];");
 
                 return true;
             } catch (Exception ex) {
