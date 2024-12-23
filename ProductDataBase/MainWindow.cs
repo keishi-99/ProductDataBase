@@ -2,12 +2,11 @@
 using System.Data;
 using System.Data.Odbc;
 using System.Data.SQLite;
-using System.Net.NetworkInformation;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
 
-        private static readonly string? s_clonePath; // ClonePathを保持する静的変数
+        private static readonly string s_networkPath = string.Empty; // ClonePathを保持する静的変数
         private static readonly string[]? s_userNames = []; // ClonePathを保持する静的変数
         // 静的コンストラクタでClonePathを読み込む
         static MainWindow() {
@@ -28,9 +27,10 @@ namespace ProductDatabase {
                     .Build();
 
                 // CloneFolderPathを取得
-                s_clonePath = config["CloneFolderPath"] ?? throw new Exception("クローンフォルダが設定されてません。");
-                if (!Directory.Exists(s_clonePath)) {
-                    throw new DirectoryNotFoundException($"クローンフォルダ '{s_clonePath}' が見つかりません。");
+                s_networkPath = config["CloneFolderPath"] ?? throw new Exception("フォルダが設定されてません。");
+                if (string.IsNullOrEmpty(s_networkPath)) { throw new Exception("フォルダが設定されてません。"); }
+                if (!Directory.Exists(s_networkPath)) {
+                    throw new DirectoryNotFoundException($"フォルダ '{s_networkPath}' が見つかりません。");
                 }
 
                 s_userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];
@@ -65,8 +65,8 @@ namespace ProductDatabase {
                         //// ログ内容をファイルの末尾に追記
                         File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
 
-                        if (!string.IsNullOrEmpty(s_clonePath)) {
-                            var cloneFilePath = Path.Combine(s_clonePath, "logs", logFileName);
+                        if (!string.IsNullOrEmpty(s_networkPath)) {
+                            var cloneFilePath = Path.Combine(s_networkPath, "db", "logs", logFileName);
                             if (cloneFilePath != logFilePath) {
                                 File.Copy(logFilePath, cloneFilePath, true);
                             }
@@ -102,9 +102,9 @@ namespace ProductDatabase {
 
                         // 元ファイルをバックアップにコピー
                         File.Copy(s_originalFilePath, backupFilePath, true);
-                        if (!string.IsNullOrEmpty(s_clonePath)) {
-                            var cloneFilePath = Path.Combine(s_clonePath, "registration.db");
-                            if (Path.Combine(Environment.CurrentDirectory, "db") != s_clonePath) {
+                        if (!string.IsNullOrEmpty(s_networkPath)) {
+                            var cloneFilePath = Path.Combine(s_networkPath, "db", "registration.db");
+                            if (Path.Combine(Environment.CurrentDirectory, "db") != s_networkPath) {
                                 File.Copy(s_originalFilePath, cloneFilePath, true);
                             }
                         }
@@ -236,10 +236,6 @@ namespace ProductDatabase {
         public static string GetConnectionInformation() {
             var informationPath = Path.Combine("db", "information.db");
 
-            if (!NetworkInterface.GetIsNetworkAvailable()) {
-                throw new Exception("ネットワーク接続がありません。処理を中断します。");
-            }
-
             // ファイルが存在するか確認
             return !File.Exists(informationPath)
                 ? throw new FileNotFoundException("データベースファイルが見つかりません。", informationPath)
@@ -247,10 +243,6 @@ namespace ProductDatabase {
         }
         public static string GetConnectionRegistration() {
             var registrationPath = Path.Combine("db", "registration.db");
-
-            if (!NetworkInterface.GetIsNetworkAvailable()) {
-                throw new Exception("ネットワーク接続がありません。処理を中断します。");
-            }
 
             // ファイルが存在するか確認
             return !File.Exists(registrationPath)
@@ -264,9 +256,8 @@ namespace ProductDatabase {
 
                 // その日のbackupファイルがない場合バックアップ作成
                 var d = DateTime.Now;
-                if (string.IsNullOrEmpty(s_clonePath)) { throw new InvalidOperationException("s_clonePath is null"); }
-                var backupDir = Path.Combine(s_clonePath, "backup", $"{d.Year}", $"{d.Month:00}");
-                var backupFilepath = Path.Combine(s_clonePath, "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
+                var backupDir = Path.Combine(s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}");
+                var backupFilepath = Path.Combine(s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
                 var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
 
                 Directory.CreateDirectory(backupDir);  // ディレクトリが存在しない場合に作成
