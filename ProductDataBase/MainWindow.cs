@@ -2,12 +2,11 @@
 using System.Data;
 using System.Data.Odbc;
 using System.Data.SQLite;
-using System.Net.NetworkInformation;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
 
-        private static readonly string? s_clonePath; // ClonePathを保持する静的変数
+        private static readonly string s_databasePath = string.Empty; // ClonePathを保持する静的変数
         private static readonly string[]? s_userNames = []; // ClonePathを保持する静的変数
         // 静的コンストラクタでClonePathを読み込む
         static MainWindow() {
@@ -28,9 +27,10 @@ namespace ProductDatabase {
                     .Build();
 
                 // CloneFolderPathを取得
-                s_clonePath = config["CloneFolderPath"] ?? throw new Exception("クローンフォルダが設定されてません。");
-                if (!Directory.Exists(s_clonePath)) {
-                    throw new DirectoryNotFoundException($"クローンフォルダ '{s_clonePath}' が見つかりません。");
+                s_databasePath = config["CloneFolderPath"] ?? throw new Exception("データベースフォルダが設定されてません。");
+                if (string.IsNullOrEmpty(s_databasePath)) { throw new Exception("データベースフォルダが設定されてません。"); }
+                if (!Directory.Exists(s_databasePath)) {
+                    throw new DirectoryNotFoundException($"データベースフォルダ '{s_databasePath}' が見つかりません。");
                 }
 
                 s_userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];
@@ -42,7 +42,7 @@ namespace ProductDatabase {
 
         // ログ作成
         public static class Logger {
-            private static readonly string s_logDirectory = Path.Combine(Environment.CurrentDirectory, "db", "logs"); // ログを保存するディレクトリ
+            private static readonly string s_logDirectory = Path.Combine(s_databasePath, "db", "logs"); // ログを保存するディレクトリ
             private static readonly object s_lockObject = new();
 
             /// <summary>
@@ -65,12 +65,6 @@ namespace ProductDatabase {
                         //// ログ内容をファイルの末尾に追記
                         File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
 
-                        if (!string.IsNullOrEmpty(s_clonePath)) {
-                            var cloneFilePath = Path.Combine(s_clonePath, "logs", logFileName);
-                            if (cloneFilePath != logFilePath) {
-                                File.Copy(logFilePath, cloneFilePath, true);
-                            }
-                        }
                     }
                 } catch (Exception ex) {
                     MessageBox.Show($"ログの書き込み中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -79,8 +73,8 @@ namespace ProductDatabase {
         }
         // バックアップ作成
         public static class BackupManager {
-            private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup"); // バックアップを保存するディレクトリ
-            private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db"); // 元ファイルパス
+            private static readonly string s_backupDirectory = Path.Combine(s_databasePath, "db", "backup"); // バックアップを保存するディレクトリ
+            private static readonly string s_originalFilePath = Path.Combine(s_databasePath, "db", "registration.db"); // 元ファイルパス
             private static readonly int s_maxBackupFiles = 10; // 最大バックアップファイル数
             private static readonly object s_lockObject = new();
 
@@ -102,12 +96,6 @@ namespace ProductDatabase {
 
                         // 元ファイルをバックアップにコピー
                         File.Copy(s_originalFilePath, backupFilePath, true);
-                        if (!string.IsNullOrEmpty(s_clonePath)) {
-                            var cloneFilePath = Path.Combine(s_clonePath, "registration.db");
-                            if (Path.Combine(Environment.CurrentDirectory, "db") != s_clonePath) {
-                                File.Copy(s_originalFilePath, cloneFilePath, true);
-                            }
-                        }
 
                         // バックアップファイルを管理
                         ManageBackupFiles();
@@ -234,11 +222,7 @@ namespace ProductDatabase {
         }
 
         public static string GetConnectionInformation() {
-            var informationPath = Path.Combine("db", "information.db");
-
-            if (!NetworkInterface.GetIsNetworkAvailable()) {
-                throw new Exception("ネットワーク接続がありません。処理を中断します。");
-            }
+            var informationPath = Path.Combine(s_databasePath, "db", "information.db");
 
             // ファイルが存在するか確認
             return !File.Exists(informationPath)
@@ -246,11 +230,7 @@ namespace ProductDatabase {
                 : new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
         }
         public static string GetConnectionRegistration() {
-            var registrationPath = Path.Combine("db", "registration.db");
-
-            if (!NetworkInterface.GetIsNetworkAvailable()) {
-                throw new Exception("ネットワーク接続がありません。処理を中断します。");
-            }
+            var registrationPath = Path.Combine(s_databasePath, "db", "registration.db");
 
             // ファイルが存在するか確認
             return !File.Exists(registrationPath)
@@ -264,10 +244,10 @@ namespace ProductDatabase {
 
                 // その日のbackupファイルがない場合バックアップ作成
                 var d = DateTime.Now;
-                if (string.IsNullOrEmpty(s_clonePath)) { throw new InvalidOperationException("s_clonePath is null"); }
-                var backupDir = Path.Combine(s_clonePath, "backup", $"{d.Year}", $"{d.Month:00}");
-                var backupFilepath = Path.Combine(s_clonePath, "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
-                var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
+                if (string.IsNullOrEmpty(s_databasePath)) { throw new InvalidOperationException("s_clonePath is null"); }
+                var backupDir = Path.Combine(s_databasePath, "backup", $"{d.Year}", $"{d.Month:00}");
+                var backupFilepath = Path.Combine(s_databasePath, "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
+                var registrationPath = Path.Combine(s_databasePath, "db", "registration.db");
 
                 Directory.CreateDirectory(backupDir);  // ディレクトリが存在しない場合に作成
                 File.Copy(registrationPath, backupFilepath, true);
