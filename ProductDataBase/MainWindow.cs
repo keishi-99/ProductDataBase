@@ -7,36 +7,6 @@ using System.Net.NetworkInformation;
 namespace ProductDatabase {
     public partial class MainWindow : Form {
 
-        private static readonly string? s_clonePath; // ClonePathを保持する静的変数
-        // 静的コンストラクタでClonePathを読み込む
-        static MainWindow() {
-            try {
-                // JSONファイルのパス
-                var jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "general", "appsettings.json");
-
-                // パスのディレクトリ部分を取得
-                var basePath = Path.GetDirectoryName(jsonFilePath);
-                if (string.IsNullOrEmpty(basePath) || !Directory.Exists(basePath)) {
-                    throw new DirectoryNotFoundException($"The directory '{basePath}' does not exist.");
-                }
-
-                // JSONファイルを読み込む
-                var config = new ConfigurationBuilder()
-                    .SetBasePath(basePath)
-                    .AddJsonFile(Path.GetFileName(jsonFilePath), optional: false, reloadOnChange: true)
-                    .Build();
-
-                // CloneFolderPathを取得
-                s_clonePath = config["CloneFolderPath"] ?? throw new Exception("クローンフォルダが設定されてません。");
-                if (!Directory.Exists(s_clonePath)) {
-                    throw new DirectoryNotFoundException($"クローンフォルダ '{s_clonePath}' が見つかりません。");
-                }
-
-            } catch (Exception ex) {
-                MessageBox.Show($"設定の読み込み中にエラーが発生しました: {ex.Message}", "設定エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
         // ログ作成
         public static class Logger {
             private static readonly string s_logDirectory = Path.Combine(Environment.CurrentDirectory, "logs"); // ログを保存するディレクトリ
@@ -92,10 +62,6 @@ namespace ProductDatabase {
 
                         // 元ファイルをバックアップにコピー
                         File.Copy(s_originalFilePath, backupFilePath, true);
-                        if (!string.IsNullOrEmpty(s_clonePath)) {
-                            var cloneFilePath = Path.Combine(s_clonePath, "registration.db");
-                            File.Copy(s_originalFilePath, cloneFilePath, true);
-                        }
 
                         // バックアップファイルを管理
                         ManageBackupFiles();
