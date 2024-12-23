@@ -93,7 +93,8 @@ namespace ProductDatabase {
                         // 元ファイルをバックアップにコピー
                         File.Copy(s_originalFilePath, backupFilePath, true);
                         if (!string.IsNullOrEmpty(s_clonePath)) {
-                            File.Copy(s_originalFilePath, s_clonePath, true);
+                            var cloneFilePath = Path.Combine(s_clonePath, "registration.db");
+                            File.Copy(s_originalFilePath, cloneFilePath, true);
                         }
 
                         // バックアップファイルを管理
