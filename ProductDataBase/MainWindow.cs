@@ -103,7 +103,7 @@ namespace ProductDatabase {
 
                         // 元ファイルをバックアップにコピー
                         File.Copy(s_originalFilePath, backupFilePath, true);
-                        var networkFilePath = Path.Combine(s_networkPath, "db", "registration.db");
+                        var networkFilePath = Path.Combine(s_networkPath, "db", "backup", $"registration_{timestamp}.db");
                         if (Environment.CurrentDirectory != s_networkPath) {
                             File.Copy(s_originalFilePath, networkFilePath, true);
                         }
