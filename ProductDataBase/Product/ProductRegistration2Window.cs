@@ -1264,6 +1264,21 @@ namespace ProductDatabase {
                 case "Substrate10CheckBox":
                     dataGridView = Substrate10DataGridView;
                     break;
+                case "Substrate11CheckBox":
+                    dataGridView = Substrate11DataGridView;
+                    break;
+                case "Substrate12CheckBox":
+                    dataGridView = Substrate12DataGridView;
+                    break;
+                case "Substrate13CheckBox":
+                    dataGridView = Substrate13DataGridView;
+                    break;
+                case "Substrate14CheckBox":
+                    dataGridView = Substrate14DataGridView;
+                    break;
+                case "Substrate15CheckBox":
+                    dataGridView = Substrate15DataGridView;
+                    break;
                 default:
                     break;
             }

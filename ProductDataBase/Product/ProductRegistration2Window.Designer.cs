@@ -1078,6 +1078,7 @@
             this.Substrate15CheckBox.TabIndex = 37;
             this.Substrate15CheckBox.Text = "-";
             this.Substrate15CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate15CheckBox.CheckedChanged += this.SubstrateCheckBox_CheckedChanged;
             // 
             // Substrate14DataGridView
             // 
@@ -1143,6 +1144,7 @@
             this.Substrate14CheckBox.TabIndex = 35;
             this.Substrate14CheckBox.Text = "-";
             this.Substrate14CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate14CheckBox.CheckedChanged += this.SubstrateCheckBox_CheckedChanged;
             // 
             // Substrate13DataGridView
             // 
@@ -1208,6 +1210,7 @@
             this.Substrate13CheckBox.TabIndex = 33;
             this.Substrate13CheckBox.Text = "-";
             this.Substrate13CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate13CheckBox.CheckedChanged += this.SubstrateCheckBox_CheckedChanged;
             // 
             // Substrate12DataGridView
             // 
@@ -1273,6 +1276,7 @@
             this.Substrate12CheckBox.TabIndex = 31;
             this.Substrate12CheckBox.Text = "-";
             this.Substrate12CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate12CheckBox.CheckedChanged += this.SubstrateCheckBox_CheckedChanged;
             // 
             // Substrate11DataGridView
             // 
@@ -1338,6 +1342,7 @@
             this.Substrate11CheckBox.TabIndex = 29;
             this.Substrate11CheckBox.Text = "-";
             this.Substrate11CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate11CheckBox.CheckedChanged += this.SubstrateCheckBox_CheckedChanged;
             // 
             // GenerationReportButton
             // 
