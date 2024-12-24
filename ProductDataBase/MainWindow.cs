@@ -234,29 +234,31 @@ namespace ProductDatabase {
 
         public static string GetConnectionInformation() {
             //var informationPath = Path.Combine(s_networkPath, "db", "information.db");
-            //if (!File.Exists(informationPath)) { throw new FileNotFoundException("データベースファイルが見つかりません。", informationPath); }
-            //var u = new Uri(informationPath);
-            //if (u.IsUnc) {
-            //    // UNCパス
-            //    informationPath = @"\" + informationPath;
-            //}
             var informationPath = Path.Combine(Environment.CurrentDirectory, "db", "information.db");
-            return !File.Exists(informationPath)
-                ? throw new FileNotFoundException("データベースファイルが見つかりません。", informationPath)
-                : new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
+            if (!File.Exists(informationPath)) { throw new FileNotFoundException("1データベースファイルが見つかりません。", informationPath); }
+            var u = new Uri(informationPath);
+            if (u.IsUnc) {
+                // UNCパス
+                informationPath = @"\" + informationPath;
+            }
+            return new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
+            //return !File.Exists(informationPath)
+            //    ? throw new FileNotFoundException("2データベースファイルが見つかりません。", informationPath)
+            //    : new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
         }
         public static string GetConnectionRegistration() {
             //var registrationPath = Path.Combine(s_networkPath, "db", "registration.db");
-            //if (!File.Exists(registrationPath)) { throw new FileNotFoundException("データベースファイルが見つかりません。", registrationPath); }
-            //var u = new Uri(registrationPath);
-            //if (u.IsUnc) {
-            //    // UNCパス
-            //    registrationPath = @"\" + registrationPath;
-            //}
             var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
-            return !File.Exists(registrationPath)
-                ? throw new FileNotFoundException("データベースファイルが見つかりません。", registrationPath)
-                : new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
+            if (!File.Exists(registrationPath)) { throw new FileNotFoundException("1データベースファイルが見つかりません。", registrationPath); }
+            var u = new Uri(registrationPath);
+            if (u.IsUnc) {
+                // UNCパス
+                registrationPath = @"\" + registrationPath;
+            }
+            return new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
+            //return !File.Exists(registrationPath)
+            //    ? throw new FileNotFoundException("2データベースファイルが見つかりません。", registrationPath)
+            //    : new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
         }
 
         // ロードイベント
