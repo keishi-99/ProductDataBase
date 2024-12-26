@@ -349,8 +349,8 @@ namespace ProductDatabase {
                     throw new Exception("登録失敗しました。");
                 }
 
-                HandleLabelPrinting();
-                HandleBarcodePrinting();
+                //HandleLabelPrinting();
+                //HandleBarcodePrinting();
 
                 MessageBox.Show("登録完了");
 
@@ -409,6 +409,7 @@ namespace ProductDatabase {
                 case 0:
                     using (SQLiteConnection con = new(GetConnectionRegistration())) {
                         con.Open();
+                        using var transaction = con.BeginTransaction();
 
                         using var cmd = con.CreateCommand();
                         cmd.CommandText =
@@ -453,12 +454,28 @@ namespace ProductDatabase {
                         cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                         cmd.ExecuteNonQuery();
+
+                        try {
+                            // ラベル印刷処理
+                            HandleLabelPrinting();
+
+                            // バーコード印刷処理
+                            HandleBarcodePrinting();
+
+                            // 印刷が成功した場合、トランザクションをコミット
+                            transaction.Commit();
+                        } catch (Exception) {
+                            // 印刷に失敗した場合、トランザクションをロールバック
+                            transaction.Rollback();
+                            throw; // 例外を再度スローして上位で処理できるようにする
+                        }
                     }
                     break;
 
                 case 1:
                     using (SQLiteConnection con = new(GetConnectionRegistration())) {
                         con.Open();
+                        using var transaction = con.BeginTransaction();
 
                         using var cmd = con.CreateCommand();
                         cmd.CommandText =
@@ -512,6 +529,21 @@ namespace ProductDatabase {
                         cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                         cmd.ExecuteNonQuery();
+
+                        try {
+                            // ラベル印刷処理
+                            HandleLabelPrinting();
+
+                            // バーコード印刷処理
+                            HandleBarcodePrinting();
+
+                            // 印刷が成功した場合、トランザクションをコミット
+                            transaction.Commit();
+                        } catch (Exception) {
+                            // 印刷に失敗した場合、トランザクションをロールバック
+                            transaction.Rollback();
+                            throw; // 例外を再度スローして上位で処理できるようにする
+                        }
                     }
                     break;
 
@@ -701,7 +733,22 @@ namespace ProductDatabase {
                         // 一時テーブルの内容を削除
                         using var command = new SQLiteCommand("DELETE FROM TempSubstrateReduction", con, transaction);
                         command.ExecuteNonQuery();
-                        transaction.Commit();
+                        //transaction.Commit();
+
+                        try {
+                            // ラベル印刷処理
+                            HandleLabelPrinting();
+
+                            // バーコード印刷処理
+                            HandleBarcodePrinting();
+
+                            // 印刷が成功した場合、トランザクションをコミット
+                            transaction.Commit();
+                        } catch (Exception) {
+                            // 印刷に失敗した場合、トランザクションをロールバック
+                            transaction.Rollback();
+                            throw; // 例外を再度スローして上位で処理できるようにする
+                        }
                     }
                     break;
             }
