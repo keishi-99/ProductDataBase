@@ -1,7 +1,14 @@
 ﻿using ClosedXML.Excel;
 using System.Data;
 using System.Data.SQLite;
+using System.Drawing.Imaging;
+using System.Text.RegularExpressions;
+using ZXing;
+using ZXing.QrCode;
+using ZXing.QrCode.Internal;
+using ZXing.Rendering;
 using static ProductDatabase.MainWindow;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ProductDatabase {
     public partial class HistoryWindow : Form {
@@ -44,6 +51,7 @@ namespace ProductDatabase {
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
                         GenerationReportButton.Visible = false;
+                        GenerationListButton.Visible = false;
                         break;
                     case 2:
                         CategoryRadioButton2.Text = "シリアル";
@@ -56,6 +64,7 @@ namespace ProductDatabase {
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
                         GenerationReportButton.Visible = false;
+                        GenerationListButton.Visible = false;
                         break;
                 }
             } catch (Exception ex) {
@@ -114,6 +123,7 @@ namespace ProductDatabase {
         private void ViewProductRegistrationLog() {
 
             GenerationReportButton.Visible = true;
+            GenerationListButton.Visible = true;
 
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new DataTable();
@@ -254,6 +264,7 @@ namespace ProductDatabase {
         private void ViewSerialLog() {
 
             GenerationReportButton.Visible = false;
+            GenerationListButton.Visible = false;
 
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new DataTable();
@@ -421,9 +432,181 @@ namespace ProductDatabase {
                 return gridView.Rows[rowIndex].Cells[colIndex].Value?.ToString() ?? string.Empty;
             }
         }
+        // リスト印刷
+        private void GenerationList() {
+            try {
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigList.xlsx");
+                using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using XLWorkbook workBook = new(fileStream);
+                var workSheetMain = workBook.Worksheet("Sheet1");
+
+                // セル検索
+                var productModelCell = workSheetMain.Search(ProductInfo.ProductModel).FirstOrDefault() ?? throw new Exception($"Configに品目番号:[{ProductInfo.ProductModel}]が見つかりません。");
+                var findRow = productModelCell.Address.RowNumber;
+
+                // ワークシートのセルから値を取得
+                var sheetName = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 2, null);
+                var productName = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 3, null);
+                var productNameRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 4, null);
+                var productNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 5, null);
+                var orderNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 6, null);
+                var regDateRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 7, null);
+                var productModel = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 8, null);
+                var productModelRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 9, null);
+                var quantityRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 10, null);
+                var serialFirstRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 11, null);
+                var serialLastRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 12, null);
+                var commentRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 13, null);
+                var qrCodeRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 14, null);
+
+                var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
+                ProductInfo.ProductID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells[0].Value);
+                ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells[1].Value.ToString() ?? string.Empty;
+                ProductInfo.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells[2].Value.ToString() ?? string.Empty;
+                ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells[4].Value.ToString() ?? string.Empty;
+                ProductInfo.Quantity = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells[5].Value);
+                ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells[10].Value.ToString() ?? string.Empty;
+                ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells[11].Value.ToString() ?? string.Empty;
+                ProductInfo.Comment = DataBaseDataGridView.Rows[selectRow].Cells[13].Value.ToString() ?? string.Empty;
+                ProductInfo.UsedSubstrate = DataBaseDataGridView.Rows[selectRow].Cells[14].Value.ToString() ?? string.Empty;
+
+                var workSheetTemp = workBook.Worksheet(sheetName);
+                workSheetTemp.Cell(productNameRange).Value = productName;
+                workSheetTemp.Cell(productNumberRange).Value = ProductInfo.ProductNumber;
+                workSheetTemp.Cell(orderNumberRange).Value = ProductInfo.OrderNumber;
+                workSheetTemp.Cell(regDateRange).Value = ProductInfo.RegDate;
+                workSheetTemp.Cell(productModelRange).Value = ProductInfo.ProductModel;
+                workSheetTemp.Cell(quantityRange).Value = ProductInfo.Quantity;
+                workSheetTemp.Cell(serialFirstRange).Value = ProductInfo.SerialFirst;
+                workSheetTemp.Cell(serialLastRange).Value = ProductInfo.SerialLast;
+                workSheetTemp.Cell(commentRange).Value = ProductInfo.Comment;
+
+                //string[] usedSubstrate =  ProductInfo.UsedSubstrate.Split(",");
+
+                var input = ProductInfo.UsedSubstrate;
+
+                // 正規表現で分割
+                var matches = Regex.Matches(input, @"\[([^\]]+)\]([^,\r\n]+(?:,[^,\r\n]+)*)");
+
+                List<string> array1 = [];
+                List<string> array2 = [];
+
+                foreach (Match match in matches) {
+                    var bracketContent = match.Groups[1].Value; // 角括弧の中身
+                    var commaSeparatedValues = match.Groups[2].Value; // カンマ区切りの文字列
+
+                    var values = commaSeparatedValues.Split(',');
+                    array2.AddRange(values);
+
+                    // valuesの数だけbracketContentを繰り返して追加
+                    array1.AddRange(Enumerable.Repeat(bracketContent, values.Length));
+                }
+
+                var findColumn = 0;
+                for (var i = 0; i <= array1.Count - 1; i++) {
+
+                    var searchRange = workSheetMain.Range(findRow, 1, findRow, 44);
+                    var searchValue = $"{array1[i]}";
+                    var foundCell = searchRange.CellsUsed(c => c.Value.ToString() == searchValue).FirstOrDefault();
+
+                    if (foundCell != null) {
+                        // セルが見つかった場合の処理
+                        var foundRow = foundCell.Address.RowNumber;
+                        var foundColumn = foundCell.Address.ColumnNumber;
+                    }
+
+                    foreach (var cell in workSheetMain.Search(array1[i])) {
+                        if (cell.Address.RowNumber == findRow) {
+                            findColumn = cell.Address.ColumnNumber;
+                            break;
+                        }
+                    }
+
+                    if (findColumn == 0) {
+                        throw new Exception($"{array1[i]}が見つかりません。");
+                    }
+
+                    var mainCellValue = workSheetMain.Cell(findRow, findColumn + 1).Value.ToString();
+                    var tempCellValue = workSheetTemp.Cell(mainCellValue).Value.ToString();
+
+                    if (mainCellValue != string.Empty) {
+                        if (tempCellValue == string.Empty) {
+                            workSheetTemp.Cell(mainCellValue).Value = $"{array2[i]}";
+                        }
+                        else {
+                            workSheetTemp.Cell(mainCellValue).Value += $"    {array2[i]}";
+                        }
+                    }
+                }
+
+                // QRコード
+                if (!string.IsNullOrEmpty(qrCodeRange)) {
+                    BarcodeWriter<PixelData> qr = new() {
+                        Format = BarcodeFormat.QR_CODE,
+                        Options = new QrCodeEncodingOptions {
+                            ErrorCorrection = ErrorCorrectionLevel.L,
+                            CharacterSet = "Shift_JIS",
+                            Width = 100,
+                            Height = 100,
+                        },
+                        Renderer = new PixelDataRenderer {
+                            Foreground = new(Color.Gray.ToArgb()),
+                            Background = new(Color.White.ToArgb()),
+                        },
+                    };
+
+                    var pixelData = qr.Write($"{ProductInfo.OrderNumber};{ProductInfo.ProductNumber};{productModel};{ProductInfo.Quantity};{ProductInfo.SerialFirst};{ProductInfo.SerialLast}");
+
+                    // PixelData を Bitmap に変換
+                    using var bitmap = new Bitmap(pixelData.Width, pixelData.Height, PixelFormat.Format32bppArgb);
+                    var bmpData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bmpData.Scan0, pixelData.Pixels.Length);
+                    bitmap.UnlockBits(bmpData);
+                    using MemoryStream stream = new();
+                    bitmap.Save(stream, ImageFormat.Bmp);
+
+                    var image = workSheetTemp.AddPicture(stream);
+                    image.MoveTo(workSheetTemp.Cell(qrCodeRange));
+                }
+
+                //引数に保存先パスを指定
+                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "temporarily.xlsx");
+                workBook.SaveAs(temporarilyPath);
+
+                // 印刷
+                Excel.Application xlApp = new() {
+                    Visible = true // Excelウィンドウを表示します。
+                };
+
+                // ワークブック開く
+                var xlBooks = xlApp.Workbooks;
+                var xlBook = xlBooks.Open(temporarilyPath);
+
+                // ワークシート選択
+                var xlSheets = xlBook.Sheets;
+                Excel.Worksheet xlSheet = xlSheets[sheetName];
+
+                // ワークシート表示
+                xlSheet.Activate();
+
+                // ワークブックを閉じてExcelを終了
+                //xlBook.Close(false);
+                //xlApp.Quit();
+
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
+
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         private void HistoryWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void GenerationReportButton_Click(object sender, EventArgs e) { GenerationReport(); }
+        private void GenerationListButton_Click(object sender, EventArgs e) { GenerationList(); }
         private void FilterStringTextBox_TextChanged(object sender, EventArgs e) { HistoryTableFilter(sender, e); }
         private void CategoryRadioButton_CheckedChanged(object sender, EventArgs e) { CategorySelect(sender); }
         private void StockCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }

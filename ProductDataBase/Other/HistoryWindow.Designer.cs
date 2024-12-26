@@ -31,6 +31,7 @@
             this.StockCheckBox = new CheckBox();
             this.AllSubstrateCheckBox = new CheckBox();
             this.GenerationReportButton = new Button();
+            this.GenerationListButton = new Button();
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).BeginInit();
             this.SuspendLayout();
             // 
@@ -127,11 +128,23 @@
             this.GenerationReportButton.UseVisualStyleBackColor = true;
             this.GenerationReportButton.Click += this.GenerationReportButton_Click;
             // 
+            // GenerationListButton
+            // 
+            this.GenerationListButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            this.GenerationListButton.Location = new Point(982, 474);
+            this.GenerationListButton.Name = "GenerationListButton";
+            this.GenerationListButton.Size = new Size(92, 25);
+            this.GenerationListButton.TabIndex = 8;
+            this.GenerationListButton.Text = "リスト作成";
+            this.GenerationListButton.UseVisualStyleBackColor = true;
+            this.GenerationListButton.Click += this.GenerationListButton_Click;
+            // 
             // HistoryWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(1184, 511);
+            this.Controls.Add(this.GenerationListButton);
             this.Controls.Add(this.GenerationReportButton);
             this.Controls.Add(this.AllSubstrateCheckBox);
             this.Controls.Add(this.StockCheckBox);
@@ -163,5 +176,6 @@
         private CheckBox StockCheckBox;
         private CheckBox AllSubstrateCheckBox;
         private Button GenerationReportButton;
+        private Button GenerationListButton;
     }
 }
