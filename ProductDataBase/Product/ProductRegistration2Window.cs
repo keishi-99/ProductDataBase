@@ -29,6 +29,7 @@ namespace ProductDatabase {
 
         private string[] _useSubstrate = [];
 
+        private int _remainingCount = 0;
         private int _labelProNSerial;
         private int _labelProNumLabelsToPrint;
 
@@ -1010,6 +1011,7 @@ namespace ProductDatabase {
                             form.WindowState = FormWindowState.Maximized;
                         }
                     };
+                    ProductRegistration2PrintPreviewDialog.PrintPreviewControl.Zoom = 3;
                     ProductRegistration2PrintPreviewDialog.Document = pd;
                     ProductRegistration2PrintPreviewDialog.ShowDialog();
                     break;
@@ -1022,7 +1024,6 @@ namespace ProductDatabase {
             var headerFooterFont = new Font("ＭＳ Ｐ明朝", 5.25F);
             Point offset;
             var serialCodePrintCopies = 0;
-            var remainingCount = 0;
 
             var maxX = 0;
             var maxY = 0;
@@ -1099,7 +1100,7 @@ namespace ProductDatabase {
                 e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
 
                 if (_pageCnt == 1) {
-                    remainingCount = serialCodePrintCopies;
+                    _remainingCount = serialCodePrintCopies;
                     _labelProNSerial = ProductInfo.SerialFirstNumber;
                 }
                 if (_pageCnt >= 2) { startLine = 0; }
@@ -1110,11 +1111,11 @@ namespace ProductDatabase {
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
 
                         // タイプ4で残り1の場合、最後のラベルに下線をつける
-                        var fontUnderline = IsUnderlinePrint && remainingCount == 1;
+                        var fontUnderline = IsUnderlinePrint && _remainingCount == 1;
 
                         // シリアル生成、PrintTypeが9かつ最終行の場合は型式下4桁、それ以外はシリアルを生成
                         string generatedCode;
-                        if (ProductInfo.PrintType != 9 || remainingCount != 1) {
+                        if (ProductInfo.PrintType != 9 || _remainingCount != 1) {
                             generatedCode = GenerateCode(_labelProNSerial); // シリアルコードを生成
                         }
                         else {
@@ -1124,8 +1125,8 @@ namespace ProductDatabase {
                         using var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)sizeX, (float)sizeY);
 
-                        remainingCount--;
-                        if (remainingCount == 0) {
+                        _remainingCount--;
+                        if (_remainingCount == 0) {
                             _labelProNSerial++;
                             _labelProNumLabelsToPrint--;
                             //印刷するラベルがなくなった場合の処理
@@ -1135,7 +1136,7 @@ namespace ProductDatabase {
                                 _labelProNumLabelsToPrint = 0;
                                 return;
                             }
-                            remainingCount = serialCodePrintCopies;
+                            _remainingCount = serialCodePrintCopies;
                         }
                     }
                 }

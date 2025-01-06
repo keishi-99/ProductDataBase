@@ -317,6 +317,7 @@ namespace ProductDatabase {
                         }
                         break;
                     case 2:
+                        SubstrateRegistrationPrintPreviewDialog.PrintPreviewControl.Zoom = 3;
                         SubstrateRegistrationPrintPreviewDialog.Document = pd;
                         SubstrateRegistrationPrintPreviewDialog.ShowDialog();
                         break;
