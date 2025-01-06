@@ -105,6 +105,7 @@ namespace ProductDatabase {
                             }
                         default: {
                                 // 他の場合は単純に最後のシリアル番号を取得して +1
+                                if (ProductInfo.RegType == 0) { return; }
                                 FirstSerialNumberTextBox.Text = (GetLastSerialNumber(cmd, ProductInfo.ProductName) + 1).ToString();
                                 break;
                             }
