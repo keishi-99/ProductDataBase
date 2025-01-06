@@ -264,15 +264,16 @@ namespace ProductDatabase {
         // ロードイベント
         private void LoadEvents() {
             try {
-
                 // その日のbackupファイルがない場合バックアップ作成
                 var d = DateTime.Now;
                 var backupDir = Path.Combine(s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}");
                 var backupFilepath = Path.Combine(s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
                 var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
 
-                Directory.CreateDirectory(backupDir);  // ディレクトリが存在しない場合に作成
-                File.Copy(registrationPath, backupFilepath, true);
+                if (!File.Exists(backupFilepath)) {
+                    Directory.CreateDirectory(backupDir);  // ディレクトリが存在しない場合に作成
+                    File.Copy(registrationPath, backupFilepath, false);
+                }
 
                 using SQLiteConnection con = new(GetConnectionInformation());
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
