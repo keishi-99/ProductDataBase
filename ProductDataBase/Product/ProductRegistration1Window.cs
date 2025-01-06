@@ -164,7 +164,7 @@ namespace ProductDatabase {
                 ProductInfo.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
                 ProductInfo.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
                 ProductInfo.Quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception("QuantityTextBox.Text is null"));
-                ProductInfo.SerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception("FirstSerialNumberTextBox.Text is null"));
+                if (ProductInfo.RegType != 0) { ProductInfo.SerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception("FirstSerialNumberTextBox.Text is null")); }
                 using ProductRegistration2Window window = new();
                 window.ProductInfo = ProductInfo;
                 window.Closed += (s, e) => this.Close();
