@@ -323,6 +323,7 @@ namespace ProductDatabase {
                                 form.WindowState = FormWindowState.Maximized;
                             }
                         };
+                        RePrintPrintPreviewDialog.PrintPreviewControl.Zoom = 3;
                         RePrintPrintPreviewDialog.Document = pd;
                         RePrintPrintPreviewDialog.ShowDialog();
                         break;
