@@ -7,7 +7,7 @@ namespace ProductDatabase {
     public partial class MainWindow : Form {
 
         private static readonly string s_networkPath = string.Empty; // ClonePathを保持する静的変数
-        private static readonly string[]? s_userNames = []; // ClonePathを保持する静的変数
+        private static readonly string[]? s_userNames = []; // ユーザーを保持する静的変数
         // 静的コンストラクタでClonePathを読み込む
         static MainWindow() {
             try {
