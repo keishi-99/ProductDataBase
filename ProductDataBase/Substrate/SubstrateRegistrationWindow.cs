@@ -370,13 +370,12 @@ namespace ProductDatabase {
                     startLine = 0;
                 }
 
+                var maxX = SettingsLabelSub.LabelSubPageSettings.NumLabelsX;
                 var maxY = SettingsLabelSub.LabelSubPageSettings.NumLabelsY;
                 int y;
                 var serialCodePrintCopies = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
+                if (maxX == 0 || maxY == 0 || serialCodePrintCopies == 0) { throw new Exception("印刷設定が異常です。"); }
                 for (y = startLine; y < maxY; y++) {
-
-                    var maxX = SettingsLabelSub.LabelSubPageSettings.NumLabelsX;
-
                     int x;
                     for (x = 0; x < maxX; x++) {
                         var posX = (float)(offsetX + (x * (intervalX + sizeX)));
