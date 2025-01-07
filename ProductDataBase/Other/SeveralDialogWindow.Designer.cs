@@ -26,6 +26,7 @@
             this.SeveralListBox = new ListBox();
             this.OKButton = new Button();
             this.panelSeveralList = new Panel();
+            this.CloseButton = new Button();
             this.panelSeveralList.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -42,7 +43,7 @@
             // 
             // OKButton
             // 
-            this.OKButton.Location = new Point(216, 247);
+            this.OKButton.Location = new Point(338, 247);
             this.OKButton.Name = "OKButton";
             this.OKButton.Size = new Size(75, 23);
             this.OKButton.TabIndex = 1;
@@ -58,12 +59,23 @@
             this.panelSeveralList.Size = new Size(482, 214);
             this.panelSeveralList.TabIndex = 2;
             // 
+            // CloseButton
+            // 
+            this.CloseButton.Location = new Point(419, 247);
+            this.CloseButton.Name = "CloseButton";
+            this.CloseButton.Size = new Size(75, 23);
+            this.CloseButton.TabIndex = 3;
+            this.CloseButton.Text = "キャンセル";
+            this.CloseButton.UseVisualStyleBackColor = true;
+            this.CloseButton.Click += this.CloseButton_Click;
+            // 
             // SeveralDialogWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(506, 282);
             this.ControlBox = false;
+            this.Controls.Add(this.CloseButton);
             this.Controls.Add(this.OKButton);
             this.Controls.Add(this.panelSeveralList);
             this.Font = new Font("Meiryo UI", 9F);
@@ -85,5 +97,6 @@
         private ListBox SeveralListBox;
         private Button OKButton;
         private Panel panelSeveralList;
+        private Button CloseButton;
     }
 }

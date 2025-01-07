@@ -617,10 +617,10 @@ namespace ProductDatabase {
             try {
                 string[] separator = ["//"];
                 var arr = QRCodeTextBox.Text.Split(separator, StringSplitOptions.None);
-                //if (arr.Length == 1) {
-                //    ProductInfo.Proness2 = QRCodeTextBox.Text;
-                //    return;
-                //}
+                if (arr.Length == 1) {
+                    ProductInfo.Proness2 = QRCodeTextBox.Text;
+                    return;
+                }
                 if (arr.Length != 4) { throw new Exception("QRコードが正しくありません。"); }
                 ProductInfo.Proness1 = arr[0];
                 ProductInfo.Proness2 = arr[1];
@@ -657,7 +657,8 @@ namespace ProductDatabase {
             using SQLiteConnection con = new(GetConnectionInformation());
             con.Open();
             using var cmd = con.CreateCommand();
-            cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber = @StrProness2 OR ProItemNumber = @StrProness2""";
+            cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber LIKE '%'|| @StrProness2 ||'%' OR ProItemNumber LIKE '%'|| @StrProness2 ||'%'""";
+            //cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber = @StrProness2 OR ProItemNumber = @StrProness2""";
             cmd.Parameters.Add("@StrProness2", DbType.String).Value = ProductInfo.Proness2;
             using var dr = cmd.ExecuteReader();
             if (!dr.HasRows) { throw new Exception($"品目番号が見つかりません。\n品目番号:[{ProductInfo.Proness2}]"); }

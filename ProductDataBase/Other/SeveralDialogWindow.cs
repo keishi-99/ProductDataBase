@@ -44,5 +44,9 @@ namespace ProductDatabase {
         private void SeveralListBox_KeyPress(object sender, KeyPressEventArgs e) {
             if (e.KeyChar == (char)Keys.Enter) { OKButton.PerformClick(); }
         }
+
+        private void CloseButton_Click(object sender, EventArgs e) {
+            Close();
+        }
     }
 }

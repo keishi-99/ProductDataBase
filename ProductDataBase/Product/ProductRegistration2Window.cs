@@ -1077,6 +1077,8 @@ namespace ProductDatabase {
                         break;
                 }
 
+                if (maxX == 0 || maxY == 0 || serialCodePrintCopies == 0) { throw new Exception("印刷設定が異常です。"); }
+
                 const decimal MM_PER_HUNDREDTH_INCH = 0.254M;
 
                 var pd = (PrintDocument)sender;
