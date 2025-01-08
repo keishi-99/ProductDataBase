@@ -1572,21 +1572,28 @@ namespace ProductDatabase {
                 var findRow = cell.Address.RowNumber;
 
                 // ワークシートのセルから値を取得
-                var filePath = workSheetMain.Cell(findRow, 3).GetString()?.Trim('"');
-                if (string.IsNullOrWhiteSpace(filePath)) { throw new Exception("Configのファイルパスが無効です。"); }
-                if (!File.Exists(filePath)) { throw new FileNotFoundException($"指定されたファイルが存在しません: {filePath}"); }
+                var directoryPath = workSheetMain.Cell(findRow, 3).GetString()?.Trim('"');
+                if (string.IsNullOrWhiteSpace(directoryPath)) { throw new Exception("Configのファイルパスが無効です。"); }
+                if (!Directory.Exists(directoryPath)) { throw new FileNotFoundException($"指定されたフォルダが存在しません: {directoryPath}"); }
+
+                var fileName = workSheetMain.Cell(findRow, 4).GetString()?.Trim('"');
+                if (string.IsNullOrWhiteSpace(fileName)) { throw new Exception("Configのファイル名が無効です。"); }
+
+                var filePaths = Directory.GetFiles(directoryPath, $"*{fileName}*", SearchOption.TopDirectoryOnly);
+                var filePath = filePaths[0];
                 var fileExtension = Path.GetExtension(filePath).ToLower(); // 開いたファイルの拡張子取得
 
-                var sheetName = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 4).GetString())
-                    ? workSheetMain.Cell(findRow, 4).GetString()
+                var sheetName = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 5).GetString())
+                    ? workSheetMain.Cell(findRow, 5).GetString()
                     : throw new Exception("シート名がありません。");
-                var productNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 5, 2);
-                var orderNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 6, 2);
-                var quantityRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 7, 2);
-                var serialFirstRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 8, 2);
-                var serialLastRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 9, 2);
+                var productNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 6, 2);
+                var orderNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 7, 2);
+                var quantityRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 8, 2);
+                var serialFirstRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 9, 2);
+                var serialLastRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 10, 2);
+                var saveDirectory = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 11, 2);
 
-                using FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 using XLWorkbook workBookReport = new(fileStreamReport);
 
                 // セルに値を挿入
@@ -1602,7 +1609,7 @@ namespace ProductDatabase {
                     Filter = $"Excel Files (*{fileExtension})|*{fileExtension}|All Files (*.*)|*.*",
                     FileName = $"{ProductInfo.ProductNumber}{fileExtension}",
                     Title = "保存先を選択してください",
-                    InitialDirectory = ""
+                    InitialDirectory = saveDirectory
                 };
                 if (saveFileDialog.ShowDialog() == DialogResult.OK) {
                     var outputPath = saveFileDialog.FileName;
