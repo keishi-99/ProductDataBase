@@ -399,11 +399,21 @@ namespace ProductDatabase {
 
                 // セルに値を挿入
                 var workSheetTemp = workBookReport.Worksheet(sheetName);
-                workSheetTemp.Cell(productNumberRange).Value = productNumber;
-                workSheetTemp.Cell(orderNumberRange).Value = orderNumber;
-                workSheetTemp.Cell(quantityRange).Value = quantity;
-                workSheetTemp.Cell(serialFirstRange).Value = serialFirst;
-                workSheetTemp.Cell(serialLastRange).Value = serialLast;
+                if (!string.IsNullOrEmpty(productNumber)) {
+                    workSheetTemp.Cell(productNumberRange).Value = productNumber;
+                }
+                if (!string.IsNullOrEmpty(orderNumber)) {
+                    workSheetTemp.Cell(orderNumberRange).Value = orderNumber;
+                }
+                if (!string.IsNullOrEmpty(quantity)) {
+                    workSheetTemp.Cell(quantityRange).Value = quantity;
+                }
+                if (!string.IsNullOrEmpty(serialFirst)) {
+                    workSheetTemp.Cell(serialFirstRange).Value = serialFirst;
+                }
+                if (!string.IsNullOrEmpty(serialLast)) {
+                    workSheetTemp.Cell(serialLastRange).Value = serialLast;
+                }
 
                 // ダイアログで保存先を選択
                 using SaveFileDialog saveFileDialog = new() {
