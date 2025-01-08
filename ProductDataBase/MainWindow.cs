@@ -418,6 +418,7 @@ namespace ProductDatabase {
                             ProductInfo.ProductName = selectedRow[0]["ProductName"].ToString() ?? string.Empty;
                             ProductInfo.SubstrateName = selectedRow[0]["SubstrateName"].ToString() ?? string.Empty;
                             ProductInfo.SubstrateModel = selectedRow[0]["SubstrateModel"].ToString() ?? string.Empty;
+                            ProductInfo.PrintType = Convert.ToInt32(selectedRow[0]["PrintType"] ?? throw new Exception("RegType is null"));
                             ProductInfo.RegType = Convert.ToInt32(selectedRow[0]["RegType"] ?? throw new Exception("RegType is null"));
                             break;
                         case 2:
@@ -425,6 +426,7 @@ namespace ProductDatabase {
                             ProductInfo.ProductName = selectedRow[0]["ProductName"].ToString() ?? string.Empty;
                             ProductInfo.ProductType = selectedRow[0]["ProductType"].ToString() ?? string.Empty;
                             ProductInfo.ProductModel = selectedRow[0]["ProductModel"].ToString() ?? string.Empty;
+                            ProductInfo.PrintType = Convert.ToInt32(selectedRow[0]["PrintType"] ?? throw new Exception("RegType is null"));
                             ProductInfo.RegType = Convert.ToInt32(selectedRow[0]["RegType"] ?? throw new Exception("RegType is null"));
                             break;
                     }
