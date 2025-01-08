@@ -1591,7 +1591,8 @@ namespace ProductDatabase {
                 var quantityRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 8, 2);
                 var serialFirstRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 9, 2);
                 var serialLastRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 10, 2);
-                var saveDirectory = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 11, 2);
+                var productModelRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 11, 2);
+                var saveDirectory = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 12, 2);
 
                 using FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 using XLWorkbook workBookReport = new(fileStreamReport);
@@ -1618,6 +1619,9 @@ namespace ProductDatabase {
                 }
                 if (!string.IsNullOrEmpty(_serialLast)) {
                     workSheetTemp.Cell(serialLastRange).Value = _serialLast;
+                }
+                if (!string.IsNullOrEmpty(productModelRange)) {
+                    workSheetTemp.Cell(serialLastRange).Value = ProductInfo.ProductModel;
                 }
 
                 // ダイアログで保存先を選択
