@@ -352,9 +352,8 @@ namespace ProductDatabase {
         private void GenerationReport() {
             try {
                 var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigReport.xlsx");
-                //using FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                //using XLWorkbook workBookConfig = new(fileStreamConfig);
-                using XLWorkbook workBookConfig = new(configPath);
+                using FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using XLWorkbook workBookConfig = new(fileStreamConfig);
                 var workSheetMain = workBookConfig.Worksheet("Sheet1");
 
                 // セル検索
@@ -383,9 +382,8 @@ namespace ProductDatabase {
                 var serialLastRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 10, 2);
                 var saveDirectory = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 11, 2);
 
-                //using FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                //using XLWorkbook workBookReport = new(fileStreamReport);
-                using XLWorkbook workBookReport = new(filePath);
+                using FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using XLWorkbook workBookReport = new(fileStreamReport);
 
                 var selectRow = DataBaseDataGridView.CurrentCell.RowIndex;
                 var productNumber = ExcelHelper.GetCellValue(DataBaseDataGridView, selectRow, 2);
@@ -394,6 +392,11 @@ namespace ProductDatabase {
                 var serialFirst = ExcelHelper.GetCellValue(DataBaseDataGridView, selectRow, 10);
                 var serialLast = ExcelHelper.GetCellValue(DataBaseDataGridView, selectRow, 11);
 
+                // すべてのワークシートを改ページプレビューに設定
+                foreach (var worksheet in workBookReport.Worksheets) {
+                    worksheet.SheetView.View = XLSheetViewOptions.PageBreakPreview;
+                }
+
                 // セルに値を挿入
                 var workSheetTemp = workBookReport.Worksheet(sheetName);
                 workSheetTemp.Cell(productNumberRange).Value = productNumber;
@@ -401,7 +404,6 @@ namespace ProductDatabase {
                 workSheetTemp.Cell(quantityRange).Value = quantity;
                 workSheetTemp.Cell(serialFirstRange).Value = serialFirst;
                 workSheetTemp.Cell(serialLastRange).Value = serialLast;
-                workSheetTemp.SheetView.View = XLSheetViewOptions.PageBreakPreview;
 
                 // ダイアログで保存先を選択
                 using SaveFileDialog saveFileDialog = new() {

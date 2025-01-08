@@ -1563,7 +1563,7 @@ namespace ProductDatabase {
         private void GenerationReport() {
             try {
                 var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigReport.xlsx");
-                using FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 using XLWorkbook workBookConfig = new(fileStreamConfig);
                 var workSheetMain = workBookConfig.Worksheet("Sheet1");
 
@@ -1595,6 +1595,11 @@ namespace ProductDatabase {
 
                 using FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 using XLWorkbook workBookReport = new(fileStreamReport);
+
+                // すべてのワークシートを改ページプレビューに設定
+                foreach (var worksheet in workBookReport.Worksheets) {
+                    worksheet.SheetView.View = XLSheetViewOptions.PageBreakPreview;
+                }
 
                 // セルに値を挿入
                 var workSheetTemp = workBookReport.Worksheet(sheetName);
