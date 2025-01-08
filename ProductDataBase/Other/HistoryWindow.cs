@@ -400,7 +400,8 @@ namespace ProductDatabase {
                 // セルに値を挿入
                 var workSheetTemp = workBookReport.Worksheet(sheetName);
                 if (!string.IsNullOrEmpty(productNumber)) {
-                    workSheetTemp.Cell(productNumberRange).Value = productNumber;
+                    var productNumbers = productNumber.Split("-");
+                    workSheetTemp.Cell(productNumberRange).Value = productNumbers[0];
                 }
                 if (!string.IsNullOrEmpty(orderNumber)) {
                     workSheetTemp.Cell(orderNumberRange).Value = orderNumber;
