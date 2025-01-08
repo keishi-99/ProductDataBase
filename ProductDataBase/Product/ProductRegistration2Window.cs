@@ -1621,7 +1621,7 @@ namespace ProductDatabase {
                     workSheetTemp.Cell(serialLastRange).Value = _serialLast;
                 }
                 if (!string.IsNullOrEmpty(productModelRange)) {
-                    workSheetTemp.Cell(serialLastRange).Value = ProductInfo.ProductModel;
+                    workSheetTemp.Cell(productModelRange).Value = ProductInfo.ProductModel;
                 }
 
                 // ダイアログで保存先を選択
