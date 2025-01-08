@@ -15,6 +15,7 @@ namespace ProductDatabase {
         public ProductInformation ProductInfo { get; }
 
         private readonly List<string> _listColFilter = [];
+        private bool IsListPrint => ProductInfo.PrintType is 5 or 6;
 
         public HistoryWindow(ProductInformation productInfo) {
             InitializeComponent();
@@ -57,6 +58,9 @@ namespace ProductDatabase {
                         CategoryRadioButton2.Text = "シリアル";
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
+                        if (!IsListPrint) {
+                            GenerationListButton.Visible = false;
+                        }
                         break;
                     case 3:
                         CategoryRadioButton1.Visible = false;
@@ -124,6 +128,9 @@ namespace ProductDatabase {
 
             GenerationReportButton.Visible = true;
             GenerationListButton.Visible = true;
+            if (!IsListPrint) {
+                GenerationListButton.Visible = false;
+            }
 
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new DataTable();
