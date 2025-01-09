@@ -610,7 +610,7 @@ namespace ProductDatabase {
 
                 // ワークブック開く
                 var xlBooks = xlApp.Workbooks;
-                var xlBook = xlBooks.Open(temporarilyPath);
+                var xlBook = xlBooks.Open(temporarilyPath, ReadOnly: true);
 
                 // ワークシート選択
                 var xlSheets = xlBook.Sheets;
