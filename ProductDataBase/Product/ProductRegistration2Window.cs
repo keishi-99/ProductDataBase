@@ -1396,6 +1396,7 @@ namespace ProductDatabase {
                 //    };
 
                 //    // ワークブックを開く。
+                //var xlBook = xlBooks.Open(temporarilyPath, ReadOnly: true);
                 //    Excel.Workbooks _xlBooks = _xlApp.Workbooks;
                 //    Excel.Workbook _xlBook = _
 
@@ -1536,7 +1537,7 @@ namespace ProductDatabase {
 
                 // ワークブック開く
                 var xlBooks = xlApp.Workbooks;
-                var xlBook = xlBooks.Open(temporarilyPath);
+                var xlBook = xlBooks.Open(temporarilyPath, ReadOnly: true);
 
                 // ワークシート選択
                 var xlSheets = xlBook.Sheets;
