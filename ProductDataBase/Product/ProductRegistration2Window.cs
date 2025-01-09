@@ -1563,7 +1563,7 @@ namespace ProductDatabase {
         private void GenerationReport() {
             try {
                 var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigReport.xlsx");
-                using FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using XLWorkbook workBookConfig = new(fileStreamConfig);
                 var workSheetMain = workBookConfig.Worksheet("Sheet1");
 
@@ -1594,7 +1594,7 @@ namespace ProductDatabase {
                 var productModelRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 11, 2);
                 var saveDirectory = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 12, 2);
 
-                using FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using XLWorkbook workBookReport = new(fileStreamReport);
 
                 // すべてのワークシートを改ページプレビューに設定
