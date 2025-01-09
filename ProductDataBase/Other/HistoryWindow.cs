@@ -49,13 +49,15 @@ namespace ProductDatabase {
                     case 1:
                         if (ProductInfo.RegType == 0) { CategoryRadioButton2.Visible = false; }
                         CategoryRadioButton2.Text = "在庫";
+                        CategoryRadioButton3.Visible = false;
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
                         GenerationReportButton.Visible = false;
                         GenerationListButton.Visible = false;
                         break;
                     case 2:
-                        CategoryRadioButton2.Text = "シリアル";
+                        CategoryRadioButton2.Text = "全てのタイプ";
+                        CategoryRadioButton3.Text = "シリアル";
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
                         if (!IsListPrint) {
@@ -65,6 +67,7 @@ namespace ProductDatabase {
                     case 3:
                         CategoryRadioButton1.Visible = false;
                         CategoryRadioButton2.Visible = false;
+                        CategoryRadioButton3.Visible = false;
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
                         GenerationReportButton.Visible = false;
@@ -79,6 +82,7 @@ namespace ProductDatabase {
         private void ViewSubstrateRegistrationLog() {
             StockCheckBox.Visible = false;
             AllSubstrateCheckBox.Visible = false;
+            CategoryRadioButton3.Visible = false;
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new DataTable();
 
@@ -138,6 +142,59 @@ namespace ProductDatabase {
             var query = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE ProductModel = @ProductModel ORDER BY ID DESC""";
             using SQLiteCommand command = new(query, con);
             command.Parameters.AddWithValue("@ProductModel", ProductInfo.ProductModel);
+            // SQLiteDataAdapterのインスタンス化
+            using SQLiteDataAdapter adapter = new(command);
+
+            // データの取得とDataTableへの格納
+            adapter.Fill(historyTable);
+
+            DataBaseDataGridView.Columns.Clear();
+            DataBaseDataGridView.DataSource = historyTable;
+
+            _listColFilter.Clear();
+            _listColFilter.Add("");
+            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
+                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
+                if (headerValue != null) { _listColFilter.Add(headerValue); }
+            }
+
+            DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
+            DataBaseDataGridView.Columns[1].HeaderCell.Value = "注文番号";
+            DataBaseDataGridView.Columns[2].HeaderCell.Value = "製造番号";
+            DataBaseDataGridView.Columns[3].HeaderCell.Value = "製品名";
+            DataBaseDataGridView.Columns[4].HeaderCell.Value = "製品型式";
+            DataBaseDataGridView.Columns[5].HeaderCell.Value = "数量";
+            DataBaseDataGridView.Columns[6].HeaderCell.Value = "担当者";
+            DataBaseDataGridView.Columns[7].HeaderCell.Value = "登録日";
+            DataBaseDataGridView.Columns[8].HeaderCell.Value = "Rev";
+            DataBaseDataGridView.Columns[9].HeaderCell.Value = "Group";
+            DataBaseDataGridView.Columns[10].HeaderCell.Value = "シリアル先頭";
+            DataBaseDataGridView.Columns[11].HeaderCell.Value = "シリアル末尾";
+            DataBaseDataGridView.Columns[12].HeaderCell.Value = "末番";
+            DataBaseDataGridView.Columns[13].HeaderCell.Value = "コメント";
+            DataBaseDataGridView.Columns[14].HeaderCell.Value = "使用基板";
+            DataBaseDataGridView.Columns[14].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+
+            CategoryComboBox.Items.Clear();
+            CategoryComboBox.Items.Add("");
+            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
+                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? string.Empty);
+            }
+        }
+        private void ViewProductRegistrationAllTypesLog() {
+
+            GenerationReportButton.Visible = true;
+            GenerationListButton.Visible = true;
+            if (!IsListPrint) {
+                GenerationListButton.Visible = false;
+            }
+
+            using SQLiteConnection con = new(GetConnectionRegistration());
+            var historyTable = new DataTable();
+
+            var query = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" ORDER BY ID DESC""";
+            using SQLiteCommand command = new(query, con);
             // SQLiteDataAdapterのインスタンス化
             using SQLiteDataAdapter adapter = new(command);
 
@@ -269,16 +326,14 @@ namespace ProductDatabase {
             }
         }
         private void ViewSerialLog() {
-
             GenerationReportButton.Visible = false;
             GenerationListButton.Visible = false;
 
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new DataTable();
 
-            var query = $"""SELECT _rowid_, * FROM "{ProductInfo.ProductName}_Serial" WHERE ProductModel = @ProductModel ORDER BY _rowid_ DESC""";
+            var query = $"""SELECT _rowid_, * FROM "{ProductInfo.ProductName}_Serial" ORDER BY _rowid_ DESC""";
             using SQLiteCommand command = new(query, con);
-            command.Parameters.AddWithValue("@ProductModel", ProductInfo.ProductModel);
             // SQLiteDataAdapterのインスタンス化
             using SQLiteDataAdapter adapter = new(command);
 
@@ -321,7 +376,8 @@ namespace ProductDatabase {
                 { (1, "1"), ViewSubstrateRegistrationLog },
                 { (1, "2"), ViewSubstrateStockLog },
                 { (2, "1"), ViewProductRegistrationLog },
-                { (2, "2"), ViewSerialLog },
+                { (2, "2"), ViewProductRegistrationAllTypesLog },
+                { (2, "3"), ViewSerialLog },
                 { (3, "1"), ViewReprintLog }
             };
 
