@@ -32,6 +32,7 @@
             this.AllSubstrateCheckBox = new CheckBox();
             this.GenerationReportButton = new Button();
             this.GenerationListButton = new Button();
+            this.CategoryRadioButton3 = new RadioButton();
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).BeginInit();
             this.SuspendLayout();
             // 
@@ -97,7 +98,7 @@
             // 
             this.StockCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.StockCheckBox.AutoSize = true;
-            this.StockCheckBox.Location = new Point(457, 480);
+            this.StockCheckBox.Location = new Point(555, 480);
             this.StockCheckBox.Name = "StockCheckBox";
             this.StockCheckBox.Size = new Size(83, 19);
             this.StockCheckBox.TabIndex = 5;
@@ -109,7 +110,7 @@
             // 
             this.AllSubstrateCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.AllSubstrateCheckBox.AutoSize = true;
-            this.AllSubstrateCheckBox.Location = new Point(546, 480);
+            this.AllSubstrateCheckBox.Location = new Point(644, 480);
             this.AllSubstrateCheckBox.Name = "AllSubstrateCheckBox";
             this.AllSubstrateCheckBox.Size = new Size(62, 19);
             this.AllSubstrateCheckBox.TabIndex = 6;
@@ -139,11 +140,27 @@
             this.GenerationListButton.UseVisualStyleBackColor = true;
             this.GenerationListButton.Click += this.GenerationListButton_Click;
             // 
+            // CategoryRadioButton3
+            // 
+            this.CategoryRadioButton3.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            this.CategoryRadioButton3.Appearance = Appearance.Button;
+            this.CategoryRadioButton3.Location = new Point(457, 474);
+            this.CategoryRadioButton3.Name = "CategoryRadioButton3";
+            this.CategoryRadioButton3.Size = new Size(92, 25);
+            this.CategoryRadioButton3.TabIndex = 9;
+            this.CategoryRadioButton3.TabStop = true;
+            this.CategoryRadioButton3.Tag = "3";
+            this.CategoryRadioButton3.Text = "Button3";
+            this.CategoryRadioButton3.TextAlign = ContentAlignment.MiddleCenter;
+            this.CategoryRadioButton3.UseVisualStyleBackColor = true;
+            this.CategoryRadioButton3.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
+            // 
             // HistoryWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(1184, 511);
+            this.Controls.Add(this.CategoryRadioButton3);
             this.Controls.Add(this.GenerationListButton);
             this.Controls.Add(this.GenerationReportButton);
             this.Controls.Add(this.AllSubstrateCheckBox);
@@ -177,5 +194,6 @@
         private CheckBox AllSubstrateCheckBox;
         private Button GenerationReportButton;
         private Button GenerationListButton;
+        private RadioButton CategoryRadioButton3;
     }
 }
