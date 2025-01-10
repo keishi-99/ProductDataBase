@@ -1034,7 +1034,6 @@ namespace ProductDatabase {
             decimal intervalX = 0;
             decimal intervalY = 0;
             var startLine = 0;
-            var labelProPageNum = 0;
             try {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
 
@@ -1087,12 +1086,14 @@ namespace ProductDatabase {
                 if (!bPrintMode) {
                     offsetX -= (decimal)e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
                     offsetY -= (decimal)e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
-                    offset = labelProPageNum == 0
+                    offset = _pageCnt == 1
                         ? new System.Drawing.Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
                         : new System.Drawing.Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
                 else {
-                    offset = new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
+                    offset = _pageCnt == 1
+                        ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
+                        : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
 
                 e.PageSettings.Margins.Left = 0;
