@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.Odbc;
 using System.Data.SQLite;
+using System.Text.RegularExpressions;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
@@ -648,12 +649,11 @@ namespace ProductDatabase {
             if (string.IsNullOrEmpty(ProductInfo.Proness1)) { throw new Exception($"一致する情報がありません。{Environment.NewLine}手配管理番号:{QRCodeTextBox.Text}"); }
         }
         private void ProcessCategoryItemData() {
-            ProductInfo.Proness2 = ProductInfo.Proness2
-                                                .Replace("-SMT", "")
-                                                .Replace("-H", "")
-                                                .Replace("-GH", "")
-                                                .Replace("-ACGH", "-AC")
-                                                .Replace("-DCGH", "-DC");
+            var pattern = @"-(?:SMT|H|GH).*";
+            var result = Regex.Replace(ProductInfo.Proness2, pattern, "");
+            ProductInfo.Proness2 = result
+                .Replace("-ACGH", "-AC")
+                .Replace("-DCGH", "-DC");
         }
         private void FetchDataFromSQLite() {
             using SQLiteConnection con = new(GetConnectionInformation());
