@@ -390,6 +390,7 @@ namespace ProductDatabase {
                 ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
                 ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
                 ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
+                ProductInfo.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
                 ProductInfo.UseSubstrate = selectedRows[0]["UseSubstrate"].ToString() ?? string.Empty;
                 using SubstrateChange1 window = new(ProductInfo);
                 window.ShowDialog(this);
