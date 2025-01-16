@@ -881,7 +881,7 @@ namespace ProductDatabase {
         }
         private bool SerialCheck() {
             try {
-                if (ProductInfo.RegType != 0) { return true; }
+                if (ProductInfo.RegType == 0) { return true; }
 
                 if (IsLabelPrint) {
                     for (var i = 0; i < ProductInfo.Quantity; i++) {
