@@ -367,7 +367,7 @@ namespace ProductDatabase {
             }
         }
         private bool Registration() {
-            if (ProductInfo.RegType > 0) {
+            if (ProductInfo.RegType != 0) {
                 using SQLiteConnection con = new(GetConnectionRegistration());
                 con.Open();
 
@@ -881,6 +881,8 @@ namespace ProductDatabase {
         }
         private bool SerialCheck() {
             try {
+                if (ProductInfo.RegType != 0) { return true; }
+
                 if (IsLabelPrint) {
                     for (var i = 0; i < ProductInfo.Quantity; i++) {
                         _serialType = "Label";
