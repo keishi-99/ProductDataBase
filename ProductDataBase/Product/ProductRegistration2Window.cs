@@ -340,9 +340,11 @@ namespace ProductDatabase {
             try {
                 _strSerial.Clear();
 
-                if (!NumberCheck() || !QuantityCheck() || !SerialCheck()) {
+                if (!NumberCheck() || !QuantityCheck()) {
                     return;
                 }
+                if (ProductInfo.RegType != 0) { SerialCheck(); }
+
                 DisableControls();
                 GenerateSerialCodes();
 
@@ -879,48 +881,50 @@ namespace ProductDatabase {
                 return false;
             }
         }
-        private bool SerialCheck() {
-            try {
-                if (ProductInfo.RegType == 0) { return true; }
-
-                if (IsLabelPrint) {
-                    for (var i = 0; i < ProductInfo.Quantity; i++) {
-                        _serialType = "Label";
-                        _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
-                    }
+        private void SerialCheck() {
+            if (IsLabelPrint) {
+                for (var i = 0; i < ProductInfo.Quantity; i++) {
+                    _serialType = "Label";
+                    _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
                 }
-                else if (IsBarcodePrint) {
-                    for (var i = 0; i < ProductInfo.Quantity; i++) {
-                        _serialType = "Barcode";
-                        _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
-                    }
+            }
+            else if (IsBarcodePrint) {
+                for (var i = 0; i < ProductInfo.Quantity; i++) {
+                    _serialType = "Barcode";
+                    _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
                 }
-
-                var strSQLSerial = string.Join("','", _strSerial);
-
-                List<string> strSerialDuplication = [];
-                using (SQLiteConnection con = new(GetConnectionRegistration())) {
-                    con.Open();
-
-                    using var cmd = con.CreateCommand();
-                    cmd.CommandText = $"""SELECT Serial FROM "{ProductInfo.ProductName}_Serial" WHERE Serial IN (@Serial)""";
-                    cmd.Parameters.Add("@Serial", DbType.String).Value = strSQLSerial;
-
-                    using var dr = cmd.ExecuteReader();
-                    while (dr.Read()) {
-                        strSerialDuplication.Add($"{dr["Serial"]}");
-                    }
+            }
+            else if (ProductInfo.RegType == 8) {
+                for (var i = 0; i < ProductInfo.Quantity; i++) {
+                    _serialType = "Label";
+                    _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
                 }
+            }
+            else { throw new Exception("PrintType unknown"); }
 
-                if (strSerialDuplication.Count > 0) {
-                    var strSQLDuplication = string.Join($"{Environment.NewLine}", strSerialDuplication);
-                    throw new Exception($"{strSQLDuplication}{Environment.NewLine}は既に使用されているシリアルです。");
+            // プレースホルダーを作成（シリアル番号の数だけ）
+            var placeholders = string.Join(",", Enumerable.Range(0, _strSerial.Count).Select(i => $"@Serial{i}"));
+
+            List<string> strSerialDuplication = [];
+            using (SQLiteConnection con = new(GetConnectionRegistration())) {
+                con.Open();
+
+                using var cmd = con.CreateCommand();
+                cmd.CommandText = $"""SELECT Serial FROM "{ProductInfo.ProductName}_Serial" WHERE Serial IN ({placeholders}) """;
+                // 各シリアル番号をパラメータとして追加
+                for (var i = 0; i < _strSerial.Count; i++) {
+                    cmd.Parameters.AddWithValue($"@Serial{i}", _strSerial[i]);
                 }
 
-                return true;
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
+                using var dr = cmd.ExecuteReader();
+                while (dr.Read()) {
+                    strSerialDuplication.Add($"{dr["Serial"]}");
+                }
+            }
+
+            if (strSerialDuplication.Count > 0) {
+                var strSQLDuplication = string.Join($"{Environment.NewLine}", strSerialDuplication);
+                throw new Exception($"{strSQLDuplication}{Environment.NewLine}は既に使用されているシリアルです。");
             }
         }
         private void HandleLabelPrinting() {
