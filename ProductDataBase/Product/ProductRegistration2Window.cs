@@ -902,19 +902,16 @@ namespace ProductDatabase {
             }
             else { throw new Exception("PrintType unknown"); }
 
-            // プレースホルダーを作成（シリアル番号の数だけ）
-            var placeholders = string.Join(",", Enumerable.Range(0, _strSerial.Count).Select(i => $"@Serial{i}"));
-
             List<string> strSerialDuplication = [];
             using (SQLiteConnection con = new(GetConnectionRegistration())) {
                 con.Open();
 
                 using var cmd = con.CreateCommand();
-                cmd.CommandText = $"""SELECT Serial FROM "{ProductInfo.ProductName}_Serial" WHERE Serial IN ({placeholders}) """;
-                // 各シリアル番号をパラメータとして追加
-                for (var i = 0; i < _strSerial.Count; i++) {
-                    cmd.Parameters.AddWithValue($"@Serial{i}", _strSerial[i]);
-                }
+                cmd.CommandText = $"""SELECT Serial FROM "{ProductInfo.ProductName}_Serial" WHERE Serial IN ({string.Join(",", _strSerial.Select((_, i) => $"@Serial{i}"))})""";
+                _strSerial
+                    .Select((serial, i) => new { ParamName = $"@Serial{i}", Value = serial.Trim() })
+                    .ToList()
+                    .ForEach(p => cmd.Parameters.Add(p.ParamName, System.Data.DbType.String).Value = p.Value);
 
                 using var dr = cmd.ExecuteReader();
                 while (dr.Read()) {
