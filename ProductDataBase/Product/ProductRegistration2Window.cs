@@ -73,6 +73,7 @@ namespace ProductDatabase {
             try {
                 Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
 
+                GenerationReportButton.Enabled = false;
                 RegisterButton.Enabled = true;
                 _useSubstrate = ProductInfo.UseSubstrate.Split(",");
 
@@ -358,6 +359,7 @@ namespace ProductDatabase {
                 MessageBox.Show("登録完了");
 
                 HandlePostRegistration();
+                GenerationReportButton.Enabled = true;
                 //if (RequiresClosing) {
                 //    Close();
                 //}
