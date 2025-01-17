@@ -1616,7 +1616,7 @@ namespace ProductDatabase {
                 if (!string.IsNullOrEmpty(ProductInfo.OrderNumber)) {
                     workSheetTemp.Cell(orderNumberRange).Value = ProductInfo.OrderNumber;
                 }
-                if (ProductInfo.Quantity == 0) {
+                if (ProductInfo.Quantity != 0) {
                     workSheetTemp.Cell(quantityRange).Value = ProductInfo.Quantity;
                 }
                 if (!string.IsNullOrEmpty(_serialFirst)) {
