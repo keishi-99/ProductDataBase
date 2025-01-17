@@ -428,11 +428,12 @@ namespace ProductDatabase {
                 if (string.IsNullOrWhiteSpace(directoryPath)) { throw new Exception("Configのファイルパスが無効です。"); }
                 if (!Directory.Exists(directoryPath)) { throw new FileNotFoundException($"指定されたフォルダが存在しません: {directoryPath}"); }
 
-                var fileName = workSheetMain.Cell(findRow, 4).GetString()?.Trim('"');
-                if (string.IsNullOrWhiteSpace(fileName)) { throw new Exception("Configのファイル名が無効です。"); }
+                var searchName = workSheetMain.Cell(findRow, 4).GetString()?.Trim('"');
+                if (string.IsNullOrWhiteSpace(searchName)) { throw new Exception("Configのファイル名が無効です。"); }
 
-                var filePaths = Directory.GetFiles(directoryPath, $"*{fileName}*", SearchOption.TopDirectoryOnly);
+                var filePaths = Directory.GetFiles(directoryPath, $"*{searchName}*", SearchOption.TopDirectoryOnly);
                 var filePath = filePaths[0];
+                var fileName = Path.GetFileNameWithoutExtension(filePath);
                 var fileExtension = Path.GetExtension(filePath).ToLower(); // 開いたファイルの拡張子取得
 
                 var sheetName = !string.IsNullOrEmpty(workSheetMain.Cell(findRow, 5).GetString())
@@ -486,7 +487,7 @@ namespace ProductDatabase {
                 // ダイアログで保存先を選択
                 using SaveFileDialog saveFileDialog = new() {
                     Filter = $"Excel Files (*{fileExtension})|*{fileExtension}|All Files (*.*)|*.*",
-                    FileName = $"{productNumber}{fileExtension}",
+                    FileName = $"{fileName} のコピー{productNumber}{fileExtension}",
                     Title = "保存先を選択してください",
                     InitialDirectory = saveDirectory
                 };
