@@ -615,6 +615,7 @@ namespace ProductDatabase {
             ProductInfo.Category12.Clear();
             ProductInfo.Category13.Clear();
             ProductInfo.Category14.Clear();
+            ResetFields();
             Enabled = false;
         }
         private void ParseQRCodeInput() {
