@@ -218,6 +218,23 @@ namespace ProductDatabase {
                     }
                 }
 
+                // 不良処理時在庫チェック
+                if (DefectNumberCheckBox.Checked) {
+                    using var cmd = con.CreateCommand();
+                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateNumber = @SubstrateNumber LIMIT 1""";
+                    cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNumber;
+                    using var dr = cmd.ExecuteReader();
+                    if (dr.Read()) {
+                        if (Convert.ToInt32(dr["Stock"]) < defectNumber) {
+                            throw new Exception($"[{substrateNumber}]は在庫が[{dr["Stock"]}]です。");
+                        }
+                    }
+                    else {
+                        // データが見つからなかった場合の処理
+                        throw new Exception($"[{substrateNumber}]は登録がありません。");
+                    }
+                }
+
                 // 基板登録テーブルへ追加
                 using (var cmd = con.CreateCommand()) {
                     cmd.CommandText =
@@ -268,7 +285,7 @@ namespace ProductDatabase {
                 // バックアップ作成
                 BackupManager.CreateBackup();
                 // ログ出力
-                var number = QuantityCheckBox.Checked ? quantity : defectNumber;
+                var number = QuantityCheckBox.Checked ? quantity : 0 - defectNumber;
                 Logger.AppendLog($";[基板登録];注文番号[{orderNumber}];製造番号[{substrateNumber}];製品名[{ProductInfo.ProductName}];基板名[{ProductInfo.SubstrateName}];型式[{ProductInfo.SubstrateModel}];数量[{number}];Revision[{revision}];登録日[{registrationDate}];担当者[{person}];");
 
                 return true;
