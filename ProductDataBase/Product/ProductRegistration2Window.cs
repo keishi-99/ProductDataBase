@@ -374,6 +374,7 @@ namespace ProductDatabase {
             if (ProductInfo.RegType != 0) {
                 using SQLiteConnection con = new(GetConnectionRegistration());
                 con.Open();
+                using var transaction = con.BeginTransaction();
 
                 foreach (var b in _strSerial) {
                     using var cmd = con.CreateCommand();
@@ -407,6 +408,21 @@ namespace ProductDatabase {
                     cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
 
                     cmd.ExecuteNonQuery();
+
+                    try {
+                        // ラベル印刷処理
+                        HandleLabelPrinting();
+
+                        // バーコード印刷処理
+                        HandleBarcodePrinting();
+
+                        // 印刷が成功した場合、トランザクションをコミット
+                        transaction.Commit();
+                    } catch (Exception) {
+                        // 印刷に失敗した場合、トランザクションをロールバック
+                        transaction.Rollback();
+                        throw; // 例外を再度スローして上位で処理できるようにする
+                    }
                 }
             }
 
