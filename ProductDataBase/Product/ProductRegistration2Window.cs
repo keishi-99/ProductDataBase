@@ -413,7 +413,6 @@ namespace ProductDatabase {
 
             switch (ProductInfo.RegType) {
                 case 0:
-
                     cmd.CommandText =
                         $"""
                         INSERT INTO "{ProductInfo.ProductName}_Product"
@@ -1024,7 +1023,7 @@ namespace ProductDatabase {
                         headerString = ConvertHeaderFooterString(SettingsBarcodePro.BarcodeProPageSettings.HeaderString);
                         headerFooterFont = SettingsBarcodePro.BarcodeProPageSettings.HeaderFooterFont;
                         serialCodePrintCopies = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
-                        startLine = (int)BarcodePrintPostionNumericUpDown.Value - 1;
+                        startLine = (int)BarcodePrintPostionNumericUpDown.Value;
                         break;
                     default:
                         break;
