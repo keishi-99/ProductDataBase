@@ -351,6 +351,7 @@ namespace ProductDatabase {
             decimal offsetY = 0;
             decimal intervalX = 0;
             decimal intervalY = 0;
+            var startLine = 0;
             try {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
 
@@ -371,6 +372,7 @@ namespace ProductDatabase {
                         headerString = ConvertHeaderFooterString(SettingsLabelPro.LabelProPageSettings.HeaderString);
                         headerFooterFont = SettingsLabelPro.LabelProPageSettings.HeaderFooterFont;
                         serialCodePrintCopies = SettingsLabelPro.LabelProLabelSettings.NumLabels;
+                        startLine = (int)PrintPostionNumericUpDown.Value - 1;
                         break;
                     case "Barcode":
                         if (SettingsBarcodePro == null) { throw new Exception("SettingsBarcodeProがnullです。"); }
@@ -386,6 +388,7 @@ namespace ProductDatabase {
                         headerString = ConvertHeaderFooterString(SettingsBarcodePro.BarcodeProPageSettings.HeaderString);
                         headerFooterFont = SettingsBarcodePro.BarcodeProPageSettings.HeaderFooterFont;
                         serialCodePrintCopies = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
+                        startLine = (int)PrintPostionNumericUpDown.Value;
                         break;
                     default:
                         break;
@@ -393,15 +396,13 @@ namespace ProductDatabase {
 
                 if (maxX == 0 || maxY == 0 || serialCodePrintCopies == 0) { throw new Exception("印刷設定が異常です。"); }
 
-                var startLineBarcode = (int)PrintPostionNumericUpDown.Value - 1;
-
                 const decimal MM_PER_HUNDREDTH_INCH = 0.254M;
 
                 if (!RePrintPrintDocument.PrintController.IsPreview) {
                     offsetX -= (decimal)e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
                     offsetY -= (decimal)e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
                     offset = _labelProPageNum == 1
-                        ? new Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLineBarcode * (intervalY + sizeY))))
+                        ? new Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
                         : new Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
                 else {
@@ -416,17 +417,17 @@ namespace ProductDatabase {
 
                 var barcodePageNum = 0;
                 offset = barcodePageNum == 0
-                    ? new Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLineBarcode * (intervalY + sizeY))))
+                    ? new Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
                     : new Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
 
                 if (_labelProPageNum == 1) {
                     _remainingCount = serialCodePrintCopies;
                     _labelProNSerial = _serialFirstNumber;
                 }
-                if (_labelProPageNum >= 2) { startLineBarcode = 0; }
+                if (_labelProPageNum >= 2) { startLine = 0; }
 
                 var y = 0;
-                for (y = startLineBarcode; y < maxY; y++) {
+                for (y = startLine; y < maxY; y++) {
                     var x = 0;
                     for (x = 0; x < maxX; x++) {
                         var posX = (float)(offsetX + (x * (intervalX + sizeX)));
