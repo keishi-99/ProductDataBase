@@ -56,13 +56,14 @@ namespace ProductDatabase {
         private readonly List<int> _usedQuantity = [];
 
         // プロパティ設定
+        private bool IsSerialGeneration => ProductInfo.RegType is 1 or 2 or 3;
         private bool IsLabelPrint => ProductInfo.PrintType is 1 or 3 or 4 or 5 or 6 or 7 or 9;
         private bool IsBarcodePrint => ProductInfo.PrintType is 2 or 3;
-        private bool IsSerialGeneration => ProductInfo.PrintType is not 0 and not 10;
-        private bool RequiresClosing => ProductInfo.PrintType is 0 or 1 or 2 or 3 or 4 or 8 or 9;
+        private bool RequiresClosing => ProductInfo.PrintType is 0 or 1 or 2 or 3 or 4 or 9;
         private bool IsListPrint => ProductInfo.PrintType is 5 or 6;
         private bool IsCheckSheetPrint => ProductInfo.PrintType is 6 or 7;
         private bool IsUnderlinePrint => ProductInfo.PrintType is 4;
+        private bool IsLast4Digits => ProductInfo.PrintType is 9;
 
         public ProductRegistration2Window() {
             InitializeComponent();
@@ -77,12 +78,15 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = true;
                 _useSubstrate = ProductInfo.UseSubstrate.Split(",");
 
-                _labelProNSerial = ProductInfo.SerialFirstNumber;
-                _serialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
+                if (IsSerialGeneration) {
+                    _labelProNSerial = ProductInfo.SerialFirstNumber;
+                    _serialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
+                }
 
                 var strQuantity = string.Empty;
                 switch (ProductInfo.RegType) {
                     case 2:
+                    case 4:
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
                             var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox;
 
@@ -316,7 +320,7 @@ namespace ProductDatabase {
             ConfigureUI();
         }
         private void ConfigureUI() {
-            if (IsLabelPrint) { ConfigureSerialLabelSettings(); }
+            if (IsLabelPrint || IsSerialGeneration) { ConfigureSerialLabelSettings(); }
             if (IsBarcodePrint) { ConfigureBarcodeSettings(); }
             SetMenuOptions();
         }
@@ -341,13 +345,13 @@ namespace ProductDatabase {
             try {
                 _strSerial.Clear();
 
-                if (!NumberCheck() || !QuantityCheck()) {
-                    return;
+                if (!NumberCheck() || !QuantityCheck()) { return; }
+                if (IsSerialGeneration) {
+                    SerialCheck();
+                    GenerateSerialCodes();
                 }
-                if (ProductInfo.RegType != 0) { SerialCheck(); }
 
                 DisableControls();
-                GenerateSerialCodes();
 
                 if (!Registration()) {
                     throw new Exception("登録失敗しました。");
@@ -376,7 +380,7 @@ namespace ProductDatabase {
             using var transaction = con.BeginTransaction();
 
             var cmd = con.CreateCommand();
-            if (ProductInfo.RegType != 0) {
+            if (IsSerialGeneration) {
                 foreach (var b in _strSerial) {
                     cmd.CommandText =
                         $"""
@@ -505,7 +509,7 @@ namespace ProductDatabase {
                     cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
                     cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(_serialFirst) ? DBNull.Value : _serialFirst;
                     cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(_serialLast) ? DBNull.Value : _serialLast;
-                    cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = _serialLastNumber;
+                    cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = IsSerialGeneration ? _serialLastNumber : DBNull.Value;
                     cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                     cmd.ExecuteNonQuery();
@@ -513,6 +517,7 @@ namespace ProductDatabase {
 
                 case 2:
                 case 3:
+                case 4:
                     string productRowId;
                     if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
                     for (var i = 0; i <= _useSubstrate.Length; i++) {
@@ -662,7 +667,7 @@ namespace ProductDatabase {
                     cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
                     cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(_serialFirst) ? DBNull.Value : _serialFirst;
                     cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(_serialLast) ? DBNull.Value : _serialLast;
-                    cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = _serialLastNumber;
+                    cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = IsSerialGeneration ? _serialLastNumber : DBNull.Value;
                     cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
                     cmd.Parameters.Add("@UsedSubstrate", DbType.String).Value = string.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
 
@@ -789,6 +794,7 @@ namespace ProductDatabase {
                         break;
                     case 2:
                     case 3:
+                    case 4:
                         if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
 
@@ -844,7 +850,7 @@ namespace ProductDatabase {
                     _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
                 }
             }
-            else if (ProductInfo.RegType == 8) {
+            else if (IsSerialGeneration) {
                 for (var i = 0; i < ProductInfo.Quantity; i++) {
                     _serialType = "Label";
                     _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
@@ -900,11 +906,9 @@ namespace ProductDatabase {
             BarcodePrintPostionNumericUpDown.Enabled = false;
         }
         private void GenerateSerialCodes() {
-            if (IsSerialGeneration) {
-                _serialType = IsBarcodePrint ? "Barcode" : "Label";
-                _serialFirst = GenerateCode(ProductInfo.SerialFirstNumber);
-                _serialLast = GenerateCode(_serialLastNumber);
-            }
+            _serialType = IsBarcodePrint ? "Barcode" : "Label";
+            _serialFirst = GenerateCode(ProductInfo.SerialFirstNumber);
+            _serialLast = GenerateCode(_serialLastNumber);
         }
         private void HandlePostRegistration() {
             foreach (Control control in Controls) {
@@ -1071,7 +1075,7 @@ namespace ProductDatabase {
 
                         // シリアル生成、PrintTypeが9かつ最終行の場合は型式下4桁、それ以外はシリアルを生成
                         string generatedCode;
-                        if (ProductInfo.PrintType != 9 || _remainingCount != 1) {
+                        if (!IsLast4Digits || _remainingCount != 1) {
                             generatedCode = GenerateCode(_labelProNSerial); // シリアルコードを生成
                         }
                         else {
@@ -1129,7 +1133,7 @@ namespace ProductDatabase {
             var outputCode = _serialType switch {
                 "Label" => SettingsLabelPro.LabelProLabelSettings.Format,
                 "Barcode" => SettingsBarcodePro.BarcodeProLabelSettings.Format,
-                _ => string.Empty
+                _ => throw new Exception("_serialType unknown")
             };
 
             outputCode = outputCode.Replace("%Y", DateTime.Parse(ProductInfo.RegDate).ToString("yy"))
