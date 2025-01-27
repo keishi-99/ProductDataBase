@@ -11,6 +11,8 @@ namespace ProductDatabase {
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
+        // プロパティ設定
+        private bool IsSerialGeneration => ProductInfo.RegType is 1 or 2 or 3;
 
         public ProductRegistration1Window(ProductInformation productInfo) {
             InitializeComponent();
@@ -72,7 +74,7 @@ namespace ProductDatabase {
 
                     // シリアル番号の最後を取得する共通メソッド
                     int GetLastSerialNumber(SQLiteCommand cmd, string productName) {
-                        cmd.CommandText = $"""SELECT SerialLastNumber FROM "{productName}_Product" ORDER BY "ID" DESC""";
+                        cmd.CommandText = $"""SELECT SerialLastNumber FROM "{productName}_Product" WHERE SerialLastNumber NOT NULL ORDER BY "ID" DESC""";
                         return int.TryParse(cmd.ExecuteScalar()?.ToString(), out var serialLastNum)
                             ? serialLastNum
                             : throw new Exception("シリアル番号の取得に失敗しました。");
@@ -164,7 +166,9 @@ namespace ProductDatabase {
                 ProductInfo.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
                 ProductInfo.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
                 ProductInfo.Quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception("QuantityTextBox.Text is null"));
-                if (ProductInfo.RegType != 0) { ProductInfo.SerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception("FirstSerialNumberTextBox.Text is null")); }
+                ProductInfo.SerialFirstNumber = IsSerialGeneration
+                    ? Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception("FirstSerialNumberTextBox.Text is null"))
+                    : -1;
                 using ProductRegistration2Window window = new();
                 window.ProductInfo = ProductInfo;
                 window.Closed += (s, e) => this.Close();
