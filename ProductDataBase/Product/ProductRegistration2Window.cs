@@ -320,7 +320,7 @@ namespace ProductDatabase {
             ConfigureUI();
         }
         private void ConfigureUI() {
-            if (IsLabelPrint || IsSerialGeneration) { ConfigureSerialLabelSettings(); }
+            if (IsLabelPrint) { ConfigureSerialLabelSettings(); }
             if (IsBarcodePrint) { ConfigureBarcodeSettings(); }
             SetMenuOptions();
         }
