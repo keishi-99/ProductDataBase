@@ -1572,8 +1572,8 @@ namespace ProductDatabase {
                 workSheetTemp.Cells[regDateRange].Value = ProductInfo.RegDate;
                 workSheetTemp.Cells[productModelRange].Value = ProductInfo.ProductModel;
                 workSheetTemp.Cells[quantityRange].Value = ProductInfo.Quantity;
-                workSheetTemp.Cells[serialFirstRange].Value = ProductInfo.SerialFirst;
-                workSheetTemp.Cells[serialLastRange].Value = ProductInfo.SerialLast;
+                workSheetTemp.Cells[serialFirstRange].Value = _serialFirst;
+                workSheetTemp.Cells[serialLastRange].Value = _serialLast;
                 workSheetTemp.Cells[commentRange].Value = ProductInfo.Comment;
 
                 for (var i = 0; i <= _usedSubstrate.Count - 1; i++) {

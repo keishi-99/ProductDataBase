@@ -650,7 +650,7 @@ namespace ProductDatabase {
                 workSheetTemp.Cells[productNameRange].Value = productName;
                 workSheetTemp.Cells[productNumberRange].Value = ProductInfo.ProductNumber;
                 workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber;
-                workSheetTemp.Cells[regDateRange].Value = ProductInfo.RegDate;
+                workSheetTemp.Cells[regDateRange].Value = DateTime.Now.ToShortDateString();
                 workSheetTemp.Cells[productModelRange].Value = ProductInfo.ProductModel;
                 workSheetTemp.Cells[quantityRange].Value = ProductInfo.Quantity;
                 workSheetTemp.Cells[serialFirstRange].Value = ProductInfo.SerialFirst;
