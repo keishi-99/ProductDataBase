@@ -1,4 +1,4 @@
-﻿using ClosedXML.Excel;
+﻿using OfficeOpenXml;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing.Imaging;
@@ -7,7 +7,6 @@ using ZXing.QrCode;
 using ZXing.QrCode.Internal;
 using ZXing.Rendering;
 using static ProductDatabase.MainWindow;
-using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ProductDatabase {
     public partial class SubstrateChange2 : Form {
@@ -499,72 +498,67 @@ namespace ProductDatabase {
             try {
                 var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigList.xlsx");
                 using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using XLWorkbook workBook = new(fileStream);
-                var workSheetMain = workBook.Worksheet("Sheet1");
+                using var workBook = new ExcelPackage(fileStream);
+                //既存ワークシートを取得（workBookはExcelWorkbookクラスオブジェクト）
+                var targetSheetName = "Sheet1";
+                var workSheetMain = workBook.Workbook.Worksheets[targetSheetName];
 
                 // セル検索
-                var productModelCell = workSheetMain.Search(ProductInfo.ProductModel).FirstOrDefault() ?? throw new Exception($"Configに品目番号:[{ProductInfo.ProductModel}]が見つかりません。");
-                var findRow = productModelCell.Address.RowNumber;
+                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Value?.ToString() == ProductInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{ProductInfo.ProductModel}]が見つかりません。");
+                var resultRow = searchAddressResult.Start.Row;
 
                 // ワークシートのセルから値を取得
-                var sheetName = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 2, null);
-                var productName = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 3, null);
-                var productNameRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 4, null);
-                var productNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 5, null);
-                var orderNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 6, null);
-                var regDateRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 7, null);
-                var productModel = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 8, null);
-                var productModelRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 9, null);
-                var quantityRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 10, null);
-                var serialFirstRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 11, null);
-                var serialLastRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 12, null);
-                var commentRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 13, null);
-                var qrCodeRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 14, null);
+                var sheetName = workSheetMain.Cells[resultRow, 2].Value?.ToString();
+                var productName = workSheetMain.Cells[resultRow, 3].Value?.ToString();
+                var productNameRange = workSheetMain.Cells[resultRow, 4].Value?.ToString();
+                var productNumberRange = workSheetMain.Cells[resultRow, 5].Value?.ToString();
+                var orderNumberRange = workSheetMain.Cells[resultRow, 6].Value?.ToString();
+                var regDateRange = workSheetMain.Cells[resultRow, 7].Value?.ToString();
+                var productModel = workSheetMain.Cells[resultRow, 8].Value?.ToString();
+                var productModelRange = workSheetMain.Cells[resultRow, 9].Value?.ToString();
+                var quantityRange = workSheetMain.Cells[resultRow, 10].Value?.ToString();
+                var serialFirstRange = workSheetMain.Cells[resultRow, 11].Value?.ToString();
+                var serialLastRange = workSheetMain.Cells[resultRow, 12].Value?.ToString();
+                var commentRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
+                var qrCodeRange = workSheetMain.Cells[resultRow, 14].Value?.ToString();
 
-                var workSheetTemp = workBook.Worksheet(sheetName);
-                workSheetTemp.Cell(productNameRange).Value = productName;
-                workSheetTemp.Cell(productNumberRange).Value = ProductInfo.ProductNumber;
-                workSheetTemp.Cell(orderNumberRange).Value = ProductInfo.OrderNumber;
-                workSheetTemp.Cell(regDateRange).Value = ProductInfo.RegDate;
-                workSheetTemp.Cell(productModelRange).Value = productModel;
-                workSheetTemp.Cell(quantityRange).Value = ProductInfo.Quantity;
-                workSheetTemp.Cell(serialFirstRange).Value = ProductInfo.SerialFirst;
-                workSheetTemp.Cell(serialLastRange).Value = ProductInfo.SerialLast;
-                workSheetTemp.Cell(commentRange).Value = ProductInfo.Comment;
+                var workSheetTemp = workBook.Workbook.Worksheets[sheetName];
+                workSheetTemp.Cells[productNameRange].Value = productName;
+                workSheetTemp.Cells[productNumberRange].Value = ProductInfo.ProductNumber;
+                workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber;
+                workSheetTemp.Cells[regDateRange].Value = ProductInfo.RegDate;
+                workSheetTemp.Cells[productModelRange].Value = ProductInfo.ProductModel;
+                workSheetTemp.Cells[quantityRange].Value = ProductInfo.Quantity;
+                workSheetTemp.Cells[serialFirstRange].Value = ProductInfo.SerialFirst;
+                workSheetTemp.Cells[serialLastRange].Value = ProductInfo.SerialLast;
+                workSheetTemp.Cells[commentRange].Value = ProductInfo.Comment;
 
-                var findColumn = 0;
                 for (var i = 0; i <= _listUsedSubstrate.Count - 1; i++) {
+                    var targetRow = resultRow; // 検索対象の行番号
+                    var searchValue = $"{_usedSubstrate[i]}";
+                    var foundColumn = 0;
 
-                    var searchRange = workSheetMain.Range(findRow, 1, findRow, 44);
-                    var searchValue = $"{_listUsedSubstrate[i]}";
-                    var foundCell = searchRange.CellsUsed(c => c.Value.ToString() == searchValue).FirstOrDefault();
+                    var searchAddressResult2 = workSheetMain.Cells
+                        .Where(x => x.Start.Row == targetRow) // 指定した行のセルのみを対象にする
+                        .First(x => x.Value?.ToString() == searchValue);
 
-                    if (foundCell != null) {
+                    if (searchAddressResult2 != null) {
                         // セルが見つかった場合の処理
-                        var foundRow = foundCell.Address.RowNumber;
-                        var foundColumn = foundCell.Address.ColumnNumber;
+                        foundColumn = searchAddressResult2.Start.Column;
+                    }
+                    if (foundColumn == 0) {
+                        throw new Exception($"{_usedSubstrate[i]}が見つかりません。");
                     }
 
-                    foreach (var cell in workSheetMain.Search(_listUsedSubstrate[i])) {
-                        if (cell.Address.RowNumber == findRow) {
-                            findColumn = cell.Address.ColumnNumber;
-                            break;
-                        }
-                    }
-
-                    if (findColumn == 0) {
-                        throw new Exception($"{_listUsedSubstrate[i]}が見つかりません。");
-                    }
-
-                    var mainCellValue = workSheetMain.Cell(findRow, findColumn + 1).Value.ToString();
-                    var tempCellValue = workSheetTemp.Cell(mainCellValue).Value.ToString();
+                    var mainCellValue = workSheetMain.Cells[resultRow, foundColumn + 1].Value.ToString();
+                    var tempCellValue = workSheetTemp.Cells[mainCellValue].Value?.ToString();
 
                     if (mainCellValue != string.Empty) {
                         if (tempCellValue == string.Empty) {
-                            workSheetTemp.Cell(mainCellValue).Value = $"{_listUsedProductNumber[i]}({_listUsedQuantity[i]})";
+                            workSheetTemp.Cells[mainCellValue].Value = $"{_listUsedProductNumber[i]}({_listUsedQuantity[i]})";
                         }
                         else {
-                            workSheetTemp.Cell(mainCellValue).Value += $"    {_listUsedProductNumber[i]}({_listUsedQuantity[i]})";
+                            workSheetTemp.Cells[mainCellValue].Value += $"    {_listUsedProductNumber[i]}({_listUsedQuantity[i]})";
                         }
                     }
                 }
@@ -595,16 +589,17 @@ namespace ProductDatabase {
                     using MemoryStream stream = new();
                     bitmap.Save(stream, ImageFormat.Bmp);
 
-                    var image = workSheetTemp.AddPicture(stream);
-                    image.MoveTo(workSheetTemp.Cell(qrCodeRange));
+                    var image = workSheetTemp.Drawings.AddPicture("QR", bitmap);
+                    image.SetPosition(workSheetTemp.Cells[qrCodeRange].Start.Row - 1, 0, workSheetTemp.Cells[qrCodeRange].Start.Column - 1, 0);
                 }
 
                 //引数に保存先パスを指定
                 var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "temporarily.xlsx");
-                workBook.SaveAs(temporarilyPath);
+                var fileInfo = new FileInfo(temporarilyPath);
+                workBook.SaveAs(fileInfo);
 
                 // 印刷
-                Excel.Application xlApp = new() {
+                Microsoft.Office.Interop.Excel.Application xlApp = new() {
                     Visible = true // Excelウィンドウを表示します。
                 };
 
@@ -614,7 +609,7 @@ namespace ProductDatabase {
 
                 // ワークシート選択
                 var xlSheets = xlBook.Sheets;
-                Excel.Worksheet xlSheet = xlSheets[sheetName];
+                Microsoft.Office.Interop.Excel.Worksheet xlSheet = xlSheets[sheetName];
 
                 // ワークシート表示
                 xlSheet.Activate();
@@ -633,25 +628,163 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        private static void ListPrint_ClosedXML() {
+            //try {
+            //    var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigList.xlsx");
+            //    using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            //    using XLWorkbook workBook = new(fileStream);
+            //    var workSheetMain = workBook.Worksheet("Sheet1");
+
+            //    // セル検索
+            //    var productModelCell = workSheetMain.Search(ProductInfo.ProductModel).FirstOrDefault() ?? throw new Exception($"Configに品目番号:[{ProductInfo.ProductModel}]が見つかりません。");
+            //    var findRow = productModelCell.Address.RowNumber;
+
+            //    // ワークシートのセルから値を取得
+            //    var sheetName = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 2, null);
+            //    var productName = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 3, null);
+            //    var productNameRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 4, null);
+            //    var productNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 5, null);
+            //    var orderNumberRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 6, null);
+            //    var regDateRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 7, null);
+            //    var productModel = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 8, null);
+            //    var productModelRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 9, null);
+            //    var quantityRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 10, null);
+            //    var serialFirstRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 11, null);
+            //    var serialLastRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 12, null);
+            //    var commentRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 13, null);
+            //    var qrCodeRange = ExcelHelper.GetCellValueOrDefault(workSheetMain, findRow, 14, null);
+
+            //    var workSheetTemp = workBook.Worksheet(sheetName);
+            //    workSheetTemp.Cell(productNameRange).Value = productName;
+            //    workSheetTemp.Cell(productNumberRange).Value = ProductInfo.ProductNumber;
+            //    workSheetTemp.Cell(orderNumberRange).Value = ProductInfo.OrderNumber;
+            //    workSheetTemp.Cell(regDateRange).Value = ProductInfo.RegDate;
+            //    workSheetTemp.Cell(productModelRange).Value = productModel;
+            //    workSheetTemp.Cell(quantityRange).Value = ProductInfo.Quantity;
+            //    workSheetTemp.Cell(serialFirstRange).Value = ProductInfo.SerialFirst;
+            //    workSheetTemp.Cell(serialLastRange).Value = ProductInfo.SerialLast;
+            //    workSheetTemp.Cell(commentRange).Value = ProductInfo.Comment;
+
+            //    var findColumn = 0;
+            //    for (var i = 0; i <= _listUsedSubstrate.Count - 1; i++) {
+
+            //        var searchRange = workSheetMain.Range(findRow, 1, findRow, 44);
+            //        var searchValue = $"{_listUsedSubstrate[i]}";
+            //        var foundCell = searchRange.CellsUsed(c => c.Value.ToString() == searchValue).FirstOrDefault();
+
+            //        if (foundCell != null) {
+            //            // セルが見つかった場合の処理
+            //            var foundRow = foundCell.Address.RowNumber;
+            //            var foundColumn = foundCell.Address.ColumnNumber;
+            //        }
+
+            //        foreach (var cell in workSheetMain.Search(_listUsedSubstrate[i])) {
+            //            if (cell.Address.RowNumber == findRow) {
+            //                findColumn = cell.Address.ColumnNumber;
+            //                break;
+            //            }
+            //        }
+
+            //        if (findColumn == 0) {
+            //            throw new Exception($"{_listUsedSubstrate[i]}が見つかりません。");
+            //        }
+
+            //        var mainCellValue = workSheetMain.Cell(findRow, findColumn + 1).Value.ToString();
+            //        var tempCellValue = workSheetTemp.Cell(mainCellValue).Value.ToString();
+
+            //        if (mainCellValue != string.Empty) {
+            //            if (tempCellValue == string.Empty) {
+            //                workSheetTemp.Cell(mainCellValue).Value = $"{_listUsedProductNumber[i]}({_listUsedQuantity[i]})";
+            //            }
+            //            else {
+            //                workSheetTemp.Cell(mainCellValue).Value += $"    {_listUsedProductNumber[i]}({_listUsedQuantity[i]})";
+            //            }
+            //        }
+            //    }
+
+            //    // QRコード
+            //    if (!string.IsNullOrEmpty(qrCodeRange)) {
+            //        BarcodeWriter<PixelData> qr = new() {
+            //            Format = BarcodeFormat.QR_CODE,
+            //            Options = new QrCodeEncodingOptions {
+            //                ErrorCorrection = ErrorCorrectionLevel.L,
+            //                CharacterSet = "Shift_JIS",
+            //                Width = 100,
+            //                Height = 100,
+            //            },
+            //            Renderer = new PixelDataRenderer {
+            //                Foreground = new(Color.Gray.ToArgb()),
+            //                Background = new(Color.White.ToArgb()),
+            //            },
+            //        };
+
+            //        var pixelData = qr.Write($"{ProductInfo.OrderNumber};{ProductInfo.ProductNumber};{productModel};{ProductInfo.Quantity};{ProductInfo.SerialFirst};{ProductInfo.SerialLast}");
+
+            //        // PixelData を Bitmap に変換
+            //        using var bitmap = new Bitmap(pixelData.Width, pixelData.Height, PixelFormat.Format32bppArgb);
+            //        var bmpData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            //        System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bmpData.Scan0, pixelData.Pixels.Length);
+            //        bitmap.UnlockBits(bmpData);
+            //        using MemoryStream stream = new();
+            //        bitmap.Save(stream, ImageFormat.Bmp);
+
+            //        var image = workSheetTemp.AddPicture(stream);
+            //        image.MoveTo(workSheetTemp.Cell(qrCodeRange));
+            //    }
+
+            //    //引数に保存先パスを指定
+            //    var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "temporarily.xlsx");
+            //    workBook.SaveAs(temporarilyPath);
+
+            //    // 印刷
+            //    Excel.Application xlApp = new() {
+            //        Visible = true // Excelウィンドウを表示します。
+            //    };
+
+            //    // ワークブック開く
+            //    var xlBooks = xlApp.Workbooks;
+            //    var xlBook = xlBooks.Open(temporarilyPath, ReadOnly: true);
+
+            //    // ワークシート選択
+            //    var xlSheets = xlBook.Sheets;
+            //    Excel.Worksheet xlSheet = xlSheets[sheetName];
+
+            //    // ワークシート表示
+            //    xlSheet.Activate();
+
+            //    // ワークブックを閉じてExcelを終了
+            //    //xlBook.Close(false);
+            //    //xlApp.Quit();
+
+            //    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
+            //    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
+            //    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook);
+            //    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks);
+            //    _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
+
+            //} catch (Exception ex) {
+            //    MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
+        }
         public static class ExcelHelper {
-            public static string GetCellValueOrDefault(IXLWorksheet sheet, int rowIndex, int colIndex, int? defaultRow = null) {
-                // 対象セルの値を取得
-                var value = sheet.Cell(rowIndex, colIndex).GetString();
+            //public static string GetCellValueOrDefault(IXLWorksheet sheet, int rowIndex, int colIndex, int? defaultRow = null) {
+            //    // 対象セルの値を取得
+            //    var value = sheet.Cell(rowIndex, colIndex).GetString();
 
-                // 値が存在しない場合の処理
-                if (string.IsNullOrEmpty(value)) {
-                    // デフォルト行が指定されていない場合は空文字を返す
-                    if (defaultRow is null or 0) {
-                        return string.Empty;
-                    }
+            //    // 値が存在しない場合の処理
+            //    if (string.IsNullOrEmpty(value)) {
+            //        // デフォルト行が指定されていない場合は空文字を返す
+            //        if (defaultRow is null or 0) {
+            //            return string.Empty;
+            //        }
 
-                    // デフォルト行の値を取得
-                    return sheet.Cell(defaultRow.Value, colIndex).GetString();
-                }
+            //        // デフォルト行の値を取得
+            //        return sheet.Cell(defaultRow.Value, colIndex).GetString();
+            //    }
 
-                // 値が存在すればその値を返す
-                return value;
-            }
+            //    // 値が存在すればその値を返す
+            //    return value;
+            //}
         }
 
         // チェックボックスイベント
