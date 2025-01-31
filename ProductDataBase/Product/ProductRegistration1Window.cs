@@ -275,7 +275,8 @@ namespace ProductDatabase {
             try {
                 if (string.IsNullOrWhiteSpace(QrCodeTextBox.Text)) { return; }
                 string[] separator = ["//"];
-                var arr = QrCodeTextBox.Text.Split(separator, StringSplitOptions.None);
+                var code = textToUpperCheckBox.Checked ? QrCodeTextBox.Text.ToUpper() : QrCodeTextBox.Text;
+                var arr = code.Split(separator, StringSplitOptions.None);
                 if (arr.Length != 4) {
                     MessageBox.Show("QRコードが正しくありません。");
                     return;
