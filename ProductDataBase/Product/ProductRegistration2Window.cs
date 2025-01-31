@@ -1411,8 +1411,8 @@ namespace ProductDatabase {
                 var quantityRange = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString() ?? workSheetMain.Cells[2, 8].Value.ToString();
                 var serialFirstRange = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString() ?? workSheetMain.Cells[2, 9].Value.ToString();
                 var serialLastRange = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString() ?? workSheetMain.Cells[2, 10].Value.ToString();
-                var productModelRange = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString() ?? workSheetMain.Cells[2, 11].Value.ToString();
-                var saveDirectory = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString() ?? workSheetMain.Cells[2, 12].Value.ToString();
+                var productModelRange = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString();
+                var saveDirectory = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString();
 
                 using FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using var workBookReport = new ExcelPackage(fileStreamReport);
