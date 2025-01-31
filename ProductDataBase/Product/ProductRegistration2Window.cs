@@ -1407,12 +1407,12 @@ namespace ProductDatabase {
                     ? workSheetMain.Cells[searchAddressResultRow, 5].Value.ToString()
                     : throw new Exception("シート名がありません。");
                 var productNumberRange = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString() ?? workSheetMain.Cells[2, 6].Value.ToString();
-                var orderNumberRange = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString() ?? workSheetMain.Cells[2, 7].Value.ToString();
-                var quantityRange = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString() ?? workSheetMain.Cells[2, 8].Value.ToString();
-                var serialFirstRange = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString() ?? workSheetMain.Cells[2, 9].Value.ToString();
-                var serialLastRange = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString() ?? workSheetMain.Cells[2, 10].Value.ToString();
-                var productModelRange = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString();
-                var saveDirectory = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString();
+                var orderNumberRange = workSheetMain.Cells[searchAddressResultRow, 7].Value?.ToString() ?? workSheetMain.Cells[2, 7].Value.ToString();
+                var quantityRange = workSheetMain.Cells[searchAddressResultRow, 8].Value?.ToString() ?? workSheetMain.Cells[2, 8].Value.ToString();
+                var serialFirstRange = workSheetMain.Cells[searchAddressResultRow, 9].Value?.ToString() ?? workSheetMain.Cells[2, 9].Value.ToString();
+                var serialLastRange = workSheetMain.Cells[searchAddressResultRow, 10].Value?.ToString() ?? workSheetMain.Cells[2, 10].Value.ToString();
+                var productModelRange = workSheetMain.Cells[searchAddressResultRow, 11].Value?.ToString();
+                var saveDirectory = workSheetMain.Cells[searchAddressResultRow, 12].Value?.ToString();
 
                 using FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using var workBookReport = new ExcelPackage(fileStreamReport);
