@@ -81,6 +81,7 @@
             this.ProductTypeLabel1 = new Label();
             this.label1 = new Label();
             this.QrCodeButton = new Button();
+            this.textToUpperCheckBox = new CheckBox();
             this.RePrintMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPostionNumericUpDown).BeginInit();
             this.panel1.SuspendLayout();
@@ -677,11 +678,24 @@
             this.QrCodeButton.UseVisualStyleBackColor = true;
             this.QrCodeButton.Click += this.QrCodeButton_Click;
             // 
+            // textToUpperCheckBox
+            // 
+            this.textToUpperCheckBox.AutoSize = true;
+            this.textToUpperCheckBox.Checked = true;
+            this.textToUpperCheckBox.CheckState = CheckState.Checked;
+            this.textToUpperCheckBox.Location = new Point(397, 71);
+            this.textToUpperCheckBox.Name = "textToUpperCheckBox";
+            this.textToUpperCheckBox.Size = new Size(140, 19);
+            this.textToUpperCheckBox.TabIndex = 609;
+            this.textToUpperCheckBox.Text = "小文字を大文字に変換";
+            this.textToUpperCheckBox.UseVisualStyleBackColor = true;
+            // 
             // RePrintWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.textToUpperCheckBox);
             this.Controls.Add(this.QrCodeButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.ProductTypeLabel2);
@@ -804,5 +818,6 @@
         private Label ProductTypeLabel1;
         private Label label1;
         private Button QrCodeButton;
+        private CheckBox textToUpperCheckBox;
     }
 }
