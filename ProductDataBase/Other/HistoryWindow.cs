@@ -398,10 +398,8 @@ namespace ProductDatabase {
                 if (string.IsNullOrEmpty(FilterStringTextBox.Text) || CategoryComboBox.SelectedIndex == 0) {
                     historyTable.DefaultView.RowFilter = null;
                 }
-                else if (CategoryComboBox.Text == "ID") {
-                    if (int.TryParse(FilterStringTextBox.Text, out var id)) {
-                        historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} = {id}";
-                    }
+                else if (historyTable.Columns[_listColFilter[CategoryComboBox.SelectedIndex]]?.DataType == typeof(long)) {
+                    historyTable.DefaultView.RowFilter = $"CONVERT({_listColFilter[CategoryComboBox.SelectedIndex]}, 'System.String') LIKE '%{FilterStringTextBox.Text}%'";
                 }
                 else if (CategoryComboBox.Text != "") {
                     historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} LIKE '*{FilterStringTextBox.Text}*'";
