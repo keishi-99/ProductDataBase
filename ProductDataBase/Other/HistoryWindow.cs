@@ -43,6 +43,7 @@ namespace ProductDatabase {
                 Font = new System.Drawing.Font(ProductInfo.FontName, ProductInfo.FontSize);
 
                 CategoryRadioButton1.Checked = true;
+                CategoryComboBox.SelectedIndex = 0;
 
                 switch (ProductInfo.RadioButtonFlg) {
                     case 1:
@@ -388,7 +389,7 @@ namespace ProductDatabase {
                 MessageBox.Show("無効な選択です。", "[CategorySelect]エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-        private void HistoryTableFilter(object sender, EventArgs e) {
+        private void HistoryTableFilter() {
             try {
                 // DataGridView のデータソースから取得
                 if (DataBaseDataGridView.DataSource is not System.Data.DataTable historyTable) {
@@ -946,7 +947,8 @@ namespace ProductDatabase {
         private void HistoryWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void GenerationReportButton_Click(object sender, EventArgs e) { GenerationReport(); }
         private void GenerationListButton_Click(object sender, EventArgs e) { GenerationList(); }
-        private void FilterStringTextBox_TextChanged(object sender, EventArgs e) { HistoryTableFilter(sender, e); }
+        private void CategoryComboBox_SelectedIndexChanged(object sender, EventArgs e) { HistoryTableFilter(); }
+        private void FilterStringTextBox_TextChanged(object sender, EventArgs e) { HistoryTableFilter(); }
         private void CategoryRadioButton_CheckedChanged(object sender, EventArgs e) { CategorySelect(sender); }
         private void StockCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }
         private void AllSubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }
