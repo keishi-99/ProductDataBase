@@ -102,6 +102,8 @@ namespace ProductDatabase {
                 }
 
                 FirstSerialNumberCheckBox.Checked = true;
+                LabelPrintButton.Enabled = IsLabelPrint;
+                BarcodePrintButton.Enabled = IsBarcodePrint;
                 LoadSettings(labelSettingFilePath, barcodeSettingFilePath);
 
             } catch (Exception ex) {
