@@ -288,6 +288,11 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = false;
                 HistoryButton.Enabled = false;
 
+                CategoryRadioButton1.Checked = false;
+                CategoryRadioButton2.Checked = false;
+                CategoryRadioButton3.Checked = false;
+                CategoryRadioButton4.Checked = false;
+
                 CategoryListBox1.Items.Clear();
                 CategoryListBox2.Items.Clear();
                 CategoryListBox3.Items.Clear();
