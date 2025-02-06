@@ -53,6 +53,7 @@
             this.CategoryComboBox.Name = "CategoryComboBox";
             this.CategoryComboBox.Size = new Size(121, 23);
             this.CategoryComboBox.TabIndex = 1;
+            this.CategoryComboBox.SelectedIndexChanged += this.CategoryComboBox_SelectedIndexChanged;
             // 
             // FilterStringTextBox
             // 
