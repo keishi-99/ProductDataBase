@@ -132,7 +132,7 @@ namespace ProductDatabase {
                             using var cmd = con.CreateCommand();
 
                             // テーブル検索SQL - [[StockName]_StockView]テーブルから基板型式[Model]で在庫基板を抽出
-                            cmd.CommandText = $"SELECT * FROM {ProductInfo.StockName}_StockView WHERE SubstrateModel = @SubstrateModel";
+                            cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateModel = @SubstrateModel""";
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using var dr = cmd.ExecuteReader();
                             var j = 0;
@@ -332,7 +332,7 @@ namespace ProductDatabase {
                                             var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[3].Value);
 
                                             using (var cmd = con.CreateCommand()) {
-                                                cmd.CommandText = $"""SELECT * FROM {ProductInfo.StockName}_StockView WHERE SubstrateModel = @SubstrateModel""";
+                                                cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateModel = @SubstrateModel""";
                                                 cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                                                 using var dr = cmd.ExecuteReader();
                                                 while (dr.Read()) {
