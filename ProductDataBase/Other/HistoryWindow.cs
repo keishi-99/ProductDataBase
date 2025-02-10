@@ -990,6 +990,8 @@ namespace ProductDatabase {
                     .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName)) // 空白でない間
                     .ToList();
 
+                if (sheetNames.Count == 0) { throw new Exception("対象シートがありません。"); }
+
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells[1].Value.ToString() ?? string.Empty;
                 ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells[4].Value.ToString() ?? string.Empty;
@@ -1000,26 +1002,26 @@ namespace ProductDatabase {
                 var date = DateTime.Parse(ProductInfo.RegDate);
 
                 foreach (var sheetName in sheetNames) {
-                    var workSheetTemp = workBook.Workbook.Worksheets[sheetName];
-                    workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber;
-                    workSheetTemp.Cells[serialFirstRange].Value = ProductInfo.SerialFirst;
-                    workSheetTemp.Cells[serialLastRange].Value = ProductInfo.SerialLast;
-                    workSheetTemp.Cells[regDateYearRange].Value = date.Year;
-                    workSheetTemp.Cells[regDateMonthRange].Value = date.Month;
-                    workSheetTemp.Cells[regDateDayRange].Value = date.Day;
-                    workSheetTemp.Cells[regTemperatureRange].Value = temperature;
-                    workSheetTemp.Cells[regHumidityRange].Value = humidity;
+                    var workSheetTemp = sheet[sheetName] ?? throw new Exception($"シート[{sheetName}]が見つかりません。");
+                    if (!string.IsNullOrEmpty(orderNumberRange)) { workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber; }
+                    if (!string.IsNullOrEmpty(serialFirstRange)) { workSheetTemp.Cells[serialFirstRange].Value = ProductInfo.SerialFirst; }
+                    if (!string.IsNullOrEmpty(serialLastRange)) { workSheetTemp.Cells[serialLastRange].Value = ProductInfo.SerialLast; }
+                    if (!string.IsNullOrEmpty(regDateYearRange)) { workSheetTemp.Cells[regDateYearRange].Value = date.Year; }
+                    if (!string.IsNullOrEmpty(regDateMonthRange)) { workSheetTemp.Cells[regDateMonthRange].Value = date.Month; }
+                    if (!string.IsNullOrEmpty(regDateDayRange)) { workSheetTemp.Cells[regDateDayRange].Value = date.Day; }
+                    if (!string.IsNullOrEmpty(regTemperatureRange)) { workSheetTemp.Cells[regTemperatureRange].Value = temperature; }
+                    if (!string.IsNullOrEmpty(regHumidityRange)) { workSheetTemp.Cells[regHumidityRange].Value = humidity; }
                 }
 
                 // 不要なシートを非表示にする
-                var allSheetName = workBook.Workbook.Worksheets
+                var allSheetName = sheet
                     .Select(sh => sh.Name.ToString())
                     .ToList();
 
                 var hiddenSheetNames = allSheetName.Except(sheetNames.Where(name => name != null).Cast<string>()).ToList();
                 sheet["Sheet1"].Hidden = eWorkSheetHidden.VeryHidden;
                 foreach (var sheetName in hiddenSheetNames) {
-                    sheet[sheetName].Hidden = eWorkSheetHidden.VeryHidden;
+                    sheet[sheetName].Hidden = eWorkSheetHidden.Hidden;
                 }
 
                 //引数に保存先パスを指定
