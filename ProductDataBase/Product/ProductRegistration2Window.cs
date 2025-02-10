@@ -1343,21 +1343,11 @@ namespace ProductDatabase {
                     var productNumber = ProductInfo.ProductNumber.Split("-");
                     workSheetTemp.Cells[productNumberRange].Value = productNumber[0];
                 }
-                if (!string.IsNullOrEmpty(ProductInfo.OrderNumber)) {
-                    workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber;
-                }
-                if (ProductInfo.Quantity != 0) {
-                    workSheetTemp.Cells[quantityRange].Value = ProductInfo.Quantity;
-                }
-                if (!string.IsNullOrEmpty(_serialFirst)) {
-                    workSheetTemp.Cells[serialFirstRange].Value = _serialFirst;
-                }
-                if (!string.IsNullOrEmpty(_serialLast)) {
-                    workSheetTemp.Cells[serialLastRange].Value = _serialLast;
-                }
-                if (!string.IsNullOrEmpty(productModelRange)) {
-                    workSheetTemp.Cells[productModelRange].Value = ProductInfo.ProductModel;
-                }
+                if (!string.IsNullOrEmpty(orderNumberRange)) { workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber; }
+                if (!string.IsNullOrEmpty(quantityRange)) { workSheetTemp.Cells[quantityRange].Value = ProductInfo.Quantity; }
+                if (!string.IsNullOrEmpty(serialFirstRange)) { workSheetTemp.Cells[serialFirstRange].Value = _serialFirst; }
+                if (!string.IsNullOrEmpty(serialLastRange)) { workSheetTemp.Cells[serialLastRange].Value = _serialLast; }
+                if (!string.IsNullOrEmpty(productModelRange)) { workSheetTemp.Cells[productModelRange].Value = ProductInfo.ProductModel; }
 
                 // ダイアログで保存先を選択
                 using SaveFileDialog saveFileDialog = new() {
@@ -1487,15 +1477,15 @@ namespace ProductDatabase {
                 var qrCodeRange = workSheetMain.Cells[resultRow, 14].Value?.ToString();
 
                 var workSheetTemp = sheet[sheetName];
-                workSheetTemp.Cells[productNameRange].Value = productName;
-                workSheetTemp.Cells[productNumberRange].Value = ProductInfo.ProductNumber;
-                workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber;
-                workSheetTemp.Cells[regDateRange].Value = ProductInfo.RegDate;
-                workSheetTemp.Cells[productModelRange].Value = ProductInfo.ProductModel;
-                workSheetTemp.Cells[quantityRange].Value = ProductInfo.Quantity;
-                workSheetTemp.Cells[serialFirstRange].Value = _serialFirst;
-                workSheetTemp.Cells[serialLastRange].Value = _serialLast;
-                workSheetTemp.Cells[commentRange].Value = ProductInfo.Comment;
+                if (string.IsNullOrEmpty(productNameRange)) { workSheetTemp.Cells[productNameRange].Value = productName; }
+                if (string.IsNullOrEmpty(productNumberRange)) { workSheetTemp.Cells[productNumberRange].Value = ProductInfo.ProductNumber; }
+                if (string.IsNullOrEmpty(orderNumberRange)) { workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber; }
+                if (string.IsNullOrEmpty(regDateRange)) { workSheetTemp.Cells[regDateRange].Value = ProductInfo.RegDate; }
+                if (string.IsNullOrEmpty(productModelRange)) { workSheetTemp.Cells[productModelRange].Value = ProductInfo.ProductModel; }
+                if (string.IsNullOrEmpty(quantityRange)) { workSheetTemp.Cells[quantityRange].Value = ProductInfo.Quantity; }
+                if (string.IsNullOrEmpty(serialFirstRange)) { workSheetTemp.Cells[serialFirstRange].Value = _serialFirst; }
+                if (string.IsNullOrEmpty(serialLastRange)) { workSheetTemp.Cells[serialLastRange].Value = _serialLast; }
+                if (string.IsNullOrEmpty(commentRange)) { workSheetTemp.Cells[commentRange].Value = ProductInfo.Comment; }
 
                 for (var i = 0; i <= _usedSubstrate.Count - 1; i++) {
                     var targetRow = resultRow; // 検索対象の行番号

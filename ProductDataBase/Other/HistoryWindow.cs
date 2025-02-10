@@ -463,21 +463,11 @@ namespace ProductDatabase {
                     var productNumbers = productNumber.Split("-");
                     workSheetTemp.Cells[productNumberRange].Value = productNumbers[0];
                 }
-                if (!string.IsNullOrEmpty(orderNumber)) {
-                    workSheetTemp.Cells[orderNumberRange].Value = orderNumber;
-                }
-                if (!string.IsNullOrEmpty(quantity)) {
-                    workSheetTemp.Cells[quantityRange].Value = quantity;
-                }
-                if (!string.IsNullOrEmpty(serialFirst)) {
-                    workSheetTemp.Cells[serialFirstRange].Value = serialFirst;
-                }
-                if (!string.IsNullOrEmpty(serialLast)) {
-                    workSheetTemp.Cells[serialLastRange].Value = serialLast;
-                }
-                if (!string.IsNullOrEmpty(productModelRange)) {
-                    workSheetTemp.Cells[productModelRange].Value = ProductInfo.ProductModel;
-                }
+                if (!string.IsNullOrEmpty(orderNumberRange)) { workSheetTemp.Cells[orderNumberRange].Value = orderNumber; }
+                if (!string.IsNullOrEmpty(quantityRange)) { workSheetTemp.Cells[quantityRange].Value = quantity; }
+                if (!string.IsNullOrEmpty(serialFirstRange)) { workSheetTemp.Cells[serialFirstRange].Value = serialFirst; }
+                if (!string.IsNullOrEmpty(serialLastRange)) { workSheetTemp.Cells[serialLastRange].Value = serialLast; }
+                if (!string.IsNullOrEmpty(productModelRange)) { workSheetTemp.Cells[productModelRange].Value = ProductInfo.ProductModel; }
 
                 // ダイアログで保存先を選択
                 using SaveFileDialog saveFileDialog = new() {
@@ -648,15 +638,15 @@ namespace ProductDatabase {
                 ProductInfo.UsedSubstrate = DataBaseDataGridView.Rows[selectRow].Cells[14].Value.ToString() ?? string.Empty;
 
                 var workSheetTemp = sheet[sheetName];
-                workSheetTemp.Cells[productNameRange].Value = productName;
-                workSheetTemp.Cells[productNumberRange].Value = ProductInfo.ProductNumber;
-                workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber;
-                workSheetTemp.Cells[regDateRange].Value = DateTime.Now.ToShortDateString();
-                workSheetTemp.Cells[productModelRange].Value = ProductInfo.ProductModel;
-                workSheetTemp.Cells[quantityRange].Value = ProductInfo.Quantity;
-                workSheetTemp.Cells[serialFirstRange].Value = ProductInfo.SerialFirst;
-                workSheetTemp.Cells[serialLastRange].Value = ProductInfo.SerialLast;
-                workSheetTemp.Cells[commentRange].Value = ProductInfo.Comment;
+                if (!string.IsNullOrEmpty(productNameRange)) { workSheetTemp.Cells[productNameRange].Value = productName; }
+                if (!string.IsNullOrEmpty(productNumberRange)) { workSheetTemp.Cells[productNumberRange].Value = ProductInfo.ProductNumber; }
+                if (!string.IsNullOrEmpty(orderNumberRange)) { workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber; }
+                if (!string.IsNullOrEmpty(regDateRange)) { workSheetTemp.Cells[regDateRange].Value = DateTime.Now.ToShortDateString(); }
+                if (!string.IsNullOrEmpty(productModelRange)) { workSheetTemp.Cells[productModelRange].Value = ProductInfo.ProductModel; }
+                if (!string.IsNullOrEmpty(quantityRange)) { workSheetTemp.Cells[quantityRange].Value = ProductInfo.Quantity; }
+                if (!string.IsNullOrEmpty(serialFirstRange)) { workSheetTemp.Cells[serialFirstRange].Value = ProductInfo.SerialFirst; }
+                if (!string.IsNullOrEmpty(serialLastRange)) { workSheetTemp.Cells[serialLastRange].Value = ProductInfo.SerialLast; }
+                if (!string.IsNullOrEmpty(commentRange)) { workSheetTemp.Cells[commentRange].Value = ProductInfo.Comment; }
 
                 //string[] usedSubstrate =  ProductInfo.UsedSubstrate.Split(",");
 
