@@ -1,4 +1,5 @@
 ﻿using OfficeOpenXml;
+using ProductDatabase.Other;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing.Imaging;
@@ -15,6 +16,7 @@ namespace ProductDatabase {
 
         private readonly List<string> _listColFilter = [];
         private bool IsListPrint => ProductInfo.PrintType is 5 or 6;
+        private bool IsCheckSheetPrint => ProductInfo.PrintType is 6 or 7;
 
         public HistoryWindow(ProductInformation productInfo) {
             InitializeComponent();
@@ -53,16 +55,16 @@ namespace ProductDatabase {
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
                         GenerationReportButton.Visible = false;
-                        GenerationListButton.Visible = false;
+                        GenerationListButton.Visible = IsListPrint;
+                        GenerationCheckSheetButton.Visible = IsCheckSheetPrint;
                         break;
                     case 2:
                         CategoryRadioButton2.Text = "全てのタイプ";
                         CategoryRadioButton3.Text = "シリアル";
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
-                        if (!IsListPrint) {
-                            GenerationListButton.Visible = false;
-                        }
+                        GenerationListButton.Visible = IsListPrint;
+                        GenerationCheckSheetButton.Visible = IsCheckSheetPrint;
                         break;
                     case 3:
                         CategoryRadioButton1.Visible = false;
@@ -71,7 +73,8 @@ namespace ProductDatabase {
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
                         GenerationReportButton.Visible = false;
-                        GenerationListButton.Visible = false;
+                        GenerationListButton.Visible = IsListPrint;
+                        GenerationCheckSheetButton.Visible = IsCheckSheetPrint;
                         break;
                 }
             } catch (Exception ex) {
@@ -131,10 +134,8 @@ namespace ProductDatabase {
         private void ViewProductRegistrationLog() {
 
             GenerationReportButton.Visible = true;
-            GenerationListButton.Visible = true;
-            if (!IsListPrint) {
-                GenerationListButton.Visible = false;
-            }
+            GenerationListButton.Visible = IsListPrint;
+            GenerationCheckSheetButton.Visible = IsCheckSheetPrint;
 
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new System.Data.DataTable();
@@ -185,10 +186,8 @@ namespace ProductDatabase {
         private void ViewProductRegistrationAllTypesLog() {
 
             GenerationReportButton.Visible = true;
-            GenerationListButton.Visible = true;
-            if (!IsListPrint) {
-                GenerationListButton.Visible = false;
-            }
+            GenerationListButton.Visible = IsListPrint;
+            GenerationCheckSheetButton.Visible = IsCheckSheetPrint;
 
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new System.Data.DataTable();
@@ -328,6 +327,7 @@ namespace ProductDatabase {
         private void ViewSerialLog() {
             GenerationReportButton.Visible = false;
             GenerationListButton.Visible = false;
+            GenerationCheckSheetButton.Visible = false;
 
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new System.Data.DataTable();
@@ -612,8 +612,9 @@ namespace ProductDatabase {
                 using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using var workBook = new ExcelPackage(fileStream);
                 //既存ワークシートを取得（workBookはExcelWorkbookクラスオブジェクト）
+                var sheet = workBook.Workbook.Worksheets;
                 var targetSheetName = "Sheet1";
-                var workSheetMain = workBook.Workbook.Worksheets[targetSheetName];
+                var workSheetMain = sheet[targetSheetName];
 
                 // セル検索
                 var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Value?.ToString() == ProductInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{ProductInfo.ProductModel}]が見つかりません。");
@@ -739,7 +740,7 @@ namespace ProductDatabase {
                 }
 
                 //引数に保存先パスを指定
-                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "temporarily.xlsx");
+                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "temporarilyList.xlsx");
                 var fileInfo = new FileInfo(temporarilyPath);
                 workBook.SaveAs(fileInfo);
 
@@ -943,10 +944,124 @@ namespace ProductDatabase {
             //    MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             //}
         }
+        // チェックシート印刷
+        private void GenerationCheckSheet() {
+            try {
+
+                var dialog = new InputDialog1();
+                var result = dialog.ShowDialog();
+
+                var temperature = string.Empty;
+                var humidity = string.Empty;
+
+                if (result == DialogResult.OK) {
+                    temperature = dialog.Temperature;
+                    humidity = dialog.Humidity;
+                }
+                else {
+                    return;
+                }
+
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigCheckSheet.xlsx");
+                using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var workBook = new ExcelPackage(fileStream);
+                //既存ワークシートを取得（workBookはExcelWorkbookクラスオブジェクト）
+                var sheet = workBook.Workbook.Worksheets;
+                var targetSheetName = "Sheet1";
+                var workSheetMain = sheet[targetSheetName];
+
+                // セル検索
+                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Value?.ToString() == ProductInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{ProductInfo.ProductModel}]が見つかりません。");
+                var resultRow = searchAddressResult.Start.Row;
+
+                // ワークシートのセルから値を取得
+                var orderNumberRange = workSheetMain.Cells[resultRow, 7].Value?.ToString();
+                var serialFirstRange = workSheetMain.Cells[resultRow, 8].Value?.ToString();
+                var serialLastRange = workSheetMain.Cells[resultRow, 9].Value?.ToString();
+                var regDateYearRange = workSheetMain.Cells[resultRow, 10].Value?.ToString();
+                var regDateMonthRange = workSheetMain.Cells[resultRow, 11].Value?.ToString();
+                var regDateDayRange = workSheetMain.Cells[resultRow, 12].Value?.ToString();
+                var regTemperatureRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
+                var regHumidityRange = workSheetMain.Cells[resultRow, 14].Value?.ToString();
+
+                const int StartColumn = 15;
+                var sheetNames = Enumerable.Range(StartColumn, 20) // 無限の範囲
+                    .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString())
+                    .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName)) // 空白でない間
+                    .ToList();
+
+                var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
+                ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells[1].Value.ToString() ?? string.Empty;
+                ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells[4].Value.ToString() ?? string.Empty;
+                ProductInfo.RegDate = DataBaseDataGridView.Rows[selectRow].Cells[7].Value.ToString() ?? string.Empty;
+                ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells[10].Value.ToString() ?? string.Empty;
+                ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells[11].Value.ToString() ?? string.Empty;
+
+                var date = DateTime.Parse(ProductInfo.RegDate);
+
+                foreach (var sheetName in sheetNames) {
+                    var workSheetTemp = workBook.Workbook.Worksheets[sheetName];
+                    workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber;
+                    workSheetTemp.Cells[serialFirstRange].Value = ProductInfo.SerialFirst;
+                    workSheetTemp.Cells[serialLastRange].Value = ProductInfo.SerialLast;
+                    workSheetTemp.Cells[regDateYearRange].Value = date.Year;
+                    workSheetTemp.Cells[regDateMonthRange].Value = date.Month;
+                    workSheetTemp.Cells[regDateDayRange].Value = date.Day;
+                    workSheetTemp.Cells[regTemperatureRange].Value = temperature;
+                    workSheetTemp.Cells[regHumidityRange].Value = humidity;
+                }
+
+                // 不要なシートを非表示にする
+                var allSheetName = workBook.Workbook.Worksheets
+                    .Select(sh => sh.Name.ToString())
+                    .ToList();
+
+                var hiddenSheetNames = allSheetName.Except(sheetNames.Where(name => name != null).Cast<string>()).ToList();
+                sheet["Sheet1"].Hidden = eWorkSheetHidden.VeryHidden;
+                foreach (var sheetName in hiddenSheetNames) {
+                    sheet[sheetName].Hidden = eWorkSheetHidden.VeryHidden;
+                }
+
+                //引数に保存先パスを指定
+                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "temporarilyCheckSheet.xlsx");
+                var fileInfo = new FileInfo(temporarilyPath);
+                workBook.SaveAs(fileInfo);
+
+                // 印刷
+                Microsoft.Office.Interop.Excel.Application xlApp = new() {
+                    Visible = true // Excelウィンドウを表示します。
+                };
+
+                // ワークブック開く
+                var xlBooks = xlApp.Workbooks;
+                var xlBook = xlBooks.Open(temporarilyPath, ReadOnly: true);
+
+                //// ワークシート選択
+                //var xlSheets = xlBook.Sheets;
+                //Microsoft.Office.Interop.Excel.Worksheet xlSheet = xlSheets[0];
+
+                //// ワークシート表示
+                //xlSheet.Activate();
+
+                //// ワークブックを閉じてExcelを終了
+                //xlBook.Close(false);
+                //xlApp.Quit();
+
+                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
+                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks);
+                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
+
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         private void HistoryWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void GenerationReportButton_Click(object sender, EventArgs e) { GenerationReport(); }
         private void GenerationListButton_Click(object sender, EventArgs e) { GenerationList(); }
+        private void GenerationCheckSheetButton_Click(object sender, EventArgs e) { GenerationCheckSheet(); }
         private void CategoryComboBox_SelectedIndexChanged(object sender, EventArgs e) { HistoryTableFilter(); }
         private void FilterStringTextBox_TextChanged(object sender, EventArgs e) { HistoryTableFilter(); }
         private void CategoryRadioButton_CheckedChanged(object sender, EventArgs e) { CategorySelect(sender); }
