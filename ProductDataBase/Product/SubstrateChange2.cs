@@ -524,15 +524,15 @@ namespace ProductDatabase {
                 var qrCodeRange = workSheetMain.Cells[resultRow, 14].Value?.ToString();
 
                 var workSheetTemp = workBook.Workbook.Worksheets[sheetName];
-                workSheetTemp.Cells[productNameRange].Value = productName;
-                workSheetTemp.Cells[productNumberRange].Value = ProductInfo.ProductNumber;
-                workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber;
-                workSheetTemp.Cells[regDateRange].Value = ProductInfo.RegDate;
-                workSheetTemp.Cells[productModelRange].Value = ProductInfo.ProductModel;
-                workSheetTemp.Cells[quantityRange].Value = ProductInfo.Quantity;
-                workSheetTemp.Cells[serialFirstRange].Value = ProductInfo.SerialFirst;
-                workSheetTemp.Cells[serialLastRange].Value = ProductInfo.SerialLast;
-                workSheetTemp.Cells[commentRange].Value = ProductInfo.Comment;
+                if (string.IsNullOrEmpty(productNameRange)) { workSheetTemp.Cells[productNameRange].Value = productName; }
+                if (string.IsNullOrEmpty(productNumberRange)) { workSheetTemp.Cells[productNumberRange].Value = ProductInfo.ProductNumber; }
+                if (string.IsNullOrEmpty(orderNumberRange)) { workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber; }
+                if (string.IsNullOrEmpty(regDateRange)) { workSheetTemp.Cells[regDateRange].Value = ProductInfo.RegDate; }
+                if (string.IsNullOrEmpty(productModelRange)) { workSheetTemp.Cells[productModelRange].Value = ProductInfo.ProductModel; }
+                if (string.IsNullOrEmpty(quantityRange)) { workSheetTemp.Cells[quantityRange].Value = ProductInfo.Quantity; }
+                if (string.IsNullOrEmpty(serialFirstRange)) { workSheetTemp.Cells[serialFirstRange].Value = ProductInfo.SerialFirst; }
+                if (string.IsNullOrEmpty(serialLastRange)) { workSheetTemp.Cells[serialLastRange].Value = ProductInfo.SerialLast; }
+                if (string.IsNullOrEmpty(commentRange)) { workSheetTemp.Cells[commentRange].Value = ProductInfo.Comment; }
 
                 for (var i = 0; i <= _listUsedSubstrate.Count - 1; i++) {
                     var targetRow = resultRow; // 検索対象の行番号
