@@ -494,14 +494,15 @@ namespace ProductDatabase {
         }
 
         // リスト印刷
-        private void ListPrint() {
+        private void GenerationList() {
             try {
                 var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigList.xlsx");
                 using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using var workBook = new ExcelPackage(fileStream);
                 //既存ワークシートを取得（workBookはExcelWorkbookクラスオブジェクト）
+                var sheet = workBook.Workbook.Worksheets;
                 var targetSheetName = "Sheet1";
-                var workSheetMain = workBook.Workbook.Worksheets[targetSheetName];
+                var workSheetMain = sheet[targetSheetName];
 
                 // セル検索
                 var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Value?.ToString() == ProductInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{ProductInfo.ProductModel}]が見つかりません。");
@@ -594,7 +595,7 @@ namespace ProductDatabase {
                 }
 
                 //引数に保存先パスを指定
-                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "temporarily.xlsx");
+                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "temporarilyList.xlsx");
                 var fileInfo = new FileInfo(temporarilyPath);
                 workBook.SaveAs(fileInfo);
 
@@ -628,7 +629,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private static void ListPrint_ClosedXML() {
+        private static void GenerationList_ClosedXML() {
             //try {
             //    var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigList.xlsx");
             //    using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -852,7 +853,7 @@ namespace ProductDatabase {
 
         private void SubstrateChange2_Load(object sender, EventArgs e) { LoadEvents(); }
         private void RegisterButton_Click(object sender, EventArgs e) { ChangeRegistration(); }
-        private void SubstrateListPrintButton_Click(object sender, EventArgs e) { ListPrint(); }
+        private void SubstrateListPrintButton_Click(object sender, EventArgs e) { GenerationList(); }
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
     }
 }

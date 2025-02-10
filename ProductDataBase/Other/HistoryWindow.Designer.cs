@@ -33,6 +33,7 @@
             this.GenerationReportButton = new Button();
             this.GenerationListButton = new Button();
             this.CategoryRadioButton3 = new RadioButton();
+            this.GenerationCheckSheetButton = new Button();
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).BeginInit();
             this.SuspendLayout();
             // 
@@ -156,11 +157,23 @@
             this.CategoryRadioButton3.UseVisualStyleBackColor = true;
             this.CategoryRadioButton3.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
             // 
+            // GenerationCheckSheetButton
+            // 
+            this.GenerationCheckSheetButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            this.GenerationCheckSheetButton.Location = new Point(884, 474);
+            this.GenerationCheckSheetButton.Name = "GenerationCheckSheetButton";
+            this.GenerationCheckSheetButton.Size = new Size(92, 25);
+            this.GenerationCheckSheetButton.TabIndex = 10;
+            this.GenerationCheckSheetButton.Text = "チェックシート";
+            this.GenerationCheckSheetButton.UseVisualStyleBackColor = true;
+            this.GenerationCheckSheetButton.Click += this.GenerationCheckSheetButton_Click;
+            // 
             // HistoryWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(1184, 511);
+            this.Controls.Add(this.GenerationCheckSheetButton);
             this.Controls.Add(this.CategoryRadioButton3);
             this.Controls.Add(this.GenerationListButton);
             this.Controls.Add(this.GenerationReportButton);
@@ -196,5 +209,6 @@
         private Button GenerationReportButton;
         private Button GenerationListButton;
         private RadioButton CategoryRadioButton3;
+        private Button GenerationCheckSheetButton;
     }
 }
