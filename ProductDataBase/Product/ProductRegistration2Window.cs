@@ -1302,8 +1302,9 @@ namespace ProductDatabase {
                 using FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using var workBookConfig = new ExcelPackage(fileStreamConfig);
                 //既存ワークシートを取得（workBookはExcelWorkbookクラスオブジェト）
+                var sheet = workBookConfig.Workbook.Worksheets;
                 var targetSheetName = "Sheet1";
-                var workSheetMain = workBookConfig.Workbook.Worksheets[targetSheetName];
+                var workSheetMain = sheet[targetSheetName];
 
                 // セル検索
                 var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Value?.ToString() == ProductInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{ProductInfo.ProductModel}]が見つかりません。");
@@ -1337,7 +1338,7 @@ namespace ProductDatabase {
                 using var workBookReport = new ExcelPackage(fileStreamReport);
 
                 // セルに値を挿入
-                var workSheetTemp = workBookReport.Workbook.Worksheets[sheetName];
+                var workSheetTemp = sheet[sheetName];
                 if (!string.IsNullOrEmpty(ProductInfo.ProductNumber)) {
                     var productNumber = ProductInfo.ProductNumber.Split("-");
                     workSheetTemp.Cells[productNumberRange].Value = productNumber[0];
@@ -1485,7 +1486,7 @@ namespace ProductDatabase {
                 var commentRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
                 var qrCodeRange = workSheetMain.Cells[resultRow, 14].Value?.ToString();
 
-                var workSheetTemp = workBook.Workbook.Worksheets[sheetName];
+                var workSheetTemp = sheet[sheetName];
                 workSheetTemp.Cells[productNameRange].Value = productName;
                 workSheetTemp.Cells[productNumberRange].Value = ProductInfo.ProductNumber;
                 workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber;
@@ -1546,7 +1547,7 @@ namespace ProductDatabase {
 
                     // PixelData を Bitmap に変換
                     using var bitmap = new Bitmap(pixelData.Width, pixelData.Height, PixelFormat.Format32bppArgb);
-                    var bmpData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    var bmpData = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                     System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bmpData.Scan0, pixelData.Pixels.Length);
                     bitmap.UnlockBits(bmpData);
                     using MemoryStream stream = new();
