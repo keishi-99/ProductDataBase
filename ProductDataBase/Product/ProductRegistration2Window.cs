@@ -1314,7 +1314,7 @@ namespace ProductDatabase {
                 var searchAddressResultRow = searchAddressResult.Start.Row;
 
                 // ワークシートのセルから値を取得
-                var directoryPath = workSheetMain.Cells[searchAddressResultRow, 3].Value.ToString()?.Trim('"');
+                var directoryPath = workSheetMain.Cells[searchAddressResultRow, 3].Value.ToString();
                 if (string.IsNullOrWhiteSpace(directoryPath)) { throw new Exception("Configのファイルパスが無効です。"); }
                 if (!Directory.Exists(directoryPath)) { throw new FileNotFoundException($"指定されたフォルダが存在しません: {directoryPath}"); }
 
