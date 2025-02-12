@@ -97,11 +97,12 @@ namespace ProductDatabase {
                     PrintButton.Visible = false;
                 }
 
-                if (File.Exists(_settingFilePath) == false) { throw new Exception("設定ファイルが見つかりませんでした"); }
+                if (File.Exists(_settingFilePath) == false) { throw new Exception("印刷設定ファイルが見つかりませんでした"); }
                 SettingsLabelSub = new CSettingsLabelSub();
                 LoadSettings(_settingFilePath);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
             } finally {
             }
         }

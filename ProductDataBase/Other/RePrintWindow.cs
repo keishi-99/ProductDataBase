@@ -72,9 +72,6 @@ namespace ProductDatabase {
                     }
                 }
 
-                // 印刷UI設定
-                ConfigurePrintSettings();
-
                 // TextBoxへ今日の年月日を入力
                 var dtNow = DateTime.Now;
                 RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
@@ -104,10 +101,14 @@ namespace ProductDatabase {
                 FirstSerialNumberCheckBox.Checked = true;
                 LabelPrintButton.Enabled = IsLabelPrint;
                 BarcodePrintButton.Enabled = IsBarcodePrint;
+
+                // 印刷UI設定
+                ConfigurePrintSettings();
                 LoadSettings(labelSettingFilePath, barcodeSettingFilePath);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
             }
         }
         private void LoadSettings(string labelSettingFilePath, string barcodeSettingFilePath) {
