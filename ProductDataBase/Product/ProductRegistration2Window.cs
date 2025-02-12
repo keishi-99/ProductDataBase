@@ -537,8 +537,9 @@ namespace ProductDatabase {
                                     var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
 
                                     cmd = con.CreateCommand();
-                                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateModel = @SubstrateModel""";
+                                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber""";
                                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
+                                    cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNum;
 
                                     using var dr = cmd.ExecuteReader();
                                     while (dr.Read()) {
