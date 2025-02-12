@@ -141,10 +141,12 @@ namespace ProductDatabase {
         private void ConfigureSerialLabelSettings() {
             SettingsLabelPro = new CSettingsLabelPro();
             labelSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", ProductInfo.ProductName, $"SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml");
+            if (!File.Exists(labelSettingFilePath)) { throw new DirectoryNotFoundException($"ラベル印刷用設定ファイルがありません。"); }
         }
         private void ConfigureBarcodeSettings() {
             SettingsBarcodePro = new CSettingsBarcodePro();
             barcodeSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", ProductInfo.ProductName, $"BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml");
+            if (!File.Exists(barcodeSettingFilePath)) { throw new DirectoryNotFoundException($"ラベル印刷用設定ファイルがありません。"); }
         }
         private void SetMenuOptions() {
             シリアルラベル印刷プレビューToolStripMenuItem.Enabled = IsLabelPrint;
@@ -315,8 +317,10 @@ namespace ProductDatabase {
                         }
                         break;
                     case 2:
-                        if (!FormCheck()) { return false; };
-                        if (!DataCheck()) { return false; };
+                        if (!FormCheck()) { return false; }
+                        ;
+                        if (!DataCheck()) { return false; }
+                        ;
                         _labelProNumLabelsToPrint = _quantity;
                         _labelProPageNum = 1;
                         // 最大で表示
