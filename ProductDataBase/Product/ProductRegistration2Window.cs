@@ -171,7 +171,7 @@ namespace ProductDatabase {
 
                         if (!string.IsNullOrEmpty(strQuantity)) {
                             Activate();
-                            MessageBox.Show($"在庫が足りません。{Environment.NewLine}{strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show($"在庫が足りません。{Environment.NewLine}{strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         }
 
                         break;
@@ -259,7 +259,7 @@ namespace ProductDatabase {
 
                         if (!string.IsNullOrEmpty(strQuantity)) {
                             Activate();
-                            MessageBox.Show($"[{ProductInfo.OrderNumber}]の在庫が足りません。{Environment.NewLine}{strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show($"[{ProductInfo.OrderNumber}]の在庫が足りません。{Environment.NewLine}{strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         }
                         break;
                     default:
@@ -281,6 +281,7 @@ namespace ProductDatabase {
                 LoadSettings(labelSettingFilePath, barcodeSettingFilePath);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
             }
         }
         private void LoadSettings(string labelSettingFilePath, string barcodeSettingFilePath) {
@@ -299,7 +300,6 @@ namespace ProductDatabase {
                 }
             } catch (Exception ex) {
                 MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } finally {
             }
         }
         // 印刷UI設定
@@ -324,10 +324,12 @@ namespace ProductDatabase {
         private void ConfigureSerialLabelSettings() {
             SettingsLabelPro = new CSettingsLabelPro();
             labelSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", ProductInfo.ProductName, $"SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml");
+            if (!File.Exists(labelSettingFilePath)) { throw new DirectoryNotFoundException($"ラベル印刷用設定ファイルがありません。"); }
         }
         private void ConfigureBarcodeSettings() {
             SettingsBarcodePro = new CSettingsBarcodePro();
             barcodeSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", ProductInfo.ProductName, $"BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml");
+            if (!File.Exists(barcodeSettingFilePath)) { throw new DirectoryNotFoundException($"バーコード印刷用設定ファイルがありません。"); }
         }
         private void SetMenuOptions() {
             シリアルラベル印刷ToolStripMenuItem.Enabled = false;
