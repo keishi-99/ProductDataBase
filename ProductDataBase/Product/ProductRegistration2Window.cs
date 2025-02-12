@@ -1755,15 +1755,16 @@ namespace ProductDatabase {
 
                 // ワークシートのセルから値を取得
                 var orderNumberRange = workSheetMain.Cells[resultRow, 7].Value?.ToString();
-                var serialFirstRange = workSheetMain.Cells[resultRow, 8].Value?.ToString();
-                var serialLastRange = workSheetMain.Cells[resultRow, 9].Value?.ToString();
-                var regDateYearRange = workSheetMain.Cells[resultRow, 10].Value?.ToString();
-                var regDateMonthRange = workSheetMain.Cells[resultRow, 11].Value?.ToString();
-                var regDateDayRange = workSheetMain.Cells[resultRow, 12].Value?.ToString();
-                var regTemperatureRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
-                var regHumidityRange = workSheetMain.Cells[resultRow, 14].Value?.ToString();
+                var quantityRange = workSheetMain.Cells[resultRow, 8].Value?.ToString();
+                var serialFirstRange = workSheetMain.Cells[resultRow, 9].Value?.ToString();
+                var serialLastRange = workSheetMain.Cells[resultRow, 10].Value?.ToString();
+                var regDateYearRange = workSheetMain.Cells[resultRow, 11].Value?.ToString();
+                var regDateMonthRange = workSheetMain.Cells[resultRow, 12].Value?.ToString();
+                var regDateDayRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
+                var regTemperatureRange = workSheetMain.Cells[resultRow, 14].Value?.ToString();
+                var regHumidityRange = workSheetMain.Cells[resultRow, 15].Value?.ToString();
 
-                const int StartColumn = 15;
+                const int StartColumn = 16;
                 var sheetNames = Enumerable.Range(StartColumn, 20) // 無限の範囲
                     .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString())
                     .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName)) // 空白でない間
@@ -1776,6 +1777,7 @@ namespace ProductDatabase {
                 foreach (var sheetName in sheetNames) {
                     var workSheetTemp = sheet[sheetName] ?? throw new Exception($"シート[{sheetName}]が見つかりません。");
                     if (!string.IsNullOrEmpty(orderNumberRange)) { workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber; }
+                    if (!string.IsNullOrEmpty(quantityRange)) { workSheetTemp.Cells[quantityRange].Value = ProductInfo.Quantity; }
                     if (!string.IsNullOrEmpty(serialFirstRange)) { workSheetTemp.Cells[serialFirstRange].Value = _serialFirst; }
                     if (!string.IsNullOrEmpty(serialLastRange)) { workSheetTemp.Cells[serialLastRange].Value = _serialLast; }
                     if (!string.IsNullOrEmpty(regDateYearRange)) { workSheetTemp.Cells[regDateYearRange].Value = date.Year; }
@@ -1791,10 +1793,10 @@ namespace ProductDatabase {
                     .ToList();
 
                 var hiddenSheetNames = allSheetName.Except(sheetNames.Where(name => name != null).Cast<string>()).ToList();
-                sheet["Sheet1"].Hidden = eWorkSheetHidden.VeryHidden;
                 foreach (var sheetName in hiddenSheetNames) {
                     sheet[sheetName].Hidden = eWorkSheetHidden.VeryHidden;
                 }
+                sheet["Sheet1"].Hidden = eWorkSheetHidden.VeryHidden;
 
                 //引数に保存先パスを指定
                 var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "temporarilyCheckSheet.xlsx");
