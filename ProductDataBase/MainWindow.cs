@@ -529,10 +529,10 @@ namespace ProductDatabase {
                 switch (ProductInfo.RadioButtonFlg) {
                     case 1:
                         selectedRows = ProductInfo.ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "SubstrateName ASC");
-                        HashSet<string> substrateNames = new(selectedRows.AsEnumerable()
+                        HashSet<string> substrateNames = [.. selectedRows.AsEnumerable()
                                                                                 .Select(x => x.Field<string>("SubstrateName"))
                                                                                 .Where(x => x != null)
-                                                                                .Select(x => x!));
+                                                                                .Select(x => x!)];
 
                         CategoryListBox3.Items.AddRange([.. substrateNames]);
                         break;
@@ -541,10 +541,10 @@ namespace ProductDatabase {
                     case 3:
                     case 4:
                         selectedRows = ProductInfo.ProductDataTable.Select($"class001 = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductType ASC");
-                        HashSet<string> productTypes = new(selectedRows.AsEnumerable()
+                        HashSet<string> productTypes = [.. selectedRows.AsEnumerable()
                                                                                 .Select(x => x.Field<string>("ProductType"))
                                                                                 .Where(x => x != null)
-                                                                                .Select(x => x!));
+                                                                                .Select(x => x!)];
 
                         CategoryListBox3.Items.AddRange([.. productTypes]);
                         break;

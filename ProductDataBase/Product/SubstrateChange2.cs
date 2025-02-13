@@ -1,11 +1,6 @@
-﻿using OfficeOpenXml;
+﻿using ProductDatabase.Other;
 using System.Data;
 using System.Data.SQLite;
-using System.Drawing.Imaging;
-using ZXing;
-using ZXing.QrCode;
-using ZXing.QrCode.Internal;
-using ZXing.Rendering;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
@@ -35,13 +30,7 @@ namespace ProductDatabase {
         private DataGridView? _objDgv;
 
         // プロパティ設定
-        private bool IsLabelPrint => ProductInfo.PrintType is 1 or 3 or 4 or 5 or 6 or 7 or 9;
-        private bool IsBarcodePrint => ProductInfo.PrintType is 2 or 3;
-        private bool IsSerialGeneration => ProductInfo.PrintType is not 0 and not 10;
-        private bool RequiresClosing => ProductInfo.PrintType is 0 or 1 or 2 or 3 or 4 or 8 or 9;
         private bool IsListPrint => ProductInfo.PrintType is 5 or 6;
-        private bool IsCheckSheetPrint => ProductInfo.PrintType is 6 or 7;
-        private bool IsUnderlinePrint => ProductInfo.PrintType is 4;
 
         public SubstrateChange2() {
             InitializeComponent();
@@ -497,135 +486,7 @@ namespace ProductDatabase {
         // リスト印刷
         private void GenerationList() {
             try {
-                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigList.xlsx");
-                using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using var workBook = new ExcelPackage(fileStream);
-                //既存ワークシートを取得（workBookはExcelWorkbookクラスオブジェクト）
-                var sheet = workBook.Workbook.Worksheets;
-                var targetSheetName = "Sheet1";
-                var workSheetMain = sheet[targetSheetName];
-
-                // セル検索
-                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Value?.ToString() == ProductInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{ProductInfo.ProductModel}]が見つかりません。");
-                var resultRow = searchAddressResult.Start.Row;
-
-                // ワークシートのセルから値を取得
-                var sheetName = workSheetMain.Cells[resultRow, 2].Value?.ToString();
-                var productName = workSheetMain.Cells[resultRow, 3].Value?.ToString();
-                var productNameRange = workSheetMain.Cells[resultRow, 4].Value?.ToString();
-                var productNumberRange = workSheetMain.Cells[resultRow, 5].Value?.ToString();
-                var orderNumberRange = workSheetMain.Cells[resultRow, 6].Value?.ToString();
-                var regDateRange = workSheetMain.Cells[resultRow, 7].Value?.ToString();
-                var productModel = workSheetMain.Cells[resultRow, 8].Value?.ToString();
-                var productModelRange = workSheetMain.Cells[resultRow, 9].Value?.ToString();
-                var quantityRange = workSheetMain.Cells[resultRow, 10].Value?.ToString();
-                var serialFirstRange = workSheetMain.Cells[resultRow, 11].Value?.ToString();
-                var serialLastRange = workSheetMain.Cells[resultRow, 12].Value?.ToString();
-                var commentRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
-                var qrCodeRange = workSheetMain.Cells[resultRow, 14].Value?.ToString();
-
-                var workSheetTemp = workBook.Workbook.Worksheets[sheetName];
-                if (!string.IsNullOrEmpty(productNameRange)) { workSheetTemp.Cells[productNameRange].Value = productName; }
-                if (!string.IsNullOrEmpty(productNumberRange)) { workSheetTemp.Cells[productNumberRange].Value = ProductInfo.ProductNumber; }
-                if (!string.IsNullOrEmpty(orderNumberRange)) { workSheetTemp.Cells[orderNumberRange].Value = ProductInfo.OrderNumber; }
-                if (!string.IsNullOrEmpty(regDateRange)) { workSheetTemp.Cells[regDateRange].Value = ProductInfo.RegDate; }
-                if (!string.IsNullOrEmpty(productModelRange)) { workSheetTemp.Cells[productModelRange].Value = ProductInfo.ProductModel; }
-                if (!string.IsNullOrEmpty(quantityRange)) { workSheetTemp.Cells[quantityRange].Value = ProductInfo.Quantity; }
-                if (!string.IsNullOrEmpty(serialFirstRange)) { workSheetTemp.Cells[serialFirstRange].Value = ProductInfo.SerialFirst; }
-                if (!string.IsNullOrEmpty(serialLastRange)) { workSheetTemp.Cells[serialLastRange].Value = ProductInfo.SerialLast; }
-                if (!string.IsNullOrEmpty(commentRange)) { workSheetTemp.Cells[commentRange].Value = ProductInfo.Comment; }
-
-                for (var i = 0; i <= _listUsedSubstrate.Count - 1; i++) {
-                    var targetRow = resultRow; // 検索対象の行番号
-                    var searchValue = $"{_usedSubstrate[i]}";
-                    var foundColumn = 0;
-
-                    var searchAddressResult2 = workSheetMain.Cells
-                        .Where(x => x.Start.Row == targetRow) // 指定した行のセルのみを対象にする
-                        .First(x => x.Value?.ToString() == searchValue);
-
-                    if (searchAddressResult2 != null) {
-                        // セルが見つかった場合の処理
-                        foundColumn = searchAddressResult2.Start.Column;
-                    }
-                    if (foundColumn == 0) {
-                        throw new Exception($"{_usedSubstrate[i]}が見つかりません。");
-                    }
-
-                    var mainCellValue = workSheetMain.Cells[resultRow, foundColumn + 1].Value.ToString();
-                    var tempCellValue = workSheetTemp.Cells[mainCellValue].Value?.ToString();
-
-                    if (mainCellValue != string.Empty) {
-                        if (tempCellValue == string.Empty) {
-                            workSheetTemp.Cells[mainCellValue].Value = $"{_listUsedProductNumber[i]}({_listUsedQuantity[i]})";
-                        }
-                        else {
-                            workSheetTemp.Cells[mainCellValue].Value += $"    {_listUsedProductNumber[i]}({_listUsedQuantity[i]})";
-                        }
-                    }
-                }
-
-                // QRコード
-                if (!string.IsNullOrEmpty(qrCodeRange)) {
-                    BarcodeWriter<PixelData> qr = new() {
-                        Format = BarcodeFormat.QR_CODE,
-                        Options = new QrCodeEncodingOptions {
-                            ErrorCorrection = ErrorCorrectionLevel.L,
-                            CharacterSet = "Shift_JIS",
-                            Width = 100,
-                            Height = 100,
-                        },
-                        Renderer = new PixelDataRenderer {
-                            Foreground = new(Color.Gray.ToArgb()),
-                            Background = new(Color.White.ToArgb()),
-                        },
-                    };
-
-                    var pixelData = qr.Write($"{ProductInfo.OrderNumber};{ProductInfo.ProductNumber};{productModel};{ProductInfo.Quantity};{ProductInfo.SerialFirst};{ProductInfo.SerialLast}");
-
-                    // PixelData を Bitmap に変換
-                    using var bitmap = new Bitmap(pixelData.Width, pixelData.Height, PixelFormat.Format32bppArgb);
-                    var bmpData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-                    System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bmpData.Scan0, pixelData.Pixels.Length);
-                    bitmap.UnlockBits(bmpData);
-                    using MemoryStream stream = new();
-                    bitmap.Save(stream, ImageFormat.Bmp);
-
-                    var image = workSheetTemp.Drawings.AddPicture("QR", bitmap);
-                    image.SetPosition(workSheetTemp.Cells[qrCodeRange].Start.Row - 1, 0, workSheetTemp.Cells[qrCodeRange].Start.Column - 1, 0);
-                }
-
-                //引数に保存先パスを指定
-                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "temporarilyList.xlsx");
-                var fileInfo = new FileInfo(temporarilyPath);
-                workBook.SaveAs(fileInfo);
-
-                // 印刷
-                Microsoft.Office.Interop.Excel.Application xlApp = new() {
-                    Visible = true // Excelウィンドウを表示します。
-                };
-
-                // ワークブック開く
-                var xlBooks = xlApp.Workbooks;
-                var xlBook = xlBooks.Open(temporarilyPath, ReadOnly: true);
-
-                // ワークシート選択
-                var xlSheets = xlBook.Sheets;
-                Microsoft.Office.Interop.Excel.Worksheet xlSheet = xlSheets[sheetName];
-
-                // ワークシート表示
-                xlSheet.Activate();
-
-                // ワークブックを閉じてExcelを終了
-                //xlBook.Close(false);
-                //xlApp.Quit();
-
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
-
+                FileGenerater.GenerationList(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
