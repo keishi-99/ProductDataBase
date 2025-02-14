@@ -16,16 +16,16 @@ namespace ProductDatabase {
 
         public ProductInformation ProductInfo { get; }
 
-        private string _orderNumber = string.Empty;
-        private string _productNumber = string.Empty;
-        private string _regDate = string.Empty;
-        private string _person = string.Empty;
-        private string _revision = string.Empty;
-        private string _comment = string.Empty;
+        //private string _orderNumber = string.Empty;
+        //private string _productNumber = string.Empty;
+        //private string _regDate = string.Empty;
+        //private string _person = string.Empty;
+        //private string _revision = string.Empty;
+        //private string _comment = string.Empty;
 
-        private int _quantity;
-        private int _serialFirstNumber;
-        private int _serialLastNumber;
+        //private int _quantity;
+        //private int _serialFirstNumber;
+        //private int _serialLastNumber;
 
         private int _labelProPageNum = 1;
         private int _labelProNSerial;
@@ -193,24 +193,24 @@ namespace ProductDatabase {
 
                 // チェックボックスにチェックがない場合はNullを
                 cmd.Parameters.Add("@PrintType", DbType.String).Value = string.IsNullOrWhiteSpace(_serialType) ? DBNull.Value : _serialType;
-                cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(_orderNumber) ? DBNull.Value : _orderNumber;
-                cmd.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(_productNumber) ? DBNull.Value : _productNumber;
+                cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                cmd.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
                 cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
                 cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
-                cmd.Parameters.Add("@Quantity", DbType.String).Value = _quantity;
-                cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(_person) ? DBNull.Value : _person;
-                cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(_regDate) ? DBNull.Value : _regDate;
-                cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(_revision) ? DBNull.Value : _revision;
+                cmd.Parameters.Add("@Quantity", DbType.String).Value = ProductInfo.Quantity;
+                cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+                cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
                 cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(_strSerialFirstNumber) ? DBNull.Value : _strSerialFirstNumber;
                 cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(_strSerialLastNumber) ? DBNull.Value : _strSerialLastNumber;
-                cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(_comment) ? DBNull.Value : _comment;
+                cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                 cmd.ExecuteNonQuery();
 
                 // バックアップ作成
                 CommonUtils.BackupManager.CreateBackup();
                 // ログ出力
-                CommonUtils.Logger.AppendLog($";[再印刷];注文番号[{_orderNumber}];製造番号[{_productNumber}];製品名[{ProductInfo.ProductName}];タイプ[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{_quantity}];シリアル先頭[{_strSerialFirstNumber}];シリアル末尾[{_strSerialLastNumber}];Revision[{_revision}];登録日[{_regDate}];担当者[{_person}];");
+                CommonUtils.Logger.AppendLog($";[再印刷];注文番号[{ProductInfo.OrderNumber}];製造番号[{ProductInfo.ProductNumber}];製品名[{ProductInfo.ProductName}];タイプ[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{ProductInfo.Quantity}];シリアル先頭[{_strSerialFirstNumber}];シリアル末尾[{_strSerialLastNumber}];Revision[{ProductInfo.Revision}];登録日[{ProductInfo.RegDate}];担当者[{ProductInfo.Person}];");
 
                 return true;
             } catch (Exception ex) {
@@ -264,19 +264,19 @@ namespace ProductDatabase {
                 }
             }
 
-            _orderNumber = OrderNumberTextBox.Text;
-            _productNumber = ManufacturingNumberMaskedTextBox.Text;
-            _quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
-            _person = PersonComboBox.Text;
-            _regDate = RegistrationDateMaskedTextBox.Text;
-            _revision = RevisionTextBox.Text;
-            _comment = CommentTextBox.Text;
+            ProductInfo.OrderNumber = OrderNumberCheckBox.Checked ? string.Empty : OrderNumberTextBox.Text;
+            ProductInfo.ProductNumber = ManufacturingNumberCheckBox.Checked ? string.Empty : ManufacturingNumberMaskedTextBox.Text;
+            ProductInfo.Quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
+            ProductInfo.Person = PersonCheckBox.Checked ? string.Empty : PersonComboBox.Text;
+            ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? string.Empty : RegistrationDateMaskedTextBox.Text;
+            ProductInfo.Revision = RevisionCheckBox.Checked ? string.Empty : RevisionTextBox.Text;
+            ProductInfo.Comment = CommentCheckBox.Checked ? string.Empty : CommentTextBox.Text;
 
-            _serialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text);
-            _serialLastNumber = _serialFirstNumber + _quantity - 1;
+            ProductInfo.SerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text);
+            ProductInfo.SerialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
 
-            _strSerialFirstNumber = GenerateCode(_serialFirstNumber);
-            _strSerialLastNumber = GenerateCode(_serialLastNumber);
+            _strSerialFirstNumber = GenerateCode(ProductInfo.SerialFirstNumber);
+            _strSerialLastNumber = GenerateCode(ProductInfo.SerialLastNumber);
             return true;
         }
         // 印刷処理
@@ -292,7 +292,7 @@ namespace ProductDatabase {
 
                 switch (printFlg) {
                     case 1:
-                        _labelProNumLabelsToPrint = _quantity;
+                        _labelProNumLabelsToPrint = ProductInfo.Quantity;
                         _labelProPageNum = 1;
                         RePrintPrintDialog.Document = pd;
                         var r = RePrintPrintDialog.ShowDialog();
@@ -322,7 +322,7 @@ namespace ProductDatabase {
                         ;
                         if (!DataCheck()) { return false; }
                         ;
-                        _labelProNumLabelsToPrint = _quantity;
+                        _labelProNumLabelsToPrint = ProductInfo.Quantity;
                         _labelProPageNum = 1;
                         // 最大で表示
                         RePrintPrintPreviewDialog.Shown += (sender, e) => {
@@ -429,7 +429,7 @@ namespace ProductDatabase {
 
                 if (_labelProPageNum == 1) {
                     _remainingCount = serialCodePrintCopies;
-                    _labelProNSerial = _serialFirstNumber;
+                    _labelProNSerial = ProductInfo.SerialFirstNumber;
                 }
                 if (_labelProPageNum >= 2) { startLine = 0; }
 
@@ -485,14 +485,14 @@ namespace ProductDatabase {
             s = s.Replace("%P", ProductInfo.ProductName)
                  .Replace("%T", ProductInfo.ProductModel)
                  .Replace("%D", DateTime.Today.ToShortDateString())
-                 .Replace("%M", _productNumber)
-                 .Replace("%O", _orderNumber)
-                 .Replace("%N", _quantity.ToString())
+                 .Replace("%M", ProductInfo.ProductNumber)
+                 .Replace("%O", ProductInfo.OrderNumber)
+                 .Replace("%N", ProductInfo.Quantity.ToString())
                  .Replace("%U", ProductInfo.Person);
             return s;
         }
         private string GenerateCode(int serialCode) {
-            var monthCode = DateTime.Parse(_regDate).ToString("MM");
+            var monthCode = DateTime.Parse(ProductInfo.RegDate).ToString("MM");
 
             monthCode = monthCode switch {
                 "10" => "X",
@@ -507,10 +507,10 @@ namespace ProductDatabase {
                 _ => string.Empty
             };
 
-            outputCode = outputCode.Replace("%Y", DateTime.Parse(_regDate).ToString("yy"))
-                                    .Replace("%MM", DateTime.Parse(_regDate).ToString("MM"))
+            outputCode = outputCode.Replace("%Y", DateTime.Parse(ProductInfo.RegDate).ToString("yy"))
+                                    .Replace("%MM", DateTime.Parse(ProductInfo.RegDate).ToString("MM"))
                                     .Replace("%T", ProductInfo.Initial)
-                                    .Replace("%R", _revision)
+                                    .Replace("%R", ProductInfo.Revision)
                                     .Replace("%M", monthCode[^1..])
                                     .Replace("%S", Convert.ToInt32(serialCode).ToString($"D{ProductInfo.SerialDigit}"));
 
@@ -710,15 +710,15 @@ namespace ProductDatabase {
                     ("StrProductName", $"{ProductInfo.ProductName}"),
                     ("StrProductModel", $"{ProductInfo.ProductModel}"),
                     ("StrProductType", $"{ProductInfo.ProductType}"),
-                    ("StrOrderNumber", $"{_orderNumber}"),
-                    ("StrProductNumber", $"{_productNumber}"),
-                    ("StrRevision", $"{_revision}"),
+                    ("StrOrderNumber", $"{ProductInfo.OrderNumber}"),
+                    ("StrProductNumber", $"{ProductInfo.ProductNumber}"),
+                    ("StrRevision", $"{ProductInfo.Revision}"),
                     ("IntRegType", $"{ProductInfo.RegType}"),
-                    ("StrRegDate", $"{_regDate}"),
-                    ("StrPerson", $"{_person}"),
-                    ("IntQuantity", $"{_quantity}"),
-                    ("IntSerialFirstNumber", $"{_serialFirstNumber}"),
-                    ("IntSerialLastNumber", $"{_serialLastNumber}"),
+                    ("StrRegDate", $"{ProductInfo.RegDate}"),
+                    ("StrPerson", $"{ProductInfo.Person}"),
+                    ("IntQuantity", $"{ProductInfo.Quantity}"),
+                    ("IntSerialFirstNumber", $"{ProductInfo.SerialFirstNumber}"),
+                    ("IntSerialLastNumber", $"{ProductInfo.SerialLastNumber}"),
                     ("StrInitial", $"{ProductInfo.Initial}"),
                     ("IntPrintType", $"{ProductInfo.PrintType}"),
                     ("IntSerialDigit", $"{ProductInfo.SerialDigit}")
