@@ -10,7 +10,7 @@ using static ProductDatabase.MainWindow;
 namespace ProductDatabase.Other {
     internal partial class ExcelGenerater {
         // 成績書作成
-        public static void GenerationReport(ProductInformation productInfo) {
+        public static void GenerateReport(ProductInformation productInfo) {
             try {
                 var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigReport.xlsx");
                 using FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -80,7 +80,7 @@ namespace ProductDatabase.Other {
             }
         }
         // リスト生成
-        public static void GenerationList(ProductInformation productInfo) {
+        public static void GenerateList(ProductInformation productInfo) {
             try {
                 var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigList.xlsx");
                 using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -236,7 +236,7 @@ namespace ProductDatabase.Other {
             }
         }
         // チェックシート生成
-        public static void GenerationCheckSheet(ProductInformation productInfo) {
+        public static void GenerateCheckSheet(ProductInformation productInfo) {
             try {
                 var dialog = new InputDialog1();
                 var result = dialog.ShowDialog();
