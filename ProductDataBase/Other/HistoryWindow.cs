@@ -46,17 +46,17 @@ namespace ProductDatabase {
                         CategoryRadioButton3.Visible = false;
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
-                        GenerationReportButton.Visible = false;
-                        GenerationListButton.Visible = IsListPrint;
-                        GenerationCheckSheetButton.Visible = IsCheckSheetPrint;
+                        GenerateReportButton.Visible = false;
+                        GenerateListButton.Visible = IsListPrint;
+                        GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
                         break;
                     case 2:
                         CategoryRadioButton2.Text = "全てのタイプ";
                         CategoryRadioButton3.Text = "シリアル";
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
-                        GenerationListButton.Visible = IsListPrint;
-                        GenerationCheckSheetButton.Visible = IsCheckSheetPrint;
+                        GenerateListButton.Visible = IsListPrint;
+                        GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
                         break;
                     case 3:
                         CategoryRadioButton1.Visible = false;
@@ -64,9 +64,9 @@ namespace ProductDatabase {
                         CategoryRadioButton3.Visible = false;
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
-                        GenerationReportButton.Visible = false;
-                        GenerationListButton.Visible = IsListPrint;
-                        GenerationCheckSheetButton.Visible = IsCheckSheetPrint;
+                        GenerateReportButton.Visible = false;
+                        GenerateListButton.Visible = IsListPrint;
+                        GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
                         break;
                 }
             } catch (Exception ex) {
@@ -125,9 +125,9 @@ namespace ProductDatabase {
         }
         private void ViewProductRegistrationLog() {
 
-            GenerationReportButton.Visible = true;
-            GenerationListButton.Visible = IsListPrint;
-            GenerationCheckSheetButton.Visible = IsCheckSheetPrint;
+            GenerateReportButton.Visible = true;
+            GenerateListButton.Visible = IsListPrint;
+            GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
 
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new System.Data.DataTable();
@@ -177,9 +177,9 @@ namespace ProductDatabase {
         }
         private void ViewProductRegistrationAllTypesLog() {
 
-            GenerationReportButton.Visible = true;
-            GenerationListButton.Visible = IsListPrint;
-            GenerationCheckSheetButton.Visible = IsCheckSheetPrint;
+            GenerateReportButton.Visible = true;
+            GenerateListButton.Visible = IsListPrint;
+            GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
 
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new System.Data.DataTable();
@@ -317,9 +317,9 @@ namespace ProductDatabase {
             }
         }
         private void ViewSerialLog() {
-            GenerationReportButton.Visible = false;
-            GenerationListButton.Visible = false;
-            GenerationCheckSheetButton.Visible = false;
+            GenerateReportButton.Visible = false;
+            GenerateListButton.Visible = false;
+            GenerateCheckSheetButton.Visible = false;
 
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new System.Data.DataTable();
@@ -402,7 +402,7 @@ namespace ProductDatabase {
             }
         }
         // 成績書作成
-        private void GenerationReport() {
+        private void GenerateReport() {
             try {
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells[1].Value.ToString() ?? string.Empty;
@@ -420,7 +420,7 @@ namespace ProductDatabase {
             }
         }
         // リスト印刷
-        private void GenerationList() {
+        private void GenerateList() {
             try {
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 ProductInfo.ProductID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells[0].Value);
@@ -440,7 +440,7 @@ namespace ProductDatabase {
             }
         }
         // チェックシート印刷
-        private void GenerationCheckSheet() {
+        private void GenerateCheckSheet() {
             try {
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells[1].Value.ToString() ?? string.Empty;
@@ -458,9 +458,9 @@ namespace ProductDatabase {
         }
 
         private void HistoryWindow_Load(object sender, EventArgs e) { LoadEvents(); }
-        private void GenerationReportButton_Click(object sender, EventArgs e) { GenerationReport(); }
-        private void GenerationListButton_Click(object sender, EventArgs e) { GenerationList(); }
-        private void GenerationCheckSheetButton_Click(object sender, EventArgs e) { GenerationCheckSheet(); }
+        private void GenerateReportButton_Click(object sender, EventArgs e) { GenerateReport(); }
+        private void GenerateListButton_Click(object sender, EventArgs e) { GenerateList(); }
+        private void GenerateCheckSheetButton_Click(object sender, EventArgs e) { GenerateCheckSheet(); }
         private void CategoryComboBox_SelectedIndexChanged(object sender, EventArgs e) { HistoryTableFilter(); }
         private void FilterStringTextBox_TextChanged(object sender, EventArgs e) { HistoryTableFilter(); }
         private void CategoryRadioButton_CheckedChanged(object sender, EventArgs e) { CategorySelect(sender); }

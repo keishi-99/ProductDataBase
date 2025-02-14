@@ -137,7 +137,7 @@
             this.dataGridViewTextBoxColumn15 = new DataGridViewTextBoxColumn();
             this.dataGridViewCheckBoxColumn5 = new DataGridViewCheckBoxColumn();
             this.Substrate11CheckBox = new CheckBox();
-            this.GenerationReportButton = new Button();
+            this.GenerateReportButton = new Button();
             this.ProductRegistration2MenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.Substrate1DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate2DataGridView).BeginInit();
@@ -1344,23 +1344,23 @@
             this.Substrate11CheckBox.UseVisualStyleBackColor = true;
             this.Substrate11CheckBox.CheckedChanged += this.SubstrateCheckBox_CheckedChanged;
             // 
-            // GenerationReportButton
+            // GenerateReportButton
             // 
-            this.GenerationReportButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            this.GenerationReportButton.Location = new Point(660, 577);
-            this.GenerationReportButton.Name = "GenerationReportButton";
-            this.GenerationReportButton.Size = new Size(100, 25);
-            this.GenerationReportButton.TabIndex = 39;
-            this.GenerationReportButton.Text = "成績書作成";
-            this.GenerationReportButton.UseVisualStyleBackColor = true;
-            this.GenerationReportButton.Click += this.GenerationReportButton_Click;
+            this.GenerateReportButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            this.GenerateReportButton.Location = new Point(660, 577);
+            this.GenerateReportButton.Name = "GenerateReportButton";
+            this.GenerateReportButton.Size = new Size(100, 25);
+            this.GenerateReportButton.TabIndex = 39;
+            this.GenerateReportButton.Text = "成績書作成";
+            this.GenerateReportButton.UseVisualStyleBackColor = true;
+            this.GenerateReportButton.Click += this.GenerateReportButton_Click;
             // 
             // ProductRegistration2Window
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(984, 611);
-            this.Controls.Add(this.GenerationReportButton);
+            this.Controls.Add(this.GenerateReportButton);
             this.Controls.Add(this.Substrate15DataGridView);
             this.Controls.Add(this.Substrate15CheckBox);
             this.Controls.Add(this.Substrate14DataGridView);
@@ -1549,6 +1549,6 @@
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn14;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn15;
         private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn5;
-        private Button GenerationReportButton;
+        private Button GenerateReportButton;
     }
 }

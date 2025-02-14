@@ -30,10 +30,10 @@
             this.CategoryRadioButton2 = new RadioButton();
             this.StockCheckBox = new CheckBox();
             this.AllSubstrateCheckBox = new CheckBox();
-            this.GenerationReportButton = new Button();
-            this.GenerationListButton = new Button();
+            this.GenerateReportButton = new Button();
+            this.GenerateListButton = new Button();
             this.CategoryRadioButton3 = new RadioButton();
-            this.GenerationCheckSheetButton = new Button();
+            this.GenerateCheckSheetButton = new Button();
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).BeginInit();
             this.SuspendLayout();
             // 
@@ -120,27 +120,27 @@
             this.AllSubstrateCheckBox.UseVisualStyleBackColor = true;
             this.AllSubstrateCheckBox.CheckedChanged += this.AllSubstrateCheckBox_CheckedChanged;
             // 
-            // GenerationReportButton
+            // GenerateReportButton
             // 
-            this.GenerationReportButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            this.GenerationReportButton.Location = new Point(1080, 474);
-            this.GenerationReportButton.Name = "GenerationReportButton";
-            this.GenerationReportButton.Size = new Size(92, 25);
-            this.GenerationReportButton.TabIndex = 7;
-            this.GenerationReportButton.Text = "成績書作成";
-            this.GenerationReportButton.UseVisualStyleBackColor = true;
-            this.GenerationReportButton.Click += this.GenerationReportButton_Click;
+            this.GenerateReportButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            this.GenerateReportButton.Location = new Point(1080, 474);
+            this.GenerateReportButton.Name = "GenerateReportButton";
+            this.GenerateReportButton.Size = new Size(92, 25);
+            this.GenerateReportButton.TabIndex = 7;
+            this.GenerateReportButton.Text = "成績書作成";
+            this.GenerateReportButton.UseVisualStyleBackColor = true;
+            this.GenerateReportButton.Click += this.GenerateReportButton_Click;
             // 
-            // GenerationListButton
+            // GenerateListButton
             // 
-            this.GenerationListButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            this.GenerationListButton.Location = new Point(982, 474);
-            this.GenerationListButton.Name = "GenerationListButton";
-            this.GenerationListButton.Size = new Size(92, 25);
-            this.GenerationListButton.TabIndex = 8;
-            this.GenerationListButton.Text = "リスト作成";
-            this.GenerationListButton.UseVisualStyleBackColor = true;
-            this.GenerationListButton.Click += this.GenerationListButton_Click;
+            this.GenerateListButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            this.GenerateListButton.Location = new Point(982, 474);
+            this.GenerateListButton.Name = "GenerateListButton";
+            this.GenerateListButton.Size = new Size(92, 25);
+            this.GenerateListButton.TabIndex = 8;
+            this.GenerateListButton.Text = "リスト作成";
+            this.GenerateListButton.UseVisualStyleBackColor = true;
+            this.GenerateListButton.Click += this.GenerateListButton_Click;
             // 
             // CategoryRadioButton3
             // 
@@ -157,26 +157,26 @@
             this.CategoryRadioButton3.UseVisualStyleBackColor = true;
             this.CategoryRadioButton3.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
             // 
-            // GenerationCheckSheetButton
+            // GenerateCheckSheetButton
             // 
-            this.GenerationCheckSheetButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            this.GenerationCheckSheetButton.Location = new Point(884, 474);
-            this.GenerationCheckSheetButton.Name = "GenerationCheckSheetButton";
-            this.GenerationCheckSheetButton.Size = new Size(92, 25);
-            this.GenerationCheckSheetButton.TabIndex = 10;
-            this.GenerationCheckSheetButton.Text = "チェックシート";
-            this.GenerationCheckSheetButton.UseVisualStyleBackColor = true;
-            this.GenerationCheckSheetButton.Click += this.GenerationCheckSheetButton_Click;
+            this.GenerateCheckSheetButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            this.GenerateCheckSheetButton.Location = new Point(884, 474);
+            this.GenerateCheckSheetButton.Name = "GenerateCheckSheetButton";
+            this.GenerateCheckSheetButton.Size = new Size(92, 25);
+            this.GenerateCheckSheetButton.TabIndex = 10;
+            this.GenerateCheckSheetButton.Text = "チェックシート";
+            this.GenerateCheckSheetButton.UseVisualStyleBackColor = true;
+            this.GenerateCheckSheetButton.Click += this.GenerateCheckSheetButton_Click;
             // 
             // HistoryWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(1184, 511);
-            this.Controls.Add(this.GenerationCheckSheetButton);
+            this.Controls.Add(this.GenerateCheckSheetButton);
             this.Controls.Add(this.CategoryRadioButton3);
-            this.Controls.Add(this.GenerationListButton);
-            this.Controls.Add(this.GenerationReportButton);
+            this.Controls.Add(this.GenerateListButton);
+            this.Controls.Add(this.GenerateReportButton);
             this.Controls.Add(this.AllSubstrateCheckBox);
             this.Controls.Add(this.StockCheckBox);
             this.Controls.Add(this.CategoryRadioButton2);
@@ -206,9 +206,9 @@
         private RadioButton CategoryRadioButton2;
         private CheckBox StockCheckBox;
         private CheckBox AllSubstrateCheckBox;
-        private Button GenerationReportButton;
-        private Button GenerationListButton;
+        private Button GenerateReportButton;
+        private Button GenerateListButton;
         private RadioButton CategoryRadioButton3;
-        private Button GenerationCheckSheetButton;
+        private Button GenerateCheckSheetButton;
     }
 }
