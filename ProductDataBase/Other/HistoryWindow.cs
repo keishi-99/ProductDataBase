@@ -388,7 +388,7 @@ namespace ProductDatabase {
                     return;
                 }
 
-                if (string.IsNullOrEmpty(FilterStringTextBox.Text) || CategoryComboBox.SelectedIndex == 0) {
+                if (string.IsNullOrEmpty(FilterStringTextBox.Text) || CategoryComboBox.SelectedIndex == -1) {
                     historyTable.DefaultView.RowFilter = null;
                 }
                 else if (historyTable.Columns[_listColFilter[CategoryComboBox.SelectedIndex]]?.DataType == typeof(long)) {
