@@ -7,38 +7,6 @@ using System.Text.RegularExpressions;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
-        private static readonly string[]? s_userNames = []; // ユーザーを保持する静的変数
-        // 静的コンストラクタでClonePathを読み込む
-        static MainWindow() {
-            try {
-                // JSONファイルのパス
-                var jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "general", "appsettings.json");
-
-                // パスのディレクトリ部分を取得
-                var basePath = Path.GetDirectoryName(jsonFilePath);
-                if (string.IsNullOrEmpty(basePath) || !Directory.Exists(basePath)) {
-                    throw new DirectoryNotFoundException($"The directory '{basePath}' does not exist.");
-                }
-
-                // JSONファイルを読み込む
-                var config = new ConfigurationBuilder()
-                    .SetBasePath(basePath)
-                    .AddJsonFile(Path.GetFileName(jsonFilePath), optional: false, reloadOnChange: true)
-                    .Build();
-
-                // CloneFolderPathを取得
-                CommonUtils.s_networkPath = config["NetworkFolderPath"] ?? throw new Exception("フォルダが設定されてません。");
-                if (string.IsNullOrEmpty(CommonUtils.s_networkPath)) { throw new Exception("フォルダが設定されてません。"); }
-                if (!Directory.Exists(CommonUtils.s_networkPath)) {
-                    throw new DirectoryNotFoundException($"フォルダ '{CommonUtils.s_networkPath}' が見つかりません。");
-                }
-
-                s_userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];
-
-            } catch (Exception ex) {
-                MessageBox.Show($"設定の読み込み中にエラーが発生しました: {ex.Message}", "設定エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
 
         public class ProductInformation {
             public int ProductID { get; set; }
@@ -130,6 +98,7 @@ namespace ProductDatabase {
         private string _strCategory13 = string.Empty;
         private string _strCategory14 = string.Empty;
 
+        private static string[]? s_userNames = []; // ユーザーを保持する静的変数
         private bool _isAuthorizedUser = false;
 
         public MainWindow() {
@@ -182,6 +151,30 @@ namespace ProductDatabase {
                 using SQLiteConnection con = new(GetConnectionInformation());
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con)) { adapter.Fill(ProductInfo.SubstrateDataTable); }
+
+                // JSONファイルのパス
+                var jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "general", "appsettings.json");
+
+                // パスのディレクトリ部分を取得
+                var basePath = Path.GetDirectoryName(jsonFilePath);
+                if (string.IsNullOrEmpty(basePath) || !Directory.Exists(basePath)) {
+                    throw new DirectoryNotFoundException($"The directory '{basePath}' does not exist.");
+                }
+
+                // JSONファイルを読み込む
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(basePath)
+                    .AddJsonFile(Path.GetFileName(jsonFilePath), optional: false, reloadOnChange: true)
+                    .Build();
+
+                // CloneFolderPathを取得
+                CommonUtils.s_networkPath = config["NetworkFolderPath"] ?? throw new Exception("フォルダが設定されてません。");
+                if (string.IsNullOrEmpty(CommonUtils.s_networkPath)) { throw new Exception("フォルダが設定されてません。"); }
+                if (!Directory.Exists(CommonUtils.s_networkPath)) {
+                    throw new DirectoryNotFoundException($"フォルダ '{CommonUtils.s_networkPath}' が見つかりません。");
+                }
+
+                s_userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];
 
                 // 現在のユーザー名がリストに含まれるかチェック
                 _isAuthorizedUser = s_userNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
