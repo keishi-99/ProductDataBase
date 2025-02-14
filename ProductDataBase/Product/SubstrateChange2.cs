@@ -486,7 +486,7 @@ namespace ProductDatabase {
         // リスト印刷
         private void GenerationList() {
             try {
-                FileGenerater.GenerationList(ProductInfo);
+                ExcelGenerater.GenerationList(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }

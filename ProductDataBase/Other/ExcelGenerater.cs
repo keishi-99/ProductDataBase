@@ -8,7 +8,7 @@ using ZXing.Rendering;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase.Other {
-    internal partial class FileGenerater {
+    internal partial class ExcelGenerater {
         // 成績書作成
         public static void GenerationReport(ProductInformation productInfo) {
             try {
@@ -21,7 +21,7 @@ namespace ProductDatabase.Other {
                 var workSheetMain = sheet[targetSheetName];
 
                 // セル検索
-                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Value?.ToString() == productInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{productInfo.ProductModel}]が見つかりません。");
+                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == productInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{productInfo.ProductModel}]が見つかりません。");
                 var searchAddressResultRow = searchAddressResult.Start.Row;
 
                 // ワークシートのセルから値を取得
@@ -91,7 +91,7 @@ namespace ProductDatabase.Other {
                 var workSheetMain = sheet[targetSheetName];
 
                 // セル検索
-                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Value?.ToString() == productInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{productInfo.ProductModel}]が見つかりません。");
+                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == productInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{productInfo.ProductModel}]が見つかりません。");
                 var resultRow = searchAddressResult.Start.Row;
 
                 // ワークシートのセルから値を取得
@@ -261,7 +261,7 @@ namespace ProductDatabase.Other {
                 var workSheetMain = sheet[targetSheetName];
 
                 // セル検索
-                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Value?.ToString() == productInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{productInfo.ProductModel}]が見つかりません。");
+                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == productInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{productInfo.ProductModel}]が見つかりません。");
                 var resultRow = searchAddressResult.Start.Row;
 
                 // ワークシートのセルから値を取得
