@@ -702,9 +702,9 @@ namespace ProductDatabase {
                 throw; // 例外を再度スローして上位で処理できるようにする
             }
             // バックアップ作成
-            BackupManager.CreateBackup();
+            CommonUtils.BackupManager.CreateBackup();
             // ログ出力
-            Logger.AppendLog($";[製品登録];注文番号[{ProductInfo.OrderNumber}];製造番号[{ProductInfo.ProductNumber}];製品名[{ProductInfo.ProductName}];タイプ[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{ProductInfo.Quantity}];シリアル先頭[{ProductInfo.SerialFirst}];シリアル末尾[{ProductInfo.SerialLast}];Revision[{ProductInfo.Revision}];登録日[{ProductInfo.RegDate}];担当者[{ProductInfo.Person}];");
+            CommonUtils.Logger.AppendLog($";[製品登録];注文番号[{ProductInfo.OrderNumber}];製造番号[{ProductInfo.ProductNumber}];製品名[{ProductInfo.ProductName}];タイプ[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{ProductInfo.Quantity}];シリアル先頭[{ProductInfo.SerialFirst}];シリアル末尾[{ProductInfo.SerialLast}];Revision[{ProductInfo.Revision}];登録日[{ProductInfo.RegDate}];担当者[{ProductInfo.Person}];");
             return true;
         }
         private bool NumberCheck() {
@@ -1292,7 +1292,7 @@ namespace ProductDatabase {
         // 成績書作成
         private void GenerationReport() {
             try {
-                ExcelGenerater.GenerateReport(ProductInfo);
+                CommonUtils.GenerateReport(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -1300,7 +1300,7 @@ namespace ProductDatabase {
         // リスト印刷
         private void GenerationList() {
             try {
-                ExcelGenerater.GenerateList(ProductInfo);
+                CommonUtils.GenerateList(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -1308,7 +1308,7 @@ namespace ProductDatabase {
         // チェックシート印刷
         private void GenerationCheckSheet() {
             try {
-                ExcelGenerater.GenerateCheckSheet(ProductInfo);
+                CommonUtils.GenerateCheckSheet(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }

@@ -284,10 +284,10 @@ namespace ProductDatabase {
                 }
 
                 // バックアップ作成
-                BackupManager.CreateBackup();
+                CommonUtils.BackupManager.CreateBackup();
                 // ログ出力
                 var number = QuantityCheckBox.Checked ? quantity : 0 - defectNumber;
-                Logger.AppendLog($";[基板登録];注文番号[{orderNumber}];製造番号[{substrateNumber}];製品名[{ProductInfo.ProductName}];基板名[{ProductInfo.SubstrateName}];型式[{ProductInfo.SubstrateModel}];数量[{number}];Revision[{revision}];登録日[{registrationDate}];担当者[{person}];");
+                CommonUtils.Logger.AppendLog($";[基板登録];注文番号[{orderNumber}];製造番号[{substrateNumber}];製品名[{ProductInfo.ProductName}];基板名[{ProductInfo.SubstrateName}];型式[{ProductInfo.SubstrateModel}];数量[{number}];Revision[{revision}];登録日[{registrationDate}];担当者[{person}];");
 
                 return true;
             } catch (Exception ex) {

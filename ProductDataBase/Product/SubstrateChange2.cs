@@ -473,9 +473,9 @@ namespace ProductDatabase {
                 }
 
                 // バックアップ作成
-                BackupManager.CreateBackup();
+                CommonUtils.BackupManager.CreateBackup();
                 // ログ出力
-                Logger.AppendLog($";[基板変更];注文番号[{ProductInfo.OrderNumber}];製造番号[{ProductInfo.ProductNumber}];製品名[{ProductInfo.ProductName}];タイプ[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{ProductInfo.Quantity}];シリアル先頭[{ProductInfo.SerialFirst}];シリアル末尾[{ProductInfo.SerialLast}];Revision[{ProductInfo.Revision}];登録日[{ProductInfo.RegDate}];担当者[{ProductInfo.Person}];");
+                CommonUtils.Logger.AppendLog($";[基板変更];注文番号[{ProductInfo.OrderNumber}];製造番号[{ProductInfo.ProductNumber}];製品名[{ProductInfo.ProductName}];タイプ[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{ProductInfo.Quantity}];シリアル先頭[{ProductInfo.SerialFirst}];シリアル末尾[{ProductInfo.SerialLast}];Revision[{ProductInfo.Revision}];登録日[{ProductInfo.RegDate}];担当者[{ProductInfo.Person}];");
                 return true;
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -486,30 +486,10 @@ namespace ProductDatabase {
         // リスト印刷
         private void GenerationList() {
             try {
-                ExcelGenerater.GenerateList(ProductInfo);
+                CommonUtils.GenerateList(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-        public static class ExcelHelper {
-            //public static string GetCellValueOrDefault(IXLWorksheet sheet, int rowIndex, int colIndex, int? defaultRow = null) {
-            //    // 対象セルの値を取得
-            //    var value = sheet.Cell(rowIndex, colIndex).GetString();
-
-            //    // 値が存在しない場合の処理
-            //    if (string.IsNullOrEmpty(value)) {
-            //        // デフォルト行が指定されていない場合は空文字を返す
-            //        if (defaultRow is null or 0) {
-            //            return string.Empty;
-            //        }
-
-            //        // デフォルト行の値を取得
-            //        return sheet.Cell(defaultRow.Value, colIndex).GetString();
-            //    }
-
-            //    // 値が存在すればその値を返す
-            //    return value;
-            //}
         }
 
         // チェックボックスイベント

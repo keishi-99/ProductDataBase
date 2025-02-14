@@ -413,7 +413,7 @@ namespace ProductDatabase {
                 ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells[10].Value.ToString() ?? string.Empty;
                 ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells[11].Value.ToString() ?? string.Empty;
 
-                ExcelGenerater.GenerateReport(ProductInfo);
+                CommonUtils.GenerateReport(ProductInfo);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -433,7 +433,7 @@ namespace ProductDatabase {
                 ProductInfo.Comment = DataBaseDataGridView.Rows[selectRow].Cells[13].Value.ToString() ?? string.Empty;
                 ProductInfo.UsedSubstrate = DataBaseDataGridView.Rows[selectRow].Cells[14].Value.ToString() ?? string.Empty;
 
-                ExcelGenerater.GenerateList(ProductInfo);
+                CommonUtils.GenerateList(ProductInfo);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -450,7 +450,7 @@ namespace ProductDatabase {
                 ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells[10].Value.ToString() ?? string.Empty;
                 ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells[11].Value.ToString() ?? string.Empty;
 
-                ExcelGenerater.GenerateCheckSheet(ProductInfo);
+                CommonUtils.GenerateCheckSheet(ProductInfo);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
