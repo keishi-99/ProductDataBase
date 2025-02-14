@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using ProductDatabase.Other;
 using System.Data;
 using System.Data.Odbc;
 using System.Data.SQLite;
@@ -6,8 +7,6 @@ using System.Text.RegularExpressions;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
-
-        private static readonly string s_networkPath = string.Empty; // ClonePathを保持する静的変数
         private static readonly string[]? s_userNames = []; // ユーザーを保持する静的変数
         // 静的コンストラクタでClonePathを読み込む
         static MainWindow() {
@@ -28,112 +27,16 @@ namespace ProductDatabase {
                     .Build();
 
                 // CloneFolderPathを取得
-                s_networkPath = config["NetworkFolderPath"] ?? throw new Exception("フォルダが設定されてません。");
-                if (string.IsNullOrEmpty(s_networkPath)) { throw new Exception("フォルダが設定されてません。"); }
-                if (!Directory.Exists(s_networkPath)) {
-                    throw new DirectoryNotFoundException($"フォルダ '{s_networkPath}' が見つかりません。");
+                CommonUtils.s_networkPath = config["NetworkFolderPath"] ?? throw new Exception("フォルダが設定されてません。");
+                if (string.IsNullOrEmpty(CommonUtils.s_networkPath)) { throw new Exception("フォルダが設定されてません。"); }
+                if (!Directory.Exists(CommonUtils.s_networkPath)) {
+                    throw new DirectoryNotFoundException($"フォルダ '{CommonUtils.s_networkPath}' が見つかりません。");
                 }
 
                 s_userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];
 
             } catch (Exception ex) {
                 MessageBox.Show($"設定の読み込み中にエラーが発生しました: {ex.Message}", "設定エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        // ログ作成
-        public static class Logger {
-            private static readonly string s_logDirectory = Path.Combine(Environment.CurrentDirectory, "db", "logs"); // ログを保存するディレクトリ
-            private static readonly object s_lockObject = new();
-
-            /// <summary>
-            /// 作業ログを追記します。
-            /// </summary>
-            /// <param name="message">記録する作業内容</param>
-            public static void AppendLog(string message) {
-                try {
-                    lock (s_lockObject) {
-                        // ディレクトリが存在しない場合は作成
-                        if (!Directory.Exists(s_logDirectory)) {
-                            Directory.CreateDirectory(s_logDirectory);
-                        }
-
-                        //// 年と月を含むログファイル名を生成
-                        var logFileName = $"log_{DateTime.Now:yyyyMM}.txt";
-                        var logFilePath = Path.Combine(s_logDirectory, logFileName);
-
-                        var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}";
-                        //// ログ内容をファイルの末尾に追記
-                        File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
-
-                        if (!string.IsNullOrEmpty(s_networkPath)) {
-                            var cloneFilePath = Path.Combine(s_networkPath, "db", "logs", logFileName);
-                            if (cloneFilePath != logFilePath) {
-                                File.Copy(logFilePath, cloneFilePath, true);
-                            }
-                        }
-                    }
-                } catch (Exception ex) {
-                    MessageBox.Show($"ログの書き込み中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-        // バックアップ作成
-        public static class BackupManager {
-            private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup"); // バックアップを保存するディレクトリ
-            private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db"); // 元ファイルパス
-            //private static readonly string s_originalFilePath = Path.Combine(s_networkPath, "db", "registration.db"); // 元ファイルパス
-            private static readonly int s_maxBackupFiles = 10; // 最大バックアップファイル数
-            private static readonly object s_lockObject = new();
-
-            /// <summary>
-            /// バックアップを作成します。
-            /// </summary>
-            public static void CreateBackup() {
-                try {
-                    lock (s_lockObject) {
-                        // バックアップ用ディレクトリが存在しない場合は作成
-                        if (!Directory.Exists(s_backupDirectory)) {
-                            Directory.CreateDirectory(s_backupDirectory);
-                        }
-
-                        // 日付と時間をファイル名に付加
-                        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                        var backupFileName = $"registration_{timestamp}.db";
-                        var backupFilePath = Path.Combine(s_backupDirectory, backupFileName);
-
-                        // 元ファイルをバックアップにコピー
-                        File.Copy(s_originalFilePath, backupFilePath, true);
-                        var networkFilePath = Path.Combine(s_networkPath, "db", "registration.db");
-                        if (Environment.CurrentDirectory != s_networkPath) {
-                            File.Copy(s_originalFilePath, networkFilePath, true);
-                        }
-
-                        // バックアップファイルを管理
-                        ManageBackupFiles();
-                    }
-                } catch (Exception ex) {
-                    MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-
-            /// <summary>
-            /// 古いバックアップファイルを削除します。
-            /// </summary>
-            private static void ManageBackupFiles() {
-                try {
-                    var backupFiles = Directory.GetFiles(s_backupDirectory, "registration_*.db")
-                                               .OrderBy(File.GetCreationTime) // 作成日時順に並べる
-                                               .ToList();
-
-                    while (backupFiles.Count > s_maxBackupFiles) {
-                        var oldestFile = backupFiles.First();
-                        File.Delete(oldestFile);
-                        backupFiles.RemoveAt(0);
-                    }
-                } catch (Exception ex) {
-                    MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
             }
         }
 
@@ -267,8 +170,8 @@ namespace ProductDatabase {
             try {
                 // その日のbackupファイルがない場合バックアップ作成
                 var d = DateTime.Now;
-                var backupDir = Path.Combine(s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}");
-                var backupFilepath = Path.Combine(s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
+                var backupDir = Path.Combine(CommonUtils.s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}");
+                var backupFilepath = Path.Combine(CommonUtils.s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
                 var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
 
                 if (!File.Exists(backupFilepath)) {
