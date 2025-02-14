@@ -61,7 +61,7 @@ namespace ProductDatabase {
             try {
                 Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
 
-                GenerationReportButton.Enabled = false;
+                GenerateReportButton.Enabled = false;
                 RegisterButton.Enabled = true;
                 _useSubstrate = ProductInfo.UseSubstrate.Split(",");
 
@@ -353,7 +353,7 @@ namespace ProductDatabase {
                 MessageBox.Show("登録完了");
 
                 HandlePostRegistration();
-                GenerationReportButton.Enabled = true;
+                GenerateReportButton.Enabled = true;
                 //if (RequiresClosing) {
                 //    Close();
                 //}
@@ -1290,7 +1290,7 @@ namespace ProductDatabase {
             }
         }
         // 成績書作成
-        private void GenerationReport() {
+        private void GenerateReport() {
             try {
                 CommonUtils.GenerateReport(ProductInfo);
             } catch (Exception ex) {
@@ -1298,7 +1298,7 @@ namespace ProductDatabase {
             }
         }
         // リスト印刷
-        private void GenerationList() {
+        private void GenerateList() {
             try {
                 CommonUtils.GenerateList(ProductInfo);
             } catch (Exception ex) {
@@ -1306,7 +1306,7 @@ namespace ProductDatabase {
             }
         }
         // チェックシート印刷
-        private void GenerationCheckSheet() {
+        private void GenerateCheckSheet() {
             try {
                 CommonUtils.GenerateCheckSheet(ProductInfo);
             } catch (Exception ex) {
@@ -1315,7 +1315,6 @@ namespace ProductDatabase {
         }
 
         private void ProductRegistration2Window_Load(object sender, EventArgs e) { LoadEvents(); }
-        private void GenerationReportButton_Click(object sender, EventArgs e) { GenerationReport(); }
         private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
         private void SubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBox_CheckedChanged(sender, e); }
@@ -1373,8 +1372,9 @@ namespace ProductDatabase {
 
             MessageBox.Show(message, "取得情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-        private void SubstrateListPrintButton_Click(object sender, EventArgs e) { GenerationList(); }
-        private void CheckSheetPrintButton_Click(object sender, EventArgs e) { GenerationCheckSheet(); }
+        private void GenerateReportButton_Click(object sender, EventArgs e) { GenerateReport(); }
+        private void SubstrateListPrintButton_Click(object sender, EventArgs e) { GenerateList(); }
+        private void CheckSheetPrintButton_Click(object sender, EventArgs e) { GenerateCheckSheet(); }
         private void ProductRegistration2PrintPreviewDialog_Load(object sender, EventArgs e) {
             var tool = (ToolStrip)ProductRegistration2PrintPreviewDialog.Controls[1];
             tool.Items[0].Visible = false;

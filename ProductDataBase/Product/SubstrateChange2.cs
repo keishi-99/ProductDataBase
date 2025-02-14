@@ -484,7 +484,7 @@ namespace ProductDatabase {
         }
 
         // リスト印刷
-        private void GenerationList() {
+        private void GenerateList() {
             try {
                 CommonUtils.GenerateList(ProductInfo);
             } catch (Exception ex) {
@@ -557,7 +557,7 @@ namespace ProductDatabase {
 
         private void SubstrateChange2_Load(object sender, EventArgs e) { LoadEvents(); }
         private void RegisterButton_Click(object sender, EventArgs e) { ChangeRegistration(); }
-        private void SubstrateListPrintButton_Click(object sender, EventArgs e) { GenerationList(); }
+        private void SubstrateListPrintButton_Click(object sender, EventArgs e) { GenerateList(); }
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
     }
 }
