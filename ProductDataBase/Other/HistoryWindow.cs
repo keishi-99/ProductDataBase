@@ -324,7 +324,23 @@ namespace ProductDatabase {
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new System.Data.DataTable();
 
-            var query = $"""SELECT _rowid_, * FROM "{ProductInfo.ProductName}_Serial" ORDER BY _rowid_ DESC""";
+            var query = $"""
+                        SELECT
+                            s.Serial,
+                            p.OrderNumber,
+                            p.ProductNumber,
+                            p.ProductType,
+                            p.ProductModel,
+                            p.RegDate,
+                            s.usedID
+                        FROM
+                            "{ProductInfo.ProductName}_Serial" AS s
+                        INNER JOIN
+                            "{ProductInfo.ProductName}_Product" AS p
+                        ON
+                            s.UsedID = p.ID;
+                        """;
+
             using SQLiteCommand command = new(query, con);
             // SQLiteDataAdapterのインスタンス化
             using SQLiteDataAdapter adapter = new(command);
@@ -342,13 +358,13 @@ namespace ProductDatabase {
                 if (headerValue != null) { _listColFilter.Add(headerValue); }
             }
 
-            DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns[1].HeaderCell.Value = "シリアル";
-            DataBaseDataGridView.Columns[2].HeaderCell.Value = "注文番号";
-            DataBaseDataGridView.Columns[3].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns[4].HeaderCell.Value = "製品名";
-            DataBaseDataGridView.Columns[5].HeaderCell.Value = "製品型式";
-            DataBaseDataGridView.Columns[6].HeaderCell.Value = "登録日";
+            DataBaseDataGridView.Columns[0].HeaderCell.Value = "シリアル";
+            DataBaseDataGridView.Columns[1].HeaderCell.Value = "注文番号";
+            DataBaseDataGridView.Columns[2].HeaderCell.Value = "製造番号";
+            DataBaseDataGridView.Columns[3].HeaderCell.Value = "製品名";
+            DataBaseDataGridView.Columns[4].HeaderCell.Value = "製品型式";
+            DataBaseDataGridView.Columns[5].HeaderCell.Value = "登録日";
+            DataBaseDataGridView.Columns[6].HeaderCell.Value = "UsedID";
             DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
 
             CategoryComboBox.Items.Clear();
