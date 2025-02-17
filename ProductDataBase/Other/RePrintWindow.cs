@@ -264,13 +264,13 @@ namespace ProductDatabase {
                 }
             }
 
-            ProductInfo.OrderNumber = OrderNumberCheckBox.Checked ? string.Empty : OrderNumberTextBox.Text;
-            ProductInfo.ProductNumber = ManufacturingNumberCheckBox.Checked ? string.Empty : ManufacturingNumberMaskedTextBox.Text;
+            ProductInfo.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
+            ProductInfo.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
             ProductInfo.Quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
-            ProductInfo.Person = PersonCheckBox.Checked ? string.Empty : PersonComboBox.Text;
-            ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? string.Empty : RegistrationDateMaskedTextBox.Text;
-            ProductInfo.Revision = RevisionCheckBox.Checked ? string.Empty : RevisionTextBox.Text;
-            ProductInfo.Comment = CommentCheckBox.Checked ? string.Empty : CommentTextBox.Text;
+            ProductInfo.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
+            ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateMaskedTextBox.Text : string.Empty;
+            ProductInfo.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
+            ProductInfo.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
 
             ProductInfo.SerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text);
             ProductInfo.SerialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
