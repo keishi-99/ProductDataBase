@@ -277,12 +277,26 @@ namespace ProductDatabase {
             var historyTable = new System.Data.DataTable();
 
             var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
+            //var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
             var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
 
+            //var query = $"""
+            //            SELECT *
+            //             FROM "{ProductInfo.ProductName}_StockView"
+            //             WHERE 1=1{otherSubstrate}{inStock}
+            //            """;
             var query = $"""
-                        SELECT *
-                         FROM "{ProductInfo.ProductName}_StockView"
-                         WHERE 1=1{otherSubstrate}{inStock}
+                        SELECT
+                            SubstrateName,
+                            SubstrateModel,
+                            SubstrateNumber,
+                            OrderNumber,
+                            SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                        FROM {ProductInfo.ProductName}_Substrate
+                        WHERE 1=1{otherSubstrate}
+                        GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                        HAVING 1=1{inStock}
+                        ORDER BY MIN(_rowid_);
                         """;
 
             using SQLiteCommand command = new(query, con);
