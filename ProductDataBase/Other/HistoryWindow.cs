@@ -45,7 +45,8 @@ namespace ProductDatabase {
                         CategoryRadioButton2.Text = "在庫";
                         CategoryRadioButton3.Visible = false;
                         StockCheckBox.Visible = false;
-                        AllSubstrateCheckBox.Visible = false;
+                        AllSubstrateCheckBox.Visible = true;
+                        AllSubstrateStockCheckBox.Visible = false;
                         GenerateReportButton.Visible = false;
                         GenerateListButton.Visible = IsListPrint;
                         GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
@@ -55,6 +56,7 @@ namespace ProductDatabase {
                         CategoryRadioButton3.Text = "シリアル";
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
+                        AllSubstrateStockCheckBox.Visible = false;
                         GenerateListButton.Visible = IsListPrint;
                         GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
                         break;
@@ -64,6 +66,7 @@ namespace ProductDatabase {
                         CategoryRadioButton3.Visible = false;
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
+                        AllSubstrateStockCheckBox.Visible = false;
                         GenerateReportButton.Visible = false;
                         GenerateListButton.Visible = IsListPrint;
                         GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
@@ -76,12 +79,18 @@ namespace ProductDatabase {
 
         private void ViewSubstrateRegistrationLog() {
             StockCheckBox.Visible = false;
-            AllSubstrateCheckBox.Visible = false;
+            AllSubstrateCheckBox.Visible = true;
+            AllSubstrateStockCheckBox.Visible = false;
             CategoryRadioButton3.Visible = false;
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new System.Data.DataTable();
 
-            var query = $"""SELECT _rowid_, * FROM "{ProductInfo.ProductName}_Substrate" WHERE SubstrateModel = @SubstrateModel ORDER BY _rowid_ DESC""";
+            var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
+
+            var query = $"""
+                SELECT _rowid_, * FROM "{ProductInfo.ProductName}_Substrate" 
+                WHERE 1=1{otherSubstrate} ORDER BY _rowid_ DESC
+                """;
             using SQLiteCommand command = new(query, con);
             command.Parameters.AddWithValue("@SubstrateModel", ProductInfo.SubstrateModel);
             // SQLiteDataAdapterのインスタンス化
@@ -272,11 +281,12 @@ namespace ProductDatabase {
         }
         private void ViewSubstrateStockLog() {
             StockCheckBox.Visible = true;
-            AllSubstrateCheckBox.Visible = true;
+            AllSubstrateCheckBox.Visible = false;
+            AllSubstrateStockCheckBox.Visible = true;
             using SQLiteConnection con = new(GetConnectionRegistration());
             var historyTable = new System.Data.DataTable();
 
-            var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
+            var otherSubstrate = !AllSubstrateStockCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
             //var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
             var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
 
@@ -495,6 +505,7 @@ namespace ProductDatabase {
         private void FilterStringTextBox_TextChanged(object sender, EventArgs e) { HistoryTableFilter(); }
         private void CategoryRadioButton_CheckedChanged(object sender, EventArgs e) { CategorySelect(sender); }
         private void StockCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }
-        private void AllSubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }
+        private void AllSubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateRegistrationLog(); }
+        private void AllSubstrateStockCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }
     }
 }

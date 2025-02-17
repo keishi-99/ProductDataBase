@@ -29,11 +29,12 @@
             this.CategoryRadioButton1 = new RadioButton();
             this.CategoryRadioButton2 = new RadioButton();
             this.StockCheckBox = new CheckBox();
-            this.AllSubstrateCheckBox = new CheckBox();
+            this.AllSubstrateStockCheckBox = new CheckBox();
             this.GenerateReportButton = new Button();
             this.GenerateListButton = new Button();
             this.CategoryRadioButton3 = new RadioButton();
             this.GenerateCheckSheetButton = new Button();
+            this.AllSubstrateCheckBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).BeginInit();
             this.SuspendLayout();
             // 
@@ -100,7 +101,7 @@
             // 
             this.StockCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.StockCheckBox.AutoSize = true;
-            this.StockCheckBox.Location = new Point(555, 480);
+            this.StockCheckBox.Location = new Point(623, 480);
             this.StockCheckBox.Name = "StockCheckBox";
             this.StockCheckBox.Size = new Size(83, 19);
             this.StockCheckBox.TabIndex = 5;
@@ -108,17 +109,17 @@
             this.StockCheckBox.UseVisualStyleBackColor = true;
             this.StockCheckBox.CheckedChanged += this.StockCheckBox_CheckedChanged;
             // 
-            // AllSubstrateCheckBox
+            // AllSubstrateStockCheckBox
             // 
-            this.AllSubstrateCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            this.AllSubstrateCheckBox.AutoSize = true;
-            this.AllSubstrateCheckBox.Location = new Point(644, 480);
-            this.AllSubstrateCheckBox.Name = "AllSubstrateCheckBox";
-            this.AllSubstrateCheckBox.Size = new Size(62, 19);
-            this.AllSubstrateCheckBox.TabIndex = 6;
-            this.AllSubstrateCheckBox.Text = "他基板";
-            this.AllSubstrateCheckBox.UseVisualStyleBackColor = true;
-            this.AllSubstrateCheckBox.CheckedChanged += this.AllSubstrateCheckBox_CheckedChanged;
+            this.AllSubstrateStockCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            this.AllSubstrateStockCheckBox.AutoSize = true;
+            this.AllSubstrateStockCheckBox.Location = new Point(712, 480);
+            this.AllSubstrateStockCheckBox.Name = "AllSubstrateStockCheckBox";
+            this.AllSubstrateStockCheckBox.Size = new Size(62, 19);
+            this.AllSubstrateStockCheckBox.TabIndex = 6;
+            this.AllSubstrateStockCheckBox.Text = "他基板";
+            this.AllSubstrateStockCheckBox.UseVisualStyleBackColor = true;
+            this.AllSubstrateStockCheckBox.CheckedChanged += this.AllSubstrateStockCheckBox_CheckedChanged;
             // 
             // GenerateReportButton
             // 
@@ -168,16 +169,29 @@
             this.GenerateCheckSheetButton.UseVisualStyleBackColor = true;
             this.GenerateCheckSheetButton.Click += this.GenerateCheckSheetButton_Click;
             // 
+            // AllSubstrateCheckBox
+            // 
+            this.AllSubstrateCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            this.AllSubstrateCheckBox.AutoSize = true;
+            this.AllSubstrateCheckBox.Location = new Point(555, 480);
+            this.AllSubstrateCheckBox.Name = "AllSubstrateCheckBox";
+            this.AllSubstrateCheckBox.Size = new Size(62, 19);
+            this.AllSubstrateCheckBox.TabIndex = 11;
+            this.AllSubstrateCheckBox.Text = "他基板";
+            this.AllSubstrateCheckBox.UseVisualStyleBackColor = true;
+            this.AllSubstrateCheckBox.CheckedChanged += this.AllSubstrateCheckBox_CheckedChanged;
+            // 
             // HistoryWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(1184, 511);
+            this.Controls.Add(this.AllSubstrateCheckBox);
             this.Controls.Add(this.GenerateCheckSheetButton);
             this.Controls.Add(this.CategoryRadioButton3);
             this.Controls.Add(this.GenerateListButton);
             this.Controls.Add(this.GenerateReportButton);
-            this.Controls.Add(this.AllSubstrateCheckBox);
+            this.Controls.Add(this.AllSubstrateStockCheckBox);
             this.Controls.Add(this.StockCheckBox);
             this.Controls.Add(this.CategoryRadioButton2);
             this.Controls.Add(this.CategoryRadioButton1);
@@ -205,10 +219,11 @@
         private RadioButton CategoryRadioButton1;
         private RadioButton CategoryRadioButton2;
         private CheckBox StockCheckBox;
-        private CheckBox AllSubstrateCheckBox;
+        private CheckBox AllSubstrateStockCheckBox;
         private Button GenerateReportButton;
         private Button GenerateListButton;
         private RadioButton CategoryRadioButton3;
         private Button GenerateCheckSheetButton;
+        private CheckBox AllSubstrateCheckBox;
     }
 }
