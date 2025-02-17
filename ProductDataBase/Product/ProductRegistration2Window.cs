@@ -365,45 +365,12 @@ namespace ProductDatabase {
             }
         }
         private bool Registration() {
+            string productRowId;
             using SQLiteConnection con = new(GetConnectionRegistration());
             con.Open();
             using var transaction = con.BeginTransaction();
 
             var cmd = con.CreateCommand();
-            if (IsSerialGeneration) {
-                foreach (var b in _strSerial) {
-                    cmd.CommandText =
-                        $"""
-                        INSERT INTO "{ProductInfo.ProductName}_Serial"
-                            (
-                            Serial,
-                            OrderNumber,
-                            ProductNumber,
-                            ProductType,
-                            ProductModel,
-                            RegDate
-                            )
-                        VALUES
-                            (
-                            @Serial,
-                            @OrderNumber,
-                            @ProductNumber,
-                            @ProductType,
-                            @ProductModel,
-                            @RegDate
-                            )
-                        """;
-
-                    cmd.Parameters.Add("@Serial", DbType.String).Value = b;
-                    cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                    cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
-                    cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-                    cmd.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                    cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-
-                    cmd.ExecuteNonQuery();
-                }
-            }
 
             switch (ProductInfo.RegType) {
                 case 0:
@@ -503,12 +470,37 @@ namespace ProductDatabase {
                     cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                     cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = "SELECT last_insert_rowid()";
+                    productRowId = cmd.ExecuteScalar().ToString() ?? string.Empty;
+
+                    if (IsSerialGeneration) {
+                        foreach (var b in _strSerial) {
+                            cmd.CommandText =
+                                $"""
+                        INSERT INTO "{ProductInfo.ProductName}_Serial"
+                            (
+                            Serial,
+                            UsedID
+                            )
+                        VALUES
+                            (
+                            @Serial,
+                            @productRowId
+                            )
+                        """;
+
+                            cmd.Parameters.Add("@Serial", DbType.String).Value = b;
+                            cmd.Parameters.Add("@productRowId", DbType.String).Value = int.Parse(productRowId);
+
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
                     break;
 
                 case 2:
                 case 3:
                 case 4:
-                    string productRowId;
                     if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
                     for (var i = 0; i <= _useSubstrate.Length; i++) {
 
@@ -685,6 +677,29 @@ namespace ProductDatabase {
                     // 一時テーブルの内容を削除
                     var command = new SQLiteCommand("DELETE FROM TempSubstrateReduction", con, transaction);
                     command.ExecuteNonQuery();
+
+                    if (IsSerialGeneration) {
+                        foreach (var b in _strSerial) {
+                            cmd.CommandText =
+                                $"""
+                        INSERT INTO "{ProductInfo.ProductName}_Serial"
+                            (
+                            Serial,
+                            UsedID
+                            )
+                        VALUES
+                            (
+                            @Serial,
+                            @productRowId
+                            )
+                        """;
+
+                            cmd.Parameters.Add("@Serial", DbType.String).Value = b;
+                            cmd.Parameters.Add("@productRowId", DbType.String).Value = int.Parse(productRowId);
+
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
                     break;
             }
             try {
