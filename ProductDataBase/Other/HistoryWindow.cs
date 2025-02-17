@@ -54,6 +54,7 @@ namespace ProductDatabase {
                     case 2:
                         CategoryRadioButton2.Text = "全てのタイプ";
                         CategoryRadioButton3.Text = "シリアル";
+                        if (ProductInfo.RegType == 0) { CategoryRadioButton3.Visible = false; }
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
                         AllSubstrateStockCheckBox.Visible = false;
@@ -88,7 +89,7 @@ namespace ProductDatabase {
             var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
 
             var query = $"""
-                SELECT _rowid_, * FROM "{ProductInfo.ProductName}_Substrate" 
+                SELECT _rowid_, * FROM "{ProductInfo.ProductName}_Substrate"
                 WHERE 1=1{otherSubstrate} ORDER BY _rowid_ DESC
                 """;
             using SQLiteCommand command = new(query, con);
