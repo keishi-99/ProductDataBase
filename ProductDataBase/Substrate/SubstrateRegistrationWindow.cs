@@ -200,7 +200,20 @@ namespace ProductDatabase {
                 if (IsRegistration) {
                     var substrateName = string.Empty;
                     using (var cmd = con.CreateCommand()) {
-                        cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateNumber = @SubstrateNumber LIMIT 1""";
+                        //cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateNumber = @SubstrateNumber LIMIT 1""";
+                        cmd.CommandText = $"""
+                            SELECT
+                                SubstrateName,
+                                SubstrateModel,
+                                SubstrateNumber,
+                                OrderNumber,
+                                SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                            FROM {ProductInfo.StockName}_Substrate
+                            WHERE SubstrateModel = @SubstrateModel
+                            GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                            ORDER BY MIN(_rowid_)
+                            LIMIT 1;
+                            """;
                         cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNumber;
                         using var dr = cmd.ExecuteReader();
                         while (dr.Read()) {
@@ -222,7 +235,20 @@ namespace ProductDatabase {
                 // 不良処理時在庫チェック
                 if (DefectNumberCheckBox.Checked) {
                     using var cmd = con.CreateCommand();
-                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateNumber = @SubstrateNumber LIMIT 1""";
+                    //cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateNumber = @SubstrateNumber LIMIT 1""";
+                    cmd.CommandText = $"""
+                            SELECT
+                                SubstrateName,
+                                SubstrateModel,
+                                SubstrateNumber,
+                                OrderNumber,
+                                SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                            FROM {ProductInfo.StockName}_Substrate
+                            WHERE SubstrateModel = @SubstrateModel
+                            GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                            ORDER BY MIN(_rowid_)
+                            LIMIT 1;
+                            """;
                     cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNumber;
                     using var dr = cmd.ExecuteReader();
                     if (dr.Read()) {

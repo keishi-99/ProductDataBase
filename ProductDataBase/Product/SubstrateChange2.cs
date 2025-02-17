@@ -121,7 +121,19 @@ namespace ProductDatabase {
                             using var cmd = con.CreateCommand();
 
                             // テーブル検索SQL - [[StockName]_StockView]テーブルから基板型式[Model]で在庫基板を抽出
-                            cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateModel = @SubstrateModel""";
+                            //cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateModel = @SubstrateModel""";
+                            cmd.CommandText = $"""
+                                SELECT
+                                    SubstrateName,
+                                    SubstrateModel,
+                                    SubstrateNumber,
+                                    OrderNumber,
+                                    SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                                FROM {ProductInfo.StockName}_Substrate
+                                WHERE SubstrateModel = @SubstrateModel
+                                GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                                ORDER BY MIN(_rowid_);
+                                """;
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using var dr = cmd.ExecuteReader();
                             var j = 0;
@@ -321,7 +333,19 @@ namespace ProductDatabase {
                                             var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[3].Value);
 
                                             using (var cmd = con.CreateCommand()) {
-                                                cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber""";
+                                                //cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber""";
+                                                cmd.CommandText = $"""
+                                                    SELECT
+                                                        SubstrateName,
+                                                        SubstrateModel,
+                                                        SubstrateNumber,
+                                                        OrderNumber,
+                                                        SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                                                    FROM {ProductInfo.StockName}_Substrate
+                                                    WHERE SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                                                    GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                                                    ORDER BY MIN(_rowid_);
+                                                    """;
                                                 cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                                                 cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNum;
                                                 using var dr = cmd.ExecuteReader();
