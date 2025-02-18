@@ -137,6 +137,26 @@ namespace ProductDatabase {
         // ロードイベント
         private void LoadEvents() {
             try {
+                // JSONファイルのパス
+                var jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "general", "appsettings.json");
+
+                // パスのディレクトリ部分を取得
+                var basePath = Path.GetDirectoryName(jsonFilePath);
+                if (string.IsNullOrEmpty(basePath) || !Directory.Exists(basePath)) {
+                    throw new DirectoryNotFoundException($"The directory '{basePath}' does not exist.");
+                }
+                // JSONファイルを読み込む
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(basePath)
+                    .AddJsonFile(Path.GetFileName(jsonFilePath), optional: false, reloadOnChange: true)
+                    .Build();
+                // CloneFolderPathを取得
+                CommonUtils.s_networkPath = config["NetworkFolderPath"] ?? throw new Exception("フォルダが設定されてません。");
+                if (string.IsNullOrEmpty(CommonUtils.s_networkPath)) { throw new Exception("フォルダが設定されてません。"); }
+                if (!Directory.Exists(CommonUtils.s_networkPath)) {
+                    throw new DirectoryNotFoundException($"フォルダ '{CommonUtils.s_networkPath}' が見つかりません。");
+                }
+
                 // その日のbackupファイルがない場合バックアップ作成
                 var d = DateTime.Now;
                 var backupDir = Path.Combine(CommonUtils.s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}");
@@ -152,27 +172,7 @@ namespace ProductDatabase {
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con)) { adapter.Fill(ProductInfo.SubstrateDataTable); }
 
-                // JSONファイルのパス
-                var jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "general", "appsettings.json");
 
-                // パスのディレクトリ部分を取得
-                var basePath = Path.GetDirectoryName(jsonFilePath);
-                if (string.IsNullOrEmpty(basePath) || !Directory.Exists(basePath)) {
-                    throw new DirectoryNotFoundException($"The directory '{basePath}' does not exist.");
-                }
-
-                // JSONファイルを読み込む
-                var config = new ConfigurationBuilder()
-                    .SetBasePath(basePath)
-                    .AddJsonFile(Path.GetFileName(jsonFilePath), optional: false, reloadOnChange: true)
-                    .Build();
-
-                // CloneFolderPathを取得
-                CommonUtils.s_networkPath = config["NetworkFolderPath"] ?? throw new Exception("フォルダが設定されてません。");
-                if (string.IsNullOrEmpty(CommonUtils.s_networkPath)) { throw new Exception("フォルダが設定されてません。"); }
-                if (!Directory.Exists(CommonUtils.s_networkPath)) {
-                    throw new DirectoryNotFoundException($"フォルダ '{CommonUtils.s_networkPath}' が見つかりません。");
-                }
 
                 s_userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];
 
