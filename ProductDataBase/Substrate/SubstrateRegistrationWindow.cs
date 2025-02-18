@@ -209,11 +209,12 @@ namespace ProductDatabase {
                                 OrderNumber,
                                 SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                             FROM {ProductInfo.StockName}_Substrate
-                            WHERE SubstrateModel = @SubstrateModel
+                            WHERE SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                             GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                             ORDER BY MIN(_rowid_)
                             LIMIT 1;
                             """;
+                        cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                         cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNumber;
                         using var dr = cmd.ExecuteReader();
                         while (dr.Read()) {
@@ -244,11 +245,12 @@ namespace ProductDatabase {
                                 OrderNumber,
                                 SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                             FROM {ProductInfo.StockName}_Substrate
-                            WHERE SubstrateModel = @SubstrateModel
+                            WHERE SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                             GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                             ORDER BY MIN(_rowid_)
                             LIMIT 1;
                             """;
+                    cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                     cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNumber;
                     using var dr = cmd.ExecuteReader();
                     if (dr.Read()) {
