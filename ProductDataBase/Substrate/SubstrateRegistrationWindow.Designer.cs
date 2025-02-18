@@ -264,10 +264,10 @@
             this.QuantityCheckBox.Location = new Point(19, 218);
             this.QuantityCheckBox.Margin = new Padding(0);
             this.QuantityCheckBox.Name = "QuantityCheckBox";
-            this.QuantityCheckBox.Size = new Size(50, 19);
+            this.QuantityCheckBox.Size = new Size(62, 19);
             this.QuantityCheckBox.TabIndex = 11;
             this.QuantityCheckBox.TabStop = false;
-            this.QuantityCheckBox.Text = "数量";
+            this.QuantityCheckBox.Text = "追加量";
             this.QuantityCheckBox.UseVisualStyleBackColor = true;
             this.QuantityCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
@@ -291,7 +291,7 @@
             this.DefectNumberCheckBox.Size = new Size(62, 19);
             this.DefectNumberCheckBox.TabIndex = 13;
             this.DefectNumberCheckBox.TabStop = false;
-            this.DefectNumberCheckBox.Text = "不良量";
+            this.DefectNumberCheckBox.Text = "減少量";
             this.DefectNumberCheckBox.UseVisualStyleBackColor = true;
             this.DefectNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
