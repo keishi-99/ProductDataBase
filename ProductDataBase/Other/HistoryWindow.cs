@@ -502,7 +502,6 @@ namespace ProductDatabase {
                                 Increase = @Increase,
                                 Decrease = @Decrease,
                                 Defect = @Defect,
-                                Revision = @Revision,
                                 Person = @Person,
                                 RegDate = @RegDate,
                                 Comment = @Comment,
