@@ -91,6 +91,12 @@ namespace ProductDatabase {
                 SerialFirstNumber = 0;
             }
         }
+        public static class Auth {
+            private static bool s_isAdministrator = false;
+            public static bool IsAdministrator {
+                get => s_isAdministrator; set => s_isAdministrator = value;
+            }
+        }
 
         public ProductInformation ProductInfo { get; set; } = new();
 
@@ -99,6 +105,7 @@ namespace ProductDatabase {
         private string _strCategory14 = string.Empty;
 
         private static string[]? s_userNames = []; // ユーザーを保持する静的変数
+        private static string[]? s_adminUserNames = []; // ユーザーを保持する静的変数
         private bool _isAuthorizedUser = false;
 
         public MainWindow() {
@@ -172,12 +179,15 @@ namespace ProductDatabase {
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con)) { adapter.Fill(ProductInfo.SubstrateDataTable); }
 
-
-
+                // 認証ユーザー名を取得
                 s_userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];
-
                 // 現在のユーザー名がリストに含まれるかチェック
                 _isAuthorizedUser = s_userNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
+
+                // 管理者ユーザー名を取得
+                s_adminUserNames = config.GetSection("Administrator").Get<string[]>() ?? [];
+                // 現在のユーザー名がリストに含まれるかチェック
+                Auth.IsAdministrator = s_adminUserNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
 
                 QRCodePanel.Enabled = _isAuthorizedUser;
 
