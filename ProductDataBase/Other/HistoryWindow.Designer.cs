@@ -35,15 +35,21 @@
             this.CategoryRadioButton3 = new RadioButton();
             this.GenerateCheckSheetButton = new Button();
             this.AllSubstrateCheckBox = new CheckBox();
+            this.menuStrip1 = new MenuStrip();
+            this.ファイルToolStripMenuItem = new ToolStripMenuItem();
+            this.編集モードToolStripMenuItem = new ToolStripMenuItem();
+            this.編集終了ToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).BeginInit();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // DataBaseDataGridView
             // 
             this.DataBaseDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            this.DataBaseDataGridView.Location = new Point(0, 0);
+            this.DataBaseDataGridView.EditMode = DataGridViewEditMode.EditOnF2;
+            this.DataBaseDataGridView.Location = new Point(0, 27);
             this.DataBaseDataGridView.Name = "DataBaseDataGridView";
-            this.DataBaseDataGridView.Size = new Size(1184, 468);
+            this.DataBaseDataGridView.Size = new Size(1184, 467);
             this.DataBaseDataGridView.TabIndex = 0;
             // 
             // CategoryComboBox
@@ -51,7 +57,7 @@
             this.CategoryComboBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.CategoryComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             this.CategoryComboBox.FormattingEnabled = true;
-            this.CategoryComboBox.Location = new Point(12, 476);
+            this.CategoryComboBox.Location = new Point(12, 502);
             this.CategoryComboBox.Name = "CategoryComboBox";
             this.CategoryComboBox.Size = new Size(121, 23);
             this.CategoryComboBox.TabIndex = 1;
@@ -60,7 +66,7 @@
             // FilterStringTextBox
             // 
             this.FilterStringTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            this.FilterStringTextBox.Location = new Point(139, 476);
+            this.FilterStringTextBox.Location = new Point(139, 502);
             this.FilterStringTextBox.MaxLength = 50;
             this.FilterStringTextBox.Name = "FilterStringTextBox";
             this.FilterStringTextBox.Size = new Size(100, 23);
@@ -71,7 +77,7 @@
             // 
             this.CategoryRadioButton1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.CategoryRadioButton1.Appearance = Appearance.Button;
-            this.CategoryRadioButton1.Location = new Point(261, 474);
+            this.CategoryRadioButton1.Location = new Point(261, 500);
             this.CategoryRadioButton1.Name = "CategoryRadioButton1";
             this.CategoryRadioButton1.Size = new Size(92, 25);
             this.CategoryRadioButton1.TabIndex = 3;
@@ -86,7 +92,7 @@
             // 
             this.CategoryRadioButton2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.CategoryRadioButton2.Appearance = Appearance.Button;
-            this.CategoryRadioButton2.Location = new Point(359, 474);
+            this.CategoryRadioButton2.Location = new Point(359, 500);
             this.CategoryRadioButton2.Name = "CategoryRadioButton2";
             this.CategoryRadioButton2.Size = new Size(92, 25);
             this.CategoryRadioButton2.TabIndex = 4;
@@ -101,7 +107,7 @@
             // 
             this.StockCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.StockCheckBox.AutoSize = true;
-            this.StockCheckBox.Location = new Point(623, 480);
+            this.StockCheckBox.Location = new Point(623, 506);
             this.StockCheckBox.Name = "StockCheckBox";
             this.StockCheckBox.Size = new Size(83, 19);
             this.StockCheckBox.TabIndex = 5;
@@ -113,7 +119,7 @@
             // 
             this.AllSubstrateStockCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.AllSubstrateStockCheckBox.AutoSize = true;
-            this.AllSubstrateStockCheckBox.Location = new Point(712, 480);
+            this.AllSubstrateStockCheckBox.Location = new Point(712, 506);
             this.AllSubstrateStockCheckBox.Name = "AllSubstrateStockCheckBox";
             this.AllSubstrateStockCheckBox.Size = new Size(62, 19);
             this.AllSubstrateStockCheckBox.TabIndex = 6;
@@ -124,7 +130,7 @@
             // GenerateReportButton
             // 
             this.GenerateReportButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            this.GenerateReportButton.Location = new Point(1080, 474);
+            this.GenerateReportButton.Location = new Point(1080, 500);
             this.GenerateReportButton.Name = "GenerateReportButton";
             this.GenerateReportButton.Size = new Size(92, 25);
             this.GenerateReportButton.TabIndex = 7;
@@ -135,7 +141,7 @@
             // GenerateListButton
             // 
             this.GenerateListButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            this.GenerateListButton.Location = new Point(982, 474);
+            this.GenerateListButton.Location = new Point(982, 500);
             this.GenerateListButton.Name = "GenerateListButton";
             this.GenerateListButton.Size = new Size(92, 25);
             this.GenerateListButton.TabIndex = 8;
@@ -147,7 +153,7 @@
             // 
             this.CategoryRadioButton3.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.CategoryRadioButton3.Appearance = Appearance.Button;
-            this.CategoryRadioButton3.Location = new Point(457, 474);
+            this.CategoryRadioButton3.Location = new Point(457, 500);
             this.CategoryRadioButton3.Name = "CategoryRadioButton3";
             this.CategoryRadioButton3.Size = new Size(92, 25);
             this.CategoryRadioButton3.TabIndex = 9;
@@ -161,7 +167,7 @@
             // GenerateCheckSheetButton
             // 
             this.GenerateCheckSheetButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            this.GenerateCheckSheetButton.Location = new Point(884, 474);
+            this.GenerateCheckSheetButton.Location = new Point(884, 500);
             this.GenerateCheckSheetButton.Name = "GenerateCheckSheetButton";
             this.GenerateCheckSheetButton.Size = new Size(92, 25);
             this.GenerateCheckSheetButton.TabIndex = 10;
@@ -173,7 +179,7 @@
             // 
             this.AllSubstrateCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.AllSubstrateCheckBox.AutoSize = true;
-            this.AllSubstrateCheckBox.Location = new Point(555, 480);
+            this.AllSubstrateCheckBox.Location = new Point(555, 506);
             this.AllSubstrateCheckBox.Name = "AllSubstrateCheckBox";
             this.AllSubstrateCheckBox.Size = new Size(62, 19);
             this.AllSubstrateCheckBox.TabIndex = 11;
@@ -181,11 +187,43 @@
             this.AllSubstrateCheckBox.UseVisualStyleBackColor = true;
             this.AllSubstrateCheckBox.CheckedChanged += this.AllSubstrateCheckBox_CheckedChanged;
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new ToolStripItem[] { this.ファイルToolStripMenuItem });
+            this.menuStrip1.Location = new Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new Size(1184, 24);
+            this.menuStrip1.TabIndex = 12;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // ファイルToolStripMenuItem
+            // 
+            this.ファイルToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.編集モードToolStripMenuItem, this.編集終了ToolStripMenuItem });
+            this.ファイルToolStripMenuItem.Name = "ファイルToolStripMenuItem";
+            this.ファイルToolStripMenuItem.Size = new Size(53, 20);
+            this.ファイルToolStripMenuItem.Text = "ファイル";
+            // 
+            // 編集モードToolStripMenuItem
+            // 
+            this.編集モードToolStripMenuItem.Enabled = false;
+            this.編集モードToolStripMenuItem.Name = "編集モードToolStripMenuItem";
+            this.編集モードToolStripMenuItem.Size = new Size(125, 22);
+            this.編集モードToolStripMenuItem.Text = "編集モード";
+            this.編集モードToolStripMenuItem.Click += this.編集ToolStripMenuItem_Click;
+            // 
+            // 編集終了ToolStripMenuItem
+            // 
+            this.編集終了ToolStripMenuItem.Enabled = false;
+            this.編集終了ToolStripMenuItem.Name = "編集終了ToolStripMenuItem";
+            this.編集終了ToolStripMenuItem.Size = new Size(125, 22);
+            this.編集終了ToolStripMenuItem.Text = "編集終了";
+            this.編集終了ToolStripMenuItem.Click += this.編集終了ToolStripMenuItem_Click;
+            // 
             // HistoryWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(1184, 511);
+            this.ClientSize = new Size(1184, 537);
             this.Controls.Add(this.AllSubstrateCheckBox);
             this.Controls.Add(this.GenerateCheckSheetButton);
             this.Controls.Add(this.CategoryRadioButton3);
@@ -198,7 +236,9 @@
             this.Controls.Add(this.FilterStringTextBox);
             this.Controls.Add(this.CategoryComboBox);
             this.Controls.Add(this.DataBaseDataGridView);
+            this.Controls.Add(this.menuStrip1);
             this.Font = new Font("Meiryo UI", 9F);
+            this.MainMenuStrip = this.menuStrip1;
             this.MinimizeBox = false;
             this.Name = "HistoryWindow";
             this.ShowIcon = false;
@@ -207,6 +247,8 @@
             this.Text = "データベース";
             this.Load += this.HistoryWindow_Load;
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).EndInit();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -225,5 +267,9 @@
         private RadioButton CategoryRadioButton3;
         private Button GenerateCheckSheetButton;
         private CheckBox AllSubstrateCheckBox;
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem ファイルToolStripMenuItem;
+        private ToolStripMenuItem 編集モードToolStripMenuItem;
+        private ToolStripMenuItem 編集終了ToolStripMenuItem;
     }
 }
