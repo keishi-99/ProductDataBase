@@ -39,6 +39,7 @@
             this.ファイルToolStripMenuItem = new ToolStripMenuItem();
             this.編集モードToolStripMenuItem = new ToolStripMenuItem();
             this.編集終了ToolStripMenuItem = new ToolStripMenuItem();
+            this.GroupModelCheckBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -219,11 +220,24 @@
             this.編集終了ToolStripMenuItem.Text = "編集終了";
             this.編集終了ToolStripMenuItem.Click += this.編集終了ToolStripMenuItem_Click;
             // 
+            // GroupModelCheckBox
+            // 
+            this.GroupModelCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            this.GroupModelCheckBox.AutoSize = true;
+            this.GroupModelCheckBox.Location = new Point(780, 506);
+            this.GroupModelCheckBox.Name = "GroupModelCheckBox";
+            this.GroupModelCheckBox.Size = new Size(62, 19);
+            this.GroupModelCheckBox.TabIndex = 13;
+            this.GroupModelCheckBox.Text = "型式毎";
+            this.GroupModelCheckBox.UseVisualStyleBackColor = true;
+            this.GroupModelCheckBox.CheckedChanged += this.GroupModelCheckBox_CheckedChanged;
+            // 
             // HistoryWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(1184, 537);
+            this.Controls.Add(this.GroupModelCheckBox);
             this.Controls.Add(this.AllSubstrateCheckBox);
             this.Controls.Add(this.GenerateCheckSheetButton);
             this.Controls.Add(this.CategoryRadioButton3);
@@ -271,5 +285,6 @@
         private ToolStripMenuItem ファイルToolStripMenuItem;
         private ToolStripMenuItem 編集モードToolStripMenuItem;
         private ToolStripMenuItem 編集終了ToolStripMenuItem;
+        private CheckBox GroupModelCheckBox;
     }
 }

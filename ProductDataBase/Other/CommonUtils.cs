@@ -366,11 +366,11 @@ namespace ProductDatabase.Other {
                 var quantityRange = workSheetMain.Cells[resultRow, 8].Value?.ToString();
                 var serialFirstRange = workSheetMain.Cells[resultRow, 9].Value?.ToString();
                 var serialLastRange = workSheetMain.Cells[resultRow, 10].Value?.ToString();
-                var regDateYearRange = workSheetMain.Cells[resultRow, 11].Value?.ToString();
-                var regDateMonthRange = workSheetMain.Cells[resultRow, 12].Value?.ToString();
-                var regDateDayRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
-                var regTemperatureRange = workSheetMain.Cells[resultRow, 14].Value?.ToString();
-                var regHumidityRange = workSheetMain.Cells[resultRow, 15].Value?.ToString();
+                var regDateRange = workSheetMain.Cells[resultRow, 11].Value?.ToString();
+                //var regDateMonthRange = workSheetMain.Cells[resultRow, 12].Value?.ToString();
+                //var regDateDayRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
+                var regTemperatureRange = workSheetMain.Cells[resultRow, 12].Value?.ToString();
+                var regHumidityRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
 
                 const int StartColumn = 16;
                 var sheetNames = Enumerable.Range(StartColumn, 20) // 無限の範囲
@@ -380,7 +380,10 @@ namespace ProductDatabase.Other {
 
                 if (sheetNames.Count == 0) { throw new Exception("対象シートがありません。"); }
 
-                var date = DateTime.Parse(productInfo.RegDate);
+                var formattedDate = string.Empty;
+                if (DateTime.TryParse(productInfo.RegDate, out var date)) {
+                    formattedDate = date.ToString("yyyy-MM-dd");
+                }
 
                 foreach (var sheetName in sheetNames) {
                     var workSheetTemp = sheet[sheetName] ?? throw new Exception($"シート[{sheetName}]が見つかりません。");
@@ -388,9 +391,9 @@ namespace ProductDatabase.Other {
                     if (!string.IsNullOrEmpty(quantityRange)) { workSheetTemp.Cells[quantityRange].Value = productInfo.Quantity; }
                     if (!string.IsNullOrEmpty(serialFirstRange)) { workSheetTemp.Cells[serialFirstRange].Value = productInfo.SerialFirst; }
                     if (!string.IsNullOrEmpty(serialLastRange)) { workSheetTemp.Cells[serialLastRange].Value = productInfo.SerialLast; }
-                    if (!string.IsNullOrEmpty(regDateYearRange)) { workSheetTemp.Cells[regDateYearRange].Value = date.Year; }
-                    if (!string.IsNullOrEmpty(regDateMonthRange)) { workSheetTemp.Cells[regDateMonthRange].Value = date.Month; }
-                    if (!string.IsNullOrEmpty(regDateDayRange)) { workSheetTemp.Cells[regDateDayRange].Value = date.Day; }
+                    if (!string.IsNullOrEmpty(regDateRange)) { workSheetTemp.Cells[regDateRange].Value = formattedDate; }
+                    //if (!string.IsNullOrEmpty(regDateMonthRange)) { workSheetTemp.Cells[regDateMonthRange].Value = date.Month; }
+                    //if (!string.IsNullOrEmpty(regDateDayRange)) { workSheetTemp.Cells[regDateDayRange].Value = date.Day; }
                     if (!string.IsNullOrEmpty(regTemperatureRange)) { workSheetTemp.Cells[regTemperatureRange].Value = temperature; }
                     if (!string.IsNullOrEmpty(regHumidityRange)) { workSheetTemp.Cells[regHumidityRange].Value = humidity; }
                 }
