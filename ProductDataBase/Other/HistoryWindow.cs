@@ -52,7 +52,6 @@ namespace ProductDatabase {
                         CategoryRadioButton3.Visible = false;
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = true;
-                        AllSubstrateStockCheckBox.Visible = false;
                         GroupModelCheckBox.Visible = false;
                         GenerateReportButton.Visible = false;
                         GenerateListButton.Visible = IsListPrint;
@@ -64,7 +63,6 @@ namespace ProductDatabase {
                         if (ProductInfo.RegType == 0) { CategoryRadioButton3.Visible = false; }
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
-                        AllSubstrateStockCheckBox.Visible = false;
                         GroupModelCheckBox.Visible = false;
                         GenerateListButton.Visible = IsListPrint;
                         GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
@@ -75,7 +73,6 @@ namespace ProductDatabase {
                         CategoryRadioButton3.Visible = false;
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
-                        AllSubstrateStockCheckBox.Visible = false;
                         GroupModelCheckBox.Visible = false;
                         GenerateReportButton.Visible = false;
                         GenerateListButton.Visible = IsListPrint;
@@ -211,17 +208,16 @@ namespace ProductDatabase {
         }
 
         private void ViewSubstrateRegistrationLog() {
-            _tableName = "Substrate";
-            編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
-            StockCheckBox.Visible = false;
-            AllSubstrateCheckBox.Visible = true;
-            AllSubstrateStockCheckBox.Visible = false;
-            GroupModelCheckBox.Visible = false;
-            CategoryRadioButton3.Visible = false;
+            if (CategoryRadioButton1.Checked) {
+                _tableName = "Substrate";
+                編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
+                StockCheckBox.Visible = false;
+                AllSubstrateCheckBox.Visible = true;
+                GroupModelCheckBox.Visible = false;
 
-            var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
+                var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
 
-            var query = $"""
+                var query = $"""
                 SELECT 
                     rowid, * 
                 FROM 
@@ -233,31 +229,31 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            LoadDataAndDisplay("Substrate", query, ("@SubstrateModel", ProductInfo.SubstrateModel));
-        }
-        private void ViewSubstrateStockLog() {
-            編集モードToolStripMenuItem.Enabled = false;
-            StockCheckBox.Visible = true;
-            AllSubstrateCheckBox.Visible = false;
-            AllSubstrateStockCheckBox.Visible = true;
-            GroupModelCheckBox.Visible = true;
+                LoadDataAndDisplay("Substrate", query, ("@SubstrateModel", ProductInfo.SubstrateModel));
+            }
+            if (CategoryRadioButton2.Checked) {
+                _tableName = string.Empty;
+                編集モードToolStripMenuItem.Enabled = false;
+                StockCheckBox.Visible = true;
+                AllSubstrateCheckBox.Visible = true;
+                GroupModelCheckBox.Visible = true;
 
-            var otherSubstrate = !AllSubstrateStockCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
-            var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
+                var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
+                var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
 
-            var selectClause = GroupModelCheckBox.Checked
-                ? "SubstrateName, SubstrateModel, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock"
-                : "SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock";
+                var selectClause = GroupModelCheckBox.Checked
+                    ? "SubstrateName, SubstrateModel, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock"
+                    : "SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock";
 
-            var groupByClause = GroupModelCheckBox.Checked
-                ? "SubstrateName, SubstrateModel"
-                : "SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber";
+                var groupByClause = GroupModelCheckBox.Checked
+                    ? "SubstrateName, SubstrateModel"
+                    : "SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber";
 
-            var orderByClause = GroupModelCheckBox.Checked
-                ? "SubstrateModel"
-                : "MIN(rowid)";
+                var orderByClause = GroupModelCheckBox.Checked
+                    ? "SubstrateModel"
+                    : "MIN(rowid) DESC";
 
-            var query = $"""
+                var query = $"""
                         SELECT 
                             {selectClause}
                         FROM 
@@ -273,7 +269,8 @@ namespace ProductDatabase {
                         ;
                         """;
 
-            LoadDataAndDisplay("SubstrateStock", query, ("@SubstrateModel", ProductInfo.SubstrateModel));
+                LoadDataAndDisplay("SubstrateStock", query, ("@SubstrateModel", ProductInfo.SubstrateModel));
+            }
         }
 
         private void ViewProductRegistration(bool filterByProductModel) {
@@ -353,7 +350,6 @@ namespace ProductDatabase {
             CategoryRadioButton3.Enabled = false;
             AllSubstrateCheckBox.Enabled = false;
             StockCheckBox.Enabled = false;
-            AllSubstrateStockCheckBox.Enabled = false;
             GenerateCheckSheetButton.Enabled = false;
             GenerateListButton.Enabled = false;
             GenerateReportButton.Enabled = false;
@@ -581,7 +577,7 @@ namespace ProductDatabase {
             var actionMap = new Dictionary<(int, string), System.Action>
             {
                 { (1, "1"), ViewSubstrateRegistrationLog },
-                { (1, "2"), ViewSubstrateStockLog },
+                { (1, "2"), ViewSubstrateRegistrationLog },
                 { (2, "1"), () => ViewProductRegistration(true) },
                 { (2, "2"), () => ViewProductRegistration(false) },
                 { (2, "3"), ViewSerialLog },
@@ -681,9 +677,8 @@ namespace ProductDatabase {
         private void CategoryComboBox_SelectedIndexChanged(object sender, EventArgs e) { HistoryTableFilter(); }
         private void FilterStringTextBox_TextChanged(object sender, EventArgs e) { HistoryTableFilter(); }
         private void CategoryRadioButton_CheckedChanged(object sender, EventArgs e) { CategorySelect(sender); }
-        private void StockCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }
+        private void StockCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateRegistrationLog(); }
         private void AllSubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateRegistrationLog(); }
-        private void AllSubstrateStockCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }
-        private void GroupModelCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }
+        private void GroupModelCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateRegistrationLog(); }
     }
 }
