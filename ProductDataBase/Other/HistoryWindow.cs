@@ -53,6 +53,7 @@ namespace ProductDatabase {
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = true;
                         AllSubstrateStockCheckBox.Visible = false;
+                        GroupModelCheckBox.Visible = false;
                         GenerateReportButton.Visible = false;
                         GenerateListButton.Visible = IsListPrint;
                         GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
@@ -64,6 +65,7 @@ namespace ProductDatabase {
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
                         AllSubstrateStockCheckBox.Visible = false;
+                        GroupModelCheckBox.Visible = false;
                         GenerateListButton.Visible = IsListPrint;
                         GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
                         break;
@@ -74,6 +76,7 @@ namespace ProductDatabase {
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
                         AllSubstrateStockCheckBox.Visible = false;
+                        GroupModelCheckBox.Visible = false;
                         GenerateReportButton.Visible = false;
                         GenerateListButton.Visible = IsListPrint;
                         GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
@@ -84,15 +87,42 @@ namespace ProductDatabase {
             }
         }
 
+        private void LoadDataAndDisplay(string tableName, string query, params (string name, object value)[] parameters) {
+            using SQLiteConnection con = new(GetConnectionRegistration());
+            using SQLiteCommand command = new(query, con);
+            using SQLiteDataAdapter adapter = new(command);
+            command.Parameters.AddRange([.. parameters.Select(p => new SQLiteParameter(p.name, p.value))]);
+
+            _historyTable = new DataTable();
+            adapter.Fill(_historyTable);
+
+            DataBaseDataGridView.Columns.Clear();
+            DataBaseDataGridView.DataSource = _historyTable;
+
+            _listColFilter.Clear();
+            _listColFilter.Add("");
+
+            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
+                _listColFilter.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty);
+            }
+
+            CategoryComboBox.Items.Clear();
+            CategoryComboBox.Items.Add("");
+            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
+                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty);
+            }
+
+            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+        }
+
         private void ViewSubstrateRegistrationLog() {
             _tableName = "Substrate";
             編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
             StockCheckBox.Visible = false;
             AllSubstrateCheckBox.Visible = true;
             AllSubstrateStockCheckBox.Visible = false;
+            GroupModelCheckBox.Visible = false;
             CategoryRadioButton3.Visible = false;
-            using SQLiteConnection con = new(GetConnectionRegistration());
-            _historyTable = new System.Data.DataTable();
 
             var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
 
@@ -100,47 +130,64 @@ namespace ProductDatabase {
                 SELECT rowid, * FROM "{ProductInfo.ProductName}_Substrate"
                 WHERE 1=1{otherSubstrate} ORDER BY rowid DESC
                 """;
-            using SQLiteCommand command = new(query, con);
-            command.Parameters.AddWithValue("@SubstrateModel", ProductInfo.SubstrateModel);
-            // SQLiteDataAdapterのインスタンス化
-            using SQLiteDataAdapter adapter = new(command);
 
-            // データの取得とDataTableへの格納
-            adapter.Fill(_historyTable);
+            LoadDataAndDisplay("Substrate", query, ("@SubstrateModel", ProductInfo.SubstrateModel));
 
-            DataBaseDataGridView.Columns.Clear();
-            DataBaseDataGridView.DataSource = _historyTable;
-
-            _listColFilter.Clear();
-            _listColFilter.Add("");
-            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
-                if (headerValue != null) { _listColFilter.Add(headerValue); }
-            }
-
-            DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns[1].HeaderCell.Value = "基板名";
-            DataBaseDataGridView.Columns[2].HeaderCell.Value = "基板型式";
-            DataBaseDataGridView.Columns[3].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns[4].HeaderCell.Value = "注文番号";
-            DataBaseDataGridView.Columns[5].HeaderCell.Value = "追加量";
-            DataBaseDataGridView.Columns[6].HeaderCell.Value = "使用量";
-            DataBaseDataGridView.Columns[7].HeaderCell.Value = "減少量";
-            DataBaseDataGridView.Columns[8].HeaderCell.Value = "使用製品名";
-            DataBaseDataGridView.Columns[9].HeaderCell.Value = "使用製番";
-            DataBaseDataGridView.Columns[10].HeaderCell.Value = "使用注番";
-            DataBaseDataGridView.Columns[11].HeaderCell.Value = "Rev";
-            DataBaseDataGridView.Columns[12].HeaderCell.Value = "担当者";
-            DataBaseDataGridView.Columns[13].HeaderCell.Value = "登録日";
-            DataBaseDataGridView.Columns[14].HeaderCell.Value = "コメント";
-            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-
-            CategoryComboBox.Items.Clear();
-            CategoryComboBox.Items.Add("");
-            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? string.Empty);
-            }
+            DataBaseDataGridView.Columns["rowid"].HeaderCell.Value = "ID";
+            DataBaseDataGridView.Columns["SubstrateName"].HeaderCell.Value = "基板名";
+            DataBaseDataGridView.Columns["SubstrateModel"].HeaderCell.Value = "基板型式";
+            DataBaseDataGridView.Columns["SubstrateNumber"].HeaderCell.Value = "製造番号";
+            DataBaseDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
+            DataBaseDataGridView.Columns["Increase"].HeaderCell.Value = "追加量";
+            DataBaseDataGridView.Columns["Decrease"].HeaderCell.Value = "使用量";
+            DataBaseDataGridView.Columns["Defect"].HeaderCell.Value = "減少量";
+            DataBaseDataGridView.Columns["UsedProductType"].HeaderCell.Value = "使用製品名";
+            DataBaseDataGridView.Columns["UsedProductNumber"].HeaderCell.Value = "使用製番";
+            DataBaseDataGridView.Columns["UsedOrderNumber"].HeaderCell.Value = "使用注番";
+            DataBaseDataGridView.Columns["Revision"].HeaderCell.Value = "Rev";
+            DataBaseDataGridView.Columns["Person"].HeaderCell.Value = "担当者";
+            DataBaseDataGridView.Columns["RegDate"].HeaderCell.Value = "登録日";
+            DataBaseDataGridView.Columns["Comment"].HeaderCell.Value = "コメント";
         }
+        private void ViewSubstrateStockLog() {
+            _tableName = "Substrate";
+            編集モードToolStripMenuItem.Enabled = false;
+            StockCheckBox.Visible = true;
+            AllSubstrateCheckBox.Visible = false;
+            AllSubstrateStockCheckBox.Visible = true;
+            GroupModelCheckBox.Visible = true;
+
+            var otherSubstrate = !AllSubstrateStockCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
+            var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
+
+            var selectClause = GroupModelCheckBox.Checked
+                ? "SubstrateName, SubstrateModel, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock"
+                : "SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock";
+
+            var groupByClause = GroupModelCheckBox.Checked
+                ? "SubstrateName, SubstrateModel"
+                : "SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber";
+
+            var query = $"""
+                        SELECT {selectClause}
+                        FROM {ProductInfo.ProductName}_Substrate
+                        WHERE 1=1{otherSubstrate}
+                        GROUP BY {groupByClause}
+                        HAVING 1=1{inStock}
+                        ORDER BY MIN(rowid);
+                        """;
+
+            LoadDataAndDisplay("Substrate", query, ("@SubstrateModel", ProductInfo.SubstrateModel));
+
+            DataBaseDataGridView.Columns["SubstrateName"].HeaderCell.Value = "基板名";
+            DataBaseDataGridView.Columns["SubstrateModel"].HeaderCell.Value = "基板型式";
+            if (!GroupModelCheckBox.Checked) {
+                DataBaseDataGridView.Columns["SubstrateNumber"].HeaderCell.Value = "製造番号";
+                DataBaseDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
+            }
+            DataBaseDataGridView.Columns["Stock"].HeaderCell.Value = "残数";
+        }
+
         private void ViewProductRegistrationLog() {
             _tableName = "Product";
             編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
@@ -148,51 +195,26 @@ namespace ProductDatabase {
             GenerateListButton.Visible = IsListPrint;
             GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
 
-            using SQLiteConnection con = new(GetConnectionRegistration());
-            _historyTable = new System.Data.DataTable();
-
             var query = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE ProductModel = @ProductModel ORDER BY ID DESC""";
-            using SQLiteCommand command = new(query, con);
-            command.Parameters.AddWithValue("@ProductModel", ProductInfo.ProductModel);
-            // SQLiteDataAdapterのインスタンス化
-            using SQLiteDataAdapter adapter = new(command);
 
-            // データの取得とDataTableへの格納
-            adapter.Fill(_historyTable);
+            LoadDataAndDisplay("Product", query, ("@ProductModel", ProductInfo.ProductModel));
 
-            DataBaseDataGridView.Columns.Clear();
-            DataBaseDataGridView.DataSource = _historyTable;
-
-            _listColFilter.Clear();
-            _listColFilter.Add("");
-            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
-                if (headerValue != null) { _listColFilter.Add(headerValue); }
-            }
-
-            DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns[1].HeaderCell.Value = "注文番号";
-            DataBaseDataGridView.Columns[2].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns[3].HeaderCell.Value = "製品名";
-            DataBaseDataGridView.Columns[4].HeaderCell.Value = "製品型式";
-            DataBaseDataGridView.Columns[5].HeaderCell.Value = "数量";
-            DataBaseDataGridView.Columns[6].HeaderCell.Value = "担当者";
-            DataBaseDataGridView.Columns[7].HeaderCell.Value = "登録日";
-            DataBaseDataGridView.Columns[8].HeaderCell.Value = "Rev";
-            DataBaseDataGridView.Columns[9].HeaderCell.Value = "Group";
-            DataBaseDataGridView.Columns[10].HeaderCell.Value = "シリアル先頭";
-            DataBaseDataGridView.Columns[11].HeaderCell.Value = "シリアル末尾";
-            DataBaseDataGridView.Columns[12].HeaderCell.Value = "末番";
-            DataBaseDataGridView.Columns[13].HeaderCell.Value = "コメント";
-            DataBaseDataGridView.Columns[14].HeaderCell.Value = "使用基板";
+            DataBaseDataGridView.Columns["ID"].HeaderCell.Value = "ID";
+            DataBaseDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
+            DataBaseDataGridView.Columns["ProductNumber"].HeaderCell.Value = "製造番号";
+            DataBaseDataGridView.Columns["ProductType"].HeaderCell.Value = "製品名";
+            DataBaseDataGridView.Columns["ProductModel"].HeaderCell.Value = "製品型式";
+            DataBaseDataGridView.Columns["Quantity"].HeaderCell.Value = "数量";
+            DataBaseDataGridView.Columns["Person"].HeaderCell.Value = "担当者";
+            DataBaseDataGridView.Columns["RegDate"].HeaderCell.Value = "登録日";
+            DataBaseDataGridView.Columns["Revision"].HeaderCell.Value = "Rev";
+            DataBaseDataGridView.Columns["RevisionGroup"].HeaderCell.Value = "Group";
+            DataBaseDataGridView.Columns["SerialFirst"].HeaderCell.Value = "シリアル先頭";
+            DataBaseDataGridView.Columns["SerialLast"].HeaderCell.Value = "シリアル末尾";
+            DataBaseDataGridView.Columns["SerialLastNumber"].HeaderCell.Value = "末番";
+            DataBaseDataGridView.Columns["Comment"].HeaderCell.Value = "コメント";
+            DataBaseDataGridView.Columns["UsedSubstrate"].HeaderCell.Value = "使用基板";
             DataBaseDataGridView.Columns[14].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-
-            CategoryComboBox.Items.Clear();
-            CategoryComboBox.Items.Add("");
-            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? string.Empty);
-            }
         }
         private void ViewProductRegistrationAllTypesLog() {
             _tableName = "Product";
@@ -201,157 +223,27 @@ namespace ProductDatabase {
             GenerateListButton.Visible = IsListPrint;
             GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
 
-            using SQLiteConnection con = new(GetConnectionRegistration());
-            _historyTable = new System.Data.DataTable();
-
             var query = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" ORDER BY ID DESC""";
-            using SQLiteCommand command = new(query, con);
-            // SQLiteDataAdapterのインスタンス化
-            using SQLiteDataAdapter adapter = new(command);
 
-            // データの取得とDataTableへの格納
-            adapter.Fill(_historyTable);
+            LoadDataAndDisplay("Product", query);
 
-            DataBaseDataGridView.Columns.Clear();
-            DataBaseDataGridView.DataSource = _historyTable;
-
-            _listColFilter.Clear();
-            _listColFilter.Add("");
-            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
-                if (headerValue != null) { _listColFilter.Add(headerValue); }
-            }
-
-            DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns[1].HeaderCell.Value = "注文番号";
-            DataBaseDataGridView.Columns[2].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns[3].HeaderCell.Value = "製品名";
-            DataBaseDataGridView.Columns[4].HeaderCell.Value = "製品型式";
-            DataBaseDataGridView.Columns[5].HeaderCell.Value = "数量";
-            DataBaseDataGridView.Columns[6].HeaderCell.Value = "担当者";
-            DataBaseDataGridView.Columns[7].HeaderCell.Value = "登録日";
-            DataBaseDataGridView.Columns[8].HeaderCell.Value = "Rev";
-            DataBaseDataGridView.Columns[9].HeaderCell.Value = "Group";
-            DataBaseDataGridView.Columns[10].HeaderCell.Value = "シリアル先頭";
-            DataBaseDataGridView.Columns[11].HeaderCell.Value = "シリアル末尾";
-            DataBaseDataGridView.Columns[12].HeaderCell.Value = "末番";
-            DataBaseDataGridView.Columns[13].HeaderCell.Value = "コメント";
-            DataBaseDataGridView.Columns[14].HeaderCell.Value = "使用基板";
+            DataBaseDataGridView.Columns["ID"].HeaderCell.Value = "ID";
+            DataBaseDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
+            DataBaseDataGridView.Columns["ProductNumber"].HeaderCell.Value = "製造番号";
+            DataBaseDataGridView.Columns["ProductType"].HeaderCell.Value = "製品名";
+            DataBaseDataGridView.Columns["ProductModel"].HeaderCell.Value = "製品型式";
+            DataBaseDataGridView.Columns["Quantity"].HeaderCell.Value = "数量";
+            DataBaseDataGridView.Columns["Person"].HeaderCell.Value = "担当者";
+            DataBaseDataGridView.Columns["RegDate"].HeaderCell.Value = "登録日";
+            DataBaseDataGridView.Columns["Revision"].HeaderCell.Value = "Rev";
+            DataBaseDataGridView.Columns["RevisionGroup"].HeaderCell.Value = "Group";
+            DataBaseDataGridView.Columns["SerialFirst"].HeaderCell.Value = "シリアル先頭";
+            DataBaseDataGridView.Columns["SerialLast"].HeaderCell.Value = "シリアル末尾";
+            DataBaseDataGridView.Columns["SerialLastNumber"].HeaderCell.Value = "末番";
+            DataBaseDataGridView.Columns["Comment"].HeaderCell.Value = "コメント";
+            DataBaseDataGridView.Columns["UsedSubstrate"].HeaderCell.Value = "使用基板";
             DataBaseDataGridView.Columns[14].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
             DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-
-            CategoryComboBox.Items.Clear();
-            CategoryComboBox.Items.Add("");
-            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? string.Empty);
-            }
-        }
-        private void ViewReprintLog() {
-            編集モードToolStripMenuItem.Enabled = false;
-            using SQLiteConnection con = new(GetConnectionRegistration());
-            _historyTable = new System.Data.DataTable();
-
-            var query = $"""SELECT rowid, * FROM Reprint WHERE ProductModel = @ProductModel ORDER BY rowid DESC""";
-            using SQLiteCommand command = new(query, con);
-            command.Parameters.AddWithValue("@ProductModel", ProductInfo.ProductModel);
-            // SQLiteDataAdapterのインスタンス化
-            using SQLiteDataAdapter adapter = new(command);
-
-            // データの取得とDataTableへの格納
-            adapter.Fill(_historyTable);
-
-            DataBaseDataGridView.Columns.Clear();
-            DataBaseDataGridView.DataSource = _historyTable;
-
-            _listColFilter.Clear();
-            _listColFilter.Add("");
-            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
-                if (headerValue != null) { _listColFilter.Add(headerValue); }
-            }
-
-            DataBaseDataGridView.Columns[0].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns[1].HeaderCell.Value = "印刷対象";
-            DataBaseDataGridView.Columns[2].HeaderCell.Value = "注文番号";
-            DataBaseDataGridView.Columns[3].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns[4].HeaderCell.Value = "製品名";
-            DataBaseDataGridView.Columns[5].HeaderCell.Value = "製品型式";
-            DataBaseDataGridView.Columns[6].HeaderCell.Value = "数量";
-            DataBaseDataGridView.Columns[7].HeaderCell.Value = "担当者";
-            DataBaseDataGridView.Columns[8].HeaderCell.Value = "登録日";
-            DataBaseDataGridView.Columns[9].HeaderCell.Value = "Rev";
-            DataBaseDataGridView.Columns[10].HeaderCell.Value = "シリアル末尾";
-            DataBaseDataGridView.Columns[11].HeaderCell.Value = "末番";
-            DataBaseDataGridView.Columns[12].HeaderCell.Value = "コメント";
-            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-
-            CategoryComboBox.Items.Clear();
-            CategoryComboBox.Items.Add("");
-            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? string.Empty);
-            }
-        }
-        private void ViewSubstrateStockLog() {
-            編集モードToolStripMenuItem.Enabled = false;
-            StockCheckBox.Visible = true;
-            AllSubstrateCheckBox.Visible = false;
-            AllSubstrateStockCheckBox.Visible = true;
-            using SQLiteConnection con = new(GetConnectionRegistration());
-            _historyTable = new System.Data.DataTable();
-
-            var otherSubstrate = !AllSubstrateStockCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
-            //var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
-            var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
-
-            //var query = $"""
-            //            SELECT *
-            //             FROM "{ProductInfo.ProductName}_StockView"
-            //             WHERE 1=1{otherSubstrate}{inStock}
-            //            """;
-            var query = $"""
-                        SELECT
-                            SubstrateName,
-                            SubstrateModel,
-                            SubstrateNumber,
-                            OrderNumber,
-                            SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                        FROM {ProductInfo.ProductName}_Substrate
-                        WHERE 1=1{otherSubstrate}
-                        GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
-                        HAVING 1=1{inStock}
-                        ORDER BY MIN(rowid);
-                        """;
-
-            using SQLiteCommand command = new(query, con);
-            command.Parameters.AddWithValue("@SubstrateModel", ProductInfo.SubstrateModel);
-            // SQLiteDataAdapterのインスタンス化
-            using SQLiteDataAdapter adapter = new(command);
-
-            // データの取得とDataTableへの格納
-            adapter.Fill(_historyTable);
-
-            DataBaseDataGridView.Columns.Clear();
-            DataBaseDataGridView.DataSource = _historyTable;
-
-            _listColFilter.Clear();
-            _listColFilter.Add("");
-            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
-                if (headerValue != null) { _listColFilter.Add(headerValue); }
-            }
-
-            DataBaseDataGridView.Columns[0].HeaderCell.Value = "基板名";
-            DataBaseDataGridView.Columns[1].HeaderCell.Value = "基板型式";
-            DataBaseDataGridView.Columns[2].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns[3].HeaderCell.Value = "注文番号";
-            DataBaseDataGridView.Columns[4].HeaderCell.Value = "残数";
-            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-
-            CategoryComboBox.Items.Clear();
-            CategoryComboBox.Items.Add("");
-            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? string.Empty);
-            }
         }
         private void ViewSerialLog() {
             _tableName = "Serial";
@@ -359,9 +251,6 @@ namespace ProductDatabase {
             GenerateReportButton.Visible = false;
             GenerateListButton.Visible = false;
             GenerateCheckSheetButton.Visible = false;
-
-            using SQLiteConnection con = new(GetConnectionRegistration());
-            _historyTable = new System.Data.DataTable();
 
             var query = $"""
                         SELECT
@@ -381,38 +270,40 @@ namespace ProductDatabase {
                             s.UsedID = p.ID;
                         """;
 
-            using SQLiteCommand command = new(query, con);
-            // SQLiteDataAdapterのインスタンス化
-            using SQLiteDataAdapter adapter = new(command);
+            LoadDataAndDisplay("Product", query);
 
-            // データの取得とDataTableへの格納
-            adapter.Fill(_historyTable);
-
-            DataBaseDataGridView.Columns.Clear();
-            DataBaseDataGridView.DataSource = _historyTable;
-
-            _listColFilter.Clear();
-            _listColFilter.Add("");
-            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                var headerValue = DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
-                if (headerValue != null) { _listColFilter.Add(headerValue); }
-            }
-
-            DataBaseDataGridView.Columns[0].HeaderCell.Value = "RowID";
-            DataBaseDataGridView.Columns[1].HeaderCell.Value = "シリアル";
-            DataBaseDataGridView.Columns[2].HeaderCell.Value = "注文番号";
-            DataBaseDataGridView.Columns[3].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns[4].HeaderCell.Value = "製品名";
-            DataBaseDataGridView.Columns[5].HeaderCell.Value = "製品型式";
-            DataBaseDataGridView.Columns[6].HeaderCell.Value = "登録日";
-            DataBaseDataGridView.Columns[7].HeaderCell.Value = "UsedID";
+            DataBaseDataGridView.Columns["rowid"].HeaderCell.Value = "ID";
+            DataBaseDataGridView.Columns["Serial"].HeaderCell.Value = "シリアル";
+            DataBaseDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
+            DataBaseDataGridView.Columns["ProductNumber"].HeaderCell.Value = "製造番号";
+            DataBaseDataGridView.Columns["ProductType"].HeaderCell.Value = "製品名";
+            DataBaseDataGridView.Columns["ProductModel"].HeaderCell.Value = "製品型式";
+            DataBaseDataGridView.Columns["RegDate"].HeaderCell.Value = "登録日";
+            DataBaseDataGridView.Columns["usedID"].HeaderCell.Value = "UsedID";
             DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+        }
 
-            CategoryComboBox.Items.Clear();
-            CategoryComboBox.Items.Add("");
-            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value.ToString() ?? string.Empty);
-            }
+        private void ViewReprintLog() {
+            編集モードToolStripMenuItem.Enabled = false;
+
+            var query = $"""SELECT rowid, * FROM Reprint WHERE ProductModel = @ProductModel ORDER BY rowid DESC""";
+
+            LoadDataAndDisplay("Product", query, ("@ProductModel", ProductInfo.ProductModel));
+
+            DataBaseDataGridView.Columns["rowid"].HeaderCell.Value = "ID";
+            DataBaseDataGridView.Columns["PrintType"].HeaderCell.Value = "印刷対象";
+            DataBaseDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
+            DataBaseDataGridView.Columns["ProductNumber"].HeaderCell.Value = "製造番号";
+            DataBaseDataGridView.Columns["ProductType"].HeaderCell.Value = "製品名";
+            DataBaseDataGridView.Columns["ProductModel"].HeaderCell.Value = "製品型式";
+            DataBaseDataGridView.Columns["Quantity"].HeaderCell.Value = "数量";
+            DataBaseDataGridView.Columns["Person"].HeaderCell.Value = "担当者";
+            DataBaseDataGridView.Columns["RegDate"].HeaderCell.Value = "登録日";
+            DataBaseDataGridView.Columns["Revision"].HeaderCell.Value = "Rev";
+            DataBaseDataGridView.Columns["SerialFirst"].HeaderCell.Value = "シリアル先頭";
+            DataBaseDataGridView.Columns["SerialLast"].HeaderCell.Value = "シリアル末尾";
+            DataBaseDataGridView.Columns["Comment"].HeaderCell.Value = "コメント";
+            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
         }
 
         private void EditMode() {
@@ -756,5 +647,6 @@ namespace ProductDatabase {
         private void StockCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }
         private void AllSubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateRegistrationLog(); }
         private void AllSubstrateStockCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }
+        private void GroupModelCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateStockLog(); }
     }
 }
