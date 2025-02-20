@@ -496,7 +496,7 @@ namespace ProductDatabase {
                             //    // UPDATE文の設定
                             command.CommandText = $"""
                             UPDATE "{ProductInfo.ProductName}_Substrate"
-                            SET  
+                            SET
                                 SubstrateNumber = @SubstrateNumber,
                                 OrderNumber = @OrderNumber,
                                 Increase = @Increase,
@@ -578,8 +578,8 @@ namespace ProductDatabase {
                             command.Connection = con;
                             command.ExecuteNonQuery();
                             // ログ出力
-                            CommonUtils.Logger.AppendLog($";[製品履歴編集:前];注文番号[{row["OrderNumber", DataRowVersion.Original]}];製造番号[{row["ProductNumber", DataRowVersion.Original]}];製品名[{ProductInfo.ProductName}];タイプ[{row["ProductType", DataRowVersion.Original]}];型式[{row["ProductModel", DataRowVersion.Original]}];Revision[{row["Revision", DataRowVersion.Original]}];登録日[{row["RegDate", DataRowVersion.Original]}];担当者[{row["Person", DataRowVersion.Original]};ID[{row["ID"]}];Comment[{row["Comment", DataRowVersion.Original]}]");
-                            CommonUtils.Logger.AppendLog($";[製品履歴編集:後];注文番号[{row["OrderNumber"]}];製造番号[{row["ProductNumber"]}];製品名[{ProductInfo.ProductName}];タイプ[{row["ProductType"]}];型式[{row["ProductModel"]}];Revision[{row["Revision"]}];登録日[{row["RegDate"]}];担当者[{row["Person"]};ID[{row["ID"]}];Comment[{row["Comment"]}]");
+                            CommonUtils.Logger.AppendLog($";[製品履歴編集:前];注文番号[{row["OrderNumber", DataRowVersion.Original]}];製造番号[{row["ProductNumber", DataRowVersion.Original]}];製品名[{ProductInfo.ProductName}];タイプ[{row["ProductType", DataRowVersion.Original]}];型式[{row["ProductModel", DataRowVersion.Original]}];Revision[{row["Revision", DataRowVersion.Original]}];登録日[{row["RegDate", DataRowVersion.Original]}];担当者[{row["Person", DataRowVersion.Original]}];ID[{row["ID"]}];Comment[{row["Comment", DataRowVersion.Original]}]");
+                            CommonUtils.Logger.AppendLog($";[製品履歴編集:後];注文番号[{row["OrderNumber"]}];製造番号[{row["ProductNumber"]}];製品名[{ProductInfo.ProductName}];タイプ[{row["ProductType"]}];型式[{row["ProductModel"]}];Revision[{row["Revision"]}];登録日[{row["RegDate"]}];担当者[{row["Person"]}];ID[{row["ID"]}];Comment[{row["Comment"]}]");
                         }
                         else if (row.RowState == DataRowState.Deleted) // 削除行の処理
                         {
