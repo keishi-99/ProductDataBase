@@ -29,7 +29,6 @@
             this.CategoryRadioButton1 = new RadioButton();
             this.CategoryRadioButton2 = new RadioButton();
             this.StockCheckBox = new CheckBox();
-            this.AllSubstrateStockCheckBox = new CheckBox();
             this.GenerateReportButton = new Button();
             this.GenerateListButton = new Button();
             this.CategoryRadioButton3 = new RadioButton();
@@ -115,18 +114,6 @@
             this.StockCheckBox.Text = "在庫有のみ";
             this.StockCheckBox.UseVisualStyleBackColor = true;
             this.StockCheckBox.CheckedChanged += this.StockCheckBox_CheckedChanged;
-            // 
-            // AllSubstrateStockCheckBox
-            // 
-            this.AllSubstrateStockCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            this.AllSubstrateStockCheckBox.AutoSize = true;
-            this.AllSubstrateStockCheckBox.Location = new Point(712, 506);
-            this.AllSubstrateStockCheckBox.Name = "AllSubstrateStockCheckBox";
-            this.AllSubstrateStockCheckBox.Size = new Size(62, 19);
-            this.AllSubstrateStockCheckBox.TabIndex = 6;
-            this.AllSubstrateStockCheckBox.Text = "他基板";
-            this.AllSubstrateStockCheckBox.UseVisualStyleBackColor = true;
-            this.AllSubstrateStockCheckBox.CheckedChanged += this.AllSubstrateStockCheckBox_CheckedChanged;
             // 
             // GenerateReportButton
             // 
@@ -224,7 +211,7 @@
             // 
             this.GroupModelCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.GroupModelCheckBox.AutoSize = true;
-            this.GroupModelCheckBox.Location = new Point(780, 506);
+            this.GroupModelCheckBox.Location = new Point(712, 506);
             this.GroupModelCheckBox.Name = "GroupModelCheckBox";
             this.GroupModelCheckBox.Size = new Size(62, 19);
             this.GroupModelCheckBox.TabIndex = 13;
@@ -243,7 +230,6 @@
             this.Controls.Add(this.CategoryRadioButton3);
             this.Controls.Add(this.GenerateListButton);
             this.Controls.Add(this.GenerateReportButton);
-            this.Controls.Add(this.AllSubstrateStockCheckBox);
             this.Controls.Add(this.StockCheckBox);
             this.Controls.Add(this.CategoryRadioButton2);
             this.Controls.Add(this.CategoryRadioButton1);
@@ -275,7 +261,6 @@
         private RadioButton CategoryRadioButton1;
         private RadioButton CategoryRadioButton2;
         private CheckBox StockCheckBox;
-        private CheckBox AllSubstrateStockCheckBox;
         private Button GenerateReportButton;
         private Button GenerateListButton;
         private RadioButton CategoryRadioButton3;
