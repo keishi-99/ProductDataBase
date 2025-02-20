@@ -210,7 +210,7 @@ namespace ProductDatabase {
                 // バックアップ作成
                 CommonUtils.BackupManager.CreateBackup();
                 // ログ出力
-                CommonUtils.Logger.AppendLog($";[再印刷];注文番号[{ProductInfo.OrderNumber}];製造番号[{ProductInfo.ProductNumber}];製品名[{ProductInfo.ProductName}];タイプ[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{ProductInfo.Quantity}];シリアル先頭[{_strSerialFirstNumber}];シリアル末尾[{_strSerialLastNumber}];Revision[{ProductInfo.Revision}];登録日[{ProductInfo.RegDate}];担当者[{ProductInfo.Person}];");
+                CommonUtils.Logger.AppendLog($"[再印刷];注文番号[{ProductInfo.OrderNumber}];製造番号[{ProductInfo.ProductNumber}];製品名[{ProductInfo.ProductName}];タイプ[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{ProductInfo.Quantity}];シリアル先頭[{_strSerialFirstNumber}];シリアル末尾[{_strSerialLastNumber}];Revision[{ProductInfo.Revision}];登録日[{ProductInfo.RegDate}];担当者[{ProductInfo.Person}];");
 
                 return true;
             } catch (Exception ex) {
