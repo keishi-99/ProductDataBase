@@ -372,7 +372,7 @@ namespace ProductDatabase.Other {
                 var regTemperatureRange = workSheetMain.Cells[resultRow, 12].Value?.ToString();
                 var regHumidityRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
 
-                const int StartColumn = 16;
+                const int StartColumn = 14;
                 var sheetNames = Enumerable.Range(StartColumn, 20) // 無限の範囲
                     .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString())
                     .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName)) // 空白でない間
