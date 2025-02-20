@@ -87,7 +87,7 @@ namespace ProductDatabase {
             }
         }
 
-        private void LoadDataAndDisplay(string tableName, string query, params (string name, object value)[] parameters) {
+        private void LoadDataAndDisplay(string categoryName, string query, params (string name, object value)[] parameters) {
             using SQLiteConnection con = new(GetConnectionRegistration());
             using SQLiteCommand command = new(query, con);
             using SQLiteDataAdapter adapter = new(command);
@@ -105,13 +105,108 @@ namespace ProductDatabase {
             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
                 _listColFilter.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty);
             }
+            var headerTextMap = new Dictionary<string, Dictionary<string, string>>
+            {
+                {
+                    "Substrate", new Dictionary<string, string>
+                    {
+                        { "rowid", "ID" },
+                        { "SubstrateName", "基板名" },
+                        { "SubstrateModel", "基板型式" },
+                        { "SubstrateNumber", "製造番号" },
+                        { "OrderNumber", "注文番号" },
+                        { "Increase", "追加量" },
+                        { "Decrease", "使用量" },
+                        { "Defect", "減少量" },
+                        { "UsedProductType", "使用製品名" },
+                        { "UsedProductNumber", "使用製番" },
+                        { "UsedOrderNumber", "使用注番" },
+                        { "Revision", "Rev" },
+                        { "Person", "担当者" },
+                        { "RegDate", "登録日" },
+                        { "Comment", "コメント" }
+                    }
+                },
+                {
+                    "SubstrateStock", new Dictionary<string, string>
+                    {
+                        { "SubstrateName", "基板名" },
+                        { "SubstrateModel", "基板型式" },
+                        { "SubstrateNumber", "製造番号" },
+                        { "OrderNumber", "注文番号" },
+                        { "Stock", "残数" }
+                    }
+                },
+                {
+                    "Product", new Dictionary<string, string>
+                    {
+                        { "ID", "ID" },
+                        { "OrderNumber", "注文番号" },
+                        { "ProductNumber", "製造番号" },
+                        { "ProductType", "製品名" },
+                        { "ProductModel", "製品型式" },
+                        { "Quantity", "数量" },
+                        { "Person", "担当者" },
+                        { "RegDate", "登録日" },
+                        { "Revision", "Rev" },
+                        { "RevisionGroup", "Group" },
+                        { "SerialFirst", "シリアル先頭" },
+                        { "SerialLast", "シリアル末尾" },
+                        { "SerialLastNumber", "末番" },
+                        { "Comment", "コメント" },
+                        { "UsedSubstrate", "使用基板" }
+                    }
+                },
+                {
+                    "Serial", new Dictionary<string, string>
+                    {
+                        { "rowid", "ID" },
+                        { "Serial", "シリアル" },
+                        { "OrderNumber", "注文番号" },
+                        { "ProductNumber", "製造番号" },
+                        { "ProductType", "製品名" },
+                        { "ProductModel", "製品型式" },
+                        { "RegDate", "登録日" },
+                        { "usedID", "UsedID" }
+                    }
+                },
+                {
+                    "Reprint", new Dictionary<string, string>
+                    {
+                        { "rowid", "ID" },
+                        { "PrintType", "印刷対象" },
+                        { "OrderNumber", "注文番号" },
+                        { "ProductNumber", "製造番号" },
+                        { "ProductType", "製品名" },
+                        { "ProductModel", "製品型式" },
+                        { "Quantity", "数量" },
+                        { "Person", "担当者" },
+                        { "RegDate", "登録日" },
+                        { "Revision", "Rev" },
+                        { "SerialFirst", "シリアル先頭" },
+                        { "SerialLast", "シリアル末尾" },
+                        { "Comment", "コメント" }
+                    }
+                }
+            };
 
-            CategoryComboBox.Items.Clear();
-            CategoryComboBox.Items.Add("");
-            for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
-                CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty);
+            if (headerTextMap.TryGetValue(categoryName, out var columnHeaders)) {
+                foreach (var column in DataBaseDataGridView.Columns.Cast<DataGridViewColumn>()) {
+                    if (columnHeaders.TryGetValue(column.Name, out var headerText)) {
+                        column.HeaderCell.Value = headerText;
+                    }
+                }
+
+                CategoryComboBox.Items.Clear();
+                CategoryComboBox.Items.Add("");
+                for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
+                    CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty);
+                }
+
+                if (categoryName == "Product") {
+                    DataBaseDataGridView.Columns["UsedSubstrate"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+                }
             }
-
             DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
         }
 
@@ -127,30 +222,20 @@ namespace ProductDatabase {
             var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
 
             var query = $"""
-                SELECT rowid, * FROM "{ProductInfo.ProductName}_Substrate"
-                WHERE 1=1{otherSubstrate} ORDER BY rowid DESC
+                SELECT 
+                    rowid, * 
+                FROM 
+                    "{ProductInfo.ProductName}_Substrate"
+                WHERE 
+                    1=1 {otherSubstrate} 
+                ORDER BY 
+                    rowid DESC
+                ;
                 """;
 
             LoadDataAndDisplay("Substrate", query, ("@SubstrateModel", ProductInfo.SubstrateModel));
-
-            DataBaseDataGridView.Columns["rowid"].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns["SubstrateName"].HeaderCell.Value = "基板名";
-            DataBaseDataGridView.Columns["SubstrateModel"].HeaderCell.Value = "基板型式";
-            DataBaseDataGridView.Columns["SubstrateNumber"].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
-            DataBaseDataGridView.Columns["Increase"].HeaderCell.Value = "追加量";
-            DataBaseDataGridView.Columns["Decrease"].HeaderCell.Value = "使用量";
-            DataBaseDataGridView.Columns["Defect"].HeaderCell.Value = "減少量";
-            DataBaseDataGridView.Columns["UsedProductType"].HeaderCell.Value = "使用製品名";
-            DataBaseDataGridView.Columns["UsedProductNumber"].HeaderCell.Value = "使用製番";
-            DataBaseDataGridView.Columns["UsedOrderNumber"].HeaderCell.Value = "使用注番";
-            DataBaseDataGridView.Columns["Revision"].HeaderCell.Value = "Rev";
-            DataBaseDataGridView.Columns["Person"].HeaderCell.Value = "担当者";
-            DataBaseDataGridView.Columns["RegDate"].HeaderCell.Value = "登録日";
-            DataBaseDataGridView.Columns["Comment"].HeaderCell.Value = "コメント";
         }
         private void ViewSubstrateStockLog() {
-            _tableName = "Substrate";
             編集モードToolStripMenuItem.Enabled = false;
             StockCheckBox.Visible = true;
             AllSubstrateCheckBox.Visible = false;
@@ -168,82 +253,46 @@ namespace ProductDatabase {
                 ? "SubstrateName, SubstrateModel"
                 : "SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber";
 
+            var orderByClause = GroupModelCheckBox.Checked
+                ? "SubstrateModel"
+                : "MIN(rowid)";
+
             var query = $"""
-                        SELECT {selectClause}
-                        FROM {ProductInfo.ProductName}_Substrate
-                        WHERE 1=1{otherSubstrate}
-                        GROUP BY {groupByClause}
-                        HAVING 1=1{inStock}
-                        ORDER BY MIN(rowid);
+                        SELECT 
+                            {selectClause}
+                        FROM 
+                            {ProductInfo.ProductName}_Substrate
+                        WHERE 
+                            1=1 {otherSubstrate}
+                        GROUP BY 
+                            {groupByClause}
+                        HAVING 
+                            1=1 {inStock}
+                        ORDER BY 
+                            {orderByClause}
+                        ;
                         """;
 
-            LoadDataAndDisplay("Substrate", query, ("@SubstrateModel", ProductInfo.SubstrateModel));
+            LoadDataAndDisplay("SubstrateStock", query, ("@SubstrateModel", ProductInfo.SubstrateModel));
+        }
 
-            DataBaseDataGridView.Columns["SubstrateName"].HeaderCell.Value = "基板名";
-            DataBaseDataGridView.Columns["SubstrateModel"].HeaderCell.Value = "基板型式";
-            if (!GroupModelCheckBox.Checked) {
-                DataBaseDataGridView.Columns["SubstrateNumber"].HeaderCell.Value = "製造番号";
-                DataBaseDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
+        private void ViewProductRegistration(bool filterByProductModel) {
+            _tableName = "Product";
+            編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
+            GenerateReportButton.Visible = true;
+            GenerateListButton.Visible = IsListPrint;
+            GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
+
+            var query = filterByProductModel
+                ? $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE ProductModel = @ProductModel ORDER BY ID DESC"""
+                : $"""SELECT * FROM "{ProductInfo.ProductName}_Product" ORDER BY ID DESC""";
+
+            if (filterByProductModel) {
+                LoadDataAndDisplay("Product", query, ("@ProductModel", ProductInfo.ProductModel));
             }
-            DataBaseDataGridView.Columns["Stock"].HeaderCell.Value = "残数";
-        }
-
-        private void ViewProductRegistrationLog() {
-            _tableName = "Product";
-            編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
-            GenerateReportButton.Visible = true;
-            GenerateListButton.Visible = IsListPrint;
-            GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
-
-            var query = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE ProductModel = @ProductModel ORDER BY ID DESC""";
-
-            LoadDataAndDisplay("Product", query, ("@ProductModel", ProductInfo.ProductModel));
-
-            DataBaseDataGridView.Columns["ID"].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
-            DataBaseDataGridView.Columns["ProductNumber"].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns["ProductType"].HeaderCell.Value = "製品名";
-            DataBaseDataGridView.Columns["ProductModel"].HeaderCell.Value = "製品型式";
-            DataBaseDataGridView.Columns["Quantity"].HeaderCell.Value = "数量";
-            DataBaseDataGridView.Columns["Person"].HeaderCell.Value = "担当者";
-            DataBaseDataGridView.Columns["RegDate"].HeaderCell.Value = "登録日";
-            DataBaseDataGridView.Columns["Revision"].HeaderCell.Value = "Rev";
-            DataBaseDataGridView.Columns["RevisionGroup"].HeaderCell.Value = "Group";
-            DataBaseDataGridView.Columns["SerialFirst"].HeaderCell.Value = "シリアル先頭";
-            DataBaseDataGridView.Columns["SerialLast"].HeaderCell.Value = "シリアル末尾";
-            DataBaseDataGridView.Columns["SerialLastNumber"].HeaderCell.Value = "末番";
-            DataBaseDataGridView.Columns["Comment"].HeaderCell.Value = "コメント";
-            DataBaseDataGridView.Columns["UsedSubstrate"].HeaderCell.Value = "使用基板";
-            DataBaseDataGridView.Columns[14].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-        }
-        private void ViewProductRegistrationAllTypesLog() {
-            _tableName = "Product";
-            編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
-            GenerateReportButton.Visible = true;
-            GenerateListButton.Visible = IsListPrint;
-            GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
-
-            var query = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" ORDER BY ID DESC""";
-
-            LoadDataAndDisplay("Product", query);
-
-            DataBaseDataGridView.Columns["ID"].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
-            DataBaseDataGridView.Columns["ProductNumber"].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns["ProductType"].HeaderCell.Value = "製品名";
-            DataBaseDataGridView.Columns["ProductModel"].HeaderCell.Value = "製品型式";
-            DataBaseDataGridView.Columns["Quantity"].HeaderCell.Value = "数量";
-            DataBaseDataGridView.Columns["Person"].HeaderCell.Value = "担当者";
-            DataBaseDataGridView.Columns["RegDate"].HeaderCell.Value = "登録日";
-            DataBaseDataGridView.Columns["Revision"].HeaderCell.Value = "Rev";
-            DataBaseDataGridView.Columns["RevisionGroup"].HeaderCell.Value = "Group";
-            DataBaseDataGridView.Columns["SerialFirst"].HeaderCell.Value = "シリアル先頭";
-            DataBaseDataGridView.Columns["SerialLast"].HeaderCell.Value = "シリアル末尾";
-            DataBaseDataGridView.Columns["SerialLastNumber"].HeaderCell.Value = "末番";
-            DataBaseDataGridView.Columns["Comment"].HeaderCell.Value = "コメント";
-            DataBaseDataGridView.Columns["UsedSubstrate"].HeaderCell.Value = "使用基板";
-            DataBaseDataGridView.Columns[14].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+            else {
+                LoadDataAndDisplay("Product", query);
+            }
         }
         private void ViewSerialLog() {
             _tableName = "Serial";
@@ -267,43 +316,31 @@ namespace ProductDatabase {
                         INNER JOIN
                             "{ProductInfo.ProductName}_Product" AS p
                         ON
-                            s.UsedID = p.ID;
+                            s.UsedID = p.ID
+                        ORDER BY 
+                            ID DESC
+                        ;
                         """;
 
-            LoadDataAndDisplay("Product", query);
-
-            DataBaseDataGridView.Columns["rowid"].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns["Serial"].HeaderCell.Value = "シリアル";
-            DataBaseDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
-            DataBaseDataGridView.Columns["ProductNumber"].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns["ProductType"].HeaderCell.Value = "製品名";
-            DataBaseDataGridView.Columns["ProductModel"].HeaderCell.Value = "製品型式";
-            DataBaseDataGridView.Columns["RegDate"].HeaderCell.Value = "登録日";
-            DataBaseDataGridView.Columns["usedID"].HeaderCell.Value = "UsedID";
-            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+            LoadDataAndDisplay("Serial", query);
         }
 
         private void ViewReprintLog() {
             編集モードToolStripMenuItem.Enabled = false;
 
-            var query = $"""SELECT rowid, * FROM Reprint WHERE ProductModel = @ProductModel ORDER BY rowid DESC""";
+            var query = $"""
+                SELECT 
+                    rowid, * 
+                FROM 
+                    Reprint 
+                WHERE 
+                    ProductModel = @ProductModel 
+                ORDER BY 
+                    rowid DESC
+                ;
+                """;
 
-            LoadDataAndDisplay("Product", query, ("@ProductModel", ProductInfo.ProductModel));
-
-            DataBaseDataGridView.Columns["rowid"].HeaderCell.Value = "ID";
-            DataBaseDataGridView.Columns["PrintType"].HeaderCell.Value = "印刷対象";
-            DataBaseDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
-            DataBaseDataGridView.Columns["ProductNumber"].HeaderCell.Value = "製造番号";
-            DataBaseDataGridView.Columns["ProductType"].HeaderCell.Value = "製品名";
-            DataBaseDataGridView.Columns["ProductModel"].HeaderCell.Value = "製品型式";
-            DataBaseDataGridView.Columns["Quantity"].HeaderCell.Value = "数量";
-            DataBaseDataGridView.Columns["Person"].HeaderCell.Value = "担当者";
-            DataBaseDataGridView.Columns["RegDate"].HeaderCell.Value = "登録日";
-            DataBaseDataGridView.Columns["Revision"].HeaderCell.Value = "Rev";
-            DataBaseDataGridView.Columns["SerialFirst"].HeaderCell.Value = "シリアル先頭";
-            DataBaseDataGridView.Columns["SerialLast"].HeaderCell.Value = "シリアル末尾";
-            DataBaseDataGridView.Columns["Comment"].HeaderCell.Value = "コメント";
-            DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+            LoadDataAndDisplay("Reprint", query, ("@ProductModel", ProductInfo.ProductModel));
         }
 
         private void EditMode() {
@@ -545,8 +582,8 @@ namespace ProductDatabase {
             {
                 { (1, "1"), ViewSubstrateRegistrationLog },
                 { (1, "2"), ViewSubstrateStockLog },
-                { (2, "1"), ViewProductRegistrationLog },
-                { (2, "2"), ViewProductRegistrationAllTypesLog },
+                { (2, "1"), () => ViewProductRegistration(true) },
+                { (2, "2"), () => ViewProductRegistration(false) },
                 { (2, "3"), ViewSerialLog },
                 { (3, "1"), ViewReprintLog }
             };
