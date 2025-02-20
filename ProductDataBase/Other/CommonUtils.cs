@@ -367,12 +367,13 @@ namespace ProductDatabase.Other {
                 var serialFirstRange = workSheetMain.Cells[resultRow, 9].Value?.ToString();
                 var serialLastRange = workSheetMain.Cells[resultRow, 10].Value?.ToString();
                 var regDateRange = workSheetMain.Cells[resultRow, 11].Value?.ToString();
-                //var regDateMonthRange = workSheetMain.Cells[resultRow, 12].Value?.ToString();
-                //var regDateDayRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
-                var regTemperatureRange = workSheetMain.Cells[resultRow, 12].Value?.ToString();
-                var regHumidityRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
+                var dateFormat = workSheetMain.Cells[resultRow, 12].Value?.ToString();
+                //var regDateMonthRange = workSheetMain.Cells[resultRow, ].Value?.ToString();
+                //var regDateDayRange = workSheetMain.Cells[resultRow, ].Value?.ToString();
+                var regTemperatureRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
+                var regHumidityRange = workSheetMain.Cells[resultRow, 14].Value?.ToString();
 
-                const int StartColumn = 14;
+                const int StartColumn = 15;
                 var sheetNames = Enumerable.Range(StartColumn, 20) // 無限の範囲
                     .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString())
                     .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName)) // 空白でない間
@@ -382,7 +383,14 @@ namespace ProductDatabase.Other {
 
                 var formattedDate = string.Empty;
                 if (DateTime.TryParse(productInfo.RegDate, out var date)) {
-                    formattedDate = date.ToString("yyyy-MM-dd");
+                    switch (dateFormat) {
+                        case "1":
+                            formattedDate = date.ToString("yyyy年MM月dd日");
+                            break;
+                        case "2":
+                            formattedDate = date.ToString("yyyy-MM-dd");
+                            break;
+                    }
                 }
 
                 foreach (var sheetName in sheetNames) {
