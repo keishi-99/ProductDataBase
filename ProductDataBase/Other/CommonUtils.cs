@@ -32,7 +32,9 @@ namespace ProductDatabase.Other {
                         var logFileName = $"log_{DateTime.Now:yyyyMM}.txt";
                         var logFilePath = Path.Combine(s_logDirectory, logFileName);
 
-                        var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} ;{message}";
+                        // 文字列から改行を除外
+                        var messageWithoutNewlines = message.Replace("\r\n", " ").Replace("\n", " ");
+                        var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} ;{messageWithoutNewlines}";
                         //// ログ内容をファイルの末尾に追記
                         File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
 
