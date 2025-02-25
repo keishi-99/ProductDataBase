@@ -742,15 +742,15 @@ namespace ProductDatabase {
         private void MainWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void ReloadToolStripMenuItem_Click(object sender, EventArgs e) { LoadEvents(); }
         private void ReportConfigToolStripMenuItem_Click(object sender, EventArgs e) {
-            var reportConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigReport.xlsx");
+            var reportConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsx");
             OpenExcel(reportConfigPath);
         }
         private void ListConfigToolStripMenuItem_Click(object sender, EventArgs e) {
-            var listConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigList.xlsx");
+            var listConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsx");
             OpenExcel(listConfigPath);
         }
         private void CheckSheetConfigToolStripMenuItem_Click(object sender, EventArgs e) {
-            var checkSheetConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigCheckSheet.xlsx");
+            var checkSheetConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsx");
             OpenExcel(checkSheetConfigPath);
         }
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { Close(); }
