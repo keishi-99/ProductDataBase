@@ -82,7 +82,7 @@ namespace ProductDatabase {
                 //    using var cmd = con.CreateCommand();
 
                 //    // テーブル検索SQL - [[ProductName]_Substrate]テーブルの最新の[Revison]を取得
-                //    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.ClassName}_Substrate" WHERE SubstrateModel = @SubstrateModel AND Revision IS NOT NULL ORDER BY _rowid_ DESC""";
+                //    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.CategoryName}_Substrate" WHERE SubstrateModel = @SubstrateModel AND Revision IS NOT NULL ORDER BY _rowid_ DESC""";
                 //    cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                 //    var result = cmd.ExecuteScalar();
                 //    RevisionTextBox.Text = result?.ToString() ?? "";
@@ -209,7 +209,7 @@ namespace ProductDatabase {
                                 SubstrateNumber,
                                 OrderNumber,
                                 SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                            FROM {ProductInfo.ClassName}_Substrate
+                            FROM {ProductInfo.CategoryName}_Substrate
                             WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                             GROUP BY StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                             ORDER BY MIN(_rowid_)
@@ -248,7 +248,7 @@ namespace ProductDatabase {
                                 SubstrateNumber,
                                 OrderNumber,
                                 SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                            FROM {ProductInfo.ClassName}_Substrate
+                            FROM {ProductInfo.CategoryName}_Substrate
                             WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                             GROUP BY StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                             ORDER BY MIN(_rowid_)
@@ -274,7 +274,7 @@ namespace ProductDatabase {
                 using (var cmd = con.CreateCommand()) {
                     cmd.CommandText =
                         $"""
-                        INSERT INTO "{ProductInfo.ClassName}_Substrate"
+                        INSERT INTO "{ProductInfo.CategoryName}_Substrate"
                             (
                             StockName,
                             SubstrateName,

@@ -222,7 +222,7 @@ namespace ProductDatabase {
                 SELECT 
                     rowid, * 
                 FROM 
-                    {ProductInfo.ClassName}_Substrate
+                    {ProductInfo.CategoryName}_Substrate
                 WHERE 
                     StockName = "{ProductInfo.StockName}"{otherSubstrate} 
                 ORDER BY 
@@ -258,7 +258,7 @@ namespace ProductDatabase {
                         SELECT 
                             {selectClause}
                         FROM 
-                            {ProductInfo.ClassName}_Substrate
+                            {ProductInfo.CategoryName}_Substrate
                         WHERE 
                             StockName = "{ProductInfo.StockName}"{otherSubstrate}
                         GROUP BY 
@@ -282,8 +282,8 @@ namespace ProductDatabase {
             GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
 
             var query = filterByProductModel
-                ? $"""SELECT * FROM "{ProductInfo.ClassName}_Product" WHERE ProductName = @ProductName AND ProductModel = @ProductModel ORDER BY ID DESC"""
-                : $"""SELECT * FROM "{ProductInfo.ClassName}_Product" WHERE ProductName = @ProductName ORDER BY ID DESC""";
+                ? $"""SELECT * FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND ProductModel = @ProductModel ORDER BY ID DESC"""
+                : $"""SELECT * FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName ORDER BY ID DESC""";
 
             if (filterByProductModel) {
                 LoadDataAndDisplay("Product", query, ("@ProductName", ProductInfo.ProductName), ("@ProductModel", ProductInfo.ProductModel));
@@ -310,9 +310,9 @@ namespace ProductDatabase {
                             p.RegDate,
                             s.usedID
                         FROM
-                            "{ProductInfo.ClassName}_Serial" AS s
+                            "{ProductInfo.CategoryName}_Serial" AS s
                         INNER JOIN
-                            "{ProductInfo.ClassName}_Product" AS p
+                            "{ProductInfo.CategoryName}_Product" AS p
                         ON
                             s.UsedID = p.ID
                         WHERE

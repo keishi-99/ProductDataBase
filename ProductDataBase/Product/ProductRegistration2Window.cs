@@ -134,7 +134,7 @@ namespace ProductDatabase {
                                     SubstrateName,
                                     SubstrateNumber,
                                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                                FROM {ProductInfo.ClassName}_Substrate
+                                FROM {ProductInfo.CategoryName}_Substrate
                                 WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel
                                 GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                                 HAVING Stock > 0
@@ -239,7 +239,7 @@ namespace ProductDatabase {
                                     SubstrateNumber,
                                     OrderNumber,
                                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                                FROM {ProductInfo.ClassName}_Substrate
+                                FROM {ProductInfo.CategoryName}_Substrate
                                 WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel
                                 GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                                 HAVING Stock > 0
@@ -402,7 +402,7 @@ namespace ProductDatabase {
                 case 0:
                     cmd.CommandText =
                         $"""
-                        INSERT INTO "{ProductInfo.ClassName}_Product"
+                        INSERT INTO "{ProductInfo.CategoryName}_Product"
                             (
                             ProductName,
                             OrderNumber,
@@ -450,7 +450,7 @@ namespace ProductDatabase {
                 case 1:
                     cmd.CommandText =
                         $"""
-                        INSERT INTO "{ProductInfo.ClassName}_Product"
+                        INSERT INTO "{ProductInfo.CategoryName}_Product"
                             (
                             ProductName,
                             OrderNumber,
@@ -510,7 +510,7 @@ namespace ProductDatabase {
                         foreach (var b in _strSerial) {
                             cmd.CommandText =
                                 $"""
-                        INSERT INTO "{ProductInfo.ClassName}_Serial"
+                        INSERT INTO "{ProductInfo.CategoryName}_Serial"
                             (
                             Serial,
                             UsedID
@@ -562,7 +562,7 @@ namespace ProductDatabase {
                                             SubstrateNumber,
                                             OrderNumber,
                                             SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                                        FROM {ProductInfo.ClassName}_Substrate
+                                        FROM {ProductInfo.CategoryName}_Substrate
                                         WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                                         GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                                         ORDER BY MIN(_rowid_);
@@ -651,7 +651,7 @@ namespace ProductDatabase {
                     cmd = con.CreateCommand();
                     cmd.CommandText =
                         $"""
-                            INSERT INTO "{ProductInfo.ClassName}_Product"
+                            INSERT INTO "{ProductInfo.CategoryName}_Product"
                             (
                             ProductName,
                             OrderNumber,
@@ -715,7 +715,7 @@ namespace ProductDatabase {
                     cmd = con.CreateCommand();
                     cmd.CommandText =
                         $"""
-                        INSERT INTO "{ProductInfo.ClassName}_Substrate" (
+                        INSERT INTO "{ProductInfo.CategoryName}_Substrate" (
                             StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, Decrease, UsedProductType, UsedProductNumber, UsedOrderNumber, Person, RegDate, Comment, UseID
                         )
                         SELECT
@@ -733,7 +733,7 @@ namespace ProductDatabase {
                         foreach (var b in _strSerial) {
                             cmd.CommandText =
                                 $"""
-                        INSERT INTO "{ProductInfo.ClassName}_Serial"
+                        INSERT INTO "{ProductInfo.CategoryName}_Serial"
                             (
                             Serial,
                             UsedID
@@ -782,7 +782,7 @@ namespace ProductDatabase {
             if (!string.IsNullOrEmpty(ProductInfo.ProductNumber)) {
                 // 製番が新規かチェック
                 using (var cmd = con.CreateCommand()) {
-                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.ClassName}_Product" WHERE ProductName = @ProductName AND ProductNumber = @ProductNumber ORDER BY "ID" ASC LIMIT 1""";
+                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND ProductNumber = @ProductNumber ORDER BY "ID" ASC LIMIT 1""";
                     cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
                     cmd.Parameters.Add("@ProductNumber", DbType.String).Value = ProductInfo.ProductNumber;
 
@@ -813,7 +813,7 @@ namespace ProductDatabase {
             if (!string.IsNullOrEmpty(ProductInfo.OrderNumber)) {
                 // 注文番号が新規かチェック
                 using (var cmd = con.CreateCommand()) {
-                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.ClassName}_Product" WHERE ProductName = @ProductName AND OrderNumber = @OrderNumber ORDER BY "ID" ASC LIMIT 1""";
+                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND OrderNumber = @OrderNumber ORDER BY "ID" ASC LIMIT 1""";
                     cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
                     cmd.Parameters.Add("@OrderNumber", DbType.String).Value = ProductInfo.OrderNumber;
 
@@ -933,9 +933,9 @@ namespace ProductDatabase {
                         p.RegDate,
                         s.usedID
                     FROM
-                        "{ProductInfo.ClassName}_Serial" AS s
+                        "{ProductInfo.CategoryName}_Serial" AS s
                     INNER JOIN
-                        "{ProductInfo.ClassName}_Product" AS p
+                        "{ProductInfo.CategoryName}_Product" AS p
                     ON
                         s.UsedID = p.ID
                     WHERE 
