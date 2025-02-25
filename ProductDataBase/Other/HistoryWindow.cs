@@ -140,7 +140,8 @@ namespace ProductDatabase {
                         { "ID", "ID" },
                         { "OrderNumber", "注文番号" },
                         { "ProductNumber", "製造番号" },
-                        { "ProductType", "製品名" },
+                        { "ProductName", "製品名" },
+                        { "ProductType", "タイプ" },
                         { "ProductModel", "製品型式" },
                         { "Quantity", "数量" },
                         { "Person", "担当者" },
@@ -161,7 +162,7 @@ namespace ProductDatabase {
                         { "Serial", "シリアル" },
                         { "OrderNumber", "注文番号" },
                         { "ProductNumber", "製造番号" },
-                        { "ProductType", "製品名" },
+                        { "ProductType", "タイプ" },
                         { "ProductModel", "製品型式" },
                         { "RegDate", "登録日" },
                         { "usedID", "UsedID" }
