@@ -377,19 +377,19 @@ namespace ProductDatabase {
                 switch (selectedRadioButton.Tag) {
                     case "1":
                         ProductInfo.RadioButtonFlg = 1;
-                        strSqlQuery = """SELECT * FROM Substrate WHERE Visible = 1;""";
+                        strSqlQuery = """SELECT * FROM Substrate WHERE Visible = 1 ORDER BY SortNumber ASC;""";
                         break;
                     case "2":
                         ProductInfo.RadioButtonFlg = 2;
-                        strSqlQuery = """SELECT * FROM Product WHERE Visible = 1;""";
+                        strSqlQuery = """SELECT * FROM Product WHERE Visible = 1 ORDER BY SortNumber ASC;""";
                         break;
                     case "3":
                         ProductInfo.RadioButtonFlg = 3;
-                        strSqlQuery = """SELECT * FROM Product WHERE Visible = 1;""";
+                        strSqlQuery = """SELECT * FROM Product WHERE Visible = 1 ORDER BY SortNumber ASC;""";
                         break;
                     case "4":
                         ProductInfo.RadioButtonFlg = 4;
-                        strSqlQuery = """SELECT * FROM Product WHERE Visible = 1 AND (PrintType = 5 OR PrintType = 6);""";
+                        strSqlQuery = """SELECT * FROM Product WHERE Visible = 1 AND (PrintType = 5 OR PrintType = 6) ORDER BY SortNumber ASC;""";
                         break;
                     default:
                         break;
@@ -400,13 +400,15 @@ namespace ProductDatabase {
                     adapter.Fill(ProductInfo.ProductDataTable);
                 }
 
-                var CategoryNameSet = new SortedSet<string>(ProductInfo.ProductDataTable.AsEnumerable()
-                    .Select(row => row.Field<string?>("CategoryName"))
-                    .Where(classVal => classVal != null)
-                    .Cast<string>()
-                );
+                // CategoryName 列の重複を削除し、ソートする
+                var categoryNames = ProductInfo.ProductDataTable.AsEnumerable()
+                    .Select(row => row.Field<string?>("CategoryName") ?? string.Empty)
+                    .Distinct()
+                    .ToList();
 
-                CategoryListBox1.Items.AddRange([.. CategoryNameSet]);
+                // リストボックスにアイテムを追加する
+                CategoryListBox1.Items.AddRange([.. categoryNames]);
+
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -582,7 +584,29 @@ namespace ProductDatabase {
             using SQLiteConnection con = new(GetConnectionInformation());
             con.Open();
             using var cmd = con.CreateCommand();
-            cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber LIKE '%'|| @StrProness2 ||'%' OR ProItemNumber LIKE '%'|| @StrProness2 ||'%'""";
+
+            cmd.CommandText =
+                $"""
+                SELECT
+                    s."SubItemNumber",
+                    s.SubstrateName,
+                    s.ProductName AS sName,
+                    p.ProductName AS pName,
+                    p.ProductType,
+                    p."ProItemNumber"
+                FROM
+                    "Substrate" AS s
+                FULL JOIN
+                    "Product" AS p
+                ON
+                    s."SubItemNumber" = p."ProItemNumber"
+                WHERE
+                    s.SubItemNumber LIKE '%'|| @StrProness2 ||'%'
+                OR
+                    p.ProItemNumber LIKE '%'|| @StrProness2 ||'%'
+                """;
+
+            //cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber LIKE '%'|| @StrProness2 ||'%' OR ProItemNumber LIKE '%'|| @StrProness2 ||'%'""";
             //cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber = @StrProness2 OR ProItemNumber = @StrProness2""";
             cmd.Parameters.Add("@StrProness2", DbType.String).Value = ProductInfo.Proness2;
             using var dr = cmd.ExecuteReader();
@@ -591,15 +615,15 @@ namespace ProductDatabase {
                 var colSubItemNumber = dr["SubItemNumber"].ToString() ?? string.Empty;
                 var colProItemNumber = dr["ProItemNumber"].ToString() ?? string.Empty;
 
-                if (!string.IsNullOrEmpty(colSubItemNumber)) {
+                if (!string.IsNullOrWhiteSpace(colSubItemNumber)) {
                     var substrateName = dr["SubstrateName"]?.ToString() ?? string.Empty;
-                    var productName = dr["ProductName"]?.ToString() ?? string.Empty;
+                    var productName = dr["sName"]?.ToString() ?? string.Empty;
                     AddToLists(colSubItemNumber, substrateName, productName, "1");
                 }
 
-                if (!string.IsNullOrEmpty(colProItemNumber)) {
+                if (!string.IsNullOrWhiteSpace(colProItemNumber)) {
                     var productType = dr["ProductType"]?.ToString() ?? string.Empty;
-                    var productName = dr["ProductName:1"]?.ToString() ?? string.Empty;
+                    var productName = dr["pName"]?.ToString() ?? string.Empty;
                     AddToLists(colProItemNumber, productType, productName, "2");
                 }
             }
