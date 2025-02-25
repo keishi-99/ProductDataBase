@@ -76,17 +76,17 @@ namespace ProductDatabase {
                 }
 
                 // 在庫管理する基板はDB2へ接続し対象製品の在庫取得
-                if (IsRegistration) {
-                    using SQLiteConnection con = new(GetConnectionRegistration());
-                    con.Open();
-                    using var cmd = con.CreateCommand();
+                //if (IsRegistration) {
+                //    using SQLiteConnection con = new(GetConnectionRegistration());
+                //    con.Open();
+                //    using var cmd = con.CreateCommand();
 
-                    // テーブル検索SQL - [[ProductName]_Substrate]テーブルの最新の[Revison]を取得
-                    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.StockName}_Substrate" WHERE SubstrateModel = @SubstrateModel AND Revision IS NOT NULL ORDER BY _rowid_ DESC""";
-                    cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
-                    var result = cmd.ExecuteScalar();
-                    RevisionTextBox.Text = result?.ToString() ?? "";
-                }
+                //    // テーブル検索SQL - [[ProductName]_Substrate]テーブルの最新の[Revison]を取得
+                //    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.ClassName}_Substrate" WHERE SubstrateModel = @SubstrateModel AND Revision IS NOT NULL ORDER BY _rowid_ DESC""";
+                //    cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
+                //    var result = cmd.ExecuteScalar();
+                //    RevisionTextBox.Text = result?.ToString() ?? "";
+                //}
 
                 // 印刷しない場合は関連コントロール非表示に
                 if (IsLabelPrint == false) {
@@ -203,17 +203,20 @@ namespace ProductDatabase {
                         //cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateNumber = @SubstrateNumber LIMIT 1""";
                         cmd.CommandText = $"""
                             SELECT
+                                StockName,
                                 SubstrateName,
                                 SubstrateModel,
                                 SubstrateNumber,
                                 OrderNumber,
                                 SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                            FROM {ProductInfo.StockName}_Substrate
-                            WHERE SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
-                            GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                            FROM {ProductInfo.ClassName}_Substrate
+                            WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                            GROUP BY StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                             ORDER BY MIN(_rowid_)
                             LIMIT 1;
                             """;
+
+                        cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
                         cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                         cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNumber;
                         using var dr = cmd.ExecuteReader();
@@ -239,17 +242,20 @@ namespace ProductDatabase {
                     //cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateNumber = @SubstrateNumber LIMIT 1""";
                     cmd.CommandText = $"""
                             SELECT
+                                StockName,
                                 SubstrateName,
                                 SubstrateModel,
                                 SubstrateNumber,
                                 OrderNumber,
                                 SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                            FROM {ProductInfo.StockName}_Substrate
-                            WHERE SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
-                            GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                            FROM {ProductInfo.ClassName}_Substrate
+                            WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                            GROUP BY StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                             ORDER BY MIN(_rowid_)
                             LIMIT 1;
                             """;
+
+                    cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                     cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNumber;
                     using var dr = cmd.ExecuteReader();
@@ -268,8 +274,9 @@ namespace ProductDatabase {
                 using (var cmd = con.CreateCommand()) {
                     cmd.CommandText =
                         $"""
-                        INSERT INTO "{ProductInfo.ProductName}_Substrate"
+                        INSERT INTO "{ProductInfo.ClassName}_Substrate"
                             (
+                            StockName,
                             SubstrateName,
                             SubstrateModel,
                             SubstrateNumber,
@@ -283,6 +290,7 @@ namespace ProductDatabase {
                             )
                         VALUES
                             (
+                            @StockName,
                             @SubstrateName,
                             @SubstrateModel,
                             @SubstrateNumber,
@@ -297,6 +305,7 @@ namespace ProductDatabase {
                         """;
 
                     // チェックボックスにチェックがない場合はNullを
+                    cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
                     cmd.Parameters.Add("@SubstrateName", DbType.String).Value = ProductInfo.SubstrateName;
                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                     cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber;

@@ -108,6 +108,7 @@ namespace ProductDatabase {
                     "Substrate", new Dictionary<string, string>
                     {
                         { "rowid", "ID" },
+                        { "StockName", "在庫名" },
                         { "SubstrateName", "基板名" },
                         { "SubstrateModel", "基板型式" },
                         { "SubstrateNumber", "製造番号" },
@@ -221,15 +222,15 @@ namespace ProductDatabase {
                 SELECT 
                     rowid, * 
                 FROM 
-                    "{ProductInfo.ProductName}_Substrate"
+                    {ProductInfo.ClassName}_Substrate
                 WHERE 
-                    1=1 {otherSubstrate} 
+                    StockName = "{ProductInfo.StockName}"{otherSubstrate} 
                 ORDER BY 
                     rowid DESC
                 ;
                 """;
 
-                LoadDataAndDisplay("Substrate", query, ("@SubstrateModel", ProductInfo.SubstrateModel));
+                LoadDataAndDisplay("Substrate", query, ("@StockName", ProductInfo.StockName), ("@SubstrateModel", ProductInfo.SubstrateModel));
             }
             if (CategoryRadioButton2.Checked) {
                 _tableName = string.Empty;
@@ -257,9 +258,9 @@ namespace ProductDatabase {
                         SELECT 
                             {selectClause}
                         FROM 
-                            {ProductInfo.ProductName}_Substrate
+                            {ProductInfo.ClassName}_Substrate
                         WHERE 
-                            1=1 {otherSubstrate}
+                            StockName = "{ProductInfo.StockName}"{otherSubstrate}
                         GROUP BY 
                             {groupByClause}
                         HAVING 
@@ -281,14 +282,14 @@ namespace ProductDatabase {
             GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
 
             var query = filterByProductModel
-                ? $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE ProductModel = @ProductModel ORDER BY ID DESC"""
-                : $"""SELECT * FROM "{ProductInfo.ProductName}_Product" ORDER BY ID DESC""";
+                ? $"""SELECT * FROM "{ProductInfo.ClassName}_Product" WHERE ProductName = @ProductName AND ProductModel = @ProductModel ORDER BY ID DESC"""
+                : $"""SELECT * FROM "{ProductInfo.ClassName}_Product" WHERE ProductName = @ProductName ORDER BY ID DESC""";
 
             if (filterByProductModel) {
-                LoadDataAndDisplay("Product", query, ("@ProductModel", ProductInfo.ProductModel));
+                LoadDataAndDisplay("Product", query, ("@ProductName", ProductInfo.ProductName), ("@ProductModel", ProductInfo.ProductModel));
             }
             else {
-                LoadDataAndDisplay("Product", query);
+                LoadDataAndDisplay("Product", query, ("@ProductName", ProductInfo.ProductName));
             }
         }
         private void ViewSerialLog() {
@@ -309,17 +310,19 @@ namespace ProductDatabase {
                             p.RegDate,
                             s.usedID
                         FROM
-                            "{ProductInfo.ProductName}_Serial" AS s
+                            "{ProductInfo.ClassName}_Serial" AS s
                         INNER JOIN
-                            "{ProductInfo.ProductName}_Product" AS p
+                            "{ProductInfo.ClassName}_Product" AS p
                         ON
                             s.UsedID = p.ID
+                        WHERE
+                            p.ProductName = @ProductName
                         ORDER BY 
                             ID DESC
                         ;
                         """;
 
-            LoadDataAndDisplay("Serial", query);
+            LoadDataAndDisplay("Serial", query, ("@ProductName", ProductInfo.ProductName));
         }
 
         private void ViewReprintLog() {
@@ -356,6 +359,7 @@ namespace ProductDatabase {
             switch (_tableName) {
                 case "Substrate":
                     DataBaseDataGridView.Columns["rowid"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["StockName"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SubstrateName"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SubstrateModel"].ReadOnly = true;
                     DataBaseDataGridView.Columns["UsedProductType"].ReadOnly = true;
@@ -363,6 +367,7 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["UsedOrderNumber"].ReadOnly = true;
                     DataBaseDataGridView.Columns["UseID"].ReadOnly = true;
                     DataBaseDataGridView.Columns["rowid"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["StockName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SubstrateName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SubstrateModel"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["UsedProductType"].DefaultCellStyle.ForeColor = Color.Red;

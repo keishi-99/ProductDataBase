@@ -134,12 +134,13 @@ namespace ProductDatabase {
                                     SubstrateName,
                                     SubstrateNumber,
                                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                                FROM {ProductInfo.StockName}_Substrate
-                                WHERE SubstrateModel = @SubstrateModel
+                                FROM {ProductInfo.ClassName}_Substrate
+                                WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel
                                 GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                                 HAVING Stock > 0
                                 ORDER BY MIN(_rowid_);
                                 """;
+                            cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using var dr = cmd.ExecuteReader();
                             while (dr.Read()) {
@@ -238,12 +239,13 @@ namespace ProductDatabase {
                                     SubstrateNumber,
                                     OrderNumber,
                                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                                FROM {ProductInfo.StockName}_Substrate
-                                WHERE SubstrateModel = @SubstrateModel
+                                FROM {ProductInfo.ClassName}_Substrate
+                                WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel
                                 GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                                 HAVING Stock > 0
                                 ORDER BY MIN(_rowid_);
                                 """;
+                            cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                             using var dr = cmd.ExecuteReader();
                             while (dr.Read()) {
@@ -400,8 +402,9 @@ namespace ProductDatabase {
                 case 0:
                     cmd.CommandText =
                         $"""
-                        INSERT INTO "{ProductInfo.ProductName}_Product"
+                        INSERT INTO "{ProductInfo.ClassName}_Product"
                             (
+                            ProductName,
                             OrderNumber,
                             ProductNumber,
                             ProductType,
@@ -415,6 +418,7 @@ namespace ProductDatabase {
                             )
                         VALUES
                             (
+                            @ProductName,
                             @OrderNumber,
                             @ProductNumber,
                             @ProductType,
@@ -428,6 +432,7 @@ namespace ProductDatabase {
                             )
                         """;
 
+                    cmd.Parameters.Add("@ProductName", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductName) ? DBNull.Value : ProductInfo.ProductName;
                     cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
                     cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
                     cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
@@ -445,8 +450,9 @@ namespace ProductDatabase {
                 case 1:
                     cmd.CommandText =
                         $"""
-                        INSERT INTO "{ProductInfo.ProductName}_Product"
+                        INSERT INTO "{ProductInfo.ClassName}_Product"
                             (
+                            ProductName,
                             OrderNumber,
                             ProductNumber,
                             ProductType,
@@ -463,6 +469,7 @@ namespace ProductDatabase {
                             )
                         VALUES
                             (
+                            @ProductName,
                             @OrderNumber,
                             @ProductNumber,
                             @ProductType,
@@ -479,6 +486,7 @@ namespace ProductDatabase {
                             )
                         """;
 
+                    cmd.Parameters.Add("@ProductName", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductName) ? DBNull.Value : ProductInfo.ProductName;
                     cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
                     cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
                     cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
@@ -502,7 +510,7 @@ namespace ProductDatabase {
                         foreach (var b in _strSerial) {
                             cmd.CommandText =
                                 $"""
-                        INSERT INTO "{ProductInfo.ProductName}_Serial"
+                        INSERT INTO "{ProductInfo.ClassName}_Serial"
                             (
                             Serial,
                             UsedID
@@ -554,11 +562,12 @@ namespace ProductDatabase {
                                             SubstrateNumber,
                                             OrderNumber,
                                             SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                                        FROM {ProductInfo.StockName}_Substrate
-                                        WHERE SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                                        FROM {ProductInfo.ClassName}_Substrate
+                                        WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                                         GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                                         ORDER BY MIN(_rowid_);
                                         """;
+                                    cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
                                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                                     cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNum;
 
@@ -579,6 +588,7 @@ namespace ProductDatabase {
                                         $"""
                                         INSERT INTO "TempSubstrateReduction"
                                             (
+                                            StockName,
                                             SubstrateName,
                                             SubstrateModel,
                                             SubstrateNumber,
@@ -593,6 +603,7 @@ namespace ProductDatabase {
                                             )
                                         VALUES
                                             (
+                                            @StockName,
                                             @SubstrateName,
                                             @SubstrateModel,
                                             @SubstrateNumber,
@@ -607,6 +618,7 @@ namespace ProductDatabase {
                                             )
                                         """;
 
+                                    cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
                                     cmd.Parameters.Add("@SubstrateName", DbType.String).Value = string.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
                                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
                                     cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
@@ -639,8 +651,9 @@ namespace ProductDatabase {
                     cmd = con.CreateCommand();
                     cmd.CommandText =
                         $"""
-                            INSERT INTO "{ProductInfo.ProductName}_Product"
+                            INSERT INTO "{ProductInfo.ClassName}_Product"
                             (
+                            ProductName,
                             OrderNumber,
                             ProductNumber,
                             ProductType,
@@ -658,6 +671,7 @@ namespace ProductDatabase {
                             )
                         VALUES
                             (
+                            @ProductName,
                             @OrderNumber,
                             @ProductNumber,
                             @ProductType,
@@ -675,6 +689,7 @@ namespace ProductDatabase {
                             )
                         """;
 
+                    cmd.Parameters.Add("@ProductName", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductName) ? DBNull.Value : ProductInfo.ProductName;
                     cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
                     cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
                     cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
@@ -700,11 +715,11 @@ namespace ProductDatabase {
                     cmd = con.CreateCommand();
                     cmd.CommandText =
                         $"""
-                        INSERT INTO "{ProductInfo.StockName}_Substrate" (
-                            SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, Decrease, UsedProductType, UsedProductNumber, UsedOrderNumber, Person, RegDate, Comment, UseID
+                        INSERT INTO "{ProductInfo.ClassName}_Substrate" (
+                            StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, Decrease, UsedProductType, UsedProductNumber, UsedOrderNumber, Person, RegDate, Comment, UseID
                         )
                         SELECT
-                            tsr.SubstrateName, tsr.SubstrateModel, tsr.SubstrateNumber, tsr.OrderNumber, tsr.Decrease, tsr.UsedProductType, tsr.UsedProductNumber, tsr.UsedOrderNumber, tsr.Person, tsr.RegDate, tsr.Comment, @productRowId
+                            tsr.StockName, tsr.SubstrateName, tsr.SubstrateModel, tsr.SubstrateNumber, tsr.OrderNumber, tsr.Decrease, tsr.UsedProductType, tsr.UsedProductNumber, tsr.UsedOrderNumber, tsr.Person, tsr.RegDate, tsr.Comment, @productRowId
                         FROM TempSubstrateReduction tsr
                         """;
                     cmd.Parameters.Add("@productRowId", DbType.String).Value = int.Parse(productRowId);
@@ -718,7 +733,7 @@ namespace ProductDatabase {
                         foreach (var b in _strSerial) {
                             cmd.CommandText =
                                 $"""
-                        INSERT INTO "{ProductInfo.ProductName}_Serial"
+                        INSERT INTO "{ProductInfo.ClassName}_Serial"
                             (
                             Serial,
                             UsedID
@@ -767,7 +782,8 @@ namespace ProductDatabase {
             if (!string.IsNullOrEmpty(ProductInfo.ProductNumber)) {
                 // 製番が新規かチェック
                 using (var cmd = con.CreateCommand()) {
-                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE ProductNumber = @ProductNumber ORDER BY "ID" ASC LIMIT 1""";
+                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.ClassName}_Product" WHERE ProductName = @ProductName AND ProductNumber = @ProductNumber ORDER BY "ID" ASC LIMIT 1""";
+                    cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
                     cmd.Parameters.Add("@ProductNumber", DbType.String).Value = ProductInfo.ProductNumber;
 
                     using var dr = cmd.ExecuteReader();
@@ -797,7 +813,8 @@ namespace ProductDatabase {
             if (!string.IsNullOrEmpty(ProductInfo.OrderNumber)) {
                 // 注文番号が新規かチェック
                 using (var cmd = con.CreateCommand()) {
-                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.ProductName}_Product" WHERE OrderNumber = @OrderNumber ORDER BY "ID" ASC LIMIT 1""";
+                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.ClassName}_Product" WHERE ProductName = @ProductName AND OrderNumber = @OrderNumber ORDER BY "ID" ASC LIMIT 1""";
+                    cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
                     cmd.Parameters.Add("@OrderNumber", DbType.String).Value = ProductInfo.OrderNumber;
 
                     using var dr = cmd.ExecuteReader();
@@ -905,7 +922,28 @@ namespace ProductDatabase {
                 con.Open();
 
                 using var cmd = con.CreateCommand();
-                cmd.CommandText = $"""SELECT Serial FROM "{ProductInfo.ProductName}_Serial" WHERE Serial IN ({string.Join(",", _strSerial.Select((_, i) => $"@Serial{i}"))})""";
+                cmd.CommandText = $"""
+                    SELECT 
+                        s.rowid,
+                        s.Serial,
+                        p.OrderNumber,
+                        p.ProductNumber,
+                        p.ProductType,
+                        p.ProductModel,
+                        p.RegDate,
+                        s.usedID
+                    FROM
+                        "{ProductInfo.ClassName}_Serial" AS s
+                    INNER JOIN
+                        "{ProductInfo.ClassName}_Product" AS p
+                    ON
+                        s.UsedID = p.ID
+                    WHERE 
+                        p.ProductName = @ProductName 
+                    AND 
+                        s.Serial IN ({string.Join(",", _strSerial.Select((_, i) => $"@Serial{i}"))})
+                    """;
+                cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
                 _strSerial
                     .Select((serial, i) => new { ParamName = $"@Serial{i}", Value = serial.Trim() })
                     .ToList()

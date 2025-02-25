@@ -67,22 +67,24 @@ namespace ProductDatabase {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
-                    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.ProductName}_Product" WHERE RevisionGroup = @RevisionGroup ORDER BY "ID" DESC""";
+                    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.ClassName}_Product" WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY "ID" DESC""";
+                    cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
                     cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
 
                     // シリアル番号の最後を取得する共通メソッド
-                    int GetLastSerialNumber(SQLiteCommand cmd, string productName) {
-                        cmd.CommandText = $"""SELECT SerialLastNumber FROM "{productName}_Product" WHERE SerialLastNumber NOT NULL ORDER BY "ID" DESC""";
+                    int GetLastSerialNumber(SQLiteCommand cmd) {
+                        cmd.CommandText = $"""SELECT SerialLastNumber FROM "{ProductInfo.ClassName}_Product" WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY "ID" DESC""";
+                        cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
                         return int.TryParse(cmd.ExecuteScalar()?.ToString(), out var serialLastNum)
                             ? serialLastNum
                             : throw new Exception("シリアル番号の取得に失敗しました。");
                     }
 
                     // 登録日を取得して年月を返す共通メソッド
-                    string GetLastRegistrationYearMonth(SQLiteCommand cmd, string productName) {
-                        cmd.CommandText = $"""SELECT RegDate FROM "{productName}_Product" ORDER BY "ID" DESC""";
+                    string GetLastRegistrationYearMonth(SQLiteCommand cmd) {
+                        cmd.CommandText = $"""SELECT RegDate FROM "{ProductInfo.ClassName}_Product" WHERE ProductName = @ProductName ORDER BY "ID" DESC""";
                         var lastRegDate = cmd.ExecuteScalar()?.ToString() ?? string.Empty;
                         var splitRegDate = lastRegDate.Split("/");
                         return splitRegDate.Length >= 2 ? $"{splitRegDate[0]}/{splitRegDate[1]}" : throw new Exception("登録日の取得に失敗しました。");
@@ -92,7 +94,7 @@ namespace ProductDatabase {
                         case 93:
                         case 94: {
                                 // 登録日の年月と現在の年月を比較
-                                var lastYearMonth = GetLastRegistrationYearMonth(cmd, ProductInfo.ProductName);
+                                var lastYearMonth = GetLastRegistrationYearMonth(cmd);
                                 var currentYearMonth = string.Join("/", ProductInfo.RegDate.Split("/").Take(2)); // 現在の年月
 
                                 if (lastYearMonth != currentYearMonth) {
@@ -101,14 +103,14 @@ namespace ProductDatabase {
                                 }
                                 else {
                                     // 月が同じ場合は最後のシリアル番号を取得して +1
-                                    FirstSerialNumberTextBox.Text = (GetLastSerialNumber(cmd, ProductInfo.ProductName) + 1).ToString();
+                                    FirstSerialNumberTextBox.Text = (GetLastSerialNumber(cmd) + 1).ToString();
                                 }
                                 break;
                             }
                         default: {
                                 // 他の場合は単純に最後のシリアル番号を取得して +1
                                 if (ProductInfo.RegType == 0) { return; }
-                                FirstSerialNumberTextBox.Text = (GetLastSerialNumber(cmd, ProductInfo.ProductName) + 1).ToString();
+                                FirstSerialNumberTextBox.Text = (GetLastSerialNumber(cmd) + 1).ToString();
                                 break;
                             }
                     }
