@@ -129,7 +129,7 @@ namespace ProductDatabase {
                                     SubstrateNumber,
                                     OrderNumber,
                                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                                FROM {ProductInfo.StockName}_Substrate
+                                FROM {ProductInfo.CategoryName}_Substrate
                                 WHERE SubstrateModel = @SubstrateModel
                                 GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                                 ORDER BY MIN(_rowid_);
@@ -341,7 +341,7 @@ namespace ProductDatabase {
                                                         SubstrateNumber,
                                                         OrderNumber,
                                                         SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                                                    FROM {ProductInfo.StockName}_Substrate
+                                                    FROM {ProductInfo.CategoryName}_Substrate
                                                     WHERE SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                                                     GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                                                     ORDER BY MIN(_rowid_);
@@ -364,7 +364,7 @@ namespace ProductDatabase {
                                             using (var cmdUpdate = con.CreateCommand()) {
                                                 cmdUpdate.CommandText =
                                                     $"""
-                                                    UPDATE {ProductInfo.StockName}_Substrate
+                                                    UPDATE {ProductInfo.CategoryName}_Substrate
                                                     SET
                                                         Decrease = @Decrease,
                                                         Person = @Person,
@@ -390,8 +390,9 @@ namespace ProductDatabase {
                                                     using var cmdInsert = con.CreateCommand();
                                                     cmdInsert.CommandText =
                                                     $"""
-                                                    INSERT INTO "{ProductInfo.StockName}_Substrate"
+                                                    INSERT INTO "{ProductInfo.CategoryName}_Substrate"
                                                         (
+                                                        StockName,
                                                         SubstrateName,
                                                         SubstrateModel,
                                                         SubstrateNumber,
@@ -407,6 +408,7 @@ namespace ProductDatabase {
                                                         )
                                                     VALUES
                                                         (
+                                                        @StockName,
                                                         @SubstrateName,
                                                         @SubstrateModel,
                                                         @SubstrateNumber,
@@ -422,6 +424,7 @@ namespace ProductDatabase {
                                                         )
                                                     """;
 
+                                                    cmdInsert.Parameters.Add("@StockName", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.StockName) ? DBNull.Value : ProductInfo.StockName;
                                                     cmdInsert.Parameters.Add("@SubstrateName", DbType.String).Value = string.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
                                                     cmdInsert.Parameters.Add("@SubstrateModel", DbType.String).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
                                                     cmdInsert.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
@@ -457,7 +460,7 @@ namespace ProductDatabase {
                             using (var cmd = con.CreateCommand()) {
                                 cmd.CommandText =
                                     $"""
-                                    UPDATE {ProductInfo.ProductName}_Product
+                                    UPDATE {ProductInfo.CategoryName}_Product
                                     SET
                                         Quantity = @Quantity,
                                         Person = @Person,

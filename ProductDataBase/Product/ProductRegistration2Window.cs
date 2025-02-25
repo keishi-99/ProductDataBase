@@ -923,7 +923,7 @@ namespace ProductDatabase {
 
                 using var cmd = con.CreateCommand();
                 cmd.CommandText = $"""
-                    SELECT 
+                    SELECT
                         s.rowid,
                         s.Serial,
                         p.OrderNumber,
@@ -938,9 +938,9 @@ namespace ProductDatabase {
                         "{ProductInfo.CategoryName}_Product" AS p
                     ON
                         s.UsedID = p.ID
-                    WHERE 
-                        p.ProductName = @ProductName 
-                    AND 
+                    WHERE
+                        p.ProductName = @ProductName
+                    AND
                         s.Serial IN ({string.Join(",", _strSerial.Select((_, i) => $"@Serial{i}"))})
                     """;
                 cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
