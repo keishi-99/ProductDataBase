@@ -621,13 +621,13 @@ namespace ProductDatabase {
         private void GenerateReport() {
             try {
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
-                ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells[1].Value.ToString() ?? string.Empty;
-                ProductInfo.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells[2].Value.ToString() ?? string.Empty;
-                ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells[4].Value.ToString() ?? string.Empty;
-                ProductInfo.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells[5].Value?.ToString(), out var quantity) ? quantity : 0;
-                ProductInfo.RegDate = DataBaseDataGridView.Rows[selectRow].Cells[7].Value.ToString() ?? string.Empty;
-                ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells[10].Value.ToString() ?? string.Empty;
-                ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells[11].Value.ToString() ?? string.Empty;
+                ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
+                ProductInfo.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
+                ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
+                ProductInfo.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
+                ProductInfo.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
+                ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
+                ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
 
                 CommonUtils.GenerateReport(ProductInfo);
 
@@ -639,15 +639,15 @@ namespace ProductDatabase {
         private void GenerateList() {
             try {
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
-                ProductInfo.ProductID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells[0].Value);
-                ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells[1].Value.ToString() ?? string.Empty;
-                ProductInfo.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells[2].Value.ToString() ?? string.Empty;
-                ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells[4].Value.ToString() ?? string.Empty;
-                ProductInfo.Quantity = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells[5].Value);
-                ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells[10].Value.ToString() ?? string.Empty;
-                ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells[11].Value.ToString() ?? string.Empty;
-                ProductInfo.Comment = DataBaseDataGridView.Rows[selectRow].Cells[13].Value.ToString() ?? string.Empty;
-                ProductInfo.UsedSubstrate = DataBaseDataGridView.Rows[selectRow].Cells[14].Value.ToString() ?? string.Empty;
+                ProductInfo.ProductID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
+                ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
+                ProductInfo.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
+                ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
+                ProductInfo.Quantity = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value);
+                ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
+                ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
+                ProductInfo.Comment = DataBaseDataGridView.Rows[selectRow].Cells["Comment"].Value.ToString() ?? string.Empty;
+                ProductInfo.UsedSubstrate = DataBaseDataGridView.Rows[selectRow].Cells["UsedSubstrate"].Value.ToString() ?? string.Empty;
 
                 CommonUtils.GenerateList(ProductInfo);
 
@@ -659,12 +659,12 @@ namespace ProductDatabase {
         private void GenerateCheckSheet() {
             try {
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
-                ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells[1].Value.ToString() ?? string.Empty;
-                ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells[4].Value.ToString() ?? string.Empty;
-                ProductInfo.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells[5].Value?.ToString(), out var quantity) ? quantity : 0;
-                ProductInfo.RegDate = DataBaseDataGridView.Rows[selectRow].Cells[7].Value.ToString() ?? string.Empty;
-                ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells[10].Value.ToString() ?? string.Empty;
-                ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells[11].Value.ToString() ?? string.Empty;
+                ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
+                ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
+                ProductInfo.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
+                ProductInfo.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
+                ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
+                ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
 
                 CommonUtils.GenerateCheckSheet(ProductInfo);
 
