@@ -377,6 +377,7 @@ namespace ProductDatabase {
                     break;
                 case "Product":
                     DataBaseDataGridView.Columns["ID"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["ProductName"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ProductType"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ProductModel"].ReadOnly = true;
                     DataBaseDataGridView.Columns["Quantity"].ReadOnly = true;
@@ -385,6 +386,7 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["SerialLastNumber"].ReadOnly = true;
                     DataBaseDataGridView.Columns["UsedSubstrate"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ID"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["ProductName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductType"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductModel"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["Quantity"].DefaultCellStyle.ForeColor = Color.Red;
