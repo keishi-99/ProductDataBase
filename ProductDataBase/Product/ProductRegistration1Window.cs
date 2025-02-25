@@ -67,7 +67,7 @@ namespace ProductDatabase {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
-                    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.ClassName}_Product" WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY "ID" DESC""";
+                    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY "ID" DESC""";
                     cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
                     cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
                     var result = cmd.ExecuteScalar();
@@ -75,7 +75,7 @@ namespace ProductDatabase {
 
                     // シリアル番号の最後を取得する共通メソッド
                     int GetLastSerialNumber(SQLiteCommand cmd) {
-                        cmd.CommandText = $"""SELECT SerialLastNumber FROM "{ProductInfo.ClassName}_Product" WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY "ID" DESC""";
+                        cmd.CommandText = $"""SELECT SerialLastNumber FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY "ID" DESC""";
                         cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
                         return int.TryParse(cmd.ExecuteScalar()?.ToString(), out var serialLastNum)
                             ? serialLastNum
@@ -84,7 +84,7 @@ namespace ProductDatabase {
 
                     // 登録日を取得して年月を返す共通メソッド
                     string GetLastRegistrationYearMonth(SQLiteCommand cmd) {
-                        cmd.CommandText = $"""SELECT RegDate FROM "{ProductInfo.ClassName}_Product" WHERE ProductName = @ProductName ORDER BY "ID" DESC""";
+                        cmd.CommandText = $"""SELECT RegDate FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName ORDER BY "ID" DESC""";
                         var lastRegDate = cmd.ExecuteScalar()?.ToString() ?? string.Empty;
                         var splitRegDate = lastRegDate.Split("/");
                         return splitRegDate.Length >= 2 ? $"{splitRegDate[0]}/{splitRegDate[1]}" : throw new Exception("登録日の取得に失敗しました。");
