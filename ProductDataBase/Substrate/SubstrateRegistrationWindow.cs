@@ -12,7 +12,7 @@ namespace ProductDatabase {
 
         public CSettingsLabelSub SettingsLabelSub { get; set; } = new CSettingsLabelSub();
 
-        private readonly string _settingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "SubstrateConfig.xml");
+        private readonly string _settingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.xml");
 
         private string _labelSubNSerial = string.Empty;
 
