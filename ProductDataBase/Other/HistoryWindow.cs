@@ -119,7 +119,6 @@ namespace ProductDatabase {
                         { "UsedProductType", "使用製品名" },
                         { "UsedProductNumber", "使用製番" },
                         { "UsedOrderNumber", "使用注番" },
-                        { "Revision", "Rev" },
                         { "Person", "担当者" },
                         { "RegDate", "登録日" },
                         { "Comment", "コメント" }
@@ -219,13 +218,13 @@ namespace ProductDatabase {
                 var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
 
                 var query = $"""
-                SELECT 
-                    rowid, * 
-                FROM 
+                SELECT
+                    rowid, *
+                FROM
                     {ProductInfo.CategoryName}_Substrate
-                WHERE 
-                    StockName = "{ProductInfo.StockName}"{otherSubstrate} 
-                ORDER BY 
+                WHERE
+                    StockName = "{ProductInfo.StockName}"{otherSubstrate}
+                ORDER BY
                     rowid DESC
                 ;
                 """;
@@ -255,17 +254,17 @@ namespace ProductDatabase {
                     : "MIN(rowid) DESC";
 
                 var query = $"""
-                        SELECT 
+                        SELECT
                             {selectClause}
-                        FROM 
+                        FROM
                             {ProductInfo.CategoryName}_Substrate
-                        WHERE 
+                        WHERE
                             StockName = "{ProductInfo.StockName}"{otherSubstrate}
-                        GROUP BY 
+                        GROUP BY
                             {groupByClause}
-                        HAVING 
+                        HAVING
                             1=1 {inStock}
-                        ORDER BY 
+                        ORDER BY
                             {orderByClause}
                         ;
                         """;
@@ -317,7 +316,7 @@ namespace ProductDatabase {
                             s.UsedID = p.ID
                         WHERE
                             p.ProductName = @ProductName
-                        ORDER BY 
+                        ORDER BY
                             ID DESC
                         ;
                         """;
@@ -329,13 +328,13 @@ namespace ProductDatabase {
             編集モードToolStripMenuItem.Enabled = false;
 
             var query = $"""
-                SELECT 
-                    rowid, * 
-                FROM 
-                    Reprint 
-                WHERE 
-                    ProductModel = @ProductModel 
-                ORDER BY 
+                SELECT
+                    rowid, *
+                FROM
+                    Reprint
+                WHERE
+                    ProductModel = @ProductModel
+                ORDER BY
                     rowid DESC
                 ;
                 """;
@@ -470,7 +469,7 @@ namespace ProductDatabase {
                             command.Connection = con;
                             command.ExecuteNonQuery();
                             // ログ出力
-                            CommonUtils.Logger.AppendLog($"[基板履歴削除];注文番号[{row["OrderNumber", DataRowVersion.Original]}];製造番号[{row["SubstrateNumber", DataRowVersion.Original]}];製品名[{ProductInfo.ProductName}];基板名[{row["SubstrateName", DataRowVersion.Original]}];型式[{row["SubstrateModel", DataRowVersion.Original]}];追加量[{row["Increase", DataRowVersion.Original]}];使用量[{row["Decrease", DataRowVersion.Original]}];減少量[{row["Defect", DataRowVersion.Original]}];Revision[{row["Revision", DataRowVersion.Original]}];登録日[{row["RegDate", DataRowVersion.Original]}];担当者[{row["Person", DataRowVersion.Original]}];rowID[{row["rowid", DataRowVersion.Original]}]");
+                            CommonUtils.Logger.AppendLog($"[基板履歴削除];注文番号[{row["OrderNumber", DataRowVersion.Original]}];製造番号[{row["SubstrateNumber", DataRowVersion.Original]}];製品名[{ProductInfo.ProductName}];基板名[{row["SubstrateName", DataRowVersion.Original]}];型式[{row["SubstrateModel", DataRowVersion.Original]}];追加量[{row["Increase", DataRowVersion.Original]}];使用量[{row["Decrease", DataRowVersion.Original]}];減少量[{row["Defect", DataRowVersion.Original]}];登録日[{row["RegDate", DataRowVersion.Original]}];担当者[{row["Person", DataRowVersion.Original]}];rowID[{row["rowid", DataRowVersion.Original]}]");
                         }
                     }
                     break;

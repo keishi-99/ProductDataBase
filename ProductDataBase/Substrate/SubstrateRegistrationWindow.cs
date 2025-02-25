@@ -190,7 +190,6 @@ namespace ProductDatabase {
                 var defectNumber = string.IsNullOrWhiteSpace(DefectNumberTextBox.Text) ? 0 : Convert.ToInt32(DefectNumberTextBox.Text);
                 var registrationDate = RegistrationDateCheckBox.Checked ? RegistrationDateMaskedTextBox.Text : string.Empty;
                 var person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
-                var revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
                 var comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
 
                 using SQLiteConnection con = new(GetConnectionRegistration());
@@ -285,7 +284,6 @@ namespace ProductDatabase {
                             Defect,
                             Person,
                             RegDate,
-                            Revision,
                             Comment
                             )
                         VALUES
@@ -299,7 +297,6 @@ namespace ProductDatabase {
                             @Defect,
                             @Person,
                             @RegDate,
-                            @Revision,
                             @Comment
                             )
                         """;
@@ -314,7 +311,6 @@ namespace ProductDatabase {
                     cmd.Parameters.Add("@Defect", DbType.String).Value = DefectNumberCheckBox.Checked ? $"-{defectNumber}" : DBNull.Value;
                     cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(registrationDate) ? DBNull.Value : registrationDate;
                     cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(person) ? DBNull.Value : person;
-                    cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(revision) ? DBNull.Value : revision;
                     cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(comment) ? DBNull.Value : comment;
 
                     cmd.ExecuteNonQuery();
@@ -505,7 +501,6 @@ namespace ProductDatabase {
             var outputCode = SettingsLabelSub.LabelSubLabelSettings.Format;
             var serialCode = serial.Substring(5, 5);
             outputCode = outputCode.Replace("%T", ProductInfo.Initial)
-                                    .Replace("%R", RevisionTextBox.Text)
                                     .Replace("%Y", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yy"))
                                     .Replace("%MM", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM"))
                                     .Replace("%M", string.IsNullOrEmpty(monthCode) ? string.Empty : monthCode[^1..])
@@ -564,7 +559,7 @@ namespace ProductDatabase {
                     if (checkBox.Checked) { QuantityCheckBox.Checked = false; }
                     break;
                 case "RevisionCheckBox":
-                    RevisionTextBox.Enabled = checkBox.Checked;
+                    //RevisionTextBox.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox1":
                     ExtraTextBox1.Enabled = checkBox.Checked;

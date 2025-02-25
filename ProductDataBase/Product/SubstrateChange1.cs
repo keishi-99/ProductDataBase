@@ -23,7 +23,7 @@ namespace ProductDatabase {
 
                 using SQLiteConnection con = new(GetConnectionRegistration());
                 HistoryTable.Clear();
-                using SQLiteDataAdapter adapter = new($"""SELECT * FROM {ProductInfo.ProductName}_Product WHERE ProductModel = '{ProductInfo.ProductModel}' ORDER BY "ID" DESC""", con);
+                using SQLiteDataAdapter adapter = new($"""SELECT * FROM {ProductInfo.CategoryName}_Product WHERE ProductModel = '{ProductInfo.ProductModel}' ORDER BY "ID" DESC""", con);
                 adapter.Fill(HistoryTable);
 
                 SubstrateChangeDataGridView.DataSource = HistoryTable;
@@ -48,30 +48,30 @@ namespace ProductDatabase {
                 SubstrateChangeDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
                 SubstrateChangeDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
-                SubstrateChangeDataGridView.Columns[0].HeaderCell.Value = "ID";
-                SubstrateChangeDataGridView.Columns[0].Width = 40;
-                SubstrateChangeDataGridView.Columns[1].HeaderCell.Value = "注文番号";
-                SubstrateChangeDataGridView.Columns[2].HeaderCell.Value = "製造番号";
-                SubstrateChangeDataGridView.Columns[2].Width = 130;
-                SubstrateChangeDataGridView.Columns[3].HeaderCell.Value = "製品名";
-                SubstrateChangeDataGridView.Columns[4].HeaderCell.Value = "製品型式";
-                SubstrateChangeDataGridView.Columns[5].HeaderCell.Value = "数量";
-                SubstrateChangeDataGridView.Columns[5].Width = 40;
-                SubstrateChangeDataGridView.Columns[6].HeaderCell.Value = "担当者";
-                SubstrateChangeDataGridView.Columns[6].Width = 70;
-                SubstrateChangeDataGridView.Columns[7].HeaderCell.Value = "登録日";
-                SubstrateChangeDataGridView.Columns[7].Width = 80;
-                SubstrateChangeDataGridView.Columns[8].HeaderCell.Value = "Rev";
-                SubstrateChangeDataGridView.Columns[8].Width = 40;
-                SubstrateChangeDataGridView.Columns[9].HeaderCell.Value = "RevisionGroup";
-                SubstrateChangeDataGridView.Columns[10].HeaderCell.Value = "シリアル先頭";
-                SubstrateChangeDataGridView.Columns[11].HeaderCell.Value = "シリアル末尾";
-                SubstrateChangeDataGridView.Columns[12].HeaderCell.Value = "末番";
-                SubstrateChangeDataGridView.Columns[12].Width = 40;
-                SubstrateChangeDataGridView.Columns[13].HeaderCell.Value = "コメント";
-                SubstrateChangeDataGridView.Columns[14].HeaderCell.Value = "使用基板";
-                SubstrateChangeDataGridView.Columns[14].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-                //SubstrateChangeDataGridView.Columns[13].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+                SubstrateChangeDataGridView.Columns["ID"].HeaderCell.Value = "ID";
+                SubstrateChangeDataGridView.Columns["ID"].Width = 40;
+                SubstrateChangeDataGridView.Columns["ProductName"].HeaderCell.Value = "製品名";
+                SubstrateChangeDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
+                SubstrateChangeDataGridView.Columns["ProductNumber"].HeaderCell.Value = "製造番号";
+                SubstrateChangeDataGridView.Columns["ProductNumber"].Width = 130;
+                SubstrateChangeDataGridView.Columns["ProductType"].HeaderCell.Value = "製品名";
+                SubstrateChangeDataGridView.Columns["ProductModel"].HeaderCell.Value = "製品型式";
+                SubstrateChangeDataGridView.Columns["Quantity"].HeaderCell.Value = "数量";
+                SubstrateChangeDataGridView.Columns["Quantity"].Width = 40;
+                SubstrateChangeDataGridView.Columns["Person"].HeaderCell.Value = "担当者";
+                SubstrateChangeDataGridView.Columns["Person"].Width = 70;
+                SubstrateChangeDataGridView.Columns["RegDate"].HeaderCell.Value = "登録日";
+                SubstrateChangeDataGridView.Columns["RegDate"].Width = 80;
+                SubstrateChangeDataGridView.Columns["Revision"].HeaderCell.Value = "Rev";
+                SubstrateChangeDataGridView.Columns["Revision"].Width = 40;
+                SubstrateChangeDataGridView.Columns["RevisionGroup"].HeaderCell.Value = "RevGroup";
+                SubstrateChangeDataGridView.Columns["SerialFirst"].HeaderCell.Value = "シリアル先頭";
+                SubstrateChangeDataGridView.Columns["SerialLast"].HeaderCell.Value = "シリアル末尾";
+                SubstrateChangeDataGridView.Columns["SerialLastNumber"].HeaderCell.Value = "末番";
+                SubstrateChangeDataGridView.Columns["SerialLastNumber"].Width = 40;
+                SubstrateChangeDataGridView.Columns["Comment"].HeaderCell.Value = "コメント";
+                SubstrateChangeDataGridView.Columns["UsedSubstrate"].HeaderCell.Value = "使用基板";
+                SubstrateChangeDataGridView.Columns["UsedSubstrate"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -84,18 +84,16 @@ namespace ProductDatabase {
 
             var i = SubstrateChangeDataGridView.SelectedCells[0].RowIndex;
 
-            ProductInfo.ProductID = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells[0].Value);
-            ProductInfo.OrderNumber = SubstrateChangeDataGridView.Rows[i].Cells[1].Value.ToString() ?? string.Empty;
-            ProductInfo.ProductNumber = SubstrateChangeDataGridView.Rows[i].Cells[2].Value.ToString() ?? string.Empty;
-            ProductInfo.ProductType = SubstrateChangeDataGridView.Rows[i].Cells[3].Value.ToString() ?? string.Empty;
-            ProductInfo.ProductModel = SubstrateChangeDataGridView.Rows[i].Cells[4].Value.ToString() ?? string.Empty;
-            ProductInfo.Quantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells[5].Value);
-            ProductInfo.Revision = SubstrateChangeDataGridView.Rows[i].Cells[8].Value.ToString() ?? string.Empty;
-            ProductInfo.SerialFirst = SubstrateChangeDataGridView.Rows[i].Cells[10].Value.ToString() ?? string.Empty;
-            ProductInfo.SerialLast = SubstrateChangeDataGridView.Rows[i].Cells[11].Value.ToString() ?? string.Empty;
-            ProductInfo.SerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells[12].Value);
-            ProductInfo.Comment = SubstrateChangeDataGridView.Rows[i].Cells[13].Value.ToString() ?? string.Empty;
-            ProductInfo.UsedSubstrate = SubstrateChangeDataGridView.Rows[i].Cells[14].Value.ToString() ?? string.Empty;
+            ProductInfo.ProductID = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["ID"].Value);
+            ProductInfo.OrderNumber = SubstrateChangeDataGridView.Rows[i].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
+            ProductInfo.ProductNumber = SubstrateChangeDataGridView.Rows[i].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
+            ProductInfo.Quantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["Quantity"].Value);
+            ProductInfo.Revision = SubstrateChangeDataGridView.Rows[i].Cells["Revision"].Value.ToString() ?? string.Empty;
+            ProductInfo.SerialFirst = SubstrateChangeDataGridView.Rows[i].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
+            ProductInfo.SerialLast = SubstrateChangeDataGridView.Rows[i].Cells["SerialLast"].Value.ToString() ?? string.Empty;
+            ProductInfo.SerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["SerialLastNumber"].Value);
+            ProductInfo.Comment = SubstrateChangeDataGridView.Rows[i].Cells["Comment"].Value.ToString() ?? string.Empty;
+            ProductInfo.UsedSubstrate = SubstrateChangeDataGridView.Rows[i].Cells["UsedSubstrate"].Value.ToString() ?? string.Empty;
             using SubstrateChange2 window = new();
             window.ProductInfo = ProductInfo;
             window.Closed += (s, e) => this.Close();
