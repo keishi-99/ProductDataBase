@@ -156,19 +156,19 @@ namespace ProductDatabase.Other {
                     var productNumbers = productInfo.ProductNumber.Split("-");
                     workSheetTemp.Cells[productNumberRange].Value = productNumbers[0];
                 }
-                if (!string.IsNullOrEmpty(orderNumberRange) || !string.IsNullOrEmpty(productInfo.OrderNumber)) {
+                if (!string.IsNullOrEmpty(orderNumberRange) && !string.IsNullOrEmpty(productInfo.OrderNumber)) {
                     workSheetTemp.Cells[orderNumberRange].Value = productInfo.OrderNumber;
                 }
-                if (!string.IsNullOrEmpty(quantityRange) || productInfo.Quantity != 0) {
+                if (!string.IsNullOrEmpty(quantityRange) && productInfo.Quantity != 0) {
                     workSheetTemp.Cells[quantityRange].Value = productInfo.Quantity;
                 }
-                if (!string.IsNullOrEmpty(serialFirstRange) || !string.IsNullOrEmpty(productInfo.SerialFirst)) {
+                if (!string.IsNullOrEmpty(serialFirstRange) && !string.IsNullOrEmpty(productInfo.SerialFirst)) {
                     workSheetTemp.Cells[serialFirstRange].Value = productInfo.SerialFirst;
                 }
-                if (!string.IsNullOrEmpty(serialLastRange) || !string.IsNullOrEmpty(productInfo.SerialLast)) {
+                if (!string.IsNullOrEmpty(serialLastRange) && !string.IsNullOrEmpty(productInfo.SerialLast)) {
                     workSheetTemp.Cells[serialLastRange].Value = productInfo.SerialLast;
                 }
-                if (!string.IsNullOrEmpty(productModelRange) || !string.IsNullOrEmpty(productInfo.ProductModel)) {
+                if (!string.IsNullOrEmpty(productModelRange) && !string.IsNullOrEmpty(productInfo.ProductModel)) {
                     workSheetTemp.Cells[productModelRange].Value = productInfo.ProductModel;
                 }
 
