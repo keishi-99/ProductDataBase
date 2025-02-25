@@ -111,7 +111,7 @@ namespace ProductDatabase.Other {
         // 成績書作成
         public static void GenerateReport(ProductInformation productInfo) {
             try {
-                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigReport.xlsx");
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsx");
                 using FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using var workBookConfig = new ExcelPackage(fileStreamConfig);
                 //既存ワークシートを取得（workBookはExcelWorkbookクラスオブジェト）
@@ -191,7 +191,7 @@ namespace ProductDatabase.Other {
         // リスト生成
         public static void GenerateList(ProductInformation productInfo) {
             try {
-                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigList.xlsx");
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsx");
                 using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using var workBook = new ExcelPackage(fileStream);
                 //既存ワークシートを取得（workBookはExcelWorkbookクラスオブジェクト）
@@ -361,7 +361,7 @@ namespace ProductDatabase.Other {
                     return;
                 }
 
-                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "ConfigCheckSheet.xlsx");
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsx");
                 using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using var workBook = new ExcelPackage(fileStream);
                 //既存ワークシートを取得（workBookはExcelWorkbookクラスオブジェクト）

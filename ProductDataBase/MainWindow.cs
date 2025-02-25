@@ -147,7 +147,7 @@ namespace ProductDatabase {
         private void LoadEvents() {
             try {
                 // JSONファイルのパス
-                var jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "general", "appsettings.json");
+                var jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "General", "appsettings.json");
 
                 // パスのディレクトリ部分を取得
                 var basePath = Path.GetDirectoryName(jsonFilePath);
