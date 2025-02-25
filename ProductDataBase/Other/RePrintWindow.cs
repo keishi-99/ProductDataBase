@@ -143,12 +143,12 @@ namespace ProductDatabase {
         }
         private void ConfigureSerialLabelSettings() {
             SettingsLabelPro = new CSettingsLabelPro();
-            labelSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", ProductInfo.CategoryName, ProductInfo.ProductName, $"SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml");
+            labelSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Product", ProductInfo.CategoryName, ProductInfo.ProductName, $"SerialConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml");
             if (!File.Exists(labelSettingFilePath)) { throw new DirectoryNotFoundException($"ラベル印刷用設定ファイルがありません。"); }
         }
         private void ConfigureBarcodeSettings() {
             SettingsBarcodePro = new CSettingsBarcodePro();
-            barcodeSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", ProductInfo.CategoryName, ProductInfo.ProductName, $"BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml");
+            barcodeSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Product", ProductInfo.CategoryName, ProductInfo.ProductName, $"BarcodeConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml");
             if (!File.Exists(barcodeSettingFilePath)) { throw new DirectoryNotFoundException($"ラベル印刷用設定ファイルがありません。"); }
         }
         private void SetMenuOptions() {
