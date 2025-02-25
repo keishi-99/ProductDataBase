@@ -318,7 +318,7 @@ namespace ProductDatabase {
                         WHERE
                             p.ProductName = @ProductName
                         ORDER BY
-                            ID DESC
+                            s.rowid DESC
                         ;
                         """;
 
