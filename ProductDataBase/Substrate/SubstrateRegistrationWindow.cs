@@ -16,9 +16,9 @@ namespace ProductDatabase {
 
         private string _labelSubNSerial = string.Empty;
 
-        private int _labelSubPageNum;
         private int _labelSubNumLabelsToPrint;
-        private int _intPageCnt = 1;
+
+        private int _pageCount;
         private System.Drawing.Printing.PrintAction _printAction;
 
         private readonly List<string> _checkBoxNames = [
@@ -164,7 +164,7 @@ namespace ProductDatabase {
                 if (IsLabelPrint) {
                     if (QuantityCheckBox.Checked) {
                         MessageBox.Show("登録完了 続けて印刷します。");
-                        PrintBarcode(1);
+                        PrintBarcode();
                         MessageBox.Show("印刷完了");
                         Close();
                     }
@@ -330,7 +330,7 @@ namespace ProductDatabase {
             }
         }
         // 印刷処理
-        private void PrintBarcode(int printFlg) {
+        private void PrintBarcode() {
             try {
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
@@ -341,43 +341,61 @@ namespace ProductDatabase {
                 if (_labelSubNumLabelsToPrint == 0) {
                     throw new Exception("数量が入力されていません。");
                 }
-                _labelSubPageNum = 0;
+                _pageCount = 0;
 
-                switch (printFlg) {
-                    case 1:
-                        SubstrateRegistrationPrintDialog.Document = pd;
-                        var r = SubstrateRegistrationPrintDialog.ShowDialog();
+                SubstrateRegistrationPrintDialog.Document = pd;
 
-                        if (r == DialogResult.OK) {
-                            // ローディング画面の表示
-                            using var loadingForm = new LoadingForm();
-                            // 別スレッドで印刷処理を実行
-                            Task.Run(() => {
-                                try {
-                                    SubstrateRegistrationPrintDialog.Document.Print();
-                                } finally {
-                                    // 印刷が終了したらローディング画面を閉じる
-                                    loadingForm.Invoke(new Action(() => loadingForm.Close()));
-                                }
-                            });
-
-                            // ローディング画面をモーダルとして表示
-                            loadingForm.ShowDialog();
+                if (SubstrateRegistrationPrintDialog.ShowDialog() == DialogResult.OK) {
+                    // ローディング画面の表示
+                    using var loadingForm = new LoadingForm();
+                    // 別スレッドで印刷処理を実行
+                    Task.Run(() => {
+                        try {
+                            SubstrateRegistrationPrintDialog.Document.Print();
+                        } finally {
+                            // 印刷が終了したらローディング画面を閉じる
+                            loadingForm.Invoke(new Action(() => loadingForm.Close()));
                         }
-                        else {
-                            return;
-                        }
-                        break;
-                    case 2:
-                        SubstrateRegistrationPrintPreviewDialog.PrintPreviewControl.Zoom = 3;
-                        SubstrateRegistrationPrintPreviewDialog.Document = pd;
-                        SubstrateRegistrationPrintPreviewDialog.ShowDialog();
-                        break;
-                    default:
-                        break;
+                    });
+
+                    // ローディング画面をモーダルとして表示
+                    loadingForm.ShowDialog();
+                }
+                else {
+                    return;
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private bool PreviewBarcode() {
+            try {
+                // PrintDocumentオブジェクトの作成
+                using System.Drawing.Printing.PrintDocument pd = new();
+                pd.BeginPrint += (sender, e) => _printAction = e.PrintAction;
+                pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
+
+                _labelSubNumLabelsToPrint = int.TryParse(QuantityTextBox.Text, out var quantity) ? quantity : 0;
+                if (_labelSubNumLabelsToPrint == 0) {
+                    throw new Exception("数量が入力されていません。");
+                }
+
+                _pageCount = 0;
+
+                // 最大で表示
+                SubstrateRegistrationPrintPreviewDialog.Shown += (sender, e) => {
+                    if (sender is Form form) {
+                        form.WindowState = FormWindowState.Maximized;
+                    }
+                };
+                SubstrateRegistrationPrintPreviewDialog.PrintPreviewControl.Zoom = 3;
+                SubstrateRegistrationPrintPreviewDialog.Document = pd;
+                SubstrateRegistrationPrintPreviewDialog.ShowDialog();
+
+                return true;
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
         private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
@@ -404,7 +422,7 @@ namespace ProductDatabase {
                 if (!isPreview) {
                     offsetX -= e.PageSettings.HardMarginX * 0.254;
                     offsetY -= e.PageSettings.HardMarginY * 0.254;
-                    offset = _labelSubPageNum == 0
+                    offset = _pageCount == 0
                         ? new System.Drawing.Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
                         : new System.Drawing.Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
@@ -420,7 +438,7 @@ namespace ProductDatabase {
                 e.Graphics.DrawString(headerString, SettingsLabelSub.LabelSubPageSettings.HeaderFooterFont, Brushes.Black, headerPos);
                 _labelSubNSerial = ManufacturingNumberMaskedTextBox.Text;
 
-                if (_labelSubPageNum >= 1) {
+                if (_pageCount >= 1) {
                     startLine = 0;
                 }
 
@@ -445,7 +463,7 @@ namespace ProductDatabase {
                             serialCodePrintCopies--;
                             if (serialCodePrintCopies <= 0) {
                                 e.HasMorePages = false;
-                                _labelSubPageNum = 0;
+                                _pageCount = 0;
                                 var txtNumPublish = 0;
                                 _labelSubNumLabelsToPrint = txtNumPublish;
                                 return;
@@ -470,8 +488,7 @@ namespace ProductDatabase {
                 }
 
                 if (_labelSubNumLabelsToPrint > 0) {
-                    _labelSubPageNum++;
-                    _intPageCnt++;
+                    _pageCount++;
                     e.HasMorePages = true;
                 }
 
@@ -659,15 +676,15 @@ namespace ProductDatabase {
         private void SubstrateRegistrationWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
         private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
-        private void PrintButton_Click(object sender, EventArgs e) { PrintBarcode(1); }
+        private void PrintButton_Click(object sender, EventArgs e) { PrintBarcode(); }
         private void SubstrateRegistrationPrintDocument_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) { PrintDocumentPrintPage(sender, e); }
         private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
         private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void DefectNumberTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void RegistrationDateMaskedTextBox_TypeValidationCompleted(object sender, TypeValidationEventArgs e) { RegistrationDateCheck(sender, e); }
-        private void 印刷ToolStripMenuItem_Click(object sender, EventArgs e) { PrintBarcode(1); }
-        private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { PrintBarcode(2); }
+        private void 印刷ToolStripMenuItem_Click(object sender, EventArgs e) { PrintBarcode(); }
+        private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { PreviewBarcode(); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             SubstrateLabelSettingsWindow ls = new();
             ls.ShowDialog(this);
