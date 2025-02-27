@@ -43,9 +43,10 @@ namespace ProductDatabase {
 
             PrintTextPostionXTextBox.Text = _labelSubLabelSettings.StringPosX.ToString();
             PrintTextPostionYTextBox.Text = _labelSubLabelSettings.StringPosY.ToString();
-            PrintTextCenterCheckBox.Checked = _labelSubLabelSettings.AlignStringCenter;
+            PrintTextXCenterCheckBox.Checked = _labelSubLabelSettings.AlignStringXCenter;
+            PrintTextYCenterCheckBox.Checked = _labelSubLabelSettings.AlignStringYCenter;
 
-            PrintTextPostionXTextBox.Enabled = !PrintTextCenterCheckBox.Checked;
+            PrintTextPostionXTextBox.Enabled = !PrintTextXCenterCheckBox.Checked;
         }
 
         private void BtnOK_Click(object sender, EventArgs e) {
@@ -89,7 +90,8 @@ namespace ProductDatabase {
             _labelSubLabelSettings.Font = TextFontDialog.Font;
             _labelSubLabelSettings.StringPosX = stringPosX;
             _labelSubLabelSettings.StringPosY = stringPosY;
-            _labelSubLabelSettings.AlignStringCenter = PrintTextCenterCheckBox.Checked;
+            _labelSubLabelSettings.AlignStringXCenter = PrintTextXCenterCheckBox.Checked;
+            _labelSubLabelSettings.AlignStringYCenter = PrintTextYCenterCheckBox.Checked;
             _labelSubLabelSettings.NumLabels = int.Parse(PrintTextQuantityTextBox.Text);
 
             DialogResult = DialogResult.OK;
@@ -111,9 +113,8 @@ namespace ProductDatabase {
 
             PrintTextFontTextBox.Text = $"{TextFontDialog.Font.Name} {TextFontDialog.Font.SizeInPoints}pt";
         }
-        private void PrintTextCenterCheckBox_CheckedChanged(object sender, EventArgs e) {
-            PrintTextPostionXTextBox.Enabled = !PrintTextCenterCheckBox.Checked;
-        }
+        private void PrintTextXCenterCheckBox_CheckedChanged(object sender, EventArgs e) { PrintTextPostionXTextBox.Enabled = !PrintTextXCenterCheckBox.Checked; }
+        private void PrintTextYCenterCheckBox_CheckedChanged(object sender, EventArgs e) { PrintTextPostionYTextBox.Enabled = !PrintTextYCenterCheckBox.Checked; }
         private void SubstratePrintSetting_Load(object sender, EventArgs e) { PageSettingsLabelLoad(sender, e); }
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
     }

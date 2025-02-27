@@ -434,7 +434,7 @@ namespace ProductDatabase {
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
 
                         var generatedCode = GenerateCode(_labelSubNSerial);
-                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1);
+                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, System.Drawing.Printing.PrintAction.PrintToPreview);
                         e.Graphics.DrawImage(labelImage, posX, posY, sizeX, sizeY);
 
                         _labelSubNumLabelsToPrint--;
@@ -508,22 +508,36 @@ namespace ProductDatabase {
 
             return outputCode;
         }
-        private Bitmap MakeLabelImage(string text, int resolution, int magnitude) {
+        private Bitmap MakeLabelImage(string text, int resolution, int magnitude, PrintAction printAction) {
             if (SettingsLabelSub is null) { throw new Exception(); }
             var sizeX = (decimal)SettingsLabelSub.LabelSubPageSettings.SizeX / 25.4M * resolution * magnitude;
             var sizeY = (decimal)SettingsLabelSub.LabelSubPageSettings.SizeY / 25.4M * resolution * magnitude;
 
             Bitmap labelImage = new((int)sizeX, (int)sizeY);
             using (var g = Graphics.FromImage(labelImage)) {
+                // アンチエイリアス処理を改善
+                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
                 var fontSize = (decimal)SettingsLabelSub.LabelSubLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
                 using (Font fnt = new(SettingsLabelSub.LabelSubLabelSettings.Font.Name, (float)fontSize)) {
-                    //var stringSize = g.MeasureString(text, fnt);
-                    var stringSize = TextRenderer.MeasureText(text, fnt);
 
-                    var stringPosX = (labelImage.Width / 2f) - (stringSize.Width / 2f);
-                    var stringPosY = (int)((decimal)SettingsLabelSub.LabelSubLabelSettings.StringPosY / 25.4M * resolution * magnitude);
+                    // StringFormat を使用して中心に配置
+                    var sf = new StringFormat {
+                        Alignment = SettingsLabelSub.LabelSubLabelSettings.AlignStringXCenter ? StringAlignment.Center : StringAlignment.Near,
+                        LineAlignment = SettingsLabelSub.LabelSubLabelSettings.AlignStringYCenter ? StringAlignment.Center : StringAlignment.Near
+                    };
 
-                    g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
+                    var stringPosX = SettingsLabelSub.LabelSubLabelSettings.AlignStringXCenter ? 0 : (float)(SettingsLabelSub.LabelSubLabelSettings.StringPosX / 25.4F * resolution * magnitude);
+                    var stringPosY = SettingsLabelSub.LabelSubLabelSettings.AlignStringYCenter ? 0 : (float)(SettingsLabelSub.LabelSubLabelSettings.StringPosY / 25.4F * resolution * magnitude);
+
+                    // 矩形領域を計算 (文字列を配置する領域)
+                    var layoutRect = new RectangleF(stringPosX, stringPosY, labelImage.Width - stringPosX, labelImage.Height - stringPosY);
+                    g.DrawString(text, fnt, Brushes.Black, layoutRect, sf);
+
+                    // プレビュー時、黒枠を描画
+                    if (printAction == System.Drawing.Printing.PrintAction.PrintToPreview) {
+                        using var p = new Pen(Color.Black, 3);
+                        g.DrawRectangle(p, 0, 0, labelImage.Width - 1, labelImage.Height - 1);
+                    }
                 }
 
                 g.Dispose();

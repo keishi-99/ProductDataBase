@@ -55,9 +55,10 @@ namespace ProductDatabase {
 
             PrintTextPostionXTextBox.Text = labelSettings.StringPosX.ToString();
             PrintTextPostionYTextBox.Text = labelSettings.StringPosY.ToString();
-            TextCenterCheckBox.Checked = labelSettings.AlignStringCenter;
+            TextXCenterCheckBox.Checked = labelSettings.AlignStringXCenter;
+            TextYCenterCheckBox.Checked = labelSettings.AlignStringYCenter;
 
-            PrintTextPostionXTextBox.Enabled = !TextCenterCheckBox.Checked;
+            PrintTextPostionXTextBox.Enabled = !TextXCenterCheckBox.Checked;
         }
         private void SetPageSettings(CLabelProPageSettings pageSettings) {
             LabelWidthTextBox.Text = pageSettings.SizeX.ToString();
@@ -119,7 +120,8 @@ namespace ProductDatabase {
             _labelProLabelSettings.Font = TextFontDialog.Font;
             _labelProLabelSettings.StringPosX = stringPosX;
             _labelProLabelSettings.StringPosY = stringPosY;
-            _labelProLabelSettings.AlignStringCenter = TextCenterCheckBox.Checked;
+            _labelProLabelSettings.AlignStringXCenter = TextXCenterCheckBox.Checked;
+            _labelProLabelSettings.AlignStringYCenter = TextYCenterCheckBox.Checked;
             _labelProLabelSettings.NumLabels = int.Parse(PrintTextQuantityTextBox.Text);
 
             SettingsLabelPro.LabelProPageSettings = _labelProPageSettings;
@@ -154,9 +156,8 @@ namespace ProductDatabase {
 
             PrintTextFontTextBox.Text = $"{TextFontDialog.Font.Name} {TextFontDialog.Font.SizeInPoints}pt";
         }
-        private void TextCenterCheckBox_CheckedChanged(object sender, EventArgs e) {
-            PrintTextPostionXTextBox.Enabled = !TextCenterCheckBox.Checked;
-        }
+        private void TextXCenterCheckBox_CheckedChanged(object sender, EventArgs e) { PrintTextPostionXTextBox.Enabled = !TextXCenterCheckBox.Checked; }
+        private void TextYCenterCheckBox_CheckedChanged(object sender, EventArgs e) { PrintTextPostionYTextBox.Enabled = !TextYCenterCheckBox.Checked; }
         private void ProductPrintSetting_Load(object sender, EventArgs e) { PageSettingsLabelLoad(sender, e); }
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
     }

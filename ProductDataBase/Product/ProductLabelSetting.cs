@@ -45,7 +45,8 @@ namespace ProductDatabase.Product {
         public string Format { get; set; } = string.Empty;
         public decimal StringPosX { get; set; }
         public decimal StringPosY { get; set; }
-        public bool AlignStringCenter { get; set; }
+        public bool AlignStringXCenter { get; set; }
+        public bool AlignStringYCenter { get; set; }
         public int NumLabels { get; set; }
         [XmlIgnore]
         public Font Font { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
