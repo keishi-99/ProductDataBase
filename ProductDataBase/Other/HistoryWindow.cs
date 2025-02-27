@@ -426,7 +426,7 @@ namespace ProductDatabase {
                         if (row.RowState == DataRowState.Modified) {
                             //    // UPDATE文の設定
                             command.CommandText = $"""
-                            UPDATE "{ProductInfo.ProductName}_Substrate"
+                            UPDATE "{ProductInfo.CategoryName}_Substrate"
                             SET
                                 SubstrateNumber = @SubstrateNumber,
                                 OrderNumber = @OrderNumber,
@@ -463,7 +463,7 @@ namespace ProductDatabase {
                         {
                             //DELETE文の設定
                             command.CommandText = $"""
-                                DELETE FROM "{ProductInfo.ProductName}_Substrate"
+                                DELETE FROM "{ProductInfo.CategoryName}_Substrate"
                                 WHERE rowid = @rowid;
                                 """;
                             command.Parameters.Clear(); // パラメータをクリア
@@ -481,7 +481,7 @@ namespace ProductDatabase {
                         if (row.RowState == DataRowState.Modified) {
                             //    // UPDATE文の設定
                             command.CommandText = $"""
-                            UPDATE "{ProductInfo.ProductName}_Product"
+                            UPDATE "{ProductInfo.CategoryName}_Product"
                             SET
                                 ID = @ID,
                                 OrderNumber = @OrderNumber,
@@ -516,7 +516,7 @@ namespace ProductDatabase {
                         {
                             //DELETE文の設定
                             command.CommandText = $"""
-                                DELETE FROM "{ProductInfo.ProductName}_Product"
+                                DELETE FROM "{ProductInfo.CategoryName}_Product"
                                 WHERE ID = @ID;
                                 """;
                             command.Parameters.Clear(); // パラメータをクリア
@@ -535,7 +535,7 @@ namespace ProductDatabase {
                         if (row.RowState == DataRowState.Modified) {
                             ////    // UPDATE文の設定
                             //command.CommandText = $"""
-                            //UPDATE "{ProductInfo.ProductName}_Serial"
+                            //UPDATE "{ProductInfo.CategoryName}_Serial"
                             //SET
                             //    Serial = @Serial,
                             //    UsedID = @UsedID
@@ -557,7 +557,7 @@ namespace ProductDatabase {
                         {
                             //DELETE文の設定
                             command.CommandText = $"""
-                                DELETE FROM "{ProductInfo.ProductName}_Serial"
+                                DELETE FROM "{ProductInfo.CategoryName}_Serial"
                                 WHERE rowid = @rowid;
                                 """;
                             command.Parameters.Clear(); // パラメータをクリア
