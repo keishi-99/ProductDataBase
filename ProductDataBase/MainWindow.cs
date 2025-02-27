@@ -385,7 +385,7 @@ namespace ProductDatabase {
                         break;
                     case "3":
                         ProductInfo.RadioButtonFlg = 3;
-                        strSqlQuery = """SELECT * FROM Product WHERE Visible = 1 ORDER BY SortNumber ASC;""";
+                        strSqlQuery = """SELECT * FROM Product WHERE Visible = 1 AND PrintType != 0 ORDER BY SortNumber ASC;""";
                         break;
                     case "4":
                         ProductInfo.RadioButtonFlg = 4;
