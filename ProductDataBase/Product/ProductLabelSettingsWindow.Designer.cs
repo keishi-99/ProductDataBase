@@ -25,6 +25,7 @@
         private void InitializeComponent() {
             this.OKButton = new Button();
             this.PrintTextGroupBox = new GroupBox();
+            this.TextYCenterCheckBox = new CheckBox();
             this.Label41 = new Label();
             this.Label40 = new Label();
             this.PrintTextFormatTextBox = new TextBox();
@@ -34,7 +35,7 @@
             this.Label36 = new Label();
             this.PrintTextQuantityTextBox = new TextBox();
             this.Label35 = new Label();
-            this.TextCenterCheckBox = new CheckBox();
+            this.TextXCenterCheckBox = new CheckBox();
             this.PrintTextPostionYTextBox = new TextBox();
             this.Label33 = new Label();
             this.PrintTextPostionXTextBox = new TextBox();
@@ -104,6 +105,7 @@
             // 
             // PrintTextGroupBox
             // 
+            this.PrintTextGroupBox.Controls.Add(this.TextYCenterCheckBox);
             this.PrintTextGroupBox.Controls.Add(this.Label41);
             this.PrintTextGroupBox.Controls.Add(this.Label40);
             this.PrintTextGroupBox.Controls.Add(this.PrintTextFormatTextBox);
@@ -113,7 +115,7 @@
             this.PrintTextGroupBox.Controls.Add(this.Label36);
             this.PrintTextGroupBox.Controls.Add(this.PrintTextQuantityTextBox);
             this.PrintTextGroupBox.Controls.Add(this.Label35);
-            this.PrintTextGroupBox.Controls.Add(this.TextCenterCheckBox);
+            this.PrintTextGroupBox.Controls.Add(this.TextXCenterCheckBox);
             this.PrintTextGroupBox.Controls.Add(this.PrintTextPostionYTextBox);
             this.PrintTextGroupBox.Controls.Add(this.Label33);
             this.PrintTextGroupBox.Controls.Add(this.PrintTextPostionXTextBox);
@@ -124,6 +126,17 @@
             this.PrintTextGroupBox.TabIndex = 22;
             this.PrintTextGroupBox.TabStop = false;
             this.PrintTextGroupBox.Text = "印刷文字設定";
+            // 
+            // TextYCenterCheckBox
+            // 
+            this.TextYCenterCheckBox.AutoSize = true;
+            this.TextYCenterCheckBox.Location = new Point(112, 55);
+            this.TextYCenterCheckBox.Name = "TextYCenterCheckBox";
+            this.TextYCenterCheckBox.Size = new Size(50, 19);
+            this.TextYCenterCheckBox.TabIndex = 31;
+            this.TextYCenterCheckBox.Text = "中心";
+            this.TextYCenterCheckBox.UseVisualStyleBackColor = true;
+            this.TextYCenterCheckBox.CheckedChanged += this.TextYCenterCheckBox_CheckedChanged;
             // 
             // Label41
             // 
@@ -205,16 +218,16 @@
             this.Label35.TabIndex = 9;
             this.Label35.Text = "発行枚数";
             // 
-            // TextCenterCheckBox
+            // TextXCenterCheckBox
             // 
-            this.TextCenterCheckBox.AutoSize = true;
-            this.TextCenterCheckBox.Location = new Point(22, 55);
-            this.TextCenterCheckBox.Name = "TextCenterCheckBox";
-            this.TextCenterCheckBox.Size = new Size(145, 19);
-            this.TextCenterCheckBox.TabIndex = 6;
-            this.TextCenterCheckBox.Text = "横位置を中心に合わせる";
-            this.TextCenterCheckBox.UseVisualStyleBackColor = true;
-            this.TextCenterCheckBox.CheckedChanged += this.TextCenterCheckBox_CheckedChanged;
+            this.TextXCenterCheckBox.AutoSize = true;
+            this.TextXCenterCheckBox.Location = new Point(22, 55);
+            this.TextXCenterCheckBox.Name = "TextXCenterCheckBox";
+            this.TextXCenterCheckBox.Size = new Size(50, 19);
+            this.TextXCenterCheckBox.TabIndex = 6;
+            this.TextXCenterCheckBox.Text = "中心";
+            this.TextXCenterCheckBox.UseVisualStyleBackColor = true;
+            this.TextXCenterCheckBox.CheckedChanged += this.TextXCenterCheckBox_CheckedChanged;
             // 
             // PrintTextPostionYTextBox
             // 
@@ -717,7 +730,7 @@
         private Label Label36;
         private TextBox PrintTextQuantityTextBox;
         private Label Label35;
-        private CheckBox TextCenterCheckBox;
+        private CheckBox TextXCenterCheckBox;
         private TextBox PrintTextPostionYTextBox;
         private Label Label33;
         private TextBox PrintTextPostionXTextBox;
@@ -767,5 +780,6 @@
         private Button CloseButton;
         private FontDialog HeaderFontDialog;
         private FontDialog TextFontDialog;
+        private CheckBox TextYCenterCheckBox;
     }
 }

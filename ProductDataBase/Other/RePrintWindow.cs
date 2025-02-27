@@ -3,6 +3,7 @@ using ProductDatabase.Other;
 using ProductDatabase.Product;
 using System.Data;
 using System.Data.SQLite;
+using System.Drawing.Printing;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
@@ -455,7 +456,7 @@ namespace ProductDatabase {
                             generatedCode = ProductInfo.ProductModel[^4..]; // 型式の下4桁を使用
                         }
 
-                        using var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
+                        using var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline, System.Drawing.Printing.PrintAction.PrintToPreview);
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)sizeX, (float)sizeY);
 
                         _remainingCount--;
@@ -519,7 +520,7 @@ namespace ProductDatabase {
 
             return outputCode;
         }
-        private Bitmap MakeLabelImage(string text, int resolution, int magnitude, bool fontUnderline) {
+        private Bitmap MakeLabelImage(string text, int resolution, int magnitude, bool fontUnderline, PrintAction printAction) {
             Bitmap labelImage = new(1, 1);
             Graphics g;
             SizeF stringSize;
@@ -552,12 +553,27 @@ namespace ProductDatabase {
 
                     labelImage = new((int)sizeX, (int)sizeY);
                     g = Graphics.FromImage(labelImage);
-                    //stringSize = g.MeasureString(text, fnt);
-                    stringSize = TextRenderer.MeasureText(text, fnt);
+                    // アンチエイリアス処理を改善
+                    g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
-                    stringPosX = (float)((labelImage.Width / 2f) - (stringSize.Width / 2f));
+                    // StringFormat を使用して中心に配置
+                    var sf = new StringFormat {
+                        Alignment = SettingsLabelPro.LabelProLabelSettings.AlignStringXCenter ? StringAlignment.Center : StringAlignment.Near,
+                        LineAlignment = SettingsLabelPro.LabelProLabelSettings.AlignStringYCenter ? StringAlignment.Center : StringAlignment.Near
+                    };
 
-                    g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
+                    var x = SettingsLabelPro.LabelProLabelSettings.AlignStringXCenter ? 0 : (float)(SettingsLabelPro.LabelProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
+                    var y = SettingsLabelPro.LabelProLabelSettings.AlignStringYCenter ? 0 : stringPosY;
+
+                    // 矩形領域を計算 (文字列を配置する領域)
+                    var layoutRect = new RectangleF(x, y, labelImage.Width - x, labelImage.Height - y);
+                    g.DrawString(text, fnt, Brushes.Black, layoutRect, sf);
+
+                    // プレビュー時、黒枠を描画
+                    if (printAction == System.Drawing.Printing.PrintAction.PrintToPreview) {
+                        using var p = new Pen(Color.Black, 3);
+                        g.DrawRectangle(p, 0, 0, labelImage.Width - 1, labelImage.Height - 1);
+                    }
 
                     g.Dispose();
                     break;
@@ -572,6 +588,7 @@ namespace ProductDatabase {
 
                     labelImage = new((int)sizeX, (int)sizeY);
                     g = Graphics.FromImage(labelImage);
+                    g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit; // アンチエイリアス処理を改善
                     //stringSize = g.MeasureString(text, fnt);
                     stringSize = TextRenderer.MeasureText(text, fnt);
 
@@ -596,6 +613,11 @@ namespace ProductDatabase {
                         var barcodeHeight = SettingsBarcodePro.BarcodeProLabelSettings.BarcodeHeight / 25.4M * resolution * magnitude;
 
                         g.DrawImage(img, barCodePosX, barCodePosY, (float)imageWidth, (float)barcodeHeight);
+                        // プレビュー時、黒枠を描画
+                        if (printAction == System.Drawing.Printing.PrintAction.PrintToPreview) {
+                            using var p = new Pen(Color.Black, 3);
+                            g.DrawRectangle(p, 0, 0, labelImage.Width - 1, labelImage.Height - 1);
+                        }
 
                         img.Dispose();
                     }
