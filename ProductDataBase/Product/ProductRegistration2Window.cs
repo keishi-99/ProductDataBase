@@ -23,7 +23,7 @@ namespace ProductDatabase {
         private int _labelProNSerial;
         private int _labelProNumLabelsToPrint;
 
-        private int _pageCnt = 1;
+        private int _pageCount = 1;
         private System.Drawing.Printing.PrintAction _printAction;
 
         private string _serialType = string.Empty;
@@ -350,10 +350,8 @@ namespace ProductDatabase {
             if (!File.Exists(barcodeSettingFilePath)) { throw new DirectoryNotFoundException($"バーコード印刷用設定ファイルがありません。"); }
         }
         private void SetMenuOptions() {
-            シリアルラベル印刷ToolStripMenuItem.Enabled = false;
             シリアルラベル印刷プレビューToolStripMenuItem.Enabled = IsLabelPrint;
             シリアルラベル印刷設定ToolStripMenuItem.Enabled = IsLabelPrint;
-            バーコード印刷ToolStripMenuItem.Enabled = false;
             バーコード印刷プレビューToolStripMenuItem.Enabled = IsBarcodePrint;
             バーコード印刷設定ToolStripMenuItem.Enabled = IsBarcodePrint;
         }
@@ -966,7 +964,7 @@ namespace ProductDatabase {
                 MessageBox.Show("シリアルラベルを印刷します。");
                 _serialType = "Label";
 
-                if (!PrintBarcode(1)) {
+                if (!PrintBarcode()) {
                     throw new OperationCanceledException("キャンセルしました。");
                 }
             }
@@ -976,7 +974,7 @@ namespace ProductDatabase {
                 MessageBox.Show("バーコードラベルを印刷します。");
                 _serialType = "Barcode";
 
-                if (!PrintBarcode(1)) {
+                if (!PrintBarcode()) {
                     throw new OperationCanceledException("キャンセルしました。");
                 }
             }
@@ -1007,53 +1005,63 @@ namespace ProductDatabase {
         }
 
         // 印刷処理
-        private bool PrintBarcode(int printFlg) {
+        private bool PrintBarcode() {
             // PrintDocumentオブジェクトの作成
             using System.Drawing.Printing.PrintDocument pd = new();
             pd.BeginPrint += (sender, e) => _printAction = e.PrintAction;
             pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
             _labelProNumLabelsToPrint = ProductInfo.Quantity;
-            _pageCnt = 1;
+            _pageCount = 1;
 
-            switch (printFlg) {
-                case 1:
-                    ProductRegistration2PrintDialog.Document = pd;
-                    var r = ProductRegistration2PrintDialog.ShowDialog();
+            ProductRegistration2PrintDialog.Document = pd;
 
-                    if (r == DialogResult.OK) {
-                        // ローディング画面の表示
-                        using var loadingForm = new LoadingForm();
-                        // 別スレッドで印刷処理を実行
-                        Task.Run(() => {
-                            try {
-                                ProductRegistration2PrintDialog.Document.Print();
-                            } finally {
-                                // 印刷が終了したらローディング画面を閉じる
-                                loadingForm.Invoke(new Action(() => loadingForm.Close()));
-                            }
-                        });
-
-                        // ローディング画面をモーダルとして表示
-                        loadingForm.ShowDialog();
+            if (ProductRegistration2PrintDialog.ShowDialog() == DialogResult.OK) {
+                // ローディング画面の表示
+                using var loadingForm = new LoadingForm();
+                // 別スレッドで印刷処理を実行
+                Task.Run(() => {
+                    try {
+                        ProductRegistration2PrintDialog.Document.Print();
+                    } finally {
+                        // 印刷が終了したらローディング画面を閉じる
+                        loadingForm.Invoke(new Action(() => loadingForm.Close()));
                     }
-                    else {
-                        return false;
-                    }
-                    break;
-                case 2:
-                    // 最大で表示
-                    ProductRegistration2PrintPreviewDialog.Shown += (sender, e) => {
-                        if (sender is Form form) {
-                            form.WindowState = FormWindowState.Maximized;
-                        }
-                    };
-                    ProductRegistration2PrintPreviewDialog.PrintPreviewControl.Zoom = 3;
-                    ProductRegistration2PrintPreviewDialog.Document = pd;
-                    ProductRegistration2PrintPreviewDialog.ShowDialog();
-                    break;
+                });
+
+                // ローディング画面をモーダルとして表示
+                loadingForm.ShowDialog();
+            }
+            else {
+                return false;
             }
             return true;
+        }
+        private bool PreviewBarcode() {
+            try {
+                // PrintDocumentオブジェクトの作成
+                using System.Drawing.Printing.PrintDocument pd = new();
+                pd.BeginPrint += (sender, e) => _printAction = e.PrintAction;
+                pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
+
+                _labelProNumLabelsToPrint = ProductInfo.Quantity;
+                _pageCount = 1;
+
+                // 最大で表示
+                ProductRegistration2PrintPreviewDialog.Shown += (sender, e) => {
+                    if (sender is Form form) {
+                        form.WindowState = FormWindowState.Maximized;
+                    }
+                };
+                ProductRegistration2PrintPreviewDialog.PrintPreviewControl.Zoom = 3;
+                ProductRegistration2PrintPreviewDialog.Document = pd;
+                ProductRegistration2PrintPreviewDialog.ShowDialog();
+
+                return true;
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
         }
         private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
             System.Drawing.Point headerPos = new(0, 0);
@@ -1125,12 +1133,12 @@ namespace ProductDatabase {
                 if (!isPreview) {
                     offsetX -= (decimal)e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
                     offsetY -= (decimal)e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
-                    offset = _pageCnt == 1
+                    offset = _pageCount == 1
                         ? new System.Drawing.Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
                         : new System.Drawing.Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
                 else {
-                    offset = _pageCnt == 1
+                    offset = _pageCount == 1
                         ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
                         : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
@@ -1141,11 +1149,11 @@ namespace ProductDatabase {
                 headerPos.Offset(offset);
                 e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
 
-                if (_pageCnt == 1) {
+                if (_pageCount == 1) {
                     _remainingCount = serialCodePrintCopies;
                     _labelProNSerial = ProductInfo.SerialFirstNumber;
                 }
-                if (_pageCnt >= 2) { startLine = 0; }
+                if (_pageCount >= 2) { startLine = 0; }
 
                 for (var y = startLine; y < maxY; y++) {
                     for (var x = 0; x < maxX; x++) {
@@ -1174,7 +1182,7 @@ namespace ProductDatabase {
                             //印刷するラベルがなくなった場合の処理
                             if (_labelProNumLabelsToPrint <= 0) {
                                 e.HasMorePages = false;
-                                _pageCnt = 1;
+                                _pageCount = 1;
                                 _labelProNumLabelsToPrint = 0;
                                 return;
                             }
@@ -1184,7 +1192,7 @@ namespace ProductDatabase {
                 }
 
                 if (_labelProNumLabelsToPrint > 0) {
-                    _pageCnt++;
+                    _pageCount++;
                     e.HasMorePages = true;
                 }
             } catch (Exception ex) {
@@ -1432,21 +1440,13 @@ namespace ProductDatabase {
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
         private void SubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBox_CheckedChanged(sender, e); }
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { Close(); }
-        private void シリアルラベル印刷ToolStripMenuItem_Click(object sender, EventArgs e) {
-            _serialType = "Label";
-            PrintBarcode(1);
-        }
         private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Label";
-            PrintBarcode(2);
-        }
-        private void バーコード印刷ToolStripMenuItem_Click(object sender, EventArgs e) {
-            _serialType = "Barcode";
-            PrintBarcode(1);
+            PreviewBarcode();
         }
         private void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Barcode";
-            PrintBarcode(2);
+            PreviewBarcode();
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             ProductLabelSettingsWindow ls = new();
