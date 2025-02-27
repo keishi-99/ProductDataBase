@@ -19,6 +19,7 @@ namespace ProductDatabase {
         private int _labelSubPageNum;
         private int _labelSubNumLabelsToPrint;
         private int _intPageCnt = 1;
+        private System.Drawing.Printing.PrintAction _printAction;
 
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectNumberCheckBox",
@@ -333,8 +334,7 @@ namespace ProductDatabase {
             try {
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
-
-                //// PrintPageイベントハンドラの追加
+                pd.BeginPrint += (sender, e) => _printAction = e.PrintAction;
                 pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
                 _labelSubNumLabelsToPrint = int.TryParse(QuantityTextBox.Text, out var quantity) ? quantity : 0;
@@ -385,6 +385,9 @@ namespace ProductDatabase {
                 if (SettingsLabelSub == null || e.Graphics == null) { return; }
 
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
+                // プレビューかどうかの判定
+                var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
+
                 var startLine = (int)PrintPostionNumericUpDown.Value - 1;
                 var sizeX = (float)SettingsLabelSub.LabelSubPageSettings.SizeX;
                 var sizeY = (float)SettingsLabelSub.LabelSubPageSettings.SizeY;
@@ -397,9 +400,8 @@ namespace ProductDatabase {
                 const double MM_PER_HUNDREDTH_INCH = 0.254;
 
                 var pd = (PrintDocument)sender;
-                var bPrintMode = pd.PrintController.IsPreview;
 
-                if (!bPrintMode) {
+                if (!isPreview) {
                     offsetX -= e.PageSettings.HardMarginX * 0.254;
                     offsetY -= e.PageSettings.HardMarginY * 0.254;
                     offset = _labelSubPageNum == 0
@@ -533,8 +535,10 @@ namespace ProductDatabase {
                     var layoutRect = new RectangleF(stringPosX, stringPosY, labelImage.Width - stringPosX, labelImage.Height - stringPosY);
                     g.DrawString(text, fnt, Brushes.Black, layoutRect, sf);
 
+                    // プレビューかどうかの判定
+                    var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
                     // プレビュー時、黒枠を描画
-                    if (printAction == System.Drawing.Printing.PrintAction.PrintToPreview) {
+                    if (isPreview) {
                         using var p = new Pen(Color.Black, 3);
                         g.DrawRectangle(p, 0, 0, labelImage.Width - 1, labelImage.Height - 1);
                     }

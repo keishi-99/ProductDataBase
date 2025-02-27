@@ -24,6 +24,7 @@ namespace ProductDatabase {
         private int _labelProNumLabelsToPrint;
 
         private int _pageCnt = 1;
+        private System.Drawing.Printing.PrintAction _printAction;
 
         private string _serialType = string.Empty;
         private int _serialLastNumber;
@@ -1009,8 +1010,7 @@ namespace ProductDatabase {
         private bool PrintBarcode(int printFlg) {
             // PrintDocumentオブジェクトの作成
             using System.Drawing.Printing.PrintDocument pd = new();
-
-            // PrintPageイベントハンドラの追加
+            pd.BeginPrint += (sender, e) => _printAction = e.PrintAction;
             pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
             _labelProNumLabelsToPrint = ProductInfo.Quantity;
@@ -1076,6 +1076,9 @@ namespace ProductDatabase {
 
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
 
+                // プレビューかどうかの判定
+                var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
+
                 switch (_serialType) {
                     case "Label":
                         if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnullです。"); }
@@ -1118,9 +1121,8 @@ namespace ProductDatabase {
                 const decimal MM_PER_HUNDREDTH_INCH = 0.254M;
 
                 var pd = (PrintDocument)sender;
-                var bPrintMode = pd.PrintController.IsPreview;
 
-                if (!bPrintMode) {
+                if (!isPreview) {
                     offsetX -= (decimal)e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
                     offsetY -= (decimal)e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
                     offset = _pageCnt == 1
@@ -1237,6 +1239,9 @@ namespace ProductDatabase {
             var displayResolution = 96.0M;
             var displayMagnitude = 3;
 
+            // プレビューかどうかの判定
+            var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
+
             // サイズとフォント情報の設定
             void SetLabelProperties(decimal labelWidth, decimal labelHeight, decimal posY, decimal fontPointSize, string fontName, bool underlined) {
                 sizeX = labelWidth / 25.4M * resolution * magnitude;
@@ -1276,7 +1281,7 @@ namespace ProductDatabase {
                     g.DrawString(text, fnt, Brushes.Black, layoutRect, sf);
 
                     // プレビュー時、黒枠を描画
-                    if (printAction == System.Drawing.Printing.PrintAction.PrintToPreview) {
+                    if (isPreview) {
                         using var p = new Pen(Color.Black, 3);
                         g.DrawRectangle(p, 0, 0, labelImage.Width - 1, labelImage.Height - 1);
                     }
@@ -1320,7 +1325,7 @@ namespace ProductDatabase {
 
                         g.DrawImage(img, barCodePosX, barCodePosY, (float)imageWidth, (float)barcodeHeight);
                         // プレビュー時、黒枠を描画
-                        if (printAction == System.Drawing.Printing.PrintAction.PrintToPreview) {
+                        if (isPreview) {
                             var p = new Pen(Color.Black, 3);
                             g.DrawRectangle(p, 0, 0, labelImage.Width - 1, labelImage.Height - 1);
                         }
