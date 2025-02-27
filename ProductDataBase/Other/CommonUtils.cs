@@ -310,7 +310,7 @@ namespace ProductDatabase.Other {
                 }
 
                 //引数に保存先パスを指定
-                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "temporarilyList.xlsx");
+                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyList.xlsx");
                 var fileInfo = new FileInfo(temporarilyPath);
                 workBook.SaveAs(fileInfo);
 
@@ -430,7 +430,7 @@ namespace ProductDatabase.Other {
                 sheet["Sheet1"].Hidden = eWorkSheetHidden.VeryHidden;
 
                 //引数に保存先パスを指定
-                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "Excel", "temporarilyCheckSheet.xlsx");
+                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsx");
                 var fileInfo = new FileInfo(temporarilyPath);
                 workBook.SaveAs(fileInfo);
 
