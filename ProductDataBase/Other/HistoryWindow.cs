@@ -416,16 +416,17 @@ namespace ProductDatabase {
             }
         }
         private void SaveRegistrationLog() {
-            using SQLiteConnection con = new(GetConnectionRegistration());
-            con.Open();
-            var command = con.CreateCommand();
+            try {
+                using SQLiteConnection con = new(GetConnectionRegistration());
+                con.Open();
+                var command = con.CreateCommand();
 
-            switch (_tableName) {
-                case "Substrate":
-                    foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
-                        if (row.RowState == DataRowState.Modified) {
-                            //    // UPDATE文の設定
-                            command.CommandText = $"""
+                switch (_tableName) {
+                    case "Substrate":
+                        foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
+                            if (row.RowState == DataRowState.Modified) {
+                                //    // UPDATE文の設定
+                                command.CommandText = $"""
                             UPDATE "{ProductInfo.CategoryName}_Substrate"
                             SET
                                 SubstrateNumber = @SubstrateNumber,
@@ -441,46 +442,46 @@ namespace ProductDatabase {
                                 rowid = @rowid;
                             """;
 
-                            command.Parameters.Clear(); // パラメータをクリア
-                            command.Parameters.Add("@SubstrateNumber", DbType.String).Value = row["SubstrateNumber"];
-                            command.Parameters.Add("@OrderNumber", DbType.String).Value = row["OrderNumber"];
-                            command.Parameters.Add("@Increase", DbType.Int32).Value = row["Increase"];
-                            command.Parameters.Add("@Decrease", DbType.Int32).Value = row["Decrease"];
-                            command.Parameters.Add("@Defect", DbType.Int32).Value = row["Defect"];
-                            command.Parameters.Add("@RegDate", DbType.String).Value = row["RegDate"];
-                            command.Parameters.Add("@Person", DbType.String).Value = row["Person"];
-                            command.Parameters.Add("@Comment", DbType.String).Value = row["Comment"];
-                            command.Parameters.Add("@UseId", DbType.Int32).Value = row["UseId"];
-                            command.Parameters.Add("@rowid", DbType.Int32).Value = row["rowid"];
+                                command.Parameters.Clear(); // パラメータをクリア
+                                command.Parameters.Add("@SubstrateNumber", DbType.String).Value = row["SubstrateNumber"];
+                                command.Parameters.Add("@OrderNumber", DbType.String).Value = row["OrderNumber"];
+                                command.Parameters.Add("@Increase", DbType.Int32).Value = row["Increase"];
+                                command.Parameters.Add("@Decrease", DbType.Int32).Value = row["Decrease"];
+                                command.Parameters.Add("@Defect", DbType.Int32).Value = row["Defect"];
+                                command.Parameters.Add("@RegDate", DbType.String).Value = row["RegDate"];
+                                command.Parameters.Add("@Person", DbType.String).Value = row["Person"];
+                                command.Parameters.Add("@Comment", DbType.String).Value = row["Comment"];
+                                command.Parameters.Add("@UseId", DbType.Int32).Value = row["UseId"];
+                                command.Parameters.Add("@rowid", DbType.Int32).Value = row["rowid"];
 
-                            command.Connection = con;
-                            command.ExecuteNonQuery();
-                            // ログ出力
-                            CommonUtils.Logger.AppendLog($"[基板履歴編集:前];注文番号[{row["OrderNumber", DataRowVersion.Original]}];製造番号[{row["SubstrateNumber", DataRowVersion.Original]}];製品名[{ProductInfo.ProductName}];基板名[{row["SubstrateName", DataRowVersion.Original]}];型式[{row["SubstrateModel", DataRowVersion.Original]}];追加量[{row["Increase", DataRowVersion.Original]}];使用量[{row["Decrease", DataRowVersion.Original]}];減少量[{row["Defect", DataRowVersion.Original]}];登録日[{row["RegDate", DataRowVersion.Original]}];担当者[{row["Person", DataRowVersion.Original]}];rowID[{row["rowid", DataRowVersion.Original]}];Comment[{row["Comment", DataRowVersion.Original]}]");
-                            CommonUtils.Logger.AppendLog($"[基板履歴編集:後];注文番号[{row["OrderNumber"]}];製造番号[{row["SubstrateNumber"]}];製品名[{ProductInfo.ProductName}];基板名[{row["SubstrateName"]}];型式[{row["SubstrateModel"]}];追加量[{row["Increase"]}];使用量[{row["Decrease"]}];減少量[{row["Defect"]}];登録日[{row["RegDate"]}];担当者[{row["Person"]}];rowID[{row["rowid"]}];Comment[{row["Comment"]}]");
-                        }
-                        else if (row.RowState == DataRowState.Deleted) // 削除行の処理
-                        {
-                            //DELETE文の設定
-                            command.CommandText = $"""
+                                command.Connection = con;
+                                command.ExecuteNonQuery();
+                                // ログ出力
+                                CommonUtils.Logger.AppendLog($"[基板履歴編集:前];注文番号[{row["OrderNumber", DataRowVersion.Original]}];製造番号[{row["SubstrateNumber", DataRowVersion.Original]}];製品名[{ProductInfo.ProductName}];基板名[{row["SubstrateName", DataRowVersion.Original]}];型式[{row["SubstrateModel", DataRowVersion.Original]}];追加量[{row["Increase", DataRowVersion.Original]}];使用量[{row["Decrease", DataRowVersion.Original]}];減少量[{row["Defect", DataRowVersion.Original]}];登録日[{row["RegDate", DataRowVersion.Original]}];担当者[{row["Person", DataRowVersion.Original]}];rowID[{row["rowid", DataRowVersion.Original]}];Comment[{row["Comment", DataRowVersion.Original]}]");
+                                CommonUtils.Logger.AppendLog($"[基板履歴編集:後];注文番号[{row["OrderNumber"]}];製造番号[{row["SubstrateNumber"]}];製品名[{ProductInfo.ProductName}];基板名[{row["SubstrateName"]}];型式[{row["SubstrateModel"]}];追加量[{row["Increase"]}];使用量[{row["Decrease"]}];減少量[{row["Defect"]}];登録日[{row["RegDate"]}];担当者[{row["Person"]}];rowID[{row["rowid"]}];Comment[{row["Comment"]}]");
+                            }
+                            else if (row.RowState == DataRowState.Deleted) // 削除行の処理
+                            {
+                                //DELETE文の設定
+                                command.CommandText = $"""
                                 DELETE FROM "{ProductInfo.CategoryName}_Substrate"
                                 WHERE rowid = @rowid;
                                 """;
-                            command.Parameters.Clear(); // パラメータをクリア
-                            command.Parameters.Add("@rowid", DbType.Int32).Value = row["rowid", DataRowVersion.Original];
+                                command.Parameters.Clear(); // パラメータをクリア
+                                command.Parameters.Add("@rowid", DbType.Int32).Value = row["rowid", DataRowVersion.Original];
 
-                            command.Connection = con;
-                            command.ExecuteNonQuery();
-                            // ログ出力
-                            CommonUtils.Logger.AppendLog($"[基板履歴削除];注文番号[{row["OrderNumber", DataRowVersion.Original]}];製造番号[{row["SubstrateNumber", DataRowVersion.Original]}];製品名[{ProductInfo.ProductName}];基板名[{row["SubstrateName", DataRowVersion.Original]}];型式[{row["SubstrateModel", DataRowVersion.Original]}];追加量[{row["Increase", DataRowVersion.Original]}];使用量[{row["Decrease", DataRowVersion.Original]}];減少量[{row["Defect", DataRowVersion.Original]}];登録日[{row["RegDate", DataRowVersion.Original]}];担当者[{row["Person", DataRowVersion.Original]}];rowID[{row["rowid", DataRowVersion.Original]}]");
+                                command.Connection = con;
+                                command.ExecuteNonQuery();
+                                // ログ出力
+                                CommonUtils.Logger.AppendLog($"[基板履歴削除];注文番号[{row["OrderNumber", DataRowVersion.Original]}];製造番号[{row["SubstrateNumber", DataRowVersion.Original]}];製品名[{ProductInfo.ProductName}];基板名[{row["SubstrateName", DataRowVersion.Original]}];型式[{row["SubstrateModel", DataRowVersion.Original]}];追加量[{row["Increase", DataRowVersion.Original]}];使用量[{row["Decrease", DataRowVersion.Original]}];減少量[{row["Defect", DataRowVersion.Original]}];登録日[{row["RegDate", DataRowVersion.Original]}];担当者[{row["Person", DataRowVersion.Original]}];rowID[{row["rowid", DataRowVersion.Original]}]");
+                            }
                         }
-                    }
-                    break;
-                case "Product":
-                    foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
-                        if (row.RowState == DataRowState.Modified) {
-                            //    // UPDATE文の設定
-                            command.CommandText = $"""
+                        break;
+                    case "Product":
+                        foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
+                            if (row.RowState == DataRowState.Modified) {
+                                //    // UPDATE文の設定
+                                command.CommandText = $"""
                             UPDATE "{ProductInfo.CategoryName}_Product"
                             SET
                                 ID = @ID,
@@ -496,84 +497,87 @@ namespace ProductDatabase {
                                 ID = @ID;
                             """;
 
-                            command.Parameters.Clear(); // パラメータをクリア
-                            command.Parameters.Add("@ID", DbType.Int32).Value = row["ID"];
-                            command.Parameters.Add("@OrderNumber", DbType.String).Value = row["OrderNumber"];
-                            command.Parameters.Add("@ProductNumber", DbType.String).Value = row["ProductNumber"];
-                            command.Parameters.Add("@Person", DbType.String).Value = row["Person"];
-                            command.Parameters.Add("@RegDate", DbType.String).Value = row["RegDate"];
-                            command.Parameters.Add("@Revision", DbType.String).Value = row["Revision"];
-                            command.Parameters.Add("@RevisionGroup", DbType.String).Value = row["RevisionGroup"];
-                            command.Parameters.Add("@Comment", DbType.String).Value = row["Comment"];
+                                command.Parameters.Clear(); // パラメータをクリア
+                                command.Parameters.Add("@ID", DbType.Int32).Value = row["ID"];
+                                command.Parameters.Add("@OrderNumber", DbType.String).Value = row["OrderNumber"];
+                                command.Parameters.Add("@ProductNumber", DbType.String).Value = row["ProductNumber"];
+                                command.Parameters.Add("@Person", DbType.String).Value = row["Person"];
+                                command.Parameters.Add("@RegDate", DbType.String).Value = row["RegDate"];
+                                command.Parameters.Add("@Revision", DbType.String).Value = row["Revision"];
+                                command.Parameters.Add("@RevisionGroup", DbType.String).Value = row["RevisionGroup"];
+                                command.Parameters.Add("@Comment", DbType.String).Value = row["Comment"];
 
-                            command.Connection = con;
-                            command.ExecuteNonQuery();
-                            // ログ出力
-                            CommonUtils.Logger.AppendLog($"[製品履歴編集:前];注文番号[{row["OrderNumber", DataRowVersion.Original]}];製造番号[{row["ProductNumber", DataRowVersion.Original]}];製品名[{ProductInfo.ProductName}];タイプ[{row["ProductType", DataRowVersion.Original]}];型式[{row["ProductModel", DataRowVersion.Original]}];Revision[{row["Revision", DataRowVersion.Original]}];登録日[{row["RegDate", DataRowVersion.Original]}];担当者[{row["Person", DataRowVersion.Original]}];ID[{row["ID"]}];Comment[{row["Comment", DataRowVersion.Original]}]");
-                            CommonUtils.Logger.AppendLog($"[製品履歴編集:後];注文番号[{row["OrderNumber"]}];製造番号[{row["ProductNumber"]}];製品名[{ProductInfo.ProductName}];タイプ[{row["ProductType"]}];型式[{row["ProductModel"]}];Revision[{row["Revision"]}];登録日[{row["RegDate"]}];担当者[{row["Person"]}];ID[{row["ID"]}];Comment[{row["Comment"]}]");
-                        }
-                        else if (row.RowState == DataRowState.Deleted) // 削除行の処理
-                        {
-                            //DELETE文の設定
-                            command.CommandText = $"""
+                                command.Connection = con;
+                                command.ExecuteNonQuery();
+                                // ログ出力
+                                CommonUtils.Logger.AppendLog($"[製品履歴編集:前];注文番号[{row["OrderNumber", DataRowVersion.Original]}];製造番号[{row["ProductNumber", DataRowVersion.Original]}];製品名[{ProductInfo.ProductName}];タイプ[{row["ProductType", DataRowVersion.Original]}];型式[{row["ProductModel", DataRowVersion.Original]}];Revision[{row["Revision", DataRowVersion.Original]}];登録日[{row["RegDate", DataRowVersion.Original]}];担当者[{row["Person", DataRowVersion.Original]}];ID[{row["ID"]}];Comment[{row["Comment", DataRowVersion.Original]}]");
+                                CommonUtils.Logger.AppendLog($"[製品履歴編集:後];注文番号[{row["OrderNumber"]}];製造番号[{row["ProductNumber"]}];製品名[{ProductInfo.ProductName}];タイプ[{row["ProductType"]}];型式[{row["ProductModel"]}];Revision[{row["Revision"]}];登録日[{row["RegDate"]}];担当者[{row["Person"]}];ID[{row["ID"]}];Comment[{row["Comment"]}]");
+                            }
+                            else if (row.RowState == DataRowState.Deleted) // 削除行の処理
+                            {
+                                //DELETE文の設定
+                                command.CommandText = $"""
                                 DELETE FROM "{ProductInfo.CategoryName}_Product"
                                 WHERE ID = @ID;
                                 """;
-                            command.Parameters.Clear(); // パラメータをクリア
-                            command.Parameters.Add("@ID", DbType.Int32).Value = row["ID", DataRowVersion.Original];
+                                command.Parameters.Clear(); // パラメータをクリア
+                                command.Parameters.Add("@ID", DbType.Int32).Value = row["ID", DataRowVersion.Original];
 
-                            command.Connection = con;
-                            command.ExecuteNonQuery();
-                            // ログ出力
-                            CommonUtils.Logger.AppendLog($"[製品履歴削除];注文番号[{row["OrderNumber", DataRowVersion.Original]}];製造番号[{row["ProductNumber", DataRowVersion.Original]}];製品名[{ProductInfo.ProductName}];タイプ[{row["ProductType", DataRowVersion.Original]}];型式[{row["ProductModel", DataRowVersion.Original]}];ID[{row["ID", DataRowVersion.Original]}]");
+                                command.Connection = con;
+                                command.ExecuteNonQuery();
+                                // ログ出力
+                                CommonUtils.Logger.AppendLog($"[製品履歴削除];注文番号[{row["OrderNumber", DataRowVersion.Original]}];製造番号[{row["ProductNumber", DataRowVersion.Original]}];製品名[{ProductInfo.ProductName}];タイプ[{row["ProductType", DataRowVersion.Original]}];型式[{row["ProductModel", DataRowVersion.Original]}];ID[{row["ID", DataRowVersion.Original]}]");
+                            }
                         }
-                    }
 
-                    break;
-                case "Serial":
-                    foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
-                        if (row.RowState == DataRowState.Modified) {
-                            ////    // UPDATE文の設定
-                            //command.CommandText = $"""
-                            //UPDATE "{ProductInfo.CategoryName}_Serial"
-                            //SET
-                            //    Serial = @Serial,
-                            //    UsedID = @UsedID
-                            //WHERE
-                            //    rowid = @rowid;
-                            //""";
+                        break;
+                    case "Serial":
+                        foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
+                            if (row.RowState == DataRowState.Modified) {
+                                ////    // UPDATE文の設定
+                                //command.CommandText = $"""
+                                //UPDATE "{ProductInfo.CategoryName}_Serial"
+                                //SET
+                                //    Serial = @Serial,
+                                //    UsedID = @UsedID
+                                //WHERE
+                                //    rowid = @rowid;
+                                //""";
 
-                            //command.Parameters.Clear(); // パラメータをクリア
-                            //command.Parameters.Add("@Serial", DbType.String).Value = row["Serial"];
-                            //command.Parameters.Add("@UsedID", DbType.String).Value = row["UsedID"];
-                            //command.Parameters.Add("@rowid", DbType.Int32).Value = row["rowid"];
+                                //command.Parameters.Clear(); // パラメータをクリア
+                                //command.Parameters.Add("@Serial", DbType.String).Value = row["Serial"];
+                                //command.Parameters.Add("@UsedID", DbType.String).Value = row["UsedID"];
+                                //command.Parameters.Add("@rowid", DbType.Int32).Value = row["rowid"];
 
-                            //command.Connection = con;
-                            //command.ExecuteNonQuery();
-                            //// ログ出力
-                            //CommonUtils.Logger.AppendLog($"[シリアル履歴編集];製品名[{ProductInfo.ProductName}];rowid[{row["rowid"]}];");
-                        }
-                        else if (row.RowState == DataRowState.Deleted) // 削除行の処理
-                        {
-                            //DELETE文の設定
-                            command.CommandText = $"""
+                                //command.Connection = con;
+                                //command.ExecuteNonQuery();
+                                //// ログ出力
+                                //CommonUtils.Logger.AppendLog($"[シリアル履歴編集];製品名[{ProductInfo.ProductName}];rowid[{row["rowid"]}];");
+                            }
+                            else if (row.RowState == DataRowState.Deleted) // 削除行の処理
+                            {
+                                //DELETE文の設定
+                                command.CommandText = $"""
                                 DELETE FROM "{ProductInfo.CategoryName}_Serial"
                                 WHERE rowid = @rowid;
                                 """;
-                            command.Parameters.Clear(); // パラメータをクリア
-                            command.Parameters.Add("@rowid", DbType.Int32).Value = row["rowid", DataRowVersion.Original];
+                                command.Parameters.Clear(); // パラメータをクリア
+                                command.Parameters.Add("@rowid", DbType.Int32).Value = row["rowid", DataRowVersion.Original];
 
-                            command.Connection = con;
-                            command.ExecuteNonQuery();
-                            // ログ出力
-                            CommonUtils.Logger.AppendLog($"[シリアル履歴削除];製品名[{ProductInfo.ProductName}];Serial[{row["Serial", DataRowVersion.Original]}];rowid[{row["rowid", DataRowVersion.Original]}]");
+                                command.Connection = con;
+                                command.ExecuteNonQuery();
+                                // ログ出力
+                                CommonUtils.Logger.AppendLog($"[シリアル履歴削除];製品名[{ProductInfo.ProductName}];Serial[{row["Serial", DataRowVersion.Original]}];rowid[{row["rowid", DataRowVersion.Original]}]");
+                            }
                         }
-                    }
-                    break;
+                        break;
+                }
+                // バックアップ作成
+                CommonUtils.BackupManager.CreateBackup();
+                Close();
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            // バックアップ作成
-            CommonUtils.BackupManager.CreateBackup();
-            Close();
         }
 
         private void CategorySelect(object sender) {
