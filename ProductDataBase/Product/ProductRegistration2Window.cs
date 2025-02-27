@@ -512,17 +512,20 @@ namespace ProductDatabase {
                         INSERT INTO "{ProductInfo.CategoryName}_Serial"
                             (
                             Serial,
-                            UsedID
+                            UsedID,
+                            ProductName
                             )
                         VALUES
                             (
                             @Serial,
                             @productRowId
+                            @ProductName
                             )
                         """;
 
                             cmd.Parameters.Add("@Serial", DbType.String).Value = b;
                             cmd.Parameters.Add("@productRowId", DbType.String).Value = int.Parse(productRowId);
+                            cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
 
                             cmd.ExecuteNonQuery();
                         }
