@@ -90,7 +90,7 @@ namespace ProductDatabase {
 
                 // 印刷しない場合は関連コントロール非表示に
                 if (IsLabelPrint == false) {
-                    RevisionCheckBox.Visible = false;
+                    ExtraCheckBox7.Visible = false;
                     PrintRowLabel.Visible = false;
                     PrintPostionNumericUpDown.Visible = false;
                     PrintOnlyCheckBox.Visible = false;

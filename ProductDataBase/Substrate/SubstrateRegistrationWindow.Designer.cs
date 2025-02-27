@@ -46,7 +46,7 @@
             this.DefectNumberTextBox = new TextBox();
             this.DefectNumberCheckBox = new CheckBox();
             this.RevisionTextBox = new TextBox();
-            this.RevisionCheckBox = new CheckBox();
+            this.ExtraCheckBox7 = new CheckBox();
             this.ExtraTextBox1 = new TextBox();
             this.ExtraCheckBox1 = new CheckBox();
             this.ExtraTextBox2 = new TextBox();
@@ -306,17 +306,17 @@
             this.RevisionTextBox.TabIndex = 16;
             this.RevisionTextBox.TextAlign = HorizontalAlignment.Right;
             // 
-            // RevisionCheckBox
+            // ExtraCheckBox7
             // 
-            this.RevisionCheckBox.Location = new Point(19, 318);
-            this.RevisionCheckBox.Margin = new Padding(0);
-            this.RevisionCheckBox.Name = "RevisionCheckBox";
-            this.RevisionCheckBox.Size = new Size(68, 19);
-            this.RevisionCheckBox.TabIndex = 15;
-            this.RevisionCheckBox.TabStop = false;
-            this.RevisionCheckBox.Text = "レビジョン";
-            this.RevisionCheckBox.UseVisualStyleBackColor = true;
-            this.RevisionCheckBox.CheckedChanged += this.CheckBoxChecked;
+            this.ExtraCheckBox7.Location = new Point(19, 318);
+            this.ExtraCheckBox7.Margin = new Padding(0);
+            this.ExtraCheckBox7.Name = "ExtraCheckBox7";
+            this.ExtraCheckBox7.Size = new Size(68, 19);
+            this.ExtraCheckBox7.TabIndex = 15;
+            this.ExtraCheckBox7.TabStop = false;
+            this.ExtraCheckBox7.Text = "予備";
+            this.ExtraCheckBox7.UseVisualStyleBackColor = true;
+            this.ExtraCheckBox7.CheckedChanged += this.CheckBoxChecked;
             // 
             // ExtraTextBox1
             // 
@@ -705,7 +705,7 @@
             this.Controls.Add(this.ExtraTextBox1);
             this.Controls.Add(this.ExtraCheckBox1);
             this.Controls.Add(this.RevisionTextBox);
-            this.Controls.Add(this.RevisionCheckBox);
+            this.Controls.Add(this.ExtraCheckBox7);
             this.Controls.Add(this.DefectNumberTextBox);
             this.Controls.Add(this.DefectNumberCheckBox);
             this.Controls.Add(this.QuantityTextBox);
@@ -764,7 +764,7 @@
         private TextBox DefectNumberTextBox;
         private CheckBox DefectNumberCheckBox;
         private TextBox RevisionTextBox;
-        private CheckBox RevisionCheckBox;
+        private CheckBox ExtraCheckBox7;
         private TextBox ExtraTextBox1;
         private CheckBox ExtraCheckBox1;
         private TextBox ExtraTextBox2;
