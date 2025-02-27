@@ -16,25 +16,14 @@ namespace ProductDatabase {
 
         public ProductInformation ProductInfo { get; }
 
-        //private string _orderNumber = string.Empty;
-        //private string _productNumber = string.Empty;
-        //private string _regDate = string.Empty;
-        //private string _person = string.Empty;
-        //private string _revision = string.Empty;
-        //private string _comment = string.Empty;
-
-        //private int _quantity;
-        //private int _serialFirstNumber;
-        //private int _serialLastNumber;
-
         private int _remainingCount;
-        private int _labelProPageNum = 1;
         private int _labelProNSerial;
         private int _labelProNumLabelsToPrint;
 
+        private int _intPageCnt = 1;
+
         private readonly decimal _displayResolution = 96.0m;
         private readonly int _displayMagnitude = 3;
-        private int _intPageCnt = 1;
 
         private System.Drawing.Printing.PrintAction _printAction;
 
@@ -292,12 +281,11 @@ namespace ProductDatabase {
                 pd.BeginPrint += (sender, e) => _printAction = e.PrintAction;
                 pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
+                _labelProNumLabelsToPrint = ProductInfo.Quantity;
                 _intPageCnt = 1;
 
                 switch (printFlg) {
                     case 1:
-                        _labelProNumLabelsToPrint = ProductInfo.Quantity;
-                        _labelProPageNum = 1;
                         RePrintPrintDialog.Document = pd;
                         var r = RePrintPrintDialog.ShowDialog();
 
@@ -325,8 +313,6 @@ namespace ProductDatabase {
                         if (!FormCheck()) { return false; }
                         if (!DataCheck()) { return false; }
 
-                        _labelProNumLabelsToPrint = ProductInfo.Quantity;
-                        _labelProPageNum = 1;
                         // 最大で表示
                         RePrintPrintPreviewDialog.Shown += (sender, e) => {
                             if (sender is Form form) {
@@ -346,7 +332,6 @@ namespace ProductDatabase {
                 return false;
             }
         }
-
         private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
             Point headerPos = new(0, 0);
             var headerString = string.Empty;
@@ -415,7 +400,7 @@ namespace ProductDatabase {
                 if (!isPreview) {
                     offsetX -= (decimal)e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
                     offsetY -= (decimal)e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
-                    offset = _labelProPageNum == 1
+                    offset = _intPageCnt == 1
                         ? new Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
                         : new Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
@@ -434,11 +419,11 @@ namespace ProductDatabase {
                     ? new Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
                     : new Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
 
-                if (_labelProPageNum == 1) {
+                if (_intPageCnt == 1) {
                     _remainingCount = serialCodePrintCopies;
                     _labelProNSerial = ProductInfo.SerialFirstNumber;
                 }
-                if (_labelProPageNum >= 2) { startLine = 0; }
+                if (_intPageCnt >= 2) { startLine = 0; }
 
                 var y = 0;
                 for (y = startLine; y < maxY; y++) {
@@ -469,7 +454,7 @@ namespace ProductDatabase {
                             //印刷するラベルがなくなった場合の処理
                             if (_labelProNumLabelsToPrint <= 0) {
                                 e.HasMorePages = false;
-                                _labelProPageNum = 1;
+                                _intPageCnt = 1;
                                 _labelProNumLabelsToPrint = 0;
                                 return;
                             }
@@ -479,7 +464,6 @@ namespace ProductDatabase {
                 }
 
                 if (_labelProNumLabelsToPrint > 0) {
-                    _labelProPageNum++;
                     _intPageCnt++;
                     e.HasMorePages = true;
                 }
