@@ -29,6 +29,8 @@ namespace ProductDatabase {
         private CheckBox? _objCbx;
         private DataGridView? _objDgv;
 
+        private readonly Dictionary<string, (List<string>, List<int>)> _dicUsedSubstrate = [];
+
         // プロパティ設定
         private bool IsListPrint => ProductInfo.PrintType is 5 or 6;
 

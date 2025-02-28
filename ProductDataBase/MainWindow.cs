@@ -45,11 +45,13 @@ namespace ProductDatabase {
             public string Comment { get; set; } = string.Empty;
             public string SerialFirst { get; set; } = string.Empty;
             public string SerialLast { get; set; } = string.Empty;
-            public string UsedSubstrate { get; set; } = string.Empty;
 
             public int Quantity { get; set; }
             public int SerialFirstNumber { get; set; }
             public int SerialLastNumber { get; set; }
+
+            public string UsedSubstrate { get; set; } = string.Empty;
+            //public Dictionary<string, (List<string>, List<int>)> UsedSubstrate { get; set; } = [];
 
             public DataTable ProductDataTable { get; } = new();
             public DataTable SubstrateDataTable { get; } = new();
@@ -87,10 +89,11 @@ namespace ProductDatabase {
                 Comment = string.Empty;
                 SerialFirst = string.Empty;
                 SerialLast = string.Empty;
-                UsedSubstrate = string.Empty;
                 SerialLastNumber = 0;
                 Quantity = 0;
                 SerialFirstNumber = 0;
+                UsedSubstrate = string.Empty;
+                //UsedSubstrate = [];
             }
         }
         public static class Auth {

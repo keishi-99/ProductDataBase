@@ -1,6 +1,7 @@
 ﻿using OfficeOpenXml;
+using System.Data;
+using System.Data.SQLite;
 using System.Drawing.Imaging;
-using System.Text.RegularExpressions;
 using ZXing;
 using ZXing.QrCode;
 using ZXing.QrCode.Internal;
@@ -229,52 +230,71 @@ namespace ProductDatabase.Other {
                 if (!string.IsNullOrEmpty(serialLastRange)) { workSheetTemp.Cells[serialLastRange].Value = productInfo.SerialLast; }
                 if (!string.IsNullOrEmpty(commentRange)) { workSheetTemp.Cells[commentRange].Value = productInfo.Comment; }
 
-                var input = productInfo.UsedSubstrate;
+                /////////////////////
 
-                // 正規表現で分割
-                var matches = Regex.Matches(input, @"\[([^\]]+)\]([^,\r\n]+(?:,[^,\r\n]+)*)");
+                List<(string, List<string>, List<int>)> usedSubstrate = [];
 
-                List<string> array1 = [];
-                List<string> array2 = [];
+                using SQLiteConnection con = new(GetConnectionRegistration());
+                con.Open();
+                using var cmd = con.CreateCommand();
 
-                foreach (Match match in matches) {
-                    var bracketContent = match.Groups[1].Value; // 角括弧の中身
-                    var commaSeparatedValues = match.Groups[2].Value; // カンマ区切りの文字列
+                cmd.CommandText = $"""
+                                SELECT
+                                	SubstrateModel,
+                                	SubstrateNumber,
+                                	Decrease
+                                FROM
+                                	PA_Substrate
+                                WHERE
+                                	UseID = @ID
+                                ORDER BY
+                                	SubstrateModel ASC
+                                """;
+                cmd.Parameters.Add("@ID", DbType.String).Value = productInfo.ProductID;
+                using var dr = cmd.ExecuteReader();
 
-                    var values = commaSeparatedValues.Split(',');
-                    array2.AddRange(values);
+                while (dr.Read()) {
+                    var substrateModel = dr.GetString(0);
+                    var substrateNumber = dr.GetString(1);
+                    var decrease = -1 * dr.GetInt32(2);
 
-                    // valuesの数だけbracketContentを繰り返して追加
-                    array1.AddRange(Enumerable.Repeat(bracketContent, values.Length));
+
+                    var substrateNumbers = new List<string> { substrateNumber };
+                    var decreases = new List<int> { decrease };
+                    var substrateData = (substrateModel, substrateNumbers, decreases);
+                    usedSubstrate.Add(substrateData);
                 }
 
-                for (var i = 0; i <= array1.Count - 1; i++) {
+                for (var i = 0; i <= usedSubstrate.Count - 1; i++) {
 
                     var targetRow = resultRow; // 検索対象の行番号
-                    var searchValue = $"{array1[i]}";
+                    var searchValue = $"{usedSubstrate[i].Item1}";
                     var foundColumn = 0;
 
                     var searchAddressResult2 = workSheetMain.Cells
-                        .Where(x => x.Start.Row == targetRow) // 指定した行のセルのみを対象にする
-                        .First(x => x.Value?.ToString() == searchValue);
+                        .Where(x => x.Start.Row == targetRow && x.Value?.ToString() == searchValue)
+                        .FirstOrDefault();
 
                     if (searchAddressResult2 != null) {
                         // セルが見つかった場合の処理
                         foundColumn = searchAddressResult2.Start.Column;
                     }
                     if (foundColumn == 0) {
-                        throw new Exception($"{array1[i]}が見つかりません。");
+                        throw new Exception($"{usedSubstrate[i]}が見つかりません。");
                     }
 
                     var mainCellValue = workSheetMain.Cells[resultRow, foundColumn + 1].Value.ToString();
                     var tempCellValue = workSheetTemp.Cells[mainCellValue].Value?.ToString();
 
-                    if (mainCellValue != string.Empty) {
-                        if (tempCellValue == string.Empty) {
-                            workSheetTemp.Cells[mainCellValue].Value = $"{array2[i]}";
+                    var substrateNumber = usedSubstrate[i].Item2[0];
+                    var decrease = usedSubstrate[i].Item3[0];
+
+                    if (!string.IsNullOrEmpty(mainCellValue)) {
+                        if (string.IsNullOrEmpty(tempCellValue)) {
+                            workSheetTemp.Cells[mainCellValue].Value = $"{substrateNumber}({decrease})";
                         }
                         else {
-                            workSheetTemp.Cells[mainCellValue].Value += $"    {array2[i]}";
+                            workSheetTemp.Cells[mainCellValue].Value += $"    {substrateNumber}({decrease})";
                         }
                     }
                 }

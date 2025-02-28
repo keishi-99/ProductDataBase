@@ -504,6 +504,7 @@ namespace ProductDatabase {
 
                     cmd.CommandText = "SELECT last_insert_rowid()";
                     productRowId = cmd.ExecuteScalar().ToString() ?? string.Empty;
+                    ProductInfo.ProductID = int.Parse(productRowId);
 
                     if (IsSerialGeneration) {
                         foreach (var b in _strSerial) {
@@ -524,7 +525,7 @@ namespace ProductDatabase {
                         """;
 
                             cmd.Parameters.Add("@Serial", DbType.String).Value = b;
-                            cmd.Parameters.Add("@productRowId", DbType.String).Value = int.Parse(productRowId);
+                            cmd.Parameters.Add("@productRowId", DbType.String).Value = ProductInfo.ProductID;
                             cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
 
                             cmd.ExecuteNonQuery();
@@ -712,6 +713,7 @@ namespace ProductDatabase {
                     // 製品ROWIDの取得
                     cmd.CommandText = "SELECT last_insert_rowid()";
                     productRowId = cmd.ExecuteScalar().ToString() ?? string.Empty;
+                    ProductInfo.ProductID = int.Parse(productRowId);
 
                     // 一時テーブルから基板テーブルにコピー
                     cmd = con.CreateCommand();
@@ -724,7 +726,7 @@ namespace ProductDatabase {
                             tsr.StockName, tsr.SubstrateName, tsr.SubstrateModel, tsr.SubstrateNumber, tsr.OrderNumber, tsr.Decrease, tsr.UsedProductType, tsr.UsedProductNumber, tsr.UsedOrderNumber, tsr.Person, tsr.RegDate, tsr.Comment, @productRowId
                         FROM TempSubstrateReduction tsr
                         """;
-                    cmd.Parameters.Add("@productRowId", DbType.String).Value = int.Parse(productRowId);
+                    cmd.Parameters.Add("@productRowId", DbType.String).Value = ProductInfo.ProductID;
                     cmd.ExecuteNonQuery();
 
                     // 一時テーブルの内容を削除
@@ -750,7 +752,7 @@ namespace ProductDatabase {
                         """;
 
                             cmd.Parameters.Add("@Serial", DbType.String).Value = b;
-                            cmd.Parameters.Add("@productRowId", DbType.String).Value = int.Parse(productRowId);
+                            cmd.Parameters.Add("@productRowId", DbType.String).Value = ProductInfo.ProductID;
                             cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
 
                             cmd.ExecuteNonQuery();
