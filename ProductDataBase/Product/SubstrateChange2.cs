@@ -8,8 +8,6 @@ namespace ProductDatabase {
 
         public ProductInformation ProductInfo { get; set; } = new ProductInformation();
 
-        private string _totalSubstrate = string.Empty;
-
         private string[] _useSubstrate = [];
 
         private readonly List<string> _listUsedSubstrate = [];
@@ -329,18 +327,17 @@ namespace ProductDatabase {
                                 if (objCbx.Checked) {
                                     var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
                                     var dgvRowCnt = objDgv.Rows.Count;
-                                    var subTotalTemp = string.Empty;
 
                                     for (var j = 0; j <= dgvRowCnt - 1; j++) {
+                                        var usedValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
                                         var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[4].Value);
+                                        var useValue = boolCbx ? Convert.ToInt32(objDgv.Rows[j].Cells[3].Value) : 0;
                                         if (boolCbx) {
                                             var substrateName = string.Empty;
                                             var substrateModel = string.Empty;
                                             var orderNum = string.Empty;
                                             var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
                                             var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
-                                            var usedValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
-                                            var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[3].Value);
 
                                             using (var cmd = con.CreateCommand()) {
                                                 //cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber""";
@@ -365,11 +362,6 @@ namespace ProductDatabase {
                                                     orderNum = $"{dr["OrderNumber"]}";
                                                 }
                                             }
-
-                                            if (useValue != 0) {
-                                                subTotalTemp = string.IsNullOrEmpty(subTotalTemp) ? $"{substrateNum}({useValue})" : $"{subTotalTemp},{substrateNum}({useValue})";
-                                            }
-
                                             // 基板テーブルを更新、できない場合は挿入
                                             using (var cmdUpdate = con.CreateCommand()) {
                                                 cmdUpdate.CommandText =
@@ -386,7 +378,7 @@ namespace ProductDatabase {
                                                         UseID = @UseID
                                                     """;
 
-                                                cmdUpdate.Parameters.Add("@Decrease", DbType.String).Value = 0 - useValue;
+                                                cmdUpdate.Parameters.Add("@Decrease", DbType.Int64).Value = 0 - useValue;
                                                 cmdUpdate.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
                                                 cmdUpdate.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
                                                 cmdUpdate.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
@@ -439,7 +431,7 @@ namespace ProductDatabase {
                                                     cmdInsert.Parameters.Add("@SubstrateModel", DbType.String).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
                                                     cmdInsert.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
                                                     cmdInsert.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(orderNum) ? DBNull.Value : orderNum;
-                                                    cmdInsert.Parameters.Add("@Decrease", DbType.String).Value = 0 - useValue;
+                                                    cmdInsert.Parameters.Add("@Decrease", DbType.Int64).Value = 0 - useValue;
                                                     cmdInsert.Parameters.Add("@UsedProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
                                                     cmdInsert.Parameters.Add("@UsedProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
                                                     cmdInsert.Parameters.Add("@UsedOrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
@@ -458,11 +450,25 @@ namespace ProductDatabase {
                                                 _listUsedQuantity.Add(useValue);
                                             }
                                         }
+                                        // 使用数が0になった場合、基板テーブルから削除
+                                        else if (usedValue != useValue && useValue == 0) {
+                                            using var cmdDelete = con.CreateCommand();
+                                            cmdDelete.CommandText =
+                                                $"""
+                                                    DELETE
+                                                    FROM
+                                                        "{ProductInfo.CategoryName}_Substrate"
+                                                    WHERE
+                                                        SubstrateNumber = @SubstrateNumber AND UseID = @ID;
+                                                    """;
+                                            cmdDelete.Parameters.Clear(); // パラメータをクリア
+                                            cmdDelete.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
+                                            cmdDelete.Parameters.Add("@ID", DbType.Int64).Value = ProductInfo.ProductID;
+
+                                            cmdDelete.Connection = con;
+                                            cmdDelete.ExecuteNonQuery();
+                                        }
                                     }
-                                    _totalSubstrate = string.IsNullOrEmpty(_totalSubstrate)
-                                        ? $"[{_useSubstrate[i]}]{subTotalTemp}"
-                                        : $"{_totalSubstrate},{Environment.NewLine}[{_useSubstrate[i]}]{subTotalTemp}";
-                                    subTotalTemp = string.Empty;
                                 }
                             }
 
