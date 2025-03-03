@@ -151,8 +151,7 @@ namespace ProductDatabase {
                         { "SerialFirst", "シリアル先頭" },
                         { "SerialLast", "シリアル末尾" },
                         { "SerialLastNumber", "末番" },
-                        { "Comment", "コメント" },
-                        { "UsedSubstrate", "使用基板" }
+                        { "Comment", "コメント" }
                     }
                 },
                 {
@@ -199,10 +198,6 @@ namespace ProductDatabase {
                 CategoryComboBox.Items.Add("");
                 for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
                     CategoryComboBox.Items.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty);
-                }
-
-                if (categoryName == "Product") {
-                    DataBaseDataGridView.Columns["UsedSubstrate"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
                 }
             }
             DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
@@ -384,7 +379,6 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["SerialFirst"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SerialLast"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SerialLastNumber"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["UsedSubstrate"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ID"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductType"].DefaultCellStyle.ForeColor = Color.Red;
@@ -393,7 +387,6 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["SerialFirst"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SerialLast"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SerialLastNumber"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["UsedSubstrate"].DefaultCellStyle.ForeColor = Color.Red;
                     break;
                 case "Serial":
                     DataBaseDataGridView.Columns["rowid"].ReadOnly = true;
@@ -653,7 +646,6 @@ namespace ProductDatabase {
                 ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
                 ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
                 ProductInfo.Comment = DataBaseDataGridView.Rows[selectRow].Cells["Comment"].Value.ToString() ?? string.Empty;
-                ProductInfo.UsedSubstrate = DataBaseDataGridView.Rows[selectRow].Cells["UsedSubstrate"].Value.ToString() ?? string.Empty;
 
                 CommonUtils.GenerateList(ProductInfo);
 

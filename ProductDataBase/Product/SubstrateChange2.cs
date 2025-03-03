@@ -11,7 +11,6 @@ namespace ProductDatabase {
         private string _totalSubstrate = string.Empty;
 
         private string[] _useSubstrate = [];
-        private string[] _usedSubstrate = [];
 
         private readonly List<string> _listUsedSubstrate = [];
         private readonly List<string> _listUsedProductNumber = [];
@@ -28,8 +27,6 @@ namespace ProductDatabase {
                         ];
         private CheckBox? _objCbx;
         private DataGridView? _objDgv;
-
-        private readonly Dictionary<string, (List<string>, List<int>)> _dicUsedSubstrate = [];
 
         // プロパティ設定
         private bool IsListPrint => ProductInfo.PrintType is 5 or 6;
@@ -65,8 +62,9 @@ namespace ProductDatabase {
                     }
                 }
 
+                // 使用基板リスト化+名前順にソート
                 _useSubstrate = ProductInfo.UseSubstrate.Split(",");
-                _usedSubstrate = ProductInfo.UsedSubstrate.Split(",");
+                Array.Sort(_useSubstrate);
                 var strQuantity = string.Empty;
                 var strSubstrateName = string.Empty;
 
@@ -118,12 +116,50 @@ namespace ProductDatabase {
                                 }
                             }
 
+                            List<(string, List<string>, List<int>)> usedSubstrate = [];
+
                             using SQLiteConnection con = new(GetConnectionRegistration());
                             con.Open();
                             using var cmd = con.CreateCommand();
 
+                            cmd.CommandText = $"""
+                                SELECT
+                                	SubstrateModel,
+                                	SubstrateNumber,
+                                	Decrease
+                                FROM
+                                	PA_Substrate
+                                WHERE
+                                	UseID = @ID
+                                ORDER BY
+                                	SubstrateModel ASC
+                                """;
+                            cmd.Parameters.Add("@ID", DbType.String).Value = ProductInfo.ProductID;
+
+                            using (var dr = cmd.ExecuteReader()) {
+                                while (dr.Read()) {
+                                    var substrateModel = dr.GetString(0);
+                                    var substrateNumber = dr.GetString(1);
+                                    var decrease = -1 * dr.GetInt32(2);
+
+                                    // 既存の substrateModel を検索
+                                    var existingSubstrate = usedSubstrate.FirstOrDefault(x => x.Item1 == substrateModel);
+
+                                    if (existingSubstrate != default) {
+                                        // 既存の substrateModel が見つかった場合、リストに追加
+                                        existingSubstrate.Item2.Add(substrateNumber);
+                                        existingSubstrate.Item3.Add(decrease);
+                                    }
+                                    else {
+                                        // 既存の substrateModel が見つからなかった場合、新しいエントリを追加
+                                        List<string> substrateNumbers = [substrateNumber];
+                                        List<int> decreases = [decrease];
+                                        (string, List<string>, List<int>) substrateData = (substrateModel, substrateNumbers, decreases);
+                                        usedSubstrate.Add(substrateData);
+                                    }
+                                }
+                            }
                             // テーブル検索SQL - [[StockName]_StockView]テーブルから基板型式[Model]で在庫基板を抽出
-                            //cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateModel = @SubstrateModel""";
                             cmd.CommandText = $"""
                                 SELECT
                                     SubstrateName,
@@ -131,81 +167,51 @@ namespace ProductDatabase {
                                     SubstrateNumber,
                                     OrderNumber,
                                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                                FROM {ProductInfo.CategoryName}_Substrate
-                                WHERE SubstrateModel = @SubstrateModel
-                                GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
-                                ORDER BY MIN(_rowid_);
+                                FROM
+                                    {ProductInfo.CategoryName}_Substrate
+                                WHERE
+                                    SubstrateModel = @SubstrateModel
+                                GROUP BY
+                                    SubstrateName,
+                                    SubstrateModel,
+                                    SubstrateNumber,
+                                    OrderNumber
+                                ORDER BY
+                                    MIN(_rowid_);
                                 """;
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
-                            using var dr = cmd.ExecuteReader();
-                            var j = 0;
-                            while (dr.Read()) {
-                                var strUsedSubNum = string.Empty;
-                                var strUsedQuantity = string.Empty;
-                                var intUsedQuantity = 0;
 
-                                // 抽出した行から製造番号,在庫取得
-                                var strSubstrateNum = $"{dr["SubstrateNumber"]}";
-                                var intStock = int.Parse($"{dr["Stock"]}");
-                                strSubstrateName = $"{dr["SubstrateName"]}";
-                                if (_objCbx != null) { _objCbx.Text = $"{strSubstrateName} - {_useSubstrate[i]}"; }
+                            using (var dr = cmd.ExecuteReader()) {
+                                var j = 0;
+                                while (dr.Read()) {
+                                    // 抽出した行から製造番号,在庫取得
+                                    var strSubstrateNum = $"{dr["SubstrateNumber"]}";
+                                    var intStock = int.Parse($"{dr["Stock"]}");
+                                    strSubstrateName = $"{dr["SubstrateName"]}";
+                                    if (_objCbx != null) { _objCbx.Text = $"{strSubstrateName} - {_useSubstrate[i]}"; }
 
-                                var subIndex = 0;
-                                var b1 = false;
+                                    // usedSubstrate から strSubstrateNum を検索
+                                    var usedSubstrateItem = usedSubstrate[i].Item2
+                                        .Select((num, index) => new { Num = num, Index = index })
+                                        .FirstOrDefault(item => item.Num == strSubstrateNum);
 
-                                for (var i1 = 0; i1 < _usedSubstrate.Length; i1++) {
-                                    var d = _usedSubstrate[i1];
-                                    b1 = d.Contains(strSubstrateNum);
-                                    if (b1 == true) {
-                                        break;
-                                    }
+                                    var strUsedSubNum = usedSubstrateItem != null ? strSubstrateNum : string.Empty;
+                                    var intUsedQuantity = usedSubstrateItem != null ? usedSubstrate[i].Item3[usedSubstrateItem.Index] : 0;
 
-                                    subIndex++;
-                                }
-                                if (b1 == true) {
-                                    strUsedSubNum = _usedSubstrate[subIndex];
-                                    strUsedSubNum = strUsedSubNum[(strUsedSubNum.IndexOf(']') + 1)..];
-                                    strUsedSubNum = strUsedSubNum[..strUsedSubNum.IndexOf('(')];
+                                    if (intStock > 0 || strUsedSubNum == strSubstrateNum) {
+                                        if (_objDgv == null) {
+                                            break;
+                                        }
 
-                                    strUsedQuantity = _usedSubstrate[subIndex];
-                                    strUsedQuantity = strUsedQuantity[(strUsedQuantity.IndexOf('(') + 1)..];
-                                    strUsedQuantity = strUsedQuantity[..strUsedQuantity.IndexOf(')')];
-                                    intUsedQuantity = int.Parse(strUsedQuantity);
-                                }
-
-                                if (intStock > 0) {
-                                    if (_objDgv == null) { break; }
-                                    _objDgv.Rows.Add();
-                                    _objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
-                                    _objDgv.Rows[j].Cells[1].Value = intStock;
-
-                                    if (intUsedQuantity != 0) {
+                                        _objDgv.Rows.Add();
+                                        _objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
+                                        _objDgv.Rows[j].Cells[1].Value = intStock;
                                         _objDgv.Rows[j].Cells[2].Value = intUsedQuantity;
                                         _objDgv.Rows[j].Cells[3].Value = intUsedQuantity;
-                                        _objDgv.Rows[j].Cells[4].Value = true;
-                                    }
-                                    else {
-                                        _objDgv.Rows[j].Cells[2].Value = 0;
-                                        _objDgv.Rows[j].Cells[3].Value = 0;
-                                    }
-                                    j++;
-                                }
-                                else if (strUsedSubNum == strSubstrateNum) {
-                                    if (_objDgv == null) { break; }
-                                    _objDgv.Rows.Add();
-                                    _objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
-                                    _objDgv.Rows[j].Cells[1].Value = intStock;
+                                        _objDgv.Rows[j].Cells[4].Value = intUsedQuantity != 0;
 
-                                    if (intUsedQuantity != 0) {
-                                        _objDgv.Rows[j].Cells[2].Value = intUsedQuantity;
-                                        _objDgv.Rows[j].Cells[3].Value = intUsedQuantity;
-                                        _objDgv.Rows[j].Cells[4].Value = true;
+                                        j++;
                                     }
-                                    else {
-                                        _objDgv.Rows[j].Cells[2].Value = 0;
-                                        _objDgv.Rows[j].Cells[3].Value = 0;
-                                    }
-                                    j++;
                                 }
                             }
                         }
@@ -471,8 +477,7 @@ namespace ProductDatabase {
                                         RevisionGroup = @RevisionGroup,
                                         SerialLast = @SerialLast,
                                         SerialLastNumber = @SerialLastNumber,
-                                        Comment = @Comment,
-                                        UsedSubstrate = @UsedSubstrate
+                                        Comment = @Comment
                                     WHERE
                                         ProductNumber = @ProductNumber
                                     AND
@@ -491,7 +496,6 @@ namespace ProductDatabase {
                                 cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialFirst) ? DBNull.Value : ProductInfo.SerialFirst;
                                 cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
                                 cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = ProductInfo.SerialLastNumber;
-                                cmd.Parameters.Add("@UsedSubstrate", DbType.String).Value = string.IsNullOrWhiteSpace(_totalSubstrate) ? DBNull.Value : _totalSubstrate;
                                 cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                                 cmd.ExecuteNonQuery();

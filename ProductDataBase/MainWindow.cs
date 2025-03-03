@@ -50,9 +50,6 @@ namespace ProductDatabase {
             public int SerialFirstNumber { get; set; }
             public int SerialLastNumber { get; set; }
 
-            public string UsedSubstrate { get; set; } = string.Empty;
-            //public Dictionary<string, (List<string>, List<int>)> UsedSubstrate { get; set; } = [];
-
             public DataTable ProductDataTable { get; } = new();
             public DataTable SubstrateDataTable { get; } = new();
 
@@ -92,8 +89,6 @@ namespace ProductDatabase {
                 SerialLastNumber = 0;
                 Quantity = 0;
                 SerialFirstNumber = 0;
-                UsedSubstrate = string.Empty;
-                //UsedSubstrate = [];
             }
         }
         public static class Auth {
@@ -118,7 +113,7 @@ namespace ProductDatabase {
         }
 
         public static string GetConnectionInformation() {
-            //var informationPath = Path.Combine(s_networkPath, "db", "information.db");
+            ////var informationPath = Path.Combine(s_networkPath, "db", "information.db");
             var informationPath = Path.Combine(Environment.CurrentDirectory, "db", "information.db");
             if (!File.Exists(informationPath)) { throw new FileNotFoundException("1データベースファイルが見つかりません。", informationPath); }
             var u = new Uri(informationPath);
@@ -127,12 +122,12 @@ namespace ProductDatabase {
                 informationPath = @"\" + informationPath;
             }
             return new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
-            //return !File.Exists(informationPath)
-            //    ? throw new FileNotFoundException("2データベースファイルが見つかりません。", informationPath)
-            //    : new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
+            ////return !File.Exists(informationPath)
+            ////    ? throw new FileNotFoundException("2データベースファイルが見つかりません。", informationPath)
+            ////    : new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
         }
         public static string GetConnectionRegistration() {
-            //var registrationPath = Path.Combine(s_networkPath, "db", "registration.db");
+            ////var registrationPath = Path.Combine(s_networkPath, "db", "registration.db");
             var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
             if (!File.Exists(registrationPath)) { throw new FileNotFoundException("1データベースファイルが見つかりません。", registrationPath); }
             var u = new Uri(registrationPath);
@@ -141,9 +136,9 @@ namespace ProductDatabase {
                 registrationPath = @"\" + registrationPath;
             }
             return new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
-            //return !File.Exists(registrationPath)
-            //    ? throw new FileNotFoundException("2データベースファイルが見つかりません。", registrationPath)
-            //    : new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
+            ////return !File.Exists(registrationPath)
+            ////    ? throw new FileNotFoundException("2データベースファイルが見つかりません。", registrationPath)
+            ////    : new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
         }
 
         // ロードイベント
@@ -609,8 +604,8 @@ namespace ProductDatabase {
                     p.ProItemNumber LIKE '%'|| @StrProness2 ||'%'
                 """;
 
-            //cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber LIKE '%'|| @StrProness2 ||'%' OR ProItemNumber LIKE '%'|| @StrProness2 ||'%'""";
-            //cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber = @StrProness2 OR ProItemNumber = @StrProness2""";
+            ////cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber LIKE '%'|| @StrProness2 ||'%' OR ProItemNumber LIKE '%'|| @StrProness2 ||'%'""";
+            ////cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber = @StrProness2 OR ProItemNumber = @StrProness2""";
             cmd.Parameters.Add("@StrProness2", DbType.String).Value = ProductInfo.Proness2;
             using var dr = cmd.ExecuteReader();
             if (!dr.HasRows) { throw new Exception($"品目番号が見つかりません。\n品目番号:[{ProductInfo.Proness2}]"); }
