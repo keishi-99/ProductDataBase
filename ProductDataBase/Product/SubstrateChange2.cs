@@ -72,6 +72,7 @@ namespace ProductDatabase {
                     case 2:
                     case 3:
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
+                            var substrateModel = _useSubstrate[i];
                             var quantity = ProductInfo.Quantity;
 
                             // チェックボックスとDgvを有効に
@@ -138,24 +139,24 @@ namespace ProductDatabase {
 
                             using (var dr = cmd.ExecuteReader()) {
                                 while (dr.Read()) {
-                                    var substrateModel = dr.GetString(0);
-                                    var substrateNumber = dr.GetString(1);
-                                    var decrease = -1 * dr.GetInt32(2);
+                                    var usedSubstrateModel = dr.GetString(0);
+                                    var usedSubstrateNumber = dr.GetString(1);
+                                    var usedDecrease = -1 * dr.GetInt32(2);
 
-                                    // 既存の substrateModel を検索
-                                    var existingSubstrate = usedSubstrate.FirstOrDefault(x => x.Item1 == substrateModel);
+                                    // 既存の usedSubstrateModel を検索
+                                    var existingSubstrate = usedSubstrate.FirstOrDefault(x => x.Item1 == usedSubstrateModel);
 
                                     if (existingSubstrate != default) {
-                                        // 既存の substrateModel が見つかった場合、リストに追加
-                                        existingSubstrate.Item2.Add(substrateNumber);
-                                        existingSubstrate.Item3.Add(decrease);
+                                        // 既存の usedSubstrateModel が見つかった場合、リストに追加
+                                        existingSubstrate.Item2.Add(usedSubstrateNumber);
+                                        existingSubstrate.Item3.Add(usedDecrease);
                                     }
                                     else {
-                                        // 既存の substrateModel が見つからなかった場合、新しいエントリを追加
-                                        List<string> substrateNumbers = [substrateNumber];
-                                        List<int> decreases = [decrease];
-                                        (string, List<string>, List<int>) substrateData = (substrateModel, substrateNumbers, decreases);
-                                        usedSubstrate.Add(substrateData);
+                                        // 既存の usedSubstrateModel が見つからなかった場合、新しいエントリを追加
+                                        List<string> usedSubstrateNumbers = [usedSubstrateNumber];
+                                        List<int> usedDecreases = [usedDecrease];
+                                        (string, List<string>, List<int>) usedSubstrateData = (usedSubstrateModel, usedSubstrateNumbers, usedDecreases);
+                                        usedSubstrate.Add(usedSubstrateData);
                                     }
                                 }
                             }
@@ -179,7 +180,7 @@ namespace ProductDatabase {
                                 ORDER BY
                                     MIN(_rowid_);
                                 """;
-                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
+                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = substrateModel;
 
                             using (var dr = cmd.ExecuteReader()) {
                                 var j = 0;
@@ -188,15 +189,16 @@ namespace ProductDatabase {
                                     var strSubstrateNum = $"{dr["SubstrateNumber"]}";
                                     var intStock = int.Parse($"{dr["Stock"]}");
                                     strSubstrateName = $"{dr["SubstrateName"]}";
-                                    if (_objCbx != null) { _objCbx.Text = $"{strSubstrateName} - {_useSubstrate[i]}"; }
+                                    if (_objCbx != null) { _objCbx.Text = $"{strSubstrateName} - {substrateModel}"; }
 
                                     // usedSubstrate から strSubstrateNum を検索
-                                    var usedSubstrateItem = usedSubstrate[i].Item2
+                                    var num = usedSubstrate.FindIndex(substrate => substrate.Item1 == substrateModel);
+                                    var usedSubstrateItem = usedSubstrate[num].Item2
                                         .Select((num, index) => new { Num = num, Index = index })
                                         .FirstOrDefault(item => item.Num == strSubstrateNum);
 
                                     var strUsedSubNum = usedSubstrateItem != null ? strSubstrateNum : string.Empty;
-                                    var intUsedQuantity = usedSubstrateItem != null ? usedSubstrate[i].Item3[usedSubstrateItem.Index] : 0;
+                                    var intUsedQuantity = usedSubstrateItem != null ? usedSubstrate[num].Item3[usedSubstrateItem.Index] : 0;
 
                                     if (intStock > 0 || strUsedSubNum == strSubstrateNum) {
                                         if (_objDgv == null) {
