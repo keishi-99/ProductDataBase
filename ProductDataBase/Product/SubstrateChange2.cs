@@ -128,7 +128,7 @@ namespace ProductDatabase {
                                 	SubstrateNumber,
                                 	Decrease
                                 FROM
-                                	PA_Substrate
+                                	{ProductInfo.CategoryName}_Substrate
                                 WHERE
                                 	UseID = @ID
                                 ORDER BY
