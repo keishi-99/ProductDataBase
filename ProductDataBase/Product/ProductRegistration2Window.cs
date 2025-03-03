@@ -65,6 +65,7 @@ namespace ProductDatabase {
                 GenerateReportButton.Enabled = false;
                 RegisterButton.Enabled = true;
                 _useSubstrate = ProductInfo.UseSubstrate.Split(",");
+                Array.Sort(_useSubstrate);
 
                 if (IsSerialGeneration) {
                     _labelProNSerial = ProductInfo.SerialFirstNumber;
