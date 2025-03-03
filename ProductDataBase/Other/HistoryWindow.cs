@@ -361,6 +361,7 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["StockName"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SubstrateName"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SubstrateModel"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["Decrease"].ReadOnly = true;
                     DataBaseDataGridView.Columns["UsedProductType"].ReadOnly = true;
                     DataBaseDataGridView.Columns["UsedProductNumber"].ReadOnly = true;
                     DataBaseDataGridView.Columns["UsedOrderNumber"].ReadOnly = true;
@@ -369,6 +370,7 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["StockName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SubstrateName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SubstrateModel"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["Decrease"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["UsedProductType"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["UsedProductNumber"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["UsedOrderNumber"].DefaultCellStyle.ForeColor = Color.Red;
