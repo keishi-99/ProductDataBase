@@ -39,6 +39,7 @@
             this.編集モードToolStripMenuItem = new ToolStripMenuItem();
             this.編集終了ToolStripMenuItem = new ToolStripMenuItem();
             this.GroupModelCheckBox = new CheckBox();
+            this.ShowUsedSubstrateButton = new Button();
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -219,11 +220,23 @@
             this.GroupModelCheckBox.UseVisualStyleBackColor = true;
             this.GroupModelCheckBox.CheckedChanged += this.GroupModelCheckBox_CheckedChanged;
             // 
+            // ShowUsedSubstrateButton
+            // 
+            this.ShowUsedSubstrateButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            this.ShowUsedSubstrateButton.Location = new Point(786, 500);
+            this.ShowUsedSubstrateButton.Name = "ShowUsedSubstrateButton";
+            this.ShowUsedSubstrateButton.Size = new Size(92, 25);
+            this.ShowUsedSubstrateButton.TabIndex = 14;
+            this.ShowUsedSubstrateButton.Text = "使用基板";
+            this.ShowUsedSubstrateButton.UseVisualStyleBackColor = true;
+            this.ShowUsedSubstrateButton.Click += this.ShowUsedSubstrateButton_Click;
+            // 
             // HistoryWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(1184, 537);
+            this.Controls.Add(this.ShowUsedSubstrateButton);
             this.Controls.Add(this.GroupModelCheckBox);
             this.Controls.Add(this.AllSubstrateCheckBox);
             this.Controls.Add(this.GenerateCheckSheetButton);
@@ -271,5 +284,6 @@
         private ToolStripMenuItem 編集モードToolStripMenuItem;
         private ToolStripMenuItem 編集終了ToolStripMenuItem;
         private CheckBox GroupModelCheckBox;
+        private Button ShowUsedSubstrateButton;
     }
 }

@@ -53,6 +53,7 @@ namespace ProductDatabase {
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = true;
                         GroupModelCheckBox.Visible = false;
+                        ShowUsedSubstrateButton.Visible = false;
                         GenerateReportButton.Visible = false;
                         GenerateListButton.Visible = IsListPrint;
                         GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
@@ -74,6 +75,7 @@ namespace ProductDatabase {
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
                         GroupModelCheckBox.Visible = false;
+                        ShowUsedSubstrateButton.Visible = false;
                         GenerateReportButton.Visible = false;
                         GenerateListButton.Visible = IsListPrint;
                         GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
@@ -273,6 +275,7 @@ namespace ProductDatabase {
             _tableName = "Product";
             編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
             GenerateReportButton.Visible = true;
+            ShowUsedSubstrateButton.Visible = true;
             GenerateListButton.Visible = IsListPrint;
             GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
 
@@ -291,6 +294,7 @@ namespace ProductDatabase {
             _tableName = "Serial";
             編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator; ;
             GenerateReportButton.Visible = false;
+            ShowUsedSubstrateButton.Visible = false;
             GenerateListButton.Visible = false;
             GenerateCheckSheetButton.Visible = false;
 
@@ -616,6 +620,62 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        // 使用基板表示
+        private void ShowDataForm() {
+            // 新しいフォームクラスを作成
+            var dataForm = new Form {
+                Text = "使用基板",
+                ShowIcon = false, // アイコンを非表示
+                Width = 800,
+                Height = 400,
+                MaximizeBox = false, // 最大化ボタンを非表示
+                MinimizeBox = false, // 最小化ボタンを非表示
+                StartPosition = FormStartPosition.CenterScreen // 画面中央に表示
+            };
+
+            // DataGridViewをフォームに追加
+            var dataGridView = new DataGridView {
+                Dock = DockStyle.Fill,
+                AllowUserToAddRows = false, // 行の追加を禁止
+                AllowUserToDeleteRows = false, // 行の削除を禁止
+                ReadOnly = true, // 編集を禁止
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells // 列幅を自動設定
+            };
+            dataForm.Controls.Add(dataGridView);
+
+            // データベース接続とSQLクエリの実行
+
+            using SQLiteConnection con = new(GetConnectionRegistration());
+            {
+                con.Open();
+                using var cmd = con.CreateCommand();
+                cmd.CommandText = $"""
+                        SELECT
+                            rowid, SubstrateName, SubstrateModel, SubstrateNumber, Decrease
+                        FROM
+                            "{ProductInfo.CategoryName}_Substrate"
+                        WHERE
+                            StockName = "{ProductInfo.StockName}" AND UseID = @ID
+                        ORDER BY
+                            SubstrateModel ASC
+                        """;
+
+                var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
+                var id = Convert.ToInt32(DataBaseDataGridView.Rows[i].Cells["ID"].Value);
+                cmd.Parameters.Add("@ID", DbType.Int64).Value = id;
+
+                using var adapter = new SQLiteDataAdapter(cmd);
+                var dt = new DataTable();
+                adapter.Fill(dt);
+
+                // DataGridViewにデータを表示
+                dataGridView.DataSource = dt;
+            }
+            // 新しいウィンドウを表示
+            dataForm.ShowDialog();
+        }
+
         // 成績書作成
         private void GenerateReport() {
             try {
@@ -674,6 +734,7 @@ namespace ProductDatabase {
         private void HistoryWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void 編集ToolStripMenuItem_Click(object sender, EventArgs e) { EditMode(); }
         private void 編集終了ToolStripMenuItem_Click(object sender, EventArgs e) { SaveRegistrationLog(); }
+        private void ShowUsedSubstrateButton_Click(object sender, EventArgs e) { ShowDataForm(); }
         private void GenerateReportButton_Click(object sender, EventArgs e) { GenerateReport(); }
         private void GenerateListButton_Click(object sender, EventArgs e) { GenerateList(); }
         private void GenerateCheckSheetButton_Click(object sender, EventArgs e) { GenerateCheckSheet(); }
