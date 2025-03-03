@@ -258,11 +258,21 @@ namespace ProductDatabase.Other {
                     var substrateNumber = dr.GetString(1);
                     var decrease = -1 * dr.GetInt32(2);
 
+                    // 既存の substrateModel を検索
+                    var existingSubstrate = usedSubstrate.FirstOrDefault(x => x.Item1 == substrateModel);
 
-                    var substrateNumbers = new List<string> { substrateNumber };
-                    var decreases = new List<int> { decrease };
-                    var substrateData = (substrateModel, substrateNumbers, decreases);
-                    usedSubstrate.Add(substrateData);
+                    if (existingSubstrate != default) {
+                        // 既存の substrateModel が見つかった場合、リストに追加
+                        existingSubstrate.Item2.Add(substrateNumber);
+                        existingSubstrate.Item3.Add(decrease);
+                    }
+                    else {
+                        // 既存の substrateModel が見つからなかった場合、新しいエントリを追加
+                        List<string> substrateNumbers = [substrateNumber];
+                        List<int> decreases = [decrease];
+                        (string, List<string>, List<int>) substrateData = (substrateModel, substrateNumbers, decreases);
+                        usedSubstrate.Add(substrateData);
+                    }
                 }
 
                 for (var i = 0; i <= usedSubstrate.Count - 1; i++) {
@@ -284,19 +294,9 @@ namespace ProductDatabase.Other {
                     }
 
                     var mainCellValue = workSheetMain.Cells[resultRow, foundColumn + 1].Value.ToString();
-                    var tempCellValue = workSheetTemp.Cells[mainCellValue].Value?.ToString();
+                    var tempCellValue = string.Join("    ", usedSubstrate[i].Item2.Select((subStrateNumber, k) => $"{subStrateNumber}({usedSubstrate[i].Item3[k]})"));
 
-                    var substrateNumber = usedSubstrate[i].Item2[0];
-                    var decrease = usedSubstrate[i].Item3[0];
-
-                    if (!string.IsNullOrEmpty(mainCellValue)) {
-                        if (string.IsNullOrEmpty(tempCellValue)) {
-                            workSheetTemp.Cells[mainCellValue].Value = $"{substrateNumber}({decrease})";
-                        }
-                        else {
-                            workSheetTemp.Cells[mainCellValue].Value += $"    {substrateNumber}({decrease})";
-                        }
-                    }
+                    workSheetTemp.Cells[mainCellValue].Value = tempCellValue;
                 }
 
                 // QRコード

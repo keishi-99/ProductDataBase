@@ -643,10 +643,6 @@ namespace ProductDatabase {
                                     }
                                 }
                             }
-                            ProductInfo.UsedSubstrate = string.IsNullOrEmpty(ProductInfo.UsedSubstrate)
-                                ? $"[{_useSubstrate[i]}]{subTotalTemp}"
-                                : $"{ProductInfo.UsedSubstrate},{Environment.NewLine}[{_useSubstrate[i]}]{subTotalTemp}";
-                            subTotalTemp = string.Empty;
                         }
                     }
 
@@ -669,8 +665,7 @@ namespace ProductDatabase {
                             SerialFirst,
                             SerialLast,
                             SerialLastNumber,
-                            Comment,
-                            UsedSubstrate
+                            Comment
                             )
                         VALUES
                             (
@@ -687,8 +682,7 @@ namespace ProductDatabase {
                             @SerialFirst,
                             @SerialLast,
                             @SerialLastNumber,
-                            @Comment,
-                            @UsedSubstrate
+                            @Comment
                             )
                         """;
 
@@ -706,7 +700,6 @@ namespace ProductDatabase {
                     cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
                     cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = IsSerialGeneration ? _serialLastNumber : DBNull.Value;
                     cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
-                    cmd.Parameters.Add("@UsedSubstrate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.UsedSubstrate) ? DBNull.Value : ProductInfo.UsedSubstrate;
 
                     cmd.ExecuteNonQuery();
 
@@ -1180,7 +1173,7 @@ namespace ProductDatabase {
                             generatedCode = ProductInfo.ProductModel[^4..]; // 型式の下4桁を使用
                         }
 
-                        using var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline, System.Drawing.Printing.PrintAction.PrintToPreview);
+                        using var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)sizeX, (float)sizeY);
 
                         _remainingCount--;
@@ -1242,7 +1235,7 @@ namespace ProductDatabase {
                                     .Replace("%S", Convert.ToInt32(serialCode).ToString($"D{ProductInfo.SerialDigit}"));
             return outputCode;
         }
-        private Bitmap MakeLabelImage(string text, int resolution, int magnitude, bool fontUnderline, PrintAction printAction) {
+        private Bitmap MakeLabelImage(string text, int resolution, int magnitude, bool fontUnderline) {
             Bitmap labelImage = new(1, 1);
             Graphics g;
             SizeF stringSize;

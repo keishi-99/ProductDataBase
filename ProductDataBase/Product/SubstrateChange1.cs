@@ -70,8 +70,6 @@ namespace ProductDatabase {
                 SubstrateChangeDataGridView.Columns["SerialLastNumber"].HeaderCell.Value = "末番";
                 SubstrateChangeDataGridView.Columns["SerialLastNumber"].Width = 40;
                 SubstrateChangeDataGridView.Columns["Comment"].HeaderCell.Value = "コメント";
-                SubstrateChangeDataGridView.Columns["UsedSubstrate"].HeaderCell.Value = "使用基板";
-                SubstrateChangeDataGridView.Columns["UsedSubstrate"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -93,7 +91,6 @@ namespace ProductDatabase {
             ProductInfo.SerialLast = SubstrateChangeDataGridView.Rows[i].Cells["SerialLast"].Value.ToString() ?? string.Empty;
             ProductInfo.SerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["SerialLastNumber"].Value);
             ProductInfo.Comment = SubstrateChangeDataGridView.Rows[i].Cells["Comment"].Value.ToString() ?? string.Empty;
-            ProductInfo.UsedSubstrate = SubstrateChangeDataGridView.Rows[i].Cells["UsedSubstrate"].Value.ToString() ?? string.Empty;
             using SubstrateChange2 window = new();
             window.ProductInfo = ProductInfo;
             window.Closed += (s, e) => this.Close();
