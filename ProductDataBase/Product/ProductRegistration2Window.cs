@@ -861,8 +861,13 @@ namespace ProductDatabase {
                                     var boolCbx = objDgv.Rows[j].Cells[3].Value != null && (bool)objDgv.Rows[j].Cells[3].Value;
                                     if (boolCbx) {
                                         var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value.ToString());
-                                        if (objDgv.Rows[j].Cells[2].Value == null) { throw new Exception("使用数が入力されていません。"); }
+                                        if (objDgv.Rows[j].Cells[2].Value == null) {
+                                            throw new Exception("使用数が入力されていません。");
+                                        }
                                         var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value.ToString());
+                                        if (useValue <= 0) {
+                                            throw new Exception("使用数が0以下になっています。");
+                                        }
 
                                         if (stockValue < useValue) {
                                             throw new Exception("在庫より多い数量が入力されています。");
