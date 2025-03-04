@@ -64,17 +64,8 @@ namespace ProductDatabase {
                 var dtNow = DateTime.Now;
                 RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
 
-                // DB1へ接続し担当者取得
-                using (SQLiteConnection con = new(GetConnectionInformation())) {
-                    con.Open();
-                    using var cmd = con.CreateCommand();
-                    // テーブル検索SQL - 担当者をComboboxへ追加
-                    cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
-                    using var dr = cmd.ExecuteReader();
-                    while (dr.Read()) {
-                        PersonComboBox.Items.Add($"{dr["PersonName"]}");
-                    }
-                }
+                // ComboBoxへ担当者を追加
+                PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
 
                 // 在庫管理する基板はDB2へ接続し対象製品の在庫取得
                 //if (IsRegistration) {
@@ -83,7 +74,7 @@ namespace ProductDatabase {
                 //    using var cmd = con.CreateCommand();
 
                 //    // テーブル検索SQL - [[ProductName]_Substrate]テーブルの最新の[Revison]を取得
-                //    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.CategoryName}_Substrate" WHERE SubstrateModel = @SubstrateModel AND Revision IS NOT NULL ORDER BY _rowid_ DESC""";
+                //    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.CategoryName}_Substrate" WHERE SubstrateModel = @SubstrateModel AND Revision IS NOT NULL ORDER BY ID DESC""";
                 //    cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
                 //    var result = cmd.ExecuteScalar();
                 //    RevisionTextBox.Text = result?.ToString() ?? "";
@@ -212,7 +203,7 @@ namespace ProductDatabase {
                             FROM {ProductInfo.CategoryName}_Substrate
                             WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                             GROUP BY StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
-                            ORDER BY MIN(_rowid_)
+                            ORDER BY MIN(ID)
                             LIMIT 1;
                             """;
 
@@ -251,7 +242,7 @@ namespace ProductDatabase {
                             FROM {ProductInfo.CategoryName}_Substrate
                             WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                             GROUP BY StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
-                            ORDER BY MIN(_rowid_)
+                            ORDER BY MIN(ID)
                             LIMIT 1;
                             """;
 

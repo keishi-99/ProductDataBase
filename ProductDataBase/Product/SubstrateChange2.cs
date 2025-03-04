@@ -48,17 +48,8 @@ namespace ProductDatabase {
                 RevisionTextBox.Text = ProductInfo.Revision;
                 CommentTextBox.Text = ProductInfo.Comment;
 
-                // DB1へ接続し担当者取得
-                using (SQLiteConnection con = new(GetConnectionInformation())) {
-                    con.Open();
-                    using var cmd = con.CreateCommand();
-                    // テーブル検索SQL - 担当者をComboboxへ追加
-                    cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
-                    using var dr = cmd.ExecuteReader();
-                    while (dr.Read()) {
-                        PersonComboBox.Items.Add($"{dr["PersonName"]}");
-                    }
-                }
+                // ComboBoxへ担当者を追加
+                PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
 
                 // 使用基板リスト化+名前順にソート
                 _useSubstrate = ProductInfo.UseSubstrate.Split(",");
@@ -176,7 +167,7 @@ namespace ProductDatabase {
                                     SubstrateNumber,
                                     OrderNumber
                                 ORDER BY
-                                    MIN(_rowid_);
+                                    MIN(ID);
                                 """;
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = substrateModel;
 
@@ -351,7 +342,7 @@ namespace ProductDatabase {
                                                     FROM {ProductInfo.CategoryName}_Substrate
                                                     WHERE SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                                                     GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
-                                                    ORDER BY MIN(_rowid_);
+                                                    ORDER BY MIN(ID);
                                                     """;
                                                 cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                                                 cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNum;

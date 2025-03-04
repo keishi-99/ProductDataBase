@@ -66,17 +66,8 @@ namespace ProductDatabase {
                 var dtNow = DateTime.Now;
                 RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
 
-                // DB1へ接続し担当者取得
-                using (SQLiteConnection con = new(GetConnectionInformation())) {
-                    con.Open();
-                    using var cmd = con.CreateCommand();
-                    // テーブル検索SQL - 担当者をComboboxへ追加
-                    cmd.CommandText = """SELECT * FROM Person ORDER BY _rowid_ ASC""";
-                    using var dr = cmd.ExecuteReader();
-                    while (dr.Read()) {
-                        PersonComboBox.Items.Add($"{dr["PersonName"]}");
-                    }
-                }
+                // ComboBoxへ担当者を追加
+                PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
 
                 // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
                 using (SQLiteConnection con = new(GetConnectionRegistration())) {
