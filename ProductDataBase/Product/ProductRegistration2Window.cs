@@ -39,9 +39,9 @@ namespace ProductDatabase {
                         "Substrate6DataGridView", "Substrate7DataGridView", "Substrate8DataGridView", "Substrate9DataGridView","Substrate10DataGridView",
                         "Substrate11DataGridView", "Substrate12DataGridView", "Substrate13DataGridView", "Substrate14DataGridView","Substrate15DataGridView"
                         ];
-        private readonly List<string> _usedSubstrate = [];
-        private readonly List<string> _usedProductNumber = [];
-        private readonly List<int> _usedQuantity = [];
+        //private readonly List<string> _usedSubstrate = [];
+        //private readonly List<string> _usedProductNumber = [];
+        //private readonly List<int> _usedQuantity = [];
 
         // プロパティ設定
         private bool IsSerialGeneration => ProductInfo.RegType is 1 or 2 or 3;
@@ -545,7 +545,6 @@ namespace ProductDatabase {
                         if (objCbx.Checked) {
                             var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
                             var dgvRowCnt = objDgv.Rows.Count;
-                            var subTotalTemp = string.Empty;
 
                             for (var j = 0; j <= dgvRowCnt - 1; j++) {
                                 var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[3].Value);
@@ -580,10 +579,6 @@ namespace ProductDatabase {
                                         substrateName = $"{dr["SubstrateName"]}";
                                         substrateModel = $"{dr["SubstrateModel"]}";
                                         orderNum = $"{dr["OrderNumber"]}";
-                                    }
-
-                                    if (useValue != 0) {
-                                        subTotalTemp = string.IsNullOrEmpty(subTotalTemp) ? $"{substrateNum}({useValue})" : $"{subTotalTemp},{substrateNum}({useValue})";
                                     }
 
                                     // 一時テーブルに登録
@@ -636,12 +631,6 @@ namespace ProductDatabase {
                                     cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                                     cmd.ExecuteNonQuery();
-
-                                    if (IsLabelPrint) {
-                                        _usedSubstrate.Add(_useSubstrate[i]);
-                                        if (substrateNum != null) { _usedProductNumber.Add(substrateNum); }
-                                        _usedQuantity.Add(useValue);
-                                    }
                                 }
                             }
                         }

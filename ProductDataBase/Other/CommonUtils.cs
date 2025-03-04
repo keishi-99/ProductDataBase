@@ -230,8 +230,6 @@ namespace ProductDatabase.Other {
                 if (!string.IsNullOrEmpty(serialLastRange)) { workSheetTemp.Cells[serialLastRange].Value = productInfo.SerialLast; }
                 if (!string.IsNullOrEmpty(commentRange)) { workSheetTemp.Cells[commentRange].Value = productInfo.Comment; }
 
-                /////////////////////
-
                 List<(string, List<string>, List<int>)> usedSubstrate = [];
 
                 using SQLiteConnection con = new(GetConnectionRegistration());
@@ -274,9 +272,7 @@ namespace ProductDatabase.Other {
                         usedSubstrate.Add(substrateData);
                     }
                 }
-
                 for (var i = 0; i <= usedSubstrate.Count - 1; i++) {
-
                     var targetRow = resultRow; // 検索対象の行番号
                     var searchValue = $"{usedSubstrate[i].Item1}";
                     var foundColumn = 0;
@@ -292,7 +288,6 @@ namespace ProductDatabase.Other {
                     if (foundColumn == 0) {
                         throw new Exception($"{usedSubstrate[i]}が見つかりません。");
                     }
-
                     var mainCellValue = workSheetMain.Cells[resultRow, foundColumn + 1].Value.ToString();
                     var tempCellValue = string.Join("    ", usedSubstrate[i].Item2.Select((subStrateNumber, k) => $"{subStrateNumber}({usedSubstrate[i].Item3[k]})"));
 
