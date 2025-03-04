@@ -929,12 +929,12 @@ namespace ProductDatabase {
                         s.usedID
                     FROM
                         "{ProductInfo.CategoryName}_Serial" AS s
-                    INNER JOIN
+                    LEFT JOIN
                         "{ProductInfo.CategoryName}_Product" AS p
                     ON
                         s.UsedID = p.ID
                     WHERE
-                        p.ProductName = @ProductName
+                        s.ProductName = @ProductName
                     AND
                         s.Serial IN ({string.Join(",", _strSerial.Select((_, i) => $"@Serial{i}"))})
                     """;
