@@ -36,6 +36,7 @@ namespace ProductDatabase {
             public int RadioButtonFlg { get; set; }
             public string FontName { get; } = "Meiryo UI";
             public int FontSize { get; set; } = 9;
+            public List<string> PersonList { get; set; } = [];
 
             public string OrderNumber { get; set; } = string.Empty;
             public string ProductNumber { get; set; } = string.Empty;
@@ -178,6 +179,17 @@ namespace ProductDatabase {
                 using SQLiteConnection con = new(GetConnectionInformation());
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
                 using (SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con)) { adapter.Fill(ProductInfo.SubstrateDataTable); }
+
+                // DB1へ接続し担当者取得
+                ProductInfo.PersonList.Clear();
+                con.Open();
+                using var cmd = con.CreateCommand();
+                // テーブル検索SQL - 担当者をPersonListへ追加
+                cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
+                using var dr = cmd.ExecuteReader();
+                while (dr.Read()) {
+                    ProductInfo.PersonList.Add($"{dr["PersonName"]}");
+                }
 
                 // 認証ユーザー名を取得
                 s_userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];

@@ -140,7 +140,7 @@ namespace ProductDatabase {
                                 WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel
                                 GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                                 HAVING Stock > 0
-                                ORDER BY MIN(_rowid_);
+                                ORDER BY MIN(ID);
                                 """;
                             cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
@@ -245,7 +245,7 @@ namespace ProductDatabase {
                                 WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel
                                 GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                                 HAVING Stock > 0
-                                ORDER BY MIN(_rowid_);
+                                ORDER BY MIN(ID);
                                 """;
                             cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
@@ -569,7 +569,7 @@ namespace ProductDatabase {
                                         FROM {ProductInfo.CategoryName}_Substrate
                                         WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                                         GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
-                                        ORDER BY MIN(_rowid_);
+                                        ORDER BY MIN(ID);
                                         """;
                                     cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
                                     cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
