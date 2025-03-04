@@ -274,6 +274,9 @@ namespace ProductDatabase {
                                         var usedValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value.ToString());
                                         var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[3].Value.ToString());
 
+                                        if (useValue <= 0) {
+                                            throw new Exception("使用数が0以下になっています。");
+                                        }
                                         if (stockValue + usedValue < useValue) {
                                             throw new Exception("在庫より多い数量が入力されています。");
                                         }
