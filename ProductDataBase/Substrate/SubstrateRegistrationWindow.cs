@@ -183,6 +183,7 @@ namespace ProductDatabase {
                 var registrationDate = RegistrationDateCheckBox.Checked ? RegistrationDateMaskedTextBox.Text : string.Empty;
                 var person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
                 var comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
+                var rowId = string.Empty;
 
                 using SQLiteConnection con = new(GetConnectionRegistration());
                 con.Open();
@@ -306,13 +307,17 @@ namespace ProductDatabase {
                     cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(comment) ? DBNull.Value : comment;
 
                     cmd.ExecuteNonQuery();
+
+                    // 追加IDの取得
+                    cmd.CommandText = $"""SELECT MAX(ID) FROM "{ProductInfo.CategoryName}_Substrate";""";
+                    rowId = cmd.ExecuteScalar().ToString() ?? string.Empty;
                 }
 
                 // バックアップ作成
                 CommonUtils.BackupManager.CreateBackup();
                 // ログ出力
                 var number = QuantityCheckBox.Checked ? quantity : 0 - defectNumber;
-                CommonUtils.Logger.AppendLog($"[基板登録];注文番号[{orderNumber}];製造番号[{substrateNumber}];製品名[{ProductInfo.ProductName}];基板名[{ProductInfo.SubstrateName}];型式[{ProductInfo.SubstrateModel}];数量[{number}];登録日[{registrationDate}];担当者[{person}];");
+                CommonUtils.Logger.AppendLog($"[基板登録];ID[{rowId}];注文番号[{orderNumber}];製造番号[{substrateNumber}];製品名[{ProductInfo.ProductName}];基板名[{ProductInfo.SubstrateName}];型式[{ProductInfo.SubstrateModel}];数量[{number}];登録日[{registrationDate}];担当者[{person}];");
 
                 return true;
             } catch (Exception ex) {
