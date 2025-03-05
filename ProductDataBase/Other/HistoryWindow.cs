@@ -77,8 +77,8 @@ namespace ProductDatabase {
                         GroupModelCheckBox.Visible = false;
                         ShowUsedSubstrateButton.Visible = false;
                         GenerateReportButton.Visible = false;
-                        GenerateListButton.Visible = IsListPrint;
-                        GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
+                        GenerateListButton.Visible = false;
+                        GenerateCheckSheetButton.Visible = false;
                         break;
                 }
             } catch (Exception ex) {
