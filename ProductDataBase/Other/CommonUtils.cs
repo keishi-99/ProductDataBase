@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing.Imaging;
+using System.Text;
 using ZXing;
 using ZXing.QrCode;
 using ZXing.QrCode.Internal;
@@ -30,14 +31,14 @@ namespace ProductDatabase.Other {
                         }
 
                         //// 年と月を含むログファイル名を生成
-                        var logFileName = $"log_{DateTime.Now:yyyyMM}.txt";
+                        var logFileName = $"log_{DateTime.Now:yyyyMM}.csv"; // CSVファイルとして保存
                         var logFilePath = Path.Combine(s_logDirectory, logFileName);
 
-                        // 文字列から改行を除外
-                        var messageWithoutNewlines = message.Replace("\r\n", " ").Replace("\n", " ");
-                        var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} ;{messageWithoutNewlines}";
-                        //// ログ内容をファイルの末尾に追記
-                        File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
+                        // CSV形式でエスケープ処理
+                        var escapedMessage = EscapeCsvField(message);
+                        var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss},{escapedMessage}";
+                        // ログ内容をファイルの末尾に追記
+                        File.AppendAllText(logFilePath, logEntry + Environment.NewLine, Encoding.UTF8); // UTF-8で保存
 
                         if (!string.IsNullOrEmpty(s_networkPath)) {
                             var cloneFilePath = Path.Combine(s_networkPath, "db", "logs", logFileName);
@@ -50,6 +51,28 @@ namespace ProductDatabase.Other {
                     MessageBox.Show($"ログの書き込み中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+        private static readonly char[] SPECIAL_CHARACTERS = { ',', '"', '\r', '\n' };
+        private static string EscapeCsvField(string field) {
+            if (string.IsNullOrEmpty(field)) {
+                return "";
+            }
+
+            if (field.IndexOfAny(SPECIAL_CHARACTERS) == -1) {
+                return field;
+            }
+
+            var sb = new StringBuilder();
+            foreach (var c in field) {
+                if (c == '"') {
+                    sb.Append("\"\""); // ダブルクォーテーションをエスケープ
+                }
+                else {
+                    sb.Append(c);
+                }
+            }
+
+            return $"\"{sb.ToString()}\""; // ダブルクォーテーションで囲む
         }
         // バックアップ作成
         public static class BackupManager {
