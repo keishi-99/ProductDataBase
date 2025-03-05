@@ -510,7 +510,23 @@ namespace ProductDatabase {
                 // バックアップ作成
                 CommonUtils.BackupManager.CreateBackup();
                 // ログ出力
-                CommonUtils.Logger.AppendLog($"[基板変更];ID[{ProductInfo.CategoryName}_{ProductInfo.ProductID}];注文番号[{ProductInfo.OrderNumber}];製造番号[{ProductInfo.ProductNumber}];製品名[{ProductInfo.ProductName}];タイプ[{ProductInfo.ProductType}];型式[{ProductInfo.ProductModel}];数量[{ProductInfo.Quantity}];シリアル先頭[{ProductInfo.SerialFirst}];シリアル末尾[{ProductInfo.SerialLast}];Revision[{ProductInfo.Revision}];登録日[{ProductInfo.RegDate}];担当者[{ProductInfo.Person}];");
+                string[] logMessageArray = [
+                    $"[基板変更]",
+                    $"ID[{ProductInfo.CategoryName}_{ProductInfo.ProductID}]",
+                    $"注文番号[{ProductInfo.OrderNumber}]",
+                    $"製造番号[{ProductInfo.ProductNumber}]",
+                    $"製品名[{ProductInfo.ProductName}]",
+                    $"タイプ[{ProductInfo.ProductType}]",
+                    $"型式[{ProductInfo.ProductModel}]",
+                    $"数量[{ProductInfo.Quantity}]",
+                    $"シリアル先頭[{ProductInfo.SerialFirst}]",
+                    $"シリアル末尾[{ProductInfo.SerialLast}]",
+                    $"Revision[{ProductInfo.Revision}]",
+                    $"登録日[{ProductInfo.RegDate}]",
+                    $"担当者[{ProductInfo.Person}]",
+                    $"コメント[{ProductInfo.Comment}]"
+                ];
+                CommonUtils.Logger.AppendLog(logMessageArray);
                 return true;
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);

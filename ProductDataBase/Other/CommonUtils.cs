@@ -2,7 +2,6 @@
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing.Imaging;
-using System.Text;
 using ZXing;
 using ZXing.QrCode;
 using ZXing.QrCode.Internal;
@@ -22,7 +21,7 @@ namespace ProductDatabase.Other {
             /// 作業ログを追記します。
             /// </summary>
             /// <param name="message">記録する作業内容</param>
-            public static void AppendLog(string message) {
+            public static void AppendLog(string[] message) {
                 try {
                     lock (s_lockObject) {
                         // ディレクトリが存在しない場合は作成
@@ -31,14 +30,13 @@ namespace ProductDatabase.Other {
                         }
 
                         //// 年と月を含むログファイル名を生成
-                        var logFileName = $"log_{DateTime.Now:yyyyMM}.csv"; // CSVファイルとして保存
+                        var logFileName = $"log_{DateTime.Now:yyyyMM}.csv";
                         var logFilePath = Path.Combine(s_logDirectory, logFileName);
 
-                        // CSV形式でエスケープ処理
-                        var escapedMessage = EscapeCsvField(message);
-                        var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss},{escapedMessage}";
+                        // CSV形式でログ内容をファイルの末尾に追記
+                        var logEntry = $"\"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\",{string.Join(",", message.Select(m => $"\"{m.Replace("\"", "\"\"")}\""))}";
                         // ログ内容をファイルの末尾に追記
-                        File.AppendAllText(logFilePath, logEntry + Environment.NewLine, Encoding.UTF8); // UTF-8で保存
+                        File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
 
                         if (!string.IsNullOrEmpty(s_networkPath)) {
                             var cloneFilePath = Path.Combine(s_networkPath, "db", "logs", logFileName);
@@ -52,33 +50,11 @@ namespace ProductDatabase.Other {
                 }
             }
         }
-        private static readonly char[] SPECIAL_CHARACTERS = { ',', '"', '\r', '\n' };
-        private static string EscapeCsvField(string field) {
-            if (string.IsNullOrEmpty(field)) {
-                return "";
-            }
-
-            if (field.IndexOfAny(SPECIAL_CHARACTERS) == -1) {
-                return field;
-            }
-
-            var sb = new StringBuilder();
-            foreach (var c in field) {
-                if (c == '"') {
-                    sb.Append("\"\""); // ダブルクォーテーションをエスケープ
-                }
-                else {
-                    sb.Append(c);
-                }
-            }
-
-            return $"\"{sb.ToString()}\""; // ダブルクォーテーションで囲む
-        }
         // バックアップ作成
         public static class BackupManager {
             private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup"); // バックアップを保存するディレクトリ
             private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db"); // 元ファイルパス
-            //private static readonly string s_originalFilePath = Path.Combine(s_networkPath, "db", "registration.db"); // 元ファイルパス
+                                                                                                                                     //private static readonly string s_originalFilePath = Path.Combine(s_networkPath, "db", "registration.db"); // 元ファイルパス
             private static readonly int s_maxBackupFiles = 10; // 最大バックアップファイル数
             private static readonly object s_lockObject = new();
 
