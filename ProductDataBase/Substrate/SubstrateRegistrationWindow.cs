@@ -317,7 +317,7 @@ namespace ProductDatabase {
                 CommonUtils.BackupManager.CreateBackup();
                 // ログ出力
                 var number = QuantityCheckBox.Checked ? quantity : 0 - defectNumber;
-                CommonUtils.Logger.AppendLog($"[基板登録];ID[{rowId}];注文番号[{orderNumber}];製造番号[{substrateNumber}];製品名[{ProductInfo.ProductName}];基板名[{ProductInfo.SubstrateName}];型式[{ProductInfo.SubstrateModel}];数量[{number}];登録日[{registrationDate}];担当者[{person}];");
+                CommonUtils.Logger.AppendLog($"[基板登録];ID[{ProductInfo.CategoryName}_{rowId}];注文番号[{orderNumber}];製造番号[{substrateNumber}];製品名[{ProductInfo.ProductName}];基板名[{ProductInfo.SubstrateName}];型式[{ProductInfo.SubstrateModel}];数量[{number}];登録日[{registrationDate}];担当者[{person}];");
 
                 return true;
             } catch (Exception ex) {
