@@ -317,7 +317,21 @@ namespace ProductDatabase {
                 CommonUtils.BackupManager.CreateBackup();
                 // ログ出力
                 var number = QuantityCheckBox.Checked ? quantity : 0 - defectNumber;
-                CommonUtils.Logger.AppendLog($"[基板登録];ID[{ProductInfo.CategoryName}_{rowId}];注文番号[{orderNumber}];製造番号[{substrateNumber}];製品名[{ProductInfo.ProductName}];基板名[{ProductInfo.SubstrateName}];型式[{ProductInfo.SubstrateModel}];数量[{number}];登録日[{registrationDate}];担当者[{person}];");
+
+                string[] logMessageArray = [
+                    $"[基板登録]",
+                    $"ID[{ProductInfo.CategoryName}_{rowId}]",
+                    $"注文番号[{orderNumber}]",
+                    $"製造番号[{substrateNumber}]",
+                    $"製品名[{ProductInfo.ProductName}]",
+                    $"基板名[{ProductInfo.SubstrateName}]",
+                    $"型式[{ProductInfo.SubstrateModel}]",
+                    $"数量[{number}]",
+                    $"登録日[{registrationDate}]",
+                    $"担当者[{person}]",
+                    $"コメント[{comment}]"
+                ];
+                CommonUtils.Logger.AppendLog(logMessageArray);
 
                 return true;
             } catch (Exception ex) {
@@ -450,7 +464,7 @@ namespace ProductDatabase {
                         var posY = (float)(offsetY + (y * (intervalY + sizeY)));
 
                         var generatedCode = GenerateCode(_labelSubNSerial);
-                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, System.Drawing.Printing.PrintAction.PrintToPreview);
+                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1);
                         e.Graphics.DrawImage(labelImage, posX, posY, sizeX, sizeY);
 
                         _labelSubNumLabelsToPrint--;
@@ -523,7 +537,7 @@ namespace ProductDatabase {
 
             return outputCode;
         }
-        private Bitmap MakeLabelImage(string text, int resolution, int magnitude, PrintAction printAction) {
+        private Bitmap MakeLabelImage(string text, int resolution, int magnitude) {
             if (SettingsLabelSub is null) { throw new Exception(); }
             var sizeX = (decimal)SettingsLabelSub.LabelSubPageSettings.SizeX / 25.4M * resolution * magnitude;
             var sizeY = (decimal)SettingsLabelSub.LabelSubPageSettings.SizeY / 25.4M * resolution * magnitude;
