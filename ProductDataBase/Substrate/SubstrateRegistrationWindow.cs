@@ -192,19 +192,17 @@ namespace ProductDatabase {
                 if (IsRegistration) {
                     var substrateName = string.Empty;
                     using (var cmd = con.CreateCommand()) {
-                        //cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateNumber = @SubstrateNumber LIMIT 1""";
                         cmd.CommandText = $"""
                             SELECT
-                                StockName,
-                                SubstrateName,
-                                SubstrateModel,
-                                SubstrateNumber,
-                                OrderNumber,
-                                SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                            FROM {ProductInfo.CategoryName}_Substrate
-                            WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
-                            GROUP BY StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
-                            ORDER BY MIN(ID)
+                                StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                            FROM
+                                {ProductInfo.CategoryName}_Substrate
+                            WHERE
+                                StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                            GROUP BY
+                                StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                            ORDER BY
+                                MIN(ID)
                             LIMIT 1;
                             """;
 
@@ -224,26 +222,23 @@ namespace ProductDatabase {
                                 if (result == DialogResult.No) { return false; }
                             }
                         }
-                        //else { throw new Exception($"[{substrateNumber}]は[{substrateName}]として在庫があります。確認してください。"); }
                     }
                 }
 
                 // 不良処理時在庫チェック
                 if (DefectNumberCheckBox.Checked) {
                     using var cmd = con.CreateCommand();
-                    //cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateNumber = @SubstrateNumber LIMIT 1""";
                     cmd.CommandText = $"""
                             SELECT
-                                StockName,
-                                SubstrateName,
-                                SubstrateModel,
-                                SubstrateNumber,
-                                OrderNumber,
-                                SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                            FROM {ProductInfo.CategoryName}_Substrate
-                            WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
-                            GROUP BY StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
-                            ORDER BY MIN(ID)
+                                StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                            FROM
+                                {ProductInfo.CategoryName}_Substrate
+                            WHERE
+                                StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                            GROUP BY
+                                StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                            ORDER BY
+                                MIN(ID)
                             LIMIT 1;
                             """;
 
@@ -267,31 +262,9 @@ namespace ProductDatabase {
                     cmd.CommandText =
                         $"""
                         INSERT INTO "{ProductInfo.CategoryName}_Substrate"
-                            (
-                            StockName,
-                            SubstrateName,
-                            SubstrateModel,
-                            SubstrateNumber,
-                            OrderNumber,
-                            Increase,
-                            Defect,
-                            Person,
-                            RegDate,
-                            Comment
-                            )
+                            (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Increase,Defect,Person,RegDate,Comment)
                         VALUES
-                            (
-                            @StockName,
-                            @SubstrateName,
-                            @SubstrateModel,
-                            @SubstrateNumber,
-                            @OrderNumber,
-                            @Increase,
-                            @Defect,
-                            @Person,
-                            @RegDate,
-                            @Comment
-                            )
+                            (@StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,@Increase,@Defect,@Person,@RegDate,@Comment)
                         """;
 
                     // チェックボックスにチェックがない場合はNullを
@@ -315,6 +288,7 @@ namespace ProductDatabase {
 
                 // バックアップ作成
                 CommonUtils.BackupManager.CreateBackup();
+
                 // ログ出力
                 var number = QuantityCheckBox.Checked ? quantity : 0 - defectNumber;
 

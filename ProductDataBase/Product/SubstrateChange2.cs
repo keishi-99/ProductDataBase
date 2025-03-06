@@ -334,18 +334,17 @@ namespace ProductDatabase {
                                             var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
 
                                             using (var cmd = con.CreateCommand()) {
-                                                //cmd.CommandText = $"""SELECT * FROM "{ProductInfo.StockName}_StockView" WHERE SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber""";
                                                 cmd.CommandText = $"""
                                                     SELECT
-                                                        SubstrateName,
-                                                        SubstrateModel,
-                                                        SubstrateNumber,
-                                                        OrderNumber,
-                                                        SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                                                    FROM {ProductInfo.CategoryName}_Substrate
-                                                    WHERE SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
-                                                    GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
-                                                    ORDER BY MIN(ID);
+                                                        SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                                                    FROM
+                                                        {ProductInfo.CategoryName}_Substrate
+                                                    WHERE
+                                                        SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                                                    GROUP BY
+                                                        SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                                                    ORDER BY
+                                                        MIN(ID);
                                                     """;
                                                 cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                                                 cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNum;
@@ -360,12 +359,10 @@ namespace ProductDatabase {
                                             using (var cmdUpdate = con.CreateCommand()) {
                                                 cmdUpdate.CommandText =
                                                     $"""
-                                                    UPDATE {ProductInfo.CategoryName}_Substrate
+                                                    UPDATE
+                                                        {ProductInfo.CategoryName}_Substrate
                                                     SET
-                                                        Decrease = @Decrease,
-                                                        Person = @Person,
-                                                        RegDate = @RegDate,
-                                                        Comment = @Comment
+                                                        Decrease = @Decrease,Person = @Person,RegDate = @RegDate,Comment = @Comment
                                                     WHERE
                                                         SubstrateNumber = @SubstrateNumber
                                                     AND
@@ -387,37 +384,11 @@ namespace ProductDatabase {
                                                     cmdInsert.CommandText =
                                                     $"""
                                                     INSERT INTO "{ProductInfo.CategoryName}_Substrate"
-                                                        (
-                                                        StockName,
-                                                        SubstrateName,
-                                                        SubstrateModel,
-                                                        SubstrateNumber,
-                                                        OrderNumber,
-                                                        Decrease,
-                                                        UsedProductType,
-                                                        UsedProductNumber,
-                                                        UsedOrderNumber,
-                                                        Person,
-                                                        RegDate,
-                                                        Comment,
-                                                        UseID
-                                                        )
+                                                        (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Decrease,
+                                                        UsedProductType,UsedProductNumber,UsedOrderNumber,Person,RegDate,Comment,UseID)
                                                     VALUES
-                                                        (
-                                                        @StockName,
-                                                        @SubstrateName,
-                                                        @SubstrateModel,
-                                                        @SubstrateNumber,
-                                                        @OrderNumber,
-                                                        @Decrease,
-                                                        @UsedProductType,
-                                                        @UsedProductNumber,
-                                                        @UsedOrderNumber,
-                                                        @Person,
-                                                        @RegDate,
-                                                        @Comment,
-                                                        @UseID
-                                                        )
+                                                        (@StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,
+                                                        @Decrease,@UsedProductType,@UsedProductNumber,@UsedOrderNumber,@Person,@RegDate,@Comment,@UseID)
                                                     """;
 
                                                     cmdInsert.Parameters.Add("@StockName", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.StockName) ? DBNull.Value : ProductInfo.StockName;
@@ -470,16 +441,11 @@ namespace ProductDatabase {
                             using (var cmd = con.CreateCommand()) {
                                 cmd.CommandText =
                                     $"""
-                                    UPDATE {ProductInfo.CategoryName}_Product
+                                    UPDATE
+                                        {ProductInfo.CategoryName}_Product
                                     SET
-                                        Quantity = @Quantity,
-                                        Person = @Person,
-                                        RegDate = @RegDate,
-                                        Revision = @Revision,
-                                        RevisionGroup = @RevisionGroup,
-                                        SerialLast = @SerialLast,
-                                        SerialLastNumber = @SerialLastNumber,
-                                        Comment = @Comment
+                                        Quantity = @Quantity,Person = @Person,RegDate = @RegDate,Revision = @Revision,RevisionGroup = @RevisionGroup,SerialLast = @SerialLast,
+                                        SerialLastNumber = @SerialLastNumber,Comment = @Comment
                                     WHERE
                                         ProductNumber = @ProductNumber
                                     AND
