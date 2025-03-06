@@ -39,19 +39,37 @@ namespace ProductDatabase {
                         "Substrate6DataGridView", "Substrate7DataGridView", "Substrate8DataGridView", "Substrate9DataGridView","Substrate10DataGridView",
                         "Substrate11DataGridView", "Substrate12DataGridView", "Substrate13DataGridView", "Substrate14DataGridView","Substrate15DataGridView"
                         ];
-        //private readonly List<string> _usedSubstrate = [];
-        //private readonly List<string> _usedProductNumber = [];
-        //private readonly List<int> _usedQuantity = [];
 
         // プロパティ設定
-        private bool IsSerialGeneration => ProductInfo.RegType is 1 or 2 or 3;
-        private bool IsLabelPrint => ProductInfo.PrintType is 1 or 3 or 4 or 5 or 6 or 7 or 9;
-        private bool IsBarcodePrint => ProductInfo.PrintType is 2 or 3;
-        private bool RequiresClosing => ProductInfo.PrintType is 0 or 1 or 2 or 3 or 4 or 9;
-        private bool IsListPrint => ProductInfo.PrintType is 5 or 6;
-        private bool IsCheckSheetPrint => ProductInfo.PrintType is 6 or 7;
-        private bool IsUnderlinePrint => ProductInfo.PrintType is 4;
-        private bool IsLast4Digits => ProductInfo.PrintType is 9;
+        private bool IsSerialGeneration => IsRegTypeIn(1, 2, 3, 9);
+        private bool IsUnderlinePrint => ProductInfo.PrintType == 4 && IsNotRegType9;
+
+        private bool IsLabelPrint => IsPrintTypeIn(1, 3, 4, 5, 6, 7, 9);
+        private bool IsBarcodePrint => IsPrintTypeIn(2, 3) && IsNotRegType9;
+        private bool IsListPrint => IsPrintTypeIn(5, 6) && IsNotRegType9;
+        private bool IsCheckSheetPrint => IsPrintTypeIn(6, 7) && IsNotRegType9;
+        private bool IsLast4Digits => IsPrintTypeIn(9) && IsNotRegType9;
+
+        // ヘルパーメソッド
+        private bool IsRegTypeIn(params int[] values) {
+            return values.Contains(ProductInfo.RegType);
+        }
+        private bool IsPrintTypeIn(params int[] values) {
+            return values.Contains(ProductInfo.PrintType);
+        }
+        private bool IsNotRegType9 => ProductInfo.RegType != 9;
+
+        // サービス向け用
+        public class ServiceInformation {
+            public DataTable ServiceDataTable { get; } = new();
+            public string ServiceCategoryName { get; set; } = string.Empty;
+            public string ServiceProductName { get; set; } = string.Empty;
+            public string ServiceStockName { get; set; } = string.Empty;
+            public string ServiceProductType { get; set; } = string.Empty;
+            public string ServiceProductModel { get; set; } = string.Empty;
+            public string[] ServiveUseSubstrate { get; set; } = [];
+        }
+        public ServiceInformation ServiceInfo { get; set; } = new();
 
         public ProductRegistration2Window() {
             InitializeComponent();
@@ -281,6 +299,9 @@ namespace ProductDatabase {
                             MessageBox.Show($"[{ProductInfo.OrderNumber}]の在庫が足りません。{Environment.NewLine}{strQuantity}", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         }
                         break;
+                    case 9:
+                        ServiceLoad();
+                        break;
                     default:
                         for (var i = 0; i <= 14; i++) {
                             if (Controls[_checkBoxNames[i]] is CheckBox objCbx) {
@@ -503,7 +524,7 @@ namespace ProductDatabase {
 
                     cmd.ExecuteNonQuery();
 
-                    cmd.CommandText = "SELECT last_insert_rowid()";
+                    cmd.CommandText = $"""SELECT MAX(ID) FROM "{ProductInfo.CategoryName}_Product";""";
                     productRowId = cmd.ExecuteScalar().ToString() ?? string.Empty;
                     ProductInfo.ProductID = int.Parse(productRowId);
 
@@ -694,7 +715,7 @@ namespace ProductDatabase {
                     cmd.ExecuteNonQuery();
 
                     // 製品ROWIDの取得
-                    cmd.CommandText = "SELECT last_insert_rowid()";
+                    cmd.CommandText = $"""SELECT MAX(ID) FROM "{ProductInfo.CategoryName}_Product";""";
                     productRowId = cmd.ExecuteScalar().ToString() ?? string.Empty;
                     ProductInfo.ProductID = int.Parse(productRowId);
 
@@ -720,19 +741,19 @@ namespace ProductDatabase {
                         foreach (var b in _strSerial) {
                             cmd.CommandText =
                                 $"""
-                        INSERT INTO "{ProductInfo.CategoryName}_Serial"
-                            (
-                            Serial,
-                            UsedID,
-                            ProductName
-                            )
-                        VALUES
-                            (
-                            @Serial,
-                            @productRowId,
-                            @ProductName
-                            )
-                        """;
+                                INSERT INTO "{ProductInfo.CategoryName}_Serial"
+                                    (
+                                    Serial,
+                                    UsedID,
+                                    ProductName
+                                    )
+                                VALUES
+                                    (
+                                    @Serial,
+                                    @productRowId,
+                                    @ProductName
+                                    )
+                                """;
 
                             cmd.Parameters.Add("@Serial", DbType.String).Value = b;
                             cmd.Parameters.Add("@productRowId", DbType.String).Value = ProductInfo.ProductID;
@@ -741,6 +762,9 @@ namespace ProductDatabase {
                             cmd.ExecuteNonQuery();
                         }
                     }
+                    break;
+                case 9:
+                    ServiceReg(con, transaction);
                     break;
             }
             try {
@@ -860,6 +884,7 @@ namespace ProductDatabase {
                     case 2:
                     case 3:
                     case 4:
+                    case 9:
                         if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
 
@@ -1014,6 +1039,300 @@ namespace ProductDatabase {
             }
             SubstrateListPrintButton.Enabled = IsListPrint;
             CheckSheetPrintButton.Enabled = IsCheckSheetPrint;
+        }
+
+        // サービス向け用処理
+        private void ServiceLoad() {
+            using ServiceForm window = new(ServiceInfo);
+            window.ShowDialog(this);
+            ServiceInfo = window.ServiceInfo;
+            var serviceCategoryName = ServiceInfo.ServiceCategoryName;
+            var serviceStockName = ServiceInfo.ServiceStockName;
+            var serviveUseSubstrate = ServiceInfo.ServiveUseSubstrate;
+
+
+            for (var i = 0; i <= serviveUseSubstrate.GetUpperBound(0); i++) {
+                var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox;
+
+                if (objCbx != null) {
+                    objCbx.Enabled = true;
+                    objCbx.Checked = true;
+                }
+
+                var objDgv = Controls[_dataGridViewNames[i]] as DataGridView;
+                if (objDgv != null) {
+                    objDgv.Columns[1].DefaultCellStyle.BackColor = Color.LightGray;
+                    objDgv.Columns[2].ReadOnly = false;
+                    objDgv.Columns[3].ReadOnly = false;
+                    switch (Font.Size) {
+                        case 9:
+                            objDgv.RowTemplate.Height = 24;
+                            objDgv.Columns[0].Width = 130;
+                            objDgv.Columns[1].Width = 35;
+                            objDgv.Columns[2].Width = 35;
+                            objDgv.Columns[3].Width = 24;
+                            break;
+                        case 12:
+                            objDgv.RowTemplate.Height = 24;
+                            objDgv.Columns[0].Width = 200;
+                            objDgv.Columns[1].Width = 50;
+                            objDgv.Columns[2].Width = 50;
+                            objDgv.Columns[3].Width = 24;
+                            break;
+                        case 14:
+                            objDgv.RowTemplate.Height = 30;
+                            objDgv.Columns[0].Width = 240;
+                            objDgv.Columns[1].Width = 60;
+                            objDgv.Columns[2].Width = 60;
+                            objDgv.Columns[3].Width = 30;
+                            break;
+                    }
+                }
+
+                using SQLiteConnection con = new(GetConnectionRegistration());
+                con.Open();
+
+                using var cmd = con.CreateCommand();
+                // 使用基板表示
+
+                var selectedRows = ProductInfo.SubstrateDataTable.Select($"SubstrateModel = '{serviveUseSubstrate[i]}'");
+                foreach (var row in selectedRows) {
+                    var productName = row["SubstrateName"].ToString() ?? throw new Exception("ProductName is null");
+                    if (objCbx != null) {
+                        objCbx.Text = $"{productName} - {serviveUseSubstrate[i]}";
+                    }
+                }
+
+                // 在庫テーブルからデータ取得
+                var substrateName = string.Empty;
+                cmd.CommandText = $"""
+                                SELECT
+                                    SubstrateName,
+                                    SubstrateNumber,
+                                    SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                                FROM {serviceCategoryName}_Substrate
+                                WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel
+                                GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                                HAVING Stock > 0
+                                ORDER BY MIN(ID);
+                                """;
+                cmd.Parameters.Add("@StockName", DbType.String).Value = serviceStockName;
+                cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = serviveUseSubstrate[i];
+                using var dr = cmd.ExecuteReader();
+                while (dr.Read()) {
+                    var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
+                    var intStock = Convert.ToInt32(dr["Stock"]);
+                    if (!string.IsNullOrEmpty($"{dr["substrateName"]}")) { substrateName = $"{dr["substrateName"]}"; }
+                    objDgv?.Rows.Add(strSubstrateNumber, intStock);
+
+                }
+            }
+        }
+        private void ServiceReg(SQLiteConnection con, SQLiteTransaction transaction) {
+            var serviceCategoryName = ServiceInfo.ServiceCategoryName;
+            var serviceStockName = ServiceInfo.ServiceStockName;
+            var serviveUseSubstrate = ServiceInfo.ServiveUseSubstrate;
+            _ = con.CreateCommand();
+
+            if (serviveUseSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
+
+            SQLiteCommand? cmd;
+            for (var i = 0; i <= serviveUseSubstrate.Length; i++) {
+
+                var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxがnullです。");
+
+                if (objCbx.Checked) {
+                    var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
+                    var dgvRowCnt = objDgv.Rows.Count;
+
+                    for (var j = 0; j <= dgvRowCnt - 1; j++) {
+                        var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[3].Value);
+                        if (boolCbx) {
+                            var substrateName = string.Empty;
+                            var substrateModel = string.Empty;
+                            var orderNum = string.Empty;
+                            var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
+                            var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
+                            var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
+
+                            cmd = con.CreateCommand();
+                            cmd.CommandText = $"""
+                                        SELECT
+                                            SubstrateName,
+                                            SubstrateModel,
+                                            SubstrateNumber,
+                                            OrderNumber,
+                                            SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                                        FROM {serviceCategoryName}_Substrate
+                                        WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                                        GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                                        ORDER BY MIN(ID);
+                                        """;
+                            cmd.Parameters.Add("@StockName", DbType.String).Value = serviceStockName;
+                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = serviveUseSubstrate[i];
+                            cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNum;
+
+                            using var dr = cmd.ExecuteReader();
+                            while (dr.Read()) {
+                                substrateName = $"{dr["SubstrateName"]}";
+                                substrateModel = $"{dr["SubstrateModel"]}";
+                                orderNum = $"{dr["OrderNumber"]}";
+                            }
+
+                            // 一時テーブルに登録
+                            cmd = con.CreateCommand();
+                            cmd.CommandText =
+                                $"""
+                                INSERT INTO "TempSubstrateReduction"
+                                    (
+                                    StockName,
+                                    SubstrateName,
+                                    SubstrateModel,
+                                    SubstrateNumber,
+                                    OrderNumber,
+                                    Defect,
+                                    UsedProductType,
+                                    UsedProductNumber,
+                                    UsedOrderNumber,
+                                    Person,
+                                    RegDate,
+                                    Comment
+                                    )
+                                VALUES
+                                    (
+                                    @StockName,
+                                    @SubstrateName,
+                                    @SubstrateModel,
+                                    @SubstrateNumber,
+                                    @OrderNumber,
+                                    @Defect,
+                                    @UsedProductType,
+                                    @UsedProductNumber,
+                                    @UsedOrderNumber,
+                                    @Person,
+                                    @RegDate,
+                                    @Comment
+                                    )
+                                """;
+
+                            cmd.Parameters.Add("@StockName", DbType.String).Value = serviceStockName;
+                            cmd.Parameters.Add("@SubstrateName", DbType.String).Value = string.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
+                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
+                            cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
+                            cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(orderNum) ? DBNull.Value : orderNum;
+                            cmd.Parameters.Add("@Defect", DbType.String).Value = 0 - useValue;
+                            cmd.Parameters.Add("@UsedProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                            cmd.Parameters.Add("@UsedProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+                            cmd.Parameters.Add("@UsedOrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                            cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+                            cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                            cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+            }
+
+            // 製品テーブルに追加
+            cmd = con.CreateCommand();
+            cmd.CommandText =
+                $"""
+                INSERT INTO "{ProductInfo.CategoryName}_Product"
+                    (
+                    ProductName,
+                    OrderNumber,
+                    ProductNumber,
+                    ProductType,
+                    ProductModel,
+                    Quantity,
+                    Person,
+                    RegDate,
+                    Revision,
+                    RevisionGroup,
+                    SerialFirst,
+                    SerialLast,
+                    SerialLastNumber,
+                    Comment
+                    )
+                VALUES
+                    (
+                    @ProductName,
+                    @OrderNumber,
+                    @ProductNumber,
+                    @ProductType,
+                    @ProductModel,
+                    @Quantity,
+                    @Person,
+                    @RegDate,
+                    @Revision,
+                    @RevisionGroup,
+                    @SerialFirst,
+                    @SerialLast,
+                    @SerialLastNumber,
+                    @Comment
+                    )
+                """;
+
+            cmd.Parameters.Add("@ProductName", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductName) ? DBNull.Value : ProductInfo.ProductName;
+            cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+            cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+            cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
+            cmd.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+            cmd.Parameters.Add("@Quantity", DbType.String).Value = ProductInfo.Quantity;
+            cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+            cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+            cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
+            cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
+            cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialFirst) ? DBNull.Value : ProductInfo.SerialFirst;
+            cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
+            cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = IsSerialGeneration ? _serialLastNumber : DBNull.Value;
+            cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+
+            cmd.ExecuteNonQuery();
+
+            // 一時テーブルから基板テーブルにコピー
+            cmd = con.CreateCommand();
+            cmd.CommandText =
+                $"""
+                INSERT INTO "{serviceCategoryName}_Substrate" (
+                    StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, Defect, UsedProductType, UsedProductNumber, UsedOrderNumber, Person, RegDate, Comment
+                )
+                SELECT
+                    tsr.StockName, tsr.SubstrateName, tsr.SubstrateModel, tsr.SubstrateNumber, tsr.OrderNumber, tsr.Defect, tsr.UsedProductType, tsr.UsedProductNumber, tsr.UsedOrderNumber, tsr.Person, tsr.RegDate, tsr.Comment
+                FROM TempSubstrateReduction tsr
+                """;
+            cmd.ExecuteNonQuery();
+
+            // 一時テーブルの内容を削除
+            var command = new SQLiteCommand("DELETE FROM TempSubstrateReduction", con, transaction);
+            command.ExecuteNonQuery();
+
+            if (IsSerialGeneration) {
+                foreach (var b in _strSerial) {
+                    cmd.CommandText =
+                                $"""
+                        INSERT INTO "{ProductInfo.CategoryName}_Serial"
+                            (
+                            Serial,
+                            UsedID,
+                            ProductName
+                            )
+                        VALUES
+                            (
+                            @Serial,
+                            @productRowId,
+                            @ProductName
+                            )
+                        """;
+
+                    cmd.Parameters.Add("@Serial", DbType.String).Value = b;
+                    cmd.Parameters.Add("@productRowId", DbType.String).Value = ProductInfo.ProductID;
+                    cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
 
         // 印刷処理
@@ -1418,7 +1737,7 @@ namespace ProductDatabase {
             dataGridView.Enabled = checkBox.Checked;
             checkBox.ForeColor = checkBox.Checked ? Color.Black : Color.Red;
 
-            if (!checkBox.Checked) {
+            if (!checkBox.Checked && IsNotRegType9) {
                 MessageBox.Show("チェックがない場合在庫から引き落とされなくなります。", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
