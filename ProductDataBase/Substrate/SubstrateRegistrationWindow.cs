@@ -28,7 +28,7 @@ namespace ProductDatabase {
 
         // プロパティ設定
         private bool IsLabelPrint => ProductInfo.PrintType is 1;
-        private bool IsRegistration => ProductInfo.RegType is 1;
+        private bool IsRegistration => ProductInfo.RegType is 0 or 1;
 
         public SubstrateRegistrationWindow(ProductInformation productInfo) {
             InitializeComponent();
