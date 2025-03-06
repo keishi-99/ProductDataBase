@@ -12,7 +12,12 @@ namespace ProductDatabase {
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
         // プロパティ設定
-        private bool IsSerialGeneration => ProductInfo.RegType is 1 or 2 or 3;
+        private bool IsSerialGeneration => IsRegTypeIn(1, 2, 3, 9);
+
+        // ヘルパーメソッド
+        private bool IsRegTypeIn(params int[] values) {
+            return values.Contains(ProductInfo.RegType);
+        }
 
         public ProductRegistration1Window(ProductInformation productInfo) {
             InitializeComponent();
