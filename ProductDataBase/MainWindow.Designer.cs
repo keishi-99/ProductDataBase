@@ -103,21 +103,21 @@
             // ReportConfigToolStripMenuItem
             // 
             this.ReportConfigToolStripMenuItem.Name = "ReportConfigToolStripMenuItem";
-            this.ReportConfigToolStripMenuItem.Size = new Size(180, 22);
+            this.ReportConfigToolStripMenuItem.Size = new Size(157, 22);
             this.ReportConfigToolStripMenuItem.Text = "成績書設定";
             this.ReportConfigToolStripMenuItem.Click += this.ReportConfigToolStripMenuItem_Click;
             // 
             // ListConfigToolStripMenuItem
             // 
             this.ListConfigToolStripMenuItem.Name = "ListConfigToolStripMenuItem";
-            this.ListConfigToolStripMenuItem.Size = new Size(180, 22);
+            this.ListConfigToolStripMenuItem.Size = new Size(157, 22);
             this.ListConfigToolStripMenuItem.Text = "基板リスト設定";
             this.ListConfigToolStripMenuItem.Click += this.ListConfigToolStripMenuItem_Click;
             // 
             // CheckSheetConfigToolStripMenuItem
             // 
             this.CheckSheetConfigToolStripMenuItem.Name = "CheckSheetConfigToolStripMenuItem";
-            this.CheckSheetConfigToolStripMenuItem.Size = new Size(180, 22);
+            this.CheckSheetConfigToolStripMenuItem.Size = new Size(157, 22);
             this.CheckSheetConfigToolStripMenuItem.Text = "チェックシート設定";
             this.CheckSheetConfigToolStripMenuItem.Click += this.CheckSheetConfigToolStripMenuItem_Click;
             // 
@@ -336,6 +336,7 @@
             this.QRCodeTextBox.Name = "QRCodeTextBox";
             this.QRCodeTextBox.Size = new Size(833, 23);
             this.QRCodeTextBox.TabIndex = 601;
+            this.QRCodeTextBox.Enter += this.QRCodeTextBox_Enter;
             this.QRCodeTextBox.KeyDown += this.QRCodeTextBox_KeyDown;
             // 
             // QRCodeButton

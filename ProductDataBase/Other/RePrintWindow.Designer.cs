@@ -633,6 +633,7 @@
             this.QrCodeTextBox.Name = "QrCodeTextBox";
             this.QrCodeTextBox.Size = new Size(320, 23);
             this.QrCodeTextBox.TabIndex = 123;
+            this.QrCodeTextBox.Enter += this.QrCodeTextBox_Enter;
             // 
             // ProductTypeLabel2
             // 
