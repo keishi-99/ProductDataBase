@@ -910,12 +910,13 @@ namespace ProductDatabase {
         public ServiceInformation ServiceInfo { get; set; } = new();
         private void ServiceLoad() {
             using ServiceForm window = new(ServiceInfo);
-            window.ShowDialog(this);
+            var result = window.ShowDialog(this);
+            if (result != DialogResult.OK) { Close(); }
+
             ServiceInfo = window.ServiceInfo;
             var serviceCategoryName = ServiceInfo.ServiceCategoryName;
             var serviceStockName = ServiceInfo.ServiceStockName;
             var serviveUseSubstrate = ServiceInfo.ServiveUseSubstrate;
-
 
             for (var i = 0; i <= serviveUseSubstrate.GetUpperBound(0); i++) {
                 var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox;

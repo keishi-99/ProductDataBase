@@ -28,6 +28,8 @@ namespace ProductDatabase.Other {
 
             // リストボックスにアイテムを追加する
             CategoryListBox1.Items.AddRange([.. categoryNames]);
+
+            RegisterButton.Enabled = false;
         }
 
         private void CategoryListBox1Select() {
@@ -72,13 +74,14 @@ namespace ProductDatabase.Other {
         }
         private void CategoryListBox3Select() {
             try {
+                if (CategoryListBox3.SelectedIndex == -1) { return; ; }
                 RegisterButton.Enabled = true;
                 ServiceInfo.ServiceProductType = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void Registration() {
+        private DialogResult Registration() {
             var selectedRows = ServiceInfo.ServiceDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
@@ -91,6 +94,7 @@ namespace ProductDatabase.Other {
                 ServiceInfo.ServiveUseSubstrate = useSubstrate.Split(",");
             }
             Close();
+            return DialogResult.OK;
         }
 
         private void ServiceForm_Load(object sender, EventArgs e) { LoadEvents(); }
