@@ -112,7 +112,6 @@
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(784, 361);
-            this.ControlBox = false;
             this.Controls.Add(this.RegisterButton);
             this.Controls.Add(this.panelCategory1);
             this.Controls.Add(this.panelCategory2);

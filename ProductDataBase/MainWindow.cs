@@ -486,6 +486,7 @@ namespace ProductDatabase {
         }
         private void CategoryListBox3Select() {
             try {
+                if (CategoryListBox3.SelectedIndex == -1) { return; }
                 RegisterButton.Enabled = _isAuthorizedUser;
                 HistoryButton.Enabled = true;
 
