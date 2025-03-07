@@ -570,7 +570,7 @@ namespace ProductDatabase {
                                 CommonUtils.Logger.AppendLog(logMessageArray);
 
                                 logMessageArray = [
-                                    $"[製品履歴編集:前]",
+                                    $"[製品履歴編集:後]",
                                     $"ID[{ProductInfo.CategoryName}_{row["ID"]}]",
                                     $"注文番号[{row["OrderNumber"]}]",
                                     $"製造番号[{row["ProductNumber"]}]",
