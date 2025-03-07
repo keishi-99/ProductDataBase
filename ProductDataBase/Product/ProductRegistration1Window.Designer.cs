@@ -565,6 +565,7 @@
             this.QrCodeTextBox.Name = "QrCodeTextBox";
             this.QrCodeTextBox.Size = new Size(320, 23);
             this.QrCodeTextBox.TabIndex = 85;
+            this.QrCodeTextBox.Enter += this.QrCodeTextBox_Enter;
             // 
             // QrCodeButton
             // 
