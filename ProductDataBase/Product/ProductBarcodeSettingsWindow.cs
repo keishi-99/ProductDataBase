@@ -85,27 +85,27 @@ namespace ProductDatabase {
         }
 
         private void BtnOK_Click(object sender, EventArgs e) {
-            decimal sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, barcodePosX, barcodePosY, barcodeHeight, barcodeMagnitude, stringPosX, stringPosY;
+            double sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, barcodePosX, barcodePosY, barcodeHeight, barcodeMagnitude, stringPosX, stringPosY;
             int numLabelsX, numLabelsY, headerPosX, headerPosY, numLabels;
 
             try {
-                sizeX = decimal.Parse(BarcodeLabelWidthTextBox.Text);
-                sizeY = decimal.Parse(BarcodeLabelHeightTextBox.Text);
+                sizeX = double.Parse(BarcodeLabelWidthTextBox.Text);
+                sizeY = double.Parse(BarcodeLabelHeightTextBox.Text);
                 numLabelsX = int.Parse(BarcodeQuantityXTextBox.Text);
                 numLabelsY = int.Parse(BarcodeQuantityYTextBox.Text);
-                offsetX = decimal.Parse(BarcodePageOffsetXTextBox.Text);
-                offsetY = decimal.Parse(BarcodePageOffsetYTextBox.Text);
-                intervalX = decimal.Parse(BarcodeLabelIntervalXTextBox.Text);
-                intervalY = decimal.Parse(BarcodeLabelIntervalYTextBox.Text);
+                offsetX = double.Parse(BarcodePageOffsetXTextBox.Text);
+                offsetY = double.Parse(BarcodePageOffsetYTextBox.Text);
+                intervalX = double.Parse(BarcodeLabelIntervalXTextBox.Text);
+                intervalY = double.Parse(BarcodeLabelIntervalYTextBox.Text);
                 headerPosX = int.Parse(BarcodeHeaderPostionXTextBox.Text);
                 headerPosY = int.Parse(BarcodeHeaderPostionYTextBox.Text);
 
-                barcodeHeight = decimal.Parse(BarcodeHeightTextBox.Text);
-                barcodePosX = decimal.Parse(BarcodePostionXTextBox.Text);
-                barcodePosY = decimal.Parse(BarcodePostionYTextBox.Text);
-                barcodeMagnitude = decimal.Parse(BarcodeMagnitudeTextBox.Text);
-                stringPosX = decimal.Parse(FontPostionXTextBox.Text);
-                stringPosY = decimal.Parse(FontPostionYTextBox.Text);
+                barcodeHeight = double.Parse(BarcodeHeightTextBox.Text);
+                barcodePosX = double.Parse(BarcodePostionXTextBox.Text);
+                barcodePosY = double.Parse(BarcodePostionYTextBox.Text);
+                barcodeMagnitude = double.Parse(BarcodeMagnitudeTextBox.Text);
+                stringPosX = double.Parse(FontPostionXTextBox.Text);
+                stringPosY = double.Parse(FontPostionYTextBox.Text);
                 numLabels = int.Parse(BarcodeQuantityTextBox.Text);
             } catch (Exception ex) {
                 MessageBox.Show($"入力値が不正です。{Environment.NewLine}{ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);

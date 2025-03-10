@@ -15,12 +15,12 @@ namespace ProductDatabase.Product {
     public class CLabelProPageSettings {
         public int NumLabelsX { get; set; }
         public int NumLabelsY { get; set; }
-        public decimal SizeX { get; set; }
-        public decimal SizeY { get; set; }
-        public decimal OffsetX { get; set; }
-        public decimal OffsetY { get; set; }
-        public decimal IntervalX { get; set; }
-        public decimal IntervalY { get; set; }
+        public double SizeX { get; set; }
+        public double SizeY { get; set; }
+        public double OffsetX { get; set; }
+        public double OffsetY { get; set; }
+        public double IntervalX { get; set; }
+        public double IntervalY { get; set; }
         public string HeaderString { get; set; } = string.Empty;
         public Point HeaderPos { get; set; }
 
@@ -43,8 +43,8 @@ namespace ProductDatabase.Product {
 
     public class CLabelProLabelSettings {
         public string Format { get; set; } = string.Empty;
-        public decimal StringPosX { get; set; }
-        public decimal StringPosY { get; set; }
+        public double StringPosX { get; set; }
+        public double StringPosY { get; set; }
         public bool AlignStringXCenter { get; set; }
         public bool AlignStringYCenter { get; set; }
         public int NumLabels { get; set; }

@@ -1209,12 +1209,12 @@ namespace ProductDatabase {
 
             var maxX = 0;
             var maxY = 0;
-            decimal sizeX = 0;
-            decimal sizeY = 0;
-            decimal offsetX = 0;
-            decimal offsetY = 0;
-            decimal intervalX = 0;
-            decimal intervalY = 0;
+            double sizeX = 0;
+            double sizeY = 0;
+            double offsetX = 0;
+            double offsetY = 0;
+            double intervalX = 0;
+            double intervalY = 0;
             var startLine = 0;
             try {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
@@ -1263,21 +1263,28 @@ namespace ProductDatabase {
 
                 if (maxX == 0 || maxY == 0 || serialCodePrintCopies == 0) { throw new Exception("印刷設定が異常です。"); }
 
-                const decimal MM_PER_HUNDREDTH_INCH = 0.254M;
+                const double MM_PER_HUNDREDTH_INCH = 0.254;
 
                 var pd = (PrintDocument)sender;
 
                 if (!isPreview) {
-                    offsetX -= (decimal)e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
-                    offsetY -= (decimal)e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
-                    offset = _pageCount == 1
-                        ? new System.Drawing.Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
-                        : new System.Drawing.Point((int)((decimal)e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
+                    // ハードマージンをミリメートルに変換
+                    offsetX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
+                    offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
+
+                    // 最初のページのみオフセットを調整
+                    var verticalOffset = _pageCount == 0 ? startLine * (intervalY + sizeY) : 0;
+
+                    // オフセットを計算
+                    offset = new System.Drawing.Point(
+                        (int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH),
+                        (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + verticalOffset)
+                    );
                 }
                 else {
                     offset = _pageCount == 1
-                        ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
-                        : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)(((decimal)e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
+                        ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
+                        : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
                 }
 
                 e.PageSettings.Margins.Left = 0;
@@ -1375,9 +1382,9 @@ namespace ProductDatabase {
             Bitmap labelImage = new(1, 1);
             Graphics g;
             SizeF stringSize;
-            decimal sizeX;
-            decimal sizeY;
-            decimal fontSize;
+            double sizeX;
+            double sizeY;
+            double fontSize;
             float stringPosX;
             float stringPosY;
             Font fnt;
@@ -1388,11 +1395,11 @@ namespace ProductDatabase {
             var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
 
             // サイズとフォント情報の設定
-            void SetLabelProperties(decimal labelWidth, decimal labelHeight, decimal posY, decimal fontPointSize, string fontName, bool underlined) {
-                sizeX = labelWidth / 25.4M * resolution * magnitude;
-                sizeY = labelHeight / 25.4M * resolution * magnitude;
-                stringPosY = (float)(posY / 25.4M * resolution * magnitude);
-                fontSize = fontPointSize / 72.0M * resolution * magnitude;
+            void SetLabelProperties(double labelWidth, double labelHeight, double posY, double fontPointSize, string fontName, bool underlined) {
+                sizeX = labelWidth / 25.4 * resolution * magnitude;
+                sizeY = labelHeight / 25.4 * resolution * magnitude;
+                stringPosY = (float)(posY / 25.4 * resolution * magnitude);
+                fontSize = fontPointSize / 72.0 * resolution * magnitude;
                 var style = underlined ? FontStyle.Underline : FontStyle.Regular;
                 fnt = new Font(fontName, (float)fontSize, style);
             }
@@ -1403,7 +1410,7 @@ namespace ProductDatabase {
                     SetLabelProperties(SettingsLabelPro.LabelProPageSettings.SizeX,
                                         SettingsLabelPro.LabelProPageSettings.SizeY,
                                         SettingsLabelPro.LabelProLabelSettings.StringPosY,
-                                        (decimal)SettingsLabelPro.LabelProLabelSettings.Font.SizeInPoints,
+                                        SettingsLabelPro.LabelProLabelSettings.Font.SizeInPoints,
                                         SettingsLabelPro.LabelProLabelSettings.Font.Name,
                                         fontUnderline);
 
@@ -1418,7 +1425,7 @@ namespace ProductDatabase {
                         LineAlignment = SettingsLabelPro.LabelProLabelSettings.AlignStringYCenter ? StringAlignment.Center : StringAlignment.Near
                     };
 
-                    var x = SettingsLabelPro.LabelProLabelSettings.AlignStringXCenter ? 0 : (float)(SettingsLabelPro.LabelProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
+                    var x = SettingsLabelPro.LabelProLabelSettings.AlignStringXCenter ? 0 : (float)(SettingsLabelPro.LabelProLabelSettings.StringPosX / 25.4 * resolution * magnitude);
                     var y = SettingsLabelPro.LabelProLabelSettings.AlignStringYCenter ? 0 : stringPosY;
 
                     // 矩形領域を計算 (文字列を配置する領域)
@@ -1438,7 +1445,7 @@ namespace ProductDatabase {
                     SetLabelProperties(SettingsBarcodePro.BarcodeProPageSettings.SizeX,
                                         SettingsBarcodePro.BarcodeProPageSettings.SizeY,
                                         SettingsBarcodePro.BarcodeProLabelSettings.StringPosY,
-                                        (decimal)SettingsBarcodePro.BarcodeProLabelSettings.Font.SizeInPoints,
+                                        SettingsBarcodePro.BarcodeProLabelSettings.Font.SizeInPoints,
                                         SettingsBarcodePro.BarcodeProLabelSettings.Font.Name,
                                         false);
 
@@ -1450,7 +1457,7 @@ namespace ProductDatabase {
 
                     stringPosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignStringCenter
                         ? (float)((labelImage.Width / 2f) - (stringSize.Width / 2f))
-                        : (float)(SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
+                        : (float)(SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4 * resolution * magnitude);
 
                     g.DrawString(text, fnt, Brushes.Black, stringPosX, stringPosY);
 
@@ -1463,10 +1470,10 @@ namespace ProductDatabase {
 
                         var barCodePosX = SettingsBarcodePro.BarcodeProLabelSettings.AlignBarcodeCenter
                             ? (float)((labelImage.Width / 2) - (imageWidth / 2))
-                            : (float)(SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4M * resolution * magnitude);
-                        var barCodePosY = (float)(SettingsBarcodePro.BarcodeProLabelSettings.BarcodePosY / 25.4M * resolution * magnitude);
+                            : (float)(SettingsBarcodePro.BarcodeProLabelSettings.StringPosX / 25.4 * resolution * magnitude);
+                        var barCodePosY = (float)(SettingsBarcodePro.BarcodeProLabelSettings.BarcodePosY / 25.4 * resolution * magnitude);
 
-                        var barcodeHeight = SettingsBarcodePro.BarcodeProLabelSettings.BarcodeHeight / 25.4M * resolution * magnitude;
+                        var barcodeHeight = SettingsBarcodePro.BarcodeProLabelSettings.BarcodeHeight / 25.4 * resolution * magnitude;
 
                         g.DrawImage(img, barCodePosX, barCodePosY, (float)imageWidth, (float)barcodeHeight);
                         // プレビュー時、黒枠を描画

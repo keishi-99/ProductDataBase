@@ -80,23 +80,23 @@ namespace ProductDatabase {
         }
 
         private void BtnOK_Click(object sender, EventArgs e) {
-            decimal sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, stringPosX, stringPosY;
+            double sizeX, sizeY, offsetX, offsetY, intervalX, intervalY, stringPosX, stringPosY;
             int numLabelsX, numLabelsY, headerPosX, headerPosY, numLabels;
 
             try {
-                sizeX = decimal.Parse(LabelWidthTextBox.Text);
-                sizeY = decimal.Parse(LabelHeightTextBox.Text);
+                sizeX = double.Parse(LabelWidthTextBox.Text);
+                sizeY = double.Parse(LabelHeightTextBox.Text);
                 numLabelsX = int.Parse(QuantityXTextBox.Text);
                 numLabelsY = int.Parse(QuantityYTextBox.Text);
-                offsetX = decimal.Parse(PageOffsetXTextBox.Text);
-                offsetY = decimal.Parse(PageOffsetYTextBox.Text);
-                intervalX = decimal.Parse(LabelIntervalXTextBox.Text);
-                intervalY = decimal.Parse(LabelIntervalYTextBox.Text);
+                offsetX = double.Parse(PageOffsetXTextBox.Text);
+                offsetY = double.Parse(PageOffsetYTextBox.Text);
+                intervalX = double.Parse(LabelIntervalXTextBox.Text);
+                intervalY = double.Parse(LabelIntervalYTextBox.Text);
                 headerPosX = int.Parse(HeaderPostionXTextBox.Text);
                 headerPosY = int.Parse(HeaderPostionYTextBox.Text);
 
-                stringPosX = decimal.Parse(PrintTextPostionXTextBox.Text);
-                stringPosY = decimal.Parse(PrintTextPostionYTextBox.Text);
+                stringPosX = double.Parse(PrintTextPostionXTextBox.Text);
+                stringPosY = double.Parse(PrintTextPostionYTextBox.Text);
                 numLabels = int.Parse(PrintTextQuantityTextBox.Text);
             } catch (Exception ex) {
                 MessageBox.Show($"入力値が不正です。{Environment.NewLine}{ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
