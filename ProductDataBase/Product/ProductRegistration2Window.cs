@@ -45,7 +45,7 @@ namespace ProductDatabase {
         private bool IsUnderlinePrint => ProductInfo.PrintType == 4 && IsNotRegType9;
 
         private bool IsLabelPrint => IsPrintTypeIn(1, 3, 4, 5, 6, 7, 9);
-        private bool IsBarcodePrint => IsPrintTypeIn(2, 3) && IsNotRegType9;
+        private bool IsBarcodePrint => IsPrintTypeIn(2, 3);
         private bool IsListPrint => IsPrintTypeIn(5, 6) && IsNotRegType9;
         private bool IsCheckSheetPrint => IsPrintTypeIn(6, 7) && IsNotRegType9;
         private bool IsLast4Digits => IsPrintTypeIn(9) && IsNotRegType9;
