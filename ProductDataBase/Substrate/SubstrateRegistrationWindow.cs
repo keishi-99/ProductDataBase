@@ -3,7 +3,6 @@ using ProductDatabase.Substrate;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing.Printing;
-using System.Runtime.InteropServices;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
@@ -716,20 +715,6 @@ namespace ProductDatabase {
             var tool = (ToolStrip)SubstrateRegistrationPrintPreviewDialog.Controls[1];
             tool.Items[0].Visible = false;
         }
-
-        private void QrCodeTextBox_Enter(object sender, EventArgs e) { CapsDisable(); }
-        // CapsLockがオンになっていたらCapsLockを解除する
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern void keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
-        private const byte VK_CAPITAL = 0x14; // CapsLock の仮想キーコード
-        private const int KEYEVENTF_EXTENDEDKEY = 0x1;
-        private const int KEYEVENTF_KEYUP = 0x2;
-        private static void CapsDisable() {
-            var isCapsLockOn = Control.IsKeyLocked(Keys.CapsLock);
-            if (isCapsLockOn) {
-                keybd_event(VK_CAPITAL, 0, KEYEVENTF_EXTENDEDKEY, 0);
-                keybd_event(VK_CAPITAL, 0, KEYEVENTF_KEYUP, 0);
-            }
-        }
+        private void QrCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
     }
 }

@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 using ZXing;
 using ZXing.QrCode;
 using ZXing.QrCode.Internal;
@@ -9,9 +10,14 @@ using ZXing.Rendering;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase.Other {
+
+    internal static partial class NativeMethods {
+        [LibraryImport("user32.dll", SetLastError = true)]
+        public static partial void keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
+    }
+
     internal partial class CommonUtils {
         public static string s_networkPath = string.Empty; // ClonePathを保持する静的変数
-
         // ログ作成
         public static class Logger {
             private static readonly string s_logDirectory = Path.Combine(Environment.CurrentDirectory, "db", "logs"); // ログを保存するディレクトリ
@@ -476,6 +482,20 @@ namespace ProductDatabase.Other {
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        // CapsLockがオンになっていたらCapsLockを解除する
+        public static partial class Keyboard {
+            private const byte VK_CAPITAL = 0x14; // CapsLock の仮想キーコード
+            private const int KEYEVENTF_EXTENDEDKEY = 0x1;
+            private const int KEYEVENTF_KEYUP = 0x2;
+
+            // CapsLock の状態を切り替える
+            public static void CapsDisable() {
+                if (Control.IsKeyLocked(Keys.CapsLock)) {
+                    NativeMethods.keybd_event(VK_CAPITAL, 0, KEYEVENTF_EXTENDEDKEY, 0);
+                    NativeMethods.keybd_event(VK_CAPITAL, 0, KEYEVENTF_KEYUP, 0);
+                }
             }
         }
     }
