@@ -565,6 +565,7 @@ namespace ProductDatabase {
             }
 
             dataGridView.Enabled = checkBox.Checked;
+            dataGridView.Visible = checkBox.Checked;
             checkBox.ForeColor = checkBox.Checked ? Color.Black : Color.Red;
 
             if (!checkBox.Checked) {
