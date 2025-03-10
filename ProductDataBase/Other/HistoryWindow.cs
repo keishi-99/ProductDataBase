@@ -469,7 +469,7 @@ namespace ProductDatabase {
                                     $"減少量[{row["Defect", DataRowVersion.Original]}]",
                                     $"登録日[{row["RegDate", DataRowVersion.Original]}]",
                                     $"担当者[{row["Person", DataRowVersion.Original]}]",
-                                    $"Comment[{row["Comment", DataRowVersion.Original]}]"
+                                    $"コメント[{row["Comment", DataRowVersion.Original]}]"
                                 ];
                                 CommonUtils.Logger.AppendLog(logMessageArray);
 
@@ -486,7 +486,7 @@ namespace ProductDatabase {
                                     $"減少量[{row["Defect"]}]",
                                     $"登録日[{row["RegDate"]}]",
                                     $"担当者[{row["Person"]}]",
-                                    $"Comment[{row["Comment"]}]"
+                                    $"コメント[{row["Comment"]}]"
                                 ];
                                 CommonUtils.Logger.AppendLog(logMessageArray);
                             }
@@ -565,7 +565,7 @@ namespace ProductDatabase {
                                     $"Revision[{row["Revision", DataRowVersion.Original]}]",
                                     $"登録日[{row["RegDate", DataRowVersion.Original]}]",
                                     $"担当者[{row["Person", DataRowVersion.Original]}]",
-                                    $"Comment[{row["Comment", DataRowVersion.Original]}]"
+                                    $"コメント[{row["Comment", DataRowVersion.Original]}]"
                                 ];
                                 CommonUtils.Logger.AppendLog(logMessageArray);
 
@@ -580,7 +580,7 @@ namespace ProductDatabase {
                                     $"Revision[{row["Revision"]}]",
                                     $"登録日[{row["RegDate"]}]",
                                     $"担当者[{row["Person"]}]",
-                                    $"Comment[{row["Comment"]}]"
+                                    $"コメント[{row["Comment"]}]"
                                 ];
                                 CommonUtils.Logger.AppendLog(logMessageArray);
                             }
