@@ -92,9 +92,12 @@ namespace ProductDatabase.Other {
                 ServiceInfo.ServiceProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
                 var useSubstrate = selectedRows[0]["UseSubstrate"].ToString() ?? string.Empty;
                 ServiceInfo.ServiveUseSubstrate = useSubstrate.Split(",");
+                DialogResult = DialogResult.OK;
             }
+            else { DialogResult = DialogResult.Cancel; }
+
             Close();
-            return DialogResult.OK;
+            return DialogResult;
         }
 
         private void ServiceForm_Load(object sender, EventArgs e) { LoadEvents(); }
