@@ -15,12 +15,12 @@ namespace ProductDatabase.Product {
     public class CBarcodeProPageSettings {
         public int NumLabelsX { get; set; }
         public int NumLabelsY { get; set; }
-        public decimal SizeX { get; set; }
-        public decimal SizeY { get; set; }
-        public decimal OffsetX { get; set; }
-        public decimal OffsetY { get; set; }
-        public decimal IntervalX { get; set; }
-        public decimal IntervalY { get; set; }
+        public double SizeX { get; set; }
+        public double SizeY { get; set; }
+        public double OffsetX { get; set; }
+        public double OffsetY { get; set; }
+        public double IntervalX { get; set; }
+        public double IntervalY { get; set; }
         public string HeaderString { get; set; } = string.Empty;
         public Point HeaderPos { get; set; }
 
@@ -42,13 +42,13 @@ namespace ProductDatabase.Product {
     }
 
     public class CBarcodeProLabelSettings {
-        public decimal BarcodeHeight { get; set; }
-        public decimal BarcodePosX { get; set; }
-        public decimal BarcodePosY { get; set; }
-        public decimal BarcodeMagnitude { get; set; }
+        public double BarcodeHeight { get; set; }
+        public double BarcodePosX { get; set; }
+        public double BarcodePosY { get; set; }
+        public double BarcodeMagnitude { get; set; }
         public string Format { get; set; } = string.Empty;
-        public decimal StringPosX { get; set; }
-        public decimal StringPosY { get; set; }
+        public double StringPosX { get; set; }
+        public double StringPosY { get; set; }
         public bool AlignStringCenter { get; set; }
         public bool AlignBarcodeCenter { get; set; }
         public int NumLabels { get; set; }

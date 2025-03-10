@@ -404,11 +404,18 @@ namespace ProductDatabase {
                 var pd = (PrintDocument)sender;
 
                 if (!isPreview) {
-                    offsetX -= e.PageSettings.HardMarginX * 0.254;
-                    offsetY -= e.PageSettings.HardMarginY * 0.254;
-                    offset = _pageCount == 0
-                        ? new System.Drawing.Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
-                        : new System.Drawing.Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
+                    // ハードマージンをミリメートルに変換
+                    offsetX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
+                    offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
+
+                    // 最初のページのみオフセットを調整
+                    var verticalOffset = _pageCount == 0 ? startLine * (intervalY + sizeY) : 0;
+
+                    // オフセットを計算
+                    offset = new System.Drawing.Point(
+                        (int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH),
+                        (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + verticalOffset)
+                    );
                 }
                 else {
                     offset = new System.Drawing.Point(0, 0);
