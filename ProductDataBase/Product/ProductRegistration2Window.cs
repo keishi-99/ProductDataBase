@@ -499,7 +499,7 @@ namespace ProductDatabase {
             var command = connection.CreateCommand();
 
             // ... (基板関連の処理) ...
-            for (var i = 0; i <= _useSubstrate.Length; i++) {
+            for (var i = 0; i < _useSubstrate.Length; i++) {
 
                 var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxがnullです。");
 
@@ -507,7 +507,7 @@ namespace ProductDatabase {
                     var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objCbxがnullです。");
                     var dgvRowCnt = objDgv.Rows.Count;
 
-                    for (var j = 0; j <= dgvRowCnt - 1; j++) {
+                    for (var j = 0; j < dgvRowCnt; j++) {
                         var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[3].Value);
                         if (boolCbx) {
                             var substrateName = string.Empty;
