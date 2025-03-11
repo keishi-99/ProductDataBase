@@ -498,6 +498,10 @@ namespace ProductDatabase {
 
             var command = connection.CreateCommand();
 
+            // 一時テーブルの内容を削除
+            command.CommandText = """DELETE FROM "TempSubstrateReduction";""";
+            command.ExecuteNonQuery();
+
             // ... (基板関連の処理) ...
             for (var i = 0; i < _useSubstrate.Length; i++) {
 
@@ -540,8 +544,8 @@ namespace ProductDatabase {
                             }
 
                             // 一時テーブルに登録
-                            using var insertCommand = connection.CreateCommand();
-                            insertCommand.CommandText =
+                            command = connection.CreateCommand();
+                            command.CommandText =
                                 $"""
                                 INSERT INTO "TempSubstrateReduction"
                                     (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,
@@ -551,20 +555,20 @@ namespace ProductDatabase {
                                     @Decrease,@UsedProductType,@UsedProductNumber,@UsedOrderNumber,@Person,@RegDate,@Comment)
                                 """;
 
-                            insertCommand.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
-                            insertCommand.Parameters.Add("@SubstrateName", DbType.String).Value = string.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
-                            insertCommand.Parameters.Add("@SubstrateModel", DbType.String).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
-                            insertCommand.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
-                            insertCommand.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(orderNum) ? DBNull.Value : orderNum;
-                            insertCommand.Parameters.Add("@Decrease", DbType.String).Value = 0 - useValue;
-                            insertCommand.Parameters.Add("@UsedProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                            insertCommand.Parameters.Add("@UsedProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                            insertCommand.Parameters.Add("@UsedOrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-                            insertCommand.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                            insertCommand.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                            insertCommand.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                            command.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
+                            command.Parameters.Add("@SubstrateName", DbType.String).Value = string.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
+                            command.Parameters.Add("@SubstrateModel", DbType.String).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
+                            command.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
+                            command.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(orderNum) ? DBNull.Value : orderNum;
+                            command.Parameters.Add("@Decrease", DbType.String).Value = 0 - useValue;
+                            command.Parameters.Add("@UsedProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                            command.Parameters.Add("@UsedProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+                            command.Parameters.Add("@UsedOrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                            command.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+                            command.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                            command.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
-                            insertCommand.ExecuteNonQuery();
+                            command.ExecuteNonQuery();
                         }
                     }
                 }
@@ -603,10 +607,6 @@ namespace ProductDatabase {
                     TempSubstrateReduction tsr
                 """;
             command.Parameters.Add("@productRowId", DbType.String).Value = ProductInfo.ProductID;
-            command.ExecuteNonQuery();
-
-            // 一時テーブルの内容を削除
-            command.CommandText = "DELETE FROM TempSubstrateReduction";
             command.ExecuteNonQuery();
 
             if (IsSerialGeneration) {
@@ -1006,7 +1006,12 @@ namespace ProductDatabase {
 
             if (serviveUseSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
 
-            SQLiteCommand? cmd;
+            var command = con.CreateCommand();
+
+            // 一時テーブルの内容を削除
+            command.CommandText = """DELETE FROM "TempSubstrateReduction";""";
+            command.ExecuteNonQuery();
+
             for (var i = 0; i <= serviveUseSubstrate.Length; i++) {
 
                 var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxがnullです。");
@@ -1024,8 +1029,8 @@ namespace ProductDatabase {
                             var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
                             var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
 
-                            cmd = con.CreateCommand();
-                            cmd.CommandText = $"""
+                            command = con.CreateCommand();
+                            command.CommandText = $"""
                                 SELECT
                                     SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                                 FROM
@@ -1037,11 +1042,11 @@ namespace ProductDatabase {
                                 ORDER BY
                                     MIN(ID);
                                 """;
-                            cmd.Parameters.Add("@StockName", DbType.String).Value = serviceStockName;
-                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = serviveUseSubstrate[i];
-                            cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNum;
+                            command.Parameters.Add("@StockName", DbType.String).Value = serviceStockName;
+                            command.Parameters.Add("@SubstrateModel", DbType.String).Value = serviveUseSubstrate[i];
+                            command.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNum;
 
-                            using var dr = cmd.ExecuteReader();
+                            using var dr = command.ExecuteReader();
                             while (dr.Read()) {
                                 substrateName = $"{dr["SubstrateName"]}";
                                 substrateModel = $"{dr["SubstrateModel"]}";
@@ -1049,8 +1054,8 @@ namespace ProductDatabase {
                             }
 
                             // 一時テーブルに登録
-                            cmd = con.CreateCommand();
-                            cmd.CommandText =
+                            command = con.CreateCommand();
+                            command.CommandText =
                                 $"""
                                 INSERT INTO "TempSubstrateReduction"
                                     (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Defect,UsedProductType,UsedProductNumber,UsedOrderNumber,Person,RegDate,Comment)
@@ -1058,28 +1063,28 @@ namespace ProductDatabase {
                                     (@StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,@Defect,@UsedProductType,@UsedProductNumber,@UsedOrderNumber,@Person,@RegDate,@Comment)
                                 """;
 
-                            cmd.Parameters.Add("@StockName", DbType.String).Value = serviceStockName;
-                            cmd.Parameters.Add("@SubstrateName", DbType.String).Value = string.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
-                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
-                            cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
-                            cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(orderNum) ? DBNull.Value : orderNum;
-                            cmd.Parameters.Add("@Defect", DbType.String).Value = 0 - useValue;
-                            cmd.Parameters.Add("@UsedProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                            cmd.Parameters.Add("@UsedProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                            cmd.Parameters.Add("@UsedOrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-                            cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                            cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                            cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                            command.Parameters.Add("@StockName", DbType.String).Value = serviceStockName;
+                            command.Parameters.Add("@SubstrateName", DbType.String).Value = string.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
+                            command.Parameters.Add("@SubstrateModel", DbType.String).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
+                            command.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
+                            command.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(orderNum) ? DBNull.Value : orderNum;
+                            command.Parameters.Add("@Defect", DbType.String).Value = 0 - useValue;
+                            command.Parameters.Add("@UsedProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                            command.Parameters.Add("@UsedProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+                            command.Parameters.Add("@UsedOrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                            command.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+                            command.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                            command.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
-                            cmd.ExecuteNonQuery();
+                            command.ExecuteNonQuery();
                         }
                     }
                 }
             }
 
             // 製品テーブルに追加
-            cmd = con.CreateCommand();
-            cmd.CommandText =
+            command = con.CreateCommand();
+            command.CommandText =
                 $"""
                 INSERT INTO "{ProductInfo.CategoryName}_Product"
                     (ProductName,OrderNumber,ProductNumber,ProductType,ProductModel,Quantity,Person,RegDate,Revision,RevisionGroup,SerialFirst,SerialLast,SerialLastNumber,Comment)
@@ -1087,26 +1092,26 @@ namespace ProductDatabase {
                     (@ProductName,@OrderNumber,@ProductNumber,@ProductType,@ProductModel,@Quantity,@Person,@RegDate,@Revision,@RevisionGroup,@SerialFirst,@SerialLast,@SerialLastNumber,@Comment)
                 """;
 
-            cmd.Parameters.Add("@ProductName", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductName) ? DBNull.Value : ProductInfo.ProductName;
-            cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-            cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-            cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
-            cmd.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-            cmd.Parameters.Add("@Quantity", DbType.String).Value = ProductInfo.Quantity;
-            cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-            cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-            cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
-            cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
-            cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialFirst) ? DBNull.Value : ProductInfo.SerialFirst;
-            cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
-            cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = IsSerialGeneration ? _serialLastNumber : DBNull.Value;
-            cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+            command.Parameters.Add("@ProductName", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductName) ? DBNull.Value : ProductInfo.ProductName;
+            command.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+            command.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+            command.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
+            command.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+            command.Parameters.Add("@Quantity", DbType.String).Value = ProductInfo.Quantity;
+            command.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+            command.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+            command.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
+            command.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
+            command.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialFirst) ? DBNull.Value : ProductInfo.SerialFirst;
+            command.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
+            command.Parameters.Add("@SerialLastNumber", DbType.String).Value = IsSerialGeneration ? _serialLastNumber : DBNull.Value;
+            command.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
-            cmd.ExecuteNonQuery();
+            command.ExecuteNonQuery();
 
             // 一時テーブルから基板テーブルにコピー
-            cmd = con.CreateCommand();
-            cmd.CommandText =
+            command = con.CreateCommand();
+            command.CommandText =
                 $"""
                 INSERT INTO "{serviceCategoryName}_Substrate"
                     (StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, Defect, UsedProductType, UsedProductNumber, UsedOrderNumber, Person, RegDate, Comment)
@@ -1115,16 +1120,11 @@ namespace ProductDatabase {
                 FROM
                     TempSubstrateReduction tsr
                 """;
-            cmd.ExecuteNonQuery();
-
-            // 一時テーブルの内容を削除
-            cmd = con.CreateCommand();
-            cmd.CommandText = "DELETE FROM TempSubstrateReduction";
-            cmd.ExecuteNonQuery();
+            command.ExecuteNonQuery();
 
             if (IsSerialGeneration) {
                 foreach (var b in _strSerial) {
-                    cmd.CommandText =
+                    command.CommandText =
                         $"""
                         INSERT INTO "{ProductInfo.CategoryName}_Serial"
                             (Serial,UsedID,ProductName)
@@ -1132,11 +1132,11 @@ namespace ProductDatabase {
                             (@Serial,@productRowId,@ProductName)
                         """;
 
-                    cmd.Parameters.Add("@Serial", DbType.String).Value = b;
-                    cmd.Parameters.Add("@productRowId", DbType.String).Value = ProductInfo.ProductID;
-                    cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
+                    command.Parameters.Add("@Serial", DbType.String).Value = b;
+                    command.Parameters.Add("@productRowId", DbType.String).Value = ProductInfo.ProductID;
+                    command.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
 
-                    cmd.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
                 }
             }
         }
