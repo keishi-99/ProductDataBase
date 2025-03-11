@@ -542,7 +542,7 @@ namespace ProductDatabase {
                             // 一時テーブルに登録
                             using var insertCommand = connection.CreateCommand();
                             insertCommand.CommandText =
-                            $"""
+                                $"""
                                 INSERT INTO "TempSubstrateReduction"
                                     (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,
                                     Decrease,UsedProductType,UsedProductNumber,UsedOrderNumber,Person,RegDate,Comment)
