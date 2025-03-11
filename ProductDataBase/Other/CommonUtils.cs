@@ -61,7 +61,7 @@ namespace ProductDatabase.Other {
             private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup"); // バックアップを保存するディレクトリ
             private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db"); // 元ファイルパス
                                                                                                                                      //private static readonly string s_originalFilePath = Path.Combine(s_networkPath, "db", "registration.db"); // 元ファイルパス
-            private static readonly int s_maxBackupFiles = 10; // 最大バックアップファイル数
+            private static readonly int s_maxBackupFiles = 20; // 最大バックアップファイル数
             private static readonly object s_lockObject = new();
 
             /// <summary>
