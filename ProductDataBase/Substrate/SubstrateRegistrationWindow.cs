@@ -403,23 +403,18 @@ namespace ProductDatabase {
 
                 var pd = (PrintDocument)sender;
 
-                if (!isPreview) {
-                    // ハードマージンをミリメートルに変換
-                    offsetX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
-                    offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
+                // ハードマージンをミリメートルに変換
+                offsetX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
+                offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
 
-                    // 最初のページのみオフセットを調整
-                    var verticalOffset = _pageCount == 0 ? startLine * (intervalY + sizeY) : 0;
+                // 最初のページのみオフセットを調整
+                var verticalOffset = _pageCount == 0 ? startLine * (intervalY + sizeY) : 0;
 
-                    // オフセットを計算
-                    offset = new System.Drawing.Point(
-                        (int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH),
-                        (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + verticalOffset)
-                    );
-                }
-                else {
-                    offset = new System.Drawing.Point(0, 0);
-                }
+                // オフセットを計算
+                offset = new System.Drawing.Point(
+                    (int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH),
+                    (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + verticalOffset)
+                );
 
                 e.PageSettings.Margins.Left = 0;
                 e.PageSettings.Margins.Top = 0;
@@ -453,10 +448,13 @@ namespace ProductDatabase {
                         if (_labelSubNumLabelsToPrint <= 0) {
                             serialCodePrintCopies--;
                             if (serialCodePrintCopies <= 0) {
+                                // 最終行の行番号を表示
+                                var rowNumber = (y + 2).ToString();
+                                e.Graphics.DrawString(rowNumber, SettingsLabelSub.LabelSubPageSettings.HeaderFooterFont, Brushes.Black, 0, posY);
+                                // 次のページがあるかどうかの判定
                                 e.HasMorePages = false;
                                 _pageCount = 0;
-                                var txtNumPublish = 0;
-                                _labelSubNumLabelsToPrint = txtNumPublish;
+                                _labelSubNumLabelsToPrint = 0;
                                 return;
                             }
                             else {

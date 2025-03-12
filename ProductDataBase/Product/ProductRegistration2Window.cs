@@ -1,6 +1,7 @@
 ﻿using GenCode128;
 using ProductDatabase.Other;
 using ProductDatabase.Product;
+using ProductDatabase.Substrate;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing.Printing;
@@ -1267,7 +1268,6 @@ namespace ProductDatabase {
 
                 var pd = (PrintDocument)sender;
 
-                if (!isPreview) {
                     // ハードマージンをミリメートルに変換
                     offsetX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
                     offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
@@ -1280,12 +1280,6 @@ namespace ProductDatabase {
                         (int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH),
                         (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + verticalOffset)
                     );
-                }
-                else {
-                    offset = _pageCount == 1
-                        ? new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
-                        : new Point((int)(e.PageSettings.HardMarginX * -0.254), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
-                }
 
                 e.PageSettings.Margins.Left = 0;
                 e.PageSettings.Margins.Top = 0;
@@ -1325,6 +1319,10 @@ namespace ProductDatabase {
                             _labelProNumLabelsToPrint--;
                             //印刷するラベルがなくなった場合の処理
                             if (_labelProNumLabelsToPrint <= 0) {
+                                // 最終行の行番号を表示
+                                var rowNumber = (y + 2).ToString();
+                                e.Graphics.DrawString(rowNumber, SettingsLabelPro.LabelProPageSettings.HeaderFooterFont, Brushes.Black, 0, posY);
+                                // 次のページがあるかどうかの判定
                                 e.HasMorePages = false;
                                 _pageCount = 1;
                                 _labelProNumLabelsToPrint = 0;
