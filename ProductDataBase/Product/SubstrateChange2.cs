@@ -221,7 +221,7 @@ namespace ProductDatabase {
             try {
                 if (!QuantityCheck()) { return; }
 
-                if (!Registration()) { throw new Exception("登録失敗しました。"); }
+                Registration();
 
                 MessageBox.Show("登録完了");
 
@@ -299,7 +299,7 @@ namespace ProductDatabase {
                 return false;
             }
         }
-        private bool Registration() {
+        private void Registration() {
             try {
                 ProductInfo.RegDate = RegistrationDateMaskedTextBox.Text;
                 ProductInfo.Person = PersonComboBox.Text;
@@ -493,10 +493,8 @@ namespace ProductDatabase {
                     $"コメント[{ProductInfo.Comment}]"
                 ];
                 CommonUtils.Logger.AppendLog(logMessageArray);
-                return true;
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
+            } catch (Exception) {
+                throw;
             }
         }
 
