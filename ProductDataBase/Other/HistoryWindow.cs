@@ -461,7 +461,7 @@ namespace ProductDatabase {
                                     $"ID[{ProductInfo.CategoryName}_{row["ID", DataRowVersion.Original]}]",
                                     $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
                                     $"製造番号[{row["SubstrateNumber", DataRowVersion.Original]}]",
-                                    $"製品名[{row["ProductName", DataRowVersion.Original]}]",
+                                    $"ストック名[{row["StockName", DataRowVersion.Original]}]",
                                     $"基板名[{row["SubstrateName", DataRowVersion.Original]}]",
                                     $"型式[{row["SubstrateModel", DataRowVersion.Original]}]",
                                     $"追加量[{row["Increase", DataRowVersion.Original]}]",
@@ -478,7 +478,7 @@ namespace ProductDatabase {
                                     $"ID[{ProductInfo.CategoryName}_{row["ID"]}]",
                                     $"注文番号[{row["OrderNumber"]}]",
                                     $"製造番号[{row["SubstrateNumber"]}]",
-                                    $"製品名[{row["ProductName"]}]",
+                                    $"ストック名[{row["StockName"]}]",
                                     $"基板名[{row["SubstrateName"]}]",
                                     $"型式[{row["SubstrateModel"]}]",
                                     $"追加量[{row["Increase"]}]",
@@ -494,7 +494,9 @@ namespace ProductDatabase {
                             {
                                 //DELETE文の設定
                                 command.CommandText = $"""
-                                    DELETE FROM "{ProductInfo.CategoryName}_Substrate"
+                                    UPDATE "{ProductInfo.CategoryName}_Substrate"
+                                    SET "StockName" = NULL, "SubstrateName" = NULL, "SubstrateModel"= NULL, "SubstrateNumber"= NULL, "OrderNumber"= NULL, "Increase"= NULL, "Decrease"= NULL, "Defect"= NULL,
+                                         "UsedProductType"= NULL, "UsedProductNumber"= NULL, "UsedOrderNumber"= NULL, "Person"= NULL, "RegDate"= NULL, "Comment"= NULL, "UseID"= NULL
                                     WHERE ID = @ID;
                                     """;
                                 command.Parameters.Clear(); // パラメータをクリア
@@ -508,7 +510,7 @@ namespace ProductDatabase {
                                     $"ID[{ProductInfo.CategoryName}_{row["ID", DataRowVersion.Original]}]",
                                     $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
                                     $"製造番号[{row["SubstrateNumber", DataRowVersion.Original]}]",
-                                    $"製品名[{row["ProductName", DataRowVersion.Original]}]",
+                                    $"ストック名[{row["StockName", DataRowVersion.Original]}]",
                                     $"基板名[{row["SubstrateName", DataRowVersion.Original]}]",
                                     $"型式[{row["SubstrateModel", DataRowVersion.Original]}]",
                                     $"追加量[{row["Increase", DataRowVersion.Original]}]",
@@ -588,7 +590,9 @@ namespace ProductDatabase {
                             {
                                 //DELETE文の設定
                                 command.CommandText = $"""
-                                    DELETE FROM "{ProductInfo.CategoryName}_Product"
+                                    UPDATE "{ProductInfo.CategoryName}_Product"
+                                    SET "ProductName" = NULL, "OrderNumber" = NULL, "ProductNumber"= NULL, "ProductType"= NULL, "ProductModel"= NULL, "Quantity"= NULL, "Person"= NULL, "RegDate"= NULL,
+                                         "Revision"= NULL, "RevisionGroup"= NULL, "SerialFirst"= NULL, "SerialLast"= NULL, "SerialLastNumber"= NULL, "Comment"= NULL
                                     WHERE ID = @ID;
                                     """;
                                 command.Parameters.Clear(); // パラメータをクリア
