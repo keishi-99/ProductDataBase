@@ -426,20 +426,20 @@ namespace ProductDatabase {
                             if (row.RowState == DataRowState.Modified) {
                                 //    // UPDATE文の設定
                                 command.CommandText = $"""
-                            UPDATE "{ProductInfo.CategoryName}_Substrate"
-                            SET
-                                SubstrateNumber = @SubstrateNumber,
-                                OrderNumber = @OrderNumber,
-                                Increase = @Increase,
-                                Decrease = @Decrease,
-                                Defect = @Defect,
-                                Person = @Person,
-                                RegDate = @RegDate,
-                                Comment = @Comment,
-                                UseId = @UseId
-                            WHERE
-                                ID = @ID;
-                            """;
+                                    UPDATE "{ProductInfo.CategoryName}_Substrate"
+                                    SET
+                                        SubstrateNumber = @SubstrateNumber,
+                                        OrderNumber = @OrderNumber,
+                                        Increase = @Increase,
+                                        Decrease = @Decrease,
+                                        Defect = @Defect,
+                                        Person = @Person,
+                                        RegDate = @RegDate,
+                                        Comment = @Comment,
+                                        UseId = @UseId
+                                    WHERE
+                                        ID = @ID;
+                                    """;
 
                                 command.Parameters.Clear(); // パラメータをクリア
                                 command.Parameters.Add("@SubstrateNumber", DbType.String).Value = row["SubstrateNumber"];
@@ -494,9 +494,9 @@ namespace ProductDatabase {
                             {
                                 //DELETE文の設定
                                 command.CommandText = $"""
-                                DELETE FROM "{ProductInfo.CategoryName}_Substrate"
-                                WHERE ID = @ID;
-                                """;
+                                    DELETE FROM "{ProductInfo.CategoryName}_Substrate"
+                                    WHERE ID = @ID;
+                                    """;
                                 command.Parameters.Clear(); // パラメータをクリア
                                 command.Parameters.Add("@ID", DbType.Int32).Value = row["ID", DataRowVersion.Original];
 
@@ -526,20 +526,20 @@ namespace ProductDatabase {
                             if (row.RowState == DataRowState.Modified) {
                                 //    // UPDATE文の設定
                                 command.CommandText = $"""
-                            UPDATE "{ProductInfo.CategoryName}_Product"
-                            SET
-                                ID = @ID,
-                                OrderNumber = @OrderNumber,
-                                ProductNumber = @ProductNumber,
-                                Person = @Person,
-                                RegDate = @RegDate,
-                                Revision = @Revision,
-                                RevisionGroup = @RevisionGroup,
-                                RegDate = @RegDate,
-                                Comment = @Comment
-                            WHERE
-                                ID = @ID;
-                            """;
+                                    UPDATE "{ProductInfo.CategoryName}_Product"
+                                    SET
+                                        ID = @ID,
+                                        OrderNumber = @OrderNumber,
+                                        ProductNumber = @ProductNumber,
+                                        Person = @Person,
+                                        RegDate = @RegDate,
+                                        Revision = @Revision,
+                                        RevisionGroup = @RevisionGroup,
+                                        RegDate = @RegDate,
+                                        Comment = @Comment
+                                    WHERE
+                                        ID = @ID;
+                                    """;
 
                                 command.Parameters.Clear(); // パラメータをクリア
                                 command.Parameters.Add("@ID", DbType.Int32).Value = row["ID"];
@@ -588,9 +588,9 @@ namespace ProductDatabase {
                             {
                                 //DELETE文の設定
                                 command.CommandText = $"""
-                                DELETE FROM "{ProductInfo.CategoryName}_Product"
-                                WHERE ID = @ID;
-                                """;
+                                    DELETE FROM "{ProductInfo.CategoryName}_Product"
+                                    WHERE ID = @ID;
+                                    """;
                                 command.Parameters.Clear(); // パラメータをクリア
                                 command.Parameters.Add("@ID", DbType.Int32).Value = row["ID", DataRowVersion.Original];
 

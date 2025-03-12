@@ -378,9 +378,10 @@ namespace ProductDatabase {
 
                 DisableControls();
 
-                if (!Registration()) {
-                    throw new Exception("登録失敗しました。");
-                }
+                //if (!Registration()) {
+                //    throw new Exception("登録失敗しました。");
+                //}
+                Registration();
 
                 //HandleLabelPrinting();
                 //HandleBarcodePrinting();
@@ -399,7 +400,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private bool Registration() {
+        private void Registration() {
             using var con = new SQLiteConnection(GetConnectionRegistration());
             con.Open();
             using var transaction = con.BeginTransaction();
@@ -426,10 +427,9 @@ namespace ProductDatabase {
                 HandleBarcodePrinting();
                 transaction.Commit();
 
-                CommonUtils.BackupManager.CreateBackup();
                 LogRegistration(ProductInfo);
+                CommonUtils.BackupManager.CreateBackup();
 
-                return true;
             } catch (Exception) {
                 transaction.Rollback();
                 throw;
