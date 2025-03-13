@@ -1141,6 +1141,10 @@ namespace ProductDatabase {
 
             command.ExecuteNonQuery();
 
+            // 最終行取得
+            command.CommandText = $"""SELECT MAX(ID) FROM "{ProductInfo.CategoryName}_Product";""";
+            ProductInfo.ProductID = Convert.ToInt32(command.ExecuteScalar());
+
             // 一時テーブルから基板テーブルにコピー
             command = con.CreateCommand();
             command.CommandText =
