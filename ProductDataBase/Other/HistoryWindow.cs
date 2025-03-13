@@ -342,7 +342,20 @@ namespace ProductDatabase {
             LoadDataAndDisplay("Reprint", query, ("@ProductModel", ProductInfo.ProductModel));
         }
 
+        private SQLiteConnection? _editModeConnection; // 編集モード用の接続
+        private SQLiteTransaction? _editModeTransaction; // 編集モード用のトランザクション
         private void EditMode() {
+            // 編集モード用の接続とトランザクションを開始
+            try {
+                _editModeConnection = new SQLiteConnection(GetConnectionRegistration());
+                _editModeConnection.Open();
+                _editModeTransaction = _editModeConnection.BeginTransaction(); // トランザクション開始（ロック）
+            } catch (SQLiteException ex) {
+                MessageBox.Show($"データベースロックに失敗しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // ロック失敗時の処理（例：編集モードをキャンセル）
+                return;
+            }
+
             編集モードToolStripMenuItem.Enabled = false;
             編集終了ToolStripMenuItem.Enabled = Auth.IsAdministrator;
             DataBaseDataGridView.AllowUserToDeleteRows = true;
@@ -664,9 +677,33 @@ namespace ProductDatabase {
                 }
                 // バックアップ作成
                 CommonUtils.BackupManager.CreateBackup();
+
+                // 編集モードのトランザクションをコミットしてロック解除
+                if (_editModeTransaction != null) {
+                    _editModeTransaction.Commit();
+                    _editModeTransaction.Dispose();
+                    _editModeTransaction = null;
+                }
+                if (_editModeConnection != null) {
+                    _editModeConnection.Close();
+                    _editModeConnection.Dispose();
+                    _editModeConnection = null;
+                }
+
                 Close();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // エラー発生時のロールバック（トランザクションが存在する場合）
+                if (_editModeTransaction != null) {
+                    _editModeTransaction.Rollback();
+                    _editModeTransaction.Dispose();
+                    _editModeTransaction = null;
+                }
+                if (_editModeConnection != null) {
+                    _editModeConnection.Close();
+                    _editModeConnection.Dispose();
+                    _editModeConnection = null;
+                }
             }
         }
 
