@@ -1,7 +1,6 @@
 ﻿using GenCode128;
 using ProductDatabase.Other;
 using ProductDatabase.Product;
-using ProductDatabase.Substrate;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing.Printing;
@@ -431,8 +430,13 @@ namespace ProductDatabase {
                 LogRegistration(ProductInfo);
                 CommonUtils.BackupManager.CreateBackup();
 
+                // 登録チェック
+                RegistrationCheck();
+
             } catch (Exception) {
-                transaction.Rollback();
+                if (transaction.Connection != null) { //接続が開いているか確認する。
+                    transaction.Rollback();
+                }
                 throw;
             }
         }
@@ -638,6 +642,33 @@ namespace ProductDatabase {
             command.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(productInfo.Revision) ? DBNull.Value : productInfo.Revision;
             command.Parameters.Add("@RevisionGroup", DbType.String).Value = productInfo.RevisionGroup;
             command.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(productInfo.Comment) ? DBNull.Value : productInfo.Comment;
+        }
+        // 登録チェック
+        private void RegistrationCheck() {
+            using SQLiteConnection con = new(GetConnectionRegistration());
+            con.Open();
+
+            using var cmd = con.CreateCommand();
+
+            cmd.CommandText = $"""SELECT * FROM {ProductInfo.CategoryName}_Product WHERE Id = @Id;""";
+            cmd.Parameters.Add("@Id", DbType.String).Value = ProductInfo.ProductID;
+
+            using var dr = cmd.ExecuteReader();
+
+            if (dr.HasRows && dr.Read()) {
+                // 1行のデータが存在する場合の処理
+                if (dr.Read()) {
+                    // 2行以上データが存在する場合の処理
+                    throw new Exception("登録IDが複数存在します。");
+                }
+                else {
+                    // 1行のみデータが存在する場合の処理
+                }
+            }
+            else {
+                // データが存在しない場合の処理
+                throw new Exception("登録IDが見つかりません。");
+            }
         }
         // ログ出力
         private static void LogRegistration(ProductInformation productInfo) {
@@ -1268,18 +1299,18 @@ namespace ProductDatabase {
 
                 var pd = (PrintDocument)sender;
 
-                    // ハードマージンをミリメートルに変換
-                    offsetX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
-                    offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
+                // ハードマージンをミリメートルに変換
+                offsetX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
+                offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
 
-                    // 最初のページのみオフセットを調整
-                    var verticalOffset = _pageCount == 0 ? startLine * (intervalY + sizeY) : 0;
+                // 最初のページのみオフセットを調整
+                var verticalOffset = _pageCount == 0 ? startLine * (intervalY + sizeY) : 0;
 
-                    // オフセットを計算
-                    offset = new System.Drawing.Point(
-                        (int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH),
-                        (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + verticalOffset)
-                    );
+                // オフセットを計算
+                offset = new System.Drawing.Point(
+                    (int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH),
+                    (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + verticalOffset)
+                );
 
                 e.PageSettings.Margins.Left = 0;
                 e.PageSettings.Margins.Top = 0;

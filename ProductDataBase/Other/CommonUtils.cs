@@ -241,18 +241,19 @@ namespace ProductDatabase.Other {
                 con.Open();
                 using var cmd = con.CreateCommand();
 
-                cmd.CommandText = $"""
-                                SELECT
-                                	SubstrateModel,
-                                	SubstrateNumber,
-                                	Decrease
-                                FROM
-                                	PA_Substrate
-                                WHERE
-                                	UseID = @ID
-                                ORDER BY
-                                	SubstrateModel ASC
-                                """;
+                cmd.CommandText =
+                    $"""
+                    SELECT
+                        SubstrateModel,
+                        SubstrateNumber,
+                        Decrease
+                    FROM
+                        PA_Substrate
+                    WHERE
+                        UseID = @ID
+                    ORDER BY
+                        SubstrateModel ASC
+                    """;
                 cmd.Parameters.Add("@ID", DbType.String).Value = productInfo.ProductID;
                 using var dr = cmd.ExecuteReader();
 
