@@ -433,9 +433,13 @@ namespace ProductDatabase {
         }
         private void SaveRegistrationLog() {
             try {
-                using SQLiteConnection con = new(GetConnectionRegistration());
-                con.Open();
-                var command = con.CreateCommand();
+                // 編集モードで使用している接続を使用
+                if (_editModeConnection == null) {
+                    MessageBox.Show("編集モードが開始されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var command = _editModeConnection.CreateCommand(); // 編集モードの接続を使用
 
                 switch (_tableName) {
                     case "Substrate":
@@ -470,7 +474,6 @@ namespace ProductDatabase {
                                 command.Parameters.Add("@UseId", DbType.Int32).Value = row["UseId"];
                                 command.Parameters.Add("@ID", DbType.Int32).Value = row["ID"];
 
-                                command.Connection = con;
                                 command.ExecuteNonQuery();
                                 // ログ出力
                                 string[] logMessageArray = [
@@ -519,7 +522,6 @@ namespace ProductDatabase {
                                 command.Parameters.Clear(); // パラメータをクリア
                                 command.Parameters.Add("@ID", DbType.Int32).Value = row["ID", DataRowVersion.Original];
 
-                                command.Connection = con;
                                 command.ExecuteNonQuery();
                                 // ログ出力
                                 string[] logMessageArray = [
@@ -570,7 +572,6 @@ namespace ProductDatabase {
                                 command.Parameters.Add("@RevisionGroup", DbType.String).Value = row["RevisionGroup"];
                                 command.Parameters.Add("@Comment", DbType.String).Value = row["Comment"];
 
-                                command.Connection = con;
                                 command.ExecuteNonQuery();
                                 // ログ出力
                                 string[] logMessageArray = [
@@ -615,7 +616,6 @@ namespace ProductDatabase {
                                 command.Parameters.Clear(); // パラメータをクリア
                                 command.Parameters.Add("@ID", DbType.Int32).Value = row["ID", DataRowVersion.Original];
 
-                                command.Connection = con;
                                 command.ExecuteNonQuery();
                                 // ログ出力
                                 string[] logMessageArray = [
@@ -635,25 +635,6 @@ namespace ProductDatabase {
                     case "Serial":
                         foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
                             if (row.RowState == DataRowState.Modified) {
-                                ////    // UPDATE文の設定
-                                //command.CommandText = $"""
-                                //UPDATE "{ProductInfo.CategoryName}_Serial"
-                                //SET
-                                //    Serial = @Serial,
-                                //    UsedID = @UsedID
-                                //WHERE
-                                //    ID = @ID;
-                                //""";
-
-                                //command.Parameters.Clear(); // パラメータをクリア
-                                //command.Parameters.Add("@Serial", DbType.String).Value = row["Serial"];
-                                //command.Parameters.Add("@UsedID", DbType.String).Value = row["UsedID"];
-                                //command.Parameters.Add("@ID", DbType.Int32).Value = row["ID"];
-
-                                //command.Connection = con;
-                                //command.ExecuteNonQuery();
-                                //// ログ出力
-                                //CommonUtils.Logger.AppendLog($"");
                             }
                             else if (row.RowState == DataRowState.Deleted) // 削除行の処理
                             {
@@ -665,7 +646,7 @@ namespace ProductDatabase {
                                 command.Parameters.Clear(); // パラメータをクリア
                                 command.Parameters.Add("@ID", DbType.Int32).Value = row["ID", DataRowVersion.Original];
 
-                                command.Connection = con;
+                                //command.Connection = con;
                                 command.ExecuteNonQuery();
                                 // ログ出力
                                 string[] logMessageArray = [
