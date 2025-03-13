@@ -395,6 +395,8 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["ProductType"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ProductModel"].ReadOnly = true;
                     DataBaseDataGridView.Columns["Quantity"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["Revision"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["RevisionGroup"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SerialFirst"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SerialLast"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SerialLastNumber"].ReadOnly = true;
@@ -403,6 +405,8 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["ProductType"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductModel"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["Quantity"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["Revision"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["RevisionGroup"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SerialFirst"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SerialLast"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SerialLastNumber"].DefaultCellStyle.ForeColor = Color.Red;
