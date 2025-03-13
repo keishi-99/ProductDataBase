@@ -325,7 +325,7 @@ namespace ProductDatabase {
                 if (_labelSubNumLabelsToPrint == 0) {
                     throw new Exception("数量が入力されていません。");
                 }
-                _pageCount = 0;
+                _pageCount = 1;
 
                 SubstrateRegistrationPrintDialog.Document = pd;
 
@@ -364,7 +364,7 @@ namespace ProductDatabase {
                     throw new Exception("数量が入力されていません。");
                 }
 
-                _pageCount = 0;
+                _pageCount = 1;
 
                 // 最大で表示
                 SubstrateRegistrationPrintPreviewDialog.Shown += (sender, e) => {
@@ -408,7 +408,7 @@ namespace ProductDatabase {
                 offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
 
                 // 最初のページのみオフセットを調整
-                var verticalOffset = _pageCount == 0 ? startLine * (intervalY + sizeY) : 0;
+                var verticalOffset = _pageCount == 1 ? startLine * (intervalY + sizeY) : 0;
 
                 // オフセットを計算
                 offset = new System.Drawing.Point(
@@ -424,7 +424,7 @@ namespace ProductDatabase {
                 e.Graphics.DrawString(headerString, SettingsLabelSub.LabelSubPageSettings.HeaderFooterFont, Brushes.Black, headerPos);
                 _labelSubNSerial = ManufacturingNumberMaskedTextBox.Text;
 
-                if (_pageCount >= 1) {
+                if (_pageCount >= 2) {
                     startLine = 0;
                 }
 
