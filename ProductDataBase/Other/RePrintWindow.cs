@@ -400,7 +400,7 @@ namespace ProductDatabase {
                         headerString = ConvertHeaderFooterString(SettingsBarcodePro.BarcodeProPageSettings.HeaderString);
                         headerFooterFont = SettingsBarcodePro.BarcodeProPageSettings.HeaderFooterFont;
                         serialCodePrintCopies = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
-                        startLine = (int)PrintPostionNumericUpDown.Value;
+                        startLine = (int)PrintPostionNumericUpDown.Value - 1;
                         break;
                     default:
                         break;
@@ -412,17 +412,17 @@ namespace ProductDatabase {
 
                 offsetX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
                 offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
-                offset = _pageCount == 1
-                    ? new Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
-                    : new Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
+
+                // 最初のページのみオフセットを調整
+                var verticalOffset = _pageCount == 1 ? startLine * (intervalY + sizeY) : 0;
+
+                offset = new Point(
+                    (int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH),
+                    (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + verticalOffset)
+                );
 
                 headerPos.Offset(offset);
                 e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
-
-                var barcodePageNum = 0;
-                offset = barcodePageNum == 0
-                    ? new Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (startLine * (intervalY + sizeY))))
-                    : new Point((int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH), (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + (0 * (intervalY + sizeY))));
 
                 if (_pageCount == 1) {
                     _remainingCount = serialCodePrintCopies;

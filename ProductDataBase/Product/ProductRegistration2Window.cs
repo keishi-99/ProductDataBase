@@ -1291,7 +1291,7 @@ namespace ProductDatabase {
                         headerString = ConvertHeaderFooterString(SettingsBarcodePro.BarcodeProPageSettings.HeaderString);
                         headerFooterFont = SettingsBarcodePro.BarcodeProPageSettings.HeaderFooterFont;
                         serialCodePrintCopies = SettingsBarcodePro.BarcodeProLabelSettings.NumLabels;
-                        startLine = (int)BarcodePrintPostionNumericUpDown.Value;
+                        startLine = (int)BarcodePrintPostionNumericUpDown.Value - 1;
                         break;
                     default:
                         break;
@@ -1308,7 +1308,7 @@ namespace ProductDatabase {
                 offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
 
                 // 最初のページのみオフセットを調整
-                var verticalOffset = _pageCount == 0 ? startLine * (intervalY + sizeY) : 0;
+                var verticalOffset = _pageCount == 1 ? startLine * (intervalY + sizeY) : 0;
 
                 // オフセットを計算
                 offset = new System.Drawing.Point(
