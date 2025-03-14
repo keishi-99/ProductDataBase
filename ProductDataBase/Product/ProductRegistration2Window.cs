@@ -1357,7 +1357,7 @@ namespace ProductDatabase {
                             if (_labelProNumLabelsToPrint <= 0) {
                                 // 最終行の行番号を表示
                                 var rowNumber = _serialType switch {
-                                    "Serial" => (y + 2).ToString(),
+                                    "Label" => (y + 2).ToString(),
                                     "Barcode" => (y + 1).ToString(),
                                     _ => throw new Exception("_serialType unknown")
                                 };
