@@ -2,7 +2,6 @@
 using ProductDatabase.Substrate;
 using System.Data;
 using System.Data.SQLite;
-using System.Drawing.Printing;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
@@ -10,8 +9,7 @@ namespace ProductDatabase {
 
         public ProductInformation ProductInfo { get; }
 
-        public CSettingsLabelSub SettingsLabelSub { get; set; } = new CSettingsLabelSub();
-
+        public SubstratePrintSettings SubstratePrintSettings { get; set; } = new SubstratePrintSettings();
         private readonly string _settingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.xml");
 
         private string _labelSubNSerial = string.Empty;
@@ -90,7 +88,7 @@ namespace ProductDatabase {
                 }
 
                 if (File.Exists(_settingFilePath) == false) { throw new Exception("印刷設定ファイルが見つかりませんでした"); }
-                SettingsLabelSub = new CSettingsLabelSub();
+                SubstratePrintSettings = new SubstratePrintSettings();
                 LoadSettings(_settingFilePath);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -100,9 +98,10 @@ namespace ProductDatabase {
         }
         private void LoadSettings(string strSettingFilePath) {
             try {
+                if (strSettingFilePath != string.Empty) { }
                 StreamReader sr = new(strSettingFilePath, new System.Text.UTF8Encoding(false));
-                System.Xml.Serialization.XmlSerializer serializer = new(typeof(CSettingsLabelSub));
-                if (serializer.Deserialize(sr) is CSettingsLabelSub result) { SettingsLabelSub = result; }
+                System.Xml.Serialization.XmlSerializer serializer = new(typeof(SubstratePrintSettings));
+                if (serializer.Deserialize(sr) is SubstratePrintSettings result) { SubstratePrintSettings = result; }
                 sr.Close();
             } catch (Exception ex) {
                 MessageBox.Show($"設定ファイルの読み込みに失敗しました。{Environment.NewLine}{ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -384,55 +383,46 @@ namespace ProductDatabase {
         }
         private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
             try {
-                if (SettingsLabelSub == null || e.Graphics == null) { return; }
+                if (SubstratePrintSettings == null || e.Graphics == null) { return; }
 
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
                 // プレビューかどうかの判定
                 var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
 
-                var labelWidth = (float)SettingsLabelSub.LabelSubPageSettings.LabelWidth;
-                var labelHeight = (float)SettingsLabelSub.LabelSubPageSettings.LabelHeight;
-                var marginX = SettingsLabelSub.LabelSubPageSettings.MarginX;
-                var marginY = SettingsLabelSub.LabelSubPageSettings.MarginY;
-                var intervalX = SettingsLabelSub.LabelSubPageSettings.IntervalX;
-                var intervalY = SettingsLabelSub.LabelSubPageSettings.IntervalY;
-                var headerPos = SettingsLabelSub.LabelSubPageSettings.HeaderPos;
-                var margin = new System.Drawing.Point(0, 0);
+                var labelWidth = (float)SubstratePrintSettings.LabelPageSettings.LabelWidth;
+                var labelHeight = (float)SubstratePrintSettings.LabelPageSettings.LabelHeight;
+                var marginX = SubstratePrintSettings.LabelPageSettings.MarginX;
+                var marginY = SubstratePrintSettings.LabelPageSettings.MarginY;
+                var intervalX = SubstratePrintSettings.LabelPageSettings.IntervalX;
+                var intervalY = SubstratePrintSettings.LabelPageSettings.IntervalY;
+                var headerPositionX = SubstratePrintSettings.LabelPageSettings.HeaderPositionX;
+                var headerPositionY = SubstratePrintSettings.LabelPageSettings.HeaderPositionY;
+                var headerFont = SubstratePrintSettings.LabelPageSettings.HeaderFont;
                 var startLine = (int)PrintPostionNumericUpDown.Value - 1;
-                const double MM_PER_HUNDREDTH_INCH = 0.254;
-
-                var pd = (PrintDocument)sender;
 
                 // ハードマージンをミリメートルに変換
+                const double MM_PER_HUNDREDTH_INCH = 0.254;
                 marginX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
                 marginY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
 
+                var headerString = ConvertHeaderString(SubstratePrintSettings.LabelPageSettings.HeaderText);
+
                 // 最初のページのみオフセットを調整
                 var verticalOffset = _pageCount == 1 ? startLine * (intervalY + labelHeight) : 0;
+                // ヘッダーの描画
+                e.Graphics.DrawString(headerString, headerFont, Brushes.Black, (float)headerPositionX, (float)(verticalOffset + headerPositionY));
 
-                // オフセットを計算
-                margin = new System.Drawing.Point(
-                    (int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH),
-                    (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + verticalOffset)
-                );
-
-                e.PageSettings.Margins.Left = 0;
-                e.PageSettings.Margins.Top = 0;
-
-                var headerString = ConvertHeaderFooterString(SettingsLabelSub.LabelSubPageSettings.HeaderString);
-                headerPos.Offset(margin);
-                e.Graphics.DrawString(headerString, SettingsLabelSub.LabelSubPageSettings.HeaderFooterFont, Brushes.Black, headerPos);
                 _labelSubNSerial = ManufacturingNumberMaskedTextBox.Text;
 
                 if (_pageCount >= 2) {
                     startLine = 0;
                 }
 
-                var labelCountX = SettingsLabelSub.LabelSubPageSettings.LabelCountX;
-                var labelCountY = SettingsLabelSub.LabelSubPageSettings.LabelCountY;
+                var labelCountX = SubstratePrintSettings.LabelPageSettings.LabelsPerColumn;
+                var labelCountY = SubstratePrintSettings.LabelPageSettings.LabelsPerRow;
                 int y;
-                var serialCodePrintCopies = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
-                if (labelCountX == 0 || labelCountY == 0 || serialCodePrintCopies == 0) { throw new Exception("印刷設定が異常です。"); }
+                var copiesPerLabel = SubstratePrintSettings.LabelLayoutSettings.CopiesPerLabel;
+                if (labelCountX == 0 || labelCountY == 0 || copiesPerLabel == 0) { throw new Exception("印刷設定が異常です。"); }
                 for (y = startLine; y < labelCountY; y++) {
                     int x;
                     for (x = 0; x < labelCountX; x++) {
@@ -446,11 +436,11 @@ namespace ProductDatabase {
                         _labelSubNumLabelsToPrint--;
 
                         if (_labelSubNumLabelsToPrint <= 0) {
-                            serialCodePrintCopies--;
-                            if (serialCodePrintCopies <= 0) {
+                            copiesPerLabel--;
+                            if (copiesPerLabel <= 0) {
                                 // 最終行の行番号を表示
                                 var rowNumber = (y + 2).ToString();
-                                e.Graphics.DrawString(rowNumber, SettingsLabelSub.LabelSubPageSettings.HeaderFooterFont, Brushes.Black, 0, posY);
+                                e.Graphics.DrawString(rowNumber, SubstratePrintSettings.LabelPageSettings.HeaderFont, Brushes.Black, 0, posY);
                                 // 次のページがあるかどうかの判定
                                 e.HasMorePages = false;
                                 _pageCount = 0;
@@ -464,11 +454,11 @@ namespace ProductDatabase {
                         }
 
                         if (x >= labelCountX - 1) {
-                            serialCodePrintCopies--;
-                            if (serialCodePrintCopies <= 0) {
-                                serialCodePrintCopies = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
+                            copiesPerLabel--;
+                            if (copiesPerLabel <= 0) {
+                                copiesPerLabel = SubstratePrintSettings.LabelLayoutSettings.CopiesPerLabel;
                             }
-                            else if (serialCodePrintCopies > 0) {
+                            else if (copiesPerLabel > 0) {
                                 _labelSubNumLabelsToPrint += x + 1;
                                 break;
                             }
@@ -486,7 +476,7 @@ namespace ProductDatabase {
             } finally {
             }
         }
-        private string ConvertHeaderFooterString(string s) {
+        private string ConvertHeaderString(string s) {
             s = s.Replace("%P", ProductInfo.SubstrateName)
                  .Replace("%T", ProductInfo.SubstrateModel)
                  .Replace("%D", DateTime.Today.ToShortDateString())
@@ -506,7 +496,7 @@ namespace ProductDatabase {
                 _ => monthCode
             };
 
-            var outputCode = SettingsLabelSub.LabelSubLabelSettings.Format;
+            var outputCode = SubstratePrintSettings.LabelLayoutSettings.Format;
             var serialCode = serial.Substring(5, 5);
             outputCode = outputCode.Replace("%T", ProductInfo.Initial)
                                     .Replace("%Y", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yy"))
@@ -517,25 +507,25 @@ namespace ProductDatabase {
             return outputCode;
         }
         private Bitmap MakeLabelImage(string text, int resolution, int magnitude) {
-            if (SettingsLabelSub is null) { throw new Exception(); }
-            var sizeX = (decimal)SettingsLabelSub.LabelSubPageSettings.LabelWidth / 25.4M * resolution * magnitude;
-            var sizeY = (decimal)SettingsLabelSub.LabelSubPageSettings.LabelHeight / 25.4M * resolution * magnitude;
+            if (SubstratePrintSettings is null) { throw new Exception(); }
+            var sizeX = (decimal)SubstratePrintSettings.LabelPageSettings.LabelWidth / 25.4M * resolution * magnitude;
+            var sizeY = (decimal)SubstratePrintSettings.LabelPageSettings.LabelHeight / 25.4M * resolution * magnitude;
 
             Bitmap labelImage = new((int)sizeX, (int)sizeY);
             using (var g = Graphics.FromImage(labelImage)) {
                 // アンチエイリアス処理を改善
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-                var fontSize = (decimal)SettingsLabelSub.LabelSubLabelSettings.Font.SizeInPoints / 72.0M * resolution * magnitude;
-                using (Font fnt = new(SettingsLabelSub.LabelSubLabelSettings.Font.Name, (float)fontSize)) {
+                var fontSize = (decimal)SubstratePrintSettings.LabelLayoutSettings.TextFont.SizeInPoints / 72.0M * resolution * magnitude;
+                using (Font fnt = new(SubstratePrintSettings.LabelLayoutSettings.TextFont.Name, (float)fontSize)) {
 
                     // StringFormat を使用して中心に配置
                     var sf = new StringFormat {
-                        Alignment = SettingsLabelSub.LabelSubLabelSettings.AlignStringXCenter ? StringAlignment.Center : StringAlignment.Near,
-                        LineAlignment = SettingsLabelSub.LabelSubLabelSettings.AlignStringYCenter ? StringAlignment.Center : StringAlignment.Near
+                        Alignment = SubstratePrintSettings.LabelLayoutSettings.AlignTextXCenter ? StringAlignment.Center : StringAlignment.Near,
+                        LineAlignment = SubstratePrintSettings.LabelLayoutSettings.AlignTextYCenter ? StringAlignment.Center : StringAlignment.Near
                     };
 
-                    var stringPosX = SettingsLabelSub.LabelSubLabelSettings.AlignStringXCenter ? 0 : (float)(SettingsLabelSub.LabelSubLabelSettings.StringPosX / 25.4F * resolution * magnitude);
-                    var stringPosY = SettingsLabelSub.LabelSubLabelSettings.AlignStringYCenter ? 0 : (float)(SettingsLabelSub.LabelSubLabelSettings.StringPosY / 25.4F * resolution * magnitude);
+                    var stringPosX = SubstratePrintSettings.LabelLayoutSettings.AlignTextXCenter ? 0 : (float)(SubstratePrintSettings.LabelLayoutSettings.TextPositionX / 25.4F * resolution * magnitude);
+                    var stringPosY = SubstratePrintSettings.LabelLayoutSettings.AlignTextYCenter ? 0 : (float)(SubstratePrintSettings.LabelLayoutSettings.TextPositionY / 25.4F * resolution * magnitude);
 
                     // 矩形領域を計算 (文字列を配置する領域)
                     var layoutRect = new RectangleF(stringPosX, stringPosY, labelImage.Width - stringPosX, labelImage.Height - stringPosY);
@@ -675,22 +665,9 @@ namespace ProductDatabase {
         private void 印刷ToolStripMenuItem_Click(object sender, EventArgs e) { PrintBarcode(); }
         private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { PreviewBarcode(); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            SubstrateLabelSettingsWindow ls = new();
+            SubstratePrintSettingsWindow ls = new();
             ls.ShowDialog(this);
-
-            try {
-                StreamWriter? sw = null;
-
-                sw = new StreamWriter(_settingFilePath, false, new System.Text.UTF8Encoding(false));
-                System.Xml.Serialization.XmlSerializer serializer = new(typeof(CSettingsLabelSub));
-                serializer.Serialize(sw, SettingsLabelSub);
-                sw?.Close();
-
-                LoadSettings(_settingFilePath);
-            } catch (Exception ex) {
-                MessageBox.Show($"設定ファイルの保存に失敗しました。{Environment.NewLine}{ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } finally {
-            }
+            LoadSettings(_settingFilePath);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
             var entries = new[]

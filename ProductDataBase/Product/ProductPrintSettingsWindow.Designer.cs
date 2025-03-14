@@ -1,5 +1,5 @@
 ﻿namespace ProductDatabase {
-    partial class SubstrateLabelSettingsWindow {
+    partial class ProductPrintSettingsWindow {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -23,47 +23,48 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            this.OKButton = new Button();
+            this.PrintTextGroupBox = new GroupBox();
+            this.AlignTextYCenterCheckBox = new CheckBox();
             this.Label41 = new Label();
             this.Label40 = new Label();
-            this.PrintTextFormatTextBox = new TextBox();
+            this.LabelFormatTextBox = new TextBox();
             this.Label39 = new Label();
             this.PrintTextFontButton = new Button();
             this.PrintTextFontTextBox = new TextBox();
             this.Label36 = new Label();
-            this.PrintTextQuantityTextBox = new TextBox();
+            this.CopiesPerLabelTextBox = new TextBox();
             this.Label35 = new Label();
-            this.PrintTextXCenterCheckBox = new CheckBox();
-            this.PrintTextPostionYTextBox = new TextBox();
-            this.OKButton = new Button();
+            this.AlignTextXCenterCheckBox = new CheckBox();
+            this.LabelTextPostionYTextBox = new TextBox();
             this.Label33 = new Label();
-            this.Label30 = new Label();
-            this.Label29 = new Label();
-            this.PrintTextGroupBox = new GroupBox();
-            this.PrintTextYCenterCheckBox = new CheckBox();
-            this.PrintTextPostionXTextBox = new TextBox();
+            this.LabelTextPostionXTextBox = new TextBox();
             this.Label32 = new Label();
-            this.HeaderStringTextBox = new TextBox();
-            this.Label22 = new Label();
+            this.WhiteSpaceGroupBox = new GroupBox();
             this.Label11 = new Label();
             this.Label10 = new Label();
-            this.PageOffsetXTextBox = new TextBox();
-            this.WhiteSpaceGroupBox = new GroupBox();
-            this.PageOffsetYTextBox = new TextBox();
+            this.LabelMarginYTextBox = new TextBox();
+            this.LabelMarginXTextBox = new TextBox();
             this.Label9 = new Label();
             this.Label8 = new Label();
             this.QuantityGroupBox = new GroupBox();
             this.Label7 = new Label();
-            this.QuantityYTextBox = new TextBox();
-            this.QuantityXTextBox = new TextBox();
+            this.LabelsPerRowTextBox = new TextBox();
+            this.LabelsPerColumnTextBox = new TextBox();
             this.Label6 = new Label();
             this.Label5 = new Label();
+            this.LabelSizeGroupBox = new GroupBox();
+            this.Label4 = new Label();
             this.Label3 = new Label();
             this.LabelHeightTextBox = new TextBox();
-            this.Label4 = new Label();
             this.LabelWidthTextBox = new TextBox();
             this.Label2 = new Label();
             this.Label1 = new Label();
-            this.LabelSizeGroupBox = new GroupBox();
+            this.HeaderGroupBox = new GroupBox();
+            this.Label30 = new Label();
+            this.Label29 = new Label();
+            this.HeaderTextTextBox = new TextBox();
+            this.Label22 = new Label();
             this.Label21 = new Label();
             this.Label20 = new Label();
             this.HeaderPostionYTextBox = new TextBox();
@@ -71,27 +72,71 @@
             this.Label19 = new Label();
             this.Label18 = new Label();
             this.Label17 = new Label();
-            this.HeaderFooterFontButton = new Button();
-            this.HeaderFooterFontTextBox = new TextBox();
-            this.Label12 = new Label();
+            this.HeaderFontButton = new Button();
+            this.HeaderFontTextBox = new TextBox();
             this.Label16 = new Label();
+            this.LabelIntervalGroupBox = new GroupBox();
             this.Label15 = new Label();
             this.Label14 = new Label();
             this.LabelIntervalYTextBox = new TextBox();
             this.LabelIntervalXTextBox = new TextBox();
             this.Label13 = new Label();
-            this.HeaderFooterGroupBox = new GroupBox();
-            this.LabelIntervalGroupBox = new GroupBox();
-            this.CancelButton = new Button();
+            this.Label12 = new Label();
+            this.CloseButton = new Button();
             this.HeaderFontDialog = new FontDialog();
-            this.TextFontDialog = new FontDialog();
+            this.LabelFontDialog = new FontDialog();
             this.PrintTextGroupBox.SuspendLayout();
             this.WhiteSpaceGroupBox.SuspendLayout();
             this.QuantityGroupBox.SuspendLayout();
             this.LabelSizeGroupBox.SuspendLayout();
-            this.HeaderFooterGroupBox.SuspendLayout();
+            this.HeaderGroupBox.SuspendLayout();
             this.LabelIntervalGroupBox.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // OKButton
+            // 
+            this.OKButton.Location = new Point(471, 524);
+            this.OKButton.Name = "OKButton";
+            this.OKButton.Size = new Size(75, 25);
+            this.OKButton.TabIndex = 24;
+            this.OKButton.Text = "OK";
+            this.OKButton.UseVisualStyleBackColor = true;
+            this.OKButton.Click += this.OKButton_Click;
+            // 
+            // PrintTextGroupBox
+            // 
+            this.PrintTextGroupBox.Controls.Add(this.AlignTextYCenterCheckBox);
+            this.PrintTextGroupBox.Controls.Add(this.Label41);
+            this.PrintTextGroupBox.Controls.Add(this.Label40);
+            this.PrintTextGroupBox.Controls.Add(this.LabelFormatTextBox);
+            this.PrintTextGroupBox.Controls.Add(this.Label39);
+            this.PrintTextGroupBox.Controls.Add(this.PrintTextFontButton);
+            this.PrintTextGroupBox.Controls.Add(this.PrintTextFontTextBox);
+            this.PrintTextGroupBox.Controls.Add(this.Label36);
+            this.PrintTextGroupBox.Controls.Add(this.CopiesPerLabelTextBox);
+            this.PrintTextGroupBox.Controls.Add(this.Label35);
+            this.PrintTextGroupBox.Controls.Add(this.AlignTextXCenterCheckBox);
+            this.PrintTextGroupBox.Controls.Add(this.LabelTextPostionYTextBox);
+            this.PrintTextGroupBox.Controls.Add(this.Label33);
+            this.PrintTextGroupBox.Controls.Add(this.LabelTextPostionXTextBox);
+            this.PrintTextGroupBox.Controls.Add(this.Label32);
+            this.PrintTextGroupBox.Location = new Point(27, 309);
+            this.PrintTextGroupBox.Name = "PrintTextGroupBox";
+            this.PrintTextGroupBox.Size = new Size(600, 170);
+            this.PrintTextGroupBox.TabIndex = 22;
+            this.PrintTextGroupBox.TabStop = false;
+            this.PrintTextGroupBox.Text = "印刷文字設定";
+            // 
+            // AlignTextYCenterCheckBox
+            // 
+            this.AlignTextYCenterCheckBox.AutoSize = true;
+            this.AlignTextYCenterCheckBox.Location = new Point(112, 55);
+            this.AlignTextYCenterCheckBox.Name = "AlignTextYCenterCheckBox";
+            this.AlignTextYCenterCheckBox.Size = new Size(50, 19);
+            this.AlignTextYCenterCheckBox.TabIndex = 31;
+            this.AlignTextYCenterCheckBox.Text = "中心";
+            this.AlignTextYCenterCheckBox.UseVisualStyleBackColor = true;
+            this.AlignTextYCenterCheckBox.CheckedChanged += this.TextYCenterCheckBox_CheckedChanged;
             // 
             // Label41
             // 
@@ -107,17 +152,17 @@
             this.Label40.AutoSize = true;
             this.Label40.Location = new Point(318, 109);
             this.Label40.Name = "Label40";
-            this.Label40.Size = new Size(213, 15);
+            this.Label40.Size = new Size(201, 15);
             this.Label40.TabIndex = 24;
-            this.Label40.Text = "%T: 型式 %R: リビジョン %S: 製造番号";
+            this.Label40.Text = "%T: 型式 %R: リビジョン %S: シリアル";
             // 
-            // PrintTextFormatTextBox
+            // LabelFormatTextBox
             // 
-            this.PrintTextFormatTextBox.Location = new Point(379, 74);
-            this.PrintTextFormatTextBox.MaxLength = 50;
-            this.PrintTextFormatTextBox.Name = "PrintTextFormatTextBox";
-            this.PrintTextFormatTextBox.Size = new Size(180, 23);
-            this.PrintTextFormatTextBox.TabIndex = 24;
+            this.LabelFormatTextBox.Location = new Point(379, 74);
+            this.LabelFormatTextBox.MaxLength = 50;
+            this.LabelFormatTextBox.Name = "LabelFormatTextBox";
+            this.LabelFormatTextBox.Size = new Size(180, 23);
+            this.LabelFormatTextBox.TabIndex = 24;
             // 
             // Label39
             // 
@@ -143,6 +188,7 @@
             this.PrintTextFontTextBox.Location = new Point(320, 30);
             this.PrintTextFontTextBox.MaxLength = 50;
             this.PrintTextFontTextBox.Name = "PrintTextFontTextBox";
+            this.PrintTextFontTextBox.ReadOnly = true;
             this.PrintTextFontTextBox.Size = new Size(135, 23);
             this.PrintTextFontTextBox.TabIndex = 24;
             // 
@@ -155,13 +201,13 @@
             this.Label36.TabIndex = 24;
             this.Label36.Text = "フォント";
             // 
-            // PrintTextQuantityTextBox
+            // CopiesPerLabelTextBox
             // 
-            this.PrintTextQuantityTextBox.Location = new Point(22, 92);
-            this.PrintTextQuantityTextBox.MaxLength = 5;
-            this.PrintTextQuantityTextBox.Name = "PrintTextQuantityTextBox";
-            this.PrintTextQuantityTextBox.Size = new Size(52, 23);
-            this.PrintTextQuantityTextBox.TabIndex = 10;
+            this.CopiesPerLabelTextBox.Location = new Point(22, 92);
+            this.CopiesPerLabelTextBox.MaxLength = 5;
+            this.CopiesPerLabelTextBox.Name = "CopiesPerLabelTextBox";
+            this.CopiesPerLabelTextBox.Size = new Size(52, 23);
+            this.CopiesPerLabelTextBox.TabIndex = 10;
             // 
             // Label35
             // 
@@ -172,34 +218,24 @@
             this.Label35.TabIndex = 9;
             this.Label35.Text = "発行枚数";
             // 
-            // PrintTextXCenterCheckBox
+            // AlignTextXCenterCheckBox
             // 
-            this.PrintTextXCenterCheckBox.AutoSize = true;
-            this.PrintTextXCenterCheckBox.Location = new Point(22, 55);
-            this.PrintTextXCenterCheckBox.Name = "PrintTextXCenterCheckBox";
-            this.PrintTextXCenterCheckBox.Size = new Size(50, 19);
-            this.PrintTextXCenterCheckBox.TabIndex = 6;
-            this.PrintTextXCenterCheckBox.Text = "中心";
-            this.PrintTextXCenterCheckBox.UseVisualStyleBackColor = true;
-            this.PrintTextXCenterCheckBox.CheckedChanged += this.PrintTextXCenterCheckBox_CheckedChanged;
+            this.AlignTextXCenterCheckBox.AutoSize = true;
+            this.AlignTextXCenterCheckBox.Location = new Point(22, 55);
+            this.AlignTextXCenterCheckBox.Name = "AlignTextXCenterCheckBox";
+            this.AlignTextXCenterCheckBox.Size = new Size(50, 19);
+            this.AlignTextXCenterCheckBox.TabIndex = 6;
+            this.AlignTextXCenterCheckBox.Text = "中心";
+            this.AlignTextXCenterCheckBox.UseVisualStyleBackColor = true;
+            this.AlignTextXCenterCheckBox.CheckedChanged += this.TextXCenterCheckBox_CheckedChanged;
             // 
-            // PrintTextPostionYTextBox
+            // LabelTextPostionYTextBox
             // 
-            this.PrintTextPostionYTextBox.Location = new Point(112, 30);
-            this.PrintTextPostionYTextBox.MaxLength = 5;
-            this.PrintTextPostionYTextBox.Name = "PrintTextPostionYTextBox";
-            this.PrintTextPostionYTextBox.Size = new Size(68, 23);
-            this.PrintTextPostionYTextBox.TabIndex = 5;
-            // 
-            // OKButton
-            // 
-            this.OKButton.Location = new Point(471, 524);
-            this.OKButton.Name = "OKButton";
-            this.OKButton.Size = new Size(75, 25);
-            this.OKButton.TabIndex = 16;
-            this.OKButton.Text = "OK";
-            this.OKButton.UseVisualStyleBackColor = true;
-            this.OKButton.Click += this.BtnOK_Click;
+            this.LabelTextPostionYTextBox.Location = new Point(112, 30);
+            this.LabelTextPostionYTextBox.MaxLength = 5;
+            this.LabelTextPostionYTextBox.Name = "LabelTextPostionYTextBox";
+            this.LabelTextPostionYTextBox.Size = new Size(68, 23);
+            this.LabelTextPostionYTextBox.TabIndex = 5;
             // 
             // Label33
             // 
@@ -210,66 +246,13 @@
             this.Label33.TabIndex = 4;
             this.Label33.Text = "縦位置";
             // 
-            // Label30
+            // LabelTextPostionXTextBox
             // 
-            this.Label30.AutoSize = true;
-            this.Label30.Location = new Point(6, 186);
-            this.Label30.Name = "Label30";
-            this.Label30.Size = new Size(188, 15);
-            this.Label30.TabIndex = 23;
-            this.Label30.Text = "%P 製品名 %N 台数  %U 担当者";
-            // 
-            // Label29
-            // 
-            this.Label29.AutoSize = true;
-            this.Label29.Location = new Point(6, 171);
-            this.Label29.Name = "Label29";
-            this.Label29.Size = new Size(227, 15);
-            this.Label29.TabIndex = 22;
-            this.Label29.Text = "%D 印刷日 %M 製番 %O 注番 %T 型式";
-            // 
-            // PrintTextGroupBox
-            // 
-            this.PrintTextGroupBox.Controls.Add(this.PrintTextYCenterCheckBox);
-            this.PrintTextGroupBox.Controls.Add(this.Label41);
-            this.PrintTextGroupBox.Controls.Add(this.Label40);
-            this.PrintTextGroupBox.Controls.Add(this.PrintTextFormatTextBox);
-            this.PrintTextGroupBox.Controls.Add(this.Label39);
-            this.PrintTextGroupBox.Controls.Add(this.PrintTextFontButton);
-            this.PrintTextGroupBox.Controls.Add(this.PrintTextFontTextBox);
-            this.PrintTextGroupBox.Controls.Add(this.Label36);
-            this.PrintTextGroupBox.Controls.Add(this.PrintTextQuantityTextBox);
-            this.PrintTextGroupBox.Controls.Add(this.Label35);
-            this.PrintTextGroupBox.Controls.Add(this.PrintTextXCenterCheckBox);
-            this.PrintTextGroupBox.Controls.Add(this.PrintTextPostionYTextBox);
-            this.PrintTextGroupBox.Controls.Add(this.Label33);
-            this.PrintTextGroupBox.Controls.Add(this.PrintTextPostionXTextBox);
-            this.PrintTextGroupBox.Controls.Add(this.Label32);
-            this.PrintTextGroupBox.Location = new Point(27, 309);
-            this.PrintTextGroupBox.Name = "PrintTextGroupBox";
-            this.PrintTextGroupBox.Size = new Size(600, 170);
-            this.PrintTextGroupBox.TabIndex = 14;
-            this.PrintTextGroupBox.TabStop = false;
-            this.PrintTextGroupBox.Text = "印刷文字設定";
-            // 
-            // PrintTextYCenterCheckBox
-            // 
-            this.PrintTextYCenterCheckBox.AutoSize = true;
-            this.PrintTextYCenterCheckBox.Location = new Point(112, 55);
-            this.PrintTextYCenterCheckBox.Name = "PrintTextYCenterCheckBox";
-            this.PrintTextYCenterCheckBox.Size = new Size(50, 19);
-            this.PrintTextYCenterCheckBox.TabIndex = 32;
-            this.PrintTextYCenterCheckBox.Text = "中心";
-            this.PrintTextYCenterCheckBox.UseVisualStyleBackColor = true;
-            this.PrintTextYCenterCheckBox.CheckedChanged += this.PrintTextYCenterCheckBox_CheckedChanged;
-            // 
-            // PrintTextPostionXTextBox
-            // 
-            this.PrintTextPostionXTextBox.Location = new Point(22, 30);
-            this.PrintTextPostionXTextBox.MaxLength = 5;
-            this.PrintTextPostionXTextBox.Name = "PrintTextPostionXTextBox";
-            this.PrintTextPostionXTextBox.Size = new Size(68, 23);
-            this.PrintTextPostionXTextBox.TabIndex = 3;
+            this.LabelTextPostionXTextBox.Location = new Point(22, 30);
+            this.LabelTextPostionXTextBox.MaxLength = 5;
+            this.LabelTextPostionXTextBox.Name = "LabelTextPostionXTextBox";
+            this.LabelTextPostionXTextBox.Size = new Size(68, 23);
+            this.LabelTextPostionXTextBox.TabIndex = 3;
             // 
             // Label32
             // 
@@ -280,22 +263,20 @@
             this.Label32.TabIndex = 2;
             this.Label32.Text = "横位置";
             // 
-            // HeaderStringTextBox
+            // WhiteSpaceGroupBox
             // 
-            this.HeaderStringTextBox.Location = new Point(79, 125);
-            this.HeaderStringTextBox.MaxLength = 50;
-            this.HeaderStringTextBox.Name = "HeaderStringTextBox";
-            this.HeaderStringTextBox.Size = new Size(185, 23);
-            this.HeaderStringTextBox.TabIndex = 12;
-            // 
-            // Label22
-            // 
-            this.Label22.AutoSize = true;
-            this.Label22.Location = new Point(6, 128);
-            this.Label22.Name = "Label22";
-            this.Label22.Size = new Size(69, 15);
-            this.Label22.TabIndex = 11;
-            this.Label22.Text = "ヘッダ文字列";
+            this.WhiteSpaceGroupBox.Controls.Add(this.Label11);
+            this.WhiteSpaceGroupBox.Controls.Add(this.Label10);
+            this.WhiteSpaceGroupBox.Controls.Add(this.LabelMarginYTextBox);
+            this.WhiteSpaceGroupBox.Controls.Add(this.LabelMarginXTextBox);
+            this.WhiteSpaceGroupBox.Controls.Add(this.Label9);
+            this.WhiteSpaceGroupBox.Controls.Add(this.Label8);
+            this.WhiteSpaceGroupBox.Location = new Point(27, 158);
+            this.WhiteSpaceGroupBox.Name = "WhiteSpaceGroupBox";
+            this.WhiteSpaceGroupBox.Size = new Size(311, 67);
+            this.WhiteSpaceGroupBox.TabIndex = 19;
+            this.WhiteSpaceGroupBox.TabStop = false;
+            this.WhiteSpaceGroupBox.Text = "用紙余白";
             // 
             // Label11
             // 
@@ -315,36 +296,21 @@
             this.Label10.TabIndex = 4;
             this.Label10.Text = "mm";
             // 
-            // PageOffsetXTextBox
+            // LabelMarginYTextBox
             // 
-            this.PageOffsetXTextBox.Location = new Point(20, 36);
-            this.PageOffsetXTextBox.MaxLength = 5;
-            this.PageOffsetXTextBox.Name = "PageOffsetXTextBox";
-            this.PageOffsetXTextBox.Size = new Size(100, 23);
-            this.PageOffsetXTextBox.TabIndex = 1;
+            this.LabelMarginYTextBox.Location = new Point(158, 36);
+            this.LabelMarginYTextBox.MaxLength = 5;
+            this.LabelMarginYTextBox.Name = "LabelMarginYTextBox";
+            this.LabelMarginYTextBox.Size = new Size(100, 23);
+            this.LabelMarginYTextBox.TabIndex = 3;
             // 
-            // WhiteSpaceGroupBox
+            // LabelMarginXTextBox
             // 
-            this.WhiteSpaceGroupBox.Controls.Add(this.Label11);
-            this.WhiteSpaceGroupBox.Controls.Add(this.Label10);
-            this.WhiteSpaceGroupBox.Controls.Add(this.PageOffsetYTextBox);
-            this.WhiteSpaceGroupBox.Controls.Add(this.PageOffsetXTextBox);
-            this.WhiteSpaceGroupBox.Controls.Add(this.Label9);
-            this.WhiteSpaceGroupBox.Controls.Add(this.Label8);
-            this.WhiteSpaceGroupBox.Location = new Point(27, 158);
-            this.WhiteSpaceGroupBox.Name = "WhiteSpaceGroupBox";
-            this.WhiteSpaceGroupBox.Size = new Size(311, 67);
-            this.WhiteSpaceGroupBox.TabIndex = 11;
-            this.WhiteSpaceGroupBox.TabStop = false;
-            this.WhiteSpaceGroupBox.Text = "用紙余白";
-            // 
-            // PageOffsetYTextBox
-            // 
-            this.PageOffsetYTextBox.Location = new Point(158, 36);
-            this.PageOffsetYTextBox.MaxLength = 5;
-            this.PageOffsetYTextBox.Name = "PageOffsetYTextBox";
-            this.PageOffsetYTextBox.Size = new Size(100, 23);
-            this.PageOffsetYTextBox.TabIndex = 3;
+            this.LabelMarginXTextBox.Location = new Point(20, 36);
+            this.LabelMarginXTextBox.MaxLength = 5;
+            this.LabelMarginXTextBox.Name = "LabelMarginXTextBox";
+            this.LabelMarginXTextBox.Size = new Size(100, 23);
+            this.LabelMarginXTextBox.TabIndex = 1;
             // 
             // Label9
             // 
@@ -367,14 +333,14 @@
             // QuantityGroupBox
             // 
             this.QuantityGroupBox.Controls.Add(this.Label7);
-            this.QuantityGroupBox.Controls.Add(this.QuantityYTextBox);
-            this.QuantityGroupBox.Controls.Add(this.QuantityXTextBox);
+            this.QuantityGroupBox.Controls.Add(this.LabelsPerRowTextBox);
+            this.QuantityGroupBox.Controls.Add(this.LabelsPerColumnTextBox);
             this.QuantityGroupBox.Controls.Add(this.Label6);
             this.QuantityGroupBox.Controls.Add(this.Label5);
             this.QuantityGroupBox.Location = new Point(27, 85);
             this.QuantityGroupBox.Name = "QuantityGroupBox";
             this.QuantityGroupBox.Size = new Size(311, 67);
-            this.QuantityGroupBox.TabIndex = 12;
+            this.QuantityGroupBox.TabIndex = 20;
             this.QuantityGroupBox.TabStop = false;
             this.QuantityGroupBox.Text = "配置数";
             // 
@@ -387,21 +353,21 @@
             this.Label7.TabIndex = 4;
             this.Label7.Text = "×";
             // 
-            // QuantityYTextBox
+            // LabelsPerRowTextBox
             // 
-            this.QuantityYTextBox.Location = new Point(158, 36);
-            this.QuantityYTextBox.MaxLength = 5;
-            this.QuantityYTextBox.Name = "QuantityYTextBox";
-            this.QuantityYTextBox.Size = new Size(100, 23);
-            this.QuantityYTextBox.TabIndex = 3;
+            this.LabelsPerRowTextBox.Location = new Point(158, 36);
+            this.LabelsPerRowTextBox.MaxLength = 5;
+            this.LabelsPerRowTextBox.Name = "LabelsPerRowTextBox";
+            this.LabelsPerRowTextBox.Size = new Size(100, 23);
+            this.LabelsPerRowTextBox.TabIndex = 3;
             // 
-            // QuantityXTextBox
+            // LabelsPerColumnTextBox
             // 
-            this.QuantityXTextBox.Location = new Point(20, 36);
-            this.QuantityXTextBox.MaxLength = 5;
-            this.QuantityXTextBox.Name = "QuantityXTextBox";
-            this.QuantityXTextBox.Size = new Size(100, 23);
-            this.QuantityXTextBox.TabIndex = 1;
+            this.LabelsPerColumnTextBox.Location = new Point(20, 36);
+            this.LabelsPerColumnTextBox.MaxLength = 5;
+            this.LabelsPerColumnTextBox.Name = "LabelsPerColumnTextBox";
+            this.LabelsPerColumnTextBox.Size = new Size(100, 23);
+            this.LabelsPerColumnTextBox.TabIndex = 1;
             // 
             // Label6
             // 
@@ -421,6 +387,30 @@
             this.Label5.TabIndex = 1;
             this.Label5.Text = "横";
             // 
+            // LabelSizeGroupBox
+            // 
+            this.LabelSizeGroupBox.Controls.Add(this.Label4);
+            this.LabelSizeGroupBox.Controls.Add(this.Label3);
+            this.LabelSizeGroupBox.Controls.Add(this.LabelHeightTextBox);
+            this.LabelSizeGroupBox.Controls.Add(this.LabelWidthTextBox);
+            this.LabelSizeGroupBox.Controls.Add(this.Label2);
+            this.LabelSizeGroupBox.Controls.Add(this.Label1);
+            this.LabelSizeGroupBox.Location = new Point(27, 12);
+            this.LabelSizeGroupBox.Name = "LabelSizeGroupBox";
+            this.LabelSizeGroupBox.Size = new Size(311, 67);
+            this.LabelSizeGroupBox.TabIndex = 18;
+            this.LabelSizeGroupBox.TabStop = false;
+            this.LabelSizeGroupBox.Text = "ラベルサイズ";
+            // 
+            // Label4
+            // 
+            this.Label4.AutoSize = true;
+            this.Label4.Location = new Point(261, 39);
+            this.Label4.Name = "Label4";
+            this.Label4.Size = new Size(31, 15);
+            this.Label4.TabIndex = 5;
+            this.Label4.Text = "mm";
+            // 
             // Label3
             // 
             this.Label3.AutoSize = true;
@@ -437,15 +427,6 @@
             this.LabelHeightTextBox.Name = "LabelHeightTextBox";
             this.LabelHeightTextBox.Size = new Size(100, 23);
             this.LabelHeightTextBox.TabIndex = 3;
-            // 
-            // Label4
-            // 
-            this.Label4.AutoSize = true;
-            this.Label4.Location = new Point(261, 39);
-            this.Label4.Name = "Label4";
-            this.Label4.Size = new Size(31, 15);
-            this.Label4.TabIndex = 5;
-            this.Label4.Text = "mm";
             // 
             // LabelWidthTextBox
             // 
@@ -473,20 +454,63 @@
             this.Label1.TabIndex = 1;
             this.Label1.Text = "横";
             // 
-            // LabelSizeGroupBox
+            // HeaderGroupBox
             // 
-            this.LabelSizeGroupBox.Controls.Add(this.Label4);
-            this.LabelSizeGroupBox.Controls.Add(this.Label3);
-            this.LabelSizeGroupBox.Controls.Add(this.LabelHeightTextBox);
-            this.LabelSizeGroupBox.Controls.Add(this.LabelWidthTextBox);
-            this.LabelSizeGroupBox.Controls.Add(this.Label2);
-            this.LabelSizeGroupBox.Controls.Add(this.Label1);
-            this.LabelSizeGroupBox.Location = new Point(27, 12);
-            this.LabelSizeGroupBox.Name = "LabelSizeGroupBox";
-            this.LabelSizeGroupBox.Size = new Size(311, 67);
-            this.LabelSizeGroupBox.TabIndex = 10;
-            this.LabelSizeGroupBox.TabStop = false;
-            this.LabelSizeGroupBox.Text = "ラベルサイズ";
+            this.HeaderGroupBox.Controls.Add(this.Label30);
+            this.HeaderGroupBox.Controls.Add(this.Label29);
+            this.HeaderGroupBox.Controls.Add(this.HeaderTextTextBox);
+            this.HeaderGroupBox.Controls.Add(this.Label22);
+            this.HeaderGroupBox.Controls.Add(this.Label21);
+            this.HeaderGroupBox.Controls.Add(this.Label20);
+            this.HeaderGroupBox.Controls.Add(this.HeaderPostionYTextBox);
+            this.HeaderGroupBox.Controls.Add(this.HeaderPostionXTextBox);
+            this.HeaderGroupBox.Controls.Add(this.Label19);
+            this.HeaderGroupBox.Controls.Add(this.Label18);
+            this.HeaderGroupBox.Controls.Add(this.Label17);
+            this.HeaderGroupBox.Controls.Add(this.HeaderFontButton);
+            this.HeaderGroupBox.Controls.Add(this.HeaderFontTextBox);
+            this.HeaderGroupBox.Controls.Add(this.Label16);
+            this.HeaderGroupBox.Location = new Point(357, 12);
+            this.HeaderGroupBox.Name = "HeaderGroupBox";
+            this.HeaderGroupBox.Size = new Size(270, 213);
+            this.HeaderGroupBox.TabIndex = 21;
+            this.HeaderGroupBox.TabStop = false;
+            this.HeaderGroupBox.Text = "ヘッダ・フッタ";
+            // 
+            // Label30
+            // 
+            this.Label30.AutoSize = true;
+            this.Label30.Location = new Point(6, 186);
+            this.Label30.Name = "Label30";
+            this.Label30.Size = new Size(188, 15);
+            this.Label30.TabIndex = 23;
+            this.Label30.Text = "%P 製品名 %N 台数  %U 担当者";
+            // 
+            // Label29
+            // 
+            this.Label29.AutoSize = true;
+            this.Label29.Location = new Point(6, 171);
+            this.Label29.Name = "Label29";
+            this.Label29.Size = new Size(227, 15);
+            this.Label29.TabIndex = 22;
+            this.Label29.Text = "%D 印刷日 %M 製番 %O 注番 %T 型式";
+            // 
+            // HeaderTextTextBox
+            // 
+            this.HeaderTextTextBox.Location = new Point(79, 125);
+            this.HeaderTextTextBox.MaxLength = 50;
+            this.HeaderTextTextBox.Name = "HeaderTextTextBox";
+            this.HeaderTextTextBox.Size = new Size(185, 23);
+            this.HeaderTextTextBox.TabIndex = 12;
+            // 
+            // Label22
+            // 
+            this.Label22.AutoSize = true;
+            this.Label22.Location = new Point(6, 128);
+            this.Label22.Name = "Label22";
+            this.Label22.Size = new Size(69, 15);
+            this.Label22.TabIndex = 11;
+            this.Label22.Text = "ヘッダ文字列";
             // 
             // Label21
             // 
@@ -549,32 +573,24 @@
             this.Label17.TabIndex = 4;
             this.Label17.Text = "ヘッダ位置";
             // 
-            // HeaderFooterFontButton
+            // HeaderFontButton
             // 
-            this.HeaderFooterFontButton.Location = new Point(168, 35);
-            this.HeaderFooterFontButton.Name = "HeaderFooterFontButton";
-            this.HeaderFooterFontButton.Size = new Size(96, 25);
-            this.HeaderFooterFontButton.TabIndex = 3;
-            this.HeaderFooterFontButton.Text = "フォント選択";
-            this.HeaderFooterFontButton.UseVisualStyleBackColor = true;
-            this.HeaderFooterFontButton.Click += this.BtnHeaderFooterFont_Click;
+            this.HeaderFontButton.Location = new Point(168, 35);
+            this.HeaderFontButton.Name = "HeaderFontButton";
+            this.HeaderFontButton.Size = new Size(96, 25);
+            this.HeaderFontButton.TabIndex = 3;
+            this.HeaderFontButton.Text = "フォント選択";
+            this.HeaderFontButton.UseVisualStyleBackColor = true;
+            this.HeaderFontButton.Click += this.HeaderFontButton_Click;
             // 
-            // HeaderFooterFontTextBox
+            // HeaderFontTextBox
             // 
-            this.HeaderFooterFontTextBox.Location = new Point(27, 36);
-            this.HeaderFooterFontTextBox.MaxLength = 50;
-            this.HeaderFooterFontTextBox.Name = "HeaderFooterFontTextBox";
-            this.HeaderFooterFontTextBox.Size = new Size(135, 23);
-            this.HeaderFooterFontTextBox.TabIndex = 2;
-            // 
-            // Label12
-            // 
-            this.Label12.AutoSize = true;
-            this.Label12.Location = new Point(18, 21);
-            this.Label12.Name = "Label12";
-            this.Label12.Size = new Size(55, 15);
-            this.Label12.TabIndex = 1;
-            this.Label12.Text = "左右間隔";
+            this.HeaderFontTextBox.Location = new Point(27, 36);
+            this.HeaderFontTextBox.MaxLength = 50;
+            this.HeaderFontTextBox.Name = "HeaderFontTextBox";
+            this.HeaderFontTextBox.ReadOnly = true;
+            this.HeaderFontTextBox.Size = new Size(135, 23);
+            this.HeaderFontTextBox.TabIndex = 2;
             // 
             // Label16
             // 
@@ -584,6 +600,21 @@
             this.Label16.Size = new Size(40, 15);
             this.Label16.TabIndex = 1;
             this.Label16.Text = "フォント";
+            // 
+            // LabelIntervalGroupBox
+            // 
+            this.LabelIntervalGroupBox.Controls.Add(this.Label15);
+            this.LabelIntervalGroupBox.Controls.Add(this.Label14);
+            this.LabelIntervalGroupBox.Controls.Add(this.LabelIntervalYTextBox);
+            this.LabelIntervalGroupBox.Controls.Add(this.LabelIntervalXTextBox);
+            this.LabelIntervalGroupBox.Controls.Add(this.Label13);
+            this.LabelIntervalGroupBox.Controls.Add(this.Label12);
+            this.LabelIntervalGroupBox.Location = new Point(27, 231);
+            this.LabelIntervalGroupBox.Name = "LabelIntervalGroupBox";
+            this.LabelIntervalGroupBox.Size = new Size(311, 67);
+            this.LabelIntervalGroupBox.TabIndex = 23;
+            this.LabelIntervalGroupBox.TabStop = false;
+            this.LabelIntervalGroupBox.Text = "ラベル間隔";
             // 
             // Label15
             // 
@@ -628,77 +659,49 @@
             this.Label13.TabIndex = 2;
             this.Label13.Text = "上下間隔";
             // 
-            // HeaderFooterGroupBox
+            // Label12
             // 
-            this.HeaderFooterGroupBox.Controls.Add(this.Label30);
-            this.HeaderFooterGroupBox.Controls.Add(this.Label29);
-            this.HeaderFooterGroupBox.Controls.Add(this.HeaderStringTextBox);
-            this.HeaderFooterGroupBox.Controls.Add(this.Label22);
-            this.HeaderFooterGroupBox.Controls.Add(this.Label21);
-            this.HeaderFooterGroupBox.Controls.Add(this.Label20);
-            this.HeaderFooterGroupBox.Controls.Add(this.HeaderPostionYTextBox);
-            this.HeaderFooterGroupBox.Controls.Add(this.HeaderPostionXTextBox);
-            this.HeaderFooterGroupBox.Controls.Add(this.Label19);
-            this.HeaderFooterGroupBox.Controls.Add(this.Label18);
-            this.HeaderFooterGroupBox.Controls.Add(this.Label17);
-            this.HeaderFooterGroupBox.Controls.Add(this.HeaderFooterFontButton);
-            this.HeaderFooterGroupBox.Controls.Add(this.HeaderFooterFontTextBox);
-            this.HeaderFooterGroupBox.Controls.Add(this.Label16);
-            this.HeaderFooterGroupBox.Location = new Point(357, 12);
-            this.HeaderFooterGroupBox.Name = "HeaderFooterGroupBox";
-            this.HeaderFooterGroupBox.Size = new Size(270, 213);
-            this.HeaderFooterGroupBox.TabIndex = 13;
-            this.HeaderFooterGroupBox.TabStop = false;
-            this.HeaderFooterGroupBox.Text = "ヘッダ・フッタ";
+            this.Label12.AutoSize = true;
+            this.Label12.Location = new Point(18, 21);
+            this.Label12.Name = "Label12";
+            this.Label12.Size = new Size(55, 15);
+            this.Label12.TabIndex = 1;
+            this.Label12.Text = "左右間隔";
             // 
-            // LabelIntervalGroupBox
+            // CloseButton
             // 
-            this.LabelIntervalGroupBox.Controls.Add(this.Label15);
-            this.LabelIntervalGroupBox.Controls.Add(this.Label14);
-            this.LabelIntervalGroupBox.Controls.Add(this.LabelIntervalYTextBox);
-            this.LabelIntervalGroupBox.Controls.Add(this.LabelIntervalXTextBox);
-            this.LabelIntervalGroupBox.Controls.Add(this.Label13);
-            this.LabelIntervalGroupBox.Controls.Add(this.Label12);
-            this.LabelIntervalGroupBox.Location = new Point(27, 231);
-            this.LabelIntervalGroupBox.Name = "LabelIntervalGroupBox";
-            this.LabelIntervalGroupBox.Size = new Size(311, 67);
-            this.LabelIntervalGroupBox.TabIndex = 15;
-            this.LabelIntervalGroupBox.TabStop = false;
-            this.LabelIntervalGroupBox.Text = "ラベル間隔";
+            this.CloseButton.Location = new Point(552, 524);
+            this.CloseButton.Name = "CloseButton";
+            this.CloseButton.Size = new Size(75, 25);
+            this.CloseButton.TabIndex = 25;
+            this.CloseButton.Text = "キャンセル";
+            this.CloseButton.UseVisualStyleBackColor = true;
+            this.CloseButton.Click += this.CloseButton_Click;
             // 
-            // CancelButton
-            // 
-            this.CancelButton.Location = new Point(552, 524);
-            this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new Size(75, 25);
-            this.CancelButton.TabIndex = 17;
-            this.CancelButton.Text = "キャンセル";
-            this.CancelButton.UseVisualStyleBackColor = true;
-            this.CancelButton.Click += this.CloseButton_Click;
-            // 
-            // SubstrateLabelSettingsWindow
+            // ProductPrintSettingsWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
+            this.CancelButton = this.CloseButton;
             this.ClientSize = new Size(654, 561);
-            this.Controls.Add(this.CancelButton);
+            this.Controls.Add(this.CloseButton);
             this.Controls.Add(this.OKButton);
             this.Controls.Add(this.PrintTextGroupBox);
             this.Controls.Add(this.WhiteSpaceGroupBox);
             this.Controls.Add(this.QuantityGroupBox);
             this.Controls.Add(this.LabelSizeGroupBox);
-            this.Controls.Add(this.HeaderFooterGroupBox);
+            this.Controls.Add(this.HeaderGroupBox);
             this.Controls.Add(this.LabelIntervalGroupBox);
             this.Font = new Font("Meiryo UI", 9F);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "SubstrateLabelSettingsWindow";
+            this.Name = "ProductPrintSettingsWindow";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = FormStartPosition.CenterParent;
-            this.Text = "基板ラベル設定";
-            this.Load += this.SubstratePrintSetting_Load;
+            this.Text = "製品ラベル設定";
+            this.Load += this.ProductPrintSetting_Load;
             this.PrintTextGroupBox.ResumeLayout(false);
             this.PrintTextGroupBox.PerformLayout();
             this.WhiteSpaceGroupBox.ResumeLayout(false);
@@ -707,8 +710,8 @@
             this.QuantityGroupBox.PerformLayout();
             this.LabelSizeGroupBox.ResumeLayout(false);
             this.LabelSizeGroupBox.PerformLayout();
-            this.HeaderFooterGroupBox.ResumeLayout(false);
-            this.HeaderFooterGroupBox.PerformLayout();
+            this.HeaderGroupBox.ResumeLayout(false);
+            this.HeaderGroupBox.PerformLayout();
             this.LabelIntervalGroupBox.ResumeLayout(false);
             this.LabelIntervalGroupBox.PerformLayout();
             this.ResumeLayout(false);
@@ -716,46 +719,47 @@
 
         #endregion
 
+        private Button OKButton;
+        private GroupBox PrintTextGroupBox;
         private Label Label41;
         private Label Label40;
-        private TextBox PrintTextFormatTextBox;
+        private TextBox LabelFormatTextBox;
         private Label Label39;
         private Button PrintTextFontButton;
         private TextBox PrintTextFontTextBox;
         private Label Label36;
-        private TextBox PrintTextQuantityTextBox;
+        private TextBox CopiesPerLabelTextBox;
         private Label Label35;
-        private CheckBox PrintTextXCenterCheckBox;
-        private TextBox PrintTextPostionYTextBox;
-        private Button OKButton;
+        private CheckBox AlignTextXCenterCheckBox;
+        private TextBox LabelTextPostionYTextBox;
         private Label Label33;
-        private Label Label30;
-        private Label Label29;
-        private GroupBox PrintTextGroupBox;
-        private TextBox PrintTextPostionXTextBox;
+        private TextBox LabelTextPostionXTextBox;
         private Label Label32;
-        private TextBox HeaderStringTextBox;
-        private Label Label22;
+        private GroupBox WhiteSpaceGroupBox;
         private Label Label11;
         private Label Label10;
-        private TextBox PageOffsetXTextBox;
-        private GroupBox WhiteSpaceGroupBox;
-        private TextBox PageOffsetYTextBox;
+        private TextBox LabelMarginYTextBox;
+        private TextBox LabelMarginXTextBox;
         private Label Label9;
         private Label Label8;
         private GroupBox QuantityGroupBox;
         private Label Label7;
-        private TextBox QuantityYTextBox;
-        private TextBox QuantityXTextBox;
+        private TextBox LabelsPerRowTextBox;
+        private TextBox LabelsPerColumnTextBox;
         private Label Label6;
         private Label Label5;
+        private GroupBox LabelSizeGroupBox;
+        private Label Label4;
         private Label Label3;
         private TextBox LabelHeightTextBox;
-        private Label Label4;
         private TextBox LabelWidthTextBox;
         private Label Label2;
         private Label Label1;
-        private GroupBox LabelSizeGroupBox;
+        private GroupBox HeaderGroupBox;
+        private Label Label30;
+        private Label Label29;
+        private TextBox HeaderTextTextBox;
+        private Label Label22;
         private Label Label21;
         private Label Label20;
         private TextBox HeaderPostionYTextBox;
@@ -763,20 +767,19 @@
         private Label Label19;
         private Label Label18;
         private Label Label17;
-        private Button HeaderFooterFontButton;
-        private TextBox HeaderFooterFontTextBox;
-        private Label Label12;
+        private Button HeaderFontButton;
+        private TextBox HeaderFontTextBox;
         private Label Label16;
+        private GroupBox LabelIntervalGroupBox;
         private Label Label15;
         private Label Label14;
         private TextBox LabelIntervalYTextBox;
         private TextBox LabelIntervalXTextBox;
         private Label Label13;
-        private GroupBox HeaderFooterGroupBox;
-        private GroupBox LabelIntervalGroupBox;
-        private new Button CancelButton;
+        private Label Label12;
+        private Button CloseButton;
         private FontDialog HeaderFontDialog;
-        private FontDialog TextFontDialog;
-        private CheckBox PrintTextYCenterCheckBox;
+        private FontDialog LabelFontDialog;
+        private CheckBox AlignTextYCenterCheckBox;
     }
 }
