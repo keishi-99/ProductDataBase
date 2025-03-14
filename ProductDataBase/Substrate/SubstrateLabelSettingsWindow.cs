@@ -15,12 +15,12 @@ namespace ProductDatabase {
 
         private void PageSettingsLabelLoad(object sender, EventArgs e) {
             _labelSubPageSettings = ((SubstrateRegistrationWindow)Owner!).SettingsLabelSub!.LabelSubPageSettings;
-            LabelWidthTextBox.Text = _labelSubPageSettings.SizeX.ToString();
-            LabelHeightTextBox.Text = _labelSubPageSettings.SizeY.ToString();
-            QuantityXTextBox.Text = _labelSubPageSettings.NumLabelsX.ToString();
-            QuantityYTextBox.Text = _labelSubPageSettings.NumLabelsY.ToString();
-            PageOffsetXTextBox.Text = _labelSubPageSettings.OffsetX.ToString();
-            PageOffsetYTextBox.Text = _labelSubPageSettings.OffsetY.ToString();
+            LabelWidthTextBox.Text = _labelSubPageSettings.LabelWidth.ToString();
+            LabelHeightTextBox.Text = _labelSubPageSettings.LabelHeight.ToString();
+            QuantityXTextBox.Text = _labelSubPageSettings.LabelCountX.ToString();
+            QuantityYTextBox.Text = _labelSubPageSettings.LabelCountY.ToString();
+            PageOffsetXTextBox.Text = _labelSubPageSettings.MarginX.ToString();
+            PageOffsetYTextBox.Text = _labelSubPageSettings.MarginY.ToString();
             LabelIntervalXTextBox.Text = _labelSubPageSettings.IntervalX.ToString();
             LabelIntervalYTextBox.Text = _labelSubPageSettings.IntervalY.ToString();
             HeaderStringTextBox.Text = _labelSubPageSettings.HeaderString;
@@ -74,12 +74,12 @@ namespace ProductDatabase {
                 return;
             }
 
-            _labelSubPageSettings.SizeX = sizeX;
-            _labelSubPageSettings.SizeY = sizeY;
-            _labelSubPageSettings.NumLabelsX = numLabelsX;
-            _labelSubPageSettings.NumLabelsY = numLabelsY;
-            _labelSubPageSettings.OffsetX = offsetX;
-            _labelSubPageSettings.OffsetY = offsetY;
+            _labelSubPageSettings.LabelWidth = sizeX;
+            _labelSubPageSettings.LabelHeight = sizeY;
+            _labelSubPageSettings.LabelCountX = numLabelsX;
+            _labelSubPageSettings.LabelCountY = numLabelsY;
+            _labelSubPageSettings.MarginX = offsetX;
+            _labelSubPageSettings.MarginY = offsetY;
             _labelSubPageSettings.IntervalX = intervalX;
             _labelSubPageSettings.IntervalY = intervalY;
             _labelSubPageSettings.HeaderPos = new Point(headerPosX, headerPosY);

@@ -66,12 +66,12 @@ namespace ProductDatabase {
             FontPostionXTextBox.Enabled = !FontCenterCheckBox.Checked;
         }
         private void SetPageSettings(CBarcodeProPageSettings pageSettings) {
-            BarcodeLabelWidthTextBox.Text = pageSettings.SizeX.ToString();
-            BarcodeLabelHeightTextBox.Text = pageSettings.SizeY.ToString();
-            BarcodeQuantityXTextBox.Text = pageSettings.NumLabelsX.ToString();
-            BarcodeQuantityYTextBox.Text = pageSettings.NumLabelsY.ToString();
-            BarcodePageOffsetXTextBox.Text = pageSettings.OffsetX.ToString();
-            BarcodePageOffsetYTextBox.Text = pageSettings.OffsetY.ToString();
+            BarcodeLabelWidthTextBox.Text = pageSettings.LabelWidth.ToString();
+            BarcodeLabelHeightTextBox.Text = pageSettings.LabelHeight.ToString();
+            BarcodeQuantityXTextBox.Text = pageSettings.LabelCountX.ToString();
+            BarcodeQuantityYTextBox.Text = pageSettings.LabelCountY.ToString();
+            BarcodePageOffsetXTextBox.Text = pageSettings.MarginX.ToString();
+            BarcodePageOffsetYTextBox.Text = pageSettings.MarginY.ToString();
             BarcodeLabelIntervalXTextBox.Text = pageSettings.IntervalX.ToString();
             BarcodeLabelIntervalYTextBox.Text = pageSettings.IntervalY.ToString();
             BarcodeHeaderStringTextBox.Text = pageSettings.HeaderString;
@@ -113,12 +113,12 @@ namespace ProductDatabase {
                 return;
             }
 
-            _barcodeProPageSettings.SizeX = sizeX;
-            _barcodeProPageSettings.SizeY = sizeY;
-            _barcodeProPageSettings.NumLabelsX = numLabelsX;
-            _barcodeProPageSettings.NumLabelsY = numLabelsY;
-            _barcodeProPageSettings.OffsetX = offsetX;
-            _barcodeProPageSettings.OffsetY = offsetY;
+            _barcodeProPageSettings.LabelWidth = sizeX;
+            _barcodeProPageSettings.LabelHeight = sizeY;
+            _barcodeProPageSettings.LabelCountX = numLabelsX;
+            _barcodeProPageSettings.LabelCountY = numLabelsY;
+            _barcodeProPageSettings.MarginX = offsetX;
+            _barcodeProPageSettings.MarginY = offsetY;
             _barcodeProPageSettings.IntervalX = intervalX;
             _barcodeProPageSettings.IntervalY = intervalY;
             _barcodeProPageSettings.HeaderPos = new Point(headerPosX, headerPosY);

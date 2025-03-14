@@ -61,12 +61,12 @@ namespace ProductDatabase {
             PrintTextPostionXTextBox.Enabled = !TextXCenterCheckBox.Checked;
         }
         private void SetPageSettings(CLabelProPageSettings pageSettings) {
-            LabelWidthTextBox.Text = pageSettings.SizeX.ToString();
-            LabelHeightTextBox.Text = pageSettings.SizeY.ToString();
-            QuantityXTextBox.Text = pageSettings.NumLabelsX.ToString();
-            QuantityYTextBox.Text = pageSettings.NumLabelsY.ToString();
-            PageOffsetXTextBox.Text = pageSettings.OffsetX.ToString();
-            PageOffsetYTextBox.Text = pageSettings.OffsetY.ToString();
+            LabelWidthTextBox.Text = pageSettings.LabelWidth.ToString();
+            LabelHeightTextBox.Text = pageSettings.LabelHeight.ToString();
+            QuantityXTextBox.Text = pageSettings.LabelCountX.ToString();
+            QuantityYTextBox.Text = pageSettings.LabelCountY.ToString();
+            PageOffsetXTextBox.Text = pageSettings.MarginX.ToString();
+            PageOffsetYTextBox.Text = pageSettings.MarginY.ToString();
             LabelIntervalXTextBox.Text = pageSettings.IntervalX.ToString();
             LabelIntervalYTextBox.Text = pageSettings.IntervalY.ToString();
             HeaderStringTextBox.Text = pageSettings.HeaderString;
@@ -104,12 +104,12 @@ namespace ProductDatabase {
                 return;
             }
 
-            _labelProPageSettings.SizeX = sizeX;
-            _labelProPageSettings.SizeY = sizeY;
-            _labelProPageSettings.NumLabelsX = numLabelsX;
-            _labelProPageSettings.NumLabelsY = numLabelsY;
-            _labelProPageSettings.OffsetX = offsetX;
-            _labelProPageSettings.OffsetY = offsetY;
+            _labelProPageSettings.LabelWidth = sizeX;
+            _labelProPageSettings.LabelHeight = sizeY;
+            _labelProPageSettings.LabelCountX = numLabelsX;
+            _labelProPageSettings.LabelCountY = numLabelsY;
+            _labelProPageSettings.MarginX = offsetX;
+            _labelProPageSettings.MarginY = offsetY;
             _labelProPageSettings.IntervalX = intervalX;
             _labelProPageSettings.IntervalY = intervalY;
             _labelProPageSettings.HeaderPos = new Point(headerPosX, headerPosY);

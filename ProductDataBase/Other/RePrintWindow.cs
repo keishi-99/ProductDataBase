@@ -349,15 +349,15 @@ namespace ProductDatabase {
             Point headerPos = new(0, 0);
             var headerString = string.Empty;
             Font headerFooterFont = new("ＭＳ Ｐ明朝", 5.25F);
-            Point offset;
+            Point margin;
             var serialCodePrintCopies = 0;
 
-            var maxX = 0;
-            var maxY = 0;
-            double sizeX = 0;
-            double sizeY = 0;
-            double offsetX = 0;
-            double offsetY = 0;
+            var labelCountX = 0;
+            var labelCountY = 0;
+            double labelWidth = 0;
+            double labelHeight = 0;
+            double marginX = 0;
+            double marginY = 0;
             double intervalX = 0;
             double intervalY = 0;
             var startLine = 0;
@@ -372,12 +372,12 @@ namespace ProductDatabase {
                 switch (_serialType) {
                     case "Label":
                         if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnullです。"); }
-                        maxX = SettingsLabelPro.LabelProPageSettings.NumLabelsX;
-                        maxY = SettingsLabelPro.LabelProPageSettings.NumLabelsY;
-                        sizeX = SettingsLabelPro.LabelProPageSettings.SizeX;
-                        sizeY = SettingsLabelPro.LabelProPageSettings.SizeY;
-                        offsetX = SettingsLabelPro.LabelProPageSettings.OffsetX;
-                        offsetY = SettingsLabelPro.LabelProPageSettings.OffsetY;
+                        labelCountX = SettingsLabelPro.LabelProPageSettings.LabelCountX;
+                        labelCountY = SettingsLabelPro.LabelProPageSettings.LabelCountY;
+                        labelWidth = SettingsLabelPro.LabelProPageSettings.LabelWidth;
+                        labelHeight = SettingsLabelPro.LabelProPageSettings.LabelHeight;
+                        marginX = SettingsLabelPro.LabelProPageSettings.MarginX;
+                        marginY = SettingsLabelPro.LabelProPageSettings.MarginY;
                         intervalX = SettingsLabelPro.LabelProPageSettings.IntervalX;
                         intervalY = SettingsLabelPro.LabelProPageSettings.IntervalY;
                         headerPos = SettingsLabelPro.LabelProPageSettings.HeaderPos;
@@ -388,12 +388,12 @@ namespace ProductDatabase {
                         break;
                     case "Barcode":
                         if (SettingsBarcodePro == null) { throw new Exception("SettingsBarcodeProがnullです。"); }
-                        maxX = SettingsBarcodePro.BarcodeProPageSettings.NumLabelsX;
-                        maxY = SettingsBarcodePro.BarcodeProPageSettings.NumLabelsY;
-                        sizeX = SettingsBarcodePro.BarcodeProPageSettings.SizeX;
-                        sizeY = SettingsBarcodePro.BarcodeProPageSettings.SizeY;
-                        offsetX = SettingsBarcodePro.BarcodeProPageSettings.OffsetX;
-                        offsetY = SettingsBarcodePro.BarcodeProPageSettings.OffsetY;
+                        labelCountX = SettingsBarcodePro.BarcodeProPageSettings.LabelCountX;
+                        labelCountY = SettingsBarcodePro.BarcodeProPageSettings.LabelCountY;
+                        labelWidth = SettingsBarcodePro.BarcodeProPageSettings.LabelWidth;
+                        labelHeight = SettingsBarcodePro.BarcodeProPageSettings.LabelHeight;
+                        marginX = SettingsBarcodePro.BarcodeProPageSettings.MarginX;
+                        marginY = SettingsBarcodePro.BarcodeProPageSettings.MarginY;
                         intervalX = SettingsBarcodePro.BarcodeProPageSettings.IntervalX;
                         intervalY = SettingsBarcodePro.BarcodeProPageSettings.IntervalY;
                         headerPos = SettingsBarcodePro.BarcodeProPageSettings.HeaderPos;
@@ -406,22 +406,22 @@ namespace ProductDatabase {
                         break;
                 }
 
-                if (maxX == 0 || maxY == 0 || serialCodePrintCopies == 0) { throw new Exception("印刷設定が異常です。"); }
+                if (labelCountX == 0 || labelCountY == 0 || serialCodePrintCopies == 0) { throw new Exception("印刷設定が異常です。"); }
 
                 const double MM_PER_HUNDREDTH_INCH = 0.254;
 
-                offsetX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
-                offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
+                marginX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
+                marginY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
 
                 // 最初のページのみオフセットを調整
-                var verticalOffset = _pageCount == 1 ? startLine * (intervalY + sizeY) : 0;
+                var verticalOffset = _pageCount == 1 ? startLine * (intervalY + labelHeight) : 0;
 
-                offset = new Point(
+                margin = new Point(
                     (int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH),
                     (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + verticalOffset)
                 );
 
-                headerPos.Offset(offset);
+                headerPos.Offset(margin);
                 e.Graphics.DrawString(headerString, headerFooterFont, Brushes.Black, headerPos);
 
                 if (_pageCount == 1) {
@@ -431,11 +431,11 @@ namespace ProductDatabase {
                 if (_pageCount >= 2) { startLine = 0; }
 
                 var y = 0;
-                for (y = startLine; y < maxY; y++) {
+                for (y = startLine; y < labelCountY; y++) {
                     var x = 0;
-                    for (x = 0; x < maxX; x++) {
-                        var posX = (float)(offsetX + (x * (intervalX + sizeX)));
-                        var posY = (float)(offsetY + (y * (intervalY + sizeY)));
+                    for (x = 0; x < labelCountX; x++) {
+                        var posX = (float)(marginX + (x * (intervalX + labelWidth)));
+                        var posY = (float)(marginY + (y * (intervalY + labelHeight)));
 
                         // タイプ4で残り1の場合、最後のラベルに下線をつける
                         var fontUnderline = IsUnderlinePrint && _remainingCount == 1;
@@ -450,7 +450,7 @@ namespace ProductDatabase {
                         }
 
                         using var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
-                        e.Graphics.DrawImage(labelImage, posX, posY, (float)sizeX, (float)sizeY);
+                        e.Graphics.DrawImage(labelImage, posX, posY, (float)labelWidth, (float)labelHeight);
 
                         _remainingCount--;
                         if (_remainingCount <= 0) {
@@ -459,7 +459,11 @@ namespace ProductDatabase {
                             //印刷するラベルがなくなった場合の処理
                             if (_labelProNumLabelsToPrint <= 0) {
                                 // 最終行の行番号を表示
-                                var rowNumber = (y + 2).ToString();
+                                var rowNumber = _serialType switch {
+                                    "Serial" => (y + 2).ToString(),
+                                    "Barcode" => (y + 1).ToString(),
+                                    _ => throw new Exception("_serialType unknown")
+                                };
                                 e.Graphics.DrawString(rowNumber, SettingsLabelPro.LabelProPageSettings.HeaderFooterFont, Brushes.Black, 0, posY);
                                 // 次のページがあるかどうかの判定
                                 e.HasMorePages = false;
@@ -542,8 +546,8 @@ namespace ProductDatabase {
             switch (_serialType) {
                 case "Label":
                     if (SettingsLabelPro == null) { throw new Exception("SettingsLabelProがnull"); }
-                    SetLabelProperties(SettingsLabelPro.LabelProPageSettings.SizeX,
-                                        SettingsLabelPro.LabelProPageSettings.SizeY,
+                    SetLabelProperties(SettingsLabelPro.LabelProPageSettings.LabelWidth,
+                                        SettingsLabelPro.LabelProPageSettings.LabelHeight,
                                         SettingsLabelPro.LabelProLabelSettings.StringPosY,
                                         SettingsLabelPro.LabelProLabelSettings.Font.SizeInPoints,
                                         SettingsLabelPro.LabelProLabelSettings.Font.Name,
@@ -577,8 +581,8 @@ namespace ProductDatabase {
                     break;
                 case "Barcode":
                     if (SettingsBarcodePro == null) { throw new Exception("SettingsBarcodeProがnull"); }
-                    SetLabelProperties(SettingsBarcodePro.BarcodeProPageSettings.SizeX,
-                                        SettingsBarcodePro.BarcodeProPageSettings.SizeY,
+                    SetLabelProperties(SettingsBarcodePro.BarcodeProPageSettings.LabelWidth,
+                                        SettingsBarcodePro.BarcodeProPageSettings.LabelHeight,
                                         SettingsBarcodePro.BarcodeProLabelSettings.StringPosY,
                                         SettingsBarcodePro.BarcodeProLabelSettings.Font.SizeInPoints,
                                         SettingsBarcodePro.BarcodeProLabelSettings.Font.Name,
