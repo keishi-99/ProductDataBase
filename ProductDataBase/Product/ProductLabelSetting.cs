@@ -13,12 +13,12 @@ namespace ProductDatabase.Product {
     }
 
     public class CLabelProPageSettings {
-        public int NumLabelsX { get; set; }
-        public int NumLabelsY { get; set; }
-        public double SizeX { get; set; }
-        public double SizeY { get; set; }
-        public double OffsetX { get; set; }
-        public double OffsetY { get; set; }
+        public int LabelCountX { get; set; }
+        public int LabelCountY { get; set; }
+        public double LabelWidth { get; set; }
+        public double LabelHeight { get; set; }
+        public double MarginX { get; set; }
+        public double MarginY { get; set; }
         public double IntervalX { get; set; }
         public double IntervalY { get; set; }
         public string HeaderString { get; set; } = string.Empty;

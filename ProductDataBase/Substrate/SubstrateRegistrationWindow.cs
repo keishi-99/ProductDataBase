@@ -390,28 +390,28 @@ namespace ProductDatabase {
                 // プレビューかどうかの判定
                 var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
 
-                var startLine = (int)PrintPostionNumericUpDown.Value - 1;
-                var sizeX = (float)SettingsLabelSub.LabelSubPageSettings.SizeX;
-                var sizeY = (float)SettingsLabelSub.LabelSubPageSettings.SizeY;
-                var offsetX = SettingsLabelSub.LabelSubPageSettings.OffsetX;
-                var offsetY = SettingsLabelSub.LabelSubPageSettings.OffsetY;
+                var labelWidth = (float)SettingsLabelSub.LabelSubPageSettings.LabelWidth;
+                var labelHeight = (float)SettingsLabelSub.LabelSubPageSettings.LabelHeight;
+                var marginX = SettingsLabelSub.LabelSubPageSettings.MarginX;
+                var marginY = SettingsLabelSub.LabelSubPageSettings.MarginY;
                 var intervalX = SettingsLabelSub.LabelSubPageSettings.IntervalX;
                 var intervalY = SettingsLabelSub.LabelSubPageSettings.IntervalY;
                 var headerPos = SettingsLabelSub.LabelSubPageSettings.HeaderPos;
-                var offset = new System.Drawing.Point(0, 0);
+                var margin = new System.Drawing.Point(0, 0);
+                var startLine = (int)PrintPostionNumericUpDown.Value - 1;
                 const double MM_PER_HUNDREDTH_INCH = 0.254;
 
                 var pd = (PrintDocument)sender;
 
                 // ハードマージンをミリメートルに変換
-                offsetX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
-                offsetY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
+                marginX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
+                marginY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
 
                 // 最初のページのみオフセットを調整
-                var verticalOffset = _pageCount == 1 ? startLine * (intervalY + sizeY) : 0;
+                var verticalOffset = _pageCount == 1 ? startLine * (intervalY + labelHeight) : 0;
 
                 // オフセットを計算
-                offset = new System.Drawing.Point(
+                margin = new System.Drawing.Point(
                     (int)(e.PageSettings.HardMarginX * -MM_PER_HUNDREDTH_INCH),
                     (int)((e.PageSettings.HardMarginY * -MM_PER_HUNDREDTH_INCH) + verticalOffset)
                 );
@@ -420,7 +420,7 @@ namespace ProductDatabase {
                 e.PageSettings.Margins.Top = 0;
 
                 var headerString = ConvertHeaderFooterString(SettingsLabelSub.LabelSubPageSettings.HeaderString);
-                headerPos.Offset(offset);
+                headerPos.Offset(margin);
                 e.Graphics.DrawString(headerString, SettingsLabelSub.LabelSubPageSettings.HeaderFooterFont, Brushes.Black, headerPos);
                 _labelSubNSerial = ManufacturingNumberMaskedTextBox.Text;
 
@@ -428,20 +428,20 @@ namespace ProductDatabase {
                     startLine = 0;
                 }
 
-                var maxX = SettingsLabelSub.LabelSubPageSettings.NumLabelsX;
-                var maxY = SettingsLabelSub.LabelSubPageSettings.NumLabelsY;
+                var labelCountX = SettingsLabelSub.LabelSubPageSettings.LabelCountX;
+                var labelCountY = SettingsLabelSub.LabelSubPageSettings.LabelCountY;
                 int y;
                 var serialCodePrintCopies = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
-                if (maxX == 0 || maxY == 0 || serialCodePrintCopies == 0) { throw new Exception("印刷設定が異常です。"); }
-                for (y = startLine; y < maxY; y++) {
+                if (labelCountX == 0 || labelCountY == 0 || serialCodePrintCopies == 0) { throw new Exception("印刷設定が異常です。"); }
+                for (y = startLine; y < labelCountY; y++) {
                     int x;
-                    for (x = 0; x < maxX; x++) {
-                        var posX = (float)(offsetX + (x * (intervalX + sizeX)));
-                        var posY = (float)(offsetY + (y * (intervalY + sizeY)));
+                    for (x = 0; x < labelCountX; x++) {
+                        var posX = (float)(marginX + (x * (intervalX + labelWidth)));
+                        var posY = (float)(marginY + (y * (intervalY + labelHeight)));
 
                         var generatedCode = GenerateCode(_labelSubNSerial);
                         var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1);
-                        e.Graphics.DrawImage(labelImage, posX, posY, sizeX, sizeY);
+                        e.Graphics.DrawImage(labelImage, posX, posY, labelWidth, labelHeight);
 
                         _labelSubNumLabelsToPrint--;
 
@@ -463,7 +463,7 @@ namespace ProductDatabase {
                             }
                         }
 
-                        if (x >= maxX - 1) {
+                        if (x >= labelCountX - 1) {
                             serialCodePrintCopies--;
                             if (serialCodePrintCopies <= 0) {
                                 serialCodePrintCopies = SettingsLabelSub.LabelSubLabelSettings.NumLabels;
@@ -518,8 +518,8 @@ namespace ProductDatabase {
         }
         private Bitmap MakeLabelImage(string text, int resolution, int magnitude) {
             if (SettingsLabelSub is null) { throw new Exception(); }
-            var sizeX = (decimal)SettingsLabelSub.LabelSubPageSettings.SizeX / 25.4M * resolution * magnitude;
-            var sizeY = (decimal)SettingsLabelSub.LabelSubPageSettings.SizeY / 25.4M * resolution * magnitude;
+            var sizeX = (decimal)SettingsLabelSub.LabelSubPageSettings.LabelWidth / 25.4M * resolution * magnitude;
+            var sizeY = (decimal)SettingsLabelSub.LabelSubPageSettings.LabelHeight / 25.4M * resolution * magnitude;
 
             Bitmap labelImage = new((int)sizeX, (int)sizeY);
             using (var g = Graphics.FromImage(labelImage)) {
