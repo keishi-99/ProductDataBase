@@ -412,7 +412,7 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["SerialLastNumber"].DefaultCellStyle.ForeColor = Color.Red;
                     break;
                 case "Serial":
-                    DataBaseDataGridView.Columns["ID"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["rowid"].ReadOnly = true;
                     DataBaseDataGridView.Columns["Serial"].ReadOnly = true;
                     DataBaseDataGridView.Columns["OrderNumber"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ProductNumber"].ReadOnly = true;
@@ -420,7 +420,7 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["ProductModel"].ReadOnly = true;
                     DataBaseDataGridView.Columns["RegDate"].ReadOnly = true;
                     DataBaseDataGridView.Columns["UsedID"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["ID"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["rowid"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["Serial"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["OrderNumber"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductNumber"].DefaultCellStyle.ForeColor = Color.Red;
