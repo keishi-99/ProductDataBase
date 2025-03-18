@@ -373,8 +373,8 @@ namespace ProductDatabase {
                         marginY = ProductPrintSettings.BarcodePageSettings.MarginY;
                         intervalX = ProductPrintSettings.BarcodePageSettings.IntervalX;
                         intervalY = ProductPrintSettings.BarcodePageSettings.IntervalY;
-                        headerPositionX = ProductPrintSettings.LabelPageSettings.HeaderPositionX;
-                        headerPositionY = ProductPrintSettings.LabelPageSettings.HeaderPositionY;
+                        headerPositionX = ProductPrintSettings.BarcodePageSettings.HeaderPositionX;
+                        headerPositionY = ProductPrintSettings.BarcodePageSettings.HeaderPositionY;
                         headerString = ConvertHeaderString(ProductPrintSettings.BarcodePageSettings.HeaderTextFormat);
                         headerFont = ProductPrintSettings.BarcodePageSettings.HeaderFont;
                         copiesPerLabel = ProductPrintSettings.BarcodeLayoutSettings.CopiesPerLabel;
@@ -437,7 +437,7 @@ namespace ProductDatabase {
                                     _ => 0
                                 };
                                 // 最終行の行番号を表示
-                                e.Graphics.DrawString((y + rowOffset).ToString(), ProductPrintSettings.LabelPageSettings.HeaderFont, Brushes.Black, 0, posY);
+                                e.Graphics.DrawString((y + rowOffset).ToString(), headerFont, Brushes.Black, 0, posY);
 
                                 e.HasMorePages = false;
                                 _pageCount = 1;
