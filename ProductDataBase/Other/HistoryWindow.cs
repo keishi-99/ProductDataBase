@@ -304,6 +304,7 @@ namespace ProductDatabase {
                             s.Serial,
                             p.OrderNumber,
                             p.ProductNumber,
+                            s.ProductName,
                             p.ProductType,
                             p.ProductModel,
                             p.RegDate,
@@ -416,6 +417,7 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["Serial"].ReadOnly = true;
                     DataBaseDataGridView.Columns["OrderNumber"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ProductNumber"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["ProductName"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ProductType"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ProductModel"].ReadOnly = true;
                     DataBaseDataGridView.Columns["RegDate"].ReadOnly = true;
@@ -424,6 +426,7 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["Serial"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["OrderNumber"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductNumber"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["ProductName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductType"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductModel"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["RegDate"].DefaultCellStyle.ForeColor = Color.Red;
@@ -641,10 +644,10 @@ namespace ProductDatabase {
                                 //DELETE文の設定
                                 command.CommandText = $"""
                                     DELETE FROM "{ProductInfo.CategoryName}_Serial"
-                                    WHERE ID = @ID;
+                                    WHERE rowid = @rowid;
                                     """;
                                 command.Parameters.Clear(); // パラメータをクリア
-                                command.Parameters.Add("@ID", DbType.Int32).Value = row["ID", DataRowVersion.Original];
+                                command.Parameters.Add("@rowid", DbType.Int32).Value = row["rowid", DataRowVersion.Original];
 
                                 //command.Connection = con;
                                 command.ExecuteNonQuery();
