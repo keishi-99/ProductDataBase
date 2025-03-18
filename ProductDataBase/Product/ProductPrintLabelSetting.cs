@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel;
-using System.Xml.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ProductDatabase.Product {
     public class ProductPrintSettings {
         public LabelPageSettings LabelPageSettings { get; set; }
         public LabelLayoutSettings LabelLayoutSettings { get; set; }
-
         public BarcodePageSettings BarcodePageSettings { get; set; }
         public BarcodeLayoutSettings BarcodeLayoutSettings { get; set; }
 
@@ -30,13 +30,8 @@ namespace ProductDatabase.Product {
         public double HeaderPositionX { get; set; }
         public double HeaderPositionY { get; set; }
 
-        [XmlIgnore]
+        [JsonConverter(typeof(FontJsonConverter))]
         public Font HeaderFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
-
-        public string HeaderFontAsString {
-            get => FontConverter.ConvertToString(HeaderFont);
-            set => HeaderFont = FontConverter.ConvertFromString(value);
-        }
     }
     public class LabelLayoutSettings {
         public string Format { get; set; } = string.Empty;
@@ -45,13 +40,9 @@ namespace ProductDatabase.Product {
         public bool AlignTextXCenter { get; set; }
         public bool AlignTextYCenter { get; set; }
         public int CopiesPerLabel { get; set; }
-        [XmlIgnore]
-        public Font TextFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
 
-        public string TextFontAsString {
-            get => FontConverter.ConvertToString(TextFont);
-            set => TextFont = FontConverter.ConvertFromString(value);
-        }
+        [JsonConverter(typeof(FontJsonConverter))]
+        public Font TextFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
     }
 
     public class BarcodePageSettings {
@@ -67,13 +58,8 @@ namespace ProductDatabase.Product {
         public double HeaderPositionX { get; set; }
         public double HeaderPositionY { get; set; }
 
-        [XmlIgnore]
-        public Font HeaderFont { get; set; } = new Font("Arial", 5.25F);
-
-        public string HeaderFontAsString {
-            get => FontConverter.ConvertToString(HeaderFont);
-            set => HeaderFont = FontConverter.ConvertFromString(value);
-        }
+        [JsonConverter(typeof(FontJsonConverter))]
+        public Font HeaderFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
     }
     public class BarcodeLayoutSettings {
         public string Format { get; set; } = string.Empty;
@@ -86,21 +72,19 @@ namespace ProductDatabase.Product {
         public bool AlignTextXCenter { get; set; }
         public bool AlignBarcodeXCenter { get; set; }
         public int CopiesPerLabel { get; set; }
-        [XmlIgnore]
-        public Font TextFont { get; set; } = new Font("Arial", 5.25F);
 
-        public string TextFontAsString {
-            get => FontConverter.ConvertToString(TextFont);
-            set => TextFont = FontConverter.ConvertFromString(value);
-        }
+        [JsonConverter(typeof(FontJsonConverter))]
+        public Font TextFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
     }
-    public static class FontConverter {
-        public static string ConvertToString(Font font) {
-            return TypeDescriptor.GetConverter(typeof(Font)).ConvertToString(font)!;
+    public class FontJsonConverter : JsonConverter<Font> {
+        public override Font Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
+            var fontString = reader.GetString()!;
+            return (Font)TypeDescriptor.GetConverter(typeof(Font)).ConvertFromString(fontString)!;
         }
 
-        public static Font ConvertFromString(string value) {
-            return (Font)TypeDescriptor.GetConverter(typeof(Font)).ConvertFromString(value)!;
+        public override void Write(Utf8JsonWriter writer, Font value, JsonSerializerOptions options) {
+            var fontString = TypeDescriptor.GetConverter(typeof(Font)).ConvertToString(value)!;
+            writer.WriteStringValue(fontString);
         }
     }
 }

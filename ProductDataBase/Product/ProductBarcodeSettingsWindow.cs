@@ -1,4 +1,7 @@
 ﻿using ProductDatabase.Product;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 
 namespace ProductDatabase {
     public partial class ProductBarcodeSettingsWindow : Form {
@@ -12,10 +15,10 @@ namespace ProductDatabase {
 
         private void LoadSettings() {
             if (Owner is ProductRegistration2Window productWindow) {
-                LoadSettingsFromWindow(productWindow.ProductPrintSettings, productWindow.labelSettingFilePath);
+                LoadSettingsFromWindow(productWindow.ProductPrintSettings, productWindow.printSettingPath);
             }
             else if (Owner is RePrintWindow rePrintWindow) {
-                LoadSettingsFromWindow(rePrintWindow.ProductPrintSettings, rePrintWindow.labelSettingFilePath);
+                LoadSettingsFromWindow(rePrintWindow.ProductPrintSettings, rePrintWindow.printSettingPath);
             }
             else {
                 MessageBox.Show("この画面を開くには正しいウィンドウから開いてください。");
@@ -84,7 +87,9 @@ namespace ProductDatabase {
                 { BarcodePostionYTextBox, "バーコード位置Y" },
                 { BarcodeMagnitudeTextBox, "バーコード倍率" },
                 { FontPostionXTextBox, "フォント位置X" },
-                { FontPostionYTextBox, "フォント位置Y" }
+                { FontPostionYTextBox, "フォント位置Y" },
+                { BarcodeLabelHeaderPostionXTextBox, "ヘッダー位置X" },
+                { BarcodeLabelHeaderPostionYTextBox, "ヘッダー位置Y" }
             };
 
             foreach (var textBox in doubleTextBoxes) {
@@ -106,8 +111,6 @@ namespace ProductDatabase {
                 { BarcodeLabelsPerRowTextBox, "ラベル行数" },
                 { BarcodeLabelsPerColumnTextBox, "ラベル列数" },
                 { BarcodeCopiesPerLabelTextBox, "ラベルごとのコピー数" },
-                { BarcodeLabelHeaderPostionXTextBox, "ヘッダー位置X" },
-                { BarcodeLabelHeaderPostionYTextBox, "ヘッダー位置Y" }
             };
 
             foreach (var textBox in intTextBoxes) {
@@ -169,10 +172,13 @@ namespace ProductDatabase {
         }
         private void SaveProductPrintSettings() {
             try {
-                using (var swBarcode = new StreamWriter(_productPrintSettingFilePath, false, System.Text.Encoding.UTF8)) {
-                    var serializerBarcode = new System.Xml.Serialization.XmlSerializer(typeof(ProductPrintSettings));
-                    serializerBarcode.Serialize(swBarcode, ProductPrintSettings);
-                }
+                var options = new JsonSerializerOptions {
+                    WriteIndented = true,
+                    PropertyNamingPolicy = null,
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                };
+                var jsonString = JsonSerializer.Serialize(ProductPrintSettings, options);
+                File.WriteAllText(_productPrintSettingFilePath, jsonString);
                 DialogResult = DialogResult.OK;
                 Close();
             } catch (Exception ex) {
