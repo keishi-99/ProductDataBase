@@ -296,6 +296,8 @@ namespace ProductDatabase {
         }
         private bool PreviewBarcode() {
             try {
+                FormCheck();
+                DataCheck();
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
                 pd.BeginPrint += (sender, e) => _printAction = e.PrintAction;
