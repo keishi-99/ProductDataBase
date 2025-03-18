@@ -77,11 +77,6 @@ namespace ProductDatabase {
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
                 }
-
-                FirstSerialNumberCheckBox.Checked = true;
-                LabelPrintButton.Enabled = IsLabelPrint;
-                BarcodePrintButton.Enabled = IsBarcodePrint;
-
                 // 印刷UI設定
                 ConfigurePrintSettings();
             } catch (Exception ex) {
@@ -91,31 +86,27 @@ namespace ProductDatabase {
         }
         // 印刷UI設定
         private void ConfigurePrintSettings() {
-            ConfigureUI();
+            FirstSerialNumberCheckBox.Checked = true;
+            LabelPrintButton.Enabled = IsLabelPrint;
+            BarcodePrintButton.Enabled = IsBarcodePrint;
+
+            シリアルラベル印刷プレビューToolStripMenuItem.Enabled = IsLabelPrint;
+            シリアルラベル印刷設定ToolStripMenuItem.Enabled = IsLabelPrint;
+            バーコード印刷プレビューToolStripMenuItem.Enabled = IsBarcodePrint;
+            バーコード印刷設定ToolStripMenuItem.Enabled = IsBarcodePrint;
+
             LoadSettings();
-        }
-        private void ConfigureUI() {
-            ConfigureSerialLabelSettings();
-            SetMenuOptions();
-        }
-        private void ConfigureSerialLabelSettings() {
-            ProductPrintSettings = new ProductPrintSettings();
-            printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", ProductInfo.CategoryName, ProductInfo.ProductName, $"PrintConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.json");
-            if (!File.Exists(printSettingPath)) { throw new DirectoryNotFoundException($"ラベル印刷用設定ファイルがありません。"); }
         }
         private void LoadSettings() {
             try {
+                ProductPrintSettings = new ProductPrintSettings();
+                printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", ProductInfo.CategoryName, ProductInfo.ProductName, $"PrintConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.json");
+                if (!File.Exists(printSettingPath)) { throw new DirectoryNotFoundException($"ラベル印刷用設定ファイルがありません。"); }
                 var jsonString = File.ReadAllText(printSettingPath);
                 ProductPrintSettings = System.Text.Json.JsonSerializer.Deserialize<ProductPrintSettings>(jsonString) ?? new ProductPrintSettings();
             } catch (Exception ex) {
                 MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-        private void SetMenuOptions() {
-            シリアルラベル印刷プレビューToolStripMenuItem.Enabled = IsLabelPrint;
-            シリアルラベル印刷設定ToolStripMenuItem.Enabled = IsLabelPrint;
-            バーコード印刷プレビューToolStripMenuItem.Enabled = IsBarcodePrint;
-            バーコード印刷設定ToolStripMenuItem.Enabled = IsBarcodePrint;
         }
         // 登録処理
         private void RegisterCheck() {
@@ -133,7 +124,7 @@ namespace ProductDatabase {
                 ProductInfo.Person = PersonComboBox.Text;
                 if (!Registeration()) { throw new Exception("登録できませんでした。"); }
 
-                if (!PrintBarcode()) { throw new Exception("キャンセルしました。"); }
+                if (!StartPrint()) { throw new Exception("キャンセルしました。"); }
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -258,7 +249,7 @@ namespace ProductDatabase {
             return true;
         }
         // 印刷処理
-        private bool PrintBarcode() {
+        private bool StartPrint() {
             try {
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
@@ -294,7 +285,7 @@ namespace ProductDatabase {
                 return false;
             }
         }
-        private bool PreviewBarcode() {
+        private bool PreviewPrint() {
             try {
                 FormCheck();
                 DataCheck();
@@ -734,11 +725,11 @@ namespace ProductDatabase {
         }
         private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Label";
-            PreviewBarcode();
+            PreviewPrint();
         }
         private void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Barcode";
-            PreviewBarcode();
+            PreviewPrint();
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             ProductPrintSettingsWindow ls = new();

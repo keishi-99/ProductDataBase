@@ -151,7 +151,7 @@ namespace ProductDatabase {
                 if (IsLabelPrint) {
                     if (QuantityCheckBox.Checked) {
                         MessageBox.Show("登録完了 続けて印刷します。");
-                        PrintBarcode();
+                        PrintStart();
                         MessageBox.Show("印刷完了");
                         Close();
                     }
@@ -310,7 +310,7 @@ namespace ProductDatabase {
             }
         }
         // 印刷処理
-        private void PrintBarcode() {
+        private void PrintStart() {
             try {
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
@@ -348,7 +348,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private bool PreviewBarcode() {
+        private bool PreviewPrint() {
             try {
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
@@ -652,15 +652,14 @@ namespace ProductDatabase {
         private void SubstrateRegistrationWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
         private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
-        private void PrintButton_Click(object sender, EventArgs e) { PrintBarcode(); }
+        private void PrintButton_Click(object sender, EventArgs e) { PrintStart(); }
         private void SubstrateRegistrationPrintDocument_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) { PrintDocumentPrintPage(sender, e); }
         private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
         private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void DefectNumberTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void RegistrationDateMaskedTextBox_TypeValidationCompleted(object sender, TypeValidationEventArgs e) { RegistrationDateCheck(sender, e); }
-        private void 印刷ToolStripMenuItem_Click(object sender, EventArgs e) { PrintBarcode(); }
-        private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { PreviewBarcode(); }
+        private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { PreviewPrint(); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             SubstratePrintSettingsWindow ls = new();
             ls.ShowDialog(this);
