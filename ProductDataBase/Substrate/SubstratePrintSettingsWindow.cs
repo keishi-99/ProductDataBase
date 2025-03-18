@@ -5,14 +5,15 @@ namespace ProductDatabase {
 
         public SubstratePrintSettings SubstratePrintSettings { get; set; } = new SubstratePrintSettings();
         private readonly string _substratePrintSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.xml");
+        //private readonly string _substratePrintSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
 
         public SubstratePrintSettingsWindow() {
             InitializeComponent();
         }
 
         private void LoadSettings() {
-            if (Owner is SubstrateRegistrationWindow productWindow) {
-                SubstratePrintSettings = productWindow.SubstratePrintSettings;
+            if (Owner is SubstrateRegistrationWindow substrateWindow) {
+                SubstratePrintSettings = substrateWindow.SubstratePrintSettings;
                 SetPageSettings(SubstratePrintSettings.LabelPageSettings);
                 SetLabelSettings(SubstratePrintSettings.LabelLayoutSettings);
             }
@@ -31,7 +32,7 @@ namespace ProductDatabase {
             LabelMarginYTextBox.Text = pageSettings.MarginY.ToString();
             LabelIntervalXTextBox.Text = pageSettings.IntervalX.ToString();
             LabelIntervalYTextBox.Text = pageSettings.IntervalY.ToString();
-            HeaderTextTextBox.Text = pageSettings.HeaderText;
+            HeaderTextTextBox.Text = pageSettings.HeaderTextFormat;
             HeaderPostionXTextBox.Text = pageSettings.HeaderPositionX.ToString();
             HeaderPostionYTextBox.Text = pageSettings.HeaderPositionY.ToString();
 
@@ -42,7 +43,7 @@ namespace ProductDatabase {
         }
         private void SetLabelSettings(Substrate.LabelLayoutSettings labelSettings) {
             CopiesPerLabelTextBox.Text = labelSettings.CopiesPerLabel.ToString();
-            LabelFormatTextBox.Text = labelSettings.Format;
+            LabelFormatTextBox.Text = labelSettings.TextFormat;
 
             if (labelSettings.TextFont != null) {
                 LabelFontDialog.Font = labelSettings.TextFont;
@@ -118,10 +119,10 @@ namespace ProductDatabase {
             SubstratePrintSettings.LabelPageSettings.IntervalY = ParseDouble(LabelIntervalYTextBox.Text);
             SubstratePrintSettings.LabelPageSettings.HeaderPositionX = ParseDouble(HeaderPostionXTextBox.Text);
             SubstratePrintSettings.LabelPageSettings.HeaderPositionY = ParseDouble(HeaderPostionYTextBox.Text);
-            SubstratePrintSettings.LabelPageSettings.HeaderText = HeaderFontTextBox.Text;
+            SubstratePrintSettings.LabelPageSettings.HeaderTextFormat = HeaderFontTextBox.Text;
             SubstratePrintSettings.LabelPageSettings.HeaderFont = HeaderFontDialog.Font;
 
-            SubstratePrintSettings.LabelLayoutSettings.Format = LabelFormatTextBox.Text;
+            SubstratePrintSettings.LabelLayoutSettings.TextFormat = LabelFormatTextBox.Text;
             SubstratePrintSettings.LabelLayoutSettings.TextFont = LabelFontDialog.Font;
             SubstratePrintSettings.LabelLayoutSettings.TextPositionX = ParseDouble(LabelTextPostionXTextBox.Text);
             SubstratePrintSettings.LabelLayoutSettings.TextPositionY = ParseDouble(LabelTextPostionYTextBox.Text);
@@ -153,6 +154,13 @@ namespace ProductDatabase {
                     var serializerLabel = new System.Xml.Serialization.XmlSerializer(typeof(SubstratePrintSettings));
                     serializerLabel.Serialize(swLabel, SubstratePrintSettings);
                 }
+
+                //if (Owner is SubstrateRegistrationWindow substrateWindow) {
+                //    var jsonString = JsonSerializer.Serialize(SubstratePrintSettings);
+                //var path = SubstrateRegistrationWindow.settingFilePath;
+                //File.WriteAllText(path, jsonString);
+                //}
+
                 DialogResult = DialogResult.OK;
                 Close();
             } catch (Exception ex) {
