@@ -138,11 +138,16 @@ namespace ProductDatabase {
                                     SubstrateName,
                                     SubstrateNumber,
                                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                                FROM {ProductInfo.CategoryName}_Substrate
-                                WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel
-                                GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
-                                HAVING Stock > 0
-                                ORDER BY MIN(ID);
+                                FROM
+                                    {ProductInfo.CategoryName}_Substrate
+                                WHERE
+                                    StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber NOTNULL
+                                GROUP BY S
+                                    ubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                                HAVING
+                                    Stock > 0
+                                ORDER BY
+                                    MIN(ID);
                                 """;
                             cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
@@ -243,11 +248,16 @@ namespace ProductDatabase {
                                     SubstrateNumber,
                                     OrderNumber,
                                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                                FROM {ProductInfo.CategoryName}_Substrate
-                                WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel
-                                GROUP BY SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
-                                HAVING Stock > 0
-                                ORDER BY MIN(ID);
+                                FROM
+                                    {ProductInfo.CategoryName}_Substrate
+                                WHERE
+                                    StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber NOTNULL
+                                GROUP BY
+                                    SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                                HAVING
+                                    Stock > 0
+                                ORDER BY
+                                    MIN(ID);
                                 """;
                             cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
