@@ -35,7 +35,7 @@ namespace ProductDatabase {
 
         private void SetLabelSettings(Product.LabelLayoutSettings labelSettings) {
             CopiesPerLabelTextBox.Text = labelSettings.CopiesPerLabel.ToString();
-            LabelFormatTextBox.Text = labelSettings.Format;
+            LabelFormatTextBox.Text = labelSettings.TextFormat;
 
             if (labelSettings.TextFont != null) {
                 LabelFontDialog.Font = labelSettings.TextFont;
@@ -58,7 +58,7 @@ namespace ProductDatabase {
             LabelMarginYTextBox.Text = pageSettings.MarginY.ToString();
             LabelIntervalXTextBox.Text = pageSettings.IntervalX.ToString();
             LabelIntervalYTextBox.Text = pageSettings.IntervalY.ToString();
-            HeaderTextTextBox.Text = pageSettings.HeaderText;
+            HeaderTextTextBox.Text = pageSettings.HeaderTextFormat;
             HeaderPostionXTextBox.Text = pageSettings.HeaderPositionX.ToString();
             HeaderPostionYTextBox.Text = pageSettings.HeaderPositionY.ToString();
 
@@ -129,10 +129,10 @@ namespace ProductDatabase {
             ProductPrintSettings.LabelPageSettings.IntervalY = ParseDouble(LabelIntervalYTextBox.Text);
             ProductPrintSettings.LabelPageSettings.HeaderPositionX = ParseDouble(HeaderPostionXTextBox.Text);
             ProductPrintSettings.LabelPageSettings.HeaderPositionY = ParseDouble(HeaderPostionYTextBox.Text);
-            ProductPrintSettings.LabelPageSettings.HeaderText = HeaderFontTextBox.Text;
+            ProductPrintSettings.LabelPageSettings.HeaderTextFormat = HeaderFontTextBox.Text;
             ProductPrintSettings.LabelPageSettings.HeaderFont = HeaderFontDialog.Font;
 
-            ProductPrintSettings.LabelLayoutSettings.Format = LabelFormatTextBox.Text;
+            ProductPrintSettings.LabelLayoutSettings.TextFormat = LabelFormatTextBox.Text;
             ProductPrintSettings.LabelLayoutSettings.TextFont = LabelFontDialog.Font;
             ProductPrintSettings.LabelLayoutSettings.TextPositionX = ParseDouble(LabelTextPostionXTextBox.Text);
             ProductPrintSettings.LabelLayoutSettings.TextPositionY = ParseDouble(LabelTextPostionYTextBox.Text);

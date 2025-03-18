@@ -358,7 +358,7 @@ namespace ProductDatabase {
                         intervalY = ProductPrintSettings.LabelPageSettings.IntervalY;
                         headerPositionX = ProductPrintSettings.LabelPageSettings.HeaderPositionX;
                         headerPositionY = ProductPrintSettings.LabelPageSettings.HeaderPositionY;
-                        headerString = ConvertHeaderString(ProductPrintSettings.LabelPageSettings.HeaderText);
+                        headerString = ConvertHeaderString(ProductPrintSettings.LabelPageSettings.HeaderTextFormat);
                         headerFont = ProductPrintSettings.LabelPageSettings.HeaderFont;
                         copiesPerLabel = ProductPrintSettings.LabelLayoutSettings.CopiesPerLabel;
                         startLine = (int)PrintPostionNumericUpDown.Value - 1;
@@ -375,7 +375,7 @@ namespace ProductDatabase {
                         intervalY = ProductPrintSettings.BarcodePageSettings.IntervalY;
                         headerPositionX = ProductPrintSettings.LabelPageSettings.HeaderPositionX;
                         headerPositionY = ProductPrintSettings.LabelPageSettings.HeaderPositionY;
-                        headerString = ConvertHeaderString(ProductPrintSettings.BarcodePageSettings.HeaderText);
+                        headerString = ConvertHeaderString(ProductPrintSettings.BarcodePageSettings.HeaderTextFormat);
                         headerFont = ProductPrintSettings.BarcodePageSettings.HeaderFont;
                         copiesPerLabel = ProductPrintSettings.BarcodeLayoutSettings.CopiesPerLabel;
                         startLine = (int)PrintPostionNumericUpDown.Value - 1;
@@ -479,8 +479,8 @@ namespace ProductDatabase {
             };
 
             var outputCode = _serialType switch {
-                "Label" => ProductPrintSettings.LabelLayoutSettings.Format,
-                "Barcode" => ProductPrintSettings.BarcodeLayoutSettings.Format,
+                "Label" => ProductPrintSettings.LabelLayoutSettings.TextFormat,
+                "Barcode" => ProductPrintSettings.BarcodeLayoutSettings.TextFormat,
                 _ => string.Empty
             };
 

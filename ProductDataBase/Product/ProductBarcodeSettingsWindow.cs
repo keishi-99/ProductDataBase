@@ -37,7 +37,7 @@ namespace ProductDatabase {
             BarcodeHeightTextBox.Text = labelSettings.BarcodeHeight.ToString();
             BarcodeMagnitudeTextBox.Text = labelSettings.BarcodeMagnitude.ToString();
             BarcodeCopiesPerLabelTextBox.Text = labelSettings.CopiesPerLabel.ToString();
-            BarcodeFormatTextBox.Text = labelSettings.Format;
+            BarcodeFormatTextBox.Text = labelSettings.TextFormat;
 
             if (labelSettings.TextFont != null) {
                 BarcodeFontDialog.Font = labelSettings.TextFont;
@@ -63,7 +63,7 @@ namespace ProductDatabase {
             BarcodeLabelMarginYTextBox.Text = pageSettings.MarginY.ToString();
             BarcodeLabelIntervalXTextBox.Text = pageSettings.IntervalX.ToString();
             BarcodeLabelIntervalYTextBox.Text = pageSettings.IntervalY.ToString();
-            BarcodeLabelHeaderTextBox.Text = pageSettings.HeaderText;
+            BarcodeLabelHeaderTextBox.Text = pageSettings.HeaderTextFormat;
             BarcodeLabelHeaderPostionXTextBox.Text = pageSettings.HeaderPositionX.ToString();
             BarcodeLabelHeaderPostionYTextBox.Text = pageSettings.HeaderPositionY.ToString();
 
@@ -137,7 +137,7 @@ namespace ProductDatabase {
             ProductPrintSettings.BarcodePageSettings.IntervalY = ParseDouble(BarcodeLabelIntervalYTextBox.Text);
             ProductPrintSettings.BarcodePageSettings.HeaderPositionX = ParseDouble(BarcodeLabelHeaderPostionXTextBox.Text);
             ProductPrintSettings.BarcodePageSettings.HeaderPositionY = ParseDouble(BarcodeLabelHeaderPostionYTextBox.Text);
-            ProductPrintSettings.BarcodePageSettings.HeaderText = BarcodeLabelHeaderTextBox.Text;
+            ProductPrintSettings.BarcodePageSettings.HeaderTextFormat = BarcodeLabelHeaderTextBox.Text;
             ProductPrintSettings.BarcodePageSettings.HeaderFont = BarcodeLabelHeaderFontDialog.Font;
 
             ProductPrintSettings.BarcodeLayoutSettings.BarcodeHeight = ParseDouble(BarcodeHeightTextBox.Text);
@@ -145,7 +145,7 @@ namespace ProductDatabase {
             ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionY = ParseDouble(BarcodePostionYTextBox.Text);
             ProductPrintSettings.BarcodeLayoutSettings.AlignBarcodeXCenter = BarcodeCenterCheckBox.Checked;
             ProductPrintSettings.BarcodeLayoutSettings.BarcodeMagnitude = ParseDouble(BarcodeMagnitudeTextBox.Text);
-            ProductPrintSettings.BarcodeLayoutSettings.Format = BarcodeFormatTextBox.Text;
+            ProductPrintSettings.BarcodeLayoutSettings.TextFormat = BarcodeFormatTextBox.Text;
             ProductPrintSettings.BarcodeLayoutSettings.TextFont = BarcodeFontDialog.Font;
             ProductPrintSettings.BarcodeLayoutSettings.TextPositionX = ParseDouble(FontPostionXTextBox.Text);
             ProductPrintSettings.BarcodeLayoutSettings.TextPositionY = ParseDouble(FontPostionYTextBox.Text);
