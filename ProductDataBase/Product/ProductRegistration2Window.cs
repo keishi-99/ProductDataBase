@@ -9,7 +9,7 @@ namespace ProductDatabase {
     public partial class ProductRegistration2Window : Form {
 
         public ProductPrintSettings ProductPrintSettings { get; set; } = new ProductPrintSettings();
-        public string labelSettingFilePath = string.Empty;
+        public string printSettingPath = string.Empty;
 
         public ProductInformation ProductInfo { get; set; } = new ProductInformation();
 
@@ -308,27 +308,11 @@ namespace ProductDatabase {
                         }
                         break;
                 }
-
                 // 印刷UI設定
                 ConfigurePrintSettings();
-
-                //LoadSettings(labelSettingFilePath, barcodeSettingFilePath);
-                LoadSettings(labelSettingFilePath);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
-            }
-        }
-        private void LoadSettings(string labelSettingFilePath) {
-            try {
-                if (labelSettingFilePath != string.Empty) {
-                    using StreamReader? srLabel = new(labelSettingFilePath, new System.Text.UTF8Encoding(false));
-                    System.Xml.Serialization.XmlSerializer serializerLabel = new(typeof(ProductPrintSettings));
-                    if (serializerLabel.Deserialize(srLabel) is ProductPrintSettings result) { ProductPrintSettings = result; }
-                    srLabel?.Close();
-                }
-            } catch (Exception ex) {
-                MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         // 印刷UI設定
@@ -343,6 +327,7 @@ namespace ProductDatabase {
             BarcodePrintPostionNumericUpDown.Visible = IsBarcodePrint;
 
             ConfigureUI();
+            LoadSettings();
         }
         private void ConfigureUI() {
             ConfigureSerialLabelSettings();
@@ -350,14 +335,22 @@ namespace ProductDatabase {
         }
         private void ConfigureSerialLabelSettings() {
             ProductPrintSettings = new ProductPrintSettings();
-            labelSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Product", ProductInfo.CategoryName, ProductInfo.ProductName, $"PrintConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.xml");
-            if (!File.Exists(labelSettingFilePath)) { throw new DirectoryNotFoundException($"印刷用設定ファイルがありません。"); }
+            printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", ProductInfo.CategoryName, ProductInfo.ProductName, $"PrintConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.json");
+            if (!File.Exists(printSettingPath)) { throw new DirectoryNotFoundException($"印刷用設定ファイルがありません。"); }
         }
         private void SetMenuOptions() {
             シリアルラベル印刷プレビューToolStripMenuItem.Enabled = IsLabelPrint;
             シリアルラベル印刷設定ToolStripMenuItem.Enabled = IsLabelPrint;
             バーコード印刷プレビューToolStripMenuItem.Enabled = IsBarcodePrint;
             バーコード印刷設定ToolStripMenuItem.Enabled = IsBarcodePrint;
+        }
+        private void LoadSettings() {
+            try {
+                var jsonString = File.ReadAllText(printSettingPath);
+                ProductPrintSettings = System.Text.Json.JsonSerializer.Deserialize<ProductPrintSettings>(jsonString) ?? new ProductPrintSettings();
+            } catch (Exception ex) {
+                MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         // 登録処理
         private void RegisterCheck() {
@@ -1614,12 +1607,12 @@ namespace ProductDatabase {
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             ProductPrintSettingsWindow ls = new();
             ls.ShowDialog(this);
-            LoadSettings(labelSettingFilePath);
+            LoadSettings();
         }
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             ProductBarcodeSettingsWindow ls = new();
             ls.ShowDialog(this);
-            LoadSettings(labelSettingFilePath);
+            LoadSettings();
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
             var entries = new[]

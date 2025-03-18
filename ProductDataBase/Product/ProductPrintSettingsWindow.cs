@@ -1,4 +1,7 @@
 ﻿using ProductDatabase.Product;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 
 namespace ProductDatabase {
     public partial class ProductPrintSettingsWindow : Form {
@@ -12,10 +15,10 @@ namespace ProductDatabase {
 
         private void LoadSettings() {
             if (Owner is ProductRegistration2Window productWindow) {
-                LoadSettingsFromWindow(productWindow.ProductPrintSettings, productWindow.labelSettingFilePath);
+                LoadSettingsFromWindow(productWindow.ProductPrintSettings, productWindow.printSettingPath);
             }
             else if (Owner is RePrintWindow rePrintWindow) {
-                LoadSettingsFromWindow(rePrintWindow.ProductPrintSettings, rePrintWindow.labelSettingFilePath);
+                LoadSettingsFromWindow(rePrintWindow.ProductPrintSettings, rePrintWindow.printSettingPath);
             }
             else {
                 MessageBox.Show("この画面を開くには正しいウィンドウから開いてください。");
@@ -30,7 +33,7 @@ namespace ProductDatabase {
             SetLabelSettings(ProductPrintSettings.LabelLayoutSettings);
         }
 
-        private void SetLabelSettings(LabelLayoutSettings labelSettings) {
+        private void SetLabelSettings(Product.LabelLayoutSettings labelSettings) {
             CopiesPerLabelTextBox.Text = labelSettings.CopiesPerLabel.ToString();
             LabelFormatTextBox.Text = labelSettings.Format;
 
@@ -46,7 +49,7 @@ namespace ProductDatabase {
 
             LabelTextPostionXTextBox.Enabled = !AlignTextXCenterCheckBox.Checked;
         }
-        private void SetPageSettings(LabelPageSettings pageSettings) {
+        private void SetPageSettings(Product.LabelPageSettings pageSettings) {
             LabelWidthTextBox.Text = pageSettings.LabelWidth.ToString();
             LabelHeightTextBox.Text = pageSettings.LabelHeight.ToString();
             LabelsPerColumnTextBox.Text = pageSettings.LabelsPerColumn.ToString();
@@ -76,7 +79,9 @@ namespace ProductDatabase {
                 { LabelIntervalXTextBox, "間隔X" },
                 { LabelIntervalYTextBox, "間隔Y" },
                 { LabelTextPostionXTextBox, "フォント位置X" },
-                { LabelTextPostionYTextBox, "フォント位置Y" }
+                { LabelTextPostionYTextBox, "フォント位置Y" },
+                { HeaderPostionXTextBox, "ヘッダー位置X" },
+                { HeaderPostionYTextBox, "ヘッダー位置Y" },
             };
 
             foreach (var textBox in doubleTextBoxes) {
@@ -98,8 +103,6 @@ namespace ProductDatabase {
                 { LabelsPerRowTextBox, "ラベル行数" },
                 { LabelsPerColumnTextBox, "ラベル列数" },
                 { CopiesPerLabelTextBox, "ラベルごとのコピー数" },
-                { HeaderPostionXTextBox, "ヘッダー位置X" },
-                { HeaderPostionYTextBox, "ヘッダー位置Y" },
             };
 
             foreach (var textBox in intTextBoxes) {
@@ -157,10 +160,13 @@ namespace ProductDatabase {
         }
         private void SaveProductPrintSettings() {
             try {
-                using (var swLabel = new StreamWriter(_productPrintSettingFilePath, false, System.Text.Encoding.UTF8)) {
-                    var serializerLabel = new System.Xml.Serialization.XmlSerializer(typeof(ProductPrintSettings));
-                    serializerLabel.Serialize(swLabel, ProductPrintSettings);
-                }
+                var options = new JsonSerializerOptions {
+                    WriteIndented = true,
+                    PropertyNamingPolicy = null,
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                };
+                var jsonString = JsonSerializer.Serialize(ProductPrintSettings, options);
+                File.WriteAllText(_productPrintSettingFilePath, jsonString);
                 DialogResult = DialogResult.OK;
                 Close();
             } catch (Exception ex) {

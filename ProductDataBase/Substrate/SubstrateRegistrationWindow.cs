@@ -10,8 +10,7 @@ namespace ProductDatabase {
         public ProductInformation ProductInfo { get; }
 
         public SubstratePrintSettings SubstratePrintSettings { get; set; } = new SubstratePrintSettings();
-        private readonly string _settingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.xml");
-        //public readonly string settingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
+        private readonly string _printSettingPath = SubstratePrintSettingsWindow.s_substratePrintSettingFilePath;
 
         private string _labelSubNSerial = string.Empty;
 
@@ -88,25 +87,19 @@ namespace ProductDatabase {
                     PrintButton.Visible = false;
                 }
 
-                if (File.Exists(settingFilePath) == false) { throw new Exception("印刷設定ファイルが見つかりませんでした"); }
+                if (File.Exists(_printSettingPath) == false) { throw new Exception("印刷設定ファイルが見つかりませんでした"); }
                 SubstratePrintSettings = new SubstratePrintSettings();
-                LoadSettings(settingFilePath);
+                LoadSettings(_printSettingPath);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
             } finally {
             }
         }
-        private void LoadSettings(string strSettingFilePath) {
+        private void LoadSettings(string settingFilePath) {
             try {
-                //var jsonString = File.ReadAllText(strSettingFilePath);
-                //SubstratePrintSettings = JsonSerializer.Deserialize<SubstratePrintSettings>(jsonString);
-
-                if (strSettingFilePath != string.Empty) { }
-                StreamReader sr = new(strSettingFilePath, new System.Text.UTF8Encoding(false));
-                System.Xml.Serialization.XmlSerializer serializer = new(typeof(SubstratePrintSettings));
-                if (serializer.Deserialize(sr) is SubstratePrintSettings result) { SubstratePrintSettings = result; }
-                sr.Close();
+                var jsonString = File.ReadAllText(settingFilePath);
+                SubstratePrintSettings = System.Text.Json.JsonSerializer.Deserialize<SubstratePrintSettings>(jsonString) ?? new SubstratePrintSettings();
             } catch (Exception ex) {
                 MessageBox.Show($"設定ファイルの読み込みに失敗しました。{Environment.NewLine}{ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
@@ -671,7 +664,7 @@ namespace ProductDatabase {
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             SubstratePrintSettingsWindow ls = new();
             ls.ShowDialog(this);
-            LoadSettings(settingFilePath);
+            LoadSettings(_printSettingPath);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
             var entries = new[]

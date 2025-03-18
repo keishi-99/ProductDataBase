@@ -1,11 +1,13 @@
 ﻿using ProductDatabase.Substrate;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 
 namespace ProductDatabase {
     public partial class SubstratePrintSettingsWindow : Form {
 
         public SubstratePrintSettings SubstratePrintSettings { get; set; } = new SubstratePrintSettings();
-        private readonly string _substratePrintSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.xml");
-        //private readonly string _substratePrintSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
+        public static readonly string s_substratePrintSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
 
         public SubstratePrintSettingsWindow() {
             InitializeComponent();
@@ -69,7 +71,9 @@ namespace ProductDatabase {
                 { LabelIntervalXTextBox, "間隔X" },
                 { LabelIntervalYTextBox, "間隔Y" },
                 { LabelTextPostionXTextBox, "フォント位置X" },
-                { LabelTextPostionYTextBox, "フォント位置Y" }
+                { LabelTextPostionYTextBox, "フォント位置Y" },
+                { HeaderPostionXTextBox, "ヘッダー位置X" },
+                { HeaderPostionYTextBox, "ヘッダー位置Y" },
             };
 
             foreach (var textBox in doubleTextBoxes) {
@@ -91,8 +95,6 @@ namespace ProductDatabase {
                 {LabelsPerRowTextBox , "ラベル行数" },
                 { LabelsPerColumnTextBox, "ラベル列数" },
                 { CopiesPerLabelTextBox, "ラベルごとのコピー数" },
-                { HeaderPostionXTextBox, "ヘッダー位置X" },
-                { HeaderPostionYTextBox, "ヘッダー位置Y" },
             };
 
             foreach (var textBox in intTextBoxes) {
@@ -150,16 +152,13 @@ namespace ProductDatabase {
         }
         private void SaveSubstratePrintSettings() {
             try {
-                using (var swLabel = new StreamWriter(_substratePrintSettingFilePath, false, System.Text.Encoding.UTF8)) {
-                    var serializerLabel = new System.Xml.Serialization.XmlSerializer(typeof(SubstratePrintSettings));
-                    serializerLabel.Serialize(swLabel, SubstratePrintSettings);
-                }
-
-                //if (Owner is SubstrateRegistrationWindow substrateWindow) {
-                //    var jsonString = JsonSerializer.Serialize(SubstratePrintSettings);
-                //var path = SubstrateRegistrationWindow.settingFilePath;
-                //File.WriteAllText(path, jsonString);
-                //}
+                var options = new JsonSerializerOptions {
+                    WriteIndented = true,
+                    PropertyNamingPolicy = null,
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                };
+                var jsonString = JsonSerializer.Serialize(SubstratePrintSettings, options);
+                File.WriteAllText(s_substratePrintSettingFilePath, jsonString);
 
                 DialogResult = DialogResult.OK;
                 Close();
@@ -174,7 +173,6 @@ namespace ProductDatabase {
             if (r == DialogResult.Cancel) {
                 return;
             }
-
             HeaderFontTextBox.Text = $"{HeaderFontDialog.Font.Name} {HeaderFontDialog.Font.SizeInPoints}pt";
         }
         private void PrintTextFontButton_Click(object sender, EventArgs e) {
@@ -182,7 +180,6 @@ namespace ProductDatabase {
             if (r == DialogResult.Cancel) {
                 return;
             }
-
             PrintTextFontTextBox.Text = $"{LabelFontDialog.Font.Name} {LabelFontDialog.Font.SizeInPoints}pt";
         }
         private void PrintTextXCenterCheckBox_CheckedChanged(object sender, EventArgs e) { LabelTextPostionXTextBox.Enabled = !AlignTextXCenterCheckBox.Checked; }
