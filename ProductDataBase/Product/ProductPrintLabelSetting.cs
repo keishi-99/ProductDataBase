@@ -26,7 +26,7 @@ namespace ProductDatabase.Product {
         public double MarginY { get; set; }
         public double IntervalX { get; set; }
         public double IntervalY { get; set; }
-        public string HeaderText { get; set; } = string.Empty;
+        public string HeaderTextFormat { get; set; } = string.Empty;
         public double HeaderPositionX { get; set; }
         public double HeaderPositionY { get; set; }
 
@@ -34,7 +34,7 @@ namespace ProductDatabase.Product {
         public Font HeaderFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
     }
     public class LabelLayoutSettings {
-        public string Format { get; set; } = string.Empty;
+        public string TextFormat { get; set; } = string.Empty;
         public double TextPositionX { get; set; }
         public double TextPositionY { get; set; }
         public bool AlignTextXCenter { get; set; }
@@ -54,7 +54,7 @@ namespace ProductDatabase.Product {
         public double MarginY { get; set; }
         public double IntervalX { get; set; }
         public double IntervalY { get; set; }
-        public string HeaderText { get; set; } = string.Empty;
+        public string HeaderTextFormat { get; set; } = string.Empty;
         public double HeaderPositionX { get; set; }
         public double HeaderPositionY { get; set; }
 
@@ -62,7 +62,7 @@ namespace ProductDatabase.Product {
         public Font HeaderFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
     }
     public class BarcodeLayoutSettings {
-        public string Format { get; set; } = string.Empty;
+        public string TextFormat { get; set; } = string.Empty;
         public double BarcodeHeight { get; set; }
         public double BarcodePositionX { get; set; }
         public double BarcodePositionY { get; set; }
