@@ -11,6 +11,7 @@ namespace ProductDatabase {
 
         public SubstratePrintSettings SubstratePrintSettings { get; set; } = new SubstratePrintSettings();
         private readonly string _settingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.xml");
+        //public readonly string settingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
 
         private string _labelSubNSerial = string.Empty;
 
@@ -87,9 +88,9 @@ namespace ProductDatabase {
                     PrintButton.Visible = false;
                 }
 
-                if (File.Exists(_settingFilePath) == false) { throw new Exception("印刷設定ファイルが見つかりませんでした"); }
+                if (File.Exists(settingFilePath) == false) { throw new Exception("印刷設定ファイルが見つかりませんでした"); }
                 SubstratePrintSettings = new SubstratePrintSettings();
-                LoadSettings(_settingFilePath);
+                LoadSettings(settingFilePath);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
@@ -98,6 +99,9 @@ namespace ProductDatabase {
         }
         private void LoadSettings(string strSettingFilePath) {
             try {
+                //var jsonString = File.ReadAllText(strSettingFilePath);
+                //SubstratePrintSettings = JsonSerializer.Deserialize<SubstratePrintSettings>(jsonString);
+
                 if (strSettingFilePath != string.Empty) { }
                 StreamReader sr = new(strSettingFilePath, new System.Text.UTF8Encoding(false));
                 System.Xml.Serialization.XmlSerializer serializer = new(typeof(SubstratePrintSettings));
@@ -405,7 +409,7 @@ namespace ProductDatabase {
                 marginX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
                 marginY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
 
-                var headerString = ConvertHeaderString(SubstratePrintSettings.LabelPageSettings.HeaderText);
+                var headerString = ConvertHeaderString(SubstratePrintSettings.LabelPageSettings.HeaderTextFormat);
 
                 // 最初のページのみオフセットを調整
                 var verticalOffset = _pageCount == 1 ? startLine * (intervalY + labelHeight) : 0;
@@ -496,7 +500,7 @@ namespace ProductDatabase {
                 _ => monthCode
             };
 
-            var outputCode = SubstratePrintSettings.LabelLayoutSettings.Format;
+            var outputCode = SubstratePrintSettings.LabelLayoutSettings.TextFormat;
             var serialCode = serial.Substring(5, 5);
             outputCode = outputCode.Replace("%T", ProductInfo.Initial)
                                     .Replace("%Y", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yy"))
@@ -667,7 +671,7 @@ namespace ProductDatabase {
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             SubstratePrintSettingsWindow ls = new();
             ls.ShowDialog(this);
-            LoadSettings(_settingFilePath);
+            LoadSettings(settingFilePath);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
             var entries = new[]

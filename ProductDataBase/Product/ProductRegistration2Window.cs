@@ -142,8 +142,8 @@ namespace ProductDatabase {
                                     {ProductInfo.CategoryName}_Substrate
                                 WHERE
                                     StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber NOTNULL
-                                GROUP BY S
-                                    ubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                                GROUP BY
+                                    SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                                 HAVING
                                     Stock > 0
                                 ORDER BY
