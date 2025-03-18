@@ -26,7 +26,6 @@
             var resources = new System.ComponentModel.ComponentResourceManager(typeof(SubstrateRegistrationWindow));
             this.SubstrateRegistrationMenuStrip = new MenuStrip();
             this.ファイルToolStripMenuItem = new ToolStripMenuItem();
-            this.印刷ToolStripMenuItem = new ToolStripMenuItem();
             this.印刷プレビューToolStripMenuItem = new ToolStripMenuItem();
             this.終了ToolStripMenuItem = new ToolStripMenuItem();
             this.設定ToolStripMenuItem = new ToolStripMenuItem();
@@ -97,29 +96,22 @@
             // 
             // ファイルToolStripMenuItem
             // 
-            this.ファイルToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.印刷ToolStripMenuItem, this.印刷プレビューToolStripMenuItem, this.終了ToolStripMenuItem });
+            this.ファイルToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.印刷プレビューToolStripMenuItem, this.終了ToolStripMenuItem });
             this.ファイルToolStripMenuItem.Name = "ファイルToolStripMenuItem";
             this.ファイルToolStripMenuItem.Size = new Size(53, 20);
             this.ファイルToolStripMenuItem.Text = "ファイル";
             // 
-            // 印刷ToolStripMenuItem
-            // 
-            this.印刷ToolStripMenuItem.Name = "印刷ToolStripMenuItem";
-            this.印刷ToolStripMenuItem.Size = new Size(142, 22);
-            this.印刷ToolStripMenuItem.Text = "印刷";
-            this.印刷ToolStripMenuItem.Click += this.印刷ToolStripMenuItem_Click;
-            // 
             // 印刷プレビューToolStripMenuItem
             // 
             this.印刷プレビューToolStripMenuItem.Name = "印刷プレビューToolStripMenuItem";
-            this.印刷プレビューToolStripMenuItem.Size = new Size(142, 22);
+            this.印刷プレビューToolStripMenuItem.Size = new Size(180, 22);
             this.印刷プレビューToolStripMenuItem.Text = "印刷プレビュー";
             this.印刷プレビューToolStripMenuItem.Click += this.印刷プレビューToolStripMenuItem_Click;
             // 
             // 終了ToolStripMenuItem
             // 
             this.終了ToolStripMenuItem.Name = "終了ToolStripMenuItem";
-            this.終了ToolStripMenuItem.Size = new Size(142, 22);
+            this.終了ToolStripMenuItem.Size = new Size(180, 22);
             this.終了ToolStripMenuItem.Text = "終了";
             // 
             // 設定ToolStripMenuItem
@@ -745,7 +737,6 @@
 
         private MenuStrip SubstrateRegistrationMenuStrip;
         private ToolStripMenuItem ファイルToolStripMenuItem;
-        private ToolStripMenuItem 印刷ToolStripMenuItem;
         private ToolStripMenuItem 印刷プレビューToolStripMenuItem;
         private ToolStripMenuItem 終了ToolStripMenuItem;
         private ToolStripMenuItem 設定ToolStripMenuItem;
