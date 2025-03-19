@@ -4,16 +4,49 @@ using System.Text.Json.Serialization;
 
 namespace ProductDatabase.Product {
     public class ProductPrintSettings {
-        public LabelPageSettings LabelPageSettings { get; set; }
-        public LabelLayoutSettings LabelLayoutSettings { get; set; }
-        public BarcodePageSettings BarcodePageSettings { get; set; }
-        public BarcodeLayoutSettings BarcodeLayoutSettings { get; set; }
+        public LabelPageSettings? LabelPageSettings { get; set; }
+        public LabelLayoutSettings? LabelLayoutSettings { get; set; }
+        public BarcodePageSettings? BarcodePageSettings { get; set; }
+        public BarcodeLayoutSettings? BarcodeLayoutSettings { get; set; }
 
         public ProductPrintSettings() {
             LabelPageSettings = new LabelPageSettings();
             LabelLayoutSettings = new LabelLayoutSettings();
             BarcodePageSettings = new BarcodePageSettings();
             BarcodeLayoutSettings = new BarcodeLayoutSettings();
+        }
+
+        public bool ShouldSerializeLabelPageSettings() {
+            return LabelPageSettings != null;
+        }
+        public bool ShouldSerializeLabelLayoutSettings() {
+            return LabelLayoutSettings != null;
+        }
+        public bool ShouldSerializeBarcodePageSettings() {
+            return BarcodePageSettings != null;
+        }
+        public bool ShouldSerializeBarcodeLayoutSettings() {
+            return BarcodeLayoutSettings != null;
+        }
+
+        public void SetSettingsType(bool isLabelPrint, bool isBarcodePrint) {
+            if (!isLabelPrint) {
+                LabelPageSettings = null;
+                LabelLayoutSettings = null;
+            }
+            else {
+                LabelPageSettings ??= new LabelPageSettings();
+                LabelLayoutSettings ??= new LabelLayoutSettings();
+            }
+
+            if (!isBarcodePrint) {
+                BarcodePageSettings = null;
+                BarcodeLayoutSettings = null;
+            }
+            else {
+                BarcodePageSettings ??= new BarcodePageSettings();
+                BarcodeLayoutSettings ??= new BarcodeLayoutSettings();
+            }
         }
     }
 
@@ -31,7 +64,7 @@ namespace ProductDatabase.Product {
         public double HeaderPositionY { get; set; }
 
         [JsonConverter(typeof(FontJsonConverter))]
-        public Font HeaderFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
+        public Font HeaderFont { get; set; } = SystemFonts.DefaultFont;
     }
     public class LabelLayoutSettings {
         public string TextFormat { get; set; } = string.Empty;
@@ -42,7 +75,7 @@ namespace ProductDatabase.Product {
         public int CopiesPerLabel { get; set; }
 
         [JsonConverter(typeof(FontJsonConverter))]
-        public Font TextFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
+        public Font TextFont { get; set; } = SystemFonts.DefaultFont;
     }
 
     public class BarcodePageSettings {
@@ -59,7 +92,7 @@ namespace ProductDatabase.Product {
         public double HeaderPositionY { get; set; }
 
         [JsonConverter(typeof(FontJsonConverter))]
-        public Font HeaderFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
+        public Font HeaderFont { get; set; } = SystemFonts.DefaultFont;
     }
     public class BarcodeLayoutSettings {
         public string TextFormat { get; set; } = string.Empty;
@@ -74,7 +107,7 @@ namespace ProductDatabase.Product {
         public int CopiesPerLabel { get; set; }
 
         [JsonConverter(typeof(FontJsonConverter))]
-        public Font TextFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
+        public Font TextFont { get; set; } = SystemFonts.DefaultFont;
     }
     public class FontJsonConverter : JsonConverter<Font> {
         public override Font Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {

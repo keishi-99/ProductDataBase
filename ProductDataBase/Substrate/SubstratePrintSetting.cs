@@ -27,7 +27,7 @@ namespace ProductDatabase.Substrate {
         public double HeaderPositionY { get; set; }
 
         [JsonConverter(typeof(FontJsonConverter))]
-        public Font HeaderFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
+        public Font HeaderFont { get; set; } = SystemFonts.DefaultFont;
     }
 
     public class LabelLayoutSettings {
@@ -39,7 +39,7 @@ namespace ProductDatabase.Substrate {
         public int CopiesPerLabel { get; set; }
 
         [JsonConverter(typeof(FontJsonConverter))]
-        public Font TextFont { get; set; } = new Font("ＭＳ Ｐ明朝", 5.25F);
+        public Font TextFont { get; set; } = SystemFonts.DefaultFont;
     }
     public class FontJsonConverter : JsonConverter<Font> {
         public override Font Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
