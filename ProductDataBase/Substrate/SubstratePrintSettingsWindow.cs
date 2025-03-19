@@ -1,6 +1,7 @@
 ﻿using ProductDatabase.Substrate;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.Unicode;
 
 namespace ProductDatabase {
@@ -8,6 +9,7 @@ namespace ProductDatabase {
 
         public SubstratePrintSettings SubstratePrintSettings { get; set; } = new SubstratePrintSettings();
         public static readonly string s_substratePrintSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
+        private JsonSerializerOptions? _jsonSerializerOptions;
 
         public SubstratePrintSettingsWindow() {
             InitializeComponent();
@@ -121,7 +123,7 @@ namespace ProductDatabase {
             SubstratePrintSettings.LabelPageSettings.IntervalY = ParseDouble(LabelIntervalYTextBox.Text);
             SubstratePrintSettings.LabelPageSettings.HeaderPositionX = ParseDouble(HeaderPostionXTextBox.Text);
             SubstratePrintSettings.LabelPageSettings.HeaderPositionY = ParseDouble(HeaderPostionYTextBox.Text);
-            SubstratePrintSettings.LabelPageSettings.HeaderTextFormat = HeaderFontTextBox.Text;
+            SubstratePrintSettings.LabelPageSettings.HeaderTextFormat = HeaderTextTextBox.Text;
             SubstratePrintSettings.LabelPageSettings.HeaderFont = HeaderFontDialog.Font;
 
             SubstratePrintSettings.LabelLayoutSettings.TextFormat = LabelFormatTextBox.Text;
@@ -152,14 +154,15 @@ namespace ProductDatabase {
         }
         private void SaveSubstratePrintSettings() {
             try {
-                var options = new JsonSerializerOptions {
+                // JsonSerializerOptions のインスタンスをキャッシュ
+                _jsonSerializerOptions ??= new JsonSerializerOptions {
                     WriteIndented = true,
                     PropertyNamingPolicy = null,
                     Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
                 };
-                var jsonString = JsonSerializer.Serialize(SubstratePrintSettings, options);
+                var jsonString = JsonSerializer.Serialize(SubstratePrintSettings, _jsonSerializerOptions);
                 File.WriteAllText(s_substratePrintSettingFilePath, jsonString);
-
                 DialogResult = DialogResult.OK;
                 Close();
             } catch (Exception ex) {
