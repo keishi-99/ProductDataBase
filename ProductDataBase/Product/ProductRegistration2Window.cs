@@ -331,7 +331,7 @@ namespace ProductDatabase {
             バーコード印刷プレビューToolStripMenuItem.Enabled = IsBarcodePrint;
             バーコード印刷設定ToolStripMenuItem.Enabled = IsBarcodePrint;
 
-            if (IsListPrint || IsBarcodePrint) {
+            if (IsLabelPrint || IsBarcodePrint) {
                 LoadSettings();
             }
         }
