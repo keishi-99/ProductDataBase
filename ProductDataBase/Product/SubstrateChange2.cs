@@ -26,9 +26,6 @@ namespace ProductDatabase {
         private CheckBox? _objCbx;
         private DataGridView? _objDgv;
 
-        // プロパティ設定
-        private bool IsListPrint => ProductInfo.PrintType is 5 or 6;
-
         public SubstrateChange2() {
             InitializeComponent();
         }
@@ -241,7 +238,7 @@ namespace ProductDatabase {
                     }
                 }
                 // リスト印刷ボタンを有効に
-                if (IsListPrint) { SubstrateListPrintButton.Enabled = true; }
+                if (ProductInfo.IsListPrint) { SubstrateListPrintButton.Enabled = true; }
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -409,7 +406,7 @@ namespace ProductDatabase {
                                                 }
                                             }
 
-                                            if (IsListPrint) {
+                                            if (ProductInfo.IsListPrint) {
                                                 _listUsedSubstrate.Add(_useSubstrate[i]);
                                                 if (substrateNum != null) { _listUsedProductNumber.Add(substrateNum); }
                                                 _listUsedQuantity.Add(useValue);

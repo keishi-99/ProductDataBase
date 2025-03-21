@@ -12,13 +12,6 @@ namespace ProductDatabase {
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
-        // プロパティ設定
-        private bool IsSerialGeneration => IsRegTypeIn(1, 2, 3, 9);
-
-        // ヘルパーメソッド
-        private bool IsRegTypeIn(params int[] values) {
-            return values.Contains(ProductInfo.RegType);
-        }
 
         public ProductRegistration1Window(ProductInformation productInfo) {
             InitializeComponent();
@@ -165,7 +158,7 @@ namespace ProductDatabase {
                 ProductInfo.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
                 ProductInfo.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
                 ProductInfo.Quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception("QuantityTextBox.Text is null"));
-                ProductInfo.SerialFirstNumber = IsSerialGeneration
+                ProductInfo.SerialFirstNumber = ProductInfo.IsSerialGeneration
                     ? Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception("FirstSerialNumberTextBox.Text is null"))
                     : -1;
                 using ProductRegistration2Window window = new();

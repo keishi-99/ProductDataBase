@@ -36,25 +36,6 @@ namespace ProductDatabase {
                         "Substrate11DataGridView", "Substrate12DataGridView", "Substrate13DataGridView", "Substrate14DataGridView","Substrate15DataGridView"
                         ];
 
-        // プロパティ設定
-        private bool IsSerialGeneration => IsRegTypeIn(1, 2, 3, 9);
-        private bool IsUnderlinePrint => ProductInfo.PrintType == 4 && IsNotRegType9;
-
-        private bool IsLabelPrint => IsPrintTypeIn(1, 3, 4, 5, 6, 7, 9);
-        private bool IsBarcodePrint => IsPrintTypeIn(2, 3);
-        private bool IsListPrint => IsPrintTypeIn(5, 6) && IsNotRegType9;
-        private bool IsCheckSheetPrint => IsPrintTypeIn(6, 7) && IsNotRegType9;
-        private bool IsLast4Digits => IsPrintTypeIn(9) && IsNotRegType9;
-
-        // ヘルパーメソッド
-        private bool IsRegTypeIn(params int[] values) {
-            return values.Contains(ProductInfo.RegType);
-        }
-        private bool IsPrintTypeIn(params int[] values) {
-            return values.Contains(ProductInfo.PrintType);
-        }
-        private bool IsNotRegType9 => ProductInfo.RegType != 9;
-
         public ProductRegistration2Window() {
             InitializeComponent();
         }
@@ -69,7 +50,7 @@ namespace ProductDatabase {
                 _useSubstrate = ProductInfo.UseSubstrate.Split(",");
                 Array.Sort(_useSubstrate);
 
-                if (IsSerialGeneration) {
+                if (ProductInfo.IsSerialGeneration) {
                     _labelProNSerial = ProductInfo.SerialFirstNumber;
                     _serialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
                 }
@@ -317,21 +298,21 @@ namespace ProductDatabase {
         }
         // 印刷UI設定
         private void ConfigurePrintSettings() {
-            SubstrateListPrintButton.Visible = IsListPrint;
-            CheckSheetPrintButton.Visible = IsCheckSheetPrint;
+            SubstrateListPrintButton.Visible = ProductInfo.IsListPrint;
+            CheckSheetPrintButton.Visible = ProductInfo.IsCheckSheetPrint;
 
-            SerialPrintPostionLabel.Visible = IsLabelPrint;
-            SerialPrintPostionNumericUpDown.Visible = IsLabelPrint;
+            SerialPrintPostionLabel.Visible = ProductInfo.IsLabelPrint;
+            SerialPrintPostionNumericUpDown.Visible = ProductInfo.IsLabelPrint;
 
-            BarcodePrintPostionLabel.Visible = IsBarcodePrint;
-            BarcodePrintPostionNumericUpDown.Visible = IsBarcodePrint;
+            BarcodePrintPostionLabel.Visible = ProductInfo.IsBarcodePrint;
+            BarcodePrintPostionNumericUpDown.Visible = ProductInfo.IsBarcodePrint;
 
-            シリアルラベル印刷プレビューToolStripMenuItem.Enabled = IsLabelPrint;
-            シリアルラベル印刷設定ToolStripMenuItem.Enabled = IsLabelPrint;
-            バーコード印刷プレビューToolStripMenuItem.Enabled = IsBarcodePrint;
-            バーコード印刷設定ToolStripMenuItem.Enabled = IsBarcodePrint;
+            シリアルラベル印刷プレビューToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;
+            シリアルラベル印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;
+            バーコード印刷プレビューToolStripMenuItem.Enabled = ProductInfo.IsBarcodePrint;
+            バーコード印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsBarcodePrint;
 
-            if (IsLabelPrint || IsBarcodePrint) {
+            if (ProductInfo.IsLabelPrint || ProductInfo.IsBarcodePrint) {
                 LoadSettings();
             }
         }
@@ -352,7 +333,7 @@ namespace ProductDatabase {
                 _strSerial.Clear();
 
                 if (!NumberCheck() || !QuantityCheck()) { return; }
-                if (IsSerialGeneration) {
+                if (ProductInfo.IsSerialGeneration) {
                     SerialCheck();
                     GenerateSerialCodes();
                 }
@@ -455,14 +436,14 @@ namespace ProductDatabase {
             AddProductParameters(command, ProductInfo);
             command.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialFirst) ? DBNull.Value : ProductInfo.SerialFirst;
             command.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
-            command.Parameters.Add("@SerialLastNumber", DbType.String).Value = IsSerialGeneration ? _serialLastNumber : DBNull.Value;
+            command.Parameters.Add("@SerialLastNumber", DbType.String).Value = ProductInfo.IsSerialGeneration ? _serialLastNumber : DBNull.Value;
             command.ExecuteNonQuery();
 
             // 最終行取得
             command.CommandText = $"""SELECT MAX(ID) FROM "{ProductInfo.CategoryName}_Product";""";
             ProductInfo.ProductID = Convert.ToInt32(command.ExecuteScalar());
 
-            if (IsSerialGeneration) {
+            if (ProductInfo.IsSerialGeneration) {
                 foreach (var serial in _strSerial) {
                     command.CommandText = $"""
                         INSERT INTO "{ProductInfo.CategoryName}_Serial"
@@ -572,7 +553,7 @@ namespace ProductDatabase {
             AddProductParameters(command, ProductInfo);
             command.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialFirst) ? DBNull.Value : ProductInfo.SerialFirst;
             command.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
-            command.Parameters.Add("@SerialLastNumber", DbType.String).Value = IsSerialGeneration ? _serialLastNumber : DBNull.Value;
+            command.Parameters.Add("@SerialLastNumber", DbType.String).Value = ProductInfo.IsSerialGeneration ? _serialLastNumber : DBNull.Value;
 
             command.ExecuteNonQuery();
 
@@ -595,7 +576,7 @@ namespace ProductDatabase {
             command.Parameters.Add("@productRowId", DbType.String).Value = ProductInfo.ProductID;
             command.ExecuteNonQuery();
 
-            if (IsSerialGeneration) {
+            if (ProductInfo.IsSerialGeneration) {
                 foreach (var serial in _strSerial) {
                     command.CommandText = $"""
                         INSERT INTO "{ProductInfo.CategoryName}_Serial"
@@ -802,19 +783,19 @@ namespace ProductDatabase {
             }
         }
         private void SerialCheck() {
-            if (IsLabelPrint) {
+            if (ProductInfo.IsLabelPrint) {
                 for (var i = 0; i < ProductInfo.Quantity; i++) {
                     _serialType = "Label";
                     _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
                 }
             }
-            else if (IsBarcodePrint) {
+            else if (ProductInfo.IsBarcodePrint) {
                 for (var i = 0; i < ProductInfo.Quantity; i++) {
                     _serialType = "Barcode";
                     _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
                 }
             }
-            else if (IsSerialGeneration) {
+            else if (ProductInfo.IsSerialGeneration) {
                 for (var i = 0; i < ProductInfo.Quantity; i++) {
                     _serialType = "Label";
                     _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
@@ -866,7 +847,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleLabelPrinting() {
-            if (IsLabelPrint) {
+            if (ProductInfo.IsLabelPrint) {
                 MessageBox.Show("シリアルラベルを印刷します。");
                 _serialType = "Label";
 
@@ -876,7 +857,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleBarcodePrinting() {
-            if (IsBarcodePrint) {
+            if (ProductInfo.IsBarcodePrint) {
                 MessageBox.Show("バーコードラベルを印刷します。");
                 _serialType = "Barcode";
 
@@ -891,7 +872,7 @@ namespace ProductDatabase {
             BarcodePrintPostionNumericUpDown.Enabled = false;
         }
         private void GenerateSerialCodes() {
-            _serialType = IsBarcodePrint ? "Barcode" : "Label";
+            _serialType = ProductInfo.IsBarcodePrint ? "Barcode" : "Label";
             ProductInfo.SerialFirst = GenerateCode(ProductInfo.SerialFirstNumber);
             ProductInfo.SerialLast = GenerateCode(_serialLastNumber);
         }
@@ -906,8 +887,8 @@ namespace ProductDatabase {
                         break;
                 }
             }
-            SubstrateListPrintButton.Enabled = IsListPrint;
-            CheckSheetPrintButton.Enabled = IsCheckSheetPrint;
+            SubstrateListPrintButton.Enabled = ProductInfo.IsListPrint;
+            CheckSheetPrintButton.Enabled = ProductInfo.IsCheckSheetPrint;
         }
 
         // サービス向け用処理
@@ -1117,7 +1098,7 @@ namespace ProductDatabase {
             command.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
             command.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialFirst) ? DBNull.Value : ProductInfo.SerialFirst;
             command.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
-            command.Parameters.Add("@SerialLastNumber", DbType.String).Value = IsSerialGeneration ? _serialLastNumber : DBNull.Value;
+            command.Parameters.Add("@SerialLastNumber", DbType.String).Value = ProductInfo.IsSerialGeneration ? _serialLastNumber : DBNull.Value;
             command.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
             command.ExecuteNonQuery();
@@ -1139,7 +1120,7 @@ namespace ProductDatabase {
                 """;
             command.ExecuteNonQuery();
 
-            if (IsSerialGeneration) {
+            if (ProductInfo.IsSerialGeneration) {
                 foreach (var b in _strSerial) {
                     command.CommandText =
                         $"""
@@ -1309,11 +1290,11 @@ namespace ProductDatabase {
                         var posY = (float)(marginY + (y * (intervalY + labelHeight)));
 
                         // タイプ4で残り1の場合、最後のラベルに下線をつける
-                        var fontUnderline = IsUnderlinePrint && _remainingCount == 1;
+                        var fontUnderline = ProductInfo.IsUnderlinePrint && _remainingCount == 1;
 
                         // シリアル生成、PrintTypeが9かつ最終行の場合は型式下4桁、それ以外はシリアルを生成
                         string generatedCode;
-                        if (!IsLast4Digits || _remainingCount != 1) {
+                        if (!ProductInfo.IsLast4Digits || _remainingCount != 1) {
                             generatedCode = GenerateCode(_labelProNSerial); // シリアルコードを生成
                         }
                         else {
@@ -1566,7 +1547,7 @@ namespace ProductDatabase {
             dataGridView.Visible = checkBox.Checked;
             checkBox.ForeColor = checkBox.Checked ? Color.Black : Color.Red;
 
-            if (!checkBox.Checked && IsNotRegType9) {
+            if (!checkBox.Checked && !ProductInfo.IsRegType9) {
                 MessageBox.Show("チェックがない場合在庫から引き落とされなくなります。", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
