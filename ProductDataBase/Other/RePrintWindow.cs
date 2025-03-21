@@ -31,11 +31,6 @@ namespace ProductDatabase {
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
 
-        // プロパティ設定
-        private bool IsLabelPrint => ProductInfo.PrintType is 1 or 3 or 4 or 5 or 6 or 7 or 9;
-        private bool IsBarcodePrint => ProductInfo.PrintType is 2 or 3;
-        private bool IsUnderlinePrint => ProductInfo.PrintType is 4;
-
         public RePrintWindow(ProductInformation productInfo) {
             InitializeComponent();
             ProductInfo = productInfo;
@@ -87,13 +82,13 @@ namespace ProductDatabase {
         // 印刷UI設定
         private void ConfigurePrintSettings() {
             FirstSerialNumberCheckBox.Checked = true;
-            LabelPrintButton.Enabled = IsLabelPrint;
-            BarcodePrintButton.Enabled = IsBarcodePrint;
+            LabelPrintButton.Enabled = ProductInfo.IsLabelPrint;
+            BarcodePrintButton.Enabled = ProductInfo.IsBarcodePrint;
 
-            シリアルラベル印刷プレビューToolStripMenuItem.Enabled = IsLabelPrint;
-            シリアルラベル印刷設定ToolStripMenuItem.Enabled = IsLabelPrint;
-            バーコード印刷プレビューToolStripMenuItem.Enabled = IsBarcodePrint;
-            バーコード印刷設定ToolStripMenuItem.Enabled = IsBarcodePrint;
+            シリアルラベル印刷プレビューToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;
+            シリアルラベル印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;
+            バーコード印刷プレビューToolStripMenuItem.Enabled = ProductInfo.IsBarcodePrint;
+            バーコード印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsBarcodePrint;
 
             LoadSettings();
         }
@@ -411,7 +406,7 @@ namespace ProductDatabase {
                         var posY = (float)(marginY + (y * (intervalY + labelHeight)));
 
                         // タイプ4で残り1の場合、最後のラベルに下線をつける
-                        var fontUnderline = IsUnderlinePrint && _remainingCount == 1;
+                        var fontUnderline = ProductInfo.IsUnderlinePrint && _remainingCount == 1;
 
                         // シリアル生成、PrintTypeが9かつ最終行の場合は型式下4桁、それ以外はシリアルを生成
                         string generatedCode;

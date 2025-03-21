@@ -10,8 +10,6 @@ namespace ProductDatabase {
         private System.Data.DataTable _historyTable = new();
 
         private readonly List<string> _listColFilter = [];
-        private bool IsListPrint => ProductInfo.PrintType is 5 or 6;
-        private bool IsCheckSheetPrint => ProductInfo.PrintType is 6 or 7;
         private string _tableName = string.Empty;
 
         public HistoryWindow(ProductInformation productInfo) {
@@ -55,8 +53,8 @@ namespace ProductDatabase {
                         GroupModelCheckBox.Visible = false;
                         ShowUsedSubstrateButton.Visible = false;
                         GenerateReportButton.Visible = false;
-                        GenerateListButton.Visible = IsListPrint;
-                        GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
+                        GenerateListButton.Visible = ProductInfo.IsListPrint;
+                        GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
                         break;
                     case 2:
                         CategoryRadioButton2.Text = "全てのタイプ";
@@ -65,8 +63,8 @@ namespace ProductDatabase {
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
                         GroupModelCheckBox.Visible = false;
-                        GenerateListButton.Visible = IsListPrint;
-                        GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
+                        GenerateListButton.Visible = ProductInfo.IsListPrint;
+                        GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
                         break;
                     case 3:
                         CategoryRadioButton1.Visible = false;
@@ -276,8 +274,8 @@ namespace ProductDatabase {
             編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
             GenerateReportButton.Visible = true;
             ShowUsedSubstrateButton.Visible = true;
-            GenerateListButton.Visible = IsListPrint;
-            GenerateCheckSheetButton.Visible = IsCheckSheetPrint;
+            GenerateListButton.Visible = ProductInfo.IsListPrint;
+            GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
 
             var query = filterByProductModel
                 ? $"""SELECT * FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND ProductModel = @ProductModel ORDER BY ID DESC"""

@@ -13,11 +13,6 @@ namespace ProductDatabase {
         private JsonSerializerOptions? _jsonSerializerOptions;
 
         public ProductInformation ProductInfo { get; set; } = new ProductInformation();
-        private bool IsLabelPrint => IsPrintTypeIn(1, 3, 4, 5, 6, 7, 9);
-        private bool IsBarcodePrint => IsPrintTypeIn(2, 3);
-        private bool IsPrintTypeIn(params int[] values) {
-            return values.Contains(ProductInfo.PrintType);
-        }
 
         public ProductBarcodeSettingsWindow() {
             InitializeComponent();
@@ -189,7 +184,7 @@ namespace ProductDatabase {
         }
         private void SaveProductPrintSettings() {
             try {
-                ProductPrintSettings.SetSettingsType(IsLabelPrint, IsBarcodePrint);
+                ProductPrintSettings.SetSettingsType(ProductInfo.IsLabelPrint, ProductInfo.IsBarcodePrint);
                 // JsonSerializerOptions のインスタンスをキャッシュ
                 _jsonSerializerOptions ??= new JsonSerializerOptions {
                     WriteIndented = true,

@@ -20,8 +20,8 @@ namespace ProductDatabase {
             public string UseSubstrate { get; set; } = string.Empty;
             public string Initial { get; set; } = string.Empty;
             public int SerialDigit { get; set; }
-            public int RegType { get; set; }
-            public int PrintType { get; set; }
+            //public int RegType { get; set; }
+            //public int PrintType { get; set; }
             public int RevisionGroup { get; set; }
             public int CheckBin { get; set; }
             public string Proness1 { get; set; } = string.Empty;
@@ -46,6 +46,52 @@ namespace ProductDatabase {
             public string Comment { get; set; } = string.Empty;
             public string SerialFirst { get; set; } = string.Empty;
             public string SerialLast { get; set; } = string.Empty;
+
+            private int _regType;
+            private int _printType;
+
+            public int RegType {
+                get => _regType;
+                set {
+                    _regType = value;
+                    UpdatePrintFlags();
+                }
+            }
+
+            public int PrintType {
+                get => _printType;
+                set {
+                    _printType = value;
+                    UpdatePrintFlags();
+                }
+            }
+
+            public bool IsLabelPrint { get; private set; }
+            public bool IsBarcodePrint { get; private set; }
+            public bool IsListPrint { get; private set; }
+            public bool IsCheckSheetPrint { get; private set; }
+            public bool IsLast4Digits { get; private set; }
+            public bool IsRegType9 { get; private set; } // 命名規則を変更
+            public bool IsSerialGeneration { get; private set; } // アクセス修飾子を変更
+            public bool IsUnderlinePrint { get; private set; } // アクセス修飾子を変更
+
+            private void UpdatePrintFlags() {
+                // RegType に基づく設定
+                IsRegType9 = RegType == 9; // 命名規則を変更
+                IsSerialGeneration = IsTypeIn(RegType, 1, 2, 3, 9);
+
+                // PrintType に基づく設定
+                IsLabelPrint = IsTypeIn(PrintType, 1, 3, 4, 5, 6, 7, 9);
+                IsBarcodePrint = IsTypeIn(PrintType, 2, 3);
+                IsListPrint = IsTypeIn(PrintType, 5, 6) && !IsRegType9; // 否定演算子を使用
+                IsCheckSheetPrint = IsTypeIn(PrintType, 6, 7) && !IsRegType9; // 否定演算子を使用
+                IsLast4Digits = IsTypeIn(PrintType, 9) && !IsRegType9; // 否定演算子を使用
+                IsUnderlinePrint = PrintType == 4 && !IsRegType9; // 否定演算子を使用
+            }
+
+            private bool IsTypeIn(int value, params int[] values) {
+                return values.Contains(value);
+            }
 
             public int Quantity { get; set; }
             public int SerialFirstNumber { get; set; }
