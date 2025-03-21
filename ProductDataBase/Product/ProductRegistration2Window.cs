@@ -301,11 +301,11 @@ namespace ProductDatabase {
             SubstrateListPrintButton.Visible = ProductInfo.IsListPrint;
             CheckSheetPrintButton.Visible = ProductInfo.IsCheckSheetPrint;
 
-            SerialPrintPostionLabel.Visible = ProductInfo.IsLabelPrint;
-            SerialPrintPostionNumericUpDown.Visible = ProductInfo.IsLabelPrint;
+            SerialPrintPositionLabel.Visible = ProductInfo.IsLabelPrint;
+            SerialPrintPositionNumericUpDown.Visible = ProductInfo.IsLabelPrint;
 
-            BarcodePrintPostionLabel.Visible = ProductInfo.IsBarcodePrint;
-            BarcodePrintPostionNumericUpDown.Visible = ProductInfo.IsBarcodePrint;
+            BarcodePrintPositionLabel.Visible = ProductInfo.IsBarcodePrint;
+            BarcodePrintPositionNumericUpDown.Visible = ProductInfo.IsBarcodePrint;
 
             シリアルラベル印刷プレビューToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;
             シリアルラベル印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;
@@ -868,8 +868,8 @@ namespace ProductDatabase {
         }
         private void DisableControls() {
             RegisterButton.Enabled = false;
-            SerialPrintPostionNumericUpDown.Enabled = false;
-            BarcodePrintPostionNumericUpDown.Enabled = false;
+            SerialPrintPositionNumericUpDown.Enabled = false;
+            BarcodePrintPositionNumericUpDown.Enabled = false;
         }
         private void GenerateSerialCodes() {
             _serialType = ProductInfo.IsBarcodePrint ? "Barcode" : "Label";
@@ -899,7 +899,7 @@ namespace ProductDatabase {
             public string ServiceStockName { get; set; } = string.Empty;
             public string ServiceProductType { get; set; } = string.Empty;
             public string ServiceProductModel { get; set; } = string.Empty;
-            public string[] ServiveUseSubstrate { get; set; } = [];
+            public string[] ServiceUseSubstrate { get; set; } = [];
         }
         public ServiceInformation ServiceInfo { get; set; } = new();
         private void ServiceLoad() {
@@ -910,9 +910,9 @@ namespace ProductDatabase {
             ServiceInfo = window.ServiceInfo;
             var serviceCategoryName = ServiceInfo.ServiceCategoryName;
             var serviceStockName = ServiceInfo.ServiceStockName;
-            var serviveUseSubstrate = ServiceInfo.ServiveUseSubstrate;
+            var serviceUseSubstrate = ServiceInfo.ServiceUseSubstrate;
 
-            for (var i = 0; i <= serviveUseSubstrate.GetUpperBound(0); i++) {
+            for (var i = 0; i <= serviceUseSubstrate.GetUpperBound(0); i++) {
                 var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox;
 
                 if (objCbx != null) {
@@ -956,11 +956,11 @@ namespace ProductDatabase {
                 using var cmd = con.CreateCommand();
                 // 使用基板表示
 
-                var selectedRows = ProductInfo.SubstrateDataTable.Select($"SubstrateModel = '{serviveUseSubstrate[i]}'");
+                var selectedRows = ProductInfo.SubstrateDataTable.Select($"SubstrateModel = '{serviceUseSubstrate[i]}'");
                 foreach (var row in selectedRows) {
                     var productName = row["SubstrateName"].ToString() ?? throw new Exception("ProductName is null");
                     if (objCbx != null) {
-                        objCbx.Text = $"{productName} - {serviveUseSubstrate[i]}";
+                        objCbx.Text = $"{productName} - {serviceUseSubstrate[i]}";
                     }
                 }
 
@@ -981,7 +981,7 @@ namespace ProductDatabase {
                                     MIN(ID);
                                 """;
                 cmd.Parameters.Add("@StockName", DbType.String).Value = serviceStockName;
-                cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = serviveUseSubstrate[i];
+                cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = serviceUseSubstrate[i];
                 using var dr = cmd.ExecuteReader();
                 while (dr.Read()) {
                     var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
@@ -995,10 +995,10 @@ namespace ProductDatabase {
         private void ServiceReg(SQLiteConnection con) {
             var serviceCategoryName = ServiceInfo.ServiceCategoryName;
             var serviceStockName = ServiceInfo.ServiceStockName;
-            var serviveUseSubstrate = ServiceInfo.ServiveUseSubstrate;
+            var serviceUseSubstrate = ServiceInfo.ServiceUseSubstrate;
             _ = con.CreateCommand();
 
-            if (serviveUseSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
+            if (serviceUseSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
 
             var command = con.CreateCommand();
 
@@ -1006,7 +1006,7 @@ namespace ProductDatabase {
             command.CommandText = """DELETE FROM "TempSubstrateReduction";""";
             command.ExecuteNonQuery();
 
-            for (var i = 0; i <= serviveUseSubstrate.Length; i++) {
+            for (var i = 0; i <= serviceUseSubstrate.Length; i++) {
 
                 var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxがnullです。");
 
@@ -1037,7 +1037,7 @@ namespace ProductDatabase {
                                     MIN(ID);
                                 """;
                             command.Parameters.Add("@StockName", DbType.String).Value = serviceStockName;
-                            command.Parameters.Add("@SubstrateModel", DbType.String).Value = serviveUseSubstrate[i];
+                            command.Parameters.Add("@SubstrateModel", DbType.String).Value = serviceUseSubstrate[i];
                             command.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNum;
 
                             using var dr = command.ExecuteReader();
@@ -1239,7 +1239,7 @@ namespace ProductDatabase {
                         if (ProductPrintSettings.LabelLayoutSettings != null) {
                             copiesPerLabel = ProductPrintSettings.LabelLayoutSettings.CopiesPerLabel;
                         }
-                        startLine = (int)SerialPrintPostionNumericUpDown.Value - 1;
+                        startLine = (int)SerialPrintPositionNumericUpDown.Value - 1;
                         break;
                     case "Barcode":
                         if (ProductPrintSettings == null) { throw new Exception("ProductPrintSettingsがnullです。"); }
@@ -1260,7 +1260,7 @@ namespace ProductDatabase {
                         if (ProductPrintSettings.BarcodeLayoutSettings != null) {
                             copiesPerLabel = ProductPrintSettings.BarcodeLayoutSettings.CopiesPerLabel;
                         }
-                        startLine = (int)BarcodePrintPostionNumericUpDown.Value - 1;
+                        startLine = (int)BarcodePrintPositionNumericUpDown.Value - 1;
                         break;
                     default:
                         break;

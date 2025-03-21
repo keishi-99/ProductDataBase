@@ -94,10 +94,10 @@
             this.dataGridViewTextBoxColumn1003 = new DataGridViewTextBoxColumn();
             this.dataGridViewCheckBoxColumn1001 = new DataGridViewCheckBoxColumn();
             this.Substrate10CheckBox = new CheckBox();
-            this.SerialPrintPostionLabel = new Label();
-            this.SerialPrintPostionNumericUpDown = new NumericUpDown();
-            this.BarcodePrintPostionNumericUpDown = new NumericUpDown();
-            this.BarcodePrintPostionLabel = new Label();
+            this.SerialPrintPositionLabel = new Label();
+            this.SerialPrintPositionNumericUpDown = new NumericUpDown();
+            this.BarcodePrintPositionNumericUpDown = new NumericUpDown();
+            this.BarcodePrintPositionLabel = new Label();
             this.SubstrateListPrintButton = new Button();
             this.CheckSheetPrintButton = new Button();
             this.RegisterButton = new Button();
@@ -147,8 +147,8 @@
             ((System.ComponentModel.ISupportInitialize)this.Substrate8DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate9DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate10DataGridView).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)this.SerialPrintPostionNumericUpDown).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)this.BarcodePrintPostionNumericUpDown).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)this.SerialPrintPositionNumericUpDown).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)this.BarcodePrintPositionNumericUpDown).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate15DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate14DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate13DataGridView).BeginInit();
@@ -892,49 +892,49 @@
             this.Substrate10CheckBox.UseVisualStyleBackColor = true;
             this.Substrate10CheckBox.CheckedChanged += this.SubstrateCheckBox_CheckedChanged;
             // 
-            // SerialPrintPostionLabel
+            // SerialPrintPositionLabel
             // 
-            this.SerialPrintPostionLabel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            this.SerialPrintPostionLabel.AutoSize = true;
-            this.SerialPrintPostionLabel.Location = new Point(400, 549);
-            this.SerialPrintPostionLabel.Name = "SerialPrintPostionLabel";
-            this.SerialPrintPostionLabel.Size = new Size(79, 30);
-            this.SerialPrintPostionLabel.TabIndex = 21;
-            this.SerialPrintPostionLabel.Text = "シリアルラベル\r\n印刷開始位置";
+            this.SerialPrintPositionLabel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            this.SerialPrintPositionLabel.AutoSize = true;
+            this.SerialPrintPositionLabel.Location = new Point(400, 549);
+            this.SerialPrintPositionLabel.Name = "SerialPrintPositionLabel";
+            this.SerialPrintPositionLabel.Size = new Size(79, 30);
+            this.SerialPrintPositionLabel.TabIndex = 21;
+            this.SerialPrintPositionLabel.Text = "シリアルラベル\r\n印刷開始位置";
             // 
-            // SerialPrintPostionNumericUpDown
+            // SerialPrintPositionNumericUpDown
             // 
-            this.SerialPrintPostionNumericUpDown.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            this.SerialPrintPostionNumericUpDown.Location = new Point(388, 580);
-            this.SerialPrintPostionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
-            this.SerialPrintPostionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            this.SerialPrintPostionNumericUpDown.Name = "SerialPrintPostionNumericUpDown";
-            this.SerialPrintPostionNumericUpDown.Size = new Size(100, 23);
-            this.SerialPrintPostionNumericUpDown.TabIndex = 22;
-            this.SerialPrintPostionNumericUpDown.TextAlign = HorizontalAlignment.Right;
-            this.SerialPrintPostionNumericUpDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            this.SerialPrintPositionNumericUpDown.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            this.SerialPrintPositionNumericUpDown.Location = new Point(388, 580);
+            this.SerialPrintPositionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
+            this.SerialPrintPositionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            this.SerialPrintPositionNumericUpDown.Name = "SerialPrintPositionNumericUpDown";
+            this.SerialPrintPositionNumericUpDown.Size = new Size(100, 23);
+            this.SerialPrintPositionNumericUpDown.TabIndex = 22;
+            this.SerialPrintPositionNumericUpDown.TextAlign = HorizontalAlignment.Right;
+            this.SerialPrintPositionNumericUpDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
-            // BarcodePrintPostionNumericUpDown
+            // BarcodePrintPositionNumericUpDown
             // 
-            this.BarcodePrintPostionNumericUpDown.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            this.BarcodePrintPostionNumericUpDown.Location = new Point(527, 580);
-            this.BarcodePrintPostionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
-            this.BarcodePrintPostionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            this.BarcodePrintPostionNumericUpDown.Name = "BarcodePrintPostionNumericUpDown";
-            this.BarcodePrintPostionNumericUpDown.Size = new Size(100, 23);
-            this.BarcodePrintPostionNumericUpDown.TabIndex = 24;
-            this.BarcodePrintPostionNumericUpDown.TextAlign = HorizontalAlignment.Right;
-            this.BarcodePrintPostionNumericUpDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            this.BarcodePrintPositionNumericUpDown.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            this.BarcodePrintPositionNumericUpDown.Location = new Point(527, 580);
+            this.BarcodePrintPositionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
+            this.BarcodePrintPositionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            this.BarcodePrintPositionNumericUpDown.Name = "BarcodePrintPositionNumericUpDown";
+            this.BarcodePrintPositionNumericUpDown.Size = new Size(100, 23);
+            this.BarcodePrintPositionNumericUpDown.TabIndex = 24;
+            this.BarcodePrintPositionNumericUpDown.TextAlign = HorizontalAlignment.Right;
+            this.BarcodePrintPositionNumericUpDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
-            // BarcodePrintPostionLabel
+            // BarcodePrintPositionLabel
             // 
-            this.BarcodePrintPostionLabel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            this.BarcodePrintPostionLabel.AutoSize = true;
-            this.BarcodePrintPostionLabel.Location = new Point(539, 549);
-            this.BarcodePrintPostionLabel.Name = "BarcodePrintPostionLabel";
-            this.BarcodePrintPostionLabel.Size = new Size(79, 30);
-            this.BarcodePrintPostionLabel.TabIndex = 23;
-            this.BarcodePrintPostionLabel.Text = "バーコード\r\n印刷開始位置";
+            this.BarcodePrintPositionLabel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            this.BarcodePrintPositionLabel.AutoSize = true;
+            this.BarcodePrintPositionLabel.Location = new Point(539, 549);
+            this.BarcodePrintPositionLabel.Name = "BarcodePrintPositionLabel";
+            this.BarcodePrintPositionLabel.Size = new Size(79, 30);
+            this.BarcodePrintPositionLabel.TabIndex = 23;
+            this.BarcodePrintPositionLabel.Text = "バーコード\r\n印刷開始位置";
             // 
             // SubstrateListPrintButton
             // 
@@ -1359,10 +1359,10 @@
             this.Controls.Add(this.RegisterButton);
             this.Controls.Add(this.CheckSheetPrintButton);
             this.Controls.Add(this.SubstrateListPrintButton);
-            this.Controls.Add(this.BarcodePrintPostionNumericUpDown);
-            this.Controls.Add(this.BarcodePrintPostionLabel);
-            this.Controls.Add(this.SerialPrintPostionNumericUpDown);
-            this.Controls.Add(this.SerialPrintPostionLabel);
+            this.Controls.Add(this.BarcodePrintPositionNumericUpDown);
+            this.Controls.Add(this.BarcodePrintPositionLabel);
+            this.Controls.Add(this.SerialPrintPositionNumericUpDown);
+            this.Controls.Add(this.SerialPrintPositionLabel);
             this.Controls.Add(this.Substrate10DataGridView);
             this.Controls.Add(this.Substrate10CheckBox);
             this.Controls.Add(this.Substrate9DataGridView);
@@ -1407,8 +1407,8 @@
             ((System.ComponentModel.ISupportInitialize)this.Substrate8DataGridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate9DataGridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate10DataGridView).EndInit();
-            ((System.ComponentModel.ISupportInitialize)this.SerialPrintPostionNumericUpDown).EndInit();
-            ((System.ComponentModel.ISupportInitialize)this.BarcodePrintPostionNumericUpDown).EndInit();
+            ((System.ComponentModel.ISupportInitialize)this.SerialPrintPositionNumericUpDown).EndInit();
+            ((System.ComponentModel.ISupportInitialize)this.BarcodePrintPositionNumericUpDown).EndInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate15DataGridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate14DataGridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate13DataGridView).EndInit();
@@ -1450,10 +1450,10 @@
         private CheckBox Substrate9CheckBox;
         private DataGridView Substrate10DataGridView;
         private CheckBox Substrate10CheckBox;
-        private Label SerialPrintPostionLabel;
-        private NumericUpDown SerialPrintPostionNumericUpDown;
-        private NumericUpDown BarcodePrintPostionNumericUpDown;
-        private Label BarcodePrintPostionLabel;
+        private Label SerialPrintPositionLabel;
+        private NumericUpDown SerialPrintPositionNumericUpDown;
+        private NumericUpDown BarcodePrintPositionNumericUpDown;
+        private Label BarcodePrintPositionLabel;
         private Button SubstrateListPrintButton;
         private Button CheckSheetPrintButton;
         private Button RegisterButton;

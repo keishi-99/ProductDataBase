@@ -91,7 +91,7 @@ namespace ProductDatabase.Other {
                 ServiceInfo.ServiceProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
                 ServiceInfo.ServiceProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
                 var useSubstrate = selectedRows[0]["UseSubstrate"].ToString() ?? string.Empty;
-                ServiceInfo.ServiveUseSubstrate = useSubstrate.Split(",");
+                ServiceInfo.ServiceUseSubstrate = useSubstrate.Split(",");
                 DialogResult = DialogResult.OK;
             }
             else { DialogResult = DialogResult.Cancel; }

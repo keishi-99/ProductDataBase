@@ -89,7 +89,7 @@ namespace ProductDatabase {
                 IsUnderlinePrint = PrintType == 4 && !IsRegType9; // 否定演算子を使用
             }
 
-            private bool IsTypeIn(int value, params int[] values) {
+            private static bool IsTypeIn(int value, params int[] values) {
                 return values.Contains(value);
             }
 
