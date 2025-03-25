@@ -171,6 +171,9 @@ namespace ProductDatabase {
             }
         }
         private bool Registration() {
+            using SQLiteConnection connection = new(GetConnectionRegistration());
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
             try {
                 var substrateNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
                 var orderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
@@ -180,15 +183,12 @@ namespace ProductDatabase {
                 var person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
                 var comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
                 var rowId = string.Empty;
-
-                using SQLiteConnection con = new(GetConnectionRegistration());
-                con.Open();
+                var commandText = string.Empty;
 
                 // 製番が新規かチェック
                 if (IsRegistration) {
                     var substrateName = string.Empty;
-                    using (var cmd = con.CreateCommand()) {
-                        cmd.CommandText = $"""
+                    commandText = $@"
                             SELECT
                                 StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                             FROM
@@ -200,15 +200,14 @@ namespace ProductDatabase {
                             ORDER BY
                                 MIN(ID)
                             LIMIT 1;
-                            """;
-
-                        cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
-                        cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
-                        cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNumber;
-                        using var dr = cmd.ExecuteReader();
-                        while (dr.Read()) {
-                            substrateName = $"{dr["SubstrateName"]}";
-                        }
+                            ";
+                    using var dr = ExecuteReader(connection, commandText,
+                        ("@StockName", ProductInfo.StockName),
+                        ("@SubstrateModel", ProductInfo.SubstrateModel),
+                        ("@SubstrateNumber", substrateNumber)
+                        );
+                    while (dr.Read()) {
+                        substrateName = $"{dr["SubstrateName"]}";
                     }
 
                     if (substrateName != string.Empty) {
@@ -223,25 +222,25 @@ namespace ProductDatabase {
 
                 // 不良処理時在庫チェック
                 if (DefectNumberCheckBox.Checked) {
-                    using var cmd = con.CreateCommand();
-                    cmd.CommandText = $"""
-                            SELECT
-                                StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                            FROM
-                                {ProductInfo.CategoryName}_Substrate
-                            WHERE
-                                StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
-                            GROUP BY
-                                StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
-                            ORDER BY
-                                MIN(ID)
-                            LIMIT 1;
-                            """;
-
-                    cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
-                    cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
-                    cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNumber;
-                    using var dr = cmd.ExecuteReader();
+                    commandText =
+                        $@"
+                        SELECT
+                            StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                        FROM
+                            {ProductInfo.CategoryName}_Substrate
+                        WHERE
+                            StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                        GROUP BY
+                            StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                        ORDER BY
+                            MIN(ID)
+                        LIMIT 1;
+                        ";
+                    using var dr = ExecuteReader(connection, commandText,
+                        ("@StockName", ProductInfo.StockName),
+                        ("@SubstrateModel", ProductInfo.SubstrateModel),
+                        ("@SubstrateNumber", substrateNumber)
+                        );
                     if (dr.Read()) {
                         if (Convert.ToInt32(dr["Stock"]) < defectNumber) {
                             throw new Exception($"[{substrateNumber}]は在庫が[{dr["Stock"]}]です。");
@@ -254,33 +253,26 @@ namespace ProductDatabase {
                 }
 
                 // 基板登録テーブルへ追加
-                using (var cmd = con.CreateCommand()) {
-                    cmd.CommandText =
-                        $"""
-                        INSERT INTO "{ProductInfo.CategoryName}_Substrate"
-                            (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Increase,Defect,Person,RegDate,Comment)
-                        VALUES
-                            (@StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,@Increase,@Defect,@Person,@RegDate,@Comment)
-                        """;
-
-                    // チェックボックスにチェックがない場合はNullを
-                    cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
-                    cmd.Parameters.Add("@SubstrateName", DbType.String).Value = ProductInfo.SubstrateName;
-                    cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
-                    cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber;
-                    cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(orderNumber) ? DBNull.Value : orderNumber;
-                    cmd.Parameters.Add("@Increase", DbType.String).Value = QuantityCheckBox.Checked ? quantity : DBNull.Value;
-                    cmd.Parameters.Add("@Defect", DbType.String).Value = DefectNumberCheckBox.Checked ? $"-{defectNumber}" : DBNull.Value;
-                    cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(registrationDate) ? DBNull.Value : registrationDate;
-                    cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(person) ? DBNull.Value : person;
-                    cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(comment) ? DBNull.Value : comment;
-
-                    cmd.ExecuteNonQuery();
-
-                    // 追加IDの取得
-                    cmd.CommandText = $"""SELECT MAX(ID) FROM "{ProductInfo.CategoryName}_Substrate";""";
-                    rowId = cmd.ExecuteScalar().ToString() ?? string.Empty;
-                }
+                commandText =
+                    $@"
+                    INSERT INTO ""{ProductInfo.CategoryName}_Substrate""
+                        (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Increase,Defect,Person,RegDate,Comment)
+                    VALUES
+                        (@StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,@Increase,@Defect,@Person,@RegDate,@Comment);";
+                ExecuteNonQuery(connection, commandText,
+                    ("@StockName", ProductInfo.StockName),
+                    ("@SubstrateName", ProductInfo.SubstrateName),
+                    ("@SubstrateModel", ProductInfo.SubstrateModel),
+                    ("@SubstrateNumber", string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber),
+                    ("@OrderNumber", string.IsNullOrWhiteSpace(orderNumber) ? DBNull.Value : orderNumber),
+                    ("@Increase", QuantityCheckBox.Checked ? quantity : DBNull.Value),
+                    ("@Defect", DefectNumberCheckBox.Checked ? $"-{defectNumber}" : DBNull.Value),
+                    ("@RegDate", string.IsNullOrWhiteSpace(registrationDate) ? DBNull.Value : registrationDate),
+                    ("@Person", string.IsNullOrWhiteSpace(person) ? DBNull.Value : person),
+                    ("@Comment", string.IsNullOrWhiteSpace(comment) ? DBNull.Value : comment)
+                    );
+                commandText = $@"SELECT MAX(ID) FROM ""{ProductInfo.CategoryName}_Substrate"";";
+                rowId = ExecuteScalar(connection, commandText).ToString() ?? string.Empty;
 
                 // バックアップ作成
                 CommonUtils.BackupManager.CreateBackup();
@@ -303,11 +295,45 @@ namespace ProductDatabase {
                 ];
                 CommonUtils.Logger.AppendLog(logMessageArray);
 
+                transaction.Commit();
+
                 return true;
             } catch (Exception ex) {
+                if (transaction.Connection != null) { //接続が開いているか確認する。
+                    transaction.Rollback();
+                }
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+        }
+        private static void ExecuteNonQuery(SQLiteConnection con, string commandText, params (string, object?)[] parameters) {
+            using var command = con.CreateCommand();
+            command.CommandText = commandText;
+            foreach (var (name, value) in parameters) {
+                // 空の文字列の場合にNULLを設定
+                var sqlValue = value is string strValue && string.IsNullOrEmpty(strValue) ? DBNull.Value : value ?? DBNull.Value;
+                command.Parameters.Add(name, DbType.String).Value = sqlValue;
+            }
+
+            command.ExecuteNonQuery();
+        }
+        private static object ExecuteScalar(SQLiteConnection con, string commandText, params (string, object)[] parameters) {
+            using var command = con.CreateCommand();
+            command.CommandText = commandText;
+            foreach (var (name, value) in parameters) {
+                command.Parameters.Add(name, DbType.String).Value = value ?? DBNull.Value;
+            }
+
+            return command.ExecuteScalar() ?? 0;
+        }
+        private static SQLiteDataReader ExecuteReader(SQLiteConnection con, string commandText, params (string, object)[] parameters) {
+            using var command = con.CreateCommand();
+            command.CommandText = commandText;
+            foreach (var (name, value) in parameters) {
+                command.Parameters.Add(name, DbType.String).Value = value ?? DBNull.Value;
+            }
+
+            return command.ExecuteReader();
         }
         // 印刷処理
         private void PrintStart() {
