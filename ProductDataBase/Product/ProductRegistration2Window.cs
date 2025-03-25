@@ -453,7 +453,7 @@ namespace ProductDatabase {
                 ("@SubstrateModel", substrateModel),
                 ("@SubstrateNumber", substrateNumber),
                 ("@OrderNumber", orderNumber),
-                ("@Decrease", useValue),
+                ("@Decrease", 0 - useValue),
                 ("@UsedProductType", ProductInfo.ProductType),
                 ("@UsedProductNumber", ProductInfo.ProductNumber),
                 ("@UsedOrderNumber", ProductInfo.OrderNumber),
