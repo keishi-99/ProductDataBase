@@ -422,8 +422,8 @@ namespace ProductDatabase {
         }
         private static (string substrateName, string substrateModel, string orderNumber) GetSubstrateInfo(SQLiteConnection con, int index, string categoryName, string stockName, string substrateNumber, string[] useSubstrate) {
             var commandText = $@"
-                SELECT SubstrateName, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                FROM {categoryName}_Substrate
+                SELECT SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                FROM ""{categoryName}_Substrate""
                 WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                 ORDER BY ID ASC LIMIT 1;";
 
@@ -438,13 +438,13 @@ namespace ProductDatabase {
         }
         private void InsertSubstrate(SQLiteConnection con, string categoryName, string stockName, string substrateName, string substrateModel, string substrateNumber, string orderNumber, int useValue, int? useID) {
             var commandText = $@"
-                INSERT INTO {categoryName}_Substrate 
-                    (StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, 
-                     Decrease, UsedProductType, UsedProductNumber, UsedOrderNumber, 
+                INSERT INTO ""{categoryName}_Substrate""
+                    (StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber,
+                     Decrease, UsedProductType, UsedProductNumber, UsedOrderNumber,
                      Person, RegDate, Comment, UseID)
-                VALUES 
-                    (@StockName, @SubstrateName, @SubstrateModel, @SubstrateNumber, @OrderNumber, 
-                     @Decrease, @UsedProductType, @UsedProductNumber, @UsedOrderNumber, 
+                VALUES
+                    (@StockName, @SubstrateName, @SubstrateModel, @SubstrateNumber, @OrderNumber,
+                     @Decrease, @UsedProductType, @UsedProductNumber, @UsedOrderNumber,
                      @Person, @RegDate, @Comment, @UseID);";
 
             ExecuteNonQuery(con, commandText,
