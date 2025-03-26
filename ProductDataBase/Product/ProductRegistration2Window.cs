@@ -129,7 +129,7 @@ namespace ProductDatabase {
                 MessageBox.Show($"在庫が足りません。{Environment.NewLine}{shortageSubstrateName}", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
-        private void SetupCheckBox(CheckBox? objCbx, int index, string substrateName, string[] useSubstrate) {
+        private static void SetupCheckBox(CheckBox? objCbx, int index, string substrateName, string[] useSubstrate) {
             if (objCbx != null) {
                 objCbx.Enabled = true;
                 objCbx.Checked = true;
@@ -180,17 +180,16 @@ namespace ProductDatabase {
                 ?? throw new Exception("ArrUseSubstrateがnullです。");
 
             var intQuantity = ProductInfo.Quantity;
-            using SQLiteConnection con = new(GetConnectionRegistration());
-            con.Open();
+            using SQLiteConnection connection = new(GetConnectionRegistration());
+            connection.Open();
 
-            using var cmd = con.CreateCommand();
-            cmd.CommandText = $"""
+            var commandText = $@"
                 SELECT
                     SubstrateName,
                     SubstrateNumber,
                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                 FROM
-                    {categoryName}_Substrate
+                    ""{categoryName}_Substrate""
                 WHERE
                     StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber NOTNULL
                 GROUP BY
@@ -199,11 +198,12 @@ namespace ProductDatabase {
                     Stock > 0
                 ORDER BY
                     MIN(ID);
-                """;
-            cmd.Parameters.Add("@StockName", DbType.String).Value = stockName;
-            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = useSubstrate[index];
+                ";
+            using var dr = ExecuteReader(connection, commandText,
+                ("@StockName", stockName),
+                ("@SubstrateModel", useSubstrate[index])
+                );
 
-            using var dr = cmd.ExecuteReader();
             while (dr.Read()) {
                 var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
                 var intStock = Convert.ToInt32(dr["Stock"]);
@@ -335,7 +335,7 @@ namespace ProductDatabase {
                 CommonUtils.BackupManager.CreateBackup();
 
                 // 登録チェック
-                RegistrationCheck();
+                RegistrationCheck(connection);
 
             } catch (Exception) {
                 if (transaction.Connection != null) { //接続が開いているか確認する。
@@ -345,7 +345,7 @@ namespace ProductDatabase {
             }
         }
 
-        private void InsertProduct(SQLiteConnection con) {
+        private void InsertProduct(SQLiteConnection connection) {
             var commandText = $@"
                 INSERT INTO {ProductInfo.CategoryName}_Product
                     (ProductName, OrderNumber, ProductNumber, ProductType, ProductModel,
@@ -356,7 +356,7 @@ namespace ProductDatabase {
                     @Quantity, @Person, @RegDate, @Revision, @RevisionGroup,
                     @SerialFirst, @SerialLast, @SerialLastNumber, @Comment);";
 
-            ExecuteNonQuery(con, commandText,
+            ExecuteNonQuery(connection, commandText,
                 ("@ProductName", ProductInfo.ProductName),
                 ("@OrderNumber", ProductInfo.OrderNumber),
                 ("@ProductNumber", ProductInfo.ProductNumber),
@@ -372,9 +372,9 @@ namespace ProductDatabase {
                 ("@SerialLastNumber", ProductInfo.IsSerialGeneration ? _serialLastNumber : DBNull.Value),
                 ("@Comment", ProductInfo.Comment));
 
-            ProductInfo.ProductID = Convert.ToInt32(ExecuteScalar(con, $"SELECT MAX(ID) FROM {ProductInfo.CategoryName}_Product"));
+            ProductInfo.ProductID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {ProductInfo.CategoryName}_Product"));
         }
-        private void InsertSerial(SQLiteConnection con) {
+        private void InsertSerial(SQLiteConnection connection) {
             var commandText = $@"
                 INSERT INTO {ProductInfo.CategoryName}_Serial
                     (Serial, UsedID, ProductName)
@@ -382,13 +382,13 @@ namespace ProductDatabase {
                     (@Serial, @productRowId, @ProductName)";
 
             foreach (var serial in _strSerial) {
-                ExecuteNonQuery(con, commandText,
+                ExecuteNonQuery(connection, commandText,
                     ("@Serial", serial),
                     ("@productRowId", ProductInfo.ProductID),
                     ("@ProductName", ProductInfo.ProductName));
             }
         }
-        private void RegisterSubstrate(SQLiteConnection con) {
+        private void RegisterSubstrate(SQLiteConnection connection) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = ProductInfo.RegType == 9;
             var categoryName = (isServiceRegistration ? ServiceInfo.ServiceCategoryName : ProductInfo.CategoryName)
@@ -415,19 +415,19 @@ namespace ProductDatabase {
 
                     var substrateNumber = row.Cells[0].Value.ToString() ?? string.Empty;
                     var useValue = Convert.ToInt32(row.Cells[2].Value);
-                    var (substrateName, substrateModel, orderNumber) = GetSubstrateInfo(con, i, categoryName, stockName, substrateNumber, useSubstrate);
-                    InsertSubstrate(con, categoryName, stockName, substrateName, substrateModel, substrateNumber, orderNumber, useValue, useID);
+                    var (substrateName, substrateModel, orderNumber) = GetSubstrateInfo(connection, i, categoryName, stockName, substrateNumber, useSubstrate);
+                    InsertSubstrate(connection, categoryName, stockName, substrateName, substrateModel, substrateNumber, orderNumber, useValue, useID);
                 }
             }
         }
-        private static (string substrateName, string substrateModel, string orderNumber) GetSubstrateInfo(SQLiteConnection con, int index, string categoryName, string stockName, string substrateNumber, string[] useSubstrate) {
+        private static (string substrateName, string substrateModel, string orderNumber) GetSubstrateInfo(SQLiteConnection connection, int index, string categoryName, string stockName, string substrateNumber, string[] useSubstrate) {
             var commandText = $@"
                 SELECT SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                 FROM ""{categoryName}_Substrate""
                 WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                 ORDER BY ID ASC LIMIT 1;";
 
-            using var dr = ExecuteReader(con, commandText,
+            using var dr = ExecuteReader(connection, commandText,
                 ("@StockName", stockName),
                 ("@SubstrateModel", useSubstrate[index]),
                 ("@SubstrateNumber", substrateNumber));
@@ -436,7 +436,7 @@ namespace ProductDatabase {
                 ? ($"{dr["SubstrateName"]}", $"{dr["SubstrateModel"]}", $"{dr["OrderNumber"]}")
                 : (string.Empty, string.Empty, string.Empty);
         }
-        private void InsertSubstrate(SQLiteConnection con, string categoryName, string stockName, string substrateName, string substrateModel, string substrateNumber, string orderNumber, int useValue, int? useID) {
+        private void InsertSubstrate(SQLiteConnection connection, string categoryName, string stockName, string substrateName, string substrateModel, string substrateNumber, string orderNumber, int useValue, int? useID) {
             var commandText = $@"
                 INSERT INTO ""{categoryName}_Substrate""
                     (StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber,
@@ -447,7 +447,7 @@ namespace ProductDatabase {
                      @Decrease, @UsedProductType, @UsedProductNumber, @UsedOrderNumber,
                      @Person, @RegDate, @Comment, @UseID);";
 
-            ExecuteNonQuery(con, commandText,
+            ExecuteNonQuery(connection, commandText,
                 ("@StockName", stockName),
                 ("@SubstrateName", substrateName),
                 ("@SubstrateModel", substrateModel),
@@ -463,8 +463,8 @@ namespace ProductDatabase {
                 ("@UseID", useID));
         }
 
-        private static void ExecuteNonQuery(SQLiteConnection con, string commandText, params (string, object?)[] parameters) {
-            using var command = con.CreateCommand();
+        private static void ExecuteNonQuery(SQLiteConnection connection, string commandText, params (string, object?)[] parameters) {
+            using var command = connection.CreateCommand();
             command.CommandText = commandText;
             foreach (var (name, value) in parameters) {
                 // 空の文字列の場合にNULLを設定
@@ -474,8 +474,8 @@ namespace ProductDatabase {
 
             command.ExecuteNonQuery();
         }
-        private static object ExecuteScalar(SQLiteConnection con, string commandText, params (string, object)[] parameters) {
-            using var command = con.CreateCommand();
+        private static object ExecuteScalar(SQLiteConnection connection, string commandText, params (string, object)[] parameters) {
+            using var command = connection.CreateCommand();
             command.CommandText = commandText;
             foreach (var (name, value) in parameters) {
                 command.Parameters.Add(name, DbType.String).Value = value ?? DBNull.Value;
@@ -483,8 +483,8 @@ namespace ProductDatabase {
 
             return command.ExecuteScalar() ?? 0;
         }
-        private static SQLiteDataReader ExecuteReader(SQLiteConnection con, string commandText, params (string, object)[] parameters) {
-            using var command = con.CreateCommand();
+        private static SQLiteDataReader ExecuteReader(SQLiteConnection connection, string commandText, params (string, object)[] parameters) {
+            using var command = connection.CreateCommand();
             command.CommandText = commandText;
             foreach (var (name, value) in parameters) {
                 command.Parameters.Add(name, DbType.String).Value = value ?? DBNull.Value;
@@ -494,16 +494,11 @@ namespace ProductDatabase {
         }
 
         // 登録チェック
-        private void RegistrationCheck() {
-            using SQLiteConnection con = new(GetConnectionRegistration());
-            con.Open();
+        private void RegistrationCheck(SQLiteConnection connection) {
 
-            using var cmd = con.CreateCommand();
+            var commandText = $@"SELECT * FROM ""{ProductInfo.CategoryName}_Product"" WHERE Id = @Id;";
 
-            cmd.CommandText = $@"SELECT * FROM {ProductInfo.CategoryName}_Product WHERE Id = @Id;";
-            cmd.Parameters.Add("@Id", DbType.String).Value = ProductInfo.ProductID;
-
-            using var dr = cmd.ExecuteReader();
+            using var dr = ExecuteReader(connection, commandText, ("@Id", ProductInfo.ProductID));
 
             if (dr.HasRows && dr.Read()) {
                 // 1行のデータが存在する場合の処理
@@ -542,22 +537,21 @@ namespace ProductDatabase {
         }
 
         private bool NumberCheck() {
-            using SQLiteConnection con = new(GetConnectionRegistration());
-            con.Open();
+            using SQLiteConnection connection = new(GetConnectionRegistration());
+            connection.Open();
 
             var productModel = string.Empty;
 
             if (!string.IsNullOrEmpty(ProductInfo.ProductNumber)) {
                 // 製番が新規かチェック
-                using (var cmd = con.CreateCommand()) {
-                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND ProductNumber = @ProductNumber ORDER BY "ID" ASC LIMIT 1""";
-                    cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
-                    cmd.Parameters.Add("@ProductNumber", DbType.String).Value = ProductInfo.ProductNumber;
+                var commandText = $@"SELECT * FROM ""{ProductInfo.CategoryName}_Product"" WHERE ProductName = @ProductName AND ProductNumber = @ProductNumber ORDER BY ""ID"" ASC LIMIT 1;";
 
-                    using var dr = cmd.ExecuteReader();
-                    while (dr.Read()) {
-                        productModel = $"{dr["ProductModel"]}";
-                    }
+                using var dr = ExecuteReader(connection, commandText,
+                    ("@ProductName", ProductInfo.ProductName),
+                    ("@ProductNumber", ProductInfo.ProductNumber)
+                    );
+                while (dr.Read()) {
+                    productModel = $"{dr["ProductModel"]}";
                 }
 
                 if (productModel != string.Empty) {
@@ -580,15 +574,14 @@ namespace ProductDatabase {
 
             if (!string.IsNullOrEmpty(ProductInfo.OrderNumber)) {
                 // 注文番号が新規かチェック
-                using (var cmd = con.CreateCommand()) {
-                    cmd.CommandText = $"""SELECT * FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND OrderNumber = @OrderNumber ORDER BY "ID" ASC LIMIT 1""";
-                    cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
-                    cmd.Parameters.Add("@OrderNumber", DbType.String).Value = ProductInfo.OrderNumber;
+                var commandText = $@"SELECT * FROM ""{ProductInfo.CategoryName}_Product"" WHERE ProductName = @ProductName AND OrderNumber = @OrderNumber ORDER BY ""ID"" ASC LIMIT 1;";
 
-                    using var dr = cmd.ExecuteReader();
-                    while (dr.Read()) {
-                        productModel = $"{dr["ProductModel"]}";
-                    }
+                using var dr = ExecuteReader(connection, commandText,
+                    ("@ProductName", ProductInfo.ProductName),
+                    ("@OrderNumber", ProductInfo.OrderNumber)
+                    );
+                while (dr.Read()) {
+                    productModel = $"{dr["ProductModel"]}";
                 }
 
                 if (productModel != string.Empty) {
@@ -715,7 +708,7 @@ namespace ProductDatabase {
                     WHERE
                         s.ProductName = @ProductName
                     AND
-                        s.Serial IN ({string.Join(",", _strSerial.Select((_, i) => $"@Serial{i}"))})
+                        s.Serial IN ({string.Join(",", _strSerial.Select((_, i) => $"@Serial{i}"))});
                     """;
                 cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
                 _strSerial
