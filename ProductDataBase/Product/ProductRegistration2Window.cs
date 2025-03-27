@@ -956,14 +956,8 @@ namespace ProductDatabase {
                             _labelProNumLabelsToPrint--;
                             //印刷するラベルがなくなった場合の処理
                             if (_labelProNumLabelsToPrint <= 0) {
-                                // 最終行の行番号を計算
-                                var rowOffset = _serialType switch {
-                                    "Label" => 2,
-                                    "Barcode" => 1,
-                                    _ => 0
-                                };
                                 // 最終行の行番号を表示
-                                e.Graphics.DrawString((y + rowOffset).ToString(), headerFont, Brushes.Black, 0, posY);
+                                e.Graphics.DrawString((y + 1).ToString(), headerFont, Brushes.Black, 0, posY);
 
                                 e.HasMorePages = false;
                                 _pageCount = 1;

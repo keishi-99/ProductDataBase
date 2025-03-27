@@ -462,7 +462,7 @@ namespace ProductDatabase {
                             copiesPerLabel--;
                             if (copiesPerLabel <= 0) {
                                 // 最終行の行番号を表示
-                                var rowNumber = (y + 2).ToString();
+                                var rowNumber = (y + 1).ToString();
                                 e.Graphics.DrawString(rowNumber, SubstratePrintSettings.LabelPageSettings.HeaderFont, Brushes.Black, 0, posY);
                                 // 次のページがあるかどうかの判定
                                 e.HasMorePages = false;
