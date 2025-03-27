@@ -45,6 +45,11 @@ namespace ProductDatabase {
                 SubstrateModelLabel2.Text = $"{ProductInfo.ProductName} - {ProductInfo.ProductModel}";
 
                 FirstSerialNumberTextBox.MaxLength = ProductInfo.SerialDigit;
+                FirstSerialNumberTextBox.Text = ProductInfo.SerialDigit switch {
+                    3 => "000",
+                    4 => "0000",
+                    _ => string.Empty
+                };
 
                 // 変数[check_bin]のビットに応じてCheckboxにチェックを入れる
                 for (var i = 0; i < _checkBoxNames.Count; i++) {
