@@ -82,13 +82,15 @@ namespace ProductDatabase.Other {
 
                         // 元ファイルをバックアップにコピー
                         File.Copy(s_originalFilePath, backupFilePath, true);
+                        // バックアップファイルを管理
+                        ManageBackupFiles();
+
+                        // ネットワークにバックアップ
                         var networkFilePath = Path.Combine(s_networkPath, "db", "registration.db");
                         if (Environment.CurrentDirectory != s_networkPath) {
                             File.Copy(s_originalFilePath, networkFilePath, true);
                         }
 
-                        // バックアップファイルを管理
-                        ManageBackupFiles();
                     }
                 } catch (Exception ex) {
                     MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
