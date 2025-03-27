@@ -425,10 +425,8 @@ namespace ProductDatabase {
 
                 // ハードマージンをミリメートルに変換
                 const double MM_PER_HUNDREDTH_INCH = 0.254;
-                if (!isPreview) {
-                    marginX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
-                    marginY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
-                }
+                marginX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
+                marginY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
 
                 var headerString = ConvertHeaderString(SubstratePrintSettings.LabelPageSettings.HeaderTextFormat);
 
