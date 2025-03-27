@@ -258,6 +258,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = FormStartPosition.CenterParent;
             this.Text = "データベース";
+            this.FormClosed += this.HistoryWindow_FormClosed;
             this.Load += this.HistoryWindow_Load;
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).EndInit();
             this.menuStrip1.ResumeLayout(false);

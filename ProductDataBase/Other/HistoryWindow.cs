@@ -848,6 +848,20 @@ namespace ProductDatabase {
             }
         }
 
+        private void ClosedEvents() {
+            // 編集モードのトランザクションをコミットしてロック解除
+            if (_editModeTransaction != null) {
+                _editModeTransaction.Commit();
+                _editModeTransaction.Dispose();
+                _editModeTransaction = null;
+            }
+            if (_editModeConnection != null) {
+                _editModeConnection.Close();
+                _editModeConnection.Dispose();
+                _editModeConnection = null;
+            }
+        }
+
         private void HistoryWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void 編集ToolStripMenuItem_Click(object sender, EventArgs e) { EditMode(); }
         private void 編集終了ToolStripMenuItem_Click(object sender, EventArgs e) { SaveRegistrationLog(); }
@@ -861,5 +875,6 @@ namespace ProductDatabase {
         private void StockCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateRegistrationLog(); }
         private void AllSubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateRegistrationLog(); }
         private void GroupModelCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateRegistrationLog(); }
+        private void HistoryWindow_FormClosed(object sender, FormClosedEventArgs e) { ClosedEvents(); }
     }
 }
