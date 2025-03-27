@@ -430,16 +430,16 @@ namespace ProductDatabase {
 
                 var headerString = ConvertHeaderString(SubstratePrintSettings.LabelPageSettings.HeaderTextFormat);
 
-                // 最初のページのみオフセットを調整
-                var verticalOffset = _pageCount == 1 ? startLine * (intervalY + labelHeight) : 0;
-                // ヘッダーの描画
-                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, (float)headerPositionX, (float)(verticalOffset + headerPositionY));
-
                 _labelSubNSerial = ManufacturingNumberMaskedTextBox.Text;
 
                 if (_pageCount >= 2) {
                     startLine = 0;
                 }
+
+                // 最初のページのみオフセットを調整
+                var verticalOffset = _pageCount == 1 ? startLine * (intervalY + labelHeight) : 0;
+                // ヘッダーの描画
+                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, (float)headerPositionX, (float)(verticalOffset + headerPositionY));
 
                 var labelCountX = SubstratePrintSettings.LabelPageSettings.LabelsPerColumn;
                 var labelCountY = SubstratePrintSettings.LabelPageSettings.LabelsPerRow;
