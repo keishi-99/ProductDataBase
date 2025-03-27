@@ -193,7 +193,7 @@ namespace ProductDatabase {
                 WHERE
                     StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber NOTNULL
                 GROUP BY
-                    SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                    SubstrateName, SubstrateModel, SubstrateNumber
                 HAVING
                     Stock > 0
                 ORDER BY
@@ -425,6 +425,7 @@ namespace ProductDatabase {
                 SELECT SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                 FROM ""{categoryName}_Substrate""
                 WHERE StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                GROUP BY OrderNumber
                 ORDER BY ID ASC LIMIT 1;";
 
             using var dr = ExecuteReader(connection, commandText,
