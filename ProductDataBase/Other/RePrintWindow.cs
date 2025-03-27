@@ -387,16 +387,16 @@ namespace ProductDatabase {
                 marginX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
                 marginY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
 
-                // 最初のページのみオフセットを調整
-                var verticalOffset = _pageCount == 1 ? startLine * (intervalY + labelHeight) : 0;
-                // ヘッダーの描画
-                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, (float)headerPositionX, (float)(verticalOffset + headerPositionY));
-
                 if (_pageCount == 1) {
                     _remainingCount = copiesPerLabel;
                     _labelProNSerial = ProductInfo.SerialFirstNumber;
                 }
                 if (_pageCount >= 2) { startLine = 0; }
+
+                // 最初のページのみオフセットを調整
+                var verticalOffset = _pageCount == 1 ? startLine * (intervalY + labelHeight) : 0;
+                // ヘッダーの描画
+                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, (float)headerPositionX, (float)(verticalOffset + headerPositionY));
 
                 var y = 0;
                 for (y = startLine; y < labelCountY; y++) {
