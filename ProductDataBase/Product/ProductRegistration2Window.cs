@@ -860,8 +860,6 @@ namespace ProductDatabase {
             double headerPositionX = 0;
             double headerPositionY = 0;
             var startLine = 0;
-            // プレビューかどうかの判定
-            var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
             try {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
 
@@ -918,10 +916,8 @@ namespace ProductDatabase {
 
                 // ハードマージンをミリメートルに変換
                 const double MM_PER_HUNDREDTH_INCH = 0.254;
-                if (!isPreview) {
-                    marginX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
-                    marginY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
-                }
+                marginX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
+                marginY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
 
                 if (_pageCount == 1) {
                     _remainingCount = copiesPerLabel;
