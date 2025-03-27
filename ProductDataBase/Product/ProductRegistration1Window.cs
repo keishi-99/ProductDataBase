@@ -89,18 +89,30 @@ namespace ProductDatabase {
 
                                 if (lastYearMonth != currentYearMonth) {
                                     // 月が異なる場合はシリアル番号をリセット
-                                    FirstSerialNumberTextBox.Text = "1";
+                                    FirstSerialNumberTextBox.Text = ProductInfo.SerialDigit switch {
+                                        3 => "001",
+                                        4 => "0001",
+                                        _ => "1"
+                                    };
                                 }
                                 else {
                                     // 月が同じ場合は最後のシリアル番号を取得して +1
-                                    FirstSerialNumberTextBox.Text = (GetLastSerialNumber(cmd) + 1).ToString();
+                                    FirstSerialNumberTextBox.Text = ProductInfo.SerialDigit switch {
+                                        3 => (GetLastSerialNumber(cmd) + 1).ToString("000"),
+                                        4 => (GetLastSerialNumber(cmd) + 1).ToString("0000"),
+                                        _ => (GetLastSerialNumber(cmd) + 1).ToString()
+                                    };
                                 }
                                 break;
                             }
                         default: {
                                 // 他の場合は単純に最後のシリアル番号を取得して +1
                                 if (ProductInfo.RegType == 0) { return; }
-                                FirstSerialNumberTextBox.Text = (GetLastSerialNumber(cmd) + 1).ToString();
+                                FirstSerialNumberTextBox.Text = ProductInfo.SerialDigit switch {
+                                    3 => (GetLastSerialNumber(cmd) + 1).ToString("000"),
+                                    4 => (GetLastSerialNumber(cmd) + 1).ToString("0000"),
+                                    _ => (GetLastSerialNumber(cmd) + 1).ToString()
+                                };
                                 break;
                             }
                     }
