@@ -435,10 +435,12 @@ namespace ProductDatabase {
                             if (_labelProNumLabelsToPrint <= 0) {
                                 // 最終行の行番号を表示
                                 var sf = new StringFormat {
-                                    LineAlignment = StringAlignment.Near
+                                    Alignment = StringAlignment.Near,
+                                    LineAlignment = StringAlignment.Center
                                 };
+                                var layoutRect = new RectangleF(0, posY, 0, (float)labelHeight);
                                 var rowNumber = (y + 1).ToString();
-                                e.Graphics.DrawString(rowNumber, headerFont, Brushes.Black, 0, posY, sf);
+                                e.Graphics.DrawString(rowNumber, headerFont, Brushes.Black, layoutRect, sf);
 
                                 e.HasMorePages = false;
                                 _pageCount = 1;
