@@ -425,8 +425,8 @@ namespace ProductDatabase {
 
                 // ハードマージンをミリメートルに変換
                 const double MM_PER_HUNDREDTH_INCH = 0.254;
-                marginX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
-                marginY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
+                var hardMarginX = isPreview ? 0 : e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
+                var hardMarginY = isPreview ? 0 : e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
 
                 var headerString = ConvertHeaderString(SubstratePrintSettings.LabelPageSettings.HeaderTextFormat);
 
@@ -439,7 +439,7 @@ namespace ProductDatabase {
                 // 最初のページのみオフセットを調整
                 var verticalOffset = _pageCount == 1 ? startLine * (intervalY + labelHeight) : 0;
                 // ヘッダーの描画
-                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, (float)headerPositionX, (float)(verticalOffset + headerPositionY));
+                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, (float)headerPositionX, (float)(verticalOffset + headerPositionY - hardMarginY));
 
                 var labelCountX = SubstratePrintSettings.LabelPageSettings.LabelsPerColumn;
                 var labelCountY = SubstratePrintSettings.LabelPageSettings.LabelsPerRow;
@@ -449,8 +449,8 @@ namespace ProductDatabase {
                 for (y = startLine; y < labelCountY; y++) {
                     int x;
                     for (x = 0; x < labelCountX; x++) {
-                        var posX = (float)(marginX + (x * (intervalX + labelWidth)));
-                        var posY = (float)(marginY + (y * (intervalY + labelHeight)));
+                        var posX = (float)(marginX - hardMarginX + (x * (intervalX + labelWidth)));
+                        var posY = (float)(marginY - hardMarginY + (y * (intervalY + labelHeight)));
 
                         var generatedCode = GenerateCode(_labelSubNSerial);
                         var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1);
@@ -463,7 +463,7 @@ namespace ProductDatabase {
                             if (copiesPerLabel <= 0) {
                                 // 最終行の行番号を表示
                                 var rowNumber = (y + 1).ToString();
-                                e.Graphics.DrawString(rowNumber, SubstratePrintSettings.LabelPageSettings.HeaderFont, Brushes.Black, 0, posY);
+                                e.Graphics.DrawString(rowNumber, headerFont, Brushes.Black, 0, posY);
                                 // 次のページがあるかどうかの判定
                                 e.HasMorePages = false;
                                 _pageCount = 0;
