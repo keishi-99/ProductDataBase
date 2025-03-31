@@ -930,7 +930,7 @@ namespace ProductDatabase {
                 // 最初のページのみオフセットを調整
                 var verticalOffset = _pageCount == 1 ? startLine * (intervalY + labelHeight) : 0;
                 // ヘッダーの描画
-                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, (float)headerPositionX, (float)(verticalOffset + headerPositionY- hardMarginY));
+                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, (float)headerPositionX, (float)(verticalOffset + headerPositionY - hardMarginY));
 
                 for (var y = startLine; y < labelCountY; y++) {
                     for (var x = 0; x < labelCountX; x++) {
@@ -960,10 +960,12 @@ namespace ProductDatabase {
                             if (_labelProNumLabelsToPrint <= 0) {
                                 // 最終行の行番号を表示
                                 var sf = new StringFormat {
-                                    LineAlignment = StringAlignment.Near
+                                    Alignment = StringAlignment.Near,
+                                    LineAlignment = StringAlignment.Center
                                 };
+                                var layoutRect = new RectangleF(0, posY, 0, (float)labelHeight);
                                 var rowNumber = (y + 1).ToString();
-                                e.Graphics.DrawString(rowNumber, headerFont, Brushes.Black, 0, posY, sf);
+                                e.Graphics.DrawString(rowNumber, headerFont, Brushes.Black, layoutRect, sf);
 
                                 e.HasMorePages = false;
                                 _pageCount = 1;

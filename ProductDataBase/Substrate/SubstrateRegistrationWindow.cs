@@ -462,8 +462,13 @@ namespace ProductDatabase {
                             copiesPerLabel--;
                             if (copiesPerLabel <= 0) {
                                 // 最終行の行番号を表示
+                                var sf = new StringFormat {
+                                    Alignment = StringAlignment.Near,
+                                    LineAlignment = StringAlignment.Center
+                                };
+                                var layoutRect = new RectangleF(0, posY, 0, labelHeight);
                                 var rowNumber = (y + 1).ToString();
-                                e.Graphics.DrawString(rowNumber, headerFont, Brushes.Black, 0, posY);
+                                e.Graphics.DrawString(rowNumber, headerFont, Brushes.Black, layoutRect, sf);
                                 // 次のページがあるかどうかの判定
                                 e.HasMorePages = false;
                                 _pageCount = 0;
