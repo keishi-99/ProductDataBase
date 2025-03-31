@@ -333,6 +333,8 @@ namespace ProductDatabase {
             double headerPositionX = 0;
             double headerPositionY = 0;
             var startLine = 0;
+            // プレビューかどうかの判定
+            var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
             try {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
 
@@ -389,8 +391,8 @@ namespace ProductDatabase {
 
                 // ハードマージンをミリメートルに変換
                 const double MM_PER_HUNDREDTH_INCH = 0.254;
-                marginX -= e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
-                marginY -= e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
+                var hardMarginX = isPreview ? 0 : e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
+                var hardMarginY = isPreview ? 0 : e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
 
                 if (_pageCount == 1) {
                     _remainingCount = copiesPerLabel;
@@ -401,14 +403,14 @@ namespace ProductDatabase {
                 // 最初のページのみオフセットを調整
                 var verticalOffset = _pageCount == 1 ? startLine * (intervalY + labelHeight) : 0;
                 // ヘッダーの描画
-                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, (float)headerPositionX, (float)(verticalOffset + headerPositionY));
+                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, (float)headerPositionX, (float)(verticalOffset + headerPositionY - hardMarginY));
 
                 var y = 0;
                 for (y = startLine; y < labelCountY; y++) {
                     var x = 0;
                     for (x = 0; x < labelCountX; x++) {
-                        var posX = (float)(marginX + (x * (intervalX + labelWidth)));
-                        var posY = (float)(marginY + (y * (intervalY + labelHeight)));
+                        var posX = (float)(marginX - hardMarginX + (x * (intervalX + labelWidth)));
+                        var posY = (float)(marginY - hardMarginY + (y * (intervalY + labelHeight)));
 
                         // タイプ4で残り1の場合、最後のラベルに下線をつける
                         var fontUnderline = ProductInfo.IsUnderlinePrint && _remainingCount == 1;
@@ -432,7 +434,11 @@ namespace ProductDatabase {
                             //印刷するラベルがなくなった場合の処理
                             if (_labelProNumLabelsToPrint <= 0) {
                                 // 最終行の行番号を表示
-                                e.Graphics.DrawString((y + 1).ToString(), headerFont, Brushes.Black, 0, posY);
+                                var sf = new StringFormat {
+                                    LineAlignment = StringAlignment.Near
+                                };
+                                var rowNumber = (y + 1).ToString();
+                                e.Graphics.DrawString(rowNumber, headerFont, Brushes.Black, 0, posY, sf);
 
                                 e.HasMorePages = false;
                                 _pageCount = 1;
