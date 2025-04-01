@@ -143,6 +143,7 @@
             this.PrintTextFontTextBox.Location = new Point(320, 30);
             this.PrintTextFontTextBox.MaxLength = 50;
             this.PrintTextFontTextBox.Name = "PrintTextFontTextBox";
+            this.PrintTextFontTextBox.ReadOnly = true;
             this.PrintTextFontTextBox.Size = new Size(135, 23);
             this.PrintTextFontTextBox.TabIndex = 24;
             // 
@@ -564,6 +565,7 @@
             this.HeaderFontTextBox.Location = new Point(27, 36);
             this.HeaderFontTextBox.MaxLength = 50;
             this.HeaderFontTextBox.Name = "HeaderFontTextBox";
+            this.HeaderFontTextBox.ReadOnly = true;
             this.HeaderFontTextBox.Size = new Size(135, 23);
             this.HeaderFontTextBox.TabIndex = 2;
             // 
