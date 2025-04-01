@@ -370,19 +370,8 @@ namespace ProductDatabase.Other {
         // チェックシート生成
         public static void GenerateCheckSheet(ProductInformation productInfo) {
             try {
-                var dialog = new InputDialog1();
-                var result = dialog.ShowDialog();
-
                 var temperature = string.Empty;
                 var humidity = string.Empty;
-
-                if (result == DialogResult.OK) {
-                    temperature = dialog.Temperature;
-                    humidity = dialog.Humidity;
-                }
-                else {
-                    return;
-                }
 
                 var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsx");
                 using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -415,6 +404,19 @@ namespace ProductDatabase.Other {
                     .ToList();
 
                 if (sheetNames.Count == 0) { throw new Exception("対象シートがありません。"); }
+
+                // 温度セルか湿度セルが設定されている場合、ダイアログを表示
+                if (!string.IsNullOrEmpty(regTemperatureRange) || !string.IsNullOrEmpty(regHumidityRange)) {
+                    var dialog = new InputDialog1();
+                    var result = dialog.ShowDialog();
+                    if (result == DialogResult.OK) {
+                        temperature = dialog.Temperature;
+                        humidity = dialog.Humidity;
+                    }
+                    else {
+                        return;
+                    }
+                }
 
                 var formattedDate = string.Empty;
                 if (DateTime.TryParse(productInfo.RegDate, out var date)) {
