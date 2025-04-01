@@ -397,16 +397,17 @@ namespace ProductDatabase.Other {
                 var resultRow = searchAddressResult.Start.Row;
 
                 // ワークシートのセルから値を取得
-                var orderNumberRange = workSheetMain.Cells[resultRow, 3].Value?.ToString();
-                var quantityRange = workSheetMain.Cells[resultRow, 4].Value?.ToString();
-                var serialFirstRange = workSheetMain.Cells[resultRow, 5].Value?.ToString();
-                var serialLastRange = workSheetMain.Cells[resultRow, 6].Value?.ToString();
-                var regDateRange = workSheetMain.Cells[resultRow, 7].Value?.ToString();
-                var dateFormat = workSheetMain.Cells[resultRow, 8].Value?.ToString();
-                var regTemperatureRange = workSheetMain.Cells[resultRow, 9].Value?.ToString();
-                var regHumidityRange = workSheetMain.Cells[resultRow, 10].Value?.ToString();
+                var productNumberRange = workSheetMain.Cells[resultRow, 3].Value?.ToString();
+                var orderNumberRange = workSheetMain.Cells[resultRow, 4].Value?.ToString();
+                var quantityRange = workSheetMain.Cells[resultRow, 5].Value?.ToString();
+                var serialFirstRange = workSheetMain.Cells[resultRow, 6].Value?.ToString();
+                var serialLastRange = workSheetMain.Cells[resultRow, 7].Value?.ToString();
+                var regDateRange = workSheetMain.Cells[resultRow, 8].Value?.ToString();
+                var dateFormat = workSheetMain.Cells[resultRow, 9].Value?.ToString();
+                var regTemperatureRange = workSheetMain.Cells[resultRow, 10].Value?.ToString();
+                var regHumidityRange = workSheetMain.Cells[resultRow, 11].Value?.ToString();
 
-                const int StartColumn = 11;
+                const int StartColumn = 12;
                 var sheetNames = Enumerable.Range(StartColumn, 20) // 無限の範囲
                     .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString())
                     .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName)) // 空白でない間
@@ -428,6 +429,7 @@ namespace ProductDatabase.Other {
 
                 foreach (var sheetName in sheetNames) {
                     var workSheetTemp = sheet[sheetName] ?? throw new Exception($"シート[{sheetName}]が見つかりません。");
+                    if (!string.IsNullOrEmpty(productNumberRange)) { workSheetTemp.Cells[productNumberRange].Value = productInfo.ProductNumber; }
                     if (!string.IsNullOrEmpty(orderNumberRange)) { workSheetTemp.Cells[orderNumberRange].Value = productInfo.OrderNumber; }
                     if (!string.IsNullOrEmpty(quantityRange)) { workSheetTemp.Cells[quantityRange].Value = productInfo.Quantity; }
                     if (!string.IsNullOrEmpty(serialFirstRange)) { workSheetTemp.Cells[serialFirstRange].Value = productInfo.SerialFirst; }
