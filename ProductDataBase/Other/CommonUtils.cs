@@ -397,18 +397,16 @@ namespace ProductDatabase.Other {
                 var resultRow = searchAddressResult.Start.Row;
 
                 // ワークシートのセルから値を取得
-                var orderNumberRange = workSheetMain.Cells[resultRow, 7].Value?.ToString();
-                var quantityRange = workSheetMain.Cells[resultRow, 8].Value?.ToString();
-                var serialFirstRange = workSheetMain.Cells[resultRow, 9].Value?.ToString();
-                var serialLastRange = workSheetMain.Cells[resultRow, 10].Value?.ToString();
-                var regDateRange = workSheetMain.Cells[resultRow, 11].Value?.ToString();
-                var dateFormat = workSheetMain.Cells[resultRow, 12].Value?.ToString();
-                //var regDateMonthRange = workSheetMain.Cells[resultRow, ].Value?.ToString();
-                //var regDateDayRange = workSheetMain.Cells[resultRow, ].Value?.ToString();
-                var regTemperatureRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
-                var regHumidityRange = workSheetMain.Cells[resultRow, 14].Value?.ToString();
+                var orderNumberRange = workSheetMain.Cells[resultRow, 3].Value?.ToString();
+                var quantityRange = workSheetMain.Cells[resultRow, 4].Value?.ToString();
+                var serialFirstRange = workSheetMain.Cells[resultRow, 5].Value?.ToString();
+                var serialLastRange = workSheetMain.Cells[resultRow, 6].Value?.ToString();
+                var regDateRange = workSheetMain.Cells[resultRow, 7].Value?.ToString();
+                var dateFormat = workSheetMain.Cells[resultRow, 8].Value?.ToString();
+                var regTemperatureRange = workSheetMain.Cells[resultRow, 9].Value?.ToString();
+                var regHumidityRange = workSheetMain.Cells[resultRow, 10].Value?.ToString();
 
-                const int StartColumn = 15;
+                const int StartColumn = 11;
                 var sheetNames = Enumerable.Range(StartColumn, 20) // 無限の範囲
                     .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString())
                     .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName)) // 空白でない間
@@ -435,8 +433,6 @@ namespace ProductDatabase.Other {
                     if (!string.IsNullOrEmpty(serialFirstRange)) { workSheetTemp.Cells[serialFirstRange].Value = productInfo.SerialFirst; }
                     if (!string.IsNullOrEmpty(serialLastRange)) { workSheetTemp.Cells[serialLastRange].Value = productInfo.SerialLast; }
                     if (!string.IsNullOrEmpty(regDateRange)) { workSheetTemp.Cells[regDateRange].Value = formattedDate; }
-                    //if (!string.IsNullOrEmpty(regDateMonthRange)) { workSheetTemp.Cells[regDateMonthRange].Value = date.Month; }
-                    //if (!string.IsNullOrEmpty(regDateDayRange)) { workSheetTemp.Cells[regDateDayRange].Value = date.Day; }
                     if (!string.IsNullOrEmpty(regTemperatureRange)) { workSheetTemp.Cells[regTemperatureRange].Value = temperature; }
                     if (!string.IsNullOrEmpty(regHumidityRange)) { workSheetTemp.Cells[regHumidityRange].Value = humidity; }
                 }
