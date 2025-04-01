@@ -834,6 +834,7 @@ namespace ProductDatabase {
         private void GenerateCheckSheet() {
             try {
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
+                ProductInfo.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
                 ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
                 ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
                 ProductInfo.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
