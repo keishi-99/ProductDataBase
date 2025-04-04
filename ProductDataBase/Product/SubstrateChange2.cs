@@ -52,7 +52,6 @@ namespace ProductDatabase {
                 _useSubstrate = ProductInfo.UseSubstrate.Split(",");
                 Array.Sort(_useSubstrate);
                 var strQuantity = string.Empty;
-                var strSubstrateName = string.Empty;
 
                 switch (ProductInfo.RegType) {
                     case 2:
@@ -174,7 +173,7 @@ namespace ProductDatabase {
                                     // 抽出した行から製造番号,在庫取得
                                     var strSubstrateNum = $"{dr["SubstrateNumber"]}";
                                     var intStock = int.Parse($"{dr["Stock"]}");
-                                    strSubstrateName = $"{dr["SubstrateName"]}";
+                                    var strSubstrateName = $"{dr["SubstrateName"]}";
                                     if (_objCbx != null) { _objCbx.Text = $"{strSubstrateName} - {substrateModel}"; }
 
                                     // usedSubstrate から strSubstrateNum を検索

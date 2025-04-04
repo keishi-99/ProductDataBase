@@ -104,7 +104,6 @@ namespace ProductDatabase {
             var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : _useSubstrate)
                 ?? throw new Exception("ArrUseSubstrateがnullです。");
 
-            var substrateName = string.Empty;
             var shortageSubstrateName = string.Empty;
 
             for (var i = 0; i < useSubstrate.Length; i++) {
@@ -112,6 +111,7 @@ namespace ProductDatabase {
                 var objDgv = Controls[_dataGridViewNames[i]] as DataGridView;
 
                 var selectedRows = ProductInfo.SubstrateDataTable.Select($"SubstrateModel = '{useSubstrate[i]}'");
+                var substrateName = string.Empty;
                 foreach (var row in selectedRows) {
                     substrateName = row["SubstrateName"].ToString() ?? string.Empty;
                 }
