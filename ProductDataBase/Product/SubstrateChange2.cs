@@ -151,17 +151,15 @@ namespace ProductDatabase {
                                     SubstrateName,
                                     SubstrateModel,
                                     SubstrateNumber,
-                                    OrderNumber,
                                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                                 FROM
                                     {ProductInfo.CategoryName}_Substrate
                                 WHERE
-                                    SubstrateModel = @SubstrateModel
+                                    SubstrateModel = @SubstrateModel AND SubstrateNumber NOTNULL
                                 GROUP BY
                                     SubstrateName,
                                     SubstrateModel,
-                                    SubstrateNumber,
-                                    OrderNumber
+                                    SubstrateNumber
                                 ORDER BY
                                     MIN(ID);
                                 """;
