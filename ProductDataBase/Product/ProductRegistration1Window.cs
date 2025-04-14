@@ -193,6 +193,59 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = true;
             }
         }
+        // revisionの変更
+        private void RevisionChange() {
+            using var connection = new SQLiteConnection(GetConnectionRegistration());
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+            try {
+                var commandText = $@"
+                INSERT INTO {ProductInfo.CategoryName}_Product
+                    (ProductName, RegDate, Revision, RevisionGroup, SerialLastNumber, Comment)
+                VALUES
+                    (@ProductName, @RegDate, @Revision, @RevisionGroup, @SerialLastNumber, @Comment);";
+
+                var serialLastNum = ExecuteScalar(connection,
+                    $@"SELECT SerialLastNumber FROM {ProductInfo.CategoryName}_Product WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;",
+                    ("@ProductName", ProductInfo.ProductName));
+
+                ExecuteNonQuery(connection, commandText,
+                    ("@ProductName", ProductInfo.ProductName),
+                    ("@RegDate", RegistrationDateMaskedTextBox.Text),
+                    ("@Revision", RevisionTextBox.Text),
+                    ("@RevisionGroup", ProductInfo.RevisionGroup),
+                    ("@SerialLastNumber", Convert.ToInt32(serialLastNum)),
+                    ("@Comment", CommentTextBox.Text));
+
+                transaction.Commit();
+                MessageBox.Show("Revision変更完了", "Revision変更", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            } catch (Exception ex) {
+                if (transaction.Connection != null) { //接続が開いているか確認する。
+                    transaction.Rollback();
+                }
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private static void ExecuteNonQuery(SQLiteConnection connection, string commandText, params (string, object?)[] parameters) {
+            using var command = connection.CreateCommand();
+            command.CommandText = commandText;
+            foreach (var (name, value) in parameters) {
+                // 空の文字列の場合にNULLを設定
+                var sqlValue = value is string strValue && string.IsNullOrEmpty(strValue) ? DBNull.Value : value ?? DBNull.Value;
+                command.Parameters.Add(name, DbType.String).Value = sqlValue;
+            }
+
+            command.ExecuteNonQuery();
+        }
+        private static object ExecuteScalar(SQLiteConnection connection, string commandText, params (string, object)[] parameters) {
+            using var command = connection.CreateCommand();
+            command.CommandText = commandText;
+            foreach (var (name, value) in parameters) {
+                command.Parameters.Add(name, DbType.String).Value = value ?? DBNull.Value;
+            }
+
+            return command.ExecuteScalar() ?? 0;
+        }
         // コメント用テンプレート
         private void TemplateComment() {
             var templateWord = CommentComboBox.SelectedIndex switch {
@@ -301,6 +354,7 @@ namespace ProductDatabase {
 
         private void ProductRegistration1Window_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
+        private void RevisionChangeButton_Click(object sender, EventArgs e) { RevisionChange(); }
         private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
         private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
         private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
@@ -331,5 +385,6 @@ namespace ProductDatabase {
             MessageBox.Show(message, "取得情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         private void QrCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
+
     }
 }
