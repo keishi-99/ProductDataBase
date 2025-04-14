@@ -70,6 +70,7 @@
             this.QrCodeButton = new Button();
             this.label1 = new Label();
             this.textToUpperCheckBox = new CheckBox();
+            this.RevisionChangeButton = new Button();
             this.ProductRegistration1MenuStrip.SuspendLayout();
             this.panelCommentTextBox.SuspendLayout();
             this.SuspendLayout();
@@ -598,11 +599,22 @@
             this.textToUpperCheckBox.Text = "小文字を大文字に変換";
             this.textToUpperCheckBox.UseVisualStyleBackColor = true;
             // 
+            // RevisionChangeButton
+            // 
+            this.RevisionChangeButton.Location = new Point(19, 375);
+            this.RevisionChangeButton.Name = "RevisionChangeButton";
+            this.RevisionChangeButton.Size = new Size(75, 25);
+            this.RevisionChangeButton.TabIndex = 609;
+            this.RevisionChangeButton.Text = "Rev変更";
+            this.RevisionChangeButton.UseVisualStyleBackColor = true;
+            this.RevisionChangeButton.Click += this.RevisionChangeButton_Click;
+            // 
             // ProductRegistration1Window
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.RevisionChangeButton);
             this.Controls.Add(this.textToUpperCheckBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.QrCodeButton);
@@ -713,5 +725,6 @@
         private Button QrCodeButton;
         private Label label1;
         private CheckBox textToUpperCheckBox;
+        private Button RevisionChangeButton;
     }
 }
