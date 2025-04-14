@@ -372,9 +372,6 @@ namespace ProductDatabase.Other {
         // チェックシート生成 EPPLUS + NPOI
         public static void GenerateCheckSheetNPOI(ProductInformation productInfo) {
             try {
-                var temperature = string.Empty;
-                var humidity = string.Empty;
-
                 var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsx");
                 using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using var workBook = new ExcelPackage(fileStream);
@@ -388,117 +385,102 @@ namespace ProductDatabase.Other {
                 var resultRow = searchAddressResult.Start.Row;
 
                 // ワークシートのセルから値を取得
-                var productModelRange = workSheetMain.Cells[resultRow, 3].Value?.ToString();
-                var productNumberRange = workSheetMain.Cells[resultRow, 4].Value?.ToString();
-                var orderNumberRange = workSheetMain.Cells[resultRow, 5].Value?.ToString();
-                var quantityRange = workSheetMain.Cells[resultRow, 6].Value?.ToString();
-                var serialFirstRange = workSheetMain.Cells[resultRow, 7].Value?.ToString();
-                var serialLastRange = workSheetMain.Cells[resultRow, 8].Value?.ToString();
-                var regDateRange = workSheetMain.Cells[resultRow, 9].Value?.ToString();
-                var dateFormat = workSheetMain.Cells[resultRow, 10].Value?.ToString();
-                var regTemperatureRange = workSheetMain.Cells[resultRow, 11].Value?.ToString();
-                var regHumidityRange = workSheetMain.Cells[resultRow, 12].Value?.ToString();
-
-                const int StartColumn = 13;
-                var sheetNames = Enumerable.Range(StartColumn, 20) // 無限の範囲
+                var excelData = new {
+                    ProductModelRange = workSheetMain.Cells[resultRow, 3].Value?.ToString(),
+                    ProductNumberRange = workSheetMain.Cells[resultRow, 4].Value?.ToString(),
+                    OrderNumberRange = workSheetMain.Cells[resultRow, 5].Value?.ToString(),
+                    QuantityRange = workSheetMain.Cells[resultRow, 6].Value?.ToString(),
+                    SerialFirstRange = workSheetMain.Cells[resultRow, 7].Value?.ToString(),
+                    SerialLastRange = workSheetMain.Cells[resultRow, 8].Value?.ToString(),
+                    RegDateRange = workSheetMain.Cells[resultRow, 9].Value?.ToString(),
+                    DateFormat = workSheetMain.Cells[resultRow, 10].Value?.ToString(),
+                    RegTemperatureRange = workSheetMain.Cells[resultRow, 11].Value?.ToString(),
+                    RegHumidityRange = workSheetMain.Cells[resultRow, 12].Value?.ToString(),
+                    SheetNames = Enumerable.Range(13, 20) // 無限の範囲
                     .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString())
                     .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName)) // 空白でない間
-                    .ToList();
+                    .ToList()
+                };
 
-                if (sheetNames.Count == 0) { throw new Exception("対象シートがありません。"); }
+                if (excelData.SheetNames.Count == 0) { throw new Exception("対象シートがありません。"); }
 
                 // 温度セルか湿度セルが設定されている場合、ダイアログを表示
-                if (!string.IsNullOrEmpty(regTemperatureRange) || !string.IsNullOrEmpty(regHumidityRange)) {
+                var temperature = string.Empty;
+                var humidity = string.Empty;
+                if (!string.IsNullOrEmpty(excelData.RegTemperatureRange) || !string.IsNullOrEmpty(excelData.RegHumidityRange)) {
                     var dialog = new InputDialog1();
                     var result = dialog.ShowDialog();
-                    if (result == DialogResult.OK) {
-                        temperature = dialog.Temperature;
-                        humidity = dialog.Humidity;
-                    }
-                    else {
+                    if (result != DialogResult.OK) {
                         return;
                     }
+                    temperature = dialog.Temperature;
+                    humidity = dialog.Humidity;
                 }
 
                 var formattedDate = string.Empty;
                 if (DateTime.TryParse(productInfo.RegDate, out var date)) {
-                    switch (dateFormat) {
-                        case "1":
-                            formattedDate = date.ToString("yyyy年MM月dd日");
-                            break;
-                        case "2":
-                            formattedDate = date.ToString("yyyy-MM-dd");
-                            break;
-                    }
+                    formattedDate = excelData.DateFormat switch {
+                        "1" => date.ToString("yyyy年MM月dd日"),
+                        "2" => date.ToString("yyyy-MM-dd"),
+                        _ => formattedDate
+                    };
                 }
 
                 // NPOIでExcelファイルを編集
                 var workBookNPOI = WorkbookFactory.Create(configPath);
 
-                var productModelCellReference = string.IsNullOrEmpty(productModelRange) ? null : new CellReference(productModelRange);
-                var productNumberCellReference = string.IsNullOrEmpty(productNumberRange) ? null : new CellReference(productNumberRange);
-                var orderNumberCellReference = string.IsNullOrEmpty(orderNumberRange) ? null : new CellReference(orderNumberRange);
-                var quantityCellReference = string.IsNullOrEmpty(quantityRange) ? null : new CellReference(quantityRange);
-                var serialFirstCellReference = string.IsNullOrEmpty(serialFirstRange) ? null : new CellReference(serialFirstRange);
-                var serialLastCellReference = string.IsNullOrEmpty(serialLastRange) ? null : new CellReference(serialLastRange);
-                var regDateCellReference = string.IsNullOrEmpty(regDateRange) ? null : new CellReference(regDateRange);
-                var regTemperatureCellReference = string.IsNullOrEmpty(regTemperatureRange) ? null : new CellReference(regTemperatureRange);
-                var regHumidityCellReference = string.IsNullOrEmpty(regHumidityRange) ? null : new CellReference(regHumidityRange);
+                // セル参照をCellReferenceオブジェクトとして作成
+                var cellReferences = new {
+                    ProductModel = string.IsNullOrEmpty(excelData.ProductModelRange) ? null : new CellReference(excelData.ProductModelRange),
+                    ProductNumber = string.IsNullOrEmpty(excelData.ProductNumberRange) ? null : new CellReference(excelData.ProductNumberRange),
+                    OrderNumber = string.IsNullOrEmpty(excelData.OrderNumberRange) ? null : new CellReference(excelData.OrderNumberRange),
+                    Quantity = string.IsNullOrEmpty(excelData.QuantityRange) ? null : new CellReference(excelData.QuantityRange),
+                    SerialFirst = string.IsNullOrEmpty(excelData.SerialFirstRange) ? null : new CellReference(excelData.SerialFirstRange),
+                    SerialLast = string.IsNullOrEmpty(excelData.SerialLastRange) ? null : new CellReference(excelData.SerialLastRange),
+                    RegDate = string.IsNullOrEmpty(excelData.RegDateRange) ? null : new CellReference(excelData.RegDateRange),
+                    RegTemperature = string.IsNullOrEmpty(excelData.RegTemperatureRange) ? null : new CellReference(excelData.RegTemperatureRange),
+                    RegHumidity = string.IsNullOrEmpty(excelData.RegHumidityRange) ? null : new CellReference(excelData.RegHumidityRange),
+                };
 
-                foreach (var sheetName in sheetNames) {
+                // 各シートに対して値を書き込む
+                foreach (var sheetName in excelData.SheetNames) {
                     var sheetNPOI = workBookNPOI.GetSheet(sheetName) ?? throw new Exception($"シート[{sheetName}]が見つかりません。");
-                    sheetNPOI.ForceFormulaRecalculation = true; // 「次回読み込み時に」「Excelによって」再計算を強制する
-                    if (productModelCellReference is not null) {
-                        WriteCellValue(sheetNPOI, productModelCellReference, productInfo.ProductModel);
-                    }
-                    if (productNumberCellReference is not null) {
-                        WriteCellValue(sheetNPOI, productNumberCellReference, productInfo.ProductNumber);
-                    }
-                    if (orderNumberCellReference is not null) {
-                        WriteCellValue(sheetNPOI, orderNumberCellReference, productInfo.OrderNumber);
-                    }
-                    if (quantityCellReference is not null) {
-                        WriteCellValue(sheetNPOI, quantityCellReference, productInfo.Quantity.ToString());
-                    }
-                    if (serialFirstCellReference is not null) {
-                        WriteCellValue(sheetNPOI, serialFirstCellReference, productInfo.SerialFirst);
-                    }
-                    if (serialLastCellReference is not null) {
-                        WriteCellValue(sheetNPOI, serialLastCellReference, productInfo.SerialLast);
-                    }
-                    if (regDateCellReference is not null) {
-                        WriteCellValue(sheetNPOI, regDateCellReference, formattedDate);
-                    }
-                    if (regTemperatureCellReference is not null) {
-                        WriteCellValue(sheetNPOI, regTemperatureCellReference, temperature);
-                    }
-                    if (regHumidityCellReference is not null) {
-                        WriteCellValue(sheetNPOI, regHumidityCellReference, humidity);
-                    }
+                    sheetNPOI.ForceFormulaRecalculation = true;
+
+                    WriteCellValue(sheetNPOI, cellReferences.ProductModel, productInfo.ProductModel);
+                    WriteCellValue(sheetNPOI, cellReferences.ProductNumber, productInfo.ProductNumber);
+                    WriteCellValue(sheetNPOI, cellReferences.OrderNumber, productInfo.OrderNumber);
+                    WriteCellValue(sheetNPOI, cellReferences.Quantity, productInfo.Quantity.ToString());
+                    WriteCellValue(sheetNPOI, cellReferences.SerialFirst, productInfo.SerialFirst);
+                    WriteCellValue(sheetNPOI, cellReferences.SerialLast, productInfo.SerialLast);
+                    WriteCellValue(sheetNPOI, cellReferences.RegDate, formattedDate);
+                    WriteCellValue(sheetNPOI, cellReferences.RegTemperature, temperature);
+                    WriteCellValue(sheetNPOI, cellReferences.RegHumidity, humidity);
                 }
 
                 //セル書き込み(書き込む値が文字列の場合)
-                static void WriteCellValue(ISheet sheet, CellReference reference, string value) {
+                static void WriteCellValue(ISheet sheet, CellReference? reference, string value) {
+                    if (reference == null) {
+                        return;
+                    }
+
                     var row = sheet.GetRow(reference.Row) ?? sheet.CreateRow(reference.Row); //指定した行を取得できない時はエラーとならないよう新規作成している
                     var cell = row.GetCell(reference.Col) ?? row.CreateCell(reference.Col); //一行上の処理の列版
-
                     cell.SetCellValue(value);
                 }
 
-                // 不要なシートを非表示にする
-                var allSheetNames = sheet.Select(sh => sh.Name.ToString()).ToList();
-                var sheetIndicesToHide = new List<int>();
+                // 非表示にするシートのインデックスを特定
+                var allSheetNames = workBook.Workbook.Worksheets.Select(sh => sh.Name.ToString()).ToList();
+                var sheetIndicesToHide = allSheetNames.Select((name, index) => new { Name = name, Index = index })
+                    .Where(sheet => !excelData.SheetNames.Contains(sheet.Name))
+                    .Select(sheet => sheet.Index)
+                    .ToList();
+                sheetIndicesToHide.Add(0); // 常に最初のシート（"Sheet1"）を非表示にする
 
-                for (var i = 0; i < allSheetNames.Count; i++) {
-                    if (!sheetNames.Contains(allSheetNames[i])) {
-                        sheetIndicesToHide.Add(i);
-                    }
-                }
-
+                // シートを非表示に設定
                 foreach (var sheetIndex in sheetIndicesToHide) {
                     workBookNPOI.SetSheetHidden(sheetIndex, SheetVisibility.VeryHidden);
                 }
-                workBookNPOI.SetSheetHidden(0, SheetVisibility.VeryHidden);
 
                 //引数に保存先パスを指定
                 var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsx");
