@@ -195,6 +195,16 @@ namespace ProductDatabase {
         }
         // revisionの変更
         private void RevisionChange() {
+            var result = MessageBox.Show("レビジョンを変更しますか？",
+                "確認",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Exclamation,
+                MessageBoxDefaultButton.Button2);
+
+            if (result == DialogResult.No) {
+                return;
+            }
+
             using var connection = new SQLiteConnection(GetConnectionRegistration());
             connection.Open();
             using var transaction = connection.BeginTransaction();
