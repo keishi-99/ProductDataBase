@@ -351,7 +351,6 @@ namespace ProductDatabase {
                 _editModeTransaction = _editModeConnection.BeginTransaction(); // トランザクション開始（ロック）
             } catch (SQLiteException ex) {
                 MessageBox.Show($"データベースロックに失敗しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                // ロック失敗時の処理（例：編集モードをキャンセル）
                 return;
             }
 
@@ -446,7 +445,7 @@ namespace ProductDatabase {
                     case "Substrate":
                         foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
                             if (row.RowState == DataRowState.Modified) {
-                                //    // UPDATE文の設定
+                                // UPDATE文の設定
                                 command.CommandText = $"""
                                     UPDATE "{ProductInfo.CategoryName}_Substrate"
                                     SET
@@ -546,7 +545,7 @@ namespace ProductDatabase {
                     case "Product":
                         foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
                             if (row.RowState == DataRowState.Modified) {
-                                //    // UPDATE文の設定
+                                // UPDATE文の設定
                                 command.CommandText = $"""
                                     UPDATE "{ProductInfo.CategoryName}_Product"
                                     SET
@@ -639,7 +638,7 @@ namespace ProductDatabase {
                             }
                             else if (row.RowState == DataRowState.Deleted) // 削除行の処理
                             {
-                                //DELETE文の設定
+                                // DELETE文の設定
                                 command.CommandText = $"""
                                     DELETE FROM "{ProductInfo.CategoryName}_Serial"
                                     WHERE rowid = @rowid;
@@ -647,7 +646,6 @@ namespace ProductDatabase {
                                 command.Parameters.Clear(); // パラメータをクリア
                                 command.Parameters.Add("@rowid", DbType.Int32).Value = row["rowid", DataRowVersion.Original];
 
-                                //command.Connection = con;
                                 command.ExecuteNonQuery();
                                 // ログ出力
                                 string[] logMessageArray = [
@@ -761,7 +759,6 @@ namespace ProductDatabase {
             dataForm.Controls.Add(dataGridView);
 
             // データベース接続とSQLクエリの実行
-
             using SQLiteConnection con = new(GetConnectionRegistration());
             {
                 con.Open();

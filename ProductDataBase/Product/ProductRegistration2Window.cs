@@ -277,24 +277,13 @@ namespace ProductDatabase {
 
                 DisableControls();
 
-                //if (!Registration()) {
-                //    throw new Exception("登録失敗しました。");
-                //}
                 Registration();
-
-                //HandleLabelPrinting();
-                //HandleBarcodePrinting();
 
                 MessageBox.Show("登録完了");
 
                 HandlePostRegistration();
                 GenerateReportButton.Enabled = true;
-                //if (RequiresClosing) {
-                //    Close();
-                //}
-                //else {
-                //    HandlePostRegistration();
-                //}
+
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -599,8 +588,6 @@ namespace ProductDatabase {
                         if (result == DialogResult.No) {
                             return false;
                         }
-                        //MessageBox.Show($"[{ProductInfo.OrderNumber}]は[{productModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        //return false;
                     }
                 }
             }

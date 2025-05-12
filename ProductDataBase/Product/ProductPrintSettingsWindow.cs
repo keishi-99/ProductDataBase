@@ -124,7 +124,7 @@ namespace ProductDatabase {
                     return false;
                 }
             }
-            return true; // すべての検証が成功した場合に true を返す
+            return true;
         }
         private void UpdateProductPrintSettings() {
             if (ProductPrintSettings.LabelPageSettings != null) {

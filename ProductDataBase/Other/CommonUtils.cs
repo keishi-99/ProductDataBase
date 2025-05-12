@@ -62,7 +62,6 @@ namespace ProductDatabase.Other {
         public static class BackupManager {
             private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup"); // バックアップを保存するディレクトリ
             private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db"); // 元ファイルパス
-                                                                                                                                     //private static readonly string s_originalFilePath = Path.Combine(s_networkPath, "db", "registration.db"); // 元ファイルパス
             private static readonly int s_maxBackupFiles = 20; // 最大バックアップファイル数
             private static readonly object s_lockObject = new();
 
@@ -105,8 +104,8 @@ namespace ProductDatabase.Other {
             private static void ManageBackupFiles() {
                 try {
                     var backupFiles = Directory.GetFiles(s_backupDirectory, "registration_*.db")
-                                               .OrderBy(File.GetCreationTime) // 作成日時順に並べる
-                                               .ToList();
+                        .OrderBy(File.GetCreationTime) // 作成日時順に並べる
+                        .ToList();
 
                     while (backupFiles.Count > s_maxBackupFiles) {
                         var oldestFile = backupFiles.First();
@@ -397,9 +396,9 @@ namespace ProductDatabase.Other {
                     RegTemperatureRange = workSheetMain.Cells[resultRow, 11].Value?.ToString(),
                     RegHumidityRange = workSheetMain.Cells[resultRow, 12].Value?.ToString(),
                     SheetNames = Enumerable.Range(13, 20) // 無限の範囲
-                    .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString())
-                    .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName)) // 空白でない間
-                    .ToList()
+                        .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString())
+                        .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName)) // 空白でない間
+                        .ToList()
                 };
 
                 if (excelData.SheetNames.Count == 0) { throw new Exception("対象シートがありません。"); }
