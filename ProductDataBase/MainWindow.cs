@@ -20,8 +20,6 @@ namespace ProductDatabase {
             public string UseSubstrate { get; set; } = string.Empty;
             public string Initial { get; set; } = string.Empty;
             public int SerialDigit { get; set; }
-            //public int RegType { get; set; }
-            //public int PrintType { get; set; }
             public int RevisionGroup { get; set; }
             public int CheckBin { get; set; }
             public string Proness1 { get; set; } = string.Empty;
@@ -71,22 +69,22 @@ namespace ProductDatabase {
             public bool IsListPrint { get; private set; }
             public bool IsCheckSheetPrint { get; private set; }
             public bool IsLast4Digits { get; private set; }
-            public bool IsRegType9 { get; private set; } // 命名規則を変更
-            public bool IsSerialGeneration { get; private set; } // アクセス修飾子を変更
-            public bool IsUnderlinePrint { get; private set; } // アクセス修飾子を変更
+            public bool IsRegType9 { get; private set; }
+            public bool IsSerialGeneration { get; private set; }
+            public bool IsUnderlinePrint { get; private set; }
 
             private void UpdatePrintFlags() {
                 // RegType に基づく設定
-                IsRegType9 = RegType == 9; // 命名規則を変更
+                IsRegType9 = RegType == 9;
                 IsSerialGeneration = IsTypeIn(RegType, 1, 2, 3, 9);
 
                 // PrintType に基づく設定
                 IsLabelPrint = IsTypeIn(PrintType, 1, 3, 4, 5, 6, 7, 9);
                 IsBarcodePrint = IsTypeIn(PrintType, 2, 3);
-                IsListPrint = IsTypeIn(PrintType, 5, 6) && !IsRegType9; // 否定演算子を使用
-                IsCheckSheetPrint = IsTypeIn(PrintType, 6, 7) && !IsRegType9; // 否定演算子を使用
-                IsLast4Digits = IsTypeIn(PrintType, 9) && !IsRegType9; // 否定演算子を使用
-                IsUnderlinePrint = PrintType == 4 && !IsRegType9; // 否定演算子を使用
+                IsListPrint = IsTypeIn(PrintType, 5, 6) && !IsRegType9;
+                IsCheckSheetPrint = IsTypeIn(PrintType, 6, 7) && !IsRegType9;
+                IsLast4Digits = IsTypeIn(PrintType, 9) && !IsRegType9;
+                IsUnderlinePrint = PrintType == 4 && !IsRegType9;
             }
 
             private static bool IsTypeIn(int value, params int[] values) {
@@ -160,32 +158,22 @@ namespace ProductDatabase {
         }
 
         public static string GetConnectionInformation() {
-            ////var informationPath = Path.Combine(s_networkPath, "db", "information.db");
             var informationPath = Path.Combine(Environment.CurrentDirectory, "db", "information.db");
-            if (!File.Exists(informationPath)) { throw new FileNotFoundException("1データベースファイルが見つかりません。", informationPath); }
+            if (!File.Exists(informationPath)) { throw new FileNotFoundException("ファイルが見つかりません。", informationPath); }
             var u = new Uri(informationPath);
             if (u.IsUnc) {
-                // UNCパス
-                informationPath = @"\" + informationPath;
+                informationPath = @"\" + informationPath; // UNCパス
             }
             return new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
-            ////return !File.Exists(informationPath)
-            ////    ? throw new FileNotFoundException("2データベースファイルが見つかりません。", informationPath)
-            ////    : new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
         }
         public static string GetConnectionRegistration() {
-            ////var registrationPath = Path.Combine(s_networkPath, "db", "registration.db");
             var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
-            if (!File.Exists(registrationPath)) { throw new FileNotFoundException("1データベースファイルが見つかりません。", registrationPath); }
+            if (!File.Exists(registrationPath)) { throw new FileNotFoundException("ファイルが見つかりません。", registrationPath); }
             var u = new Uri(registrationPath);
             if (u.IsUnc) {
-                // UNCパス
-                registrationPath = @"\" + registrationPath;
+                registrationPath = @"\" + registrationPath; // UNCパス
             }
             return new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
-            ////return !File.Exists(registrationPath)
-            ////    ? throw new FileNotFoundException("2データベースファイルが見つかりません。", registrationPath)
-            ////    : new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
         }
 
         // ロードイベント
@@ -504,9 +492,9 @@ namespace ProductDatabase {
                     case 1:
                         selectedRows = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "SubstrateName ASC");
                         HashSet<string> substrateNames = [.. selectedRows.AsEnumerable()
-                                                                                .Select(x => x.Field<string>("SubstrateName"))
-                                                                                .Where(x => x != null)
-                                                                                .Select(x => x!)];
+                            .Select(x => x.Field<string>("SubstrateName"))
+                            .Where(x => x != null)
+                            .Select(x => x!)];
 
                         CategoryListBox3.Items.AddRange([.. substrateNames]);
                         break;
@@ -516,9 +504,9 @@ namespace ProductDatabase {
                     case 4:
                         selectedRows = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductType ASC");
                         HashSet<string> productTypes = [.. selectedRows.AsEnumerable()
-                                                                                .Select(x => x.Field<string>("ProductType"))
-                                                                                .Where(x => x != null)
-                                                                                .Select(x => x!)];
+                            .Select(x => x.Field<string>("ProductType"))
+                            .Where(x => x != null)
+                            .Select(x => x!)];
 
                         CategoryListBox3.Items.AddRange([.. productTypes]);
                         break;
@@ -663,8 +651,6 @@ namespace ProductDatabase {
                     p.ProItemNumber LIKE '%'|| @StrProness2 ||'%'
                 """;
 
-            ////cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber LIKE '%'|| @StrProness2 ||'%' OR ProItemNumber LIKE '%'|| @StrProness2 ||'%'""";
-            ////cmd.CommandText = $"""SELECT * FROM V_ItemList WHERE SubItemNumber = @StrProness2 OR ProItemNumber = @StrProness2""";
             cmd.Parameters.Add("@StrProness2", DbType.String).Value = ProductInfo.Proness2;
             using var dr = cmd.ExecuteReader();
             if (!dr.HasRows) { throw new Exception($"品目番号が見つかりません。\n品目番号:[{ProductInfo.Proness2}]"); }
@@ -789,7 +775,7 @@ namespace ProductDatabase {
         private void OpenExcel(string filePath) {
             //Excel実行ファイルの場所を取得
             var xlApp = new Microsoft.Office.Interop.Excel.Application();
-            var excelFullPath = System.IO.Path.Combine(xlApp.Path, "EXCEL.EXE");   //フルパス作成
+            var excelFullPath = System.IO.Path.Combine(xlApp.Path, "EXCEL.EXE"); //フルパス作成
             xlApp.Quit();
             System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
             // ファイルを実行

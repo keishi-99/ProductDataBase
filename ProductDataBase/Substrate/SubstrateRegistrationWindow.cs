@@ -65,19 +65,6 @@ namespace ProductDatabase {
                 // ComboBoxへ担当者を追加
                 PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
 
-                // 在庫管理する基板はDB2へ接続し対象製品の在庫取得
-                //if (IsRegistration) {
-                //    using SQLiteConnection con = new(GetConnectionRegistration());
-                //    con.Open();
-                //    using var cmd = con.CreateCommand();
-
-                //    // テーブル検索SQL - [[ProductName]_Substrate]テーブルの最新の[Revison]を取得
-                //    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.CategoryName}_Substrate" WHERE SubstrateModel = @SubstrateModel AND Revision IS NOT NULL ORDER BY ID DESC""";
-                //    cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = ProductInfo.SubstrateModel;
-                //    var result = cmd.ExecuteScalar();
-                //    RevisionTextBox.Text = result?.ToString() ?? "";
-                //}
-
                 // 印刷しない場合は関連コントロール非表示に
                 if (IsLabelPrint == false) {
                     ExtraCheckBox7.Visible = false;
@@ -461,7 +448,7 @@ namespace ProductDatabase {
                         if (_labelSubNumLabelsToPrint <= 0) {
                             copiesPerLabel--;
                             if (copiesPerLabel <= 0) {
-                                // 最終行の行番号を表示
+                                // 最終行の行番号を描画
                                 var sf = new StringFormat {
                                     Alignment = StringAlignment.Near,
                                     LineAlignment = StringAlignment.Center
