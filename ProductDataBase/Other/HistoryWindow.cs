@@ -116,9 +116,9 @@ namespace ProductDatabase {
                         { "Increase", "追加量" },
                         { "Decrease", "使用量" },
                         { "Defect", "減少量" },
-                        { "UsedProductType", "使用製品名" },
-                        { "UsedProductNumber", "使用製番" },
-                        { "UsedOrderNumber", "使用注番" },
+                        { "ProductType", "使用製品名" },
+                        { "ProductNumber", "使用製番" },
+                        { "OrderNumber1", "使用注番" },
                         { "Person", "担当者" },
                         { "RegDate", "登録日" },
                         { "Comment", "コメント" }
@@ -211,17 +211,21 @@ namespace ProductDatabase {
                 AllSubstrateCheckBox.Visible = true;
                 GroupModelCheckBox.Visible = false;
 
-                var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
+                var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND s.SubstrateModel = @SubstrateModel" : string.Empty;
 
                 var query = $"""
                 SELECT
-                    *
+                    s.ID, s.stockName, s.SubstrateName, s.SubstrateModel, s.SubstrateNumber, s.OrderNumber,s.Increase, s.Decrease, s.Defect, p.ProductType, p.ProductNumber, p.OrderNumber, s.Person, s.RegDate, s.Comment
                 FROM
-                    {ProductInfo.CategoryName}_Substrate
+                    {ProductInfo.CategoryName}_Substrate AS s
+                LEFT JOIN
+                    "{ProductInfo.CategoryName}_Product" AS p
+                ON
+                    s.UseID = p.ID
                 WHERE
-                    StockName = "{ProductInfo.StockName}"{otherSubstrate}
+                    s.StockName = "{ProductInfo.StockName}"{otherSubstrate}
                 ORDER BY
-                    ID DESC
+                    s.ID DESC
                 ;
                 """;
 
