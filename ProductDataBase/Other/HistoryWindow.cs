@@ -121,7 +121,8 @@ namespace ProductDatabase {
                         { "OrderNumber1", "使用注番" },
                         { "Person", "担当者" },
                         { "RegDate", "登録日" },
-                        { "Comment", "コメント" }
+                        { "Comment", "コメント" },
+                        { "usedID", "UsedID" }
                     }
                 },
                 {
@@ -215,7 +216,7 @@ namespace ProductDatabase {
 
                 var query = $"""
                 SELECT
-                    s.ID, s.stockName, s.SubstrateName, s.SubstrateModel, s.SubstrateNumber, s.OrderNumber,s.Increase, s.Decrease, s.Defect, p.ProductType, p.ProductNumber, p.OrderNumber, s.Person, s.RegDate, s.Comment
+                    s.ID, s.stockName, s.SubstrateName, s.SubstrateModel, s.SubstrateNumber, s.OrderNumber,s.Increase, s.Decrease, s.Defect, p.ProductType, p.ProductNumber, p.OrderNumber, s.Person, s.RegDate, s.Comment, s.UseID
                 FROM
                     {ProductInfo.CategoryName}_Substrate AS s
                 LEFT JOIN
