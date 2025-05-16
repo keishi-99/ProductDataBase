@@ -430,12 +430,10 @@ namespace ProductDatabase {
             var commandText = $@"
                 INSERT INTO ""{categoryName}_Substrate""
                     (StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber,
-                     Decrease, UsedProductType, UsedProductNumber, UsedOrderNumber,
-                     Person, RegDate, Comment, UseID)
+                     Decrease, Person, RegDate, Comment, UseID)
                 VALUES
                     (@StockName, @SubstrateName, @SubstrateModel, @SubstrateNumber, @OrderNumber,
-                     @Decrease, @UsedProductType, @UsedProductNumber, @UsedOrderNumber,
-                     @Person, @RegDate, @Comment, @UseID);";
+                     @Decrease, @Person, @RegDate, @Comment, @UseID);";
 
             ExecuteNonQuery(connection, commandText,
                 ("@StockName", stockName),
@@ -444,9 +442,6 @@ namespace ProductDatabase {
                 ("@SubstrateNumber", substrateNumber),
                 ("@OrderNumber", orderNumber),
                 ("@Decrease", 0 - useValue),
-                ("@UsedProductType", ProductInfo.ProductType),
-                ("@UsedProductNumber", ProductInfo.ProductNumber),
-                ("@UsedOrderNumber", ProductInfo.OrderNumber),
                 ("@Person", ProductInfo.Person),
                 ("@RegDate", ProductInfo.RegDate),
                 ("@Comment", ProductInfo.Comment),
