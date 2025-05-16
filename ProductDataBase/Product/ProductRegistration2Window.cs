@@ -1194,7 +1194,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        // リスト印刷
+        // リスト作成
         private void GenerateList() {
             try {
                 CommonUtils.GenerateList(ProductInfo);
@@ -1202,7 +1202,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        // チェックシート印刷
+        // チェックシート作成
         private void GenerateCheckSheet() {
             try {
                 CommonUtils.GenerateCheckSheetNPOI(ProductInfo);
