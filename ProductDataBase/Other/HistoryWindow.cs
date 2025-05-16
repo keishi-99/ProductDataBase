@@ -739,7 +739,7 @@ namespace ProductDatabase {
         private void ShowDataForm() {
 
             // 選択された行がない場合は処理を終了
-            if (DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
+            if (DataBaseDataGridView.CurrentCell == null) { return; }
 
             // 新しいフォームクラスを作成
             var dataForm = new Form {
