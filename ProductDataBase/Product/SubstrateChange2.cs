@@ -379,10 +379,10 @@ namespace ProductDatabase {
                                                     $"""
                                                     INSERT INTO "{ProductInfo.CategoryName}_Substrate"
                                                         (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Decrease,
-                                                        UsedProductType,UsedProductNumber,UsedOrderNumber,Person,RegDate,Comment,UseID)
+                                                        Person,RegDate,Comment,UseID)
                                                     VALUES
                                                         (@StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,
-                                                        @Decrease,@UsedProductType,@UsedProductNumber,@UsedOrderNumber,@Person,@RegDate,@Comment,@UseID)
+                                                        @Decrease,@Person,@RegDate,@Comment,@UseID)
                                                     """;
 
                                                     cmdInsert.Parameters.Add("@StockName", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.StockName) ? DBNull.Value : ProductInfo.StockName;
@@ -391,9 +391,6 @@ namespace ProductDatabase {
                                                     cmdInsert.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
                                                     cmdInsert.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(orderNum) ? DBNull.Value : orderNum;
                                                     cmdInsert.Parameters.Add("@Decrease", DbType.Int64).Value = 0 - useValue;
-                                                    cmdInsert.Parameters.Add("@UsedProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                                                    cmdInsert.Parameters.Add("@UsedProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                                                    cmdInsert.Parameters.Add("@UsedOrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
                                                     cmdInsert.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
                                                     cmdInsert.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
                                                     cmdInsert.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
