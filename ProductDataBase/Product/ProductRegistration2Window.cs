@@ -249,7 +249,9 @@ namespace ProductDatabase {
             バーコード印刷プレビューToolStripMenuItem.Enabled = ProductInfo.IsBarcodePrint;
             バーコード印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsBarcodePrint;
 
-            if (ProductInfo.IsLabelPrint || ProductInfo.IsBarcodePrint) {
+            var serialReg = ProductInfo.RegType is 1 or 2 or 3;
+
+            if (ProductInfo.IsLabelPrint || ProductInfo.IsBarcodePrint || serialReg) {
                 LoadSettings();
             }
         }
