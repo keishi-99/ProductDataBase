@@ -261,9 +261,6 @@ namespace ProductDatabase {
                 commandText = $@"SELECT MAX(ID) FROM ""{ProductInfo.CategoryName}_Substrate"";";
                 rowId = ExecuteScalar(connection, commandText).ToString() ?? string.Empty;
 
-                // バックアップ作成
-                CommonUtils.BackupManager.CreateBackup();
-
                 // ログ出力
                 var number = QuantityCheckBox.Checked ? quantity : 0 - defectNumber;
 
@@ -283,6 +280,9 @@ namespace ProductDatabase {
                 CommonUtils.Logger.AppendLog(logMessageArray);
 
                 transaction.Commit();
+
+                // バックアップ作成
+                CommonUtils.BackupManager.CreateBackup();
 
                 return true;
             } catch (Exception ex) {
