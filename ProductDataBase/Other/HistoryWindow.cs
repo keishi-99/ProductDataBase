@@ -379,18 +379,18 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["SubstrateName"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SubstrateModel"].ReadOnly = true;
                     DataBaseDataGridView.Columns["Decrease"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["UsedProductType"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["UsedProductNumber"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["UsedOrderNumber"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["ProductType"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["ProductNumber"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["OrderNumber"].ReadOnly = true;
                     DataBaseDataGridView.Columns["UseID"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ID"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["StockName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SubstrateName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SubstrateModel"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["Decrease"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["UsedProductType"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["UsedProductNumber"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["UsedOrderNumber"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["ProductType"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["ProductNumber"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["OrderNumber"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["UseID"].DefaultCellStyle.ForeColor = Color.Red;
                     break;
                 case "Product":
