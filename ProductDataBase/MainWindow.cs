@@ -27,10 +27,11 @@ namespace ProductDatabase {
             public string Proness3 { get; set; } = string.Empty;
             public int Proness4 { get; set; }
             public string Proness5 { get; set; } = string.Empty;
-            public List<string> Category11 { get; set; } = [];
-            public List<string> Category12 { get; set; } = [];
-            public List<string> Category13 { get; set; } = [];
-            public List<string> Category14 { get; set; } = [];
+            public List<string> CategoryItemNumber { get; set; } = [];
+            public List<string> CategoryProductName { get; set; } = [];
+            public List<string> CategorySubstrateName { get; set; } = [];
+            public List<string> CategoryProductType { get; set; } = [];
+            public List<string> CategoryType { get; set; } = [];
             public int RadioButtonFlg { get; set; }
             public string FontName { get; } = "Meiryo UI";
             public int FontSize { get; set; } = 9;
@@ -119,10 +120,10 @@ namespace ProductDatabase {
                 Proness3 = string.Empty;
                 Proness4 = 0;
                 Proness5 = string.Empty;
-                Category11 = [];
-                Category12 = [];
-                Category13 = [];
-                Category14 = [];
+                CategoryItemNumber = [];
+                CategoryProductType = [];
+                CategoryProductName = [];
+                CategoryType = [];
                 OrderNumber = string.Empty;
                 ProductNumber = string.Empty;
                 RegDate = string.Empty;
@@ -149,11 +150,6 @@ namespace ProductDatabase {
         }
 
         public ProductInformation ProductInfo { get; set; } = new();
-
-        private string _strCategory12 = string.Empty;
-        private string _strCategory13 = string.Empty;
-        private string _strCategory14 = string.Empty;
-
 
         public MainWindow() {
             InitializeComponent();
@@ -563,7 +559,7 @@ namespace ProductDatabase {
                 FetchDataFromSQLite();
 
                 var listIndex = 0;
-                if (ProductInfo.Category11.Count >= 2) {
+                if (ProductInfo.CategoryItemNumber.Count >= 2) {
                     listIndex = ShowDialogWindowForMultipleItems();
                 }
 
@@ -581,10 +577,10 @@ namespace ProductDatabase {
             CategoryListBox1.Items.Clear();
             CategoryListBox2.Items.Clear();
             CategoryListBox3.Items.Clear();
-            ProductInfo.Category11.Clear();
-            ProductInfo.Category12.Clear();
-            ProductInfo.Category13.Clear();
-            ProductInfo.Category14.Clear();
+            ProductInfo.CategoryItemNumber.Clear();
+            ProductInfo.CategoryProductType.Clear();
+            ProductInfo.CategoryProductName.Clear();
+            ProductInfo.CategoryType.Clear();
             ResetFields();
             Enabled = false;
         }
@@ -661,23 +657,24 @@ namespace ProductDatabase {
                 var colProItemNumber = dr["ProItemNumber"].ToString() ?? string.Empty;
 
                 if (!string.IsNullOrWhiteSpace(colSubItemNumber)) {
-                    var substrateName = dr["SubstrateName"]?.ToString() ?? string.Empty;
                     var productName = dr["sName"]?.ToString() ?? string.Empty;
-                    AddToLists(colSubItemNumber, substrateName, productName, "1");
+                    var substrateName = dr["SubstrateName"]?.ToString() ?? string.Empty;
+                    AddToLists(colSubItemNumber, productName, string.Empty, substrateName, "1");
                 }
 
                 if (!string.IsNullOrWhiteSpace(colProItemNumber)) {
-                    var productType = dr["ProductType"]?.ToString() ?? string.Empty;
                     var productName = dr["pName"]?.ToString() ?? string.Empty;
-                    AddToLists(colProItemNumber, productType, productName, "2");
+                    var productType = dr["ProductType"]?.ToString() ?? string.Empty;
+                    AddToLists(colProItemNumber, productName, productType, string.Empty, "2");
                 }
             }
         }
-        private void AddToLists(string itemNumber, string category12, string category13, string category14) {
-            ProductInfo.Category11.Add(itemNumber);
-            ProductInfo.Category12.Add(category12);
-            ProductInfo.Category13.Add(category13);
-            ProductInfo.Category14.Add(category14);
+        private void AddToLists(string itemNumber, string productName, string productType, string substrateName, string type) {
+            ProductInfo.CategoryItemNumber.Add(itemNumber);
+            ProductInfo.CategoryProductName.Add(productName);
+            ProductInfo.CategoryProductType.Add(productType);
+            ProductInfo.CategorySubstrateName.Add(substrateName);
+            ProductInfo.CategoryType.Add(type);
         }
         private int ShowDialogWindowForMultipleItems() {
             using SeveralDialogWindow window = new(ProductInfo);
@@ -685,28 +682,29 @@ namespace ProductDatabase {
             return window.SelectedIndex;
         }
         private void HandleSelectedItem(int listIndex) {
-            _strCategory12 = ProductInfo.Category12[listIndex];
-            _strCategory13 = ProductInfo.Category13[listIndex];
-            _strCategory14 = ProductInfo.Category14[listIndex];
+            var productName = ProductInfo.CategoryProductName[listIndex];
+            var productType = ProductInfo.CategoryProductType[listIndex];
+            var substrateName = ProductInfo.CategorySubstrateName[listIndex];
+            var type = ProductInfo.CategoryType[listIndex];
 
-            switch (_strCategory14) {
+            switch (type) {
                 case "1":
-                    HandleSubstrateSelection();
+                    HandleSubstrateSelection(productName, substrateName);
                     break;
                 case "2":
-                    HandleProductSelection();
+                    HandleProductSelection(productName, productType);
                     break;
                 default:
                     throw new Exception($"一致する情報がありません。{Environment.NewLine}品目番号:{ProductInfo.Proness2}{Environment.NewLine}");
             }
         }
-        private void HandleSubstrateSelection() {
+        private void HandleSubstrateSelection(string productName, string substrateName) {
             using (SQLiteConnection con = new(GetConnectionInformation())) {
                 using SQLiteDataAdapter adapter = new("""SELECT * FROM Substrate;""", con);
                 adapter.Fill(ProductInfo.ProductDataTable);
             }
 
-            var substrateRet = ProductInfo.ProductDataTable.Select($"ProductName = '{_strCategory13}' AND SubstrateName = '{_strCategory12}'");
+            var substrateRet = ProductInfo.ProductDataTable.Select($"ProductName = '{productName}' AND SubstrateName = '{substrateName}'");
             OpenSubstrateRegistrationWindow(substrateRet);
         }
         private void OpenSubstrateRegistrationWindow(DataRow[] substrateRet) {
@@ -722,13 +720,13 @@ namespace ProductDatabase {
             using SubstrateRegistrationWindow window = new(ProductInfo);
             window.ShowDialog(this);
         }
-        private void HandleProductSelection() {
+        private void HandleProductSelection(string productName, string productType) {
             using (SQLiteConnection con = new(GetConnectionInformation())) {
                 using SQLiteDataAdapter adapter = new("""SELECT * FROM Product;""", con);
                 adapter.Fill(ProductInfo.ProductDataTable);
             }
 
-            var productRet = ProductInfo.ProductDataTable.Select($"ProductName = '{_strCategory13}' AND ProductType = '{_strCategory12}'");
+            var productRet = ProductInfo.ProductDataTable.Select($"ProductName = '{productName}' AND ProductType = '{productType}'");
             OpenProductRegistrationWindow(productRet);
         }
         private void OpenProductRegistrationWindow(DataRow[] productRet) {
