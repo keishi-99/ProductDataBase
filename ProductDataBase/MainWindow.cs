@@ -121,8 +121,9 @@ namespace ProductDatabase {
                 Proness4 = 0;
                 Proness5 = string.Empty;
                 CategoryItemNumber = [];
-                CategoryProductType = [];
                 CategoryProductName = [];
+                CategoryProductType = [];
+                CategorySubstrateName = [];
                 CategoryType = [];
                 OrderNumber = string.Empty;
                 ProductNumber = string.Empty;
