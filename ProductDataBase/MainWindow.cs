@@ -149,8 +149,6 @@ namespace ProductDatabase {
         private string _strCategory13 = string.Empty;
         private string _strCategory14 = string.Empty;
 
-        private static string[]? s_userNames = []; // ユーザーを保持する静的変数
-        private static string[]? s_adminUserNames = []; // ユーザーを保持する静的変数
         private bool _isAuthorizedUser = false;
 
         public MainWindow() {
@@ -226,14 +224,14 @@ namespace ProductDatabase {
                 }
 
                 // 認証ユーザー名を取得
-                s_userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];
+                var userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];
                 // 現在のユーザー名がリストに含まれるかチェック
-                _isAuthorizedUser = s_userNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
+                _isAuthorizedUser = userNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
 
                 // 管理者ユーザー名を取得
-                s_adminUserNames = config.GetSection("Administrator").Get<string[]>() ?? [];
+                var adminUserNames = config.GetSection("Administrator").Get<string[]>() ?? [];
                 // 現在のユーザー名がリストに含まれるかチェック
-                Auth.IsAdministrator = s_adminUserNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
+                Auth.IsAdministrator = adminUserNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
 
                 QRCodePanel.Enabled = _isAuthorizedUser;
 
