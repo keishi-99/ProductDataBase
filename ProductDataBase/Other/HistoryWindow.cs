@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SQLite;
 using static ProductDatabase.MainWindow;
+using static ProductDatabase.Other.CommonUtils;
 
 namespace ProductDatabase {
     public partial class HistoryWindow : Form {
@@ -812,7 +813,7 @@ namespace ProductDatabase {
                 ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
                 ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
 
-                CommonUtils.GenerateReport(ProductInfo);
+                ReportGenerator.GenerateReport(ProductInfo);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -834,7 +835,7 @@ namespace ProductDatabase {
                 ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
                 ProductInfo.Comment = DataBaseDataGridView.Rows[selectRow].Cells["Comment"].Value.ToString() ?? string.Empty;
 
-                CommonUtils.GenerateList(ProductInfo);
+                ListGenerator.GenerateList(ProductInfo);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -854,7 +855,7 @@ namespace ProductDatabase {
                 ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
                 ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
 
-                CommonUtils.GenerateCheckSheetNPOI(ProductInfo);
+                CheckSheetGenerator.GenerateCheckSheetNPOI(ProductInfo);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);

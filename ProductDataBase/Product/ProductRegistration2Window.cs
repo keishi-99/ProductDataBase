@@ -4,6 +4,7 @@ using ProductDatabase.Product;
 using System.Data;
 using System.Data.SQLite;
 using static ProductDatabase.MainWindow;
+using static ProductDatabase.Other.CommonUtils;
 
 namespace ProductDatabase {
     public partial class ProductRegistration2Window : Form {
@@ -1184,7 +1185,8 @@ namespace ProductDatabase {
         // 成績書作成
         private void GenerateReport() {
             try {
-                CommonUtils.GenerateReport(ProductInfo);
+                //CommonUtils.GenerateReport(ProductInfo);
+                ReportGenerator.GenerateReport(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -1192,7 +1194,7 @@ namespace ProductDatabase {
         // リスト作成
         private void GenerateList() {
             try {
-                CommonUtils.GenerateList(ProductInfo);
+                ListGenerator.GenerateList(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -1200,7 +1202,7 @@ namespace ProductDatabase {
         // チェックシート作成
         private void GenerateCheckSheet() {
             try {
-                CommonUtils.GenerateCheckSheetNPOI(ProductInfo);
+                CheckSheetGenerator.GenerateCheckSheetNPOI(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
