@@ -141,6 +141,11 @@ namespace ProductDatabase {
             public static bool IsAdministrator {
                 get => s_isAdministrator; set => s_isAdministrator = value;
             }
+
+            private static bool s_isAuthorizedUser = false;
+            public static bool IsAuthorizedUser {
+                get => s_isAuthorizedUser; set => s_isAuthorizedUser = value;
+            }
         }
 
         public ProductInformation ProductInfo { get; set; } = new();
@@ -149,7 +154,6 @@ namespace ProductDatabase {
         private string _strCategory13 = string.Empty;
         private string _strCategory14 = string.Empty;
 
-        private bool _isAuthorizedUser = false;
 
         public MainWindow() {
             InitializeComponent();
@@ -226,14 +230,14 @@ namespace ProductDatabase {
                 // 認証ユーザー名を取得
                 var userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];
                 // 現在のユーザー名がリストに含まれるかチェック
-                _isAuthorizedUser = userNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
+                Auth.IsAuthorizedUser = userNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
 
                 // 管理者ユーザー名を取得
                 var adminUserNames = config.GetSection("Administrator").Get<string[]>() ?? [];
                 // 現在のユーザー名がリストに含まれるかチェック
                 Auth.IsAdministrator = adminUserNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
 
-                QRCodePanel.Enabled = _isAuthorizedUser;
+                QRCodePanel.Enabled = Auth.IsAuthorizedUser;
 
                 RegisterButton.Enabled = false;
                 HistoryButton.Enabled = false;
@@ -519,7 +523,7 @@ namespace ProductDatabase {
         private void CategoryListBox3Select() {
             try {
                 if (CategoryListBox3.SelectedIndex == -1) { return; }
-                RegisterButton.Enabled = _isAuthorizedUser;
+                RegisterButton.Enabled = Auth.IsAuthorizedUser;
                 HistoryButton.Enabled = true;
 
                 switch (ProductInfo.RadioButtonFlg) {
