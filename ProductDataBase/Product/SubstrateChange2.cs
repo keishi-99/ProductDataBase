@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SQLite;
 using static ProductDatabase.MainWindow;
+using static ProductDatabase.Other.CommonUtils;
 
 namespace ProductDatabase {
     public partial class SubstrateChange2 : Form {
@@ -492,7 +493,7 @@ namespace ProductDatabase {
         // リスト印刷
         private void GenerateList() {
             try {
-                CommonUtils.GenerateList(ProductInfo);
+                ListGenerator.GenerateList(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }

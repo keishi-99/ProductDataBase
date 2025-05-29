@@ -117,127 +117,283 @@ namespace ProductDatabase.Other {
                 }
             }
         }
-        // 成績書作成
-        public static void GenerateReport(ProductInformation productInfo) {
-            try {
+        // CapsLockがオンになっていたらCapsLockを解除する
+        public static partial class Keyboard {
+            private const byte VK_CAPITAL = 0x14; // CapsLock の仮想キーコード
+            private const int KEYEVENTF_EXTENDEDKEY = 0x1;
+            private const int KEYEVENTF_KEYUP = 0x2;
+
+            // CapsLock の状態を切り替える
+            public static void CapsDisable() {
+                if (Control.IsKeyLocked(Keys.CapsLock)) {
+                    NativeMethods.keybd_event(VK_CAPITAL, 0, KEYEVENTF_EXTENDEDKEY, 0);
+                    NativeMethods.keybd_event(VK_CAPITAL, 0, KEYEVENTF_KEYUP, 0);
+                }
+            }
+        }
+
+        // 成績書生成データを保持するクラス
+        public class ReportConfig {
+            public required string DirectoryPath { get; set; }
+            public required string FileName { get; set; }
+            public required string FileExtension { get; set; }
+            public required string SearchFileName { get; set; }
+            public required string SheetName { get; set; }
+            public string? ProductNumberRange { get; set; }
+            public string? OrderNumberRange { get; set; }
+            public string? QuantityRange { get; set; }
+            public string? SerialFirstRange { get; set; }
+            public string? SerialLastRange { get; set; }
+            public string? ProductModelRange { get; set; }
+            public string? SaveDirectory { get; set; }
+        }
+        // 成績書生成
+        public static class ReportGenerator {
+            // レポートを生成するメインメソッド
+            public static void GenerateReport(ProductInformation productInfo) {
+                try {
+                    // 1. 設定ファイルを読み込み、レポート設定を取得
+                    var configWorkbook = LoadConfigWorkbook();
+                    var reportConfig = GetReportConfig(configWorkbook, productInfo.ProductModel);
+
+                    // 2. レポートテンプレートを読み込み
+                    var reportWorkbook = LoadReportTemplate(reportConfig.DirectoryPath, reportConfig.SearchFileName);
+
+                    // 3. レポートシートにデータを挿入
+                    PopulateReportSheet(reportWorkbook, productInfo, reportConfig);
+
+                    // 4. レポートを保存
+                    SaveReport(reportWorkbook, productInfo, reportConfig);
+
+                    MessageBox.Show("成績書が正常に生成されました。", "完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                } catch (Exception ex) {
+                    // エラーメッセージをユーザーに表示
+                    MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            // 設定Excelワークブックを読み込む
+            private static ExcelPackage LoadConfigWorkbook() {
                 var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsx");
-                using FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using var workBookConfig = new ExcelPackage(fileStreamConfig);
-                //既存ワークシートを取得（workBookはExcelWorkbookクラスオブジェト）
-                var sheet = workBookConfig.Workbook.Worksheets;
-                var targetSheetName = "Sheet1";
-                var workSheetMain = sheet[targetSheetName];
+                if (!File.Exists(configPath)) {
+                    throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
+                }
+
+                try {
+                    FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    return new ExcelPackage(fileStreamConfig);
+                } catch (Exception ex) {
+                    throw new Exception($"設定ファイルの読み込み中にエラーが発生しました: {ex.Message}", ex);
+                }
+            }
+
+            // 設定ワークブックから製品に対応する設定を抽出する
+            private static ReportConfig GetReportConfig(ExcelPackage configWorkbook, string productModel) {
+                var workSheetMain = configWorkbook.Workbook.Worksheets["Sheet1"] ?? throw new Exception("設定ファイルに 'Sheet1' が見つかりません。");
 
                 // セル検索
-                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == productInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{productInfo.ProductModel}]が見つかりません。");
+                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == productModel)
+                    ?? throw new Exception($"Configに品目番号:[{productModel}]が見つかりません。");
                 var searchAddressResultRow = searchAddressResult.Start.Row;
 
-                // ワークシートのセルから値を取得
+                // ワークシートのセルから値を取得し、ReportConfigオブジェクトに格納
                 var directoryPath = workSheetMain.Cells[searchAddressResultRow, 3].Value?.ToString()?.Trim('"');
                 if (string.IsNullOrWhiteSpace(directoryPath)) { throw new Exception("Configのファイルパスが無効です。"); }
                 if (!Directory.Exists(directoryPath)) { throw new FileNotFoundException($"指定されたフォルダが存在しません: {directoryPath}"); }
 
-                var searchName = workSheetMain.Cells[searchAddressResultRow, 4].Value.ToString()?.Trim('"');
+                var searchName = workSheetMain.Cells[searchAddressResultRow, 4].Value?.ToString()?.Trim('"');
                 if (string.IsNullOrWhiteSpace(searchName)) { throw new Exception("Configのファイル名が無効です。"); }
 
                 var filePaths = Directory.GetFiles(directoryPath, $"*{searchName}*", SearchOption.TopDirectoryOnly);
                 var filePath = filePaths[0];
                 var fileName = Path.GetFileNameWithoutExtension(filePath);
-                var fileExtension = Path.GetExtension(filePath).ToLower(); // 開いたファイルの拡張子取得
+                var fileExtension = Path.GetExtension(filePath).ToLower();
 
-                var sheetName = !string.IsNullOrEmpty(workSheetMain.Cells[searchAddressResultRow, 5].Value.ToString())
-                    ? workSheetMain.Cells[searchAddressResultRow, 5].Value.ToString()
-                    : throw new Exception("シート名がありません。");
-                var productNumberRange = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString();
-                var orderNumberRange = workSheetMain.Cells[searchAddressResultRow, 7].Value?.ToString();
-                var quantityRange = workSheetMain.Cells[searchAddressResultRow, 8].Value?.ToString();
-                var serialFirstRange = workSheetMain.Cells[searchAddressResultRow, 9].Value?.ToString();
-                var serialLastRange = workSheetMain.Cells[searchAddressResultRow, 10].Value?.ToString();
-                var productModelRange = workSheetMain.Cells[searchAddressResultRow, 11].Value?.ToString();
-                var saveDirectory = workSheetMain.Cells[searchAddressResultRow, 12].Value?.ToString();
-                using FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using var workBookReport = new ExcelPackage(fileStreamReport);
-                var reportSheet = workBookReport.Workbook.Worksheets;
+                var sheetName = workSheetMain.Cells[searchAddressResultRow, 5].Value?.ToString();
+                return string.IsNullOrWhiteSpace(sheetName)
+                    ? throw new Exception("シート名がありません。")
+                    : new ReportConfig {
+                        DirectoryPath = directoryPath,
+                        FileName = fileName,
+                        FileExtension = fileExtension,
+                        SearchFileName = searchName,
+                        SheetName = sheetName,
+                        ProductNumberRange = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString() ?? string.Empty,
+                        OrderNumberRange = workSheetMain.Cells[searchAddressResultRow, 7].Value?.ToString() ?? string.Empty,
+                        QuantityRange = workSheetMain.Cells[searchAddressResultRow, 8].Value?.ToString() ?? string.Empty,
+                        SerialFirstRange = workSheetMain.Cells[searchAddressResultRow, 9].Value?.ToString() ?? string.Empty,
+                        SerialLastRange = workSheetMain.Cells[searchAddressResultRow, 10].Value?.ToString() ?? string.Empty,
+                        ProductModelRange = workSheetMain.Cells[searchAddressResultRow, 11].Value?.ToString() ?? string.Empty,
+                        SaveDirectory = workSheetMain.Cells[searchAddressResultRow, 12].Value?.ToString() ?? string.Empty
+                    };
+            }
+
+            // レポートテンプレートExcelワークブックを読み込む
+            private static ExcelPackage LoadReportTemplate(string directoryPath, string searchFileName) {
+                var filePaths = Directory.GetFiles(directoryPath, $"*{searchFileName}*", SearchOption.TopDirectoryOnly);
+                if (filePaths.Length == 0) {
+                    throw new FileNotFoundException($"指定されたファイル名 '{searchFileName}' のファイルが '{directoryPath}' に見つかりません。");
+                }
+                var filePath = filePaths[0]; // 最初のファイルを使用
+
+                try {
+                    FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    return new ExcelPackage(fileStreamReport);
+                } catch (Exception ex) {
+                    throw new Exception($"レポートテンプレートの読み込み中にエラーが発生しました: {ex.Message}", ex);
+                }
+            }
+
+            // レポートシートに製品情報を挿入する
+            private static void PopulateReportSheet(ExcelPackage reportWorkbook, ProductInformation productInfo, ReportConfig config) {
+                var workSheetTemp = reportWorkbook.Workbook.Worksheets[config.SheetName] ?? throw new Exception($"シート '{config.SheetName}' が見つかりません。");
 
                 // セルに値を挿入
-                var workSheetTemp = reportSheet[sheetName];
-                if (!string.IsNullOrEmpty(productNumberRange) && !string.IsNullOrEmpty(productInfo.ProductNumber)) {
-                    var productNumbers = productInfo.ProductNumber.Split("-");
-                    workSheetTemp.Cells[productNumberRange].Value = productNumbers[0];
+                if (!string.IsNullOrEmpty(config.ProductNumberRange) && !string.IsNullOrEmpty(productInfo.ProductNumber)) {
+                    var productNumbers = productInfo.ProductNumber.Split('-');
+                    workSheetTemp.Cells[config.ProductNumberRange].Value = productNumbers[0];
                 }
-                if (!string.IsNullOrEmpty(orderNumberRange) && !string.IsNullOrEmpty(productInfo.OrderNumber)) {
-                    workSheetTemp.Cells[orderNumberRange].Value = productInfo.OrderNumber;
+                if (!string.IsNullOrEmpty(config.OrderNumberRange) && !string.IsNullOrEmpty(productInfo.OrderNumber)) {
+                    workSheetTemp.Cells[config.OrderNumberRange].Value = productInfo.OrderNumber;
                 }
-                if (!string.IsNullOrEmpty(quantityRange) && productInfo.Quantity != 0) {
-                    workSheetTemp.Cells[quantityRange].Value = productInfo.Quantity;
+                if (!string.IsNullOrEmpty(config.QuantityRange) && productInfo.Quantity != 0) {
+                    workSheetTemp.Cells[config.QuantityRange].Value = productInfo.Quantity;
                 }
-                if (!string.IsNullOrEmpty(serialFirstRange) && !string.IsNullOrEmpty(productInfo.SerialFirst)) {
-                    workSheetTemp.Cells[serialFirstRange].Value = productInfo.SerialFirst;
+                if (!string.IsNullOrEmpty(config.SerialFirstRange) && !string.IsNullOrEmpty(productInfo.SerialFirst)) {
+                    workSheetTemp.Cells[config.SerialFirstRange].Value = productInfo.SerialFirst;
                 }
-                if (!string.IsNullOrEmpty(serialLastRange) && !string.IsNullOrEmpty(productInfo.SerialLast)) {
-                    workSheetTemp.Cells[serialLastRange].Value = productInfo.SerialLast;
+                if (!string.IsNullOrEmpty(config.SerialLastRange) && !string.IsNullOrEmpty(productInfo.SerialLast)) {
+                    workSheetTemp.Cells[config.SerialLastRange].Value = productInfo.SerialLast;
                 }
-                if (!string.IsNullOrEmpty(productModelRange) && !string.IsNullOrEmpty(productInfo.ProductModel)) {
-                    workSheetTemp.Cells[productModelRange].Value = productInfo.ProductModel;
+                if (!string.IsNullOrEmpty(config.ProductModelRange) && !string.IsNullOrEmpty(productInfo.ProductModel)) {
+                    workSheetTemp.Cells[config.ProductModelRange].Value = productInfo.ProductModel;
                 }
+            }
 
-                // ダイアログで保存先を選択
+            // 変更されたレポートをファイルに保存する
+            private static void SaveReport(ExcelPackage reportWorkbook, ProductInformation productInfo, ReportConfig config) {
+                var fileName = config.FileName;
+                var fileExtension = config.FileExtension;
+                var initialDirectory = config.SaveDirectory;
+
                 using SaveFileDialog saveFileDialog = new() {
                     Filter = $"Excel Files (*{fileExtension})|*{fileExtension}|All Files (*.*)|*.*",
                     FileName = $"{fileName} のコピー{productInfo.ProductNumber}{fileExtension}",
                     Title = "保存先を選択してください",
-                    InitialDirectory = saveDirectory
+                    InitialDirectory = initialDirectory ?? Environment.CurrentDirectory // Nullの場合はデフォルトディレクトリを使用
                 };
+
                 if (saveFileDialog.ShowDialog() == DialogResult.OK) {
                     var outputPath = saveFileDialog.FileName;
                     var fileInfo = new FileInfo(outputPath);
-                    workBookReport.SaveAs(fileInfo);
+                    reportWorkbook.SaveAs(fileInfo);
                 }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                else {
+                    // ユーザーが保存をキャンセルした場合の処理
+                    throw new OperationCanceledException("キャンセルされました。");
+                }
             }
         }
+
         // リスト生成
-        public static void GenerateList(ProductInformation productInfo) {
-            try {
-                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsx");
-                using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using var workBook = new ExcelPackage(fileStream);
-                //既存ワークシートを取得（workBookはExcelWorkbookクラスオブジェクト）
+        public static class ListGenerator {
+            // メインのオーケストレーションメソッド
+            public static void GenerateList(ProductInformation productInfo) {
+                try {
+                    // 1. Excel設定の読み込みとワークブックの準備
+                    var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsx");
+                    using var workBook = new ExcelPackage(new FileInfo(configPath));
+                    var (targetSheetName, resultRow, workSheetMain) = LoadExcelConfiguration(workBook, productInfo.ProductModel);
+
+                    // 2. 製品情報の設定とExcelへの書き込み
+                    var productCellRanges = GetProductCellRanges(workSheetMain, resultRow);
+                    var workSheetTemp = workBook.Workbook.Worksheets[targetSheetName] ?? throw new Exception($"テンプレートシート:[{targetSheetName}]が見つかりません。");
+                    PopulateProductDetails(workSheetTemp, productInfo, productCellRanges);
+
+                    // 3. データベースから使用済み基板情報を取得
+                    var usedSubstrate = GetUsedSubstrateData(productInfo);
+
+                    // 4. 基板情報のExcelへの書き込み
+                    UpdateSubstrateDetailsInExcel(workSheetMain, workSheetTemp, resultRow, usedSubstrate);
+
+                    // 5. QRコードの生成と埋め込み
+                    if (!string.IsNullOrEmpty(productCellRanges.QrCodeRange)) {
+                        GenerateAndEmbedQrCode(workSheetTemp, productInfo, productCellRanges.QrCodeRange);
+                    }
+
+                    // 6. Excelファイルの保存と印刷
+                    var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyList.xlsx");
+                    SaveAndPrintExcel(workBook, temporarilyPath, targetSheetName);
+                } catch (Exception ex) {
+                    MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            // Excel設定を読み込むメソッド
+            private static (string sheetName, int resultRow, ExcelWorksheet workSheetMain) LoadExcelConfiguration(ExcelPackage workBook, string productModel) {
                 var sheet = workBook.Workbook.Worksheets;
                 var targetSheetName = "Sheet1";
-                var workSheetMain = sheet[targetSheetName];
+                var workSheetMain = sheet[targetSheetName] ?? throw new Exception($"設定シート:[{targetSheetName}]が見つかりません。");
 
                 // セル検索
-                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == productInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{productInfo.ProductModel}]が見つかりません。");
+                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == productModel)
+                                          ?? throw new Exception($"Configに品目番号:[{productModel}]が見つかりません。");
                 var resultRow = searchAddressResult.Start.Row;
 
-                // ワークシートのセルから値を取得
-                var sheetName = workSheetMain.Cells[resultRow, 2].Value?.ToString();
-                var productName = workSheetMain.Cells[resultRow, 3].Value?.ToString();
-                var productNameRange = workSheetMain.Cells[resultRow, 4].Value?.ToString();
-                var productNumberRange = workSheetMain.Cells[resultRow, 5].Value?.ToString();
-                var orderNumberRange = workSheetMain.Cells[resultRow, 6].Value?.ToString();
-                var regDateRange = workSheetMain.Cells[resultRow, 7].Value?.ToString();
-                var productModel = workSheetMain.Cells[resultRow, 8].Value?.ToString();
-                var productModelRange = workSheetMain.Cells[resultRow, 9].Value?.ToString();
-                var quantityRange = workSheetMain.Cells[resultRow, 10].Value?.ToString();
-                var serialFirstRange = workSheetMain.Cells[resultRow, 11].Value?.ToString();
-                var serialLastRange = workSheetMain.Cells[resultRow, 12].Value?.ToString();
-                var commentRange = workSheetMain.Cells[resultRow, 13].Value?.ToString();
-                var qrCodeRange = workSheetMain.Cells[resultRow, 14].Value?.ToString();
+                var sheetName = workSheetMain.Cells[resultRow, 2].Value?.ToString()
+                                ?? throw new Exception($"設定シートの行 {resultRow}, 列 2 にシート名が設定されていません。");
 
-                var workSheetTemp = sheet[sheetName];
-                if (!string.IsNullOrEmpty(productNameRange)) { workSheetTemp.Cells[productNameRange].Value = productName; }
-                if (!string.IsNullOrEmpty(productNumberRange)) { workSheetTemp.Cells[productNumberRange].Value = productInfo.ProductNumber; }
-                if (!string.IsNullOrEmpty(orderNumberRange)) { workSheetTemp.Cells[orderNumberRange].Value = productInfo.OrderNumber; }
-                if (!string.IsNullOrEmpty(regDateRange)) { workSheetTemp.Cells[regDateRange].Value = productInfo.RegDate; }
-                if (!string.IsNullOrEmpty(productModelRange)) { workSheetTemp.Cells[productModelRange].Value = productInfo.ProductModel; }
-                if (!string.IsNullOrEmpty(quantityRange)) { workSheetTemp.Cells[quantityRange].Value = productInfo.Quantity; }
-                if (!string.IsNullOrEmpty(serialFirstRange)) { workSheetTemp.Cells[serialFirstRange].Value = productInfo.SerialFirst; }
-                if (!string.IsNullOrEmpty(serialLastRange)) { workSheetTemp.Cells[serialLastRange].Value = productInfo.SerialLast; }
-                if (!string.IsNullOrEmpty(commentRange)) { workSheetTemp.Cells[commentRange].Value = productInfo.Comment; }
+                return (sheetName, resultRow, workSheetMain);
+            }
 
+            // 製品情報に関連するExcelのセル範囲を取得するヘルパーメソッド
+            private static ProductCellRanges GetProductCellRanges(ExcelWorksheet workSheetMain, int resultRow) {
+                return new ProductCellRanges {
+                    ProductNameRange = workSheetMain.Cells[resultRow, 4].Value?.ToString() ?? string.Empty,
+                    ProductNumberRange = workSheetMain.Cells[resultRow, 5].Value?.ToString() ?? string.Empty,
+                    OrderNumberRange = workSheetMain.Cells[resultRow, 6].Value?.ToString() ?? string.Empty,
+                    RegDateRange = workSheetMain.Cells[resultRow, 7].Value?.ToString() ?? string.Empty,
+                    ProductModelConfig = workSheetMain.Cells[resultRow, 8].Value?.ToString() ?? string.Empty,
+                    ProductModelRange = workSheetMain.Cells[resultRow, 9].Value?.ToString() ?? string.Empty,
+                    QuantityRange = workSheetMain.Cells[resultRow, 10].Value?.ToString() ?? string.Empty,
+                    SerialFirstRange = workSheetMain.Cells[resultRow, 11].Value?.ToString() ?? string.Empty,
+                    SerialLastRange = workSheetMain.Cells[resultRow, 12].Value?.ToString() ?? string.Empty,
+                    CommentRange = workSheetMain.Cells[resultRow, 13].Value?.ToString() ?? string.Empty,
+                    QrCodeRange = workSheetMain.Cells[resultRow, 14].Value?.ToString() ?? string.Empty
+                };
+            }
+
+            // ProductCellRanges クラスを定義
+            private class ProductCellRanges {
+                public string? ProductNameRange { get; set; }
+                public string? ProductNumberRange { get; set; }
+                public string? OrderNumberRange { get; set; }
+                public string? RegDateRange { get; set; }
+                public string? ProductModelConfig { get; set; }
+                public string? ProductModelRange { get; set; }
+                public string? QuantityRange { get; set; }
+                public string? SerialFirstRange { get; set; }
+                public string? SerialLastRange { get; set; }
+                public string? CommentRange { get; set; }
+                public string? QrCodeRange { get; set; }
+            }
+
+
+            // 製品情報をExcelシートに書き込むメソッド
+            private static void PopulateProductDetails(ExcelWorksheet workSheetTemp, ProductInformation productInfo, ProductCellRanges ranges) {
+                if (!string.IsNullOrEmpty(ranges.ProductNameRange)) { workSheetTemp.Cells[ranges.ProductNameRange].Value = productInfo.ProductModel; } // ProductNameはProductModelから取得
+                if (!string.IsNullOrEmpty(ranges.ProductNumberRange)) { workSheetTemp.Cells[ranges.ProductNumberRange].Value = productInfo.ProductNumber; }
+                if (!string.IsNullOrEmpty(ranges.OrderNumberRange)) { workSheetTemp.Cells[ranges.OrderNumberRange].Value = productInfo.OrderNumber; }
+                if (!string.IsNullOrEmpty(ranges.RegDateRange)) { workSheetTemp.Cells[ranges.RegDateRange].Value = productInfo.RegDate; }
+                if (!string.IsNullOrEmpty(ranges.ProductModelRange)) { workSheetTemp.Cells[ranges.ProductModelRange].Value = productInfo.ProductModel; }
+                if (!string.IsNullOrEmpty(ranges.QuantityRange)) { workSheetTemp.Cells[ranges.QuantityRange].Value = productInfo.Quantity; }
+                if (!string.IsNullOrEmpty(ranges.SerialFirstRange)) { workSheetTemp.Cells[ranges.SerialFirstRange].Value = productInfo.SerialFirst; }
+                if (!string.IsNullOrEmpty(ranges.SerialLastRange)) { workSheetTemp.Cells[ranges.SerialLastRange].Value = productInfo.SerialLast; }
+                if (!string.IsNullOrEmpty(ranges.CommentRange)) { workSheetTemp.Cells[ranges.CommentRange].Value = productInfo.Comment; }
+            }
+
+            // データベースから使用済み基板情報を取得するメソッド
+            private static List<(string SubstrateModel, List<string> SubstrateNumbers, List<int> Decreases)> GetUsedSubstrateData(ProductInformation productInfo) {
                 List<(string, List<string>, List<int>)> usedSubstrate = [];
 
                 using SQLiteConnection con = new(GetConnectionRegistration());
@@ -265,171 +421,269 @@ namespace ProductDatabase.Other {
                     var substrateNumber = dr.GetString(1);
                     var decrease = -1 * dr.GetInt32(2);
 
-                    // 既存の substrateModel を検索
-                    var existingSubstrate = usedSubstrate.FirstOrDefault(x => x.Item1 == substrateModel);
+                    // 既存の substrateModel を検索し、見つかればリストに追加、なければ新しいエントリを作成
+                    var existingSubstrateIndex = usedSubstrate.FindIndex(x => x.Item1 == substrateModel);
 
-                    if (existingSubstrate != default) {
-                        // 既存の substrateModel が見つかった場合、リストに追加
-                        existingSubstrate.Item2.Add(substrateNumber);
-                        existingSubstrate.Item3.Add(decrease);
+                    if (existingSubstrateIndex != -1) {
+                        usedSubstrate[existingSubstrateIndex].Item2.Add(substrateNumber);
+                        usedSubstrate[existingSubstrateIndex].Item3.Add(decrease);
                     }
                     else {
-                        // 既存の substrateModel が見つからなかった場合、新しいエントリを追加
                         List<string> substrateNumbers = [substrateNumber];
                         List<int> decreases = [decrease];
-                        (string, List<string>, List<int>) substrateData = (substrateModel, substrateNumbers, decreases);
-                        usedSubstrate.Add(substrateData);
+                        usedSubstrate.Add((substrateModel, substrateNumbers, decreases));
                     }
                 }
-                for (var i = 0; i <= usedSubstrate.Count - 1; i++) {
-                    var targetRow = resultRow; // 検索対象の行番号
-                    var searchValue = $"{usedSubstrate[i].Item1}";
+                return usedSubstrate;
+            }
+
+            // 基板情報をExcelシートに書き込むメソッド
+            private static void UpdateSubstrateDetailsInExcel(ExcelWorksheet workSheetMain, ExcelWorksheet workSheetTemp, int resultRow, List<(string SubstrateModel, List<string> SubstrateNumbers, List<int> Decreases)> usedSubstrate) {
+                foreach (var (substrateModel, substrateNumbers, decreases) in usedSubstrate) {
+                    var targetRow = resultRow;
+                    var searchValue = substrateModel;
                     var foundColumn = 0;
 
                     var searchAddressResult2 = workSheetMain.Cells
-                        .Where(x => x.Start.Row == targetRow && x.Value?.ToString() == searchValue)
-                        .FirstOrDefault();
+                                                .Where(x => x.Start.Row == targetRow && x.Value?.ToString() == searchValue)
+                                                .FirstOrDefault();
 
-                    if (searchAddressResult2 != null) {
-                        // セルが見つかった場合の処理
-                        foundColumn = searchAddressResult2.Start.Column;
-                    }
-                    if (foundColumn == 0) {
-                        throw new Exception($"{usedSubstrate[i]}が見つかりません。");
-                    }
-                    var mainCellValue = workSheetMain.Cells[resultRow, foundColumn + 1].Value.ToString();
-                    var tempCellValue = string.Join("    ", usedSubstrate[i].Item2.Select((subStrateNumber, k) => $"{subStrateNumber}({usedSubstrate[i].Item3[k]})"));
+                    foundColumn = searchAddressResult2 != null
+                        ? searchAddressResult2.Start.Column
+                        : throw new Exception($"Configに基板モデル:[{searchValue}]が見つかりません。");
+
+                    var mainCellValue = workSheetMain.Cells[resultRow, foundColumn + 1].Value?.ToString()
+                        ?? throw new Exception($"Configシートの行 {resultRow}, 列 {foundColumn + 1} にセル範囲が設定されていません。");
+
+                    var tempCellValue = string.Join("   ", substrateNumbers.Select((subStrateNumber, k) => $"{subStrateNumber}({decreases[k]})"));
 
                     workSheetTemp.Cells[mainCellValue].Value = tempCellValue;
                 }
+            }
 
-                // QRコード
-                if (!string.IsNullOrEmpty(qrCodeRange)) {
-                    BarcodeWriter<PixelData> qr = new() {
-                        Format = BarcodeFormat.QR_CODE,
-                        Options = new QrCodeEncodingOptions {
-                            ErrorCorrection = ErrorCorrectionLevel.L,
-                            CharacterSet = "Shift_JIS",
-                            Width = 100,
-                            Height = 100,
-                        },
-                        Renderer = new PixelDataRenderer {
-                            Foreground = new(Color.Gray.ToArgb()),
-                            Background = new(Color.White.ToArgb()),
-                        },
-                    };
+            // QRコードを生成し、Excelシートに埋め込むメソッド
+            private static void GenerateAndEmbedQrCode(ExcelWorksheet workSheetTemp, ProductInformation productInfo, string qrCodeRange) {
+                BarcodeWriter<PixelData> qr = new() {
+                    Format = BarcodeFormat.QR_CODE,
+                    Options = new QrCodeEncodingOptions {
+                        ErrorCorrection = ErrorCorrectionLevel.L,
+                        CharacterSet = "Shift_JIS",
+                        Width = 100,
+                        Height = 100,
+                    },
+                    Renderer = new PixelDataRenderer {
+                        Foreground = new(Color.Gray.ToArgb()),
+                        Background = new(Color.White.ToArgb()),
+                    },
+                };
 
-                    var pixelData = qr.Write($"{productInfo.OrderNumber};{productInfo.ProductNumber};{productModel};{productInfo.Quantity};{productInfo.SerialFirst};{productInfo.SerialLast}");
+                // QRコードのデータ文字列を構築
+                var qrData = $"{productInfo.OrderNumber};{productInfo.ProductNumber};{productInfo.ProductModel};{productInfo.Quantity};{productInfo.SerialFirst};{productInfo.SerialLast}";
+                var pixelData = qr.Write(qrData);
 
-                    // PixelData を Bitmap に変換
-                    using var bitmap = new Bitmap(pixelData.Width, pixelData.Height, PixelFormat.Format32bppArgb);
-                    var bmpData = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-                    System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bmpData.Scan0, pixelData.Pixels.Length);
-                    bitmap.UnlockBits(bmpData);
-                    using MemoryStream stream = new();
-                    bitmap.Save(stream, ImageFormat.Bmp);
+                // PixelData を Bitmap に変換
+                using var bitmap = new Bitmap(pixelData.Width, pixelData.Height, PixelFormat.Format32bppArgb);
+                var bmpData = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bmpData.Scan0, pixelData.Pixels.Length);
+                bitmap.UnlockBits(bmpData);
 
-                    var image = workSheetTemp.Drawings.AddPicture("QR", bitmap);
-                    image.SetPosition(workSheetTemp.Cells[qrCodeRange].Start.Row - 1, 0, workSheetTemp.Cells[qrCodeRange].Start.Column - 1, 0);
-                }
+                // Excelに画像を埋め込む
+                var image = workSheetTemp.Drawings.AddPicture("QR", bitmap);
+                // QRコードのセル範囲の左上隅に画像を配置
+                image.SetPosition(workSheetTemp.Cells[qrCodeRange].Start.Row - 1, 0, workSheetTemp.Cells[qrCodeRange].Start.Column - 1, 0);
+            }
 
-                //引数に保存先パスを指定
-                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyList.xlsx");
+            // Excelファイルを保存し、印刷処理を行うメソッド
+            private static void SaveAndPrintExcel(ExcelPackage workBook, string temporarilyPath, string sheetName) {
                 var fileInfo = new FileInfo(temporarilyPath);
                 workBook.SaveAs(fileInfo);
 
-                // 印刷
-                Microsoft.Office.Interop.Excel.Application xlApp = new() {
-                    Visible = true // Excelウィンドウを表示します。
-                };
+                // 印刷 (COM Interop)
+                Microsoft.Office.Interop.Excel.Application? xlApp = null;
+                Microsoft.Office.Interop.Excel.Workbooks? xlBooks = null;
+                Microsoft.Office.Interop.Excel.Workbook? xlBook = null;
+                Microsoft.Office.Interop.Excel.Sheets? xlSheets = null;
+                Microsoft.Office.Interop.Excel.Worksheet? xlSheet = null;
 
-                // ワークブック開く
-                var xlBooks = xlApp.Workbooks;
-                var xlBook = xlBooks.Open(temporarilyPath, ReadOnly: true);
+                try {
+                    xlApp = new Microsoft.Office.Interop.Excel.Application {
+                        Visible = true // Excelウィンドウを表示します。
+                    };
 
-                // ワークシート選択
-                var xlSheets = xlBook.Sheets;
-                Microsoft.Office.Interop.Excel.Worksheet xlSheet = xlSheets[sheetName];
+                    // ワークブック開く
+                    xlBooks = xlApp.Workbooks;
+                    xlBook = xlBooks.Open(temporarilyPath, ReadOnly: true);
 
-                // ワークシート表示
-                xlSheet.Activate();
+                    // ワークシート選択
+                    xlSheets = xlBook.Sheets;
+                    xlSheet = xlSheets[sheetName];
 
-                // ワークブックを閉じてExcelを終了
-                //xlBook.Close(false);
-                //xlApp.Quit();
+                    // ワークシート表示
+                    xlSheet.Activate();
 
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
+                    // 印刷処理が必要な場合は、ここに xlSheet.PrintOut() などを追加します。
+                    // 例: xlSheet.PrintOut();
 
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // ワークブックを閉じてExcelを終了 (必要に応じてコメント解除)
+                    // xlBook.Close(false);
+                    // xlApp.Quit();
+                } finally {
+                    // COMオブジェクトの解放
+                    if (xlSheet != null) {
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
+                    }
+
+                    if (xlSheets != null) {
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
+                    }
+
+                    if (xlBook != null) {
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook);
+                    }
+
+                    if (xlBooks != null) {
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks);
+                    }
+
+                    if (xlApp != null) {
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
+                    }
+                }
             }
         }
-        // チェックシート生成 EPPLUS + NPOI
-        public static void GenerateCheckSheetNPOI(ProductInformation productInfo) {
-            try {
-                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsx");
+
+        // チェックシート生成データを保持するクラス
+        public class CheckSheetConfigData {
+            public string? ProductModelRange { get; set; }
+            public string? ProductNumberRange { get; set; }
+            public string? OrderNumberRange { get; set; }
+            public string? QuantityRange { get; set; }
+            public string? SerialFirstRange { get; set; }
+            public string? SerialLastRange { get; set; }
+            public string? RegDateRange { get; set; }
+            public string? DateFormat { get; set; }
+            public string? RegTemperatureRange { get; set; }
+            public string? RegHumidityRange { get; set; }
+            public List<string> SheetNames { get; set; } = [];
+        }
+        // チェックシート生成
+        public static class CheckSheetGenerator {
+            // Excelチェックシートを生成し、データを書き込み、印刷します。
+            public static void GenerateCheckSheetNPOI(ProductInformation productInfo) {
+                try {
+                    // 設定ファイルのパスを構築
+                    var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsx");
+                    var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsx");
+
+                    // 1. 設定ファイルの読み込みとメインシートの取得
+                    // EPPlusを使用して設定ファイルを読み込み、必要な情報を抽出
+                    var excelData = LoadAndExtractConfig(configPath, productInfo);
+
+                    // 2. 温度・湿度入力ダイアログの表示と値の取得
+                    (var temperature, var humidity) = GetTemperatureAndHumidity(excelData);
+
+                    // 3. 日付のフォーマット
+                    var formattedDate = FormatDate(productInfo.RegDate, excelData.DateFormat);
+
+                    // 4. NPOIでExcelファイルを編集
+                    // 設定ファイルからNPOIワークブックを作成
+                    using (var workBookNPOI = WorkbookFactory.Create(configPath)) {
+                        // セル参照をCellReferenceオブジェクトとして作成
+                        var cellReferences = CreateCellReferences(excelData);
+
+                        // 各シートに対して値を書き込む
+                        PopulateExcelSheets(workBookNPOI, productInfo, cellReferences, temperature, humidity, formattedDate, excelData.SheetNames);
+
+                        // 不要なシートを非表示にする
+                        HideSheets(workBookNPOI, excelData.SheetNames);
+
+                        // ブックを保存
+                        SaveWorkbook(workBookNPOI, temporarilyPath);
+                    }
+
+                    // 5. Excel Interopを使用して印刷
+                    PrintExcelFile(temporarilyPath);
+                } catch (Exception ex) {
+                    // エラーメッセージを表示
+                    MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            // Excel設定ファイルを読み込み、メインシートから設定データを抽出します。
+            private static CheckSheetConfigData LoadAndExtractConfig(string configPath, ProductInformation productInfo) {
+                if (!File.Exists(configPath)) {
+                    throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
+                }
+
                 using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using var workBook = new ExcelPackage(fileStream);
-                //既存ワークシートを取得（workBookはExcelWorkbookクラスオブジェクト）
+
+                // 既存ワークシートを取得
                 var sheet = workBook.Workbook.Worksheets;
                 var targetSheetName = "Sheet1";
                 var workSheetMain = sheet[targetSheetName];
 
-                // セル検索
-                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == productInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{productInfo.ProductModel}]が見つかりません。");
+                // セル検索: ProductModelに基づいて行を特定
+                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == productInfo.ProductModel)
+                                          ?? throw new Exception($"Configに品目番号:[{productInfo.ProductModel}]が見つかりません。");
                 var resultRow = searchAddressResult.Start.Row;
 
-                // ワークシートのセルから値を取得
-                var excelData = new {
-                    ProductModelRange = workSheetMain.Cells[resultRow, 3].Value?.ToString(),
-                    ProductNumberRange = workSheetMain.Cells[resultRow, 4].Value?.ToString(),
-                    OrderNumberRange = workSheetMain.Cells[resultRow, 5].Value?.ToString(),
-                    QuantityRange = workSheetMain.Cells[resultRow, 6].Value?.ToString(),
-                    SerialFirstRange = workSheetMain.Cells[resultRow, 7].Value?.ToString(),
-                    SerialLastRange = workSheetMain.Cells[resultRow, 8].Value?.ToString(),
-                    RegDateRange = workSheetMain.Cells[resultRow, 9].Value?.ToString(),
-                    DateFormat = workSheetMain.Cells[resultRow, 10].Value?.ToString(),
-                    RegTemperatureRange = workSheetMain.Cells[resultRow, 11].Value?.ToString(),
-                    RegHumidityRange = workSheetMain.Cells[resultRow, 12].Value?.ToString(),
-                    SheetNames = Enumerable.Range(13, 20) // 無限の範囲
-                        .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString())
-                        .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName)) // 空白でない間
-                        .ToList()
+                // ワークシートのセルから値を取得し、ExcelConfigDataオブジェクトに格納
+                var excelData = new CheckSheetConfigData {
+                    ProductModelRange = workSheetMain.Cells[resultRow, 3].Value?.ToString() ?? string.Empty,
+                    ProductNumberRange = workSheetMain.Cells[resultRow, 4].Value?.ToString() ?? string.Empty,
+                    OrderNumberRange = workSheetMain.Cells[resultRow, 5].Value?.ToString() ?? string.Empty,
+                    QuantityRange = workSheetMain.Cells[resultRow, 6].Value?.ToString() ?? string.Empty,
+                    SerialFirstRange = workSheetMain.Cells[resultRow, 7].Value?.ToString() ?? string.Empty,
+                    SerialLastRange = workSheetMain.Cells[resultRow, 8].Value?.ToString() ?? string.Empty,
+                    RegDateRange = workSheetMain.Cells[resultRow, 9].Value?.ToString() ?? string.Empty,
+                    DateFormat = workSheetMain.Cells[resultRow, 10].Value?.ToString() ?? string.Empty,
+                    RegTemperatureRange = workSheetMain.Cells[resultRow, 11].Value?.ToString() ?? string.Empty,
+                    RegHumidityRange = workSheetMain.Cells[resultRow, 12].Value?.ToString() ?? string.Empty,
+                    SheetNames = [.. Enumerable.Range(13, 20)
+                                       .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString() ?? string.Empty)
+                                       .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName))]
                 };
 
-                if (excelData.SheetNames.Count == 0) { throw new Exception("対象シートがありません。"); }
+                return excelData.SheetNames.Count == 0 ? throw new Exception("対象シートがConfigファイルに設定されていません。") : excelData;
+            }
 
-                // 温度セルか湿度セルが設定されている場合、ダイアログを表示
+            // 温度と湿度の入力ダイアログを表示し、ユーザーからの値を取得します。
+            private static (string temperature, string humidity) GetTemperatureAndHumidity(CheckSheetConfigData excelData) {
                 var temperature = string.Empty;
                 var humidity = string.Empty;
+
+                // 温度セルか湿度セルが設定されている場合、ダイアログを表示
                 if (!string.IsNullOrEmpty(excelData.RegTemperatureRange) || !string.IsNullOrEmpty(excelData.RegHumidityRange)) {
                     var dialog = new InputDialog1();
                     var result = dialog.ShowDialog();
                     if (result != DialogResult.OK) {
-                        return;
+                        // キャンセルされた場合は処理を中断
+                        throw new OperationCanceledException("ユーザーによって温度・湿度入力がキャンセルされました。");
                     }
                     temperature = dialog.Temperature;
                     humidity = dialog.Humidity;
                 }
+                return (temperature, humidity);
+            }
 
+            // 日付を指定されたフォーマットで文字列に変換します。
+            private static string FormatDate(string dateString, string? dateFormat) {
                 var formattedDate = string.Empty;
-                if (DateTime.TryParse(productInfo.RegDate, out var date)) {
-                    formattedDate = excelData.DateFormat switch {
+                if (DateTime.TryParse(dateString, out var date)) {
+                    formattedDate = dateFormat switch {
                         "1" => date.ToString("yyyy年MM月dd日"),
                         "2" => date.ToString("yyyy-MM-dd"),
                         _ => formattedDate
                     };
                 }
+                return formattedDate;
+            }
 
-                // NPOIでExcelファイルを編集
-                var workBookNPOI = WorkbookFactory.Create(configPath);
-
+            // ExcelConfigDataからNPOIのCellReferenceオブジェクトを作成します。
+            private static dynamic CreateCellReferences(CheckSheetConfigData excelData) {
                 // セル参照をCellReferenceオブジェクトとして作成
-                var cellReferences = new {
+                return new {
                     ProductModel = string.IsNullOrEmpty(excelData.ProductModelRange) ? null : new CellReference(excelData.ProductModelRange),
                     ProductNumber = string.IsNullOrEmpty(excelData.ProductNumberRange) ? null : new CellReference(excelData.ProductNumberRange),
                     OrderNumber = string.IsNullOrEmpty(excelData.OrderNumberRange) ? null : new CellReference(excelData.OrderNumberRange),
@@ -440,12 +694,22 @@ namespace ProductDatabase.Other {
                     RegTemperature = string.IsNullOrEmpty(excelData.RegTemperatureRange) ? null : new CellReference(excelData.RegTemperatureRange),
                     RegHumidity = string.IsNullOrEmpty(excelData.RegHumidityRange) ? null : new CellReference(excelData.RegHumidityRange),
                 };
+            }
 
-                // 各シートに対して値を書き込む
-                foreach (var sheetName in excelData.SheetNames) {
+            // 指定されたNPOIワークブックの各シートに製品情報を書き込みます。
+            private static void PopulateExcelSheets(
+                IWorkbook workBookNPOI,
+                ProductInformation productInfo,
+                dynamic cellReferences,
+                string temperature,
+                string humidity,
+                string formattedDate,
+                List<string> sheetNames) {
+                foreach (var sheetName in sheetNames) {
                     var sheetNPOI = workBookNPOI.GetSheet(sheetName) ?? throw new Exception($"シート[{sheetName}]が見つかりません。");
-                    sheetNPOI.ForceFormulaRecalculation = true;
+                    sheetNPOI.ForceFormulaRecalculation = true; // 数式の再計算を強制
 
+                    // 各セルに値を書き込む
                     WriteCellValue(sheetNPOI, cellReferences.ProductModel, productInfo.ProductModel);
                     WriteCellValue(sheetNPOI, cellReferences.ProductNumber, productInfo.ProductNumber);
                     WriteCellValue(sheetNPOI, cellReferences.OrderNumber, productInfo.OrderNumber);
@@ -456,202 +720,80 @@ namespace ProductDatabase.Other {
                     WriteCellValue(sheetNPOI, cellReferences.RegTemperature, temperature);
                     WriteCellValue(sheetNPOI, cellReferences.RegHumidity, humidity);
                 }
+            }
 
-                //セル書き込み(書き込む値が文字列の場合)
-                static void WriteCellValue(ISheet sheet, CellReference? reference, string value) {
-                    if (reference == null) {
-                        return;
-                    }
-
-                    var row = sheet.GetRow(reference.Row) ?? sheet.CreateRow(reference.Row); //指定した行を取得できない時はエラーとならないよう新規作成している
-                    var cell = row.GetCell(reference.Col) ?? row.CreateCell(reference.Col); //一行上の処理の列版
-                    cell.SetCellValue(value);
+            // 指定されたシートのセルに値を書き込みます。
+            private static void WriteCellValue(ISheet sheet, CellReference? reference, string value) {
+                if (reference == null) {
+                    return; // 参照がnullの場合は何もしない
                 }
 
+                // 指定した行を取得できない時はエラーとならないよう新規作成している
+                var row = sheet.GetRow(reference.Row) ?? sheet.CreateRow(reference.Row);
+                // 一行上の処理の列版
+                var cell = row.GetCell(reference.Col) ?? row.CreateCell(reference.Col);
+                cell.SetCellValue(value);
+            }
+
+            // 指定されたNPOIワークブックの不要なシートを非表示にします。
+            private static void HideSheets(IWorkbook workBookNPOI, List<string> sheetsToKeep) {
                 // 非表示にするシートのインデックスを特定
-                var allSheetNames = workBook.Workbook.Worksheets.Select(sh => sh.Name.ToString()).ToList();
+                var allSheetNames = new List<string>();
+                for (var i = 0; i < workBookNPOI.NumberOfSheets; i++) {
+                    allSheetNames.Add(workBookNPOI.GetSheetName(i));
+                }
+
                 var sheetIndicesToHide = allSheetNames.Select((name, index) => new { Name = name, Index = index })
-                    .Where(sheet => !excelData.SheetNames.Contains(sheet.Name))
-                    .Select(sheet => sheet.Index)
-                    .ToList();
-                sheetIndicesToHide.Add(0); // 常に最初のシート（"Sheet1"）を非表示にする
+                                                      .Where(sheet => !sheetsToKeep.Contains(sheet.Name))
+                                                      .Select(sheet => sheet.Index)
+                                                      .ToList();
+
+                // シート（"Sheet1"）を非表示にする
+                if (workBookNPOI.GetSheetIndex("Sheet1") != -1 && !sheetIndicesToHide.Contains(workBookNPOI.GetSheetIndex("Sheet1"))) {
+                    sheetIndicesToHide.Add(workBookNPOI.GetSheetIndex("Sheet1"));
+                }
 
                 // シートを非表示に設定
                 foreach (var sheetIndex in sheetIndicesToHide) {
                     workBookNPOI.SetSheetHidden(sheetIndex, SheetVisibility.VeryHidden);
                 }
+            }
 
-                //引数に保存先パスを指定
-                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsx");
-
-                //ブックを保存
-                using (var fs = new FileStream(temporarilyPath, FileMode.Create)) {
+            // NPOIワークブックをファイルに保存します。
+            private static void SaveWorkbook(IWorkbook workBookNPOI, string outputPath) {
+                try {
+                    using var fs = new FileStream(outputPath, FileMode.Create);
                     workBookNPOI.Write(fs);
+                } catch (IOException ex) {
+                    throw new IOException($"Excelファイルの保存に失敗しました: {outputPath}. 詳細: {ex.Message}", ex);
                 }
-
-                // 印刷
-                Microsoft.Office.Interop.Excel.Application xlApp = new() {
-                    Visible = true // Excelウィンドウを表示します。
-                };
-
-                // ワークブック開く
-                var xlBooks = xlApp.Workbooks;
-                var xlBook = xlBooks.Open(temporarilyPath, ReadOnly: true);
-
-                //// ワークシート選択
-                //var xlSheets = xlBook.Sheets;
-                //Microsoft.Office.Interop.Excel.Worksheet xlSheet = xlSheets[0];
-
-                //// ワークシート表示
-                //xlSheet.Activate();
-
-                //// ワークブックを閉じてExcelを終了
-                //xlBook.Close(false);
-                //xlApp.Quit();
-
-                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
-                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
-
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-        // チェックシート生成 EPPLUS
-        public static void GenerateCheckSheetEPPLUS(ProductInformation productInfo) {
-            try {
-                var temperature = string.Empty;
-                var humidity = string.Empty;
 
-                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsx");
-                using FileStream fileStream = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using var workBook = new ExcelPackage(fileStream);
-                //既存ワークシートを取得（workBookはExcelWorkbookクラスオブジェクト）
-                var sheet = workBook.Workbook.Worksheets;
-                var targetSheetName = "Sheet1";
-                var workSheetMain = sheet[targetSheetName];
+            // Excel Interopを使用して指定されたExcelファイルを開きます。
+            private static void PrintExcelFile(string filePath) {
+                Microsoft.Office.Interop.Excel.Application? xlApp = null;
+                Microsoft.Office.Interop.Excel.Workbooks? xlBooks = null;
+                Microsoft.Office.Interop.Excel.Workbook? xlBook = null;
 
-                // セル検索
-                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == productInfo.ProductModel) ?? throw new Exception($"Configに品目番号:[{productInfo.ProductModel}]が見つかりません。");
-                var resultRow = searchAddressResult.Start.Row;
+                try {
+                    xlApp = new Microsoft.Office.Interop.Excel.Application {
+                        Visible = true // Excelウィンドウを表示します。
+                    };
 
-                // ワークシートのセルから値を取得
-                var productModelRange = workSheetMain.Cells[resultRow, 3].Value?.ToString();
-                var productNumberRange = workSheetMain.Cells[resultRow, 4].Value?.ToString();
-                var orderNumberRange = workSheetMain.Cells[resultRow, 5].Value?.ToString();
-                var quantityRange = workSheetMain.Cells[resultRow, 6].Value?.ToString();
-                var serialFirstRange = workSheetMain.Cells[resultRow, 7].Value?.ToString();
-                var serialLastRange = workSheetMain.Cells[resultRow, 8].Value?.ToString();
-                var regDateRange = workSheetMain.Cells[resultRow, 9].Value?.ToString();
-                var dateFormat = workSheetMain.Cells[resultRow, 10].Value?.ToString();
-                var regTemperatureRange = workSheetMain.Cells[resultRow, 11].Value?.ToString();
-                var regHumidityRange = workSheetMain.Cells[resultRow, 12].Value?.ToString();
+                    xlBooks = xlApp.Workbooks;
+                    xlBook = xlBooks.Open(filePath, ReadOnly: true);
 
-                const int StartColumn = 13;
-                var sheetNames = Enumerable.Range(StartColumn, 20) // 無限の範囲
-                    .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString())
-                    .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName)) // 空白でない間
-                    .ToList();
-
-                if (sheetNames.Count == 0) { throw new Exception("対象シートがありません。"); }
-
-                // 温度セルか湿度セルが設定されている場合、ダイアログを表示
-                if (!string.IsNullOrEmpty(regTemperatureRange) || !string.IsNullOrEmpty(regHumidityRange)) {
-                    var dialog = new InputDialog1();
-                    var result = dialog.ShowDialog();
-                    if (result == DialogResult.OK) {
-                        temperature = dialog.Temperature;
-                        humidity = dialog.Humidity;
-                    }
-                    else {
-                        return;
-                    }
-                }
-
-                var formattedDate = string.Empty;
-                if (DateTime.TryParse(productInfo.RegDate, out var date)) {
-                    switch (dateFormat) {
-                        case "1":
-                            formattedDate = date.ToString("yyyy年MM月dd日");
-                            break;
-                        case "2":
-                            formattedDate = date.ToString("yyyy-MM-dd");
-                            break;
-                    }
-                }
-
-                foreach (var sheetName in sheetNames) {
-                    var workSheetTemp = sheet[sheetName] ?? throw new Exception($"シート[{sheetName}]が見つかりません。");
-                    if (!string.IsNullOrEmpty(productModelRange)) { workSheetTemp.Cells[productModelRange].Value = productInfo.ProductModel; }
-                    if (!string.IsNullOrEmpty(productNumberRange)) { workSheetTemp.Cells[productNumberRange].Value = productInfo.ProductNumber; }
-                    if (!string.IsNullOrEmpty(orderNumberRange)) { workSheetTemp.Cells[orderNumberRange].Value = productInfo.OrderNumber; }
-                    if (!string.IsNullOrEmpty(quantityRange)) { workSheetTemp.Cells[quantityRange].Value = productInfo.Quantity; }
-                    if (!string.IsNullOrEmpty(serialFirstRange)) { workSheetTemp.Cells[serialFirstRange].Value = productInfo.SerialFirst; }
-                    if (!string.IsNullOrEmpty(serialLastRange)) { workSheetTemp.Cells[serialLastRange].Value = productInfo.SerialLast; }
-                    if (!string.IsNullOrEmpty(regDateRange)) { workSheetTemp.Cells[regDateRange].Value = formattedDate; }
-                    if (!string.IsNullOrEmpty(regTemperatureRange)) { workSheetTemp.Cells[regTemperatureRange].Value = temperature; }
-                    if (!string.IsNullOrEmpty(regHumidityRange)) { workSheetTemp.Cells[regHumidityRange].Value = humidity; }
-                }
-
-                // 不要なシートを非表示にする
-                var allSheetName = sheet
-                    .Select(sh => sh.Name.ToString())
-                    .ToList();
-
-                var hiddenSheetNames = allSheetName.Except(sheetNames.Where(name => name != null).Cast<string>()).ToList();
-                foreach (var sheetName in hiddenSheetNames) {
-                    sheet[sheetName].Hidden = eWorkSheetHidden.VeryHidden;
-                }
-                sheet["Sheet1"].Hidden = eWorkSheetHidden.VeryHidden;
-
-                //引数に保存先パスを指定
-                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsx");
-                var fileInfo = new FileInfo(temporarilyPath);
-                workBook.SaveAs(fileInfo);
-
-                // 印刷
-                Microsoft.Office.Interop.Excel.Application xlApp = new() {
-                    Visible = true // Excelウィンドウを表示します。
-                };
-
-                // ワークブック開く
-                var xlBooks = xlApp.Workbooks;
-                var xlBook = xlBooks.Open(temporarilyPath, ReadOnly: true);
-
-                //// ワークシート選択
-                //var xlSheets = xlBook.Sheets;
-                //Microsoft.Office.Interop.Excel.Worksheet xlSheet = xlSheets[0];
-
-                //// ワークシート表示
-                //xlSheet.Activate();
-
-                //// ワークブックを閉じてExcelを終了
-                //xlBook.Close(false);
-                //xlApp.Quit();
-
-                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
-                //_ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks);
-                _ = System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
-
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        // CapsLockがオンになっていたらCapsLockを解除する
-        public static partial class Keyboard {
-            private const byte VK_CAPITAL = 0x14; // CapsLock の仮想キーコード
-            private const int KEYEVENTF_EXTENDEDKEY = 0x1;
-            private const int KEYEVENTF_KEYUP = 0x2;
-
-            // CapsLock の状態を切り替える
-            public static void CapsDisable() {
-                if (Control.IsKeyLocked(Keys.CapsLock)) {
-                    NativeMethods.keybd_event(VK_CAPITAL, 0, KEYEVENTF_EXTENDEDKEY, 0);
-                    NativeMethods.keybd_event(VK_CAPITAL, 0, KEYEVENTF_KEYUP, 0);
+                    //// ワークブックを閉じる (falseは変更を保存しない)
+                    //xlBook.Close(false);
+                    //// Excelアプリケーションを終了
+                    //xlApp.Quit();
+                } catch (Exception ex) {
+                    throw new Exception($"エラーが発生しました。詳細: {ex.Message}", ex);
+                } finally {
+                    // COMオブジェクトの解放
+                    if (xlBook != null) { System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook); }
+                    if (xlBooks != null) { System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks); }
+                    if (xlApp != null) { System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp); }
                 }
             }
         }
