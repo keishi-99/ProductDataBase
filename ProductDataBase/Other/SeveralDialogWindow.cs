@@ -18,11 +18,13 @@ namespace ProductDatabase {
             Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
             var j = 0;
 
-            foreach (var category in ProductInfo.Category11) {
-                var type = (ProductInfo.Category14[j] == "1") ? "基板" : "製品";
+            foreach (var category in ProductInfo.CategoryItemNumber) {
+                var isSubstrate = ProductInfo.CategoryType[j] == "1";
+                var type = isSubstrate ? "基板登録" : "製品登録";
+                var textString = isSubstrate ? ProductInfo.CategorySubstrateName[j] : ProductInfo.CategoryProductType[j];
 
-                if (!string.IsNullOrEmpty(ProductInfo.Category11[j])) {
-                    var itemText = $"[{type}]  [{ProductInfo.Category13[j]}]  [{ProductInfo.Category12[j]}]  [{category}]";
+                if (!string.IsNullOrEmpty(ProductInfo.CategoryItemNumber[j])) {
+                    var itemText = $"[{type}]  [{ProductInfo.CategoryProductName[j]}]  [{textString}]  [{category}]";
 
                     // 重複チェック
                     if (!SeveralListBox.Items.Contains(itemText)) {
