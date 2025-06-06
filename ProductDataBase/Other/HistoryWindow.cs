@@ -522,7 +522,7 @@ namespace ProductDatabase {
                                 command.CommandText = $"""
                                     UPDATE "{ProductInfo.CategoryName}_Substrate"
                                     SET "StockName" = NULL, "SubstrateName" = NULL, "SubstrateModel"= NULL, "SubstrateNumber"= NULL, "OrderNumber"= NULL, "Increase"= NULL, "Decrease"= NULL, "Defect"= NULL,
-                                         "UsedProductType"= NULL, "UsedProductNumber"= NULL, "UsedOrderNumber"= NULL, "Person"= NULL, "RegDate"= NULL, "Comment"= NULL, "UseID"= NULL
+                                         "Person"= NULL, "RegDate"= NULL, "Comment"= NULL, "UseID"= NULL
                                     WHERE ID = @ID;
                                     """;
                                 command.Parameters.Clear(); // パラメータをクリア
