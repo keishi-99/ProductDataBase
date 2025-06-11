@@ -205,29 +205,44 @@ namespace ProductDatabase {
                 return;
             }
 
+            ProductInfo.Revision = RevisionTextBox.Text.Trim();
+            ProductInfo.RegDate = RegistrationDateMaskedTextBox.Text.Trim();
+            ProductInfo.Comment = CommentTextBox.Text.Trim();
+
             using var connection = new SQLiteConnection(GetConnectionRegistration());
             connection.Open();
             using var transaction = connection.BeginTransaction();
             try {
-                var commandText = $@"
-                INSERT INTO {ProductInfo.CategoryName}_Product
-                    (ProductName, RegDate, Revision, RevisionGroup, SerialLastNumber, Comment)
-                VALUES
-                    (@ProductName, @RegDate, @Revision, @RevisionGroup, @SerialLastNumber, @Comment);";
+                var commandText =
+                $"""
+                INSERT INTO {ProductInfo.CategoryName}_Product (
+                    ProductName, ProductType, ProductModel, RegDate, Revision, RevisionGroup, SerialLastNumber, Comment
+                )
+                VALUES (
+                    @ProductName, @ProductType, @ProductModel, @RegDate, @Revision, @RevisionGroup, @SerialLastNumber, @Comment
+                );
+                """;
 
                 var serialLastNum = ExecuteScalar(connection,
-                    $@"SELECT SerialLastNumber FROM {ProductInfo.CategoryName}_Product WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;",
+                    $"""SELECT SerialLastNumber FROM {ProductInfo.CategoryName}_Product WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;""",
                     ("@ProductName", ProductInfo.ProductName));
 
                 ExecuteNonQuery(connection, commandText,
                     ("@ProductName", ProductInfo.ProductName),
-                    ("@RegDate", RegistrationDateMaskedTextBox.Text),
-                    ("@Revision", RevisionTextBox.Text),
+                    ("@ProductType", ProductInfo.ProductType),
+                    ("@ProductModel", ProductInfo.ProductModel),
+                    ("@Revision", ProductInfo.Revision),
+                    ("@RegDate", ProductInfo.RegDate),
                     ("@RevisionGroup", ProductInfo.RevisionGroup),
                     ("@SerialLastNumber", Convert.ToInt32(serialLastNum)),
-                    ("@Comment", CommentTextBox.Text));
+                    ("@Comment", ProductInfo.Comment));
+
+                ProductInfo.ProductID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {ProductInfo.CategoryName}_Product"));
 
                 transaction.Commit();
+
+                LogRegistration(ProductInfo);
+
                 MessageBox.Show("Revision変更完了", "Revision変更", MessageBoxButtons.OK, MessageBoxIcon.Information);
             } catch (Exception ex) {
                 if (transaction.Connection != null) { //接続が開いているか確認する。
@@ -360,6 +375,20 @@ namespace ProductDatabase {
             } catch (Exception ex) {
                 throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}");
             }
+        }
+        // ログ出力
+        private static void LogRegistration(ProductInformation productInfo) {
+            string[] logMessageArray = [
+                $"[Rev変更]",
+                $"ID[{productInfo.CategoryName}_{productInfo.ProductID}]",
+                $"製品名[{productInfo.ProductName}]",
+                $"タイプ[{productInfo.ProductType}]",
+                $"型式[{productInfo.ProductModel}]",
+                $"Revision[{productInfo.Revision}]",
+                $"登録日[{productInfo.RegDate}]",
+                $"コメント[{productInfo.Comment}]"
+            ];
+            CommonUtils.Logger.AppendLog(logMessageArray);
         }
 
         private void ProductRegistration1Window_Load(object sender, EventArgs e) { LoadEvents(); }
