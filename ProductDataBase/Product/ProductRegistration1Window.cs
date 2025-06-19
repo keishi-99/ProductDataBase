@@ -64,20 +64,22 @@ namespace ProductDatabase {
                 var revisionResult = cmd.ExecuteScalar();
                 RevisionTextBox.Text = revisionResult?.ToString() ?? "";
 
-                cmd.Parameters.Clear();
-                cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
-                cmd.CommandText = $"""SELECT SerialLastNumber FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY "ID" DESC""";
-                var serialResult = cmd.ExecuteScalar();
-                if (!int.TryParse(serialResult?.ToString(), out var serialLastNum)) { throw new Exception("シリアル番号の取得に失敗しました。"); }
+                if (ProductInfo.IsSerialGeneration) {
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
+                    cmd.CommandText = $"""SELECT SerialLastNumber FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY "ID" DESC""";
+                    var serialResult = cmd.ExecuteScalar();
+                    if (!int.TryParse(serialResult?.ToString(), out var serialLastNum)) { throw new Exception("シリアル番号の取得に失敗しました。"); }
 
-                // シリアル番号の初期値を設定
-                if (ProductInfo.RegType == 0) { return; }
-                var formatString = ProductInfo.SerialDigit switch {
-                    3 => "000",
-                    4 => "0000",
-                    _ => ""
-                };
-                FirstSerialNumberTextBox.Text = (serialLastNum + 1).ToString(formatString);
+                    // シリアル番号の初期値を設定
+                    if (ProductInfo.RegType == 0) { return; }
+                    var formatString = ProductInfo.SerialDigit switch {
+                        3 => "000",
+                        4 => "0000",
+                        _ => ""
+                    };
+                    FirstSerialNumberTextBox.Text = (serialLastNum + 1).ToString(formatString);
+                }
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
