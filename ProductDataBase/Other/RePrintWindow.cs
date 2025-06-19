@@ -210,27 +210,30 @@ namespace ProductDatabase {
                 : QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0 ? throw new Exception("1台以上入力して下さい。") : true;
         }
         private bool DataCheck() {
-            var quantity = Convert.ToInt32(QuantityTextBox.Text);
-            if (quantity == 0) { throw new Exception("1以上入力してください。"); }
-            var firstSerial = Convert.ToInt32(FirstSerialNumberTextBox.Text);
-            if (firstSerial == 0) { throw new Exception("シリアル開始番号を入力してください。"); }
-
-            switch (ProductInfo.SerialDigit) {
-                case 3:
-                    CheckAndAdjustSerial(999, 1);
-                    break;
-                case 4:
-                    CheckAndAdjustSerial(9999, 1);
-                    break;
-                default:
-                    break;
+            if (!int.TryParse(QuantityTextBox.Text, out var quantity)) {
+                MessageBox.Show("数量が不正な形式です。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
 
-            void CheckAndAdjustSerial(int threshold, int resetValue) {
-                if (quantity + firstSerial >= threshold) {
-                    MessageBox.Show($"シリアルが{threshold}を超えるので{resetValue.ToString().PadLeft(ProductInfo.SerialDigit, '0')}から開始します。");
-                    FirstSerialNumberTextBox.Text = resetValue.ToString();
-                }
+            if (!int.TryParse(FirstSerialNumberTextBox.Text, out var firstSerial)) {
+                MessageBox.Show("シリアル開始番号が不正な形式です。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            // 最終シリアル番号計算
+            var calculatedLastSerial = quantity + firstSerial - 1; // 数量と開始番号から最終シリアルを算出
+
+            // シリアル番号の桁数に応じて、閾値とリセット値を設定
+            (var minNumber, var maxNumber, var digit) = ProductInfo.SerialType switch {
+                3 => (1, 999, 3),
+                4 => (1, 9999, 4),
+                101 => (1, 899, 3),
+                102 => (901, 999, 3),
+                _ => throw new InvalidOperationException("不明なシリアル桁数です。") // より具体的な例外
+            };
+
+            if (calculatedLastSerial > maxNumber || firstSerial < minNumber) {// あるいは firstSerialがminNumber未満の場合も対象に
+                MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                FirstSerialNumberTextBox.Text = minNumber.ToString();
             }
 
             ProductInfo.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;

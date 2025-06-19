@@ -19,7 +19,7 @@ namespace ProductDatabase {
             public string SubstrateModel { get; set; } = string.Empty;
             public string UseSubstrate { get; set; } = string.Empty;
             public string Initial { get; set; } = string.Empty;
-            public int SerialDigit { get; set; }
+            public int SerialType { get; set; }
             public int RevisionGroup { get; set; }
             public int CheckBin { get; set; }
             public string Proness1 { get; set; } = string.Empty;
@@ -99,6 +99,12 @@ namespace ProductDatabase {
             public DataTable ProductDataTable { get; } = new();
             public DataTable SubstrateDataTable { get; } = new();
 
+            public int SerialDigit => SerialType switch {
+                3 or 101 or 102 => 3,
+                4 => 4,
+                _ => 0
+            };
+
             public void Reset() {
                 ProductID = 0;
                 CategoryName = string.Empty;
@@ -110,7 +116,7 @@ namespace ProductDatabase {
                 SubstrateModel = string.Empty;
                 UseSubstrate = string.Empty;
                 Initial = string.Empty;
-                SerialDigit = 0;
+                SerialType = 0;
                 RegType = 0;
                 PrintType = 0;
                 RevisionGroup = 0;
@@ -311,7 +317,7 @@ namespace ProductDatabase {
                 ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
                 ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
                 ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["PrintType"] ?? throw new Exception("PrintType is null"));
-                ProductInfo.SerialDigit = Convert.ToInt32(selectedRows[0]["SerialDigit"] ?? throw new Exception("SerialDigit is null"));
+                ProductInfo.SerialType = Convert.ToInt32(selectedRows[0]["SerialType"] ?? throw new Exception("SerialType is null"));
                 ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
                 ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
                 ProductInfo.UseSubstrate = selectedRows[0]["UseSubstrate"].ToString() ?? string.Empty;
@@ -330,7 +336,7 @@ namespace ProductDatabase {
                 ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
                 ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
                 ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["PrintType"] ?? throw new Exception("PrintType is null"));
-                ProductInfo.SerialDigit = Convert.ToInt32(selectedRows[0]["SerialDigit"] ?? throw new Exception("SerialDigit is null"));
+                ProductInfo.SerialType = Convert.ToInt32(selectedRows[0]["SerialType"] ?? throw new Exception("SerialType is null"));
                 ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
                 ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
                 ProductInfo.Initial = selectedRows[0]["Initial"].ToString() ?? string.Empty;
@@ -742,7 +748,7 @@ namespace ProductDatabase {
             ProductInfo.RegType = Convert.ToInt32(productRet[0]["RegType"] ?? throw new Exception("RegType is null"));
             ProductInfo.PrintType = Convert.ToInt32(productRet[0]["PrintType"] ?? throw new Exception("PrintType is null"));
             ProductInfo.CheckBin = Convert.ToInt32(productRet[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
-            ProductInfo.SerialDigit = Convert.ToInt32(productRet[0]["SerialDigit"] ?? throw new Exception("SerialDigit is null"));
+            ProductInfo.SerialType = Convert.ToInt32(productRet[0]["SerialType"] ?? throw new Exception("SerialType is null"));
             using ProductRegistration1Window window = new(ProductInfo);
             window.ShowDialog(this);
         }
