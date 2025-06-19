@@ -53,33 +53,32 @@ namespace ProductDatabase {
                 PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
 
                 // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
-                using (SQLiteConnection con = new(GetConnectionRegistration())) {
-                    con.Open();
-                    using var cmd = con.CreateCommand();
+                using SQLiteConnection con = new(GetConnectionRegistration());
+                con.Open();
+                using var cmd = con.CreateCommand();
 
-                    // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
-                    cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
-                    cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
-                    cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY "ID" DESC""";
-                    var revisionResult = cmd.ExecuteScalar();
-                    RevisionTextBox.Text = revisionResult?.ToString() ?? "";
+                // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
+                cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
+                cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
+                cmd.CommandText = $"""SELECT Revision FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY "ID" DESC""";
+                var revisionResult = cmd.ExecuteScalar();
+                RevisionTextBox.Text = revisionResult?.ToString() ?? "";
 
-                    cmd.Parameters.Clear();
-                    cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
-                    cmd.CommandText = $"""SELECT SerialLastNumber FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY "ID" DESC""";
-                    var serialResult = cmd.ExecuteScalar();
-                    if (!int.TryParse(serialResult?.ToString(), out var serialLastNum)) { throw new Exception("シリアル番号の取得に失敗しました。"); }
+                cmd.Parameters.Clear();
+                cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
+                cmd.CommandText = $"""SELECT SerialLastNumber FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY "ID" DESC""";
+                var serialResult = cmd.ExecuteScalar();
+                if (!int.TryParse(serialResult?.ToString(), out var serialLastNum)) { throw new Exception("シリアル番号の取得に失敗しました。"); }
 
-                    // シリアル番号の初期値を設定
-                    if (ProductInfo.RegType == 0) { return; }
-                    var formatString = ProductInfo.SerialDigit switch {
-                        3 => "000",
-                        4 => "0000",
-                        _ => throw new Exception("不明なシリアル桁数です。")
-                    };
-                    FirstSerialNumberTextBox.Text = (serialLastNum + 1).ToString(formatString);
+                // シリアル番号の初期値を設定
+                if (ProductInfo.RegType == 0) { return; }
+                var formatString = ProductInfo.SerialDigit switch {
+                    3 => "000",
+                    4 => "0000",
+                    _ => ""
+                };
+                FirstSerialNumberTextBox.Text = (serialLastNum + 1).ToString(formatString);
 
-                }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
@@ -113,30 +112,32 @@ namespace ProductDatabase {
                     return;
                 }
 
-                if (!int.TryParse(QuantityTextBox.Text, out var quantity)) {
-                    MessageBox.Show("数量が不正な形式です。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+                if (ProductInfo.IsSerialGeneration) {
+                    if (!int.TryParse(QuantityTextBox.Text, out var quantity)) {
+                        MessageBox.Show("数量が不正な形式です。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
 
-                if (!int.TryParse(FirstSerialNumberTextBox.Text, out var firstSerial)) {
-                    MessageBox.Show("シリアル開始番号が不正な形式です。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                // 最終シリアル番号計算
-                var calculatedLastSerial = quantity + firstSerial - 1; // 数量と開始番号から最終シリアルを算出
+                    if (!int.TryParse(FirstSerialNumberTextBox.Text, out var firstSerial)) {
+                        MessageBox.Show("シリアル開始番号が不正な形式です。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    // 最終シリアル番号計算
+                    var calculatedLastSerial = quantity + firstSerial - 1; // 数量と開始番号から最終シリアルを算出
 
-                // シリアル番号の桁数に応じて、閾値とリセット値を設定
-                (var minNumber, var maxNumber, var digit) = ProductInfo.SerialType switch {
-                    3 => (1, 999, 3),
-                    4 => (1, 9999, 4),
-                    101 => (1, 899, 3),
-                    102 => (901, 999, 3),
-                    _ => throw new InvalidOperationException("不明なシリアル桁数です。") // より具体的な例外
-                };
+                    // シリアル番号の桁数に応じて、閾値とリセット値を設定
+                    (var minNumber, var maxNumber, var digit) = ProductInfo.SerialType switch {
+                        3 => (1, 999, 3),
+                        4 => (1, 9999, 4),
+                        101 => (1, 899, 3),
+                        102 => (901, 999, 3),
+                        _ => throw new InvalidOperationException("不明なシリアル桁数です。") // より具体的な例外
+                    };
 
-                if (calculatedLastSerial > maxNumber || firstSerial < minNumber) {// あるいは firstSerialがminNumber未満の場合も対象に
-                    MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    FirstSerialNumberTextBox.Text = minNumber.ToString();
+                    if (calculatedLastSerial > maxNumber || firstSerial < minNumber) {// あるいは firstSerialがminNumber未満の場合も対象に
+                        MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        FirstSerialNumberTextBox.Text = minNumber.ToString();
+                    }
                 }
 
                 RegisterButton.Enabled = false;
