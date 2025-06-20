@@ -112,7 +112,7 @@ namespace ProductDatabase {
         private void RegisterCheck() {
             try {
                 FormCheck();
-                DataCheck();
+                if (!DataCheck()) { return; }
 
                 DialogResult result;
                 result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
@@ -207,7 +207,7 @@ namespace ProductDatabase {
                 ? throw new Exception("空欄があります。")
                 : ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15
                 ? throw new Exception("製番を10桁+4桁で入力して下さい。")
-                : QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0 ? throw new Exception("1台以上入力して下さい。") : true;
+                : true;
         }
         private bool DataCheck() {
             var revision = RevisionTextBox.Text.Trim();
