@@ -28,7 +28,6 @@ namespace ProductDatabase {
             DataBaseDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Lavender;
             DataBaseDataGridView.ColumnHeadersDefaultCellStyle.Font = new System.Drawing.Font(DataBaseDataGridView.Font, FontStyle.Bold);
             DataBaseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            DataBaseDataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
             DataBaseDataGridView.ReadOnly = true;
             DataBaseDataGridView.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             DataBaseDataGridView.RowTemplate.DefaultCellStyle.Padding = new Padding(5);
