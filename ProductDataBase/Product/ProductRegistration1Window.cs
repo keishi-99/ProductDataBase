@@ -105,25 +105,59 @@ namespace ProductDatabase {
                 if (!anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
                 if (!allTextBoxesFilled || (PersonCheckBox.Checked && string.IsNullOrWhiteSpace(PersonComboBox.Text))) { throw new Exception("空欄があります。"); }
 
+                var revision = RevisionTextBox.Text.Trim();
+                if (RevisionCheckBox.Checked) {
+                    // revision.Any(...) は、revision 内のいずれかの文字が条件を満たす場合に true を返します。
+                    // char.ToUpperInvariant(c) は、文字を大文字に変換し、比較を行います。
+                    if (revision.Any(c => "IO".Contains(char.ToUpperInvariant(c)))) {
+                        MessageBox.Show("Revisionに I, O は使用できません。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        RevisionTextBox.Focus();
+                        return;
+                    }
+                }
+
                 if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
 
-                if (QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
+                if (string.IsNullOrWhiteSpace(QuantityTextBox.Text)) {
+                    MessageBox.Show("数量を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    QuantityTextBox.Focus();
+                    return;
+                }
+                if (!int.TryParse(QuantityTextBox.Text, out var quantity)) {
+                    MessageBox.Show("数量は有効な数値を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    QuantityTextBox.Focus();
+                    return;
+                }
+                if (quantity <= 0) {
+                    MessageBox.Show("1台以上入力して下さい。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    QuantityTextBox.Focus();
+                    return;
+                }
 
                 var result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) {
                     return;
                 }
 
+                var firstSerial = -1;
                 if (ProductInfo.IsSerialGeneration) {
-                    if (!int.TryParse(QuantityTextBox.Text, out var quantity)) {
-                        MessageBox.Show("数量が不正な形式です。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    if (string.IsNullOrWhiteSpace(FirstSerialNumberTextBox.Text)) {
+                        MessageBox.Show("シリアル開始番号を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        FirstSerialNumberTextBox.Focus();
+                        return;
+                    }
+                    if (!int.TryParse(FirstSerialNumberTextBox.Text, out firstSerial)) {
+                        MessageBox.Show("シリアル開始番号が不正な形式です。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        FirstSerialNumberTextBox.Focus();
+                        return;
+                    }
+                    if (firstSerial <= 0) {
+                        MessageBox.Show("1以上入力して下さい。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        FirstSerialNumberTextBox.Focus();
                         return;
                     }
 
-                    if (!int.TryParse(FirstSerialNumberTextBox.Text, out var firstSerial)) {
-                        MessageBox.Show("シリアル開始番号が不正な形式です。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
                     // 最終シリアル番号計算
                     var calculatedLastSerial = quantity + firstSerial - 1; // 数量と開始番号から最終シリアルを算出
 
@@ -150,10 +184,8 @@ namespace ProductDatabase {
                 ProductInfo.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
                 ProductInfo.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
                 ProductInfo.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
-                ProductInfo.Quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception("QuantityTextBox.Text is null"));
-                ProductInfo.SerialFirstNumber = ProductInfo.IsSerialGeneration
-                    ? Convert.ToInt32(FirstSerialNumberTextBox.Text ?? throw new Exception("FirstSerialNumberTextBox.Text is null"))
-                    : -1;
+                ProductInfo.Quantity = quantity;
+                ProductInfo.SerialFirstNumber = ProductInfo.IsSerialGeneration ? firstSerial : -1;
                 using ProductRegistration2Window window = new();
                 window.ProductInfo = ProductInfo;
                 window.Closed += (s, e) => this.Close();
@@ -177,7 +209,16 @@ namespace ProductDatabase {
                 return;
             }
 
-            ProductInfo.Revision = RevisionTextBox.Text.Trim();
+            var revision = RevisionTextBox.Text.Trim();
+            // revision.Any(...) は、revision 内のいずれかの文字が条件を満たす場合に true を返します。
+            // char.ToUpperInvariant(c) は、文字を大文字に変換し、比較を行います。
+            if (revision.Any(c => "IO".Contains(char.ToUpperInvariant(c)))) {
+                MessageBox.Show("Revisionに I, O は使用できません。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                RevisionTextBox.Focus();
+                return;
+            }
+
+            ProductInfo.Revision = revision;
             ProductInfo.RegDate = RegistrationDateMaskedTextBox.Text.Trim();
             ProductInfo.Comment = CommentTextBox.Text.Trim();
 

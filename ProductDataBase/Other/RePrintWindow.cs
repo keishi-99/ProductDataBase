@@ -210,15 +210,49 @@ namespace ProductDatabase {
                 : QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0 ? throw new Exception("1台以上入力して下さい。") : true;
         }
         private bool DataCheck() {
+            var revision = RevisionTextBox.Text.Trim();
+            if (RevisionCheckBox.Checked) {
+                // revision.Any(...) は、revision 内のいずれかの文字が条件を満たす場合に true を返します。
+                // char.ToUpperInvariant(c) は、文字を大文字に変換し、比較を行います。
+                if (revision.Any(c => "IO".Contains(char.ToUpperInvariant(c)))) {
+                    MessageBox.Show("Revisionに I, O は使用できません。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    RevisionTextBox.Focus();
+                    return false;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(QuantityTextBox.Text)) {
+                MessageBox.Show("数量を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                QuantityTextBox.Focus();
+                return false;
+            }
             if (!int.TryParse(QuantityTextBox.Text, out var quantity)) {
-                MessageBox.Show("数量が不正な形式です。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("数量は有効な数値を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                QuantityTextBox.Focus();
+                return false;
+            }
+            if (quantity <= 0) {
+                MessageBox.Show("1台以上入力して下さい。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                QuantityTextBox.Focus();
                 return false;
             }
 
-            if (!int.TryParse(FirstSerialNumberTextBox.Text, out var firstSerial)) {
-                MessageBox.Show("シリアル開始番号が不正な形式です。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (string.IsNullOrWhiteSpace(FirstSerialNumberTextBox.Text)) {
+                MessageBox.Show("シリアル開始番号を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                FirstSerialNumberTextBox.Focus();
                 return false;
             }
+            if (!int.TryParse(FirstSerialNumberTextBox.Text, out var firstSerial)) {
+                MessageBox.Show("シリアル開始番号が不正な形式です。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                FirstSerialNumberTextBox.Focus();
+                return false;
+            }
+            if (firstSerial <= 0) {
+                MessageBox.Show("1以上入力して下さい。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                FirstSerialNumberTextBox.Focus();
+                return false;
+            }
+
             // 最終シリアル番号計算
             var calculatedLastSerial = quantity + firstSerial - 1; // 数量と開始番号から最終シリアルを算出
 
@@ -238,13 +272,13 @@ namespace ProductDatabase {
 
             ProductInfo.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
             ProductInfo.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
-            ProductInfo.Quantity = Convert.ToInt32(QuantityTextBox.Text ?? throw new Exception());
+            ProductInfo.Quantity = quantity;
             ProductInfo.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
             ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateMaskedTextBox.Text : string.Empty;
             ProductInfo.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
             ProductInfo.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
 
-            ProductInfo.SerialFirstNumber = Convert.ToInt32(FirstSerialNumberTextBox.Text);
+            ProductInfo.SerialFirstNumber = firstSerial;
             ProductInfo.SerialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
 
             _strSerialFirstNumber = GenerateCode(ProductInfo.SerialFirstNumber);
