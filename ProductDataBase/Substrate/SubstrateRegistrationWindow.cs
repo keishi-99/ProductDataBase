@@ -116,9 +116,41 @@ namespace ProductDatabase {
 
                 if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
 
-                if (QuantityCheckBox.Checked && int.Parse(QuantityTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
+                if (QuantityCheckBox.Checked) {
+                    if (string.IsNullOrWhiteSpace(QuantityTextBox.Text)) {
+                        MessageBox.Show("数量を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        QuantityTextBox.Focus();
+                        return;
+                    }
+                    if (!int.TryParse(QuantityTextBox.Text, out var quantity)) {
+                        MessageBox.Show("数量は有効な数値を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        QuantityTextBox.Focus();
+                        return;
+                    }
+                    if (quantity <= 0) {
+                        MessageBox.Show("1台以上入力して下さい。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        QuantityTextBox.Focus();
+                        return;
+                    }
+                }
 
-                if (DefectNumberCheckBox.Checked && int.Parse(DefectNumberTextBox.Text) <= 0) { throw new Exception("1台以上入力して下さい。"); }
+                if (DefectNumberCheckBox.Checked) {
+                    if (string.IsNullOrWhiteSpace(DefectNumberTextBox.Text)) {
+                        MessageBox.Show("数量を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        DefectNumberTextBox.Focus();
+                        return;
+                    }
+                    if (!int.TryParse(DefectNumberTextBox.Text, out var quantity)) {
+                        MessageBox.Show("数量は有効な数値を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        DefectNumberTextBox.Focus();
+                        return;
+                    }
+                    if (quantity <= 0) {
+                        MessageBox.Show("1台以上入力して下さい。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        DefectNumberTextBox.Focus();
+                        return;
+                    }
+                }
 
                 if (!QuantityCheckBox.Checked && !DefectNumberCheckBox.Checked) { throw new Exception("追加量か減少数を入力してください。"); }
 
