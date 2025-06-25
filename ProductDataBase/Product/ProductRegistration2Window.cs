@@ -505,7 +505,7 @@ namespace ProductDatabase {
             }
             else {
                 // データが存在しない場合の処理
-                throw new Exception("登録IDが見つかりません。");
+                throw new Exception("登録に失敗しました。IDが見つかりません。");
             }
         }
         // ログ出力
