@@ -541,7 +541,8 @@ namespace ProductDatabase {
                                     $"使用量[{row["Decrease", DataRowVersion.Original]}]",
                                     $"減少量[{row["Defect", DataRowVersion.Original]}]",
                                     $"登録日[{row["RegDate", DataRowVersion.Original]}]",
-                                    $"担当者[{row["Person", DataRowVersion.Original]}]"
+                                    $"担当者[{row["Person", DataRowVersion.Original]}]",
+                                    $"UseID[{ProductInfo.CategoryName}_{row["UseID", DataRowVersion.Original]}]",
                                 ];
                                 CommonUtils.Logger.AppendLog(logMessageArray);
                             }
