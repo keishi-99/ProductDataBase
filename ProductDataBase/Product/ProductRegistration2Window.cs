@@ -292,6 +292,10 @@ namespace ProductDatabase {
                 connection.Open();
                 RegistrationCheck(connection);
 
+                // 印刷処理
+                HandleLabelPrinting();
+                HandleBarcodePrinting();
+
                 MessageBox.Show("登録完了");
 
                 HandlePostRegistration();
@@ -329,9 +333,6 @@ namespace ProductDatabase {
                     default:
                         throw new Exception("RegType unknown");
                 }
-
-                HandleLabelPrinting();
-                HandleBarcodePrinting();
                 transaction.Commit();
 
             } catch (Exception) {
