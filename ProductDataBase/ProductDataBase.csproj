@@ -30,7 +30,6 @@
     <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
     <PackageReference Include="System.Data.Odbc" Version="9.0.0" />
     <PackageReference Include="System.Private.Uri" Version="4.3.2" />
-    <PackageReference Include="ZXing.Net" Version="0.16.10" />
     <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.13" />
   </ItemGroup>
   <ItemGroup>
