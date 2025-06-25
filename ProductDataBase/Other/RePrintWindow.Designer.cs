@@ -23,7 +23,6 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            var resources = new System.ComponentModel.ComponentResourceManager(typeof(RePrintWindow));
             this.TemplateButton = new Button();
             this.CommentComboBox = new ComboBox();
             this.CommentTextBox = new TextBox();
@@ -72,9 +71,6 @@
             this.LabelPrintButton = new Button();
             this.PrintPostionNumericUpDown = new NumericUpDown();
             this.PrintRowLabel = new Label();
-            this.RePrintPrintDialog = new PrintDialog();
-            this.RePrintPrintDocument = new System.Drawing.Printing.PrintDocument();
-            this.RePrintPrintPreviewDialog = new PrintPreviewDialog();
             this.panel1 = new Panel();
             this.QrCodeTextBox = new TextBox();
             this.ProductTypeLabel2 = new Label();
@@ -602,22 +598,6 @@
             this.PrintRowLabel.TabIndex = 117;
             this.PrintRowLabel.Text = "印刷開始位置";
             // 
-            // RePrintPrintDialog
-            // 
-            this.RePrintPrintDialog.UseEXDialog = true;
-            // 
-            // RePrintPrintPreviewDialog
-            // 
-            this.RePrintPrintPreviewDialog.AutoScrollMargin = new Size(0, 0);
-            this.RePrintPrintPreviewDialog.AutoScrollMinSize = new Size(0, 0);
-            this.RePrintPrintPreviewDialog.ClientSize = new Size(400, 300);
-            this.RePrintPrintPreviewDialog.Enabled = true;
-            this.RePrintPrintPreviewDialog.Icon = (Icon)resources.GetObject("RePrintPrintPreviewDialog.Icon");
-            this.RePrintPrintPreviewDialog.Name = "RePrintPrintPreviewDialog";
-            this.RePrintPrintPreviewDialog.ShowIcon = false;
-            this.RePrintPrintPreviewDialog.Visible = false;
-            this.RePrintPrintPreviewDialog.Load += this.ProductRegistration2PrintPreviewDialog_Load;
-            // 
             // panel1
             // 
             this.panel1.Controls.Add(this.CommentTextBox);
@@ -805,9 +785,6 @@
         private Button LabelPrintButton;
         private NumericUpDown PrintPostionNumericUpDown;
         private Label PrintRowLabel;
-        private PrintDialog RePrintPrintDialog;
-        private System.Drawing.Printing.PrintDocument RePrintPrintDocument;
-        private PrintPreviewDialog RePrintPrintPreviewDialog;
         private Panel panel1;
         private ToolStripMenuItem 設定ToolStripMenuItem;
         private ToolStripMenuItem シリアルラベル印刷設定ToolStripMenuItem;
