@@ -172,6 +172,7 @@ namespace ProductDatabase {
 
                     if (calculatedLastSerial > maxNumber || firstSerial < minNumber) {// あるいは firstSerialがminNumber未満の場合も対象に
                         MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        FirstSerialNumberTextBox.Text = minNumber.ToString();
                         firstSerial = minNumber;
                     }
                 }
