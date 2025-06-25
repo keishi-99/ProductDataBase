@@ -23,7 +23,6 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            var resources = new System.ComponentModel.ComponentResourceManager(typeof(ProductRegistration2Window));
             this.ProductRegistration2MenuStrip = new MenuStrip();
             this.ファイルToolStripMenuItem = new ToolStripMenuItem();
             this.シリアルラベル印刷プレビューToolStripMenuItem = new ToolStripMenuItem();
@@ -102,9 +101,6 @@
             this.CheckSheetPrintButton = new Button();
             this.RegisterButton = new Button();
             this.CloseButton = new Button();
-            this.ProductRegistration2PrintDialog = new PrintDialog();
-            this.ProductRegistration2PrintDocument = new System.Drawing.Printing.PrintDocument();
-            this.ProductRegistration2PrintPreviewDialog = new PrintPreviewDialog();
             this.Substrate15DataGridView = new DataGridView();
             this.dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
@@ -983,21 +979,6 @@
             this.CloseButton.UseVisualStyleBackColor = true;
             this.CloseButton.Click += this.CloseButton_Click;
             // 
-            // ProductRegistration2PrintDialog
-            // 
-            this.ProductRegistration2PrintDialog.UseEXDialog = true;
-            // 
-            // ProductRegistration2PrintPreviewDialog
-            // 
-            this.ProductRegistration2PrintPreviewDialog.AutoScrollMargin = new Size(0, 0);
-            this.ProductRegistration2PrintPreviewDialog.AutoScrollMinSize = new Size(0, 0);
-            this.ProductRegistration2PrintPreviewDialog.ClientSize = new Size(400, 300);
-            this.ProductRegistration2PrintPreviewDialog.Enabled = true;
-            this.ProductRegistration2PrintPreviewDialog.Icon = (Icon)resources.GetObject("ProductRegistration2PrintPreviewDialog.Icon");
-            this.ProductRegistration2PrintPreviewDialog.Name = "ProductRegistration2PrintPreviewDialog";
-            this.ProductRegistration2PrintPreviewDialog.Visible = false;
-            this.ProductRegistration2PrintPreviewDialog.Load += this.ProductRegistration2PrintPreviewDialog_Load;
-            // 
             // Substrate15DataGridView
             // 
             this.Substrate15DataGridView.AllowUserToAddRows = false;
@@ -1458,9 +1439,6 @@
         private Button CheckSheetPrintButton;
         private Button RegisterButton;
         private Button CloseButton;
-        private PrintDialog ProductRegistration2PrintDialog;
-        private System.Drawing.Printing.PrintDocument ProductRegistration2PrintDocument;
-        private PrintPreviewDialog ProductRegistration2PrintPreviewDialog;
         private DataGridView Substrate15DataGridView;
         private CheckBox Substrate15CheckBox;
         private DataGridView Substrate14DataGridView;

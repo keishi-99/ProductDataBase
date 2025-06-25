@@ -1,8 +1,9 @@
-﻿using GenCode128;
-using ProductDatabase.Other;
+﻿using ProductDatabase.Other;
 using ProductDatabase.Product;
 using System.Data;
 using System.Data.SQLite;
+using ZXing;
+using ZXing.Windows.Compatibility;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
@@ -20,9 +21,6 @@ namespace ProductDatabase {
         private int _pageCount = 1;
         private System.Drawing.Printing.PrintAction _printAction;
 
-        private readonly double _displayResolution = 96.0;
-        private readonly int _displayMagnitude = 3;
-
         private string _serialType = string.Empty;
         private string _strSerialFirstNumber = string.Empty;
         private string _strSerialLastNumber = string.Empty;
@@ -34,6 +32,8 @@ namespace ProductDatabase {
         public RePrintWindow(ProductInformation productInfo) {
             InitializeComponent();
             ProductInfo = productInfo;
+
+
         }
 
         // ロードイベント
@@ -290,21 +290,22 @@ namespace ProductDatabase {
             try {
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
+                //PrintPreviewDialogオブジェクトの作成
+                var ppd = new PrintPreviewDialog();
+
                 pd.BeginPrint += (sender, e) => _printAction = e.PrintAction;
                 pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
                 _labelProNumLabelsToPrint = ProductInfo.Quantity;
                 _pageCount = 1;
 
-                RePrintPrintDialog.Document = pd;
-
-                if (RePrintPrintDialog.ShowDialog() == DialogResult.OK) {
+                if (ppd.ShowDialog() == DialogResult.OK) {
                     // ローディング画面の表示
                     using var loadingForm = new LoadingForm();
                     // 別スレッドで印刷処理を実行
                     Task.Run(() => {
                         try {
-                            RePrintPrintDialog.Document.Print();
+                            ppd.Document?.Print();
                         } finally {
                             // 印刷が終了したらローディング画面を閉じる
                             loadingForm.Invoke(new Action(() => loadingForm.Close()));
@@ -328,6 +329,9 @@ namespace ProductDatabase {
                 DataCheck();
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
+                //PrintPreviewDialogオブジェクトの作成
+                var ppd = new PrintPreviewDialog();
+
                 pd.BeginPrint += (sender, e) => _printAction = e.PrintAction;
                 pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
@@ -338,15 +342,17 @@ namespace ProductDatabase {
                     return false;
                 }
 
-                // 最大で表示
-                RePrintPrintPreviewDialog.Shown += (sender, e) => {
+                ppd.Shown += (sender, e) => {
+                    var tool = (ToolStrip)ppd.Controls[1];
+                    tool.Items[0].Visible = false;
                     if (sender is Form form) {
                         form.WindowState = FormWindowState.Maximized;
                     }
                 };
-                RePrintPrintPreviewDialog.PrintPreviewControl.Zoom = 3;
-                RePrintPrintPreviewDialog.Document = pd;
-                RePrintPrintPreviewDialog.ShowDialog();
+                ppd.PrintPreviewControl.Zoom = 3;
+                //プレビューするPrintDocumentを設定
+                ppd.Document = pd;
+                ppd.ShowDialog();
 
                 return true;
             } catch (Exception ex) {
@@ -607,13 +613,15 @@ namespace ProductDatabase {
                         barcodePosX = (float)(ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionX / 25.4 * resolution * magnitude);
                         barcodePosY = (float)(ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionY / 25.4 * resolution * magnitude);
                         barcodeHeight = ProductPrintSettings.BarcodeLayoutSettings.BarcodeHeight / 25.4 * resolution * magnitude;
-                        barcodeMagnitude = ProductPrintSettings.BarcodeLayoutSettings.BarcodeMagnitude;
+                        barcodeMagnitude = ProductPrintSettings.BarcodeLayoutSettings.BarcodeMagnitude / 25.4 * resolution * magnitude;
                     }
 
                     labelImage = new((int)sizeX, (int)sizeY);
+
                     g = Graphics.FromImage(labelImage);
                     g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
+                    // テキストを描画
                     stringSize = TextRenderer.MeasureText(text, textFont);
 
                     textPosX = ProductPrintSettings?.BarcodeLayoutSettings?.AlignTextXCenter ?? false
@@ -622,24 +630,29 @@ namespace ProductDatabase {
 
                     g.DrawString(text, textFont, Brushes.Black, textPosX, textPosY);
 
-                    var barWeight = resolution == _displayResolution ? 1 : (int)(1 * resolution / _displayResolution / _displayMagnitude);
+                    // ZXingライブラリを使用してバーコードを描画
+                    var writer = new BarcodeWriter<Bitmap> {
+                        Format = BarcodeFormat.CODE_128,
+                        Options = new ZXing.Common.EncodingOptions {
+                            Height = (int)barcodeHeight,
+                            Width = (int)barcodeMagnitude,
+                            PureBarcode = true
+                        },
+                        Renderer = new BitmapRenderer()
+                    };
 
-                    using (var img = Code128Rendering.MakeBarcodeImage(text, barWeight, true)) {
-                        var imageWidth = img.Width * barcodeMagnitude;
-
-                        if (imageWidth > labelImage.Width) { MessageBox.Show($"バーコードの幅がラベル幅を超えています{imageWidth}>{labelImage.Width}"); }
-
+                    using (var barcodeBitmap = writer.Write(text)) {
+                        // X座標の調整
                         barcodePosX = ProductPrintSettings?.BarcodeLayoutSettings?.AlignBarcodeXCenter ?? false
-                            ? (float)((labelImage.Width / 2) - (imageWidth / 2))
+                            ? ((labelImage.Width / 2) - (barcodeBitmap.Width / 2))
                             : barcodePosX;
 
-                        g.DrawImage(img, barcodePosX, barcodePosY, (float)imageWidth, (float)barcodeHeight);
-                        // プレビュー時、黒枠を描画
-                        if (isPreview) {
-                            using var p = new Pen(Color.Black, 3);
-                            g.DrawRectangle(p, 0, 0, labelImage.Width - 1, labelImage.Height - 1);
-                        }
-                        img.Dispose();
+                        g.DrawImage(barcodeBitmap, barcodePosX, barcodePosY, barcodeBitmap.Width, barcodeBitmap.Height);
+                    }
+                    // プレビュー時、黒枠を描画
+                    if (isPreview) {
+                        using var p = new Pen(Color.Black, 3);
+                        g.DrawRectangle(p, 0, 0, labelImage.Width - 1, labelImage.Height - 1);
                     }
                     g.Dispose();
                     break;
@@ -793,10 +806,6 @@ namespace ProductDatabase {
             };
             ls.ShowDialog(this);
             LoadSettings();
-        }
-        private void ProductRegistration2PrintPreviewDialog_Load(object sender, EventArgs e) {
-            var tool = (ToolStrip)RePrintPrintPreviewDialog.Controls[1];
-            tool.Items[0].Visible = false;
         }
         private void QrCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
     }
