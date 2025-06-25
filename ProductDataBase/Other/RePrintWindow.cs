@@ -293,8 +293,6 @@ namespace ProductDatabase {
             try {
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
-                //PrintPreviewDialogオブジェクトの作成
-                var ppd = new PrintPreviewDialog();
 
                 pd.BeginPrint += (sender, e) => _printAction = e.PrintAction;
                 pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
@@ -304,13 +302,17 @@ namespace ProductDatabase {
 
                 switch (print) {
                     case true:
-                        if (ppd.ShowDialog() == DialogResult.OK) {
+                        //PrintDialogクラスの作成
+                        var pdlg = new PrintDialog {
+                            Document = pd
+                        };
+                        if (pdlg.ShowDialog() == DialogResult.OK) {
                             // ローディング画面の表示
                             using var loadingForm = new LoadingForm();
                             // 別スレッドで印刷処理を実行
                             Task.Run(() => {
                                 try {
-                                    ppd.Document?.Print();
+                                    pd.Print();
                                 } finally {
                                     // 印刷が終了したらローディング画面を閉じる
                                     loadingForm.Invoke(new Action(() => loadingForm.Close()));
@@ -327,6 +329,8 @@ namespace ProductDatabase {
                     case false:
                         FormCheck();
                         DataCheck();
+                        //PrintPreviewDialogオブジェクトの作成
+                        var ppd = new PrintPreviewDialog();
                         ppd.Shown += (sender, e) => {
                             var tool = (ToolStrip)ppd.Controls[1];
                             tool.Items[0].Visible = false;
