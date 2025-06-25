@@ -292,11 +292,12 @@ namespace ProductDatabase {
                 connection.Open();
                 RegistrationCheck(connection);
 
+                // 登録完了メッセージ
+                MessageBox.Show("登録しました。");
+
                 // 印刷処理
                 HandleLabelPrinting();
                 HandleBarcodePrinting();
-
-                MessageBox.Show("登録完了");
 
                 HandlePostRegistration();
                 GenerateReportButton.Enabled = true;
