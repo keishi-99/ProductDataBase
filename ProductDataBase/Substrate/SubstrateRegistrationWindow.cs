@@ -555,15 +555,15 @@ namespace ProductDatabase {
         }
         private Bitmap MakeLabelImage(string text, int resolution, int magnitude) {
             if (SubstratePrintSettings is null) { throw new Exception(); }
-            var sizeX = (decimal)SubstratePrintSettings.LabelPageSettings.LabelWidth / 25.4M * resolution * magnitude;
-            var sizeY = (decimal)SubstratePrintSettings.LabelPageSettings.LabelHeight / 25.4M * resolution * magnitude;
+            var sizeX = (int)(SubstratePrintSettings.LabelPageSettings.LabelWidth / 25.4F * resolution * magnitude);
+            var sizeY = (int)(SubstratePrintSettings.LabelPageSettings.LabelHeight / 25.4F * resolution * magnitude);
 
-            Bitmap labelImage = new((int)sizeX, (int)sizeY);
+            Bitmap labelImage = new(sizeX, sizeY);
             using (var g = Graphics.FromImage(labelImage)) {
                 // アンチエイリアス処理を改善
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-                var fontSize = (decimal)SubstratePrintSettings.LabelLayoutSettings.TextFont.SizeInPoints / 72.0M * resolution * magnitude;
-                using (Font fnt = new(SubstratePrintSettings.LabelLayoutSettings.TextFont.Name, (float)fontSize)) {
+                var fontSize = SubstratePrintSettings.LabelLayoutSettings.TextFont.SizeInPoints / 72.0F * resolution * magnitude;
+                using (Font fnt = new(SubstratePrintSettings.LabelLayoutSettings.TextFont.Name, fontSize)) {
 
                     // StringFormat を使用して中心に配置
                     var sf = new StringFormat {
@@ -571,8 +571,8 @@ namespace ProductDatabase {
                         LineAlignment = SubstratePrintSettings.LabelLayoutSettings.AlignTextYCenter ? StringAlignment.Center : StringAlignment.Near
                     };
 
-                    var stringPosX = SubstratePrintSettings.LabelLayoutSettings.AlignTextXCenter ? 0 : (float)(SubstratePrintSettings.LabelLayoutSettings.TextPositionX / 25.4F * resolution * magnitude);
-                    var stringPosY = SubstratePrintSettings.LabelLayoutSettings.AlignTextYCenter ? 0 : (float)(SubstratePrintSettings.LabelLayoutSettings.TextPositionY / 25.4F * resolution * magnitude);
+                    var stringPosX = SubstratePrintSettings.LabelLayoutSettings.AlignTextXCenter ? 0 : (SubstratePrintSettings.LabelLayoutSettings.TextPositionX / 25.4F * resolution * magnitude);
+                    var stringPosY = SubstratePrintSettings.LabelLayoutSettings.AlignTextYCenter ? 0 : (SubstratePrintSettings.LabelLayoutSettings.TextPositionY / 25.4F * resolution * magnitude);
 
                     // 矩形領域を計算 (文字列を配置する領域)
                     var layoutRect = new RectangleF(stringPosX, stringPosY, labelImage.Width - stringPosX, labelImage.Height - stringPosY);
@@ -586,8 +586,6 @@ namespace ProductDatabase {
                         g.DrawRectangle(p, 0, 0, labelImage.Width - 1, labelImage.Height - 1);
                     }
                 }
-
-                g.Dispose();
             }
 
             return labelImage;

@@ -461,9 +461,9 @@
             this.Label2.AutoSize = true;
             this.Label2.Location = new Point(156, 21);
             this.Label2.Name = "Label2";
-            this.Label2.Size = new Size(19, 15);
+            this.Label2.Size = new Size(27, 15);
             this.Label2.TabIndex = 2;
-            this.Label2.Text = "縦";
+            this.Label2.Text = "高さ";
             // 
             // Label1
             // 
@@ -472,7 +472,7 @@
             this.Label1.Name = "Label1";
             this.Label1.Size = new Size(19, 15);
             this.Label1.TabIndex = 1;
-            this.Label1.Text = "横";
+            this.Label1.Text = "幅";
             // 
             // LabelSizeGroupBox
             // 

@@ -39,7 +39,7 @@
             this.Label36 = new Label();
             this.BarcodeCopiesPerLabelTextBox = new TextBox();
             this.Label35 = new Label();
-            this.BarcodeMagnitudeTextBox = new TextBox();
+            this.BarcodeWidthTextBox = new TextBox();
             this.Label34 = new Label();
             this.BarcodeCenterCheckBox = new CheckBox();
             this.BarcodePostionYTextBox = new TextBox();
@@ -127,7 +127,7 @@
             this.BarcodeGroupBox.Controls.Add(this.Label36);
             this.BarcodeGroupBox.Controls.Add(this.BarcodeCopiesPerLabelTextBox);
             this.BarcodeGroupBox.Controls.Add(this.Label35);
-            this.BarcodeGroupBox.Controls.Add(this.BarcodeMagnitudeTextBox);
+            this.BarcodeGroupBox.Controls.Add(this.BarcodeWidthTextBox);
             this.BarcodeGroupBox.Controls.Add(this.Label34);
             this.BarcodeGroupBox.Controls.Add(this.BarcodeCenterCheckBox);
             this.BarcodeGroupBox.Controls.Add(this.BarcodePostionYTextBox);
@@ -268,22 +268,22 @@
             this.Label35.TabIndex = 9;
             this.Label35.Text = "発行枚数";
             // 
-            // BarcodeMagnitudeTextBox
+            // BarcodeWidthTextBox
             // 
-            this.BarcodeMagnitudeTextBox.Location = new Point(22, 92);
-            this.BarcodeMagnitudeTextBox.MaxLength = 5;
-            this.BarcodeMagnitudeTextBox.Name = "BarcodeMagnitudeTextBox";
-            this.BarcodeMagnitudeTextBox.Size = new Size(52, 23);
-            this.BarcodeMagnitudeTextBox.TabIndex = 8;
+            this.BarcodeWidthTextBox.Location = new Point(22, 92);
+            this.BarcodeWidthTextBox.MaxLength = 5;
+            this.BarcodeWidthTextBox.Name = "BarcodeWidthTextBox";
+            this.BarcodeWidthTextBox.Size = new Size(52, 23);
+            this.BarcodeWidthTextBox.TabIndex = 8;
             // 
             // Label34
             // 
             this.Label34.AutoSize = true;
             this.Label34.Location = new Point(20, 77);
             this.Label34.Name = "Label34";
-            this.Label34.Size = new Size(31, 15);
+            this.Label34.Size = new Size(65, 15);
             this.Label34.TabIndex = 7;
-            this.Label34.Text = "倍率";
+            this.Label34.Text = "バーコード幅";
             // 
             // BarcodeCenterCheckBox
             // 
@@ -343,9 +343,9 @@
             this.Label31.AutoSize = true;
             this.Label31.Location = new Point(20, 15);
             this.Label31.Name = "Label31";
-            this.Label31.Size = new Size(27, 15);
+            this.Label31.Size = new Size(73, 15);
             this.Label31.TabIndex = 1;
-            this.Label31.Text = "高さ";
+            this.Label31.Text = "バーコード高さ";
             // 
             // WhiteSpaceGroupBox
             // 
@@ -525,9 +525,9 @@
             this.Label2.AutoSize = true;
             this.Label2.Location = new Point(156, 21);
             this.Label2.Name = "Label2";
-            this.Label2.Size = new Size(19, 15);
+            this.Label2.Size = new Size(27, 15);
             this.Label2.TabIndex = 2;
-            this.Label2.Text = "縦";
+            this.Label2.Text = "高さ";
             // 
             // Label1
             // 
@@ -536,7 +536,7 @@
             this.Label1.Name = "Label1";
             this.Label1.Size = new Size(19, 15);
             this.Label1.TabIndex = 1;
-            this.Label1.Text = "横";
+            this.Label1.Text = "幅";
             // 
             // HeaderGroupBox
             // 
@@ -812,7 +812,7 @@
         private Label Label36;
         private TextBox BarcodeCopiesPerLabelTextBox;
         private Label Label35;
-        private TextBox BarcodeMagnitudeTextBox;
+        private TextBox BarcodeWidthTextBox;
         private Label Label34;
         private CheckBox BarcodeCenterCheckBox;
         private TextBox BarcodePostionYTextBox;
