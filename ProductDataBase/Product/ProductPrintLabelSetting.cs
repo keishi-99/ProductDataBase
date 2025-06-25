@@ -53,23 +53,23 @@ namespace ProductDatabase.Product {
     public class LabelPageSettings {
         public int LabelsPerRow { get; set; }
         public int LabelsPerColumn { get; set; }
-        public double LabelWidth { get; set; }
-        public double LabelHeight { get; set; }
-        public double MarginX { get; set; }
-        public double MarginY { get; set; }
-        public double IntervalX { get; set; }
-        public double IntervalY { get; set; }
+        public float LabelWidth { get; set; }
+        public float LabelHeight { get; set; }
+        public float MarginX { get; set; }
+        public float MarginY { get; set; }
+        public float IntervalX { get; set; }
+        public float IntervalY { get; set; }
         public string HeaderTextFormat { get; set; } = string.Empty;
-        public double HeaderPositionX { get; set; }
-        public double HeaderPositionY { get; set; }
+        public float HeaderPositionX { get; set; }
+        public float HeaderPositionY { get; set; }
 
         [JsonConverter(typeof(FontJsonConverter))]
         public Font HeaderFont { get; set; } = SystemFonts.DefaultFont;
     }
     public class LabelLayoutSettings {
         public string TextFormat { get; set; } = string.Empty;
-        public double TextPositionX { get; set; }
-        public double TextPositionY { get; set; }
+        public float TextPositionX { get; set; }
+        public float TextPositionY { get; set; }
         public bool AlignTextXCenter { get; set; }
         public bool AlignTextYCenter { get; set; }
         public int CopiesPerLabel { get; set; }
@@ -81,27 +81,27 @@ namespace ProductDatabase.Product {
     public class BarcodePageSettings {
         public int LabelsPerRow { get; set; }
         public int LabelsPerColumn { get; set; }
-        public double LabelWidth { get; set; }
-        public double LabelHeight { get; set; }
-        public double MarginX { get; set; }
-        public double MarginY { get; set; }
-        public double IntervalX { get; set; }
-        public double IntervalY { get; set; }
+        public float LabelWidth { get; set; }
+        public float LabelHeight { get; set; }
+        public float MarginX { get; set; }
+        public float MarginY { get; set; }
+        public float IntervalX { get; set; }
+        public float IntervalY { get; set; }
         public string HeaderTextFormat { get; set; } = string.Empty;
-        public double HeaderPositionX { get; set; }
-        public double HeaderPositionY { get; set; }
+        public float HeaderPositionX { get; set; }
+        public float HeaderPositionY { get; set; }
 
         [JsonConverter(typeof(FontJsonConverter))]
         public Font HeaderFont { get; set; } = SystemFonts.DefaultFont;
     }
     public class BarcodeLayoutSettings {
         public string TextFormat { get; set; } = string.Empty;
-        public double BarcodeHeight { get; set; }
-        public double BarcodePositionX { get; set; }
-        public double BarcodePositionY { get; set; }
-        public double BarcodeMagnitude { get; set; }
-        public double TextPositionX { get; set; }
-        public double TextPositionY { get; set; }
+        public float BarcodeHeight { get; set; }
+        public float BarcodeWidth { get; set; }
+        public float BarcodePositionX { get; set; }
+        public float BarcodePositionY { get; set; }
+        public float TextPositionX { get; set; }
+        public float TextPositionY { get; set; }
         public bool AlignTextXCenter { get; set; }
         public bool AlignBarcodeXCenter { get; set; }
         public int CopiesPerLabel { get; set; }

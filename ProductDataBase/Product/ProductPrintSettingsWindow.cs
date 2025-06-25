@@ -128,31 +128,31 @@ namespace ProductDatabase {
         }
         private void UpdateProductPrintSettings() {
             if (ProductPrintSettings.LabelPageSettings != null) {
-                ProductPrintSettings.LabelPageSettings.LabelWidth = ParseDouble(LabelWidthTextBox.Text);
-                ProductPrintSettings.LabelPageSettings.LabelHeight = ParseDouble(LabelHeightTextBox.Text);
+                ProductPrintSettings.LabelPageSettings.LabelWidth = ParseFloat(LabelWidthTextBox.Text);
+                ProductPrintSettings.LabelPageSettings.LabelHeight = ParseFloat(LabelHeightTextBox.Text);
                 ProductPrintSettings.LabelPageSettings.LabelsPerRow = ParseInt(LabelsPerRowTextBox.Text);
                 ProductPrintSettings.LabelPageSettings.LabelsPerColumn = ParseInt(LabelsPerColumnTextBox.Text);
-                ProductPrintSettings.LabelPageSettings.MarginX = ParseDouble(LabelMarginXTextBox.Text);
-                ProductPrintSettings.LabelPageSettings.MarginY = ParseDouble(LabelMarginYTextBox.Text);
-                ProductPrintSettings.LabelPageSettings.IntervalX = ParseDouble(LabelIntervalXTextBox.Text);
-                ProductPrintSettings.LabelPageSettings.IntervalY = ParseDouble(LabelIntervalYTextBox.Text);
-                ProductPrintSettings.LabelPageSettings.HeaderPositionX = ParseDouble(HeaderPostionXTextBox.Text);
-                ProductPrintSettings.LabelPageSettings.HeaderPositionY = ParseDouble(HeaderPostionYTextBox.Text);
+                ProductPrintSettings.LabelPageSettings.MarginX = ParseFloat(LabelMarginXTextBox.Text);
+                ProductPrintSettings.LabelPageSettings.MarginY = ParseFloat(LabelMarginYTextBox.Text);
+                ProductPrintSettings.LabelPageSettings.IntervalX = ParseFloat(LabelIntervalXTextBox.Text);
+                ProductPrintSettings.LabelPageSettings.IntervalY = ParseFloat(LabelIntervalYTextBox.Text);
+                ProductPrintSettings.LabelPageSettings.HeaderPositionX = ParseFloat(HeaderPostionXTextBox.Text);
+                ProductPrintSettings.LabelPageSettings.HeaderPositionY = ParseFloat(HeaderPostionYTextBox.Text);
                 ProductPrintSettings.LabelPageSettings.HeaderTextFormat = HeaderTextTextBox.Text;
                 ProductPrintSettings.LabelPageSettings.HeaderFont = HeaderFontDialog.Font;
             }
             if (ProductPrintSettings.LabelLayoutSettings != null) {
                 ProductPrintSettings.LabelLayoutSettings.TextFormat = LabelFormatTextBox.Text;
                 ProductPrintSettings.LabelLayoutSettings.TextFont = LabelFontDialog.Font;
-                ProductPrintSettings.LabelLayoutSettings.TextPositionX = ParseDouble(LabelTextPostionXTextBox.Text);
-                ProductPrintSettings.LabelLayoutSettings.TextPositionY = ParseDouble(LabelTextPostionYTextBox.Text);
+                ProductPrintSettings.LabelLayoutSettings.TextPositionX = ParseFloat(LabelTextPostionXTextBox.Text);
+                ProductPrintSettings.LabelLayoutSettings.TextPositionY = ParseFloat(LabelTextPostionYTextBox.Text);
                 ProductPrintSettings.LabelLayoutSettings.AlignTextXCenter = AlignTextXCenterCheckBox.Checked;
                 ProductPrintSettings.LabelLayoutSettings.AlignTextYCenter = AlignTextYCenterCheckBox.Checked;
                 ProductPrintSettings.LabelLayoutSettings.CopiesPerLabel = ParseInt(CopiesPerLabelTextBox.Text);
             }
         }
-        private static double ParseDouble(string text) {
-            if (double.TryParse(text, out var value)) {
+        private static float ParseFloat(string text) {
+            if (float.TryParse(text, out var value)) {
                 return value;
             }
             else {

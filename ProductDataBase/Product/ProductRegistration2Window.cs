@@ -21,6 +21,9 @@ namespace ProductDatabase {
         private int _labelProNSerial;
         private int _labelProNumLabelsToPrint;
 
+        private const float MmPerInch = 25.4F;
+        private const float PointsPerInch = 72.0F;
+
         private int _pageCount = 1;
         private System.Drawing.Printing.PrintAction _printAction;
 
@@ -717,7 +720,7 @@ namespace ProductDatabase {
                 MessageBox.Show("シリアルラベルを印刷します。");
                 _serialType = "Label";
 
-                if (!StartPrint()) {
+                if (!Print(true)) {
                     throw new OperationCanceledException("キャンセルしました。");
                 }
             }
@@ -727,7 +730,7 @@ namespace ProductDatabase {
                 MessageBox.Show("バーコードラベルを印刷します。");
                 _serialType = "Barcode";
 
-                if (!StartPrint()) {
+                if (!Print(true)) {
                     throw new OperationCanceledException("キャンセルしました。");
                 }
             }
@@ -770,40 +773,7 @@ namespace ProductDatabase {
         public ServiceInformation ServiceInfo { get; set; } = new();
 
         // 印刷処理
-        private bool StartPrint() {
-            // PrintDocumentオブジェクトの作成
-            using System.Drawing.Printing.PrintDocument pd = new();
-            //PrintPreviewDialogオブジェクトの作成
-            var ppd = new PrintPreviewDialog();
-
-            pd.BeginPrint += (sender, e) => _printAction = e.PrintAction;
-            pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
-
-            _labelProNumLabelsToPrint = ProductInfo.Quantity;
-            _pageCount = 1;
-
-            if (ppd.ShowDialog() == DialogResult.OK) {
-                // ローディング画面の表示
-                using var loadingForm = new LoadingForm();
-                // 別スレッドで印刷処理を実行
-                Task.Run(() => {
-                    try {
-                        ppd.Document?.Print();
-                    } finally {
-                        // 印刷が終了したらローディング画面を閉じる
-                        loadingForm.Invoke(new Action(() => loadingForm.Close()));
-                    }
-                });
-
-                // ローディング画面をモーダルとして表示
-                loadingForm.ShowDialog();
-            }
-            else {
-                return false;
-            }
-            return true;
-        }
-        private bool PreviewPrint() {
+        private bool Print(bool print) {
             try {
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
@@ -816,18 +786,42 @@ namespace ProductDatabase {
                 _labelProNumLabelsToPrint = ProductInfo.Quantity;
                 _pageCount = 1;
 
-                ppd.Shown += (sender, e) => {
-                    var tool = (ToolStrip)ppd.Controls[1];
-                    tool.Items[0].Visible = false;
-                    if (sender is Form form) {
-                        form.WindowState = FormWindowState.Maximized;
-                    }
-                };
-                ppd.PrintPreviewControl.Zoom = 3;
-                ppd.Document = pd;
-                ppd.ShowDialog();
+                switch (print) {
+                    case true:
+                        if (ppd.ShowDialog() == DialogResult.OK) {
+                            // ローディング画面の表示
+                            using var loadingForm = new LoadingForm();
+                            // 別スレッドで印刷処理を実行
+                            Task.Run(() => {
+                                try {
+                                    ppd.Document?.Print();
+                                } finally {
+                                    // 印刷が終了したらローディング画面を閉じる
+                                    loadingForm.Invoke(new Action(() => loadingForm.Close()));
+                                }
+                            });
 
-                return true;
+                            // ローディング画面をモーダルとして表示
+                            loadingForm.ShowDialog();
+                        }
+                        else {
+                            return false;
+                        }
+                        return true;
+                    case false:
+                        ppd.Shown += (sender, e) => {
+                            var tool = (ToolStrip)ppd.Controls[1];
+                            tool.Items[0].Visible = false;
+                            if (sender is Form form) {
+                                form.WindowState = FormWindowState.Maximized;
+                            }
+                        };
+                        ppd.PrintPreviewControl.Zoom = 3;
+                        ppd.Document = pd;
+                        ppd.ShowDialog();
+
+                        return true;
+                }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
@@ -1013,9 +1007,9 @@ namespace ProductDatabase {
             Bitmap labelImage = new(1, 1);
             Graphics g;
             SizeF stringSize;
-            double sizeX = 0;
-            double sizeY = 0;
-            double fontSize;
+            var sizeX = 0;
+            var sizeY = 0;
+            float fontSize;
             float textPosX = 0;
             float textPosY = 0;
             var textFont = SystemFonts.DefaultFont;
@@ -1028,18 +1022,19 @@ namespace ProductDatabase {
                         throw new Exception("ProductPrintSettingsがnull");
                     }
                     if (ProductPrintSettings.LabelPageSettings != null) {
-                        sizeX = ProductPrintSettings.LabelPageSettings.LabelWidth / 25.4 * resolution * magnitude;
-                        sizeY = ProductPrintSettings.LabelPageSettings.LabelHeight / 25.4 * resolution * magnitude;
+                        sizeX = (int)(ProductPrintSettings.LabelPageSettings.LabelWidth / MmPerInch * resolution * magnitude);
+                        sizeY = (int)(ProductPrintSettings.LabelPageSettings.LabelHeight / MmPerInch * resolution * magnitude);
                     }
                     if (ProductPrintSettings.LabelLayoutSettings != null) {
-                        textPosX = (float)(ProductPrintSettings.LabelLayoutSettings.TextPositionX / 25.4 * resolution * magnitude);
-                        textPosY = (float)(ProductPrintSettings.LabelLayoutSettings.TextPositionY / 25.4 * resolution * magnitude);
-                        fontSize = ProductPrintSettings.LabelLayoutSettings.TextFont.SizeInPoints / 72.0 * resolution * magnitude;
+                        textPosX = ProductPrintSettings.LabelLayoutSettings.TextPositionX / MmPerInch * resolution * magnitude;
+                        textPosY = ProductPrintSettings.LabelLayoutSettings.TextPositionY / MmPerInch * resolution * magnitude;
+                        fontSize = ProductPrintSettings.LabelLayoutSettings.TextFont.SizeInPoints / PointsPerInch * resolution * magnitude;
                         var style = fontUnderline ? FontStyle.Underline : FontStyle.Regular;
-                        textFont = new Font(ProductPrintSettings.LabelLayoutSettings.TextFont.Name, (float)fontSize, style);
+                        textFont = new Font(ProductPrintSettings.LabelLayoutSettings.TextFont.Name, fontSize, style);
                     }
 
-                    labelImage = new((int)sizeX, (int)sizeY);
+                    labelImage = new(sizeX, sizeY);
+
                     g = Graphics.FromImage(labelImage);
                     // アンチエイリアス処理を改善
                     g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
@@ -1067,36 +1062,37 @@ namespace ProductDatabase {
                 case "Barcode":
                     float barcodePosX = 0;
                     float barcodePosY = 0;
-                    double barcodeHeight = 1;
-                    double barcodeMagnitude = 1;
+                    var barcodeHeight = 1;
+                    var barcodeWidth = 1;
                     if (ProductPrintSettings == null) {
                         throw new Exception("SettingsBarcodeProがnull");
                     }
                     if (ProductPrintSettings.BarcodePageSettings != null) {
-                        sizeX = ProductPrintSettings.BarcodePageSettings.LabelWidth / 25.4 * resolution * magnitude;
-                        sizeY = ProductPrintSettings.BarcodePageSettings.LabelHeight / 25.4 * resolution * magnitude;
+                        sizeX = (int)(ProductPrintSettings.BarcodePageSettings.LabelWidth / MmPerInch * resolution * magnitude);
+                        sizeY = (int)(ProductPrintSettings.BarcodePageSettings.LabelHeight / MmPerInch * resolution * magnitude);
                     }
                     if (ProductPrintSettings.BarcodeLayoutSettings != null) {
-                        textPosX = (float)(ProductPrintSettings.BarcodeLayoutSettings.TextPositionX / 25.4 * resolution * magnitude);
-                        textPosY = (float)(ProductPrintSettings.BarcodeLayoutSettings.TextPositionY / 25.4 * resolution * magnitude);
-                        fontSize = ProductPrintSettings.BarcodeLayoutSettings.TextFont.SizeInPoints / 72.0 * resolution * magnitude;
+                        textPosX = ProductPrintSettings.BarcodeLayoutSettings.TextPositionX / MmPerInch * resolution * magnitude;
+                        textPosY = ProductPrintSettings.BarcodeLayoutSettings.TextPositionY / MmPerInch * resolution * magnitude;
+                        fontSize = ProductPrintSettings.BarcodeLayoutSettings.TextFont.SizeInPoints / PointsPerInch * resolution * magnitude;
                         textFont = new Font(ProductPrintSettings.BarcodeLayoutSettings.TextFont.Name, (float)fontSize, FontStyle.Regular);
-                        barcodePosX = (float)(ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionX / 25.4 * resolution * magnitude);
-                        barcodePosY = (float)(ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionY / 25.4 * resolution * magnitude);
-                        barcodeHeight = ProductPrintSettings.BarcodeLayoutSettings.BarcodeHeight / 25.4 * resolution * magnitude;
-                        barcodeMagnitude = ProductPrintSettings.BarcodeLayoutSettings.BarcodeMagnitude;
+                        barcodePosX = ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionX / MmPerInch * resolution * magnitude;
+                        barcodePosY = ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionY / MmPerInch * resolution * magnitude;
+                        barcodeHeight = (int)(ProductPrintSettings.BarcodeLayoutSettings.BarcodeHeight / MmPerInch * resolution * magnitude);
+                        barcodeWidth = (int)(ProductPrintSettings.BarcodeLayoutSettings.BarcodeWidth / MmPerInch * resolution * magnitude);
                     }
 
-                    labelImage = new((int)sizeX, (int)sizeY);
+                    labelImage = new(sizeX, sizeY);
                     g = Graphics.FromImage(labelImage);
                     g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit; // アンチエイリアス処理を改善
 
                     // テキストを描画
                     stringSize = TextRenderer.MeasureText(text, textFont);
 
-                    textPosX = ProductPrintSettings?.BarcodeLayoutSettings?.AlignTextXCenter ?? false
-                        ? (float)((labelImage.Width / 2) - (stringSize.Width / 2))
-                        : textPosX;
+                    // X座標の調整
+                    if (ProductPrintSettings?.BarcodeLayoutSettings?.AlignTextXCenter ?? false) {
+                        textPosX = (labelImage.Width / 2) - (stringSize.Width / 2);
+                    }
 
                     g.DrawString(text, textFont, Brushes.Black, textPosX, textPosY);
 
@@ -1104,8 +1100,8 @@ namespace ProductDatabase {
                     var writer = new BarcodeWriter<Bitmap> {
                         Format = BarcodeFormat.CODE_128,
                         Options = new ZXing.Common.EncodingOptions {
-                            Height = (int)barcodeHeight,
-                            Width = (int)barcodeMagnitude,
+                            Height = barcodeHeight,
+                            Width = barcodeWidth,
                             PureBarcode = true
                         },
                         Renderer = new BitmapRenderer()
@@ -1113,11 +1109,11 @@ namespace ProductDatabase {
 
                     using (var barcodeBitmap = writer.Write(text)) {
                         // X座標の調整
-                        barcodePosX = ProductPrintSettings?.BarcodeLayoutSettings?.AlignBarcodeXCenter ?? false
-                            ? ((labelImage.Width / 2) - (barcodeBitmap.Width / 2))
-                            : barcodePosX;
+                        if (ProductPrintSettings?.BarcodeLayoutSettings?.AlignBarcodeXCenter ?? false) {
+                            barcodePosX = (labelImage.Width / 2) - (barcodeBitmap.Width / 2);
+                        }
 
-                        g.DrawImage(barcodeBitmap, barcodePosX, barcodePosY, barcodeBitmap.Width, barcodeBitmap.Height);
+                        g.DrawImage(barcodeBitmap, barcodePosX, barcodePosY, barcodeWidth, barcodeHeight);
                     }
 
                     // プレビュー時、黒枠を描画
@@ -1226,11 +1222,11 @@ namespace ProductDatabase {
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { Close(); }
         private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Label";
-            PreviewPrint();
+            Print(false);
         }
         private void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Barcode";
-            PreviewPrint();
+            Print(false);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             ProductPrintSettingsWindow ls = new() {
