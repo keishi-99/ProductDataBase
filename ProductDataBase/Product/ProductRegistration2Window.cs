@@ -284,6 +284,14 @@ namespace ProductDatabase {
 
                 Registration();
 
+                LogRegistration(ProductInfo);
+                BackupManager.CreateBackup();
+
+                // 登録チェック
+                using var connection = new SQLiteConnection(GetConnectionRegistration());
+                connection.Open();
+                RegistrationCheck(connection);
+
                 MessageBox.Show("登録完了");
 
                 HandlePostRegistration();
@@ -299,12 +307,12 @@ namespace ProductDatabase {
             using var transaction = connection.BeginTransaction();
 
             try {
+                InsertProduct(connection);
+
                 switch (ProductInfo.RegType) {
                     case 0:
-                        InsertProduct(connection);
                         break;
                     case 1:
-                        InsertProduct(connection);
                         if (ProductInfo.IsSerialGeneration) {
                             InsertSerial(connection);
                         }
@@ -313,28 +321,23 @@ namespace ProductDatabase {
                     case 3:
                     case 4:
                     case 9:
-                        InsertProduct(connection);
                         if (ProductInfo.IsSerialGeneration) {
                             InsertSerial(connection);
                         }
                         RegisterSubstrate(connection);
                         break;
+                    default:
+                        throw new Exception("RegType unknown");
                 }
 
                 HandleLabelPrinting();
                 HandleBarcodePrinting();
                 transaction.Commit();
 
-                LogRegistration(ProductInfo);
-                CommonUtils.BackupManager.CreateBackup();
-
-                // 登録チェック
-                RegistrationCheck(connection);
-
             } catch (Exception) {
-                if (transaction.Connection != null) { //接続が開いているか確認する。
-                    transaction.Rollback();
-                }
+                // エラーが発生した場合はトランザクションをロールバック
+                MessageBox.Show("登録に失敗しました。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                transaction.Rollback();
                 throw;
             }
         }
