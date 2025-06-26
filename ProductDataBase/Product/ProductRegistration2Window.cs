@@ -41,12 +41,19 @@ namespace ProductDatabase {
                         "Substrate11DataGridView", "Substrate12DataGridView", "Substrate13DataGridView", "Substrate14DataGridView","Substrate15DataGridView"
                         ];
 
+        private SQLiteConnection? _editModeConnection; // 編集モード用の接続
+        private SQLiteTransaction? _editModeTransaction; // 編集モード用のトランザクション
+
         public ProductRegistration2Window() {
             InitializeComponent();
         }
 
         private void LoadEvents() {
             try {
+                _editModeConnection = new SQLiteConnection(GetConnectionRegistration());
+                _editModeConnection.Open();
+                _editModeTransaction = _editModeConnection.BeginTransaction(); // トランザクション開始（ロック）
+
                 SetFont();
                 InitializeUIControls();
 
@@ -66,7 +73,7 @@ namespace ProductDatabase {
                             }
                             ServiceInfo = window.ServiceInfo;
                         }
-                        LoadSubstrateData();
+                        LoadSubstrateData(_editModeConnection);
                         break;
                     default:
                         HideAllControls();
@@ -77,6 +84,18 @@ namespace ProductDatabase {
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
+            }
+        }
+        private void ClosingEvents() {
+            // 編集モードのトランザクションをコミットしてロック解除
+            if (_editModeTransaction != null) {
+                _editModeTransaction.Dispose();
+                _editModeTransaction = null;
+            }
+            if (_editModeConnection != null) {
+                _editModeConnection.Close();
+                _editModeConnection.Dispose();
+                _editModeConnection = null;
             }
         }
         private void SetFont() {
@@ -103,7 +122,7 @@ namespace ProductDatabase {
             _labelProNSerial = ProductInfo.SerialFirstNumber;
             _serialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
         }
-        private void LoadSubstrateData() {
+        private void LoadSubstrateData(SQLiteConnection connection) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = ProductInfo.RegType == 9;
             var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : _useSubstrate)
@@ -124,7 +143,7 @@ namespace ProductDatabase {
                 SetupCheckBox(objCbx, i, substrateName, useSubstrate);
                 SetupDataGridView(objDgv);
 
-                if (FetchAndDisplaySubstrateData(objDgv, i)) {
+                if (FetchAndDisplaySubstrateData(connection, objDgv, i)) {
                     shortageSubstrateName += $"[{substrateName}]{Environment.NewLine}";
                 }
             }
@@ -174,7 +193,7 @@ namespace ProductDatabase {
                     break;
             }
         }
-        private bool FetchAndDisplaySubstrateData(DataGridView? objDgv, int index) {
+        private bool FetchAndDisplaySubstrateData(SQLiteConnection connection, DataGridView? objDgv, int index) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = ProductInfo.RegType == 9;
             var categoryName = (isServiceRegistration ? ServiceInfo.ServiceCategoryName : ProductInfo.CategoryName)
@@ -185,8 +204,6 @@ namespace ProductDatabase {
                 ?? throw new Exception("ArrUseSubstrateがnullです。");
 
             var intQuantity = ProductInfo.Quantity;
-            using SQLiteConnection connection = new(GetConnectionRegistration());
-            connection.Open();
 
             var commandText = $@"
                 SELECT
@@ -274,23 +291,25 @@ namespace ProductDatabase {
             try {
                 _strSerial.Clear();
 
-                if (!NumberCheck() || !QuantityCheck()) { return; }
+                if (_editModeConnection == null || _editModeTransaction == null) {
+                    throw new InvalidOperationException("編集モード用の接続が初期化されていません。");
+                }
+
+                if (!NumberCheck(_editModeConnection) || !QuantityCheck()) { return; }
                 if (ProductInfo.IsSerialGeneration) {
-                    SerialCheck();
+                    SerialCheck(_editModeConnection);
                     GenerateSerialCodes();
                 }
 
                 DisableControls();
 
-                Registration();
+                Registration(_editModeConnection, _editModeTransaction);
 
                 LogRegistration(ProductInfo);
                 BackupManager.CreateBackup();
 
                 // 登録チェック
-                using var connection = new SQLiteConnection(GetConnectionRegistration());
-                connection.Open();
-                RegistrationCheck(connection);
+                RegistrationCheck(_editModeConnection);
 
                 // 登録完了メッセージ
                 MessageBox.Show("登録しました。");
@@ -306,11 +325,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void Registration() {
-            using var connection = new SQLiteConnection(GetConnectionRegistration());
-            connection.Open();
-            using var transaction = connection.BeginTransaction();
-
+        private void Registration(SQLiteConnection connection, SQLiteTransaction transaction) {
             try {
                 InsertProduct(connection);
 
@@ -338,8 +353,8 @@ namespace ProductDatabase {
 
             } catch (Exception) {
                 // エラーが発生した場合はトランザクションをロールバック
-                MessageBox.Show("登録に失敗しました。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 transaction.Rollback();
+                MessageBox.Show("登録に失敗しました。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 throw;
             }
         }
@@ -531,10 +546,7 @@ namespace ProductDatabase {
             CommonUtils.Logger.AppendLog(logMessageArray);
         }
 
-        private bool NumberCheck() {
-            using SQLiteConnection connection = new(GetConnectionRegistration());
-            connection.Open();
-
+        private bool NumberCheck(SQLiteConnection connection) {
             var productModel = string.Empty;
 
             if (!string.IsNullOrEmpty(ProductInfo.ProductNumber)) {
@@ -656,7 +668,7 @@ namespace ProductDatabase {
                 return false;
             }
         }
-        private void SerialCheck() {
+        private void SerialCheck(SQLiteConnection connection) {
             if (ProductInfo.IsLabelPrint) {
                 for (var i = 0; i < ProductInfo.Quantity; i++) {
                     _serialType = "Label";
@@ -678,11 +690,9 @@ namespace ProductDatabase {
             else { throw new Exception("PrintType unknown"); }
 
             List<string> strSerialDuplication = [];
-            using (SQLiteConnection con = new(GetConnectionRegistration())) {
-                con.Open();
 
-                using var cmd = con.CreateCommand();
-                cmd.CommandText = $"""
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = $"""
                     SELECT
                         s.rowid,
                         s.Serial,
@@ -703,16 +713,15 @@ namespace ProductDatabase {
                     AND
                         s.Serial IN ({string.Join(",", _strSerial.Select((_, i) => $"@Serial{i}"))});
                     """;
-                cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
-                _strSerial
-                    .Select((serial, i) => new { ParamName = $"@Serial{i}", Value = serial.Trim() })
-                    .ToList()
-                    .ForEach(p => cmd.Parameters.Add(p.ParamName, System.Data.DbType.String).Value = p.Value);
+            cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
+            _strSerial
+                .Select((serial, i) => new { ParamName = $"@Serial{i}", Value = serial.Trim() })
+                .ToList()
+                .ForEach(p => cmd.Parameters.Add(p.ParamName, System.Data.DbType.String).Value = p.Value);
 
-                using var dr = cmd.ExecuteReader();
-                while (dr.Read()) {
-                    strSerialDuplication.Add($"{dr["Serial"]}");
-                }
+            using var dr = cmd.ExecuteReader();
+            while (dr.Read()) {
+                strSerialDuplication.Add($"{dr["Serial"]}");
             }
 
             if (strSerialDuplication.Count > 0) {
@@ -1225,6 +1234,7 @@ namespace ProductDatabase {
         }
 
         private void ProductRegistration2Window_Load(object sender, EventArgs e) { LoadEvents(); }
+        private void ProductRegistration2Window_FormClosing(object sender, FormClosingEventArgs e) { ClosingEvents(); }
         private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
         private void SubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBox_CheckedChanged(sender, e); }
@@ -1281,5 +1291,6 @@ namespace ProductDatabase {
         private void GenerateReportButton_Click(object sender, EventArgs e) { GenerateReport(); }
         private void SubstrateListPrintButton_Click(object sender, EventArgs e) { GenerateList(); }
         private void CheckSheetPrintButton_Click(object sender, EventArgs e) { GenerateCheckSheet(); }
+
     }
 }
