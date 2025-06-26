@@ -112,22 +112,24 @@ namespace ProductDatabase {
             }
         }
         // 登録処理
-        private void RegisterCheck() {
+        private void RegisterCheck(bool print) {
             try {
                 FormCheck();
                 if (!DataCheck()) { return; }
 
-                DialogResult result;
-                result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                if (result == DialogResult.Cancel) { return; }
+                if (print) {
+                    DialogResult result;
+                    result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                    if (result == DialogResult.Cancel) { return; }
 
-                result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                if (result == DialogResult.Cancel) { return; }
+                    result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                    if (result == DialogResult.Cancel) { return; }
 
-                ProductInfo.Person = PersonComboBox.Text;
-                if (!Registeration()) { throw new Exception("登録できませんでした。"); }
+                    ProductInfo.Person = PersonComboBox.Text;
+                    if (!Registeration()) { throw new Exception("登録できませんでした。"); }
+                }
 
-                if (!Print(true)) { throw new Exception("キャンセルしました。"); }
+                if (!Print(print)) { throw new Exception("キャンセルしました。"); }
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -327,8 +329,6 @@ namespace ProductDatabase {
                         }
                         return true;
                     case false:
-                        FormCheck();
-                        DataCheck();
                         //PrintPreviewDialogオブジェクトの作成
                         var ppd = new PrintPreviewDialog();
                         ppd.Shown += (sender, e) => {
@@ -744,11 +744,11 @@ namespace ProductDatabase {
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
         private void LabelPrintButton_Click(object sender, EventArgs e) {
             _serialType = "Label";
-            RegisterCheck();
+            RegisterCheck(true);
         }
         private void BarcodePrintButton_Click(object sender, EventArgs e) {
             _serialType = "Barcode";
-            RegisterCheck();
+            RegisterCheck(true);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
             var entries = new[]
@@ -778,11 +778,11 @@ namespace ProductDatabase {
         }
         private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Label";
-            Print(false);
+            RegisterCheck(false);
         }
         private void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Barcode";
-            Print(false);
+            RegisterCheck(false);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             ProductPrintSettingsWindow ls = new() {
