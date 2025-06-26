@@ -41,8 +41,8 @@ namespace ProductDatabase {
                         "Substrate11DataGridView", "Substrate12DataGridView", "Substrate13DataGridView", "Substrate14DataGridView","Substrate15DataGridView"
                         ];
 
-        private SQLiteConnection? _editModeConnection; // 編集モード用の接続
-        private SQLiteTransaction? _editModeTransaction; // 編集モード用のトランザクション
+        private SQLiteConnection? _sqLiteConnection; // 編集モード用の接続
+        private SQLiteTransaction? _sqLiteTransaction; // 編集モード用のトランザクション
 
         public ProductRegistration2Window() {
             InitializeComponent();
@@ -50,9 +50,9 @@ namespace ProductDatabase {
 
         private void LoadEvents() {
             try {
-                _editModeConnection = new SQLiteConnection(GetConnectionRegistration());
-                _editModeConnection.Open();
-                _editModeTransaction = _editModeConnection.BeginTransaction(); // トランザクション開始（ロック）
+                _sqLiteConnection = new SQLiteConnection(GetConnectionRegistration());
+                _sqLiteConnection.Open();
+                _sqLiteTransaction = _sqLiteConnection.BeginTransaction(); // トランザクション開始（ロック）
 
                 SetFont();
                 InitializeUIControls();
@@ -73,7 +73,7 @@ namespace ProductDatabase {
                             }
                             ServiceInfo = window.ServiceInfo;
                         }
-                        LoadSubstrateData(_editModeConnection);
+                        LoadSubstrateData(_sqLiteConnection);
                         break;
                     default:
                         HideAllControls();
@@ -81,6 +81,10 @@ namespace ProductDatabase {
                 }
 
                 ConfigurePrintSettings();
+
+            } catch (SQLiteException ex) {
+                MessageBox.Show($"データベースがロックされています。: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
@@ -88,14 +92,14 @@ namespace ProductDatabase {
         }
         private void ClosingEvents() {
             // 編集モードのトランザクションをコミットしてロック解除
-            if (_editModeTransaction != null) {
-                _editModeTransaction.Dispose();
-                _editModeTransaction = null;
+            if (_sqLiteTransaction != null) {
+                _sqLiteTransaction.Dispose();
+                _sqLiteTransaction = null;
             }
-            if (_editModeConnection != null) {
-                _editModeConnection.Close();
-                _editModeConnection.Dispose();
-                _editModeConnection = null;
+            if (_sqLiteConnection != null) {
+                _sqLiteConnection.Close();
+                _sqLiteConnection.Dispose();
+                _sqLiteConnection = null;
             }
         }
         private void SetFont() {
@@ -291,25 +295,25 @@ namespace ProductDatabase {
             try {
                 _strSerial.Clear();
 
-                if (_editModeConnection == null || _editModeTransaction == null) {
+                if (_sqLiteConnection == null || _sqLiteTransaction == null) {
                     throw new InvalidOperationException("編集モード用の接続が初期化されていません。");
                 }
 
-                if (!NumberCheck(_editModeConnection) || !QuantityCheck()) { return; }
+                if (!NumberCheck(_sqLiteConnection) || !QuantityCheck()) { return; }
                 if (ProductInfo.IsSerialGeneration) {
-                    SerialCheck(_editModeConnection);
+                    SerialCheck(_sqLiteConnection);
                     GenerateSerialCodes();
                 }
 
                 DisableControls();
 
-                Registration(_editModeConnection, _editModeTransaction);
+                Registration(_sqLiteConnection, _sqLiteTransaction);
 
                 LogRegistration(ProductInfo);
                 BackupManager.CreateBackup();
 
                 // 登録チェック
-                RegistrationCheck(_editModeConnection);
+                RegistrationCheck(_sqLiteConnection);
 
                 // 登録完了メッセージ
                 MessageBox.Show("登録しました。");

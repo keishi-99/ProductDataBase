@@ -355,7 +355,7 @@ namespace ProductDatabase {
                 _editModeConnection.Open();
                 _editModeTransaction = _editModeConnection.BeginTransaction(); // トランザクション開始（ロック）
             } catch (SQLiteException ex) {
-                MessageBox.Show($"データベースロックに失敗しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"データベースがロックされています。: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
