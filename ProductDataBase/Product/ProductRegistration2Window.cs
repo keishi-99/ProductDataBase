@@ -870,6 +870,7 @@ namespace ProductDatabase {
             try {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
 
+                var dpiX = e.Graphics.DpiX;
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
 
                 switch (_serialType) {
@@ -954,7 +955,6 @@ namespace ProductDatabase {
                             generatedCode = ProductInfo.ProductModel[^4..]; // 型式の下4桁を使用
                         }
 
-                        var dpiX = e.Graphics.DpiX;
                         using var labelImage = MakeLabelImage(generatedCode, dpiX, fontUnderline);
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)labelWidth, (float)labelHeight);
 
