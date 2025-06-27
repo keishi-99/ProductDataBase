@@ -455,8 +455,8 @@ namespace ProductDatabase {
                         else {
                             generatedCode = ProductInfo.ProductModel[^4..]; // 型式の下4桁を使用
                         }
-
-                        using var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1, fontUnderline);
+                        var dpiX = e.Graphics.DpiX;
+                        using var labelImage = MakeLabelImage(generatedCode, dpiX, fontUnderline);
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)labelWidth, (float)labelHeight);
 
                         _remainingCount--;
@@ -528,7 +528,7 @@ namespace ProductDatabase {
 
             return outputCode;
         }
-        private Bitmap MakeLabelImage(string text, int resolution, int magnitude, bool fontUnderline) {
+        private Bitmap MakeLabelImage(string text, float dpi, bool fontUnderline) {
             Bitmap labelImage = new(1, 1);
             Graphics g;
             SizeF stringSize;
@@ -547,13 +547,13 @@ namespace ProductDatabase {
                         throw new Exception("ProductPrintSettingsがnull");
                     }
                     if (ProductPrintSettings.LabelPageSettings != null) {
-                        sizeX = (int)(ProductPrintSettings.LabelPageSettings.LabelWidth / MmPerInch * resolution * magnitude);
-                        sizeY = (int)(ProductPrintSettings.LabelPageSettings.LabelHeight / MmPerInch * resolution * magnitude);
+                        sizeX = (int)(ProductPrintSettings.LabelPageSettings.LabelWidth / MmPerInch * dpi);
+                        sizeY = (int)(ProductPrintSettings.LabelPageSettings.LabelHeight / MmPerInch * dpi);
                     }
                     if (ProductPrintSettings.LabelLayoutSettings != null) {
-                        textPosX = ProductPrintSettings.LabelLayoutSettings.TextPositionX / MmPerInch * resolution * magnitude;
-                        textPosY = ProductPrintSettings.LabelLayoutSettings.TextPositionY / MmPerInch * resolution * magnitude;
-                        fontSize = ProductPrintSettings.LabelLayoutSettings.TextFont.SizeInPoints / PointsPerInch * resolution * magnitude;
+                        textPosX = ProductPrintSettings.LabelLayoutSettings.TextPositionX / MmPerInch * dpi;
+                        textPosY = ProductPrintSettings.LabelLayoutSettings.TextPositionY / MmPerInch * dpi;
+                        fontSize = ProductPrintSettings.LabelLayoutSettings.TextFont.SizeInPoints / PointsPerInch * dpi;
                         var style = fontUnderline ? FontStyle.Underline : FontStyle.Regular;
                         textFont = new Font(ProductPrintSettings.LabelLayoutSettings.TextFont.Name, fontSize, style);
                     }
@@ -592,18 +592,18 @@ namespace ProductDatabase {
                         throw new Exception("SettingsBarcodeProがnull");
                     }
                     if (ProductPrintSettings.BarcodePageSettings != null) {
-                        sizeX = (int)(ProductPrintSettings.BarcodePageSettings.LabelWidth / MmPerInch * resolution * magnitude);
-                        sizeY = (int)(ProductPrintSettings.BarcodePageSettings.LabelHeight / MmPerInch * resolution * magnitude);
+                        sizeX = (int)(ProductPrintSettings.BarcodePageSettings.LabelWidth / MmPerInch * dpi);
+                        sizeY = (int)(ProductPrintSettings.BarcodePageSettings.LabelHeight / MmPerInch * dpi);
                     }
                     if (ProductPrintSettings.BarcodeLayoutSettings != null) {
-                        textPosX = ProductPrintSettings.BarcodeLayoutSettings.TextPositionX / MmPerInch * resolution * magnitude;
-                        textPosY = ProductPrintSettings.BarcodeLayoutSettings.TextPositionY / MmPerInch * resolution * magnitude;
-                        fontSize = ProductPrintSettings.BarcodeLayoutSettings.TextFont.SizeInPoints / PointsPerInch * resolution * magnitude;
+                        textPosX = ProductPrintSettings.BarcodeLayoutSettings.TextPositionX / MmPerInch * dpi;
+                        textPosY = ProductPrintSettings.BarcodeLayoutSettings.TextPositionY / MmPerInch * dpi;
+                        fontSize = ProductPrintSettings.BarcodeLayoutSettings.TextFont.SizeInPoints / PointsPerInch * dpi;
                         textFont = new Font(ProductPrintSettings.BarcodeLayoutSettings.TextFont.Name, fontSize, FontStyle.Regular);
-                        barcodePosX = ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionX / MmPerInch * resolution * magnitude;
-                        barcodePosY = ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionY / MmPerInch * resolution * magnitude;
-                        barcodeHeight = (int)(ProductPrintSettings.BarcodeLayoutSettings.BarcodeHeight / MmPerInch * resolution * magnitude);
-                        barcodeWidth = (int)(ProductPrintSettings.BarcodeLayoutSettings.BarcodeWidth / MmPerInch * resolution * magnitude);
+                        barcodePosX = ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionX / MmPerInch * dpi;
+                        barcodePosY = ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionY / MmPerInch * dpi;
+                        barcodeHeight = (int)(ProductPrintSettings.BarcodeLayoutSettings.BarcodeHeight / MmPerInch * dpi);
+                        barcodeWidth = (int)(ProductPrintSettings.BarcodeLayoutSettings.BarcodeWidth / MmPerInch * dpi);
                     }
 
                     labelImage = new(sizeX, sizeY);
