@@ -50,8 +50,8 @@ namespace ProductDatabase {
 
                 LabelTextPostionXTextBox.Text = labelSettings.TextPositionX.ToString();
                 LabelTextPostionYTextBox.Text = labelSettings.TextPositionY.ToString();
-                AlignTextXCenterCheckBox.Checked = labelSettings.AlignTextXCenter;
-                AlignTextYCenterCheckBox.Checked = labelSettings.AlignTextYCenter;
+                AlignTextXCenterCheckBox.Checked = labelSettings.AlignTextCenterX;
+                AlignTextYCenterCheckBox.Checked = labelSettings.AlignTextCenterY;
             }
             LabelTextPostionXTextBox.Enabled = !AlignTextXCenterCheckBox.Checked;
         }
@@ -146,8 +146,8 @@ namespace ProductDatabase {
                 ProductPrintSettings.LabelLayoutSettings.TextFont = LabelFontDialog.Font;
                 ProductPrintSettings.LabelLayoutSettings.TextPositionX = ParseFloat(LabelTextPostionXTextBox.Text);
                 ProductPrintSettings.LabelLayoutSettings.TextPositionY = ParseFloat(LabelTextPostionYTextBox.Text);
-                ProductPrintSettings.LabelLayoutSettings.AlignTextXCenter = AlignTextXCenterCheckBox.Checked;
-                ProductPrintSettings.LabelLayoutSettings.AlignTextYCenter = AlignTextYCenterCheckBox.Checked;
+                ProductPrintSettings.LabelLayoutSettings.AlignTextCenterX = AlignTextXCenterCheckBox.Checked;
+                ProductPrintSettings.LabelLayoutSettings.AlignTextCenterY = AlignTextYCenterCheckBox.Checked;
                 ProductPrintSettings.LabelLayoutSettings.CopiesPerLabel = ParseInt(CopiesPerLabelTextBox.Text);
             }
         }

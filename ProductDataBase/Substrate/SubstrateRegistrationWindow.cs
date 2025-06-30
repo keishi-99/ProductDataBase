@@ -567,12 +567,12 @@ namespace ProductDatabase {
 
                     // StringFormat を使用して中心に配置
                     var sf = new StringFormat {
-                        Alignment = SubstratePrintSettings.LabelLayoutSettings.AlignTextXCenter ? StringAlignment.Center : StringAlignment.Near,
-                        LineAlignment = SubstratePrintSettings.LabelLayoutSettings.AlignTextYCenter ? StringAlignment.Center : StringAlignment.Near
+                        Alignment = SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterX ? StringAlignment.Center : StringAlignment.Near,
+                        LineAlignment = SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterY ? StringAlignment.Center : StringAlignment.Near
                     };
 
-                    var stringPosX = SubstratePrintSettings.LabelLayoutSettings.AlignTextXCenter ? 0 : (SubstratePrintSettings.LabelLayoutSettings.TextPositionX / 25.4F * resolution * magnitude);
-                    var stringPosY = SubstratePrintSettings.LabelLayoutSettings.AlignTextYCenter ? 0 : (SubstratePrintSettings.LabelLayoutSettings.TextPositionY / 25.4F * resolution * magnitude);
+                    var stringPosX = SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterX ? 0 : (SubstratePrintSettings.LabelLayoutSettings.TextPositionX / 25.4F * resolution * magnitude);
+                    var stringPosY = SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterY ? 0 : (SubstratePrintSettings.LabelLayoutSettings.TextPositionY / 25.4F * resolution * magnitude);
 
                     // 矩形領域を計算 (文字列を配置する領域)
                     var layoutRect = new RectangleF(stringPosX, stringPosY, labelImage.Width - stringPosX, labelImage.Height - stringPosY);
