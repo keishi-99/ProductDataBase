@@ -419,8 +419,8 @@ namespace ProductDatabase {
                 if (labelCountX == 0 || labelCountY == 0 || copiesPerLabel == 0) { throw new Exception("印刷設定が異常です。"); }
 
                 // ハードマージンをミリメートルに変換
-                var hardMarginX = isPreview ? 0 : e.PageSettings.HardMarginX * MmPerInch;
-                var hardMarginY = isPreview ? 0 : e.PageSettings.HardMarginY * MmPerInch;
+                var hardMarginX = isPreview ? 0 : e.PageSettings.HardMarginX * MmPerInch / 100;
+                var hardMarginY = isPreview ? 0 : e.PageSettings.HardMarginY * MmPerInch / 100;
 
                 if (_pageCount == 1) {
                     _remainingCount = copiesPerLabel;
@@ -453,7 +453,6 @@ namespace ProductDatabase {
                         }
 
                         using var labelImage = MakeLabelImage(generatedCode, fontUnderline, dpiX, dpiY);
-                        //using var labelImage = MakeLabelImage(generatedCode, dpiX, fontUnderline);
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)labelWidth, (float)labelHeight);
 
                         _remainingCount--;
