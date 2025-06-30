@@ -52,11 +52,11 @@ namespace ProductDatabase {
 
                 BarcodePostionXTextBox.Text = labelSettings.BarcodePositionX.ToString();
                 BarcodePostionYTextBox.Text = labelSettings.BarcodePositionY.ToString();
-                BarcodeCenterCheckBox.Checked = labelSettings.AlignBarcodeXCenter;
+                BarcodeCenterCheckBox.Checked = labelSettings.AlignBarcodeCenterX;
 
                 FontPostionXTextBox.Text = labelSettings.TextPositionX.ToString();
                 FontPostionYTextBox.Text = labelSettings.TextPositionY.ToString();
-                FontCenterCheckBox.Checked = labelSettings.AlignTextXCenter;
+                FontCenterCheckBox.Checked = labelSettings.AlignTextCenterX;
             }
             BarcodePostionXTextBox.Enabled = !BarcodeCenterCheckBox.Checked;
             FontPostionXTextBox.Enabled = !FontCenterCheckBox.Checked;
@@ -156,12 +156,12 @@ namespace ProductDatabase {
                 ProductPrintSettings.BarcodeLayoutSettings.BarcodeWidth = ParseFloat(BarcodeWidthTextBox.Text);
                 ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionX = ParseFloat(BarcodePostionXTextBox.Text);
                 ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionY = ParseFloat(BarcodePostionYTextBox.Text);
-                ProductPrintSettings.BarcodeLayoutSettings.AlignBarcodeXCenter = BarcodeCenterCheckBox.Checked;
+                ProductPrintSettings.BarcodeLayoutSettings.AlignBarcodeCenterX = BarcodeCenterCheckBox.Checked;
                 ProductPrintSettings.BarcodeLayoutSettings.TextFormat = BarcodeFormatTextBox.Text;
                 ProductPrintSettings.BarcodeLayoutSettings.TextFont = BarcodeFontDialog.Font;
                 ProductPrintSettings.BarcodeLayoutSettings.TextPositionX = ParseFloat(FontPostionXTextBox.Text);
                 ProductPrintSettings.BarcodeLayoutSettings.TextPositionY = ParseFloat(FontPostionYTextBox.Text);
-                ProductPrintSettings.BarcodeLayoutSettings.AlignTextXCenter = FontCenterCheckBox.Checked;
+                ProductPrintSettings.BarcodeLayoutSettings.AlignTextCenterX = FontCenterCheckBox.Checked;
                 ProductPrintSettings.BarcodeLayoutSettings.CopiesPerLabel = ParseInt(BarcodeCopiesPerLabelTextBox.Text);
             }
         }

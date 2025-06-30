@@ -70,8 +70,8 @@ namespace ProductDatabase.Product {
         public string TextFormat { get; set; } = string.Empty;
         public float TextPositionX { get; set; }
         public float TextPositionY { get; set; }
-        public bool AlignTextXCenter { get; set; }
-        public bool AlignTextYCenter { get; set; }
+        public bool AlignTextCenterX { get; set; }
+        public bool AlignTextCenterY { get; set; }
         public int CopiesPerLabel { get; set; }
 
         [JsonConverter(typeof(FontJsonConverter))]
@@ -102,8 +102,8 @@ namespace ProductDatabase.Product {
         public float BarcodePositionY { get; set; }
         public float TextPositionX { get; set; }
         public float TextPositionY { get; set; }
-        public bool AlignTextXCenter { get; set; }
-        public bool AlignBarcodeXCenter { get; set; }
+        public bool AlignTextCenterX { get; set; }
+        public bool AlignBarcodeCenterX { get; set; }
         public int CopiesPerLabel { get; set; }
 
         [JsonConverter(typeof(FontJsonConverter))]

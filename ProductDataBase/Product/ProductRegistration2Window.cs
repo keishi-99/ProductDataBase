@@ -871,6 +871,7 @@ namespace ProductDatabase {
                 if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
 
                 var dpiX = e.Graphics.DpiX;
+                var dpiY = e.Graphics.DpiY;
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
 
                 switch (_serialType) {
@@ -955,7 +956,7 @@ namespace ProductDatabase {
                             generatedCode = ProductInfo.ProductModel[^4..]; // 型式の下4桁を使用
                         }
 
-                        using var labelImage = MakeLabelImage(generatedCode, dpiX, fontUnderline);
+                        using var labelImage = MakeLabelImage(generatedCode, fontUnderline, dpiX, dpiY);
                         e.Graphics.DrawImage(labelImage, posX, posY, (float)labelWidth, (float)labelHeight);
 
                         _remainingCount--;
@@ -1026,128 +1027,179 @@ namespace ProductDatabase {
                                     .Replace("%S", Convert.ToInt32(serialCode).ToString($"D{ProductInfo.SerialDigit}"));
             return outputCode;
         }
-        private Bitmap MakeLabelImage(string text, float dpiX, bool fontUnderline) {
-            Bitmap labelImage = new(1, 1);
-            Graphics g;
-            SizeF stringSize;
-            var sizeX = 0;
-            var sizeY = 0;
-            float fontSize;
-            float textPosX = 0;
-            float textPosY = 0;
-            var textFont = SystemFonts.DefaultFont;
-            // プレビューかどうかの判定
+        private Bitmap MakeLabelImage(string text, bool fontUnderline, float dpiX, float dpiY) {
+            // --- 1. 初期化と設定の検証 ---
+
+            if (ProductPrintSettings == null) {
+                throw new InvalidOperationException("ProductPrintSettingsがnullです。");
+            }
+
+            // プレビューモードかどうかを判定
             var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
 
-            switch (_serialType) {
-                case "Label":
-                    if (ProductPrintSettings == null) {
-                        throw new Exception("ProductPrintSettingsがnull");
-                    }
-                    if (ProductPrintSettings.LabelPageSettings != null) {
-                        sizeX = (int)(ProductPrintSettings.LabelPageSettings.LabelWidth / MmPerInch * dpiX);
-                        sizeY = (int)(ProductPrintSettings.LabelPageSettings.LabelHeight / MmPerInch * dpiX);
-                    }
-                    if (ProductPrintSettings.LabelLayoutSettings != null) {
-                        textPosX = ProductPrintSettings.LabelLayoutSettings.TextPositionX / MmPerInch * dpiX;
-                        textPosY = ProductPrintSettings.LabelLayoutSettings.TextPositionY / MmPerInch * dpiX;
-                        fontSize = ProductPrintSettings.LabelLayoutSettings.TextFont.SizeInPoints / PointsPerInch * dpiX;
-                        var style = fontUnderline ? FontStyle.Underline : FontStyle.Regular;
-                        textFont = new Font(ProductPrintSettings.LabelLayoutSettings.TextFont.Name, fontSize, style);
-                    }
+            // --- 2. Bitmapの生成とGraphicsの準備 ---
+            (var labelWidth, var labelHeight) = _serialType switch {
+                "Label" => ProductPrintSettings.LabelPageSettings is { } settings
+                    ? (settings.LabelWidth, settings.LabelHeight)
+                    : throw new InvalidOperationException("LabelPageSettingsがnullです。"),
 
-                    labelImage = new(sizeX, sizeY);
+                "Barcode" => ProductPrintSettings.BarcodePageSettings is { } settings
+                    ? (settings.LabelWidth, settings.LabelHeight)
+                    : throw new InvalidOperationException("BarcodePageSettingsがnullです。"),
 
-                    g = Graphics.FromImage(labelImage);
-                    // アンチエイリアス処理を改善
-                    g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+                _ => throw new InvalidOperationException("Unsupported serial type.")
+            };
 
-                    // StringFormat を使用して中心に配置
-                    var sf = new StringFormat {
-                        Alignment = ProductPrintSettings?.LabelLayoutSettings?.AlignTextXCenter ?? false ? StringAlignment.Center : StringAlignment.Near,
-                        LineAlignment = ProductPrintSettings?.LabelLayoutSettings?.AlignTextYCenter ?? false ? StringAlignment.Center : StringAlignment.Near
-                    };
+            // ビットマップのサイズをピクセル単位で計算
+            var pixelWidth = (int)(labelWidth / MmPerInch * dpiX);
+            var pixelHeight = (int)(labelHeight / MmPerInch * dpiY);
 
-                    var x = ProductPrintSettings?.LabelLayoutSettings?.AlignTextXCenter ?? false ? 0 : textPosX;
-                    var y = ProductPrintSettings?.LabelLayoutSettings?.AlignTextYCenter ?? false ? 0 : textPosY;
+            var labelImage = new Bitmap(pixelWidth, pixelHeight);
+            labelImage.SetResolution(dpiX, dpiY);
 
-                    // 矩形領域を計算 (文字列を配置する領域)
-                    var layoutRect = new RectangleF(x, y, labelImage.Width - x, labelImage.Height - y);
-                    g.DrawString(text, textFont, Brushes.Black, layoutRect, sf);
+            // 'using'ステートメントでGraphicsオブジェクトを確実に破棄
+            using (var g = Graphics.FromImage(labelImage)) {
+                // すべての描画操作をミリメートル単位で行うように設定
+                g.PageUnit = GraphicsUnit.Millimeter;
 
-                    // プレビュー時、黒枠を描画
-                    if (isPreview) {
-                        using var p = new Pen(Color.Black, 3);
-                        g.DrawRectangle(p, 0, 0, labelImage.Width - 1, labelImage.Height - 1);
-                    }
-                    g.Dispose();
-                    break;
-                case "Barcode":
-                    float barcodePosX = 0;
-                    float barcodePosY = 0;
-                    var barcodeHeight = 1;
-                    var barcodeWidth = 1;
-                    if (ProductPrintSettings == null) {
-                        throw new Exception("SettingsBarcodeProがnull");
-                    }
-                    if (ProductPrintSettings.BarcodePageSettings != null) {
-                        sizeX = (int)(ProductPrintSettings.BarcodePageSettings.LabelWidth / MmPerInch * dpiX);
-                        sizeY = (int)(ProductPrintSettings.BarcodePageSettings.LabelHeight / MmPerInch * dpiX);
-                    }
-                    if (ProductPrintSettings.BarcodeLayoutSettings != null) {
-                        textPosX = ProductPrintSettings.BarcodeLayoutSettings.TextPositionX / MmPerInch * dpiX;
-                        textPosY = ProductPrintSettings.BarcodeLayoutSettings.TextPositionY / MmPerInch * dpiX;
-                        fontSize = ProductPrintSettings.BarcodeLayoutSettings.TextFont.SizeInPoints / PointsPerInch * dpiX;
-                        textFont = new Font(ProductPrintSettings.BarcodeLayoutSettings.TextFont.Name, (float)fontSize, FontStyle.Regular);
-                        barcodePosX = ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionX / MmPerInch * dpiX;
-                        barcodePosY = ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionY / MmPerInch * dpiX;
-                        barcodeHeight = (int)(ProductPrintSettings.BarcodeLayoutSettings.BarcodeHeight / MmPerInch * dpiX);
-                        barcodeWidth = (int)(ProductPrintSettings.BarcodeLayoutSettings.BarcodeWidth / MmPerInch * dpiX);
-                    }
+                // 高品質な描画設定
+                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 
-                    labelImage = new(sizeX, sizeY);
-                    g = Graphics.FromImage(labelImage);
-                    g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit; // アンチエイリアス処理を改善
+                // --- 3. 印刷タイプに応じた描画処理 ---
 
-                    // テキストを描画
-                    stringSize = TextRenderer.MeasureText(text, textFont);
+                switch (_serialType) {
+                    case "Label":
+                        DrawLabel(g, text, fontUnderline);
+                        break;
 
-                    // X座標の調整
-                    if (ProductPrintSettings?.BarcodeLayoutSettings?.AlignTextXCenter ?? false) {
-                        textPosX = (labelImage.Width / 2) - (stringSize.Width / 2);
-                    }
+                    case "Barcode":
+                        DrawBarcode(g, text);
+                        break;
+                }
 
-                    g.DrawString(text, textFont, Brushes.Black, textPosX, textPosY);
+                // --- 4. プレビュー用の枠を描画 ---
 
-                    // ZXingライブラリを使用してバーコードを描画
-                    var writer = new BarcodeWriter<Bitmap> {
-                        Format = BarcodeFormat.CODE_128,
-                        Options = new ZXing.Common.EncodingOptions {
-                            Height = barcodeHeight,
-                            Width = barcodeWidth,
-                            PureBarcode = true
-                        },
-                        Renderer = new BitmapRenderer()
-                    };
-
-                    using (var barcodeBitmap = writer.Write(text)) {
-                        // X座標の調整
-                        if (ProductPrintSettings?.BarcodeLayoutSettings?.AlignBarcodeXCenter ?? false) {
-                            barcodePosX = (labelImage.Width / 2) - (barcodeBitmap.Width / 2);
-                        }
-
-                        g.DrawImage(barcodeBitmap, barcodePosX, barcodePosY, barcodeWidth, barcodeHeight);
-                    }
-
-                    // プレビュー時、黒枠を描画
-                    if (isPreview) {
-                        var p = new Pen(Color.Black, 3);
-                        g.DrawRectangle(p, 0, 0, labelImage.Width - 1, labelImage.Height - 1);
-                    }
-                    g.Dispose();
-                    break;
+                if (isPreview) {
+                    // 0.1mmの黒いペンで枠線を描画
+                    using var p = new Pen(Color.Black, 0.1f);
+                    g.DrawRectangle(p, 0, 0, labelWidth - 0.1f, labelHeight - 0.1f);
+                }
             }
+
             return labelImage;
+        }
+        private void DrawLabel(Graphics g, string text, bool fontUnderline) {
+
+            var pageSettings = ProductPrintSettings.LabelPageSettings;
+            if (pageSettings == null) {
+                return;
+            }
+
+            var layoutSettings = ProductPrintSettings.LabelLayoutSettings;
+            if (layoutSettings == null) {
+                return;
+            }
+
+            // フォントサイズはポイント単位でそのまま使用
+            var fontName = layoutSettings.TextFont.Name;
+            var fontSize = layoutSettings.TextFont.SizeInPoints;
+            var style = fontUnderline ? FontStyle.Underline : FontStyle.Regular;
+
+            using var textFont = new Font(fontName, fontSize, style);
+            // テキストの配置設定
+            using var sf = new StringFormat {
+                Alignment = layoutSettings.AlignTextCenterX ? StringAlignment.Center : StringAlignment.Near,
+                LineAlignment = layoutSettings.AlignTextCenterY ? StringAlignment.Center : StringAlignment.Near
+            };
+            // 描画領域をミリメートル単位で計算
+            var textPosX = layoutSettings.AlignTextCenterX ? 0 : layoutSettings.TextPositionX;
+            var textPosY = layoutSettings.AlignTextCenterY ? 0 : layoutSettings.TextPositionY;
+
+            var pageWidth = pageSettings.LabelWidth;
+            var pageHeight = pageSettings.LabelHeight;
+
+            var stringSize = g.MeasureString(text, textFont);
+            // X座標を中央に調整
+            if (layoutSettings.AlignTextCenterX) {
+                textPosX = (pageWidth / 2f) - (stringSize.Width / 2f);
+            }
+            // Y座標を中央に調整
+            if (layoutSettings.AlignTextCenterY) {
+                textPosY = (pageHeight / 2f) - (stringSize.Height / 2f);
+            }
+
+            g.DrawString(text, textFont, Brushes.Black, textPosX, textPosY);
+        }
+        private void DrawBarcode(Graphics g, string text) {
+
+            var pageSettings = ProductPrintSettings.BarcodePageSettings;
+            if (pageSettings == null) {
+                return;
+            }
+
+            var layoutSettings = ProductPrintSettings.BarcodeLayoutSettings;
+            if (layoutSettings == null) {
+                return;
+            }
+
+            var pageWidth = pageSettings.LabelWidth;
+            var pageHeight = pageSettings.LabelHeight;
+
+            // --- テキストの描画 ---
+            // フォントサイズはポイント単位でそのまま使用
+            var fontName = layoutSettings.TextFont.Name;
+            var fontSize = layoutSettings.TextFont.SizeInPoints;
+
+            using (var textFont = new Font(fontName, fontSize, FontStyle.Regular)) {
+                // テキストの配置設定
+                using var sf = new StringFormat {
+                    Alignment = layoutSettings.AlignTextCenterX ? StringAlignment.Center : StringAlignment.Near
+                };
+                //// g.MeasureStringは現在のPageUnit(Millimeter)でサイズを返す
+                //var stringSize = g.MeasureString(text, textFont);
+
+                var textPosX = layoutSettings.AlignTextCenterX ? 0 : layoutSettings.TextPositionX;
+                //var textPosX = layoutSettings.TextPositionX;
+                var textPosY = layoutSettings.TextPositionY;
+
+
+                var layoutRect = new RectangleF(textPosX, textPosY, pageWidth - textPosX, pageHeight);
+
+                g.DrawString(text, textFont, Brushes.Black, layoutRect, sf);
+            }
+
+            // --- バーコードの描画 ---
+
+            // ZXingはピクセル単位で画像を生成するため、mmからpixelへの変換が必要
+            // GraphicsオブジェクトのDPI（g.DpiX）を使用して計算する
+            var barcodePixelWidth = (int)(layoutSettings.BarcodeWidth / MmPerInch * g.DpiX);
+            var barcodePixelHeight = (int)(layoutSettings.BarcodeHeight / MmPerInch * g.DpiY);
+
+            var writer = new BarcodeWriter<Bitmap> {
+                Format = BarcodeFormat.CODE_128,
+                Options = new ZXing.Common.EncodingOptions {
+                    Height = barcodePixelHeight,
+                    Width = barcodePixelWidth,
+                    PureBarcode = true // テキストを含まないバーコードのみを生成
+                },
+                Renderer = new BitmapRenderer()
+            };
+
+            using (var barcodeBitmap = writer.Write(text)) {
+                var barcodePosX = layoutSettings.BarcodePositionX;
+                var barcodePosY = layoutSettings.BarcodePositionY;
+                var barcodeWidth = layoutSettings.BarcodeWidth;
+                var barcodeHeight = layoutSettings.BarcodeHeight;
+
+                // X座標を中央に調整 (ミリメートル単位で計算)
+                if (layoutSettings.AlignBarcodeCenterX) {
+                    barcodePosX = (pageWidth / 2F) - (barcodeWidth / 2F);
+                }
+
+                // g.DrawImageでミリメートル単位の座標とサイズを指定して描画
+                g.DrawImage(barcodeBitmap, barcodePosX, barcodePosY, barcodeWidth, barcodeHeight);
+            }
         }
         // チェックボックスイベント
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
