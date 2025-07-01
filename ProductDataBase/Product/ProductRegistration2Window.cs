@@ -31,6 +31,7 @@ namespace ProductDatabase {
 
         private int _pageCount = 1;
         private System.Drawing.Printing.PrintAction _printAction;
+        private string _printerName = string.Empty;
 
         private string _serialType = string.Empty;
         private int _serialLastNumber;
@@ -804,6 +805,7 @@ namespace ProductDatabase {
                 pd.BeginPrint += (sender, e) => _printAction = e.PrintAction;
                 pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
+                _printerName = pd.PrinterSettings.PrinterName;
                 _labelProNumLabelsToPrint = ProductInfo.Quantity;
                 _pageCount = 1;
 
@@ -919,8 +921,15 @@ namespace ProductDatabase {
                 if (labelCountX == 0 || labelCountY == 0 || copiesPerLabel == 0) { throw new Exception("印刷設定が異常です。"); }
 
                 // ハードマージンをミリメートルに変換
-                var hardMarginX = isPreview ? 0 : e.PageSettings.HardMarginX * MmPerInch / 100;
-                var hardMarginY = isPreview ? 0 : e.PageSettings.HardMarginY * MmPerInch / 100;
+                var hardMarginX = 0f;
+                var hardMarginY = 0f;
+                if (!isPreview) {
+                    (hardMarginX, hardMarginY) = _printerName switch {
+                        "TOSHIBA Universal Printer 2" => (5.6f, 1.9f),
+                        "検査課　複合機" => (5.6f, 1.9f),
+                        _ => (e.PageSettings.HardMarginX * MmPerInch / 100, e.PageSettings.HardMarginY * MmPerInch / 100)
+                    };
+                }
 
                 if (_pageCount == 1) {
                     _remainingCount = copiesPerLabel;
