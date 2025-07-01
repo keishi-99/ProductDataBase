@@ -595,7 +595,7 @@ namespace ProductDatabase {
                 var pageHeight = (float)LabelPageSettings.LabelHeight;
 
                 // 矩形領域を計算 (文字列を配置する領域)
-                var layoutRect = new RectangleF(stringPosX, stringPosY, pageWidth, pageHeight);
+                var layoutRect = new RectangleF(stringPosX, stringPosY, pageWidth - stringPosX, pageHeight - stringPosY);
                 g.DrawString(text, fnt, Brushes.Black, layoutRect, sf);
 
                 // プレビューかどうかの判定

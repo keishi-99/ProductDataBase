@@ -1092,7 +1092,7 @@ namespace ProductDatabase {
             var pageWidth = (float)LabelPageSettings.LabelWidth;
             var pageHeight = (float)LabelPageSettings.LabelHeight;
 
-            var layoutRect = new RectangleF(textPosX, textPosY, pageWidth, pageHeight);
+            var layoutRect = new RectangleF(textPosX, textPosY, pageWidth - textPosX, pageHeight - textPosY);
 
             g.DrawString(text, textFont, Brushes.Black, layoutRect, sf);
         }
@@ -1115,9 +1115,9 @@ namespace ProductDatabase {
                 var textPosX = BarcodeLayoutSettings.AlignTextCenterX ? 0f : (float)BarcodeLayoutSettings.TextPositionX;
                 var textPosY = (float)BarcodeLayoutSettings.TextPositionY;
 
-                var layoutRect = new RectangleF(textPosX, textPosY, pageWidth - textPosX, pageHeight);
+                var layoutRectString = new RectangleF(textPosX, textPosY, pageWidth - textPosX, pageHeight - textPosY);
 
-                g.DrawString(text, textFont, Brushes.Black, layoutRect, sf);
+                g.DrawString(text, textFont, Brushes.Black, layoutRectString, sf);
             }
 
             // --- バーコードの描画 ---
@@ -1148,8 +1148,9 @@ namespace ProductDatabase {
                 barcodePosX = (pageWidth / 2f) - (barcodeWidth / 2f);
             }
 
+            var layoutRectBarcode = new RectangleF(barcodePosX, barcodePosY, barcodeWidth, barcodeHeight);
             // g.DrawImageでミリメートル単位の座標とサイズを指定して描画
-            g.DrawImage(barcodeBitmap, barcodePosX, barcodePosY, barcodeWidth, barcodeHeight);
+            g.DrawImage(barcodeBitmap, layoutRectBarcode);
         }
         // チェックボックスイベント
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
