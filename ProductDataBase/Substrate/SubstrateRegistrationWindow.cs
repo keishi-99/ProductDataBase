@@ -1,4 +1,5 @@
 ﻿using ProductDatabase.Other;
+using ProductDatabase.Product;
 using ProductDatabase.Substrate;
 using System.Data;
 using System.Data.SQLite;
@@ -10,11 +11,15 @@ namespace ProductDatabase {
         public ProductInformation ProductInfo { get; }
 
         public SubstratePrintSettings SubstratePrintSettings { get; set; } = new SubstratePrintSettings();
+        public Substrate.LabelPageSettings LabelPageSettings => SubstratePrintSettings.LabelPageSettings ?? new Substrate.LabelPageSettings();
+        public Substrate.LabelLayoutSettings LabelLayoutSettings => SubstratePrintSettings.LabelLayoutSettings ?? new Substrate.LabelLayoutSettings();
         private readonly string _printSettingPath = SubstratePrintSettingsWindow.s_substratePrintSettingFilePath;
 
         private string _labelSubNSerial = string.Empty;
 
         private int _labelSubNumLabelsToPrint;
+
+        private const float MmPerInch = 25.4f;
 
         private int _pageCount;
         private System.Drawing.Printing.PrintAction _printAction;
@@ -425,29 +430,30 @@ namespace ProductDatabase {
         }
         private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
             try {
-                if (SubstratePrintSettings == null || e.Graphics == null) { return; }
-
+                if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
+                var dpiX = e.Graphics.DpiX;
+                var dpiY = e.Graphics.DpiY;
                 e.Graphics.PageUnit = GraphicsUnit.Millimeter;
+
                 // プレビューかどうかの判定
                 var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
 
-                var labelWidth = (float)SubstratePrintSettings.LabelPageSettings.LabelWidth;
-                var labelHeight = (float)SubstratePrintSettings.LabelPageSettings.LabelHeight;
-                var marginX = SubstratePrintSettings.LabelPageSettings.MarginX;
-                var marginY = SubstratePrintSettings.LabelPageSettings.MarginY;
-                var intervalX = SubstratePrintSettings.LabelPageSettings.IntervalX;
-                var intervalY = SubstratePrintSettings.LabelPageSettings.IntervalY;
-                var headerPositionX = SubstratePrintSettings.LabelPageSettings.HeaderPositionX;
-                var headerPositionY = SubstratePrintSettings.LabelPageSettings.HeaderPositionY;
-                var headerFont = SubstratePrintSettings.LabelPageSettings.HeaderFont;
+                var labelWidth = (float)LabelPageSettings.LabelWidth;
+                var labelHeight = (float)LabelPageSettings.LabelHeight;
+                var marginX = LabelPageSettings.MarginX;
+                var marginY = LabelPageSettings.MarginY;
+                var intervalX = LabelPageSettings.IntervalX;
+                var intervalY = LabelPageSettings.IntervalY;
+                var headerPositionX = LabelPageSettings.HeaderPositionX;
+                var headerPositionY = LabelPageSettings.HeaderPositionY;
+                var headerFont = LabelPageSettings.HeaderFont;
                 var startLine = (int)PrintPostionNumericUpDown.Value - 1;
 
                 // ハードマージンをミリメートルに変換
-                const double MM_PER_HUNDREDTH_INCH = 0.254;
-                var hardMarginX = isPreview ? 0 : e.PageSettings.HardMarginX * MM_PER_HUNDREDTH_INCH;
-                var hardMarginY = isPreview ? 0 : e.PageSettings.HardMarginY * MM_PER_HUNDREDTH_INCH;
+                var hardMarginX = isPreview ? 0 : e.PageSettings.HardMarginX * MmPerInch / 100;
+                var hardMarginY = isPreview ? 0 : e.PageSettings.HardMarginY * MmPerInch / 100;
 
-                var headerString = ConvertHeaderString(SubstratePrintSettings.LabelPageSettings.HeaderTextFormat);
+                var headerString = ConvertHeaderString(LabelPageSettings.HeaderTextFormat);
 
                 _labelSubNSerial = ManufacturingNumberMaskedTextBox.Text;
 
@@ -460,10 +466,10 @@ namespace ProductDatabase {
                 // ヘッダーの描画
                 e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, (float)headerPositionX, (float)(verticalOffset + headerPositionY - hardMarginY));
 
-                var labelCountX = SubstratePrintSettings.LabelPageSettings.LabelsPerColumn;
-                var labelCountY = SubstratePrintSettings.LabelPageSettings.LabelsPerRow;
+                var labelCountX = LabelPageSettings.LabelsPerColumn;
+                var labelCountY = LabelPageSettings.LabelsPerRow;
                 int y;
-                var copiesPerLabel = SubstratePrintSettings.LabelLayoutSettings.CopiesPerLabel;
+                var copiesPerLabel = LabelLayoutSettings.CopiesPerLabel;
                 if (labelCountX == 0 || labelCountY == 0 || copiesPerLabel == 0) { throw new Exception("印刷設定が異常です。"); }
                 for (y = startLine; y < labelCountY; y++) {
                     int x;
@@ -472,7 +478,7 @@ namespace ProductDatabase {
                         var posY = (float)(marginY - hardMarginY + (y * (intervalY + labelHeight)));
 
                         var generatedCode = GenerateCode(_labelSubNSerial);
-                        var labelImage = MakeLabelImage(generatedCode, (int)e.Graphics.DpiX, 1);
+                        var labelImage = MakeLabelImage(generatedCode, dpiX, dpiY);
                         e.Graphics.DrawImage(labelImage, posX, posY, labelWidth, labelHeight);
 
                         _labelSubNumLabelsToPrint--;
@@ -503,7 +509,7 @@ namespace ProductDatabase {
                         if (x >= labelCountX - 1) {
                             copiesPerLabel--;
                             if (copiesPerLabel <= 0) {
-                                copiesPerLabel = SubstratePrintSettings.LabelLayoutSettings.CopiesPerLabel;
+                                copiesPerLabel = LabelLayoutSettings.CopiesPerLabel;
                             }
                             else if (copiesPerLabel > 0) {
                                 _labelSubNumLabelsToPrint += x + 1;
@@ -543,7 +549,7 @@ namespace ProductDatabase {
                 _ => monthCode
             };
 
-            var outputCode = SubstratePrintSettings.LabelLayoutSettings.TextFormat;
+            var outputCode = LabelLayoutSettings.TextFormat;
             var serialCode = serial.Substring(5, 5);
             outputCode = outputCode.Replace("%T", ProductInfo.Initial)
                                     .Replace("%Y", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yy"))
@@ -553,38 +559,52 @@ namespace ProductDatabase {
 
             return outputCode;
         }
-        private Bitmap MakeLabelImage(string text, int resolution, int magnitude) {
-            if (SubstratePrintSettings is null) { throw new Exception(); }
-            var sizeX = (int)(SubstratePrintSettings.LabelPageSettings.LabelWidth / 25.4F * resolution * magnitude);
-            var sizeY = (int)(SubstratePrintSettings.LabelPageSettings.LabelHeight / 25.4F * resolution * magnitude);
+        private Bitmap MakeLabelImage(string text, float dpiX, float dpiY) {
 
-            Bitmap labelImage = new(sizeX, sizeY);
+            var labelWidth = (float)LabelPageSettings.LabelWidth;
+            var labelHeight = (float)LabelPageSettings.LabelHeight;
+
+            // ビットマップのサイズをピクセル単位で計算
+            var pixelWidth = (int)(labelWidth / MmPerInch * dpiX);
+            var pixelHeight = (int)(labelHeight / MmPerInch * dpiY);
+
+            var labelImage = new Bitmap(pixelWidth, pixelHeight);
+            labelImage.SetResolution(dpiX, dpiY);
+
+            //Bitmap labelImage = new(sizeX, sizeY);
             using (var g = Graphics.FromImage(labelImage)) {
+                g.PageUnit = GraphicsUnit.Millimeter;
                 // アンチエイリアス処理を改善
-                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-                var fontSize = SubstratePrintSettings.LabelLayoutSettings.TextFont.SizeInPoints / 72.0F * resolution * magnitude;
-                using (Font fnt = new(SubstratePrintSettings.LabelLayoutSettings.TextFont.Name, fontSize)) {
+                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 
-                    // StringFormat を使用して中心に配置
-                    var sf = new StringFormat {
-                        Alignment = SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterX ? StringAlignment.Center : StringAlignment.Near,
-                        LineAlignment = SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterY ? StringAlignment.Center : StringAlignment.Near
-                    };
+                var fontName = LabelLayoutSettings.TextFont.Name;
+                var fontSize = LabelLayoutSettings.TextFont.SizeInPoints;
+                using Font fnt = new(fontName, fontSize);
 
-                    var stringPosX = SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterX ? 0 : (SubstratePrintSettings.LabelLayoutSettings.TextPositionX / 25.4F * resolution * magnitude);
-                    var stringPosY = SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterY ? 0 : (SubstratePrintSettings.LabelLayoutSettings.TextPositionY / 25.4F * resolution * magnitude);
+                // StringFormat を使用して中心に配置
+                var sf = new StringFormat {
+                    Alignment = LabelLayoutSettings.AlignTextCenterX ? StringAlignment.Center : StringAlignment.Near,
+                    LineAlignment = LabelLayoutSettings.AlignTextCenterY ? StringAlignment.Center : StringAlignment.Near
+                };
 
-                    // 矩形領域を計算 (文字列を配置する領域)
-                    var layoutRect = new RectangleF(stringPosX, stringPosY, labelImage.Width - stringPosX, labelImage.Height - stringPosY);
-                    g.DrawString(text, fnt, Brushes.Black, layoutRect, sf);
+                var stringPosX = LabelLayoutSettings.AlignTextCenterX ? 0f : (float)LabelLayoutSettings.TextPositionX;
+                var stringPosY = LabelLayoutSettings.AlignTextCenterY ? 0f : (float)LabelLayoutSettings.TextPositionY;
 
-                    // プレビューかどうかの判定
-                    var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
-                    // プレビュー時、黒枠を描画
-                    if (isPreview) {
-                        using var p = new Pen(Color.Black, 3);
-                        g.DrawRectangle(p, 0, 0, labelImage.Width - 1, labelImage.Height - 1);
-                    }
+                var pageWidth = (float)LabelPageSettings.LabelWidth;
+                var pageHeight = (float)LabelPageSettings.LabelHeight;
+
+                // 矩形領域を計算 (文字列を配置する領域)
+                var layoutRect = new RectangleF(stringPosX, stringPosY, pageWidth, pageHeight);
+                g.DrawString(text, fnt, Brushes.Black, layoutRect, sf);
+
+                // プレビューかどうかの判定
+                var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
+                // プレビュー時、黒枠を描画
+                if (isPreview) {
+                    // 0.1mmの黒いペンで枠線を描画
+                    using var p = new Pen(Color.Black, 0.1f);
+                    g.DrawRectangle(p, 0, 0, labelWidth - 0.1f, labelHeight - 0.1f);
                 }
             }
 
