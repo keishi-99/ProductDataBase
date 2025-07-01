@@ -569,7 +569,7 @@ namespace ProductDatabase {
                 if (isPreview) {
                     // 0.1mmの黒いペンで枠線を描画
                     using var p = new Pen(Color.Black, 0.1f);
-                    g.DrawRectangle(p, 0, 0, labelWidth - 0.1f, labelHeight - 0.1f);
+                    g.DrawRectangle(p, 0, 0, (float)labelWidth - 0.1f, (float)labelHeight - 0.1f);
                 }
             }
 
@@ -589,28 +589,20 @@ namespace ProductDatabase {
                 LineAlignment = LabelLayoutSettings.AlignTextCenterY ? StringAlignment.Center : StringAlignment.Near
             };
             // 描画領域をミリメートル単位で計算
-            var textPosX = LabelLayoutSettings.AlignTextCenterX ? 0 : LabelLayoutSettings.TextPositionX;
-            var textPosY = LabelLayoutSettings.AlignTextCenterY ? 0 : LabelLayoutSettings.TextPositionY;
+            var textPosX = LabelLayoutSettings.AlignTextCenterX ? 0f : (float)LabelLayoutSettings.TextPositionX;
+            var textPosY = LabelLayoutSettings.AlignTextCenterY ? 0f : (float)LabelLayoutSettings.TextPositionY;
 
-            var pageWidth = LabelPageSettings.LabelWidth;
-            var pageHeight = LabelPageSettings.LabelHeight;
+            var pageWidth = (float)LabelPageSettings.LabelWidth;
+            var pageHeight = (float)LabelPageSettings.LabelHeight;
 
-            var stringSize = g.MeasureString(text, textFont);
-            // X座標を中央に調整
-            if (LabelLayoutSettings.AlignTextCenterX) {
-                textPosX = (pageWidth / 2f) - (stringSize.Width / 2f);
-            }
-            // Y座標を中央に調整
-            if (LabelLayoutSettings.AlignTextCenterY) {
-                textPosY = (pageHeight / 2f) - (stringSize.Height / 2f);
-            }
+            var layoutRect = new RectangleF(textPosX, textPosY, pageWidth, pageHeight);
 
-            g.DrawString(text, textFont, Brushes.Black, textPosX, textPosY);
+            g.DrawString(text, textFont, Brushes.Black, layoutRect, sf);
         }
         private void DrawBarcode(Graphics g, string text) {
 
-            var pageWidth = BarcodePageSettings.LabelWidth;
-            var pageHeight = BarcodePageSettings.LabelHeight;
+            var pageWidth = (float)BarcodePageSettings.LabelWidth;
+            var pageHeight = (float)BarcodePageSettings.LabelHeight;
 
             // --- テキストの描画 ---
             // フォントサイズはポイント単位でそのまま使用
@@ -623,8 +615,8 @@ namespace ProductDatabase {
                     Alignment = BarcodeLayoutSettings.AlignTextCenterX ? StringAlignment.Center : StringAlignment.Near
                 };
 
-                var textPosX = BarcodeLayoutSettings.AlignTextCenterX ? 0 : BarcodeLayoutSettings.TextPositionX;
-                var textPosY = BarcodeLayoutSettings.TextPositionY;
+                var textPosX = BarcodeLayoutSettings.AlignTextCenterX ? 0f : (float)BarcodeLayoutSettings.TextPositionX;
+                var textPosY = (float)BarcodeLayoutSettings.TextPositionY;
 
                 var layoutRect = new RectangleF(textPosX, textPosY, pageWidth - textPosX, pageHeight);
 
@@ -649,10 +641,10 @@ namespace ProductDatabase {
             };
 
             using var barcodeBitmap = writer.Write(text);
-            var barcodePosX = BarcodeLayoutSettings.BarcodePositionX;
-            var barcodePosY = BarcodeLayoutSettings.BarcodePositionY;
-            var barcodeWidth = BarcodeLayoutSettings.BarcodeWidth;
-            var barcodeHeight = BarcodeLayoutSettings.BarcodeHeight;
+            var barcodePosX = (float)BarcodeLayoutSettings.BarcodePositionX;
+            var barcodePosY = (float)BarcodeLayoutSettings.BarcodePositionY;
+            var barcodeWidth = (float)BarcodeLayoutSettings.BarcodeWidth;
+            var barcodeHeight = (float)BarcodeLayoutSettings.BarcodeHeight;
 
             // X座標を中央に調整 (ミリメートル単位で計算)
             if (BarcodeLayoutSettings.AlignBarcodeCenterX) {

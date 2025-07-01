@@ -138,35 +138,35 @@ namespace ProductDatabase {
         }
         private void UpdateProductPrintSettings() {
             if (ProductPrintSettings.BarcodePageSettings != null) {
-                ProductPrintSettings.BarcodePageSettings.LabelWidth = ParseFloat(BarcodeLabelWidthTextBox.Text);
-                ProductPrintSettings.BarcodePageSettings.LabelHeight = ParseFloat(BarcodeLabelHeightTextBox.Text);
+                ProductPrintSettings.BarcodePageSettings.LabelWidth = ParseDouble(BarcodeLabelWidthTextBox.Text);
+                ProductPrintSettings.BarcodePageSettings.LabelHeight = ParseDouble(BarcodeLabelHeightTextBox.Text);
                 ProductPrintSettings.BarcodePageSettings.LabelsPerRow = ParseInt(BarcodeLabelsPerRowTextBox.Text);
                 ProductPrintSettings.BarcodePageSettings.LabelsPerColumn = ParseInt(BarcodeLabelsPerColumnTextBox.Text);
-                ProductPrintSettings.BarcodePageSettings.MarginX = ParseFloat(BarcodeLabelMarginXTextBox.Text);
-                ProductPrintSettings.BarcodePageSettings.MarginY = ParseFloat(BarcodeLabelMarginYTextBox.Text);
-                ProductPrintSettings.BarcodePageSettings.IntervalX = ParseFloat(BarcodeLabelIntervalXTextBox.Text);
-                ProductPrintSettings.BarcodePageSettings.IntervalY = ParseFloat(BarcodeLabelIntervalYTextBox.Text);
-                ProductPrintSettings.BarcodePageSettings.HeaderPositionX = ParseFloat(BarcodeLabelHeaderPostionXTextBox.Text);
-                ProductPrintSettings.BarcodePageSettings.HeaderPositionY = ParseFloat(BarcodeLabelHeaderPostionYTextBox.Text);
+                ProductPrintSettings.BarcodePageSettings.MarginX = ParseDouble(BarcodeLabelMarginXTextBox.Text);
+                ProductPrintSettings.BarcodePageSettings.MarginY = ParseDouble(BarcodeLabelMarginYTextBox.Text);
+                ProductPrintSettings.BarcodePageSettings.IntervalX = ParseDouble(BarcodeLabelIntervalXTextBox.Text);
+                ProductPrintSettings.BarcodePageSettings.IntervalY = ParseDouble(BarcodeLabelIntervalYTextBox.Text);
+                ProductPrintSettings.BarcodePageSettings.HeaderPositionX = ParseDouble(BarcodeLabelHeaderPostionXTextBox.Text);
+                ProductPrintSettings.BarcodePageSettings.HeaderPositionY = ParseDouble(BarcodeLabelHeaderPostionYTextBox.Text);
                 ProductPrintSettings.BarcodePageSettings.HeaderTextFormat = BarcodeLabelHeaderTextBox.Text;
                 ProductPrintSettings.BarcodePageSettings.HeaderFont = BarcodeLabelHeaderFontDialog.Font;
             }
             if (ProductPrintSettings.BarcodeLayoutSettings != null) {
-                ProductPrintSettings.BarcodeLayoutSettings.BarcodeHeight = ParseFloat(BarcodeHeightTextBox.Text);
-                ProductPrintSettings.BarcodeLayoutSettings.BarcodeWidth = ParseFloat(BarcodeWidthTextBox.Text);
-                ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionX = ParseFloat(BarcodePostionXTextBox.Text);
-                ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionY = ParseFloat(BarcodePostionYTextBox.Text);
+                ProductPrintSettings.BarcodeLayoutSettings.BarcodeHeight = ParseDouble(BarcodeHeightTextBox.Text);
+                ProductPrintSettings.BarcodeLayoutSettings.BarcodeWidth = ParseDouble(BarcodeWidthTextBox.Text);
+                ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionX = ParseDouble(BarcodePostionXTextBox.Text);
+                ProductPrintSettings.BarcodeLayoutSettings.BarcodePositionY = ParseDouble(BarcodePostionYTextBox.Text);
                 ProductPrintSettings.BarcodeLayoutSettings.AlignBarcodeCenterX = BarcodeCenterCheckBox.Checked;
                 ProductPrintSettings.BarcodeLayoutSettings.TextFormat = BarcodeFormatTextBox.Text;
                 ProductPrintSettings.BarcodeLayoutSettings.TextFont = BarcodeFontDialog.Font;
-                ProductPrintSettings.BarcodeLayoutSettings.TextPositionX = ParseFloat(FontPostionXTextBox.Text);
-                ProductPrintSettings.BarcodeLayoutSettings.TextPositionY = ParseFloat(FontPostionYTextBox.Text);
+                ProductPrintSettings.BarcodeLayoutSettings.TextPositionX = ParseDouble(FontPostionXTextBox.Text);
+                ProductPrintSettings.BarcodeLayoutSettings.TextPositionY = ParseDouble(FontPostionYTextBox.Text);
                 ProductPrintSettings.BarcodeLayoutSettings.AlignTextCenterX = FontCenterCheckBox.Checked;
                 ProductPrintSettings.BarcodeLayoutSettings.CopiesPerLabel = ParseInt(BarcodeCopiesPerLabelTextBox.Text);
             }
         }
-        private static float ParseFloat(string text) {
-            if (float.TryParse(text, out var value)) {
+        private static double ParseDouble(string text) {
+            if (double.TryParse(text, out var value)) {
                 return value;
             }
             else {
