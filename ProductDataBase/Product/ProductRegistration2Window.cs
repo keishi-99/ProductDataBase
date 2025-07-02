@@ -925,8 +925,8 @@ namespace ProductDatabase {
                 var hardMarginY = 0f;
                 if (!isPreview) {
                     (hardMarginX, hardMarginY) = _printerName switch {
-                        "TOSHIBA Universal Printer 2" => (5.6f, 1.9f),
-                        "検査課　複合機" => (5.6f, 1.9f),
+                        //"TOSHIBA Universal Printer 2" => (5.6f, 1.9f),
+                        //"検査課　複合機" => (5.6f, 1.9f),
                         _ => (e.PageSettings.HardMarginX * MmPerInch / 100, e.PageSettings.HardMarginY * MmPerInch / 100)
                     };
                 }
