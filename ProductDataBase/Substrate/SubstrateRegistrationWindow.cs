@@ -310,6 +310,9 @@ namespace ProductDatabase {
                     $"基板名[{ProductInfo.SubstrateName}]",
                     $"型式[{ProductInfo.SubstrateModel}]",
                     $"数量[{number}]",
+                    $"[]",
+                    $"[]",
+                    $"[]",
                     $"登録日[{registrationDate}]",
                     $"担当者[{person}]",
                     $"コメント[{comment}]"

@@ -109,7 +109,8 @@ namespace ProductDatabase {
                             con.Open();
                             using var cmd = con.CreateCommand();
 
-                            cmd.CommandText = $"""
+                            cmd.CommandText =
+                                $"""
                                 SELECT
                                 	SubstrateModel,
                                 	SubstrateNumber,
@@ -147,7 +148,8 @@ namespace ProductDatabase {
                                 }
                             }
                             // テーブル検索SQL - [[StockName]_StockView]テーブルから基板型式[Model]で在庫基板を抽出
-                            cmd.CommandText = $"""
+                            cmd.CommandText =
+                                $"""
                                 SELECT
                                     SubstrateName,
                                     SubstrateModel,
@@ -329,7 +331,8 @@ namespace ProductDatabase {
                                             var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
 
                                             using (var cmd = con.CreateCommand()) {
-                                                cmd.CommandText = $"""
+                                                cmd.CommandText =
+                                                    $"""
                                                     SELECT
                                                         SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                                                     FROM

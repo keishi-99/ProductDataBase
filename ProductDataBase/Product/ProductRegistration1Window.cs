@@ -395,11 +395,17 @@ namespace ProductDatabase {
             string[] logMessageArray = [
                 $"[Rev変更]",
                 $"ID[{productInfo.CategoryName}_{productInfo.ProductID}]",
+                $"[]",
+                $"[]",
                 $"製品名[{productInfo.ProductName}]",
                 $"タイプ[{productInfo.ProductType}]",
                 $"型式[{productInfo.ProductModel}]",
+                $"[]",
+                $"[]",
+                $"[]",
                 $"Revision[{productInfo.Revision}]",
                 $"登録日[{productInfo.RegDate}]",
+                $"[]",
                 $"コメント[{productInfo.Comment}]"
             ];
             CommonUtils.Logger.AppendLog(logMessageArray);
