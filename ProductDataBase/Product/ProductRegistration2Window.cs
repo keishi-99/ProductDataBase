@@ -539,7 +539,8 @@ namespace ProductDatabase {
         private static void LogRegistration(ProductInformation productInfo) {
             string[] logMessageArray = [
                 $"[製品登録]",
-                $"ID[{productInfo.CategoryName}_{productInfo.ProductID}]",
+                $"[{productInfo.CategoryName}]",
+                $"ID[{productInfo.ProductID}]",
                 $"注文番号[{productInfo.OrderNumber}]",
                 $"製造番号[{productInfo.ProductNumber}]",
                 $"製品名[{productInfo.ProductName}]",

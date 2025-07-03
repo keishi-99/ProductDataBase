@@ -394,7 +394,8 @@ namespace ProductDatabase {
         private static void LogRegistration(ProductInformation productInfo) {
             string[] logMessageArray = [
                 $"[Rev変更]",
-                $"ID[{productInfo.CategoryName}_{productInfo.ProductID}]",
+                $"[{productInfo.CategoryName}]",
+                $"ID{productInfo.ProductID}]",
                 $"[]",
                 $"[]",
                 $"製品名[{productInfo.ProductName}]",

@@ -303,7 +303,8 @@ namespace ProductDatabase {
 
                 string[] logMessageArray = [
                     $"[基板登録]",
-                    $"ID[{ProductInfo.CategoryName}_{rowId}]",
+                    $"[{ProductInfo.CategoryName}]",
+                    $"ID[{rowId}]",
                     $"注文番号[{orderNumber}]",
                     $"製造番号[{substrateNumber}]",
                     $"製品名[{ProductInfo.ProductName}]",

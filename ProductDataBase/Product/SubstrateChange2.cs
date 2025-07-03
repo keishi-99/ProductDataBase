@@ -473,7 +473,8 @@ namespace ProductDatabase {
                 // ログ出力
                 string[] logMessageArray = [
                     $"[基板変更]",
-                    $"ID[{ProductInfo.CategoryName}_{ProductInfo.ProductID}]",
+                    $"[{ProductInfo.CategoryName}]",
+                    $"ID[{ProductInfo.ProductID}]",
                     $"注文番号[{ProductInfo.OrderNumber}]",
                     $"製造番号[{ProductInfo.ProductNumber}]",
                     $"製品名[{ProductInfo.ProductName}]",

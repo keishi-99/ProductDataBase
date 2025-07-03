@@ -177,6 +177,7 @@ namespace ProductDatabase {
                 // ログ出力
                 string[] logMessageArray = [
                     $"[再印刷]",
+                    $"[{ProductInfo.CategoryName}]",
                     $"[]",
                     $"注文番号[{ProductInfo.OrderNumber}]",
                     $"製造番号[{ProductInfo.ProductNumber}]",
