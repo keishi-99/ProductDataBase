@@ -702,27 +702,28 @@ namespace ProductDatabase {
             List<string> strSerialDuplication = [];
 
             using var cmd = connection.CreateCommand();
-            cmd.CommandText = $"""
-                    SELECT
-                        s.rowid,
-                        s.Serial,
-                        p.OrderNumber,
-                        p.ProductNumber,
-                        p.ProductType,
-                        p.ProductModel,
-                        p.RegDate,
-                        s.usedID
-                    FROM
-                        "{ProductInfo.CategoryName}_Serial" AS s
-                    LEFT JOIN
-                        "{ProductInfo.CategoryName}_Product" AS p
-                    ON
-                        s.UsedID = p.ID
-                    WHERE
-                        s.ProductName = @ProductName
-                    AND
-                        s.Serial IN ({string.Join(",", _strSerial.Select((_, i) => $"@Serial{i}"))});
-                    """;
+            cmd.CommandText = 
+                $"""
+                SELECT
+                    s.rowid,
+                    s.Serial,
+                    p.OrderNumber,
+                    p.ProductNumber,
+                    p.ProductType,
+                    p.ProductModel,
+                    p.RegDate,
+                    s.usedID
+                FROM
+                    "{ProductInfo.CategoryName}_Serial" AS s
+                LEFT JOIN
+                    "{ProductInfo.CategoryName}_Product" AS p
+                ON
+                    s.UsedID = p.ID
+                WHERE
+                    s.ProductName = @ProductName
+                AND
+                    s.Serial IN ({string.Join(",", _strSerial.Select((_, i) => $"@Serial{i}"))});
+                """;
             cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
             _strSerial
                 .Select((serial, i) => new { ParamName = $"@Serial{i}", Value = serial.Trim() })
