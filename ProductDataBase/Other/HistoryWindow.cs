@@ -488,7 +488,8 @@ namespace ProductDatabase {
                                 // ログ出力
                                 string[] logMessageArray = [
                                     $"[基板履歴編集:前]",
-                                    $"ID[{ProductInfo.CategoryName}_{row["ID", DataRowVersion.Original]}]",
+                                    $"[{ProductInfo.CategoryName}]",
+                                    $"ID[{row["ID", DataRowVersion.Original]}]",
                                     $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
                                     $"製造番号[{row["SubstrateNumber", DataRowVersion.Original]}]",
                                     $"ストック名[{row["StockName", DataRowVersion.Original]}]",
@@ -506,7 +507,8 @@ namespace ProductDatabase {
 
                                 logMessageArray = [
                                     $"[基板履歴編集:後]",
-                                    $"ID[{ProductInfo.CategoryName}_{row["ID"]}]",
+                                    $"[{ProductInfo.CategoryName}]",
+                                    $"ID[{row["ID"]}]",
                                     $"注文番号[{row["OrderNumber"]}]",
                                     $"製造番号[{row["SubstrateNumber"]}]",
                                     $"ストック名[{row["StockName"]}]",
@@ -539,7 +541,8 @@ namespace ProductDatabase {
                                 // ログ出力
                                 string[] logMessageArray = [
                                     $"[基板履歴削除]",
-                                    $"ID[{ProductInfo.CategoryName}_{row["ID", DataRowVersion.Original]}]",
+                                    $"[{ProductInfo.CategoryName}]",
+                                    $"ID[{row["ID", DataRowVersion.Original]}]",
                                     $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
                                     $"製造番号[{row["SubstrateNumber", DataRowVersion.Original]}]",
                                     $"ストック名[{row["StockName", DataRowVersion.Original]}]",
@@ -592,7 +595,8 @@ namespace ProductDatabase {
                                 // ログ出力
                                 string[] logMessageArray = [
                                     $"[製品履歴編集:前]",
-                                    $"ID[{ProductInfo.CategoryName}_{row["ID", DataRowVersion.Original]}]",
+                                    $"[{ProductInfo.CategoryName}]",
+                                    $"ID[{row["ID", DataRowVersion.Original]}]",
                                     $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
                                     $"製造番号[{row["ProductNumber", DataRowVersion.Original]}]",
                                     $"製品名[{row["ProductName", DataRowVersion.Original]}]",
@@ -610,7 +614,8 @@ namespace ProductDatabase {
 
                                 logMessageArray = [
                                     $"[製品履歴編集:後]",
-                                    $"ID[{ProductInfo.CategoryName}_{row["ID"]}]",
+                                    $"[{ProductInfo.CategoryName}]",
+                                    $"ID[{row["ID"]}]",
                                     $"注文番号[{row["OrderNumber"]}]",
                                     $"製造番号[{row["ProductNumber"]}]",
                                     $"製品名[{row["ProductName"]}]",
@@ -643,7 +648,8 @@ namespace ProductDatabase {
                                 // ログ出力
                                 string[] logMessageArray = [
                                     $"[製品履歴削除]",
-                                    $"ID[{ProductInfo.CategoryName}_{row["ID", DataRowVersion.Original]}]",
+                                    $"[{ProductInfo.CategoryName}]",
+                                    $"ID[{row["ID"]}]",
                                     $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
                                     $"製造番号[{row["ProductNumber", DataRowVersion.Original]}]",
                                     $"製品名[{row["ProductName", DataRowVersion.Original]}]",
@@ -681,7 +687,8 @@ namespace ProductDatabase {
                                 // ログ出力
                                 string[] logMessageArray = [
                                     $"[シリアル履歴削除]",
-                                    $"ID[{ProductInfo.CategoryName}_{row["rowid", DataRowVersion.Original]}]",
+                                    $"[{ProductInfo.CategoryName}]",
+                                    $"ID[{row["ID"]}]",
                                     $"製品名[{row["ProductName", DataRowVersion.Original]}]",
                                     $"Serial[{row["Serial", DataRowVersion.Original]}]",
                                     $"UsedID[{row["UsedID", DataRowVersion.Original]}]",
