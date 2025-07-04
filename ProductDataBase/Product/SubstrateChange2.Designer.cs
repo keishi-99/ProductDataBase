@@ -101,7 +101,6 @@
             this.label2 = new Label();
             this.ManufacturingNumberTextBox = new TextBox();
             this.QuantityTextBox = new TextBox();
-            this.RegistrationDateMaskedTextBox = new MaskedTextBox();
             this.RevisionTextBox = new TextBox();
             this.PersonComboBox = new ComboBox();
             this.CommentTextBox = new TextBox();
@@ -146,6 +145,7 @@
             this.dataGridViewTextBoxColumn20 = new DataGridViewTextBoxColumn();
             this.dataGridViewCheckBoxColumn5 = new DataGridViewCheckBoxColumn();
             this.Substrate11CheckBox = new CheckBox();
+            this.RegistrationDateTimePicker = new DateTimePicker();
             ((System.ComponentModel.ISupportInitialize)this.Substrate10DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate9DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate8DataGridView).BeginInit();
@@ -989,17 +989,6 @@
             this.QuantityTextBox.TabIndex = 63;
             this.QuantityTextBox.TextAlign = HorizontalAlignment.Right;
             // 
-            // RegistrationDateMaskedTextBox
-            // 
-            this.RegistrationDateMaskedTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            this.RegistrationDateMaskedTextBox.Location = new Point(285, 536);
-            this.RegistrationDateMaskedTextBox.Mask = "0000/00/00";
-            this.RegistrationDateMaskedTextBox.Name = "RegistrationDateMaskedTextBox";
-            this.RegistrationDateMaskedTextBox.PromptChar = '*';
-            this.RegistrationDateMaskedTextBox.Size = new Size(110, 23);
-            this.RegistrationDateMaskedTextBox.TabIndex = 67;
-            this.RegistrationDateMaskedTextBox.TextAlign = HorizontalAlignment.Right;
-            // 
             // RevisionTextBox
             // 
             this.RevisionTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
@@ -1462,11 +1451,20 @@
             this.Substrate11CheckBox.UseVisualStyleBackColor = true;
             this.Substrate11CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
+            // RegistrationDateTimePicker
+            // 
+            this.RegistrationDateTimePicker.Format = DateTimePickerFormat.Short;
+            this.RegistrationDateTimePicker.Location = new Point(285, 536);
+            this.RegistrationDateTimePicker.Name = "RegistrationDateTimePicker";
+            this.RegistrationDateTimePicker.Size = new Size(110, 23);
+            this.RegistrationDateTimePicker.TabIndex = 613;
+            // 
             // SubstrateChange2
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(984, 621);
+            this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.Substrate15DataGridView);
             this.Controls.Add(this.Substrate15CheckBox);
             this.Controls.Add(this.Substrate14DataGridView);
@@ -1484,7 +1482,6 @@
             this.Controls.Add(this.label103);
             this.Controls.Add(this.PersonComboBox);
             this.Controls.Add(this.RevisionTextBox);
-            this.Controls.Add(this.RegistrationDateMaskedTextBox);
             this.Controls.Add(this.QuantityTextBox);
             this.Controls.Add(this.ManufacturingNumberTextBox);
             this.Controls.Add(this.label2);
@@ -1574,7 +1571,6 @@
         private Label label2;
         private TextBox ManufacturingNumberTextBox;
         private TextBox QuantityTextBox;
-        private MaskedTextBox RegistrationDateMaskedTextBox;
         private TextBox RevisionTextBox;
         private ComboBox PersonComboBox;
         private TextBox CommentTextBox;
@@ -1669,5 +1665,6 @@
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn20;
         private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn5;
         private CheckBox Substrate11CheckBox;
+        private DateTimePicker RegistrationDateTimePicker;
     }
 }

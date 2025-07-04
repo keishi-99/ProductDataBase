@@ -63,10 +63,6 @@ namespace ProductDatabase {
                     }
                 }
 
-                // TextBoxへ今日の年月日を入力
-                var dtNow = DateTime.Now;
-                RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
-
                 // ComboBoxへ担当者を追加
                 PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
 
@@ -203,7 +199,7 @@ namespace ProductDatabase {
                 var orderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
                 var quantity = string.IsNullOrWhiteSpace(QuantityTextBox.Text) ? 0 : Convert.ToInt32(QuantityTextBox.Text);
                 var defectNumber = string.IsNullOrWhiteSpace(DefectNumberTextBox.Text) ? 0 : Convert.ToInt32(DefectNumberTextBox.Text);
-                var registrationDate = RegistrationDateCheckBox.Checked ? RegistrationDateMaskedTextBox.Text : string.Empty;
+                var registrationDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
                 var person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
                 var comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
                 var rowId = string.Empty;
@@ -544,7 +540,7 @@ namespace ProductDatabase {
             return s;
         }
         private string GenerateCode(string serial) {
-            var monthCode = DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM");
+            var monthCode = RegistrationDateTimePicker.Value.Month.ToString("MM");
 
             monthCode = monthCode switch {
                 "10" => "X",
@@ -556,8 +552,8 @@ namespace ProductDatabase {
             var outputCode = LabelLayoutSettings.TextFormat;
             var serialCode = serial.Substring(5, 5);
             outputCode = outputCode.Replace("%T", ProductInfo.Initial)
-                                    .Replace("%Y", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("yy"))
-                                    .Replace("%MM", DateTime.Parse(RegistrationDateMaskedTextBox.Text).ToString("MM"))
+                                    .Replace("%Y", RegistrationDateTimePicker.Value.Year.ToString("yy"))
+                                    .Replace("%MM", RegistrationDateTimePicker.Value.Month.ToString("MM"))
                                     .Replace("%M", string.IsNullOrEmpty(monthCode) ? string.Empty : monthCode[^1..])
                                     .Replace("%S", serialCode);
 
@@ -654,7 +650,7 @@ namespace ProductDatabase {
                     ExtraTextBox3.Enabled = checkBox.Checked;
                     break;
                 case "RegistrationDateCheckBox":
-                    RegistrationDateMaskedTextBox.Enabled = checkBox.Checked;
+                    RegistrationDateTimePicker.Enabled = checkBox.Checked;
                     break;
                 case "PersonCheckBox":
                     PersonComboBox.Enabled = checkBox.Checked;
@@ -687,13 +683,6 @@ namespace ProductDatabase {
             // 0～9と、バックスペース以外の時は、イベントをキャンセルする
             if (e.KeyChar is (< '0' or > '9') and not '\b') {
                 e.Handled = true;
-            }
-        }
-        // 日付チェック
-        private void RegistrationDateCheck(object sender, TypeValidationEventArgs e) {
-            if (!e.IsValidInput) {
-                MessageBox.Show("日付が正しくありません。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                RegistrationDateMaskedTextBox.Focus();
             }
         }
         // QR入力処理
@@ -730,7 +719,6 @@ namespace ProductDatabase {
         private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void DefectNumberTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
-        private void RegistrationDateMaskedTextBox_TypeValidationCompleted(object sender, TypeValidationEventArgs e) { RegistrationDateCheck(sender, e); }
         private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { PreviewPrint(); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             SubstratePrintSettingsWindow ls = new();

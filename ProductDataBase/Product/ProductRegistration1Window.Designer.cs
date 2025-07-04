@@ -36,7 +36,6 @@
             this.ExtraCheckBox4 = new CheckBox();
             this.PersonComboBox = new ComboBox();
             this.PersonCheckBox = new CheckBox();
-            this.RegistrationDateMaskedTextBox = new MaskedTextBox();
             this.RegistrationDateCheckBox = new CheckBox();
             this.FirstSerialNumberTextBox = new TextBox();
             this.FirstSerialNumberCheckBox = new CheckBox();
@@ -71,6 +70,7 @@
             this.label1 = new Label();
             this.textToUpperCheckBox = new CheckBox();
             this.RevisionChangeButton = new Button();
+            this.RegistrationDateTimePicker = new DateTimePicker();
             this.ProductRegistration1MenuStrip.SuspendLayout();
             this.panelCommentTextBox.SuspendLayout();
             this.SuspendLayout();
@@ -225,18 +225,6 @@
             this.PersonCheckBox.Text = "担当者";
             this.PersonCheckBox.UseVisualStyleBackColor = true;
             this.PersonCheckBox.CheckedChanged += this.NumberCheckBox_CheckedChanged;
-            // 
-            // RegistrationDateMaskedTextBox
-            // 
-            this.RegistrationDateMaskedTextBox.Enabled = false;
-            this.RegistrationDateMaskedTextBox.Location = new Point(166, 291);
-            this.RegistrationDateMaskedTextBox.Mask = "0000/00/00";
-            this.RegistrationDateMaskedTextBox.Name = "RegistrationDateMaskedTextBox";
-            this.RegistrationDateMaskedTextBox.PromptChar = '*';
-            this.RegistrationDateMaskedTextBox.Size = new Size(120, 23);
-            this.RegistrationDateMaskedTextBox.TabIndex = 66;
-            this.RegistrationDateMaskedTextBox.TextAlign = HorizontalAlignment.Right;
-            this.RegistrationDateMaskedTextBox.TypeValidationCompleted += this.RegistrationDateMaskedTextBox_TypeValidationCompleted;
             // 
             // RegistrationDateCheckBox
             // 
@@ -609,11 +597,20 @@
             this.RevisionChangeButton.UseVisualStyleBackColor = true;
             this.RevisionChangeButton.Click += this.RevisionChangeButton_Click;
             // 
+            // RegistrationDateTimePicker
+            // 
+            this.RegistrationDateTimePicker.Format = DateTimePickerFormat.Short;
+            this.RegistrationDateTimePicker.Location = new Point(166, 291);
+            this.RegistrationDateTimePicker.Name = "RegistrationDateTimePicker";
+            this.RegistrationDateTimePicker.Size = new Size(120, 23);
+            this.RegistrationDateTimePicker.TabIndex = 612;
+            // 
             // ProductRegistration1Window
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.RevisionChangeButton);
             this.Controls.Add(this.textToUpperCheckBox);
             this.Controls.Add(this.label1);
@@ -633,7 +630,6 @@
             this.Controls.Add(this.ExtraCheckBox4);
             this.Controls.Add(this.PersonComboBox);
             this.Controls.Add(this.PersonCheckBox);
-            this.Controls.Add(this.RegistrationDateMaskedTextBox);
             this.Controls.Add(this.RegistrationDateCheckBox);
             this.Controls.Add(this.FirstSerialNumberTextBox);
             this.Controls.Add(this.FirstSerialNumberCheckBox);
@@ -691,7 +687,6 @@
         private CheckBox ExtraCheckBox4;
         private ComboBox PersonComboBox;
         private CheckBox PersonCheckBox;
-        private MaskedTextBox RegistrationDateMaskedTextBox;
         private CheckBox RegistrationDateCheckBox;
         private TextBox FirstSerialNumberTextBox;
         private CheckBox FirstSerialNumberCheckBox;
@@ -726,5 +721,6 @@
         private Label label1;
         private CheckBox textToUpperCheckBox;
         private Button RevisionChangeButton;
+        private DateTimePicker RegistrationDateTimePicker;
     }
 }

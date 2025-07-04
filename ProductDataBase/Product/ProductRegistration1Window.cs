@@ -45,10 +45,6 @@ namespace ProductDatabase {
                     }
                 }
 
-                // TextBoxへ今日の年月日を入力
-                var dtNow = DateTime.Now;
-                RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
-
                 // ComboBoxへ担当者を追加
                 PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
 
@@ -181,7 +177,7 @@ namespace ProductDatabase {
 
                 ProductInfo.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
                 ProductInfo.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
-                ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateMaskedTextBox.Text : string.Empty;
+                ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
                 ProductInfo.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
                 ProductInfo.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
                 ProductInfo.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
@@ -220,7 +216,7 @@ namespace ProductDatabase {
             }
 
             ProductInfo.Revision = revision;
-            ProductInfo.RegDate = RegistrationDateMaskedTextBox.Text.Trim();
+            ProductInfo.RegDate = RegistrationDateTimePicker.Value.ToShortDateString();
             ProductInfo.Comment = CommentTextBox.Text.Trim();
 
             using var connection = new SQLiteConnection(GetConnectionRegistration());
@@ -329,7 +325,7 @@ namespace ProductDatabase {
                     FirstSerialNumberTextBox.Enabled = checkBox.Checked;
                     break;
                 case "RegistrationDateCheckBox":
-                    RegistrationDateMaskedTextBox.Enabled = checkBox.Checked;
+                    RegistrationDateTimePicker.Enabled = checkBox.Checked;
                     break;
                 case "PersonCheckBox":
                     PersonComboBox.Enabled = checkBox.Checked;
@@ -357,13 +353,6 @@ namespace ProductDatabase {
             // 0～9と、バックスペース以外の時は、イベントをキャンセルする
             if (e.KeyChar is (< '0' or > '9') and not '\b') {
                 e.Handled = true;
-            }
-        }
-        // 日付チェック
-        private void RegistrationDateCheck(object sender, TypeValidationEventArgs e) {
-            if (!e.IsValidInput) {
-                MessageBox.Show("日付が正しくありません。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                RegistrationDateMaskedTextBox.Focus();
             }
         }
         // QR入力処理
@@ -419,7 +408,6 @@ namespace ProductDatabase {
         private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
         private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
-        private void RegistrationDateMaskedTextBox_TypeValidationCompleted(object sender, TypeValidationEventArgs e) { RegistrationDateCheck(sender, e); }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
             var entries = new[]
                 {

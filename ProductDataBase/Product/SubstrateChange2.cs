@@ -41,8 +41,6 @@ namespace ProductDatabase {
                 OrderNumberTextBox.Text = ProductInfo.OrderNumber;
                 ManufacturingNumberTextBox.Text = ProductInfo.ProductNumber;
                 QuantityTextBox.Text = ProductInfo.Quantity.ToString();
-                var dtNow = DateTime.Now;
-                RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
                 RevisionTextBox.Text = ProductInfo.Revision;
                 CommentTextBox.Text = ProductInfo.Comment;
 
@@ -223,7 +221,7 @@ namespace ProductDatabase {
                 MessageBox.Show("登録完了");
 
                 // フォームを編集不可にする
-                RegistrationDateMaskedTextBox.Enabled = false;
+                RegistrationDateTimePicker.Enabled = false;
                 PersonComboBox.Enabled = false;
                 RegisterButton.Enabled = false;
                 for (var i = 0; i <= 9; i++) {
@@ -298,7 +296,7 @@ namespace ProductDatabase {
         }
         private void Registration() {
             try {
-                ProductInfo.RegDate = RegistrationDateMaskedTextBox.Text;
+                ProductInfo.RegDate = RegistrationDateTimePicker.Value.ToShortDateString();
                 ProductInfo.Person = PersonComboBox.Text;
                 ProductInfo.Comment = CommentTextBox.Text;
                 if (string.IsNullOrEmpty(ProductInfo.Person)) { throw new Exception("担当者を選択してください。"); }
