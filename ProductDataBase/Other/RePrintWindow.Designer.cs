@@ -35,7 +35,6 @@
             this.ExtraCheckBox4 = new CheckBox();
             this.PersonComboBox = new ComboBox();
             this.PersonCheckBox = new CheckBox();
-            this.RegistrationDateMaskedTextBox = new MaskedTextBox();
             this.RegistrationDateCheckBox = new CheckBox();
             this.FirstSerialNumberTextBox = new TextBox();
             this.FirstSerialNumberCheckBox = new CheckBox();
@@ -78,6 +77,7 @@
             this.label1 = new Label();
             this.QrCodeButton = new Button();
             this.textToUpperCheckBox = new CheckBox();
+            this.RegistrationDateTimePicker = new DateTimePicker();
             this.RePrintMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPostionNumericUpDown).BeginInit();
             this.panel1.SuspendLayout();
@@ -222,26 +222,15 @@
             this.PersonCheckBox.UseVisualStyleBackColor = true;
             this.PersonCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
-            // RegistrationDateMaskedTextBox
-            // 
-            this.RegistrationDateMaskedTextBox.Location = new Point(166, 291);
-            this.RegistrationDateMaskedTextBox.Mask = "0000/00/00";
-            this.RegistrationDateMaskedTextBox.Name = "RegistrationDateMaskedTextBox";
-            this.RegistrationDateMaskedTextBox.PromptChar = '*';
-            this.RegistrationDateMaskedTextBox.Size = new Size(120, 23);
-            this.RegistrationDateMaskedTextBox.TabIndex = 104;
-            this.RegistrationDateMaskedTextBox.TextAlign = HorizontalAlignment.Right;
-            this.RegistrationDateMaskedTextBox.TypeValidationCompleted += this.RegistrationDateCheck;
-            // 
             // RegistrationDateCheckBox
             // 
             this.RegistrationDateCheckBox.Location = new Point(166, 268);
             this.RegistrationDateCheckBox.Margin = new Padding(0);
             this.RegistrationDateCheckBox.Name = "RegistrationDateCheckBox";
-            this.RegistrationDateCheckBox.Size = new Size(62, 19);
+            this.RegistrationDateCheckBox.Size = new Size(120, 19);
             this.RegistrationDateCheckBox.TabIndex = 103;
             this.RegistrationDateCheckBox.TabStop = false;
-            this.RegistrationDateCheckBox.Text = "登録日";
+            this.RegistrationDateCheckBox.Text = "シリアル発行年月";
             this.RegistrationDateCheckBox.UseVisualStyleBackColor = true;
             this.RegistrationDateCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
@@ -671,11 +660,20 @@
             this.textToUpperCheckBox.Text = "小文字を大文字に変換";
             this.textToUpperCheckBox.UseVisualStyleBackColor = true;
             // 
+            // RegistrationDateTimePicker
+            // 
+            this.RegistrationDateTimePicker.Format = DateTimePickerFormat.Short;
+            this.RegistrationDateTimePicker.Location = new Point(166, 291);
+            this.RegistrationDateTimePicker.Name = "RegistrationDateTimePicker";
+            this.RegistrationDateTimePicker.Size = new Size(120, 23);
+            this.RegistrationDateTimePicker.TabIndex = 611;
+            // 
             // RePrintWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.textToUpperCheckBox);
             this.Controls.Add(this.QrCodeButton);
             this.Controls.Add(this.label1);
@@ -697,7 +695,6 @@
             this.Controls.Add(this.ExtraCheckBox4);
             this.Controls.Add(this.PersonComboBox);
             this.Controls.Add(this.PersonCheckBox);
-            this.Controls.Add(this.RegistrationDateMaskedTextBox);
             this.Controls.Add(this.RegistrationDateCheckBox);
             this.Controls.Add(this.FirstSerialNumberTextBox);
             this.Controls.Add(this.FirstSerialNumberCheckBox);
@@ -754,7 +751,6 @@
         private CheckBox ExtraCheckBox4;
         private ComboBox PersonComboBox;
         private CheckBox PersonCheckBox;
-        private MaskedTextBox RegistrationDateMaskedTextBox;
         private CheckBox RegistrationDateCheckBox;
         private TextBox FirstSerialNumberTextBox;
         private CheckBox FirstSerialNumberCheckBox;
@@ -797,5 +793,6 @@
         private Label label1;
         private Button QrCodeButton;
         private CheckBox textToUpperCheckBox;
+        private DateTimePicker RegistrationDateTimePicker;
     }
 }

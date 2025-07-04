@@ -68,10 +68,6 @@ namespace ProductDatabase {
                     }
                 }
 
-                // TextBoxへ今日の年月日を入力
-                var dtNow = DateTime.Now;
-                RegistrationDateMaskedTextBox.Text = dtNow.ToShortDateString();
-
                 // ComboBoxへ担当者を追加
                 PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
 
@@ -287,7 +283,7 @@ namespace ProductDatabase {
             ProductInfo.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
             ProductInfo.Quantity = quantity;
             ProductInfo.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
-            ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateMaskedTextBox.Text : string.Empty;
+            ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
             ProductInfo.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
             ProductInfo.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
 
@@ -696,7 +692,7 @@ namespace ProductDatabase {
                     FirstSerialNumberTextBox.Enabled = checkBox.Checked;
                     break;
                 case "RegistrationDateCheckBox":
-                    RegistrationDateMaskedTextBox.Enabled = checkBox.Checked;
+                    RegistrationDateTimePicker.Enabled = checkBox.Checked;
                     break;
                 case "PersonCheckBox":
                     PersonComboBox.Enabled = checkBox.Checked;
@@ -722,13 +718,6 @@ namespace ProductDatabase {
             // 0～9と、バックスペース以外の時は、イベントをキャンセルする
             if (e.KeyChar is (< '0' or > '9') and not '\b') {
                 e.Handled = true;
-            }
-        }
-        // 日付チェック
-        private void RegistrationDateCheck(object sender, TypeValidationEventArgs e) {
-            if (!e.IsValidInput) {
-                MessageBox.Show("日付が正しくありません。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                RegistrationDateMaskedTextBox.Focus();
             }
         }
         // QR入力処理
