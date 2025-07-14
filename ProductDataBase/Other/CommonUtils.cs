@@ -89,6 +89,8 @@ namespace ProductDatabase.Other {
                         // ネットワークにバックアップ
                         var networkFilePath = Path.Combine(s_networkPath, "db", "registration.db");
                         if (Environment.CurrentDirectory != s_networkPath) {
+                            // ファイルを削除してからコピー
+                            DeleteWithRetry(networkFilePath);
                             File.Copy(s_originalFilePath, networkFilePath, true);
                         }
 
@@ -109,11 +111,30 @@ namespace ProductDatabase.Other {
 
                     while (backupFiles.Count > s_maxBackupFiles) {
                         var oldestFile = backupFiles.First();
-                        File.Delete(oldestFile);
+                        DeleteWithRetry(oldestFile);
                         backupFiles.RemoveAt(0);
                     }
                 } catch (Exception ex) {
                     MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            /// <summary>
+            /// ファイルを削除します。
+            /// </summary>
+            private static void DeleteWithRetry(string filePath, int retryCount = 5, int delayMilliseconds = 2000) {
+                for (var attempt = 1; attempt <= retryCount; attempt++) {
+                    try {
+                        if (File.Exists(filePath)) {
+                            File.Delete(filePath);
+                        }
+                        return;
+                    } catch (IOException) {
+                        if (attempt == retryCount) {
+                            throw new Exception("バックアップファイルが削除できません。"); // 最後の試行で失敗したら例外を投げる
+                        }
+                        Thread.Sleep(delayMilliseconds); // 一定時間待機してリトライ
+                    }
                 }
             }
         }
