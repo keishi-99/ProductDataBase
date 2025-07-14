@@ -89,8 +89,6 @@ namespace ProductDatabase.Other {
                         // ネットワークにバックアップ
                         var networkFilePath = Path.Combine(s_networkPath, "db", "registration.db");
                         if (Environment.CurrentDirectory != s_networkPath) {
-                            // ファイルを削除してからコピー
-                            DeleteWithRetry(networkFilePath);
                             File.Copy(s_originalFilePath, networkFilePath, true);
                         }
 
