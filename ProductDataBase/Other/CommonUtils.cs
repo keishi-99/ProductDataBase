@@ -19,6 +19,43 @@ namespace ProductDatabase.Other {
     }
 
     internal partial class CommonUtils {
+        /// <summary>
+        /// ファイルをコピーします。
+        /// </summary>
+        private static void CopyWithRetry(string sourceFileName, string destFileName, bool overwrite, int retryCount = 5, int delayMilliseconds = 2000) {
+            for (var attempt = 1; attempt <= retryCount; attempt++) {
+                try {
+                    if (File.Exists(sourceFileName)) {
+                        File.Copy(sourceFileName, destFileName, overwrite);
+                    }
+                    return;
+                } catch (IOException) {
+                    if (attempt == retryCount) {
+                        throw new Exception("バックアップファイルがコピーできません。"); // 最後の試行で失敗したら例外を投げる
+                    }
+                    Thread.Sleep(delayMilliseconds); // 一定時間待機してリトライ
+                }
+            }
+        }
+        /// <summary>
+        /// ファイルを削除します。
+        /// </summary>
+        private static void DeleteWithRetry(string filePath, int retryCount = 5, int delayMilliseconds = 2000) {
+            for (var attempt = 1; attempt <= retryCount; attempt++) {
+                try {
+                    if (File.Exists(filePath)) {
+                        File.Delete(filePath);
+                    }
+                    return;
+                } catch (IOException) {
+                    if (attempt == retryCount) {
+                        throw new Exception("バックアップファイルが削除できません。"); // 最後の試行で失敗したら例外を投げる
+                    }
+                    Thread.Sleep(delayMilliseconds); // 一定時間待機してリトライ
+                }
+            }
+        }
+
         public static string s_networkPath = string.Empty; // ClonePathを保持する静的変数
         // ログ作成
         public static class Logger {
@@ -49,7 +86,7 @@ namespace ProductDatabase.Other {
                         if (!string.IsNullOrEmpty(s_networkPath)) {
                             var cloneFilePath = Path.Combine(s_networkPath, "db", "logs", logFileName);
                             if (cloneFilePath != logFilePath) {
-                                File.Copy(logFilePath, cloneFilePath, true);
+                                CopyWithRetry(logFilePath, cloneFilePath, true);
                             }
                         }
                     }
@@ -82,14 +119,14 @@ namespace ProductDatabase.Other {
                         var backupFilePath = Path.Combine(s_backupDirectory, backupFileName);
 
                         // 元ファイルをバックアップにコピー
-                        File.Copy(s_originalFilePath, backupFilePath, true);
+                        CopyWithRetry(s_originalFilePath, backupFilePath, true);
                         // バックアップファイルを管理
                         ManageBackupFiles();
 
                         // ネットワークにバックアップ
                         var networkFilePath = Path.Combine(s_networkPath, "db", "registration.db");
                         if (Environment.CurrentDirectory != s_networkPath) {
-                            File.Copy(s_originalFilePath, networkFilePath, true);
+                            CopyWithRetry(s_originalFilePath, networkFilePath, true);
                         }
 
                     }
@@ -114,25 +151,6 @@ namespace ProductDatabase.Other {
                     }
                 } catch (Exception ex) {
                     MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-
-            /// <summary>
-            /// ファイルを削除します。
-            /// </summary>
-            private static void DeleteWithRetry(string filePath, int retryCount = 5, int delayMilliseconds = 2000) {
-                for (var attempt = 1; attempt <= retryCount; attempt++) {
-                    try {
-                        if (File.Exists(filePath)) {
-                            File.Delete(filePath);
-                        }
-                        return;
-                    } catch (IOException) {
-                        if (attempt == retryCount) {
-                            throw new Exception("バックアップファイルが削除できません。"); // 最後の試行で失敗したら例外を投げる
-                        }
-                        Thread.Sleep(delayMilliseconds); // 一定時間待機してリトライ
-                    }
                 }
             }
         }
