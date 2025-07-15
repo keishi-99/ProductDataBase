@@ -504,8 +504,8 @@ namespace ProductDatabase.Other {
                     Options = new QrCodeEncodingOptions {
                         ErrorCorrection = ErrorCorrectionLevel.L,
                         CharacterSet = "Shift_JIS",
-                        Width = 100,
-                        Height = 100,
+                        Width = 90,
+                        Height = 90,
                     },
                     Renderer = new BitmapRenderer {
                         Foreground = Color.Gray,
