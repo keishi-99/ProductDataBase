@@ -3,12 +3,11 @@ using NPOI.SS.Util;
 using OfficeOpenXml;
 using System.Data;
 using System.Data.SQLite;
-using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using ZXing;
 using ZXing.QrCode;
 using ZXing.QrCode.Internal;
-using ZXing.Rendering;
+using ZXing.Windows.Compatibility;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase.Other {
@@ -500,7 +499,7 @@ namespace ProductDatabase.Other {
 
             // QRコードを生成し、Excelシートに埋め込むメソッド
             private static void GenerateAndEmbedQrCode(ExcelWorksheet workSheetTemp, ProductInformation productInfo, string qrCodeRange) {
-                BarcodeWriter<PixelData> qr = new() {
+                BarcodeWriter<Bitmap> qr = new() {
                     Format = BarcodeFormat.QR_CODE,
                     Options = new QrCodeEncodingOptions {
                         ErrorCorrection = ErrorCorrectionLevel.L,
@@ -508,26 +507,20 @@ namespace ProductDatabase.Other {
                         Width = 100,
                         Height = 100,
                     },
-                    Renderer = new PixelDataRenderer {
-                        Foreground = new(Color.Gray.ToArgb()),
-                        Background = new(Color.White.ToArgb()),
-                    },
+                    Renderer = new BitmapRenderer {
+                        Foreground = Color.Gray,
+                        Background = Color.White,
+                    }
                 };
 
                 // QRコードのデータ文字列を構築
                 var qrData = $"{productInfo.OrderNumber};{productInfo.ProductNumber};{productInfo.ProductModel};{productInfo.Quantity};{productInfo.SerialFirst};{productInfo.SerialLast}";
-                var pixelData = qr.Write(qrData);
-
-                // PixelData を Bitmap に変換
-                using var bitmap = new Bitmap(pixelData.Width, pixelData.Height, PixelFormat.Format32bppArgb);
-                var bmpData = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-                System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bmpData.Scan0, pixelData.Pixels.Length);
-                bitmap.UnlockBits(bmpData);
+                var qrBitmap = qr.Write(qrData);
 
                 // Excelに画像を埋め込む
-                var image = workSheetTemp.Drawings.AddPicture("QR", bitmap);
+                var picture = workSheetTemp.Drawings.AddPicture("QR", qrBitmap);
                 // QRコードのセル範囲の左上隅に画像を配置
-                image.SetPosition(workSheetTemp.Cells[qrCodeRange].Start.Row - 1, 0, workSheetTemp.Cells[qrCodeRange].Start.Column - 1, 0);
+                picture.SetPosition(workSheetTemp.Cells[qrCodeRange].Start.Row - 1, 0, workSheetTemp.Cells[qrCodeRange].Start.Column - 1, 0);
             }
 
             // Excelファイルを保存し、印刷処理を行うメソッド
