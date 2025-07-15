@@ -255,7 +255,8 @@ namespace ProductDatabase {
                 CategoryListBox3.Items.Clear();
                 ProductInfo.ProductDataTable.Clear();
 
-                ActiveControl = QRCodeTextBox;
+                this.Activate();
+                QRCodeTextBox.Select();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
