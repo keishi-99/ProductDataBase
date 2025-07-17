@@ -427,12 +427,33 @@ namespace ProductDatabase {
                 };
 
             var maxLabelLength = items.Keys.Max(k => k.Length);
-            // メッセージの整形
             var message = string.Join("\n", items.Select(kvp =>
-                kvp.Key.PadRight(maxLabelLength + 4) + $"[{kvp.Value}]"
+                kvp.Key.PadRight(maxLabelLength + 4) + $"[ {kvp.Value} ]"
             ));
 
-            MessageBox.Show(message, "取得情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var form = new Form {
+                Text = "取得情報",
+                Width = 300,
+                Height = 300,
+                StartPosition = FormStartPosition.CenterScreen,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+
+            var label = new Label {
+                Text = message,
+                AutoSize = false,
+                Dock = DockStyle.Fill,
+                Padding = new Padding(10),
+                TextAlign = ContentAlignment.MiddleLeft,
+                Font = new Font("PlemolJP", 10)
+                //Font = font ?? new Font("MS Gothic", 10)
+            };
+
+            form.Controls.Add(label);
+
+            form.ShowDialog();
         }
         private void QrCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
 
