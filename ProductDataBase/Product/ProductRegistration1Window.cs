@@ -429,7 +429,7 @@ namespace ProductDatabase {
             var maxLabelLength = items.Keys.Max(k => k.Length);
             // メッセージの整形
             var message = string.Join("\n", items.Select(kvp =>
-                kvp.Key.PadRight(maxLabelLength + 4) + $"[{kvp.Value}]"
+                kvp.Key.PadRight(maxLabelLength + 2) + kvp.Value
             ));
 
             MessageBox.Show(message, "取得情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
