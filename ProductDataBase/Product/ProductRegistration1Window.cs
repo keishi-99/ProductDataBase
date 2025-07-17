@@ -409,26 +409,28 @@ namespace ProductDatabase {
         private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
-            var entries = new[]
+            var items = new Dictionary<string, string>
                 {
-                    ("StrProness1", $"{ProductInfo.Proness1}"),
-                    ("StrProness2", $"{ProductInfo.Proness2}"),
-                    ("StrProness3", $"{ProductInfo.Proness3}"),
-                    ("StrProness4", $"{ProductInfo.Proness4}"),
-                    ("StrProness5", $"{ProductInfo.Proness5}"),
-                    ("StrProductName", $"{ProductInfo.ProductName}"),
-                    ("StrStockName", $"{ProductInfo.StockName}"),
-                    ("StrProductModel", $"{ProductInfo.ProductModel}"),
-                    ("RevisionGroup", $"{ProductInfo.RevisionGroup}"),
-                    ("StrInitial", $"{ProductInfo.Initial}"),
-                    ("IntRegType", $"{ProductInfo.RegType}"),
-                    ("IntPrintType", $"{ProductInfo.PrintType}"),
-                    ("IntSerialDigit", $"{ProductInfo.SerialDigit}")
+                    {"Proness1", $"{ProductInfo.Proness1}" },
+                    {"Proness2", $"{ProductInfo.Proness2}"},
+                    {"Proness3", $"{ProductInfo.Proness3}"},
+                    {"Proness4", $"{ProductInfo.Proness4}"},
+                    {"Proness5", $"{ProductInfo.Proness5}"},
+                    {"ProductName", $"{ProductInfo.ProductName}"},
+                    {"StockName", $"{ProductInfo.StockName}"},
+                    {"ProductModel", $"{ProductInfo.ProductModel}"},
+                    {"RevisionGroup", $"{ProductInfo.RevisionGroup}"},
+                    {"Initial", $"{ProductInfo.Initial}"},
+                    {"RegType", $"{ProductInfo.RegType}"},
+                    {"PrintType", $"{ProductInfo.PrintType}"},
+                    {"SerialDigit", $"{ProductInfo.SerialDigit}"}
                 };
 
-            const int ColumnWidth = 15;
-            var message = string.Join(Environment.NewLine,
-                entries.Select(entry => $"{entry.Item1,-ColumnWidth}[{entry.Item2}]"));
+            var maxLabelLength = items.Keys.Max(k => k.Length);
+            // メッセージの整形
+            var message = string.Join("\n", items.Select(kvp =>
+                kvp.Key.PadRight(maxLabelLength + 4) + $"[{kvp.Value}]"
+            ));
 
             MessageBox.Show(message, "取得情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
