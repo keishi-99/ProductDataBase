@@ -703,7 +703,7 @@ namespace ProductDatabase {
             List<string> strSerialDuplication = [];
 
             using var cmd = connection.CreateCommand();
-            cmd.CommandText = 
+            cmd.CommandText =
                 $"""
                 SELECT
                     s.rowid,
@@ -1252,6 +1252,71 @@ namespace ProductDatabase {
             }
         }
 
+        // 取得情報表示
+        private void ShowInfo() {
+            var items = new Dictionary<string, string>
+                {
+                    {"ProductName", $"{ProductInfo.ProductName}"},
+                    {"ProductModel", $"{ProductInfo.ProductModel}"},
+                    {"StockName", $"{ProductInfo.StockName}"},
+                    {"ProductType", $"{ProductInfo.ProductType}"},
+                    {"OrderNumber", $"{ProductInfo.OrderNumber}"},
+                    {"ProductNumber", $"{ProductInfo.ProductNumber}"},
+                    {"Revision", $"{ProductInfo.Revision}"},
+                    {"RegDate", $"{ProductInfo.RegDate}"},
+                    {"Person", $"{ProductInfo.Person}"},
+                    {"Quantity", $"{ProductInfo.Quantity}"},
+                    {"SerialFirstNumber", $"{ProductInfo.SerialFirstNumber}"},
+                    {"SerialLastNumber", $"{_serialLastNumber}"},
+                    {"Initial", $"{ProductInfo.Initial}"},
+                    {"RegType", $"{ProductInfo.RegType}"},
+                    {"PrintType", $"{ProductInfo.PrintType}"},
+                    {"SerialDigit", $"{ProductInfo.SerialDigit}"}
+                };
+
+            var form = new Form {
+                Text = "取得情報",
+                Width = 300,
+                Height = 400,
+                AutoSize = true,
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.SizableToolWindow,
+                ShowInTaskbar = false,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+
+            // ListView作成
+            var listView = new ListView {
+                Dock = DockStyle.Fill,
+                View = View.Details,
+                FullRowSelect = true,
+                GridLines = true,
+                Font = new Font("PlemolJP Console", ProductInfo.FontSize), // 等幅フォント
+            };
+
+            // 列の追加
+            listView.Columns.Add("", 0);   // 値列の幅（調整可）
+            listView.Columns.Add("項目", 200, HorizontalAlignment.Right);  // 項目列の幅
+            listView.Columns.Add("値", 360);   // 値列の幅（調整可）
+
+            // データを追加
+            foreach (var kvp in items) {
+                //var item = new ListViewItem(kvp.Key);
+                var item = new ListViewItem("");  // ダミー1列目
+                item.SubItems.Add(kvp.Key);
+                item.SubItems.Add(kvp.Value);
+                listView.Items.Add(item);
+            }
+            form.Controls.Add(listView);
+
+            // フォームのイベントハンドラ
+            form.Shown += (_, _) => {
+                listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            };
+            form.ShowDialog();
+        }
+
         private void ProductRegistration2Window_Load(object sender, EventArgs e) { LoadEvents(); }
         private void ProductRegistration2Window_FormClosing(object sender, FormClosingEventArgs e) { ClosingEvents(); }
         private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
@@ -1280,33 +1345,7 @@ namespace ProductDatabase {
             ls.ShowDialog(this);
             LoadSettings();
         }
-        private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
-            var entries = new[]
-                {
-                    ("StrProductName", $"{ProductInfo.ProductName}"),
-                    ("StrProductModel", $"{ProductInfo.ProductModel}"),
-                    ("StrStockName", $"{ProductInfo.StockName}"),
-                    ("StrProductType", $"{ProductInfo.ProductType}"),
-                    ("StrOrderNumber", $"{ProductInfo.OrderNumber}"),
-                    ("StrProductNumber", $"{ProductInfo.ProductNumber}"),
-                    ("StrRevision", $"{ProductInfo.Revision}"),
-                    ("StrRegDate", $"{ProductInfo.RegDate}"),
-                    ("StrPerson", $"{ProductInfo.Person}"),
-                    ("IntQuantity", $"{ProductInfo.Quantity}"),
-                    ("IntSerialFirstNumber", $"{ProductInfo.SerialFirstNumber}"),
-                    ("IntSerialLastNumber", $"{_serialLastNumber}"),
-                    ("StrInitial", $"{ProductInfo.Initial}"),
-                    ("IntRegType", $"{ProductInfo.RegType}"),
-                    ("IntPrintType", $"{ProductInfo.PrintType}"),
-                    ("IntSerialDigit", $"{ProductInfo.SerialDigit}")
-                };
-
-            const int ColumnWidth = 15;
-            var message = string.Join(Environment.NewLine,
-                entries.Select(entry => $"{entry.Item1,-ColumnWidth}[{entry.Item2}]"));
-
-            MessageBox.Show(message, "取得情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
+        private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
         private void GenerateReportButton_Click(object sender, EventArgs e) { GenerateReport(); }
         private void SubstrateListPrintButton_Click(object sender, EventArgs e) { GenerateList(); }
         private void CheckSheetPrintButton_Click(object sender, EventArgs e) { GenerateCheckSheet(); }
