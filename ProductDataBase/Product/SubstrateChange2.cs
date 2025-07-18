@@ -176,30 +176,30 @@ namespace ProductDatabase {
                                     if (_objCbx != null) { _objCbx.Text = $"{strSubstrateName} - {substrateModel}"; }
 
                                     // usedSubstrate から strSubstrateNum を検索
+                                    var usedSubstrateItem = null as dynamic;
                                     var num = usedSubstrate.FindIndex(substrate => substrate.Item1 == substrateModel);
                                     if (num != -1) {
-
-                                        var usedSubstrateItem = usedSubstrate[num].Item2
+                                        usedSubstrateItem = usedSubstrate[num].Item2
                                             .Select((num, index) => new { Num = num, Index = index })
                                             .FirstOrDefault(item => item.Num == strSubstrateNum);
+                                    }
 
-                                        var strUsedSubNum = usedSubstrateItem != null ? strSubstrateNum : string.Empty;
-                                        var intUsedQuantity = usedSubstrateItem != null ? usedSubstrate[num].Item3[usedSubstrateItem.Index] : 0;
+                                    var strUsedSubNum = usedSubstrateItem != null ? strSubstrateNum : string.Empty;
+                                    var intUsedQuantity = usedSubstrateItem != null ? usedSubstrate[num].Item3[usedSubstrateItem.Index] : 0;
 
-                                        if (intStock > 0 || strUsedSubNum == strSubstrateNum) {
-                                            if (_objDgv == null) {
-                                                break;
-                                            }
-
-                                            _objDgv.Rows.Add();
-                                            _objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
-                                            _objDgv.Rows[j].Cells[1].Value = intStock;
-                                            _objDgv.Rows[j].Cells[2].Value = intUsedQuantity;
-                                            _objDgv.Rows[j].Cells[3].Value = intUsedQuantity;
-                                            _objDgv.Rows[j].Cells[4].Value = intUsedQuantity != 0;
-
-                                            j++;
+                                    if (intStock > 0 || strUsedSubNum == strSubstrateNum) {
+                                        if (_objDgv == null) {
+                                            break;
                                         }
+
+                                        _objDgv.Rows.Add();
+                                        _objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
+                                        _objDgv.Rows[j].Cells[1].Value = intStock;
+                                        _objDgv.Rows[j].Cells[2].Value = intUsedQuantity;
+                                        _objDgv.Rows[j].Cells[3].Value = intUsedQuantity;
+                                        _objDgv.Rows[j].Cells[4].Value = intUsedQuantity != 0;
+
+                                        j++;
                                     }
                                 }
                             }
