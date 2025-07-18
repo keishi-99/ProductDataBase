@@ -400,15 +400,8 @@ namespace ProductDatabase {
             ];
             CommonUtils.Logger.AppendLog(logMessageArray);
         }
-
-        private void ProductRegistration1Window_Load(object sender, EventArgs e) { LoadEvents(); }
-        private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
-        private void RevisionChangeButton_Click(object sender, EventArgs e) { RevisionChange(); }
-        private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
-        private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
-        private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
-        private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
-        private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
+        // 取得情報表示
+        private void ShowInfo() {
             var items = new Dictionary<string, string>
                 {
                     {"Proness1", $"{ProductInfo.Proness1}" },
@@ -426,35 +419,57 @@ namespace ProductDatabase {
                     {"SerialDigit", $"{ProductInfo.SerialDigit}"}
                 };
 
-            var maxLabelLength = items.Keys.Max(k => k.Length);
-            var message = string.Join("\n", items.Select(kvp =>
-                kvp.Key.PadRight(maxLabelLength + 4) + $"[ {kvp.Value} ]"
-            ));
-
             var form = new Form {
                 Text = "取得情報",
                 Width = 300,
-                Height = 300,
-                StartPosition = FormStartPosition.CenterScreen,
-                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Height = 400,
+                AutoSize = true,
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.SizableToolWindow,
+                ShowInTaskbar = false,
                 MaximizeBox = false,
                 MinimizeBox = false
             };
 
-            var label = new Label {
-                Text = message,
-                AutoSize = false,
+            // ListView作成
+            var listView = new ListView {
                 Dock = DockStyle.Fill,
-                Padding = new Padding(10),
-                TextAlign = ContentAlignment.MiddleLeft,
-                Font = new Font("PlemolJP", 10)
-                //Font = font ?? new Font("MS Gothic", 10)
+                View = View.Details,
+                FullRowSelect = true,
+                GridLines = true,
+                Font = new Font("PlemolJP Console", ProductInfo.FontSize), // 等幅フォント
             };
 
-            form.Controls.Add(label);
+            // 列の追加
+            listView.Columns.Add("", 0);   // 値列の幅（調整可）
+            listView.Columns.Add("項目", 200, HorizontalAlignment.Right);  // 項目列の幅
+            listView.Columns.Add("値", 360);   // 値列の幅（調整可）
 
+            // データを追加
+            foreach (var kvp in items) {
+                //var item = new ListViewItem(kvp.Key);
+                var item = new ListViewItem("");  // ダミー1列目
+                item.SubItems.Add(kvp.Key);
+                item.SubItems.Add(kvp.Value);
+                listView.Items.Add(item);
+            }
+            form.Controls.Add(listView);
+
+            // フォームのイベントハンドラ
+            form.Shown += (_, _) => {
+                listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            };
             form.ShowDialog();
         }
+
+        private void ProductRegistration1Window_Load(object sender, EventArgs e) { LoadEvents(); }
+        private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
+        private void RevisionChangeButton_Click(object sender, EventArgs e) { RevisionChange(); }
+        private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
+        private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
+        private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
+        private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
+        private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
         private void QrCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
 
     }

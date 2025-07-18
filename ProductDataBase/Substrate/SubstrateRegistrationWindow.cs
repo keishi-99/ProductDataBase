@@ -709,6 +709,67 @@ namespace ProductDatabase {
                 throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}");
             }
         }
+        // 取得情報表示
+        private void ShowInfo() {
+            var items = new Dictionary<string, string>
+                {
+                    {"Proness1", $"{ProductInfo.Proness1}"},
+                    {"Proness2", $"{ProductInfo.Proness2}"},
+                    {"Proness3", $"{ProductInfo.Proness3}"},
+                    {"Proness4", $"{ProductInfo.Proness4}"},
+                    {"Proness5", $"{ProductInfo.Proness5}"},
+                    {"ProductName", $"{ProductInfo.ProductName}"},
+                    {"StockName", $"{ProductInfo.StockName}"},
+                    {"SubstrateName", $"{ProductInfo.SubstrateName}"},
+                    {"SubstrateModel", $"{ProductInfo.SubstrateModel}"},
+                    {"ProductNumber", $"{ProductInfo.ProductNumber}"},
+                    {"Initial", $"{ProductInfo.Initial}"},
+                    {"RegType", $"{ProductInfo.RegType}"},
+                    {"PrintType", $"{ProductInfo.PrintType}"}
+                };
+
+            var form = new Form {
+                Text = "取得情報",
+                Width = 300,
+                Height = 400,
+                AutoSize = true,
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.SizableToolWindow,
+                ShowInTaskbar = false,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+
+            // ListView作成
+            var listView = new ListView {
+                Dock = DockStyle.Fill,
+                View = View.Details,
+                FullRowSelect = true,
+                GridLines = true,
+                Font = new Font("PlemolJP Console", ProductInfo.FontSize), // 等幅フォント
+            };
+
+            // 列の追加
+            listView.Columns.Add("", 0);   // 値列の幅（調整可）
+            listView.Columns.Add("項目", 200, HorizontalAlignment.Right);  // 項目列の幅
+            listView.Columns.Add("値", 360);   // 値列の幅（調整可）
+
+            // データを追加
+            foreach (var kvp in items) {
+                //var item = new ListViewItem(kvp.Key);
+                var item = new ListViewItem("");  // ダミー1列目
+                item.SubItems.Add(kvp.Key);
+                item.SubItems.Add(kvp.Value);
+                listView.Items.Add(item);
+            }
+            form.Controls.Add(listView);
+
+            // フォームのイベントハンドラ
+            form.Shown += (_, _) => {
+                listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            };
+            form.ShowDialog();
+        }
 
         private void SubstrateRegistrationWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
@@ -725,30 +786,7 @@ namespace ProductDatabase {
             ls.ShowDialog(this);
             LoadSettings(_printSettingPath);
         }
-        private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
-            var entries = new[]
-                {
-                    ("StrProness1", $"{ProductInfo.Proness1}"),
-                    ("StrProness2", $"{ProductInfo.Proness2}"),
-                    ("StrProness3", $"{ProductInfo.Proness3}"),
-                    ("StrProness4", $"{ProductInfo.Proness4}"),
-                    ("StrProness5", $"{ProductInfo.Proness5}"),
-                    ("StrProductName", $"{ProductInfo.ProductName}"),
-                    ("StrStockName", $"{ProductInfo.StockName}"),
-                    ("StrSubstrateName", $"{ProductInfo.SubstrateName}"),
-                    ("StrSubstrateModel", $"{ProductInfo.SubstrateModel}"),
-                    ("StrProductNumber", $"{ProductInfo.ProductNumber}"),
-                    ("StrInitial", $"{ProductInfo.Initial}"),
-                    ("IntRegType", $"{ProductInfo.RegType}"),
-                    ("IntPrintType", $"{ProductInfo.PrintType}")
-                };
-
-            const int ColumnWidth = 15;
-            var message = string.Join(Environment.NewLine,
-                entries.Select(entry => $"{entry.Item1,-ColumnWidth}[{entry.Item2}]"));
-
-            MessageBox.Show(message, "取得情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
+        private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
         private void SubstrateRegistrationPrintPreviewDialog_Load(object sender, EventArgs e) {
             var tool = (ToolStrip)SubstrateRegistrationPrintPreviewDialog.Controls[1];
             tool.Items[0].Visible = false;
