@@ -14,6 +14,8 @@ namespace ProductDatabase {
         public SubstrateChange1(ProductInformation productInfo) {
             InitializeComponent();
             ProductInfo = productInfo;
+
+            SubstrateChangeDataGridView.RowTemplate.DefaultCellStyle.Padding = new Padding(5);
         }
 
         // ロードイベント
@@ -23,7 +25,24 @@ namespace ProductDatabase {
 
                 using SQLiteConnection con = new(GetConnectionRegistration());
                 HistoryTable.Clear();
-                using SQLiteDataAdapter adapter = new($"""SELECT * FROM {ProductInfo.CategoryName}_Product WHERE ProductModel = '{ProductInfo.ProductModel}' ORDER BY "ID" DESC""", con);
+
+                using var cmd = con.CreateCommand();
+                cmd.CommandText =
+                    $"""
+                    SELECT
+                        *
+                    FROM
+                        {ProductInfo.CategoryName}_Product
+                    WHERE
+                        ProductModel = @ProductModel AND Quantity > 1
+                    ORDER BY
+                        ID DESC
+                    """;
+
+                cmd.Parameters.Add("@ProductModel", DbType.String).Value = ProductInfo.ProductModel;
+
+                using var adapter = new SQLiteDataAdapter(cmd);
+
                 adapter.Fill(HistoryTable);
 
                 SubstrateChangeDataGridView.DataSource = HistoryTable;
