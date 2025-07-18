@@ -145,7 +145,7 @@ namespace ProductDatabase {
                                     }
                                 }
                             }
-                            // テーブル検索SQL - [[StockName]_StockView]テーブルから基板型式[Model]で在庫基板を抽出
+                            // テーブル検索SQL - 基板型式[Model]で基板を抽出
                             cmd.CommandText =
                                 $"""
                                 SELECT
@@ -161,6 +161,8 @@ namespace ProductDatabase {
                                     SubstrateName,
                                     SubstrateModel,
                                     SubstrateNumber
+                                HAVING
+                                    Stock > 0
                                 ORDER BY
                                     MIN(ID);
                                 """;
