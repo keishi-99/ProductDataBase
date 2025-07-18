@@ -746,7 +746,7 @@ namespace ProductDatabase {
                 View = View.Details,
                 FullRowSelect = true,
                 GridLines = true,
-                Font = new Font("PlemolJP Console", ProductInfo.FontSize), // 等幅フォント
+                Font = new Font("PlemolJP", ProductInfo.FontSize), // 等幅フォント
             };
 
             // 列の追加
