@@ -177,26 +177,29 @@ namespace ProductDatabase {
 
                                     // usedSubstrate から strSubstrateNum を検索
                                     var num = usedSubstrate.FindIndex(substrate => substrate.Item1 == substrateModel);
-                                    var usedSubstrateItem = usedSubstrate[num].Item2
-                                        .Select((num, index) => new { Num = num, Index = index })
-                                        .FirstOrDefault(item => item.Num == strSubstrateNum);
+                                    if (num != -1) {
 
-                                    var strUsedSubNum = usedSubstrateItem != null ? strSubstrateNum : string.Empty;
-                                    var intUsedQuantity = usedSubstrateItem != null ? usedSubstrate[num].Item3[usedSubstrateItem.Index] : 0;
+                                        var usedSubstrateItem = usedSubstrate[num].Item2
+                                            .Select((num, index) => new { Num = num, Index = index })
+                                            .FirstOrDefault(item => item.Num == strSubstrateNum);
 
-                                    if (intStock > 0 || strUsedSubNum == strSubstrateNum) {
-                                        if (_objDgv == null) {
-                                            break;
+                                        var strUsedSubNum = usedSubstrateItem != null ? strSubstrateNum : string.Empty;
+                                        var intUsedQuantity = usedSubstrateItem != null ? usedSubstrate[num].Item3[usedSubstrateItem.Index] : 0;
+
+                                        if (intStock > 0 || strUsedSubNum == strSubstrateNum) {
+                                            if (_objDgv == null) {
+                                                break;
+                                            }
+
+                                            _objDgv.Rows.Add();
+                                            _objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
+                                            _objDgv.Rows[j].Cells[1].Value = intStock;
+                                            _objDgv.Rows[j].Cells[2].Value = intUsedQuantity;
+                                            _objDgv.Rows[j].Cells[3].Value = intUsedQuantity;
+                                            _objDgv.Rows[j].Cells[4].Value = intUsedQuantity != 0;
+
+                                            j++;
                                         }
-
-                                        _objDgv.Rows.Add();
-                                        _objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
-                                        _objDgv.Rows[j].Cells[1].Value = intStock;
-                                        _objDgv.Rows[j].Cells[2].Value = intUsedQuantity;
-                                        _objDgv.Rows[j].Cells[3].Value = intUsedQuantity;
-                                        _objDgv.Rows[j].Cells[4].Value = intUsedQuantity != 0;
-
-                                        j++;
                                     }
                                 }
                             }
@@ -252,7 +255,6 @@ namespace ProductDatabase {
 
                             var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
                             objCbx.Enabled = true;
-                            objCbx.Checked = true;
 
                             var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
                             objDgv.Columns[3].ReadOnly = false;
