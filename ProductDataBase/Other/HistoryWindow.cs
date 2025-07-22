@@ -213,6 +213,8 @@ namespace ProductDatabase {
                 AllSubstrateCheckBox.Visible = true;
                 GroupModelCheckBox.Visible = false;
 
+                var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
+                var productTableName = $"[{ProductInfo.CategoryName}_Product]";
                 var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND s.SubstrateModel = @SubstrateModel" : string.Empty;
 
                 var query =
@@ -220,9 +222,9 @@ namespace ProductDatabase {
                     SELECT
                         s.ID, s.stockName, s.SubstrateName, s.SubstrateModel, s.SubstrateNumber, s.OrderNumber,s.Increase, s.Decrease, s.Defect, p.ProductType, p.ProductNumber, p.OrderNumber, s.Person, s.RegDate, s.Comment, s.UseID
                     FROM
-                        '{ProductInfo.CategoryName}_Substrate' AS s
+                        {substrateTableName} AS s
                     LEFT JOIN
-                        '{ProductInfo.CategoryName}_Product' AS p
+                        {productTableName} AS p
                     ON
                         s.UseID = p.ID
                     WHERE
@@ -241,6 +243,7 @@ namespace ProductDatabase {
                 AllSubstrateCheckBox.Visible = true;
                 GroupModelCheckBox.Visible = true;
 
+                var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
                 var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
                 var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
 
@@ -261,7 +264,7 @@ namespace ProductDatabase {
                     SELECT
                         {selectClause}
                     FROM
-                        '{ProductInfo.CategoryName}_Substrate'
+                        {substrateTableName}
                     WHERE
                         StockName = @StockName{otherSubstrate}
                     GROUP BY
@@ -285,9 +288,10 @@ namespace ProductDatabase {
             GenerateListButton.Visible = ProductInfo.IsListPrint;
             GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
 
+            var productTableName = $"[{ProductInfo.CategoryName}_Product]";
             var query = filterByProductModel
-                ? $"SELECT * FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND ProductModel = @ProductModel ORDER BY ID DESC;"
-                : $"SELECT * FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName ORDER BY ID DESC;";
+                ? $"SELECT * FROM {productTableName} WHERE ProductName = @ProductName AND ProductModel = @ProductModel ORDER BY ID DESC;"
+                : $"SELECT * FROM {productTableName} WHERE ProductName = @ProductName ORDER BY ID DESC;";
 
             if (filterByProductModel) {
                 LoadDataAndDisplay("Product", query, ("@ProductName", ProductInfo.ProductName), ("@ProductModel", ProductInfo.ProductModel));
@@ -304,6 +308,9 @@ namespace ProductDatabase {
             GenerateListButton.Visible = false;
             GenerateCheckSheetButton.Visible = false;
 
+
+            var serialTableName = $"[{ProductInfo.CategoryName}_Serial]";
+            var productTableName = $"[{ProductInfo.CategoryName}_Product]";
             var query =
                 $"""
                 SELECT
@@ -317,9 +324,9 @@ namespace ProductDatabase {
                     p.RegDate,
                     s.usedID
                 FROM
-                    '{ProductInfo.CategoryName}_Serial' AS s
+                    {serialTableName} AS s
                 LEFT JOIN
-                    '{ProductInfo.CategoryName}_Product' AS p
+                    {productTableName} AS p
                 ON
                     s.UsedID = p.ID
                 WHERE
@@ -529,10 +536,12 @@ namespace ProductDatabase {
                             else if (row.RowState == DataRowState.Deleted) // 削除行の処理
                             {
                                 //DELETE文の設定
+
+                                var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
                                 command.CommandText =
                                     $"""
                                     UPDATE
-                                        '{ProductInfo.CategoryName}_Substrate'
+                                        {substrateTableName}
                                     SET
                                         StockName = NULL, SubstrateName = NULL, SubstrateModel = NULL, SubstrateNumber = NULL, OrderNumber = NULL, Increase = NULL, Decrease = NULL, Defect = NULL,
                                         Person = NULL, RegDate = NULL, Comment = NULL, UseID = NULL
@@ -570,10 +579,11 @@ namespace ProductDatabase {
                         foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
                             if (row.RowState == DataRowState.Modified) {
                                 // UPDATE文の設定
+                                var productTableName = $"[{ProductInfo.CategoryName}_Product]";
                                 command.CommandText =
                                     $"""
                                     UPDATE
-                                        '{ProductInfo.CategoryName}_Product'
+                                        {productTableName}
                                     SET
                                         ID = @ID,
                                         OrderNumber = @OrderNumber,
@@ -642,10 +652,11 @@ namespace ProductDatabase {
                             else if (row.RowState == DataRowState.Deleted) // 削除行の処理
                             {
                                 //DELETE文の設定
+                                var productTableName = $"[{ProductInfo.CategoryName}_Product]";
                                 command.CommandText =
                                     $"""
                                     UPDATE
-                                        '{ProductInfo.CategoryName}_Product'
+                                        {productTableName}
                                     SET
                                         ProductName = NULL, OrderNumber = NULL, ProductNumber = NULL, ProductType = NULL, ProductModel = NULL, Quantity = NULL, Person = NULL, RegDate = NULL,
                                         Revision = NULL, RevisionGroup = NULL, SerialFirst = NULL, SerialLast = NULL, SerialLastNumber = NULL, Comment = NULL
@@ -687,10 +698,11 @@ namespace ProductDatabase {
                             else if (row.RowState == DataRowState.Deleted) // 削除行の処理
                             {
                                 // DELETE文の設定
+                                var serialTableName = $"[{ProductInfo.CategoryName}_Serial]";
                                 command.CommandText =
                                     $"""
                                     DELETE FROM
-                                        '{ProductInfo.CategoryName}_Serial'
+                                        {serialTableName}
                                     WHERE
                                         rowid = @rowid
                                     ;
@@ -830,12 +842,14 @@ namespace ProductDatabase {
             {
                 con.Open();
                 using var cmd = con.CreateCommand();
+
+                var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
                 cmd.CommandText =
                     $"""
                     SELECT
                         ID, SubstrateName, SubstrateModel, SubstrateNumber, Decrease
                     FROM
-                        '{ProductInfo.CategoryName}_Substrate'
+                        {substrateTableName}
                     WHERE
                         StockName = @StockName AND UseID = @ID
                     ORDER BY

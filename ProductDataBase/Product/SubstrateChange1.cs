@@ -27,12 +27,13 @@ namespace ProductDatabase {
                 HistoryTable.Clear();
 
                 using var cmd = con.CreateCommand();
+                var productTableName = $"[{ProductInfo.CategoryName}_Product]";
                 cmd.CommandText =
                     $"""
                     SELECT
                         *
                     FROM
-                        '{ProductInfo.CategoryName}_Product'
+                        {productTableName}
                     WHERE
                         ProductModel = @ProductModel AND Quantity > 1
                     ORDER BY
