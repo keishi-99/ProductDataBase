@@ -114,11 +114,12 @@ namespace ProductDatabase {
                                 	SubstrateNumber,
                                 	Decrease
                                 FROM
-                                	{ProductInfo.CategoryName}_Substrate
+                                	'{ProductInfo.CategoryName}_Substrate'
                                 WHERE
                                 	UseID = @ID
                                 ORDER BY
                                 	SubstrateModel ASC
+                                ;
                                 """;
                             cmd.Parameters.Add("@ID", DbType.String).Value = ProductInfo.ProductID;
 
@@ -154,7 +155,7 @@ namespace ProductDatabase {
                                     SubstrateNumber,
                                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                                 FROM
-                                    {ProductInfo.CategoryName}_Substrate
+                                    '{ProductInfo.CategoryName}_Substrate'
                                 WHERE
                                     SubstrateModel = @SubstrateModel AND SubstrateNumber NOTNULL
                                 GROUP BY
@@ -164,7 +165,8 @@ namespace ProductDatabase {
                                 HAVING
                                     Stock > 0
                                 ORDER BY
-                                    MIN(ID);
+                                    MIN(ID)
+                                ;
                                 """;
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = substrateModel;
 
@@ -338,13 +340,14 @@ namespace ProductDatabase {
                                                     SELECT
                                                         SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                                                     FROM
-                                                        {ProductInfo.CategoryName}_Substrate
+                                                        '{ProductInfo.CategoryName}_Substrate'
                                                     WHERE
                                                         SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                                                     GROUP BY
                                                         SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                                                     ORDER BY
-                                                        MIN(ID);
+                                                        MIN(ID)
+                                                    ;
                                                     """;
                                                 cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
                                                 cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNum;
