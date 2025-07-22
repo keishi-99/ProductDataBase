@@ -149,6 +149,7 @@ namespace ProductDatabase {
                         (PrintType, OrderNumber, ProductName, ProductNumber, ProductType, ProductModel, Quantity, Person, RegDate, Revision, SerialFirst, SerialLast, Comment)
                     VALUES
                         (@PrintType, @OrderNumber, @ProductName, @ProductNumber, @ProductType, @ProductModel, @Quantity, @Person, @RegDate, @Revision, @SerialFirst, @SerialLast, @Comment)
+                    ;
                     """;
 
                 // チェックボックスにチェックがない場合はNullを

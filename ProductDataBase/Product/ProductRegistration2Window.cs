@@ -413,6 +413,7 @@ namespace ProductDatabase {
                     (Serial, UsedID, ProductName)
                 VALUES
                     (@Serial, @productRowId, @ProductName)
+                ;
                 """;
 
             foreach (var serial in _strSerial) {
@@ -489,7 +490,8 @@ namespace ProductDatabase {
                      Decrease, Person, RegDate, Comment, UseID)
                 VALUES
                     (@StockName, @SubstrateName, @SubstrateModel, @SubstrateNumber, @OrderNumber,
-                     @Decrease, @Person, @RegDate, @Comment, @UseID);
+                     @Decrease, @Person, @RegDate, @Comment, @UseID)
+                ;
                 """;
 
             ExecuteNonQuery(connection, commandText,
@@ -585,7 +587,18 @@ namespace ProductDatabase {
 
             if (!string.IsNullOrEmpty(ProductInfo.ProductNumber)) {
                 // 製番が新規かチェック
-                var commandText = $@"SELECT * FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND ProductNumber = @ProductNumber ORDER BY ID ASC LIMIT 1;";
+                var commandText =
+                    $"""
+                    SELECT
+                        *
+                    FROM
+                        '{ProductInfo.CategoryName}_Product'
+                    WHERE
+                        ProductName = @ProductName AND ProductNumber = @ProductNumber
+                    ORDER BY
+                        ID ASC LIMIT 1;
+                    """;
+
 
                 using var dr = ExecuteReader(connection, commandText,
                     ("@ProductName", ProductInfo.ProductName),
@@ -615,7 +628,18 @@ namespace ProductDatabase {
 
             if (!string.IsNullOrEmpty(ProductInfo.OrderNumber)) {
                 // 注文番号が新規かチェック
-                var commandText = $@"SELECT * FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND OrderNumber = @OrderNumber ORDER BY ID ASC LIMIT 1;";
+                var commandText =
+                    $"""
+                    SELECT
+                        *
+                    FROM
+                        '{ProductInfo.CategoryName}_Product'
+                    WHERE
+                        ProductName = @ProductName AND OrderNumber = @OrderNumber
+                    ORDER BY
+                        ID ASC LIMIT 1;
+
+                    """;
 
                 using var dr = ExecuteReader(connection, commandText,
                     ("@ProductName", ProductInfo.ProductName),

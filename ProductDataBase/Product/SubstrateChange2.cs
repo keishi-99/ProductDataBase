@@ -363,13 +363,14 @@ namespace ProductDatabase {
                                                 cmdUpdate.CommandText =
                                                     $"""
                                                     UPDATE
-                                                        {ProductInfo.CategoryName}_Substrate
+                                                        '{ProductInfo.CategoryName}_Substrate'
                                                     SET
                                                         Decrease = @Decrease,Person = @Person,RegDate = @RegDate,Comment = @Comment
                                                     WHERE
                                                         SubstrateNumber = @SubstrateNumber
                                                     AND
                                                         UseID = @UseID
+                                                    ;
                                                     """;
 
                                                 cmdUpdate.Parameters.Add("@Decrease", DbType.Int64).Value = 0 - useValue;
@@ -386,12 +387,13 @@ namespace ProductDatabase {
                                                     using var cmdInsert = con.CreateCommand();
                                                     cmdInsert.CommandText =
                                                     $"""
-                                                    INSERT INTO "{ProductInfo.CategoryName}_Substrate"
+                                                    INSERT INTO '{ProductInfo.CategoryName}_Substrate'
                                                         (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Decrease,
                                                         Person,RegDate,Comment,UseID)
                                                     VALUES
                                                         (@StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,
                                                         @Decrease,@Person,@RegDate,@Comment,@UseID)
+                                                    ;
                                                     """;
 
                                                     cmdInsert.Parameters.Add("@StockName", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.StockName) ? DBNull.Value : ProductInfo.StockName;
@@ -420,12 +422,13 @@ namespace ProductDatabase {
                                             using var cmdDelete = con.CreateCommand();
                                             cmdDelete.CommandText =
                                                 $"""
-                                                    DELETE
-                                                    FROM
-                                                        "{ProductInfo.CategoryName}_Substrate"
-                                                    WHERE
-                                                        SubstrateNumber = @SubstrateNumber AND UseID = @ID;
-                                                    """;
+                                                DELETE
+                                                FROM
+                                                    '{ProductInfo.CategoryName}_Substrate'
+                                                WHERE
+                                                    SubstrateNumber = @SubstrateNumber AND UseID = @ID
+                                                ;
+                                                """;
                                             cmdDelete.Parameters.Clear(); // パラメータをクリア
                                             cmdDelete.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
                                             cmdDelete.Parameters.Add("@ID", DbType.Int64).Value = ProductInfo.ProductID;
@@ -442,7 +445,7 @@ namespace ProductDatabase {
                                 cmd.CommandText =
                                     $"""
                                     UPDATE
-                                        {ProductInfo.CategoryName}_Product
+                                        '{ProductInfo.CategoryName}_Product'
                                     SET
                                         Quantity = @Quantity,Person = @Person,RegDate = @RegDate,Revision = @Revision,RevisionGroup = @RevisionGroup,SerialLast = @SerialLast,
                                         SerialLastNumber = @SerialLastNumber,Comment = @Comment
@@ -450,6 +453,7 @@ namespace ProductDatabase {
                                         ProductNumber = @ProductNumber
                                     AND
                                         SerialFirst = @SerialFirst
+                                    ;
                                     """;
 
                                 cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;

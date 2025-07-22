@@ -281,7 +281,8 @@ namespace ProductDatabase {
                     INSERT INTO '{ProductInfo.CategoryName}_Substrate'
                         (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Increase,Defect,Person,RegDate,Comment)
                     VALUES
-                        (@StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,@Increase,@Defect,@Person,@RegDate,@Comment);
+                        (@StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,@Increase,@Defect,@Person,@RegDate,@Comment)
+                    ;
                     """;
                 ExecuteNonQuery(connection, commandText,
                     ("@StockName", ProductInfo.StockName),
