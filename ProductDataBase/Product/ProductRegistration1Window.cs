@@ -243,7 +243,8 @@ namespace ProductDatabase {
                     ("@RegDate", ProductInfo.RegDate),
                     ("@RevisionGroup", ProductInfo.RevisionGroup),
                     ("@SerialLastNumber", Convert.ToInt32(serialLastNum)),
-                    ("@Comment", ProductInfo.Comment));
+                    ("@Comment", ProductInfo.Comment)
+                );
 
                 ProductInfo.ProductID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM '{ProductInfo.CategoryName}_Product';"));
 

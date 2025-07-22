@@ -289,7 +289,9 @@ namespace ProductDatabase {
             try {
                 ProductPrintSettings = new ProductPrintSettings();
                 printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", ProductInfo.CategoryName, ProductInfo.ProductName, $"PrintConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.json");
-                if (!File.Exists(printSettingPath)) { throw new DirectoryNotFoundException($"印刷用設定ファイルがありません。"); }
+                if (!File.Exists(printSettingPath)) {
+                    throw new DirectoryNotFoundException($"印刷用設定ファイルがありません。");
+                }
                 var jsonString = File.ReadAllText(printSettingPath);
                 ProductPrintSettings = System.Text.Json.JsonSerializer.Deserialize<ProductPrintSettings>(jsonString) ?? new ProductPrintSettings();
             } catch (Exception ex) {
@@ -305,7 +307,9 @@ namespace ProductDatabase {
                     throw new InvalidOperationException("編集モード用の接続が初期化されていません。");
                 }
 
-                if (!NumberCheck(_sqLiteConnection) || !QuantityCheck()) { return; }
+                if (!NumberCheck(_sqLiteConnection) || !QuantityCheck()) {
+                    return;
+                }
                 if (ProductInfo.IsSerialGeneration) {
                     SerialCheck(_sqLiteConnection);
                     GenerateSerialCodes();
@@ -412,7 +416,11 @@ namespace ProductDatabase {
                 """;
 
             foreach (var serial in _strSerial) {
-                ExecuteNonQuery(connection, commandText, ("@Serial", serial), ("@productRowId", ProductInfo.ProductID), ("@ProductName", ProductInfo.ProductName));
+                ExecuteNonQuery(connection, commandText,
+                    ("@Serial", serial),
+                    ("@productRowId", ProductInfo.ProductID),
+                    ("@ProductName", ProductInfo.ProductName)
+                );
             }
         }
         private void RegisterSubstrate(SQLiteConnection connection) {
@@ -463,7 +471,11 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            using var dr = ExecuteReader(connection, commandText, ("@StockName", stockName), ("@SubstrateModel", useSubstrate[index]), ("@SubstrateNumber", substrateNumber));
+            using var dr = ExecuteReader(connection, commandText,
+                ("@StockName", stockName),
+                ("@SubstrateModel", useSubstrate[index]),
+                ("@SubstrateNumber", substrateNumber)
+            );
 
             return dr.Read()
                 ? ($"{dr["SubstrateName"]}", $"{dr["SubstrateModel"]}", $"{dr["OrderNumber"]}")
@@ -490,7 +502,8 @@ namespace ProductDatabase {
                 ("@Person", ProductInfo.Person),
                 ("@RegDate", ProductInfo.RegDate),
                 ("@Comment", ProductInfo.Comment),
-                ("@UseID", useID));
+                ("@UseID", useID)
+                );
         }
 
         private static void ExecuteNonQuery(SQLiteConnection connection, string commandText, params (string, object?)[] parameters) {
@@ -642,7 +655,9 @@ namespace ProductDatabase {
                     case 3:
                     case 4:
                     case 9:
-                        if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
+                        if (_useSubstrate == null) {
+                            throw new Exception("ArrUseSubstrateが空です");
+                        }
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
 
                             var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxがnullです。");
@@ -708,7 +723,9 @@ namespace ProductDatabase {
                     _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
                 }
             }
-            else { throw new Exception("PrintType unknown"); }
+            else {
+                throw new Exception("PrintType unknown");
+            }
 
             List<string> strSerialDuplication = [];
 
@@ -888,7 +905,9 @@ namespace ProductDatabase {
             // プレビューかどうかの判定
             var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
             try {
-                if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
+                if (e.Graphics == null) {
+                    throw new Exception("e.Graphicsがnullです。");
+                }
 
                 var dpiX = e.Graphics.DpiX;
                 var dpiY = e.Graphics.DpiY;
@@ -931,7 +950,9 @@ namespace ProductDatabase {
                         break;
                 }
 
-                if (labelCountX == 0 || labelCountY == 0 || copiesPerLabel == 0) { throw new Exception("印刷設定が異常です。"); }
+                if (labelCountX == 0 || labelCountY == 0 || copiesPerLabel == 0) {
+                    throw new Exception("印刷設定が異常です。");
+                }
 
                 // ハードマージンをミリメートルに変換
                 var hardMarginX = 0f;
@@ -948,7 +969,9 @@ namespace ProductDatabase {
                     _remainingCount = copiesPerLabel;
                     _labelProNSerial = ProductInfo.SerialFirstNumber;
                 }
-                if (_pageCount >= 2) { startLine = 0; }
+                if (_pageCount >= 2) {
+                    startLine = 0;
+                }
 
                 // 最初のページのみオフセットを調整
                 var verticalOffset = _pageCount == 1 ? startLine * (intervalY + labelHeight) : 0;
@@ -1328,12 +1351,24 @@ namespace ProductDatabase {
             form.ShowDialog();
         }
 
-        private void ProductRegistration2Window_Load(object sender, EventArgs e) { LoadEvents(); }
-        private void ProductRegistration2Window_FormClosing(object sender, FormClosingEventArgs e) { ClosingEvents(); }
-        private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
-        private void CloseButton_Click(object sender, EventArgs e) { Close(); }
-        private void SubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBox_CheckedChanged(sender, e); }
-        private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { Close(); }
+        private void ProductRegistration2Window_Load(object sender, EventArgs e) {
+            LoadEvents();
+        }
+        private void ProductRegistration2Window_FormClosing(object sender, FormClosingEventArgs e) {
+            ClosingEvents();
+        }
+        private void RegisterButton_Click(object sender, EventArgs e) {
+            RegisterCheck();
+        }
+        private void CloseButton_Click(object sender, EventArgs e) {
+            Close();
+        }
+        private void SubstrateCheckBox_CheckedChanged(object sender, EventArgs e) {
+            CheckBox_CheckedChanged(sender, e);
+        }
+        private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) {
+            Close();
+        }
         private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Label";
             Print(false);
@@ -1356,10 +1391,18 @@ namespace ProductDatabase {
             ls.ShowDialog(this);
             LoadSettings();
         }
-        private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
-        private void GenerateReportButton_Click(object sender, EventArgs e) { GenerateReport(); }
-        private void SubstrateListPrintButton_Click(object sender, EventArgs e) { GenerateList(); }
-        private void CheckSheetPrintButton_Click(object sender, EventArgs e) { GenerateCheckSheet(); }
+        private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
+            ShowInfo();
+        }
+        private void GenerateReportButton_Click(object sender, EventArgs e) {
+            GenerateReport();
+        }
+        private void SubstrateListPrintButton_Click(object sender, EventArgs e) {
+            GenerateList();
+        }
+        private void CheckSheetPrintButton_Click(object sender, EventArgs e) {
+            GenerateCheckSheet();
+        }
 
     }
 }

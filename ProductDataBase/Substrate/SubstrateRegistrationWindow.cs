@@ -223,7 +223,11 @@ namespace ProductDatabase {
                         LIMIT 1
                         ;
                         """;
-                    using var dr = ExecuteReader(connection, commandText, ("@StockName", ProductInfo.StockName), ("@SubstrateModel", ProductInfo.SubstrateModel), ("@SubstrateNumber", substrateNumber));
+                    using var dr = ExecuteReader(connection, commandText,
+                        ("@StockName", ProductInfo.StockName),
+                        ("@SubstrateModel", ProductInfo.SubstrateModel),
+                        ("@SubstrateNumber", substrateNumber)
+                    );
                     while (dr.Read()) {
                         substrateName = $"{dr["SubstrateName"]}";
                     }
@@ -255,7 +259,11 @@ namespace ProductDatabase {
                         LIMIT 1
                         ;
                         """;
-                    using var dr = ExecuteReader(connection, commandText, ("@StockName", ProductInfo.StockName), ("@SubstrateModel", ProductInfo.SubstrateModel), ("@SubstrateNumber", substrateNumber));
+                    using var dr = ExecuteReader(connection, commandText,
+                        ("@StockName", ProductInfo.StockName),
+                        ("@SubstrateModel", ProductInfo.SubstrateModel),
+                        ("@SubstrateNumber", substrateNumber)
+                    );
                     if (dr.Read()) {
                         if (Convert.ToInt32(dr["Stock"]) < defectNumber) {
                             throw new Exception($"[{substrateNumber}]は在庫が[{dr["Stock"]}]です。");
