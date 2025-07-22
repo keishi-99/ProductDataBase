@@ -378,14 +378,16 @@ namespace ProductDatabase {
             var productTableName = $"[{ProductInfo.CategoryName}_Product]";
             var commandText =
                 $"""
-                INSERT INTO {productTableName}
-                    (ProductName, OrderNumber, ProductNumber, ProductType, ProductModel,
+                INSERT INTO {productTableName} (
+                    ProductName, OrderNumber, ProductNumber, ProductType, ProductModel,
                     Quantity, Person, RegDate, Revision, RevisionGroup,
-                    SerialFirst, SerialLast, SerialLastNumber, Comment)
-                VALUES
-                    (@ProductName, @OrderNumber, @ProductNumber, @ProductType, @ProductModel,
+                    SerialFirst, SerialLast, SerialLastNumber, Comment
+                    )
+                VALUES (
+                    @ProductName, @OrderNumber, @ProductNumber, @ProductType, @ProductModel,
                     @Quantity, @Person, @RegDate, @Revision, @RevisionGroup,
-                    @SerialFirst, @SerialLast, @SerialLastNumber, @Comment)
+                    @SerialFirst, @SerialLast, @SerialLastNumber, @Comment
+                    )
                 ;
                 """;
 
@@ -412,10 +414,12 @@ namespace ProductDatabase {
             var serialTableName = $"[{ProductInfo.CategoryName}_Serial]";
             var commandText =
                 $"""
-                INSERT INTO {serialTableName}
-                    (Serial, UsedID, ProductName)
-                VALUES
-                    (@Serial, @productRowId, @ProductName)
+                INSERT INTO {serialTableName} (
+                    Serial, UsedID, ProductName
+                    )
+                VALUES (
+                    @Serial, @productRowId, @ProductName
+                    )
                 ;
                 """;
 
@@ -490,12 +494,14 @@ namespace ProductDatabase {
             var substrateTableName = $"[{categoryName}_Substrate]";
             var commandText =
                 $"""
-                INSERT INTO {substrateTableName}
-                    (StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber,
-                     Decrease, Person, RegDate, Comment, UseID)
-                VALUES
-                    (@StockName, @SubstrateName, @SubstrateModel, @SubstrateNumber, @OrderNumber,
-                     @Decrease, @Person, @RegDate, @Comment, @UseID)
+                INSERT INTO {substrateTableName} (
+                    StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber,
+                    Decrease, Person, RegDate, Comment, UseID
+                    )
+                VALUES (
+                    @StockName, @SubstrateName, @SubstrateModel, @SubstrateNumber, @OrderNumber,
+                    @Decrease, @Person, @RegDate, @Comment, @UseID
+                    )
                 ;
                 """;
 
@@ -645,8 +651,8 @@ namespace ProductDatabase {
                     WHERE
                         ProductName = @ProductName AND OrderNumber = @OrderNumber
                     ORDER BY
-                        ID ASC LIMIT 1;
-
+                        ID ASC LIMIT 1
+                    ;
                     """;
 
                 using var dr = ExecuteReader(connection, commandText,

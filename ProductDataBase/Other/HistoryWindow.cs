@@ -463,9 +463,11 @@ namespace ProductDatabase {
                         foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
                             if (row.RowState == DataRowState.Modified) {
                                 // UPDATE文の設定
+                                var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
                                 command.CommandText =
                                     $"""
-                                    UPDATE "{ProductInfo.CategoryName}_Substrate"
+                                    UPDATE 
+                                        {substrateTableName}
                                     SET
                                         SubstrateNumber = @SubstrateNumber,
                                         OrderNumber = @OrderNumber,
