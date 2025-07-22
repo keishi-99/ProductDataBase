@@ -56,14 +56,14 @@ namespace ProductDatabase {
                 // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
                 cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
                 cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
-                cmd.CommandText = $"SELECT Revision FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY 'ID' DESC;";
+                cmd.CommandText = $"SELECT Revision FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
                 var revisionResult = cmd.ExecuteScalar();
                 RevisionTextBox.Text = revisionResult?.ToString() ?? "";
 
                 if (ProductInfo.IsSerialGeneration) {
                     cmd.Parameters.Clear();
                     cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
-                    cmd.CommandText = $"SELECT SerialLastNumber FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY 'ID' DESC;";
+                    cmd.CommandText = $"SELECT SerialLastNumber FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;";
                     var serialResult = cmd.ExecuteScalar();
                     if (!int.TryParse(serialResult?.ToString(), out var serialLastNum)) { throw new Exception("シリアル番号の取得に失敗しました。"); }
 
