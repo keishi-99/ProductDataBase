@@ -585,7 +585,7 @@ namespace ProductDatabase {
 
             if (!string.IsNullOrEmpty(ProductInfo.ProductNumber)) {
                 // 製番が新規かチェック
-                var commandText = $@"SELECT * FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND ProductNumber = @ProductNumber ORDER BY 'ID' ASC LIMIT 1;";
+                var commandText = $@"SELECT * FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND ProductNumber = @ProductNumber ORDER BY ID ASC LIMIT 1;";
 
                 using var dr = ExecuteReader(connection, commandText,
                     ("@ProductName", ProductInfo.ProductName),
@@ -615,7 +615,7 @@ namespace ProductDatabase {
 
             if (!string.IsNullOrEmpty(ProductInfo.OrderNumber)) {
                 // 注文番号が新規かチェック
-                var commandText = $@"SELECT * FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND OrderNumber = @OrderNumber ORDER BY 'ID' ASC LIMIT 1;";
+                var commandText = $@"SELECT * FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND OrderNumber = @OrderNumber ORDER BY ID ASC LIMIT 1;";
 
                 using var dr = ExecuteReader(connection, commandText,
                     ("@ProductName", ProductInfo.ProductName),
