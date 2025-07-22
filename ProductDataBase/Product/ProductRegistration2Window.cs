@@ -208,6 +208,7 @@ namespace ProductDatabase {
             var isServiceRegistration = ProductInfo.RegType == 9;
             var categoryName = (isServiceRegistration ? ServiceInfo.ServiceCategoryName : ProductInfo.CategoryName)
                 ?? throw new Exception("CategoryNameがnullです。");
+            var substrateTableName = $"[{categoryName}_Substrate]";
             var stockName = (isServiceRegistration ? ServiceInfo.ServiceStockName : ProductInfo.StockName)
                 ?? throw new Exception("StockNameがnullです。");
             var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : _useSubstrate)
@@ -222,7 +223,7 @@ namespace ProductDatabase {
                     SubstrateNumber,
                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                 FROM
-                    '{categoryName}_Substrate'
+                    {substrateTableName}
                 WHERE
                     StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber NOTNULL
                 GROUP BY
@@ -374,9 +375,10 @@ namespace ProductDatabase {
         }
 
         private void InsertProduct(SQLiteConnection connection) {
+            var productTableName = $"[{ProductInfo.CategoryName}_Product]";
             var commandText =
                 $"""
-                INSERT INTO '{ProductInfo.CategoryName}_Product'
+                INSERT INTO {productTableName}
                     (ProductName, OrderNumber, ProductNumber, ProductType, ProductModel,
                     Quantity, Person, RegDate, Revision, RevisionGroup,
                     SerialFirst, SerialLast, SerialLastNumber, Comment)
@@ -404,12 +406,13 @@ namespace ProductDatabase {
                 ("@Comment", ProductInfo.Comment)
                 );
 
-            ProductInfo.ProductID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM '{ProductInfo.CategoryName}_Product';"));
+            ProductInfo.ProductID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {productTableName};"));
         }
         private void InsertSerial(SQLiteConnection connection) {
+            var serialTableName = $"[{ProductInfo.CategoryName}_Serial]";
             var commandText =
                 $"""
-                INSERT INTO '{ProductInfo.CategoryName}_Serial'
+                INSERT INTO {serialTableName}
                     (Serial, UsedID, ProductName)
                 VALUES
                     (@Serial, @productRowId, @ProductName)
@@ -457,12 +460,13 @@ namespace ProductDatabase {
             }
         }
         private static (string substrateName, string substrateModel, string orderNumber) GetSubstrateInfo(SQLiteConnection connection, int index, string categoryName, string stockName, string substrateNumber, string[] useSubstrate) {
+                var substrateTableName = $"[{categoryName}_Substrate]";
             var commandText =
                 $"""
                 SELECT
                     SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                 FROM
-                    '{categoryName}_Substrate'
+                    {substrateTableName}
                 WHERE
                     StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                 GROUP BY
@@ -483,9 +487,10 @@ namespace ProductDatabase {
                 : (string.Empty, string.Empty, string.Empty);
         }
         private void InsertSubstrate(SQLiteConnection connection, string categoryName, string stockName, string substrateName, string substrateModel, string substrateNumber, string orderNumber, int useValue, int? useID) {
+            var substrateTableName = $"[{categoryName}_Substrate]";
             var commandText =
                 $"""
-                INSERT INTO '{categoryName}_Substrate'
+                INSERT INTO {substrateTableName}
                     (StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber,
                      Decrease, Person, RegDate, Comment, UseID)
                 VALUES
@@ -541,7 +546,8 @@ namespace ProductDatabase {
         // 登録チェック
         private void RegistrationCheck(SQLiteConnection connection) {
 
-            var commandText = $@"SELECT * FROM '{ProductInfo.CategoryName}_Product' WHERE Id = @Id;";
+            var productTableName = $"[{ProductInfo.CategoryName}_Product]";
+            var commandText = $@"SELECT * FROM {productTableName} WHERE Id = @Id;";
 
             using var dr = ExecuteReader(connection, commandText, ("@Id", ProductInfo.ProductID));
 
@@ -587,12 +593,13 @@ namespace ProductDatabase {
 
             if (!string.IsNullOrEmpty(ProductInfo.ProductNumber)) {
                 // 製番が新規かチェック
+                var productTableName = $"[{ProductInfo.CategoryName}_Product]";
                 var commandText =
                     $"""
                     SELECT
                         *
                     FROM
-                        '{ProductInfo.CategoryName}_Product'
+                        {productTableName}
                     WHERE
                         ProductName = @ProductName AND ProductNumber = @ProductNumber
                     ORDER BY
@@ -628,12 +635,13 @@ namespace ProductDatabase {
 
             if (!string.IsNullOrEmpty(ProductInfo.OrderNumber)) {
                 // 注文番号が新規かチェック
+                var productTableName = $"[{ProductInfo.CategoryName}_Product]";
                 var commandText =
                     $"""
                     SELECT
                         *
                     FROM
-                        '{ProductInfo.CategoryName}_Product'
+                        {productTableName}
                     WHERE
                         ProductName = @ProductName AND OrderNumber = @OrderNumber
                     ORDER BY
@@ -754,6 +762,8 @@ namespace ProductDatabase {
             List<string> strSerialDuplication = [];
 
             using var cmd = connection.CreateCommand();
+            var serialTableName = $"[{ProductInfo.CategoryName}_Serial]";
+            var productTableName = $"[{ProductInfo.CategoryName}_Product]";
             cmd.CommandText =
                 $"""
                 SELECT
@@ -766,9 +776,9 @@ namespace ProductDatabase {
                     p.RegDate,
                     s.usedID
                 FROM
-                    '{ProductInfo.CategoryName}_Serial' AS s
+                    {serialTableName} AS s
                 LEFT JOIN
-                    '{ProductInfo.CategoryName}_Product' AS p
+                    {productTableName} AS p
                 ON
                     s.UsedID = p.ID
                 WHERE

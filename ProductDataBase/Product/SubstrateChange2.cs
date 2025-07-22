@@ -107,6 +107,7 @@ namespace ProductDatabase {
                             con.Open();
                             using var cmd = con.CreateCommand();
 
+                            var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
                             cmd.CommandText =
                                 $"""
                                 SELECT
@@ -114,7 +115,7 @@ namespace ProductDatabase {
                                 	SubstrateNumber,
                                 	Decrease
                                 FROM
-                                	'{ProductInfo.CategoryName}_Substrate'
+                                    {substrateTableName}
                                 WHERE
                                 	UseID = @ID
                                 ORDER BY
@@ -155,7 +156,7 @@ namespace ProductDatabase {
                                     SubstrateNumber,
                                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                                 FROM
-                                    '{ProductInfo.CategoryName}_Substrate'
+                                    {substrateTableName}
                                 WHERE
                                     SubstrateModel = @SubstrateModel AND SubstrateNumber NOTNULL
                                 GROUP BY
@@ -335,12 +336,13 @@ namespace ProductDatabase {
                                             var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
 
                                             using (var cmd = con.CreateCommand()) {
+                                                var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
                                                 cmd.CommandText =
                                                     $"""
                                                     SELECT
                                                         SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                                                     FROM
-                                                        '{ProductInfo.CategoryName}_Substrate'
+                                                        {substrateTableName}
                                                     WHERE
                                                         SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                                                     GROUP BY
@@ -360,10 +362,11 @@ namespace ProductDatabase {
                                             }
                                             // 基板テーブルを更新、できない場合は挿入
                                             using (var cmdUpdate = con.CreateCommand()) {
+                                                var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
                                                 cmdUpdate.CommandText =
                                                     $"""
                                                     UPDATE
-                                                        '{ProductInfo.CategoryName}_Substrate'
+                                                        {substrateTableName}
                                                     SET
                                                         Decrease = @Decrease,Person = @Person,RegDate = @RegDate,Comment = @Comment
                                                     WHERE
@@ -387,7 +390,7 @@ namespace ProductDatabase {
                                                     using var cmdInsert = con.CreateCommand();
                                                     cmdInsert.CommandText =
                                                     $"""
-                                                    INSERT INTO '{ProductInfo.CategoryName}_Substrate'
+                                                    INSERT INTO {substrateTableName}
                                                         (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Decrease,
                                                         Person,RegDate,Comment,UseID)
                                                     VALUES
@@ -420,11 +423,12 @@ namespace ProductDatabase {
                                         // 使用数が0になった場合、基板テーブルから削除
                                         else if (usedValue != useValue && useValue == 0) {
                                             using var cmdDelete = con.CreateCommand();
+                                            var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
                                             cmdDelete.CommandText =
                                                 $"""
                                                 DELETE
                                                 FROM
-                                                    '{ProductInfo.CategoryName}_Substrate'
+                                                    {substrateTableName}
                                                 WHERE
                                                     SubstrateNumber = @SubstrateNumber AND UseID = @ID
                                                 ;
@@ -442,10 +446,11 @@ namespace ProductDatabase {
 
                             // 製品テーブル更新
                             using (var cmd = con.CreateCommand()) {
+                                var productTableName = $"[{ProductInfo.CategoryName}_Product]";
                                 cmd.CommandText =
                                     $"""
                                     UPDATE
-                                        '{ProductInfo.CategoryName}_Product'
+                                        {productTableName}
                                     SET
                                         Quantity = @Quantity,Person = @Person,RegDate = @RegDate,Revision = @Revision,RevisionGroup = @RevisionGroup,SerialLast = @SerialLast,
                                         SerialLastNumber = @SerialLastNumber,Comment = @Comment

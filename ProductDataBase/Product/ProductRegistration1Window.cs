@@ -56,14 +56,15 @@ namespace ProductDatabase {
                 // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
                 cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
                 cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
-                cmd.CommandText = $"SELECT Revision FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
+                var productTableName = $"[{ProductInfo.CategoryName}_Product]";
+                cmd.CommandText = $"SELECT Revision FROM {productTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
                 var revisionResult = cmd.ExecuteScalar();
                 RevisionTextBox.Text = revisionResult?.ToString() ?? "";
 
                 if (ProductInfo.IsSerialGeneration) {
                     cmd.Parameters.Clear();
                     cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
-                    cmd.CommandText = $"SELECT SerialLastNumber FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;";
+                    cmd.CommandText = $"SELECT SerialLastNumber FROM {productTableName} WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;";
                     var serialResult = cmd.ExecuteScalar();
                     if (!int.TryParse(serialResult?.ToString(), out var serialLastNum)) { throw new Exception("シリアル番号の取得に失敗しました。"); }
 
@@ -223,9 +224,10 @@ namespace ProductDatabase {
             connection.Open();
             using var transaction = connection.BeginTransaction();
             try {
+                var productTableName = $"[{ProductInfo.CategoryName}_Product]";
                 var commandText =
                 $"""
-                INSERT INTO '{ProductInfo.CategoryName}_Product' (
+                INSERT INTO {productTableName} (
                     ProductName, ProductType, ProductModel, RegDate, Revision, RevisionGroup, SerialLastNumber, Comment
                 )
                 VALUES (
@@ -233,7 +235,7 @@ namespace ProductDatabase {
                 );
                 """;
 
-                var serialLastNum = ExecuteScalar(connection, $"SELECT SerialLastNumber FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;", ("@ProductName", ProductInfo.ProductName));
+                var serialLastNum = ExecuteScalar(connection, $"SELECT SerialLastNumber FROM {productTableName} WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;", ("@ProductName", ProductInfo.ProductName));
 
                 ExecuteNonQuery(connection, commandText,
                     ("@ProductName", ProductInfo.ProductName),
@@ -246,7 +248,7 @@ namespace ProductDatabase {
                     ("@Comment", ProductInfo.Comment)
                 );
 
-                ProductInfo.ProductID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM '{ProductInfo.CategoryName}_Product';"));
+                ProductInfo.ProductID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {productTableName};"));
 
                 transaction.Commit();
 

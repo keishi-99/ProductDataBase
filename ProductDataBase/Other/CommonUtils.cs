@@ -436,6 +436,7 @@ namespace ProductDatabase.Other {
                 con.Open();
                 using var cmd = con.CreateCommand();
 
+                var tableName = $"{productInfo.CategoryName}_Substrate]";
                 cmd.CommandText =
                     $"""
                     SELECT
@@ -443,7 +444,7 @@ namespace ProductDatabase.Other {
                         SubstrateNumber,
                         Decrease
                     FROM
-                        '{productInfo.CategoryName}_Substrate'
+                        {tableName}
                     WHERE
                         UseID = @ID
                     ORDER BY

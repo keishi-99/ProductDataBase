@@ -195,6 +195,7 @@ namespace ProductDatabase {
             connection.Open();
             using var transaction = connection.BeginTransaction();
             try {
+                var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
                 var substrateNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
                 var orderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
                 var quantity = string.IsNullOrWhiteSpace(QuantityTextBox.Text) ? 0 : Convert.ToInt32(QuantityTextBox.Text);
@@ -213,7 +214,7 @@ namespace ProductDatabase {
                         SELECT
                             StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                         FROM
-                            '{ProductInfo.CategoryName}_Substrate'
+                            {substrateTableName}
                         WHERE
                             StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                         GROUP BY
@@ -249,7 +250,7 @@ namespace ProductDatabase {
                         SELECT
                             StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                         FROM
-                            '{ProductInfo.CategoryName}_Substrate'
+                            {substrateTableName}
                         WHERE
                             StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                         GROUP BY
@@ -278,7 +279,7 @@ namespace ProductDatabase {
                 // 基板登録テーブルへ追加
                 commandText =
                     $"""
-                    INSERT INTO '{ProductInfo.CategoryName}_Substrate'
+                    INSERT INTO {substrateTableName}
                         (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Increase,Defect,Person,RegDate,Comment)
                     VALUES
                         (@StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,@Increase,@Defect,@Person,@RegDate,@Comment)
@@ -296,7 +297,7 @@ namespace ProductDatabase {
                     ("@Person", string.IsNullOrWhiteSpace(person) ? DBNull.Value : person),
                     ("@Comment", string.IsNullOrWhiteSpace(comment) ? DBNull.Value : comment)
                     );
-                commandText = $@"SELECT MAX(ID) FROM '{ProductInfo.CategoryName}_Substrate';";
+                commandText = $@"SELECT MAX(ID) FROM {substrateTableName};";
                 rowId = ExecuteScalar(connection, commandText).ToString() ?? string.Empty;
 
                 // ログ出力
