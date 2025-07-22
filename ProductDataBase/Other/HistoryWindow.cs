@@ -220,13 +220,13 @@ namespace ProductDatabase {
                     SELECT
                         s.ID, s.stockName, s.SubstrateName, s.SubstrateModel, s.SubstrateNumber, s.OrderNumber,s.Increase, s.Decrease, s.Defect, p.ProductType, p.ProductNumber, p.OrderNumber, s.Person, s.RegDate, s.Comment, s.UseID
                     FROM
-                        {ProductInfo.CategoryName}_Substrate AS s
+                        '{ProductInfo.CategoryName}_Substrate' AS s
                     LEFT JOIN
-                        "{ProductInfo.CategoryName}_Product" AS p
+                        '{ProductInfo.CategoryName}_Product' AS p
                     ON
                         s.UseID = p.ID
                     WHERE
-                        s.StockName = "{ProductInfo.StockName}"{otherSubstrate}
+                        s.StockName = @StockName{otherSubstrate}
                     ORDER BY
                         s.ID DESC
                     ;
@@ -261,9 +261,9 @@ namespace ProductDatabase {
                     SELECT
                         {selectClause}
                     FROM
-                        {ProductInfo.CategoryName}_Substrate
+                        '{ProductInfo.CategoryName}_Substrate'
                     WHERE
-                        StockName = "{ProductInfo.StockName}"{otherSubstrate}
+                        StockName = @StockName{otherSubstrate}
                     GROUP BY
                         {groupByClause}
                     HAVING
@@ -273,7 +273,7 @@ namespace ProductDatabase {
                     ;
                     """;
 
-                LoadDataAndDisplay("SubstrateStock", query, ("@SubstrateModel", ProductInfo.SubstrateModel));
+                LoadDataAndDisplay("SubstrateStock", query, ("@StockName", ProductInfo.StockName), ("@SubstrateModel", ProductInfo.SubstrateModel));
             }
         }
 
@@ -286,8 +286,8 @@ namespace ProductDatabase {
             GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
 
             var query = filterByProductModel
-                ? $"""SELECT * FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName AND ProductModel = @ProductModel ORDER BY ID DESC"""
-                : $"""SELECT * FROM "{ProductInfo.CategoryName}_Product" WHERE ProductName = @ProductName ORDER BY ID DESC""";
+                ? $"SELECT * FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName AND ProductModel = @ProductModel ORDER BY ID DESC;"
+                : $"SELECT * FROM '{ProductInfo.CategoryName}_Product' WHERE ProductName = @ProductName ORDER BY ID DESC;";
 
             if (filterByProductModel) {
                 LoadDataAndDisplay("Product", query, ("@ProductName", ProductInfo.ProductName), ("@ProductModel", ProductInfo.ProductModel));
@@ -317,9 +317,9 @@ namespace ProductDatabase {
                     p.RegDate,
                     s.usedID
                 FROM
-                    "{ProductInfo.CategoryName}_Serial" AS s
+                    '{ProductInfo.CategoryName}_Serial' AS s
                 LEFT JOIN
-                    "{ProductInfo.CategoryName}_Product" AS p
+                    '{ProductInfo.CategoryName}_Product' AS p
                 ON
                     s.UsedID = p.ID
                 WHERE
@@ -821,15 +821,17 @@ namespace ProductDatabase {
                     SELECT
                         ID, SubstrateName, SubstrateModel, SubstrateNumber, Decrease
                     FROM
-                        "{ProductInfo.CategoryName}_Substrate"
+                        '{ProductInfo.CategoryName}_Substrate'
                     WHERE
-                        StockName = "{ProductInfo.StockName}" AND UseID = @ID
+                        StockName = @StockName AND UseID = @ID
                     ORDER BY
                         SubstrateModel ASC
+                    ;
                     """;
 
                 var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 var id = Convert.ToInt32(DataBaseDataGridView.Rows[i].Cells["ID"].Value);
+                cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
                 cmd.Parameters.Add("@ID", DbType.Int64).Value = id;
 
                 using var adapter = new SQLiteDataAdapter(cmd);

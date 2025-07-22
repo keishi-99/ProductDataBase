@@ -32,11 +32,12 @@ namespace ProductDatabase {
                     SELECT
                         *
                     FROM
-                        {ProductInfo.CategoryName}_Product
+                        '{ProductInfo.CategoryName}_Product'
                     WHERE
                         ProductModel = @ProductModel AND Quantity > 1
                     ORDER BY
                         ID DESC
+                    ;
                     """;
 
                 cmd.Parameters.Add("@ProductModel", DbType.String).Value = ProductInfo.ProductModel;

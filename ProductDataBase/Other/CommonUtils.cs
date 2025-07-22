@@ -443,11 +443,12 @@ namespace ProductDatabase.Other {
                         SubstrateNumber,
                         Decrease
                     FROM
-                        {productInfo.CategoryName}_Substrate
+                        '{productInfo.CategoryName}_Substrate'
                     WHERE
                         UseID = @ID
                     ORDER BY
                         SubstrateModel ASC
+                    ;
                     """;
                 cmd.Parameters.Add("@ID", DbType.String).Value = productInfo.ProductID;
                 using var dr = cmd.ExecuteReader();

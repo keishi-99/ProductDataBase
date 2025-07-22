@@ -208,24 +208,22 @@ namespace ProductDatabase {
                 // 製番が新規かチェック
                 if (IsRegistration) {
                     var substrateName = string.Empty;
-                    commandText = $@"
-                            SELECT
-                                StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                            FROM
-                                {ProductInfo.CategoryName}_Substrate
-                            WHERE
-                                StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
-                            GROUP BY
-                                StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
-                            ORDER BY
-                                MIN(ID)
-                            LIMIT 1;
-                            ";
-                    using var dr = ExecuteReader(connection, commandText,
-                        ("@StockName", ProductInfo.StockName),
-                        ("@SubstrateModel", ProductInfo.SubstrateModel),
-                        ("@SubstrateNumber", substrateNumber)
-                        );
+                    commandText =
+                        $"""
+                        SELECT
+                            StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                        FROM
+                            '{ProductInfo.CategoryName}_Substrate'
+                        WHERE
+                            StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                        GROUP BY
+                            StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                        ORDER BY
+                            MIN(ID)
+                        LIMIT 1
+                        ;
+                        """;
+                    using var dr = ExecuteReader(connection, commandText, ("@StockName", ProductInfo.StockName), ("@SubstrateModel", ProductInfo.SubstrateModel), ("@SubstrateNumber", substrateNumber));
                     while (dr.Read()) {
                         substrateName = $"{dr["SubstrateName"]}";
                     }
@@ -243,24 +241,21 @@ namespace ProductDatabase {
                 // 不良処理時在庫チェック
                 if (DefectNumberCheckBox.Checked) {
                     commandText =
-                        $@"
+                        $"""
                         SELECT
                             StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                         FROM
-                            {ProductInfo.CategoryName}_Substrate
+                            '{ProductInfo.CategoryName}_Substrate'
                         WHERE
                             StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                         GROUP BY
                             StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                         ORDER BY
                             MIN(ID)
-                        LIMIT 1;
-                        ";
-                    using var dr = ExecuteReader(connection, commandText,
-                        ("@StockName", ProductInfo.StockName),
-                        ("@SubstrateModel", ProductInfo.SubstrateModel),
-                        ("@SubstrateNumber", substrateNumber)
-                        );
+                        LIMIT 1
+                        ;
+                        """;
+                    using var dr = ExecuteReader(connection, commandText, ("@StockName", ProductInfo.StockName), ("@SubstrateModel", ProductInfo.SubstrateModel), ("@SubstrateNumber", substrateNumber));
                     if (dr.Read()) {
                         if (Convert.ToInt32(dr["Stock"]) < defectNumber) {
                             throw new Exception($"[{substrateNumber}]は在庫が[{dr["Stock"]}]です。");
@@ -291,7 +286,7 @@ namespace ProductDatabase {
                     ("@Person", string.IsNullOrWhiteSpace(person) ? DBNull.Value : person),
                     ("@Comment", string.IsNullOrWhiteSpace(comment) ? DBNull.Value : comment)
                     );
-                commandText = $@"SELECT MAX(ID) FROM ""{ProductInfo.CategoryName}_Substrate"";";
+                commandText = $@"SELECT MAX(ID) FROM '{ProductInfo.CategoryName}_Substrate';";
                 rowId = ExecuteScalar(connection, commandText).ToString() ?? string.Empty;
 
                 // ログ出力
