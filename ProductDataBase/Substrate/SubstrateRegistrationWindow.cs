@@ -269,11 +269,12 @@ namespace ProductDatabase {
 
                 // 基板登録テーブルへ追加
                 commandText =
-                    $@"
-                    INSERT INTO ""{ProductInfo.CategoryName}_Substrate""
+                    $"""
+                    INSERT INTO '{ProductInfo.CategoryName}_Substrate'
                         (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Increase,Defect,Person,RegDate,Comment)
                     VALUES
-                        (@StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,@Increase,@Defect,@Person,@RegDate,@Comment);";
+                        (@StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,@Increase,@Defect,@Person,@RegDate,@Comment);
+                    """;
                 ExecuteNonQuery(connection, commandText,
                     ("@StockName", ProductInfo.StockName),
                     ("@SubstrateName", ProductInfo.SubstrateName),

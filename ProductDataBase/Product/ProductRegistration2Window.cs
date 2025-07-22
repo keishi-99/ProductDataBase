@@ -397,7 +397,8 @@ namespace ProductDatabase {
                 ("@SerialFirst", ProductInfo.SerialFirst),
                 ("@SerialLast", ProductInfo.SerialLast),
                 ("@SerialLastNumber", ProductInfo.IsSerialGeneration ? _serialLastNumber : DBNull.Value),
-                ("@Comment", ProductInfo.Comment));
+                ("@Comment", ProductInfo.Comment)
+                );
 
             ProductInfo.ProductID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM '{ProductInfo.CategoryName}_Product';"));
         }
@@ -469,13 +470,15 @@ namespace ProductDatabase {
                 : (string.Empty, string.Empty, string.Empty);
         }
         private void InsertSubstrate(SQLiteConnection connection, string categoryName, string stockName, string substrateName, string substrateModel, string substrateNumber, string orderNumber, int useValue, int? useID) {
-            var commandText = $@"
-                INSERT INTO ""{categoryName}_Substrate""
+            var commandText =
+                $"""
+                INSERT INTO '{categoryName}_Substrate'
                     (StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber,
                      Decrease, Person, RegDate, Comment, UseID)
                 VALUES
                     (@StockName, @SubstrateName, @SubstrateModel, @SubstrateNumber, @OrderNumber,
-                     @Decrease, @Person, @RegDate, @Comment, @UseID);";
+                     @Decrease, @Person, @RegDate, @Comment, @UseID);
+                """;
 
             ExecuteNonQuery(connection, commandText,
                 ("@StockName", stockName),
