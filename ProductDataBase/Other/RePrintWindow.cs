@@ -146,10 +146,12 @@ namespace ProductDatabase {
                 using var cmd = con.CreateCommand();
                 cmd.CommandText =
                     $"""
-                    INSERT INTO Reprint
-                        (PrintType, OrderNumber, ProductName, ProductNumber, ProductType, ProductModel, Quantity, Person, RegDate, Revision, SerialFirst, SerialLast, Comment)
-                    VALUES
-                        (@PrintType, @OrderNumber, @ProductName, @ProductNumber, @ProductType, @ProductModel, @Quantity, @Person, @RegDate, @Revision, @SerialFirst, @SerialLast, @Comment)
+                    INSERT INTO Reprint (
+                        PrintType, OrderNumber, ProductName, ProductNumber, ProductType, ProductModel, Quantity, Person, RegDate, Revision, SerialFirst, SerialLast, Comment
+                        )
+                    VALUES (
+                        @PrintType, @OrderNumber, @ProductName, @ProductNumber, @ProductType, @ProductModel, @Quantity, @Person, @RegDate, @Revision, @SerialFirst, @SerialLast, @Comment
+                        )
                     ;
                     """;
 

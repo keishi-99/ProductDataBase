@@ -279,10 +279,12 @@ namespace ProductDatabase {
                 // 基板登録テーブルへ追加
                 commandText =
                     $"""
-                    INSERT INTO {substrateTableName}
-                        (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Increase,Defect,Person,RegDate,Comment)
-                    VALUES
-                        (@StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,@Increase,@Defect,@Person,@RegDate,@Comment)
+                    INSERT INTO {substrateTableName} (
+                        StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Increase,Defect,Person,RegDate,Comment
+                        )
+                    VALUES (
+                        @StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,@Increase,@Defect,@Person,@RegDate,@Comment
+                        )
                     ;
                     """;
                 ExecuteNonQuery(connection, commandText,
