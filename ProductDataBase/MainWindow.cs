@@ -204,15 +204,15 @@ namespace ProductDatabase {
                     throw new DirectoryNotFoundException($"フォルダ '{CommonUtils.s_networkPath}' が見つかりません。");
                 }
 
-                // その日のbackupファイルがない場合バックアップ作成
+                // その日の backupファイルがない場合バックアップ作成
                 var d = DateTime.Now;
                 var backupDir = Path.Combine(CommonUtils.s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}");
-                var backupFilepath = Path.Combine(CommonUtils.s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
+                var backupFilePath = Path.Combine(CommonUtils.s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
                 var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
 
-                if (!File.Exists(backupFilepath)) {
+                if (!File.Exists(backupFilePath)) {
                     Directory.CreateDirectory(backupDir);  // ディレクトリが存在しない場合に作成
-                    File.Copy(registrationPath, backupFilepath, false);
+                    File.Copy(registrationPath, backupFilePath, false);
                 }
 
                 using SQLiteConnection con = new(GetConnectionInformation());
