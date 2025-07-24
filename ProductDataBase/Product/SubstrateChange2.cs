@@ -1,7 +1,6 @@
 ﻿using ProductDatabase.Other;
 using System.Data;
 using System.Data.SQLite;
-using System.Diagnostics;
 using static ProductDatabase.MainWindow;
 using static ProductDatabase.Other.CommonUtils;
 
@@ -51,6 +50,7 @@ namespace ProductDatabase {
                 // 使用基板リスト化+名前順にソート
                 _useSubstrate = ProductInfo.UseSubstrate.Split(",");
                 Array.Sort(_useSubstrate);
+
                 var strQuantity = string.Empty;
 
                 switch (ProductInfo.RegType) {
@@ -102,113 +102,96 @@ namespace ProductDatabase {
                                 }
                             }
 
-                            List<(string, List<string>, List<int>)> usedSubstrate = [];
-
                             using SQLiteConnection con = new(GetConnectionRegistration());
                             con.Open();
                             using var cmd = con.CreateCommand();
 
                             var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
+
                             cmd.CommandText =
                                 $"""
+                                -- 使用履歴のある SubstrateNumber ごとの合計を別テーブルで集計
+                                WITH Used AS (
+                                    SELECT
+                                        SubstrateNumber,
+                                        COALESCE(SUM(Decrease), 0) AS UsedDecrease
+                                    FROM
+                                        {substrateTableName}
+                                    WHERE
+                                        SubstrateModel = @SubstrateModel
+                                        AND UseID = @ID
+                                        AND SubstrateNumber NOTNULL
+                                    GROUP BY
+                                        SubstrateNumber
+                                ),
+
+                                Stocked AS (
+                                    SELECT
+                                        SubstrateName,
+                                        SubstrateModel,
+                                        SubstrateNumber,
+                                        COALESCE(SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)), 0) AS Stock
+                                    FROM
+                                        {substrateTableName}
+                                    WHERE
+                                        SubstrateModel = @SubstrateModel
+                                        AND SubstrateNumber NOTNULL
+                                    GROUP BY
+                                        SubstrateName,
+                                        SubstrateModel,
+                                        SubstrateNumber
+                                )
+
+                                -- 最終結合（在庫がある or 使用済み）を条件に絞る
                                 SELECT
-                                	SubstrateModel,
-                                	SubstrateNumber,
-                                	Decrease
+                                    s.SubstrateName,
+                                    s.SubstrateModel,
+                                    s.SubstrateNumber,
+                                    s.Stock,
+                                    COALESCE(u.UsedDecrease * -1, 0) AS UsedDecrease
                                 FROM
-                                    {substrateTableName}
+                                    Stocked s
+                                    LEFT JOIN Used u ON s.SubstrateNumber = u.SubstrateNumber
                                 WHERE
-                                	UseID = @ID AND SubstrateModel = @SubstrateModel
+                                    s.Stock > 0 OR u.UsedDecrease IS NOT NULL
                                 ORDER BY
-                                	SubstrateModel ASC
-                                ;
+                                    CASE WHEN COALESCE(u.UsedDecrease, 0) = 0 THEN 1 ELSE 0 END,
+                                    s.SubstrateNumber;
                                 """;
+
+                            cmd.Parameters.Clear();
                             cmd.Parameters.Add("@ID", DbType.Int64).Value = ProductInfo.ProductID;
                             cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = substrateModel;
 
-                            using (var dr = cmd.ExecuteReader()) {
-                                while (dr.Read()) {
-                                    var usedSubstrateModel = dr.GetString(0);
-                                    var usedSubstrateNumber = dr.GetString(1);
-                                    var usedDecrease = -1 * dr.GetInt32(2);
+                            using var dr = cmd.ExecuteReader();
+                            var j = 0;
 
-                                    // 既存の usedSubstrateModel を検索
-                                    var existingSubstrate = usedSubstrate.FirstOrDefault(x => x.Item1 == usedSubstrateModel);
+                            if (_objCbx != null) {
+                                var substrateName = ProductInfo.SubstrateDataTable
+                                    .AsEnumerable()
+                                    .FirstOrDefault(row => row.Field<string>("SubstrateModel") == substrateModel)?
+                                    .Field<string>("SubstrateName") ?? string.Empty;
 
-                                    if (existingSubstrate != default) {
-                                        // 既存の usedSubstrateModel が見つかった場合、リストに追加
-                                        existingSubstrate.Item2.Add(usedSubstrateNumber);
-                                        existingSubstrate.Item3.Add(usedDecrease);
-                                    }
-                                    else {
-                                        // 既存の usedSubstrateModel が見つからなかった場合、新しいエントリを追加
-                                        List<string> usedSubstrateNumbers = [usedSubstrateNumber];
-                                        List<int> usedDecreases = [usedDecrease];
-                                        (string, List<string>, List<int>) usedSubstrateData = (usedSubstrateModel, usedSubstrateNumbers, usedDecreases);
-                                        usedSubstrate.Add(usedSubstrateData);
-                                    }
-                                }
+                                var splitSubstrateName = substrateName.Split(':');
+
+                                _objCbx.Text = $"{splitSubstrateName.Last()} - {substrateModel}";
                             }
-                            // テーブル検索SQL - 基板型式[Model]で基板を抽出
-                            cmd.CommandText =
-                                $"""
-                                SELECT
-                                    SubstrateName,
-                                    SubstrateModel,
-                                    SubstrateNumber,
-                                    SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                                FROM
-                                    {substrateTableName}
-                                WHERE
-                                    SubstrateModel = @SubstrateModel AND SubstrateNumber NOTNULL
-                                GROUP BY
-                                    SubstrateName,
-                                    SubstrateModel,
-                                    SubstrateNumber
-                                HAVING
-                                    Stock >= 0
-                                ORDER BY
-                                    MIN(ID)
-                                ;
-                                """;
-                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = substrateModel;
+                            while (dr.Read()) {
+                                var strSubstrateNum = dr["SubstrateNumber"].ToString() ?? string.Empty;
+                                var intStock = Convert.ToInt32(dr["Stock"]);
+                                var intUsedQuantity = Convert.ToInt32(dr["UsedDecrease"]); ;
 
-                            using (var dr = cmd.ExecuteReader()) {
-                                var j = 0;
-                                while (dr.Read()) {
-                                    // 抽出した行から製造番号,在庫取得
-                                    var strSubstrateNum = $"{dr["SubstrateNumber"]}";
-                                    var intStock = int.Parse($"{dr["Stock"]}");
-                                    var strSubstrateName = $"{dr["SubstrateName"]}";
-                                    if (_objCbx != null) { _objCbx.Text = $"{strSubstrateName} - {substrateModel}"; }
-
-                                    // usedSubstrate から strSubstrateNum を検索
-                                    var usedSubstrateItem = null as dynamic;
-                                    var num = usedSubstrate.FindIndex(substrate => substrate.Item1 == substrateModel);
-                                    if (num != -1) {
-                                        usedSubstrateItem = usedSubstrate[num].Item2
-                                            .Select((num, index) => new { Num = num, Index = index })
-                                            .FirstOrDefault(item => item.Num == strSubstrateNum);
-                                    }
-
-                                    var strUsedSubNum = usedSubstrateItem != null ? strSubstrateNum : string.Empty;
-                                    var intUsedQuantity = usedSubstrateItem != null ? usedSubstrate[num].Item3[usedSubstrateItem.Index] : 0;
-
-                                    if (intStock > 0 || strUsedSubNum == strSubstrateNum) {
-                                        if (_objDgv == null) {
-                                            break;
-                                        }
-
-                                        _objDgv.Rows.Add();
-                                        _objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
-                                        _objDgv.Rows[j].Cells[1].Value = intStock;
-                                        _objDgv.Rows[j].Cells[2].Value = intUsedQuantity;
-                                        _objDgv.Rows[j].Cells[3].Value = intUsedQuantity;
-                                        _objDgv.Rows[j].Cells[4].Value = intUsedQuantity != 0;
-
-                                        j++;
-                                    }
+                                if (_objDgv == null) {
+                                    break;
                                 }
+
+                                _objDgv.Rows.Add();
+                                _objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
+                                _objDgv.Rows[j].Cells[1].Value = intStock;
+                                _objDgv.Rows[j].Cells[2].Value = intUsedQuantity;
+                                _objDgv.Rows[j].Cells[3].Value = intUsedQuantity;
+                                _objDgv.Rows[j].Cells[4].Value = intUsedQuantity != 0;
+                                j++;
                             }
                         }
                         break;

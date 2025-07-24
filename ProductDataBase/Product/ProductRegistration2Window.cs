@@ -167,7 +167,8 @@ namespace ProductDatabase {
             if (objCbx != null) {
                 objCbx.Enabled = true;
                 objCbx.Checked = true;
-                objCbx.Text = $"{substrateName} - {useSubstrate[index]}";
+                var splitSubstrateName = substrateName.Split(':');
+                objCbx.Text = $"{splitSubstrateName.Last()} - {useSubstrate[index]}";
             }
         }
         private void SetupDataGridView(DataGridView? objDgv) {
