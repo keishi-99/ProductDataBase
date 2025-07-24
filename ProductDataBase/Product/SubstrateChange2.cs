@@ -1,6 +1,7 @@
 ﻿using ProductDatabase.Other;
 using System.Data;
 using System.Data.SQLite;
+using System.Diagnostics;
 using static ProductDatabase.MainWindow;
 using static ProductDatabase.Other.CommonUtils;
 
@@ -117,12 +118,13 @@ namespace ProductDatabase {
                                 FROM
                                     {substrateTableName}
                                 WHERE
-                                	UseID = @ID
+                                	UseID = @ID AND SubstrateModel = @SubstrateModel
                                 ORDER BY
                                 	SubstrateModel ASC
                                 ;
                                 """;
-                            cmd.Parameters.Add("@ID", DbType.String).Value = ProductInfo.ProductID;
+                            cmd.Parameters.Add("@ID", DbType.Int64).Value = ProductInfo.ProductID;
+                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = substrateModel;
 
                             using (var dr = cmd.ExecuteReader()) {
                                 while (dr.Read()) {
@@ -164,7 +166,7 @@ namespace ProductDatabase {
                                     SubstrateModel,
                                     SubstrateNumber
                                 HAVING
-                                    Stock > 0
+                                    Stock >= 0
                                 ORDER BY
                                     MIN(ID)
                                 ;
