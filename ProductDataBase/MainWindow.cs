@@ -32,7 +32,7 @@ namespace ProductDatabase {
             public List<string> CategorySubstrateName { get; set; } = [];
             public List<string> CategoryProductType { get; set; } = [];
             public List<string> CategoryType { get; set; } = [];
-            public int RadioButtonFlg { get; set; }
+            public int RadioButtonNumber { get; set; }
             public string FontName { get; } = "Meiryo UI";
             public int FontSize { get; set; } = 9;
             public List<string> PersonList { get; set; } = [];
@@ -270,7 +270,7 @@ namespace ProductDatabase {
                 ResetFields();
 
                 if (CategoryListBox3.SelectedIndex == -1) { return; }
-                switch (ProductInfo.RadioButtonFlg) {
+                switch (ProductInfo.RadioButtonNumber) {
                     case 1:
                         HandleSubstrateRegistration();
                         break;
@@ -369,38 +369,39 @@ namespace ProductDatabase {
             try {
                 DataRow[]? selectedRow = null;
 
-                switch (ProductInfo.RadioButtonFlg) {
-                    case 1:
-                        selectedRow = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND SubstrateName = '{CategoryListBox3.SelectedItem}'");
-                        break;
-                    case 2:
-                    case 3:
-                    case 4:
-                        selectedRow = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
-                        break;
-                }
+                var listBox3 = ProductInfo.RadioButtonNumber switch {
+                    1 => CategoryListBox3.SelectedIndex == -1 ? string.Empty : $"AND SubstrateName = '{CategoryListBox3.SelectedItem}'",
+                    2 or 3 or 4 => CategoryListBox3.SelectedIndex == -1 ? string.Empty : $"AND ProductType = '{CategoryListBox3.SelectedItem}'",
+                    _ => string.Empty
+                };
+                selectedRow = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' {listBox3}");
 
                 if (selectedRow != null && selectedRow.Length > 0) {
-
-                    switch (ProductInfo.RadioButtonFlg) {
+                    switch (ProductInfo.RadioButtonNumber) {
                         case 1:
                             ProductInfo.CategoryName = selectedRow[0]["CategoryName"].ToString() ?? string.Empty;
                             ProductInfo.ProductName = selectedRow[0]["ProductName"].ToString() ?? string.Empty;
                             ProductInfo.StockName = selectedRow[0]["StockName"].ToString() ?? string.Empty;
-                            ProductInfo.SubstrateName = selectedRow[0]["SubstrateName"].ToString() ?? string.Empty;
-                            ProductInfo.SubstrateModel = selectedRow[0]["SubstrateModel"].ToString() ?? string.Empty;
-                            ProductInfo.PrintType = Convert.ToInt32(selectedRow[0]["PrintType"] ?? throw new Exception("RegType is null"));
-                            ProductInfo.RegType = Convert.ToInt32(selectedRow[0]["RegType"] ?? throw new Exception("RegType is null"));
+
+                            if (!string.IsNullOrEmpty(listBox3)) {
+                                ProductInfo.SubstrateName = selectedRow[0]["SubstrateName"].ToString() ?? string.Empty;
+                                ProductInfo.SubstrateModel = selectedRow[0]["SubstrateModel"].ToString() ?? string.Empty;
+                                ProductInfo.PrintType = Convert.ToInt32(selectedRow[0]["PrintType"] ?? throw new Exception("RegType is null"));
+                                ProductInfo.RegType = Convert.ToInt32(selectedRow[0]["RegType"] ?? throw new Exception("RegType is null"));
+                            }
                             break;
                         case 2:
                         case 3:
                             ProductInfo.CategoryName = selectedRow[0]["CategoryName"].ToString() ?? string.Empty;
                             ProductInfo.ProductName = selectedRow[0]["ProductName"].ToString() ?? string.Empty;
                             ProductInfo.StockName = selectedRow[0]["StockName"].ToString() ?? string.Empty;
-                            ProductInfo.ProductType = selectedRow[0]["ProductType"].ToString() ?? string.Empty;
-                            ProductInfo.ProductModel = selectedRow[0]["ProductModel"].ToString() ?? string.Empty;
-                            ProductInfo.PrintType = Convert.ToInt32(selectedRow[0]["PrintType"] ?? throw new Exception("RegType is null"));
-                            ProductInfo.RegType = Convert.ToInt32(selectedRow[0]["RegType"] ?? throw new Exception("RegType is null"));
+
+                            if (!string.IsNullOrEmpty(listBox3)) {
+                                ProductInfo.ProductType = selectedRow[0]["ProductType"].ToString() ?? string.Empty;
+                                ProductInfo.ProductModel = selectedRow[0]["ProductModel"].ToString() ?? string.Empty;
+                                ProductInfo.PrintType = Convert.ToInt32(selectedRow[0]["PrintType"] ?? throw new Exception("RegType is null"));
+                                ProductInfo.RegType = Convert.ToInt32(selectedRow[0]["RegType"] ?? throw new Exception("RegType is null"));
+                            }
                             break;
                     }
 
@@ -426,19 +427,19 @@ namespace ProductDatabase {
 
                 switch (selectedRadioButton.Tag) {
                     case "1":
-                        ProductInfo.RadioButtonFlg = 1;
+                        ProductInfo.RadioButtonNumber = 1;
                         strSqlQuery = "SELECT * FROM Substrate WHERE Visible = 1 ORDER BY SortNumber ASC;";
                         break;
                     case "2":
-                        ProductInfo.RadioButtonFlg = 2;
+                        ProductInfo.RadioButtonNumber = 2;
                         strSqlQuery = "SELECT * FROM Product WHERE Visible = 1 ORDER BY SortNumber ASC;";
                         break;
                     case "3":
-                        ProductInfo.RadioButtonFlg = 3;
+                        ProductInfo.RadioButtonNumber = 3;
                         strSqlQuery = "SELECT * FROM Product WHERE Visible = 1 AND PrintType != 0 ORDER BY SortNumber ASC;";
                         break;
                     case "4":
-                        ProductInfo.RadioButtonFlg = 4;
+                        ProductInfo.RadioButtonNumber = 4;
                         strSqlQuery = "SELECT * FROM Product WHERE Visible = 1 AND (PrintType = 5 OR PrintType = 6) ORDER BY SortNumber ASC;";
                         break;
                     default:
@@ -489,12 +490,12 @@ namespace ProductDatabase {
         private void CategoryListBox2Select() {
             try {
                 RegisterButton.Enabled = false;
-                HistoryButton.Enabled = false;
+                HistoryButton.Enabled = true;
                 CategoryListBox3.Items.Clear();
 
                 DataRow[] selectedRows;
 
-                switch (ProductInfo.RadioButtonFlg) {
+                switch (ProductInfo.RadioButtonNumber) {
                     case 1:
                         selectedRows = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "SubstrateName ASC");
                         HashSet<string> substrateNames = [.. selectedRows.AsEnumerable()
@@ -530,7 +531,7 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = Auth.IsAuthorizedUser;
                 HistoryButton.Enabled = true;
 
-                switch (ProductInfo.RadioButtonFlg) {
+                switch (ProductInfo.RadioButtonNumber) {
                     case 1:
                         ProductInfo.SubstrateName = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
                         break;

@@ -43,7 +43,7 @@ namespace ProductDatabase {
 
                 編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
 
-                switch (ProductInfo.RadioButtonFlg) {
+                switch (ProductInfo.RadioButtonNumber) {
                     case 1:
                         if (ProductInfo.RegType == 0) { CategoryRadioButton2.Visible = false; }
                         CategoryRadioButton2.Text = "在庫";
@@ -59,12 +59,14 @@ namespace ProductDatabase {
                     case 2:
                         CategoryRadioButton2.Text = "全てのタイプ";
                         CategoryRadioButton3.Text = "シリアル";
-                        if (ProductInfo.RegType == 0) { CategoryRadioButton3.Visible = false; }
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
                         GroupModelCheckBox.Visible = false;
-                        GenerateListButton.Visible = ProductInfo.IsListPrint;
-                        GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
+                        if (!string.IsNullOrEmpty(ProductInfo.ProductModel)) {
+                            if (ProductInfo.RegType == 0) { CategoryRadioButton3.Visible = false; }
+                            GenerateListButton.Visible = ProductInfo.IsListPrint;
+                            GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
+                        }
                         break;
                     case 3:
                         CategoryRadioButton1.Visible = false;
@@ -280,13 +282,15 @@ namespace ProductDatabase {
             }
         }
 
-        private void ViewProductRegistration(bool filterByProductModel) {
+        private void ViewProductRegistration( ) {
             _tableName = "Product";
             編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
             GenerateReportButton.Visible = true;
             ShowUsedSubstrateButton.Visible = true;
             GenerateListButton.Visible = ProductInfo.IsListPrint;
             GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
+
+            var filterByProductModel = !string.IsNullOrEmpty(ProductInfo.ProductModel);
 
             var productTableName = $"[{ProductInfo.CategoryName}_Product]";
             var query = filterByProductModel
@@ -466,7 +470,7 @@ namespace ProductDatabase {
                                 var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
                                 command.CommandText =
                                     $"""
-                                    UPDATE 
+                                    UPDATE
                                         {substrateTableName}
                                     SET
                                         SubstrateNumber = @SubstrateNumber,
@@ -777,14 +781,14 @@ namespace ProductDatabase {
             {
                 { (1, "1"), ViewSubstrateRegistrationLog },
                 { (1, "2"), ViewSubstrateRegistrationLog },
-                { (2, "1"), () => ViewProductRegistration(true) },
-                { (2, "2"), () => ViewProductRegistration(false) },
+                { (2, "1"), ViewProductRegistration },
+                { (2, "2"), ViewProductRegistration },
                 { (2, "3"), ViewSerialLog },
                 { (3, "1"), ViewReprintLog }
             };
 
             // Tag と RadioButtonFlg の組み合わせに応じた動作を実行
-            if (actionMap.TryGetValue((ProductInfo.RadioButtonFlg, tag), out var action)) {
+            if (actionMap.TryGetValue((ProductInfo.RadioButtonNumber, tag), out var action)) {
                 action();
             }
             else {
