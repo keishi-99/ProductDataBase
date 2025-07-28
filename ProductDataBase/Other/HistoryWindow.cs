@@ -55,6 +55,7 @@ namespace ProductDatabase {
                         GenerateReportButton.Visible = false;
                         GenerateListButton.Visible = ProductInfo.IsListPrint;
                         GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
+                        if (string.IsNullOrEmpty(ProductInfo.SubstrateModel)) { AllSubstrateCheckBox.Checked = true; }
                         break;
                     case 2:
                         CategoryRadioButton2.Text = "全てのタイプ";
