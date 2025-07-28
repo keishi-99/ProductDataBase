@@ -172,7 +172,7 @@
             this.AllSubstrateCheckBox.Name = "AllSubstrateCheckBox";
             this.AllSubstrateCheckBox.Size = new Size(62, 19);
             this.AllSubstrateCheckBox.TabIndex = 11;
-            this.AllSubstrateCheckBox.Text = "他基板";
+            this.AllSubstrateCheckBox.Text = "全基板";
             this.AllSubstrateCheckBox.UseVisualStyleBackColor = true;
             this.AllSubstrateCheckBox.CheckedChanged += this.AllSubstrateCheckBox_CheckedChanged;
             // 
