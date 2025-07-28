@@ -79,6 +79,7 @@
             this.QrCodeTextBox = new TextBox();
             this.textToUpperCheckBox = new CheckBox();
             this.RegistrationDateTimePicker = new DateTimePicker();
+            this.OpenSubstrateInformationButton = new Button();
             this.SubstrateRegistrationMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPostionNumericUpDown).BeginInit();
             this.panelCommentTexrBox.SuspendLayout();
@@ -660,11 +661,23 @@
             this.RegistrationDateTimePicker.Size = new Size(120, 23);
             this.RegistrationDateTimePicker.TabIndex = 610;
             // 
+            // OpenSubstrateInformationButton
+            // 
+            this.OpenSubstrateInformationButton.Location = new Point(539, 407);
+            this.OpenSubstrateInformationButton.Margin = new Padding(0);
+            this.OpenSubstrateInformationButton.Name = "OpenSubstrateInformationButton";
+            this.OpenSubstrateInformationButton.Size = new Size(75, 25);
+            this.OpenSubstrateInformationButton.TabIndex = 611;
+            this.OpenSubstrateInformationButton.Text = "基板情報";
+            this.OpenSubstrateInformationButton.UseVisualStyleBackColor = true;
+            this.OpenSubstrateInformationButton.Click += this.OpenSubstrateInformationButton_Click;
+            // 
             // SubstrateRegistrationWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.OpenSubstrateInformationButton);
             this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.textToUpperCheckBox);
             this.Controls.Add(this.label1);
@@ -786,5 +799,6 @@
         private TextBox QrCodeTextBox;
         private CheckBox textToUpperCheckBox;
         private DateTimePicker RegistrationDateTimePicker;
+        private Button OpenSubstrateInformationButton;
     }
 }

@@ -29,9 +29,10 @@
             this.ReloadToolStripMenuItem = new ToolStripMenuItem();
             this.終了ToolStripMenuItem = new ToolStripMenuItem();
             this.設定ToolStripMenuItem = new ToolStripMenuItem();
-            this.ReportConfigToolStripMenuItem = new ToolStripMenuItem();
-            this.ListConfigToolStripMenuItem = new ToolStripMenuItem();
-            this.CheckSheetConfigToolStripMenuItem = new ToolStripMenuItem();
+            this.ConfigReportToolStripMenuItem = new ToolStripMenuItem();
+            this.ConfigListToolStripMenuItem = new ToolStripMenuItem();
+            this.ConfigCheckSheetToolStripMenuItem = new ToolStripMenuItem();
+            this.ConfigSubstrateInformationToolStripMenuItem = new ToolStripMenuItem();
             this.CategoryRadioButton1 = new RadioButton();
             this.CategoryRadioButton2 = new RadioButton();
             this.CategoryRadioButton3 = new RadioButton();
@@ -95,31 +96,38 @@
             // 
             // 設定ToolStripMenuItem
             // 
-            this.設定ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.ReportConfigToolStripMenuItem, this.ListConfigToolStripMenuItem, this.CheckSheetConfigToolStripMenuItem });
+            this.設定ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.ConfigReportToolStripMenuItem, this.ConfigListToolStripMenuItem, this.ConfigCheckSheetToolStripMenuItem, this.ConfigSubstrateInformationToolStripMenuItem });
             this.設定ToolStripMenuItem.Name = "設定ToolStripMenuItem";
             this.設定ToolStripMenuItem.Size = new Size(43, 20);
             this.設定ToolStripMenuItem.Text = "設定";
             // 
-            // ReportConfigToolStripMenuItem
+            // ConfigReportToolStripMenuItem
             // 
-            this.ReportConfigToolStripMenuItem.Name = "ReportConfigToolStripMenuItem";
-            this.ReportConfigToolStripMenuItem.Size = new Size(157, 22);
-            this.ReportConfigToolStripMenuItem.Text = "成績書設定";
-            this.ReportConfigToolStripMenuItem.Click += this.ReportConfigToolStripMenuItem_Click;
+            this.ConfigReportToolStripMenuItem.Name = "ConfigReportToolStripMenuItem";
+            this.ConfigReportToolStripMenuItem.Size = new Size(180, 22);
+            this.ConfigReportToolStripMenuItem.Text = "成績書設定";
+            this.ConfigReportToolStripMenuItem.Click += this.ConfigReportToolStripMenuItem_Click;
             // 
-            // ListConfigToolStripMenuItem
+            // ConfigListToolStripMenuItem
             // 
-            this.ListConfigToolStripMenuItem.Name = "ListConfigToolStripMenuItem";
-            this.ListConfigToolStripMenuItem.Size = new Size(157, 22);
-            this.ListConfigToolStripMenuItem.Text = "基板リスト設定";
-            this.ListConfigToolStripMenuItem.Click += this.ListConfigToolStripMenuItem_Click;
+            this.ConfigListToolStripMenuItem.Name = "ConfigListToolStripMenuItem";
+            this.ConfigListToolStripMenuItem.Size = new Size(180, 22);
+            this.ConfigListToolStripMenuItem.Text = "基板リスト設定";
+            this.ConfigListToolStripMenuItem.Click += this.ConfigListToolStripMenuItem_Click;
             // 
-            // CheckSheetConfigToolStripMenuItem
+            // ConfigCheckSheetToolStripMenuItem
             // 
-            this.CheckSheetConfigToolStripMenuItem.Name = "CheckSheetConfigToolStripMenuItem";
-            this.CheckSheetConfigToolStripMenuItem.Size = new Size(157, 22);
-            this.CheckSheetConfigToolStripMenuItem.Text = "チェックシート設定";
-            this.CheckSheetConfigToolStripMenuItem.Click += this.CheckSheetConfigToolStripMenuItem_Click;
+            this.ConfigCheckSheetToolStripMenuItem.Name = "ConfigCheckSheetToolStripMenuItem";
+            this.ConfigCheckSheetToolStripMenuItem.Size = new Size(180, 22);
+            this.ConfigCheckSheetToolStripMenuItem.Text = "チェックシート設定";
+            this.ConfigCheckSheetToolStripMenuItem.Click += this.ConfigCheckSheetToolStripMenuItem_Click;
+            // 
+            // ConfigSubstrateInformationToolStripMenuItem
+            // 
+            this.ConfigSubstrateInformationToolStripMenuItem.Name = "ConfigSubstrateInformationToolStripMenuItem";
+            this.ConfigSubstrateInformationToolStripMenuItem.Size = new Size(180, 22);
+            this.ConfigSubstrateInformationToolStripMenuItem.Text = "基板情報設定";
+            this.ConfigSubstrateInformationToolStripMenuItem.Click += this.ConfigSubstrateInformationToolStripMenuItem_Click;
             // 
             // CategoryRadioButton1
             // 
@@ -454,8 +462,9 @@
         private CheckBox textToUpperCheckBox;
         private ToolStripMenuItem ReloadToolStripMenuItem;
         private ToolStripMenuItem 設定ToolStripMenuItem;
-        private ToolStripMenuItem ReportConfigToolStripMenuItem;
-        private ToolStripMenuItem ListConfigToolStripMenuItem;
-        private ToolStripMenuItem CheckSheetConfigToolStripMenuItem;
+        private ToolStripMenuItem ConfigReportToolStripMenuItem;
+        private ToolStripMenuItem ConfigListToolStripMenuItem;
+        private ToolStripMenuItem ConfigCheckSheetToolStripMenuItem;
+        private ToolStripMenuItem ConfigSubstrateInformationToolStripMenuItem;
     }
 }

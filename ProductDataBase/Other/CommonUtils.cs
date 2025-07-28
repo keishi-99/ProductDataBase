@@ -829,5 +829,109 @@ namespace ProductDatabase.Other {
                 }
             }
         }
+
+        // 基板設定を開く
+        public static class SubstrateInformation {
+            // 基板設定ファイルを開くメソッド
+            public static void OpenSubstrateInformation(ProductInformation productInfo) {
+                try {
+                    // 1. 設定ファイルを読み込み、レポート設定を取得
+                    var configWorkbook = LoadConfigWorkbook();
+                    var (filePaths, fileName) = GetSubstrateConfig(configWorkbook, productInfo.SubstrateModel);
+
+                    OpenExcel(filePaths, fileName);
+
+                } catch (Exception ex) {
+                    // エラーメッセージを表示
+                    MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            // 設定Excelワークブックを読み込む
+            private static ExcelPackage LoadConfigWorkbook() {
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsx");
+                if (!File.Exists(configPath)) {
+                    throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
+                }
+
+                try {
+                    FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    return new ExcelPackage(fileStreamConfig);
+                } catch (Exception ex) {
+                    throw new Exception($"設定ファイルの読み込み中にエラーが発生しました: {ex.Message}", ex);
+                }
+            }
+
+            // 設定ワークブックから製品に対応する設定を抽出する
+            private static (string filePaths, string sheetName) GetSubstrateConfig(ExcelPackage configWorkbook, string substrateModel) {
+                var workSheetMain = configWorkbook.Workbook.Worksheets["Sheet1"] ?? throw new Exception("設定ファイルに 'Sheet1' が見つかりません。");
+
+                // セル検索
+                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == substrateModel)
+                    ?? throw new Exception($"Configに型式:[{substrateModel}]が見つかりません。");
+                var searchAddressResultRow = searchAddressResult.Start.Row;
+
+                // ディレクトリパスとファイル名を取得(ディレクトリパスが空の場合は、Configの2行目の値を使用する)
+                var directoryPath = workSheetMain.Cells[searchAddressResultRow, 4].Value?.ToString()?.Trim('"') ?? workSheetMain.Cells[2, 4].Value?.ToString()?.Trim('"') ?? string.Empty;
+                var fileName = workSheetMain.Cells[searchAddressResultRow, 5].Value?.ToString()?.Trim('"') ?? string.Empty;
+                var filePaths = Path.Combine(directoryPath, fileName);
+                if (!File.Exists(filePaths)) { throw new FileNotFoundException($"指定されたファイルが存在しません: {filePaths}"); }
+
+                var sheetName = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString()?.Trim('"') ?? string.Empty;
+
+                return (filePaths, sheetName);
+            }
+
+            // Excelファイルを開くメソッド
+            private static void OpenExcel(string filePath, string sheetName) {
+
+                // COM Interopを使用してExcelを開く
+                Microsoft.Office.Interop.Excel.Application? xlApp = null;
+                Microsoft.Office.Interop.Excel.Workbooks? xlBooks = null;
+                Microsoft.Office.Interop.Excel.Workbook? xlBook = null;
+                Microsoft.Office.Interop.Excel.Sheets? xlSheets = null;
+                Microsoft.Office.Interop.Excel.Worksheet? xlSheet = null;
+
+                try {
+                    xlApp = new Microsoft.Office.Interop.Excel.Application {
+                        Visible = true // Excelウィンドウを表示します。
+                    };
+
+                    // ワークブック開く
+                    xlBooks = xlApp.Workbooks;
+                    xlBook = xlBooks.Open(filePath, ReadOnly: true);
+
+                    // ワークシート選択
+                    xlSheets = xlBook.Sheets;
+                    xlSheet = string.IsNullOrEmpty(sheetName) ? xlSheets[1] : xlSheets[sheetName];
+
+                    // ワークシート表示
+                    xlSheet.Activate();
+
+                } finally {
+                    // COMオブジェクトの解放
+                    if (xlSheet != null) {
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
+                    }
+
+                    if (xlSheets != null) {
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
+                    }
+
+                    if (xlBook != null) {
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook);
+                    }
+
+                    if (xlBooks != null) {
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks);
+                    }
+
+                    if (xlApp != null) {
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
+                    }
+                }
+            }
+
+        }
     }
 }

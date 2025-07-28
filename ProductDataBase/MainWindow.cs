@@ -491,7 +491,7 @@ namespace ProductDatabase {
             try {
                 RegisterButton.Enabled = false;
                 if (ProductInfo.RadioButtonNumber == 4) { HistoryButton.Enabled = false; }
-                else {HistoryButton.Enabled = true; }
+                else { HistoryButton.Enabled = true; }
                 CategoryListBox3.Items.Clear();
 
                 DataRow[] selectedRows;
@@ -795,16 +795,20 @@ namespace ProductDatabase {
 
         private void MainWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void ReloadToolStripMenuItem_Click(object sender, EventArgs e) { LoadEvents(); }
-        private void ReportConfigToolStripMenuItem_Click(object sender, EventArgs e) {
+        private void ConfigReportToolStripMenuItem_Click(object sender, EventArgs e) {
             var reportConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsx");
             OpenExcel(reportConfigPath);
         }
-        private void ListConfigToolStripMenuItem_Click(object sender, EventArgs e) {
+        private void ConfigListToolStripMenuItem_Click(object sender, EventArgs e) {
             var listConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsx");
             OpenExcel(listConfigPath);
         }
-        private void CheckSheetConfigToolStripMenuItem_Click(object sender, EventArgs e) {
+        private void ConfigCheckSheetToolStripMenuItem_Click(object sender, EventArgs e) {
             var checkSheetConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsx");
+            OpenExcel(checkSheetConfigPath);
+        }
+        private void ConfigSubstrateInformationToolStripMenuItem_Click(object sender, EventArgs e) {
+            var checkSheetConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsx");
             OpenExcel(checkSheetConfigPath);
         }
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { Close(); }
@@ -825,5 +829,6 @@ namespace ProductDatabase {
         }
         private void QRCodeButton_Click(object sender, EventArgs e) { CodeScan(); }
         private void QRCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
+
     }
 }

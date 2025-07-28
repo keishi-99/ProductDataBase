@@ -778,11 +778,20 @@ namespace ProductDatabase {
             };
             form.ShowDialog();
         }
+        // 基板設定を開く
+        private void OpenSubstrateInformation() {
+            try {
+                CommonUtils.SubstrateInformation.OpenSubstrateInformation(ProductInfo);
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         private void SubstrateRegistrationWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
         private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
         private void PrintButton_Click(object sender, EventArgs e) { PrintStart(); }
+        private void OpenSubstrateInformationButton_Click(object sender, EventArgs e) { OpenSubstrateInformation(); }
         private void SubstrateRegistrationPrintDocument_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) { PrintDocumentPrintPage(sender, e); }
         private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
         private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
