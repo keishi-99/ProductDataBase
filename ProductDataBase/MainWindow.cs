@@ -490,7 +490,8 @@ namespace ProductDatabase {
         private void CategoryListBox2Select() {
             try {
                 RegisterButton.Enabled = false;
-                HistoryButton.Enabled = true;
+                if (ProductInfo.RadioButtonNumber == 4) { HistoryButton.Enabled = false; }
+                else {HistoryButton.Enabled = true; }
                 CategoryListBox3.Items.Clear();
 
                 DataRow[] selectedRows;
