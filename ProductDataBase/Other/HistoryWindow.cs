@@ -62,11 +62,6 @@ namespace ProductDatabase {
                         StockCheckBox.Visible = false;
                         AllSubstrateCheckBox.Visible = false;
                         GroupModelCheckBox.Visible = false;
-                        if (!string.IsNullOrEmpty(ProductInfo.ProductModel)) {
-                            if (ProductInfo.RegType == 0) { CategoryRadioButton3.Visible = false; }
-                            GenerateListButton.Visible = ProductInfo.IsListPrint;
-                            GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
-                        }
                         break;
                     case 3:
                         CategoryRadioButton1.Visible = false;
@@ -282,13 +277,19 @@ namespace ProductDatabase {
             }
         }
 
-        private void ViewProductRegistration( ) {
+        private void ViewProductRegistration() {
             _tableName = "Product";
             編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
             GenerateReportButton.Visible = true;
             ShowUsedSubstrateButton.Visible = true;
-            GenerateListButton.Visible = ProductInfo.IsListPrint;
-            GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
+            if (string.IsNullOrEmpty(ProductInfo.ProductModel)) {
+                GenerateListButton.Visible = true;
+                GenerateCheckSheetButton.Visible = true;
+            }
+            else {
+                GenerateListButton.Visible = ProductInfo.IsListPrint;
+                GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
+            }
 
             var filterByProductModel = !string.IsNullOrEmpty(ProductInfo.ProductModel);
 
@@ -311,7 +312,6 @@ namespace ProductDatabase {
             ShowUsedSubstrateButton.Visible = false;
             GenerateListButton.Visible = false;
             GenerateCheckSheetButton.Visible = false;
-
 
             var serialTableName = $"[{ProductInfo.CategoryName}_Serial]";
             var productTableName = $"[{ProductInfo.CategoryName}_Product]";
