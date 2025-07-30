@@ -22,7 +22,7 @@ namespace ProductDatabase {
 
         private int _serialLastNumber;
 
-        private string _lastInsertRowid;
+        private string _lastInsertRowid = string.Empty;
         private string _printerName = string.Empty;
         private string _serialType = string.Empty;
 
