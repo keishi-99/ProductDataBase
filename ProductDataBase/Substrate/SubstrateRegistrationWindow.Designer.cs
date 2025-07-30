@@ -66,7 +66,7 @@
             this.CommentComboBox = new ComboBox();
             this.TemplateButton = new Button();
             this.PrintRowLabel = new Label();
-            this.PrintPostionNumericUpDown = new NumericUpDown();
+            this.PrintPositionNumericUpDown = new NumericUpDown();
             this.RegisterButton = new Button();
             this.PrintOnlyCheckBox = new CheckBox();
             this.PrintButton = new Button();
@@ -81,7 +81,7 @@
             this.RegistrationDateTimePicker = new DateTimePicker();
             this.OpenSubstrateInformationButton = new Button();
             this.SubstrateRegistrationMenuStrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)this.PrintPostionNumericUpDown).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)this.PrintPositionNumericUpDown).BeginInit();
             this.panelCommentTexrBox.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -544,17 +544,17 @@
             this.PrintRowLabel.TabIndex = 37;
             this.PrintRowLabel.Text = "印刷開始位置";
             // 
-            // PrintPostionNumericUpDown
+            // PrintPositionNumericUpDown
             // 
-            this.PrintPostionNumericUpDown.Location = new Point(166, 410);
-            this.PrintPostionNumericUpDown.Margin = new Padding(0);
-            this.PrintPostionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
-            this.PrintPostionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            this.PrintPostionNumericUpDown.Name = "PrintPostionNumericUpDown";
-            this.PrintPostionNumericUpDown.Size = new Size(110, 23);
-            this.PrintPostionNumericUpDown.TabIndex = 38;
-            this.PrintPostionNumericUpDown.TextAlign = HorizontalAlignment.Right;
-            this.PrintPostionNumericUpDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            this.PrintPositionNumericUpDown.Location = new Point(166, 410);
+            this.PrintPositionNumericUpDown.Margin = new Padding(0);
+            this.PrintPositionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
+            this.PrintPositionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            this.PrintPositionNumericUpDown.Name = "PrintPositionNumericUpDown";
+            this.PrintPositionNumericUpDown.Size = new Size(110, 23);
+            this.PrintPositionNumericUpDown.TabIndex = 38;
+            this.PrintPositionNumericUpDown.TextAlign = HorizontalAlignment.Right;
+            this.PrintPositionNumericUpDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // RegisterButton
             // 
@@ -686,7 +686,7 @@
             this.Controls.Add(this.PrintButton);
             this.Controls.Add(this.PrintOnlyCheckBox);
             this.Controls.Add(this.RegisterButton);
-            this.Controls.Add(this.PrintPostionNumericUpDown);
+            this.Controls.Add(this.PrintPositionNumericUpDown);
             this.Controls.Add(this.PrintRowLabel);
             this.Controls.Add(this.TemplateButton);
             this.Controls.Add(this.CommentComboBox);
@@ -735,7 +735,7 @@
             this.Load += this.SubstrateRegistrationWindow_Load;
             this.SubstrateRegistrationMenuStrip.ResumeLayout(false);
             this.SubstrateRegistrationMenuStrip.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)this.PrintPostionNumericUpDown).EndInit();
+            ((System.ComponentModel.ISupportInitialize)this.PrintPositionNumericUpDown).EndInit();
             this.panelCommentTexrBox.ResumeLayout(false);
             this.panelCommentTexrBox.PerformLayout();
             this.ResumeLayout(false);
@@ -786,7 +786,7 @@
         private ComboBox CommentComboBox;
         private Button TemplateButton;
         private Label PrintRowLabel;
-        private NumericUpDown PrintPostionNumericUpDown;
+        private NumericUpDown PrintPositionNumericUpDown;
         private Button RegisterButton;
         private CheckBox PrintOnlyCheckBox;
         private Button PrintButton;

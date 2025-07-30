@@ -36,9 +36,9 @@
             this.CopiesPerLabelTextBox = new TextBox();
             this.Label35 = new Label();
             this.AlignTextXCenterCheckBox = new CheckBox();
-            this.LabelTextPostionYTextBox = new TextBox();
+            this.LabelTextPositionYTextBox = new TextBox();
             this.Label33 = new Label();
-            this.LabelTextPostionXTextBox = new TextBox();
+            this.LabelTextPositionXTextBox = new TextBox();
             this.Label32 = new Label();
             this.WhiteSpaceGroupBox = new GroupBox();
             this.Label11 = new Label();
@@ -67,8 +67,8 @@
             this.Label22 = new Label();
             this.Label21 = new Label();
             this.Label20 = new Label();
-            this.HeaderPostionYTextBox = new TextBox();
-            this.HeaderPostionXTextBox = new TextBox();
+            this.HeaderPositionYTextBox = new TextBox();
+            this.HeaderPositionXTextBox = new TextBox();
             this.Label19 = new Label();
             this.Label18 = new Label();
             this.Label17 = new Label();
@@ -116,9 +116,9 @@
             this.PrintTextGroupBox.Controls.Add(this.CopiesPerLabelTextBox);
             this.PrintTextGroupBox.Controls.Add(this.Label35);
             this.PrintTextGroupBox.Controls.Add(this.AlignTextXCenterCheckBox);
-            this.PrintTextGroupBox.Controls.Add(this.LabelTextPostionYTextBox);
+            this.PrintTextGroupBox.Controls.Add(this.LabelTextPositionYTextBox);
             this.PrintTextGroupBox.Controls.Add(this.Label33);
-            this.PrintTextGroupBox.Controls.Add(this.LabelTextPostionXTextBox);
+            this.PrintTextGroupBox.Controls.Add(this.LabelTextPositionXTextBox);
             this.PrintTextGroupBox.Controls.Add(this.Label32);
             this.PrintTextGroupBox.Location = new Point(27, 309);
             this.PrintTextGroupBox.Name = "PrintTextGroupBox";
@@ -229,13 +229,13 @@
             this.AlignTextXCenterCheckBox.UseVisualStyleBackColor = true;
             this.AlignTextXCenterCheckBox.CheckedChanged += this.TextXCenterCheckBox_CheckedChanged;
             // 
-            // LabelTextPostionYTextBox
+            // LabelTextPositionYTextBox
             // 
-            this.LabelTextPostionYTextBox.Location = new Point(112, 30);
-            this.LabelTextPostionYTextBox.MaxLength = 5;
-            this.LabelTextPostionYTextBox.Name = "LabelTextPostionYTextBox";
-            this.LabelTextPostionYTextBox.Size = new Size(68, 23);
-            this.LabelTextPostionYTextBox.TabIndex = 5;
+            this.LabelTextPositionYTextBox.Location = new Point(112, 30);
+            this.LabelTextPositionYTextBox.MaxLength = 5;
+            this.LabelTextPositionYTextBox.Name = "LabelTextPositionYTextBox";
+            this.LabelTextPositionYTextBox.Size = new Size(68, 23);
+            this.LabelTextPositionYTextBox.TabIndex = 5;
             // 
             // Label33
             // 
@@ -246,13 +246,13 @@
             this.Label33.TabIndex = 4;
             this.Label33.Text = "縦位置";
             // 
-            // LabelTextPostionXTextBox
+            // LabelTextPositionXTextBox
             // 
-            this.LabelTextPostionXTextBox.Location = new Point(22, 30);
-            this.LabelTextPostionXTextBox.MaxLength = 5;
-            this.LabelTextPostionXTextBox.Name = "LabelTextPostionXTextBox";
-            this.LabelTextPostionXTextBox.Size = new Size(68, 23);
-            this.LabelTextPostionXTextBox.TabIndex = 3;
+            this.LabelTextPositionXTextBox.Location = new Point(22, 30);
+            this.LabelTextPositionXTextBox.MaxLength = 5;
+            this.LabelTextPositionXTextBox.Name = "LabelTextPositionXTextBox";
+            this.LabelTextPositionXTextBox.Size = new Size(68, 23);
+            this.LabelTextPositionXTextBox.TabIndex = 3;
             // 
             // Label32
             // 
@@ -462,8 +462,8 @@
             this.HeaderGroupBox.Controls.Add(this.Label22);
             this.HeaderGroupBox.Controls.Add(this.Label21);
             this.HeaderGroupBox.Controls.Add(this.Label20);
-            this.HeaderGroupBox.Controls.Add(this.HeaderPostionYTextBox);
-            this.HeaderGroupBox.Controls.Add(this.HeaderPostionXTextBox);
+            this.HeaderGroupBox.Controls.Add(this.HeaderPositionYTextBox);
+            this.HeaderGroupBox.Controls.Add(this.HeaderPositionXTextBox);
             this.HeaderGroupBox.Controls.Add(this.Label19);
             this.HeaderGroupBox.Controls.Add(this.Label18);
             this.HeaderGroupBox.Controls.Add(this.Label17);
@@ -530,21 +530,21 @@
             this.Label20.TabIndex = 9;
             this.Label20.Text = "mm";
             // 
-            // HeaderPostionYTextBox
+            // HeaderPositionYTextBox
             // 
-            this.HeaderPostionYTextBox.Location = new Point(168, 99);
-            this.HeaderPostionYTextBox.MaxLength = 50;
-            this.HeaderPostionYTextBox.Name = "HeaderPostionYTextBox";
-            this.HeaderPostionYTextBox.Size = new Size(64, 23);
-            this.HeaderPostionYTextBox.TabIndex = 8;
+            this.HeaderPositionYTextBox.Location = new Point(168, 99);
+            this.HeaderPositionYTextBox.MaxLength = 50;
+            this.HeaderPositionYTextBox.Name = "HeaderPositionYTextBox";
+            this.HeaderPositionYTextBox.Size = new Size(64, 23);
+            this.HeaderPositionYTextBox.TabIndex = 8;
             // 
-            // HeaderPostionXTextBox
+            // HeaderPositionXTextBox
             // 
-            this.HeaderPostionXTextBox.Location = new Point(36, 99);
-            this.HeaderPostionXTextBox.MaxLength = 50;
-            this.HeaderPostionXTextBox.Name = "HeaderPostionXTextBox";
-            this.HeaderPostionXTextBox.Size = new Size(64, 23);
-            this.HeaderPostionXTextBox.TabIndex = 7;
+            this.HeaderPositionXTextBox.Location = new Point(36, 99);
+            this.HeaderPositionXTextBox.MaxLength = 50;
+            this.HeaderPositionXTextBox.Name = "HeaderPositionXTextBox";
+            this.HeaderPositionXTextBox.Size = new Size(64, 23);
+            this.HeaderPositionXTextBox.TabIndex = 7;
             // 
             // Label19
             // 
@@ -731,9 +731,9 @@
         private TextBox CopiesPerLabelTextBox;
         private Label Label35;
         private CheckBox AlignTextXCenterCheckBox;
-        private TextBox LabelTextPostionYTextBox;
+        private TextBox LabelTextPositionYTextBox;
         private Label Label33;
-        private TextBox LabelTextPostionXTextBox;
+        private TextBox LabelTextPositionXTextBox;
         private Label Label32;
         private GroupBox WhiteSpaceGroupBox;
         private Label Label11;
@@ -762,8 +762,8 @@
         private Label Label22;
         private Label Label21;
         private Label Label20;
-        private TextBox HeaderPostionYTextBox;
-        private TextBox HeaderPostionXTextBox;
+        private TextBox HeaderPositionYTextBox;
+        private TextBox HeaderPositionXTextBox;
         private Label Label19;
         private Label Label18;
         private Label Label17;

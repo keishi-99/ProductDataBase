@@ -68,7 +68,7 @@
             this.取得情報ToolStripMenuItem = new ToolStripMenuItem();
             this.BarcodePrintButton = new Button();
             this.LabelPrintButton = new Button();
-            this.PrintPostionNumericUpDown = new NumericUpDown();
+            this.PrintPositionNumericUpDown = new NumericUpDown();
             this.PrintRowLabel = new Label();
             this.panel1 = new Panel();
             this.QrCodeTextBox = new TextBox();
@@ -79,7 +79,7 @@
             this.textToUpperCheckBox = new CheckBox();
             this.RegistrationDateTimePicker = new DateTimePicker();
             this.RePrintMenuStrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)this.PrintPostionNumericUpDown).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)this.PrintPositionNumericUpDown).BeginInit();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -566,17 +566,17 @@
             this.LabelPrintButton.UseVisualStyleBackColor = true;
             this.LabelPrintButton.Click += this.LabelPrintButton_Click;
             // 
-            // PrintPostionNumericUpDown
+            // PrintPositionNumericUpDown
             // 
-            this.PrintPostionNumericUpDown.Location = new Point(166, 406);
-            this.PrintPostionNumericUpDown.Margin = new Padding(0);
-            this.PrintPostionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
-            this.PrintPostionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            this.PrintPostionNumericUpDown.Name = "PrintPostionNumericUpDown";
-            this.PrintPostionNumericUpDown.Size = new Size(110, 23);
-            this.PrintPostionNumericUpDown.TabIndex = 118;
-            this.PrintPostionNumericUpDown.TextAlign = HorizontalAlignment.Right;
-            this.PrintPostionNumericUpDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            this.PrintPositionNumericUpDown.Location = new Point(166, 406);
+            this.PrintPositionNumericUpDown.Margin = new Padding(0);
+            this.PrintPositionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
+            this.PrintPositionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            this.PrintPositionNumericUpDown.Name = "PrintPositionNumericUpDown";
+            this.PrintPositionNumericUpDown.Size = new Size(110, 23);
+            this.PrintPositionNumericUpDown.TabIndex = 118;
+            this.PrintPositionNumericUpDown.TextAlign = HorizontalAlignment.Right;
+            this.PrintPositionNumericUpDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // PrintRowLabel
             // 
@@ -682,7 +682,7 @@
             this.Controls.Add(this.QrCodeTextBox);
             this.Controls.Add(this.BarcodePrintButton);
             this.Controls.Add(this.LabelPrintButton);
-            this.Controls.Add(this.PrintPostionNumericUpDown);
+            this.Controls.Add(this.PrintPositionNumericUpDown);
             this.Controls.Add(this.PrintRowLabel);
             this.Controls.Add(this.TemplateButton);
             this.Controls.Add(this.CommentComboBox);
@@ -730,7 +730,7 @@
             this.Load += this.RePrintWindow_Load;
             this.RePrintMenuStrip.ResumeLayout(false);
             this.RePrintMenuStrip.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)this.PrintPostionNumericUpDown).EndInit();
+            ((System.ComponentModel.ISupportInitialize)this.PrintPositionNumericUpDown).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);
@@ -779,7 +779,7 @@
         private ToolStripMenuItem 取得情報ToolStripMenuItem;
         private Button BarcodePrintButton;
         private Button LabelPrintButton;
-        private NumericUpDown PrintPostionNumericUpDown;
+        private NumericUpDown PrintPositionNumericUpDown;
         private Label PrintRowLabel;
         private Panel panel1;
         private ToolStripMenuItem 設定ToolStripMenuItem;

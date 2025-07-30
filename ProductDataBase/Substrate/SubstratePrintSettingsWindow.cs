@@ -37,8 +37,8 @@ namespace ProductDatabase {
             LabelIntervalXTextBox.Text = pageSettings.IntervalX.ToString();
             LabelIntervalYTextBox.Text = pageSettings.IntervalY.ToString();
             HeaderTextTextBox.Text = pageSettings.HeaderTextFormat;
-            HeaderPostionXTextBox.Text = pageSettings.HeaderPositionX.ToString();
-            HeaderPostionYTextBox.Text = pageSettings.HeaderPositionY.ToString();
+            HeaderPositionXTextBox.Text = pageSettings.HeaderPositionX.ToString();
+            HeaderPositionYTextBox.Text = pageSettings.HeaderPositionY.ToString();
 
             if (pageSettings.HeaderFont != null) {
                 HeaderFontDialog.Font = pageSettings.HeaderFont;
@@ -54,12 +54,12 @@ namespace ProductDatabase {
                 PrintTextFontTextBox.Text = $"{LabelFontDialog.Font.Name} {LabelFontDialog.Font.SizeInPoints}pt";
             }
 
-            LabelTextPostionXTextBox.Text = labelSettings.TextPositionX.ToString();
-            LabelTextPostionYTextBox.Text = labelSettings.TextPositionY.ToString();
+            LabelTextPositionXTextBox.Text = labelSettings.TextPositionX.ToString();
+            LabelTextPositionYTextBox.Text = labelSettings.TextPositionY.ToString();
             AlignTextXCenterCheckBox.Checked = labelSettings.AlignTextCenterX;
             AlignTextYCenterCheckBox.Checked = labelSettings.AlignTextCenterY;
 
-            LabelTextPostionXTextBox.Enabled = !AlignTextXCenterCheckBox.Checked;
+            LabelTextPositionXTextBox.Enabled = !AlignTextXCenterCheckBox.Checked;
         }
 
         private bool ValidateInput() {
@@ -72,10 +72,10 @@ namespace ProductDatabase {
                 { LabelMarginYTextBox, "マージンY" },
                 { LabelIntervalXTextBox, "間隔X" },
                 { LabelIntervalYTextBox, "間隔Y" },
-                { LabelTextPostionXTextBox, "フォント位置X" },
-                { LabelTextPostionYTextBox, "フォント位置Y" },
-                { HeaderPostionXTextBox, "ヘッダー位置X" },
-                { HeaderPostionYTextBox, "ヘッダー位置Y" },
+                { LabelTextPositionXTextBox, "フォント位置X" },
+                { LabelTextPositionYTextBox, "フォント位置Y" },
+                { HeaderPositionXTextBox, "ヘッダー位置X" },
+                { HeaderPositionYTextBox, "ヘッダー位置Y" },
             };
 
             foreach (var textBox in doubleTextBoxes) {
@@ -121,15 +121,15 @@ namespace ProductDatabase {
             SubstratePrintSettings.LabelPageSettings.MarginY = ParseDouble(LabelMarginYTextBox.Text);
             SubstratePrintSettings.LabelPageSettings.IntervalX = ParseDouble(LabelIntervalXTextBox.Text);
             SubstratePrintSettings.LabelPageSettings.IntervalY = ParseDouble(LabelIntervalYTextBox.Text);
-            SubstratePrintSettings.LabelPageSettings.HeaderPositionX = ParseDouble(HeaderPostionXTextBox.Text);
-            SubstratePrintSettings.LabelPageSettings.HeaderPositionY = ParseDouble(HeaderPostionYTextBox.Text);
+            SubstratePrintSettings.LabelPageSettings.HeaderPositionX = ParseDouble(HeaderPositionXTextBox.Text);
+            SubstratePrintSettings.LabelPageSettings.HeaderPositionY = ParseDouble(HeaderPositionYTextBox.Text);
             SubstratePrintSettings.LabelPageSettings.HeaderTextFormat = HeaderTextTextBox.Text;
             SubstratePrintSettings.LabelPageSettings.HeaderFont = HeaderFontDialog.Font;
 
             SubstratePrintSettings.LabelLayoutSettings.TextFormat = LabelFormatTextBox.Text;
             SubstratePrintSettings.LabelLayoutSettings.TextFont = LabelFontDialog.Font;
-            SubstratePrintSettings.LabelLayoutSettings.TextPositionX = ParseDouble(LabelTextPostionXTextBox.Text);
-            SubstratePrintSettings.LabelLayoutSettings.TextPositionY = ParseDouble(LabelTextPostionYTextBox.Text);
+            SubstratePrintSettings.LabelLayoutSettings.TextPositionX = ParseDouble(LabelTextPositionXTextBox.Text);
+            SubstratePrintSettings.LabelLayoutSettings.TextPositionY = ParseDouble(LabelTextPositionYTextBox.Text);
             SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterX = AlignTextXCenterCheckBox.Checked;
             SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterY = AlignTextYCenterCheckBox.Checked;
             SubstratePrintSettings.LabelLayoutSettings.CopiesPerLabel = ParseInt(CopiesPerLabelTextBox.Text);
@@ -185,8 +185,8 @@ namespace ProductDatabase {
             }
             PrintTextFontTextBox.Text = $"{LabelFontDialog.Font.Name} {LabelFontDialog.Font.SizeInPoints}pt";
         }
-        private void PrintTextXCenterCheckBox_CheckedChanged(object sender, EventArgs e) { LabelTextPostionXTextBox.Enabled = !AlignTextXCenterCheckBox.Checked; }
-        private void PrintTextYCenterCheckBox_CheckedChanged(object sender, EventArgs e) { LabelTextPostionYTextBox.Enabled = !AlignTextYCenterCheckBox.Checked; }
+        private void PrintTextXCenterCheckBox_CheckedChanged(object sender, EventArgs e) { LabelTextPositionXTextBox.Enabled = !AlignTextXCenterCheckBox.Checked; }
+        private void PrintTextYCenterCheckBox_CheckedChanged(object sender, EventArgs e) { LabelTextPositionYTextBox.Enabled = !AlignTextYCenterCheckBox.Checked; }
         private void SubstratePrintSetting_Load(object sender, EventArgs e) { LoadSettings(); }
         private void OKButton_Click(object sender, EventArgs e) {
             if (!ValidateInput()) {
