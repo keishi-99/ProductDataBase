@@ -26,8 +26,8 @@
             this.OKButton = new Button();
             this.BarcodeGroupBox = new GroupBox();
             this.FontCenterCheckBox = new CheckBox();
-            this.FontPostionYTextBox = new TextBox();
-            this.FontPostionXTextBox = new TextBox();
+            this.FontPositionYTextBox = new TextBox();
+            this.FontPositionXTextBox = new TextBox();
             this.Label37 = new Label();
             this.Label28 = new Label();
             this.Label41 = new Label();
@@ -42,9 +42,9 @@
             this.BarcodeWidthTextBox = new TextBox();
             this.Label34 = new Label();
             this.BarcodeCenterCheckBox = new CheckBox();
-            this.BarcodePostionYTextBox = new TextBox();
+            this.BarcodePositionYTextBox = new TextBox();
             this.Label33 = new Label();
-            this.BarcodePostionXTextBox = new TextBox();
+            this.BarcodePositionXTextBox = new TextBox();
             this.Label32 = new Label();
             this.BarcodeHeightTextBox = new TextBox();
             this.Label31 = new Label();
@@ -75,8 +75,8 @@
             this.Label22 = new Label();
             this.Label21 = new Label();
             this.Label20 = new Label();
-            this.BarcodeLabelHeaderPostionYTextBox = new TextBox();
-            this.BarcodeLabelHeaderPostionXTextBox = new TextBox();
+            this.BarcodeLabelHeaderPositionYTextBox = new TextBox();
+            this.BarcodeLabelHeaderPositionXTextBox = new TextBox();
             this.Label19 = new Label();
             this.Label18 = new Label();
             this.Label17 = new Label();
@@ -114,8 +114,8 @@
             // BarcodeGroupBox
             // 
             this.BarcodeGroupBox.Controls.Add(this.FontCenterCheckBox);
-            this.BarcodeGroupBox.Controls.Add(this.FontPostionYTextBox);
-            this.BarcodeGroupBox.Controls.Add(this.FontPostionXTextBox);
+            this.BarcodeGroupBox.Controls.Add(this.FontPositionYTextBox);
+            this.BarcodeGroupBox.Controls.Add(this.FontPositionXTextBox);
             this.BarcodeGroupBox.Controls.Add(this.Label37);
             this.BarcodeGroupBox.Controls.Add(this.Label28);
             this.BarcodeGroupBox.Controls.Add(this.Label41);
@@ -130,9 +130,9 @@
             this.BarcodeGroupBox.Controls.Add(this.BarcodeWidthTextBox);
             this.BarcodeGroupBox.Controls.Add(this.Label34);
             this.BarcodeGroupBox.Controls.Add(this.BarcodeCenterCheckBox);
-            this.BarcodeGroupBox.Controls.Add(this.BarcodePostionYTextBox);
+            this.BarcodeGroupBox.Controls.Add(this.BarcodePositionYTextBox);
             this.BarcodeGroupBox.Controls.Add(this.Label33);
-            this.BarcodeGroupBox.Controls.Add(this.BarcodePostionXTextBox);
+            this.BarcodeGroupBox.Controls.Add(this.BarcodePositionXTextBox);
             this.BarcodeGroupBox.Controls.Add(this.Label32);
             this.BarcodeGroupBox.Controls.Add(this.BarcodeHeightTextBox);
             this.BarcodeGroupBox.Controls.Add(this.Label31);
@@ -154,21 +154,21 @@
             this.FontCenterCheckBox.UseVisualStyleBackColor = true;
             this.FontCenterCheckBox.CheckedChanged += this.FontCenterCheckBox_CheckedChanged;
             // 
-            // FontPostionYTextBox
+            // FontPositionYTextBox
             // 
-            this.FontPostionYTextBox.Location = new Point(410, 79);
-            this.FontPostionYTextBox.MaxLength = 5;
-            this.FontPostionYTextBox.Name = "FontPostionYTextBox";
-            this.FontPostionYTextBox.Size = new Size(68, 23);
-            this.FontPostionYTextBox.TabIndex = 34;
+            this.FontPositionYTextBox.Location = new Point(410, 79);
+            this.FontPositionYTextBox.MaxLength = 5;
+            this.FontPositionYTextBox.Name = "FontPositionYTextBox";
+            this.FontPositionYTextBox.Size = new Size(68, 23);
+            this.FontPositionYTextBox.TabIndex = 34;
             // 
-            // FontPostionXTextBox
+            // FontPositionXTextBox
             // 
-            this.FontPostionXTextBox.Location = new Point(320, 79);
-            this.FontPostionXTextBox.MaxLength = 5;
-            this.FontPostionXTextBox.Name = "FontPostionXTextBox";
-            this.FontPostionXTextBox.Size = new Size(68, 23);
-            this.FontPostionXTextBox.TabIndex = 33;
+            this.FontPositionXTextBox.Location = new Point(320, 79);
+            this.FontPositionXTextBox.MaxLength = 5;
+            this.FontPositionXTextBox.Name = "FontPositionXTextBox";
+            this.FontPositionXTextBox.Size = new Size(68, 23);
+            this.FontPositionXTextBox.TabIndex = 33;
             // 
             // Label37
             // 
@@ -296,13 +296,13 @@
             this.BarcodeCenterCheckBox.UseVisualStyleBackColor = true;
             this.BarcodeCenterCheckBox.CheckedChanged += this.BarcodeCenterCheckBox_CheckedChanged;
             // 
-            // BarcodePostionYTextBox
+            // BarcodePositionYTextBox
             // 
-            this.BarcodePostionYTextBox.Location = new Point(194, 30);
-            this.BarcodePostionYTextBox.MaxLength = 5;
-            this.BarcodePostionYTextBox.Name = "BarcodePostionYTextBox";
-            this.BarcodePostionYTextBox.Size = new Size(68, 23);
-            this.BarcodePostionYTextBox.TabIndex = 5;
+            this.BarcodePositionYTextBox.Location = new Point(194, 30);
+            this.BarcodePositionYTextBox.MaxLength = 5;
+            this.BarcodePositionYTextBox.Name = "BarcodePositionYTextBox";
+            this.BarcodePositionYTextBox.Size = new Size(68, 23);
+            this.BarcodePositionYTextBox.TabIndex = 5;
             // 
             // Label33
             // 
@@ -313,13 +313,13 @@
             this.Label33.TabIndex = 4;
             this.Label33.Text = "縦位置";
             // 
-            // BarcodePostionXTextBox
+            // BarcodePositionXTextBox
             // 
-            this.BarcodePostionXTextBox.Location = new Point(104, 30);
-            this.BarcodePostionXTextBox.MaxLength = 5;
-            this.BarcodePostionXTextBox.Name = "BarcodePostionXTextBox";
-            this.BarcodePostionXTextBox.Size = new Size(68, 23);
-            this.BarcodePostionXTextBox.TabIndex = 3;
+            this.BarcodePositionXTextBox.Location = new Point(104, 30);
+            this.BarcodePositionXTextBox.MaxLength = 5;
+            this.BarcodePositionXTextBox.Name = "BarcodePositionXTextBox";
+            this.BarcodePositionXTextBox.Size = new Size(68, 23);
+            this.BarcodePositionXTextBox.TabIndex = 3;
             // 
             // Label32
             // 
@@ -546,8 +546,8 @@
             this.HeaderGroupBox.Controls.Add(this.Label22);
             this.HeaderGroupBox.Controls.Add(this.Label21);
             this.HeaderGroupBox.Controls.Add(this.Label20);
-            this.HeaderGroupBox.Controls.Add(this.BarcodeLabelHeaderPostionYTextBox);
-            this.HeaderGroupBox.Controls.Add(this.BarcodeLabelHeaderPostionXTextBox);
+            this.HeaderGroupBox.Controls.Add(this.BarcodeLabelHeaderPositionYTextBox);
+            this.HeaderGroupBox.Controls.Add(this.BarcodeLabelHeaderPositionXTextBox);
             this.HeaderGroupBox.Controls.Add(this.Label19);
             this.HeaderGroupBox.Controls.Add(this.Label18);
             this.HeaderGroupBox.Controls.Add(this.Label17);
@@ -614,21 +614,21 @@
             this.Label20.TabIndex = 9;
             this.Label20.Text = "mm";
             // 
-            // BarcodeLabelHeaderPostionYTextBox
+            // BarcodeLabelHeaderPositionYTextBox
             // 
-            this.BarcodeLabelHeaderPostionYTextBox.Location = new Point(168, 99);
-            this.BarcodeLabelHeaderPostionYTextBox.MaxLength = 50;
-            this.BarcodeLabelHeaderPostionYTextBox.Name = "BarcodeLabelHeaderPostionYTextBox";
-            this.BarcodeLabelHeaderPostionYTextBox.Size = new Size(64, 23);
-            this.BarcodeLabelHeaderPostionYTextBox.TabIndex = 8;
+            this.BarcodeLabelHeaderPositionYTextBox.Location = new Point(168, 99);
+            this.BarcodeLabelHeaderPositionYTextBox.MaxLength = 50;
+            this.BarcodeLabelHeaderPositionYTextBox.Name = "BarcodeLabelHeaderPositionYTextBox";
+            this.BarcodeLabelHeaderPositionYTextBox.Size = new Size(64, 23);
+            this.BarcodeLabelHeaderPositionYTextBox.TabIndex = 8;
             // 
-            // BarcodeLabelHeaderPostionXTextBox
+            // BarcodeLabelHeaderPositionXTextBox
             // 
-            this.BarcodeLabelHeaderPostionXTextBox.Location = new Point(36, 99);
-            this.BarcodeLabelHeaderPostionXTextBox.MaxLength = 50;
-            this.BarcodeLabelHeaderPostionXTextBox.Name = "BarcodeLabelHeaderPostionXTextBox";
-            this.BarcodeLabelHeaderPostionXTextBox.Size = new Size(64, 23);
-            this.BarcodeLabelHeaderPostionXTextBox.TabIndex = 7;
+            this.BarcodeLabelHeaderPositionXTextBox.Location = new Point(36, 99);
+            this.BarcodeLabelHeaderPositionXTextBox.MaxLength = 50;
+            this.BarcodeLabelHeaderPositionXTextBox.Name = "BarcodeLabelHeaderPositionXTextBox";
+            this.BarcodeLabelHeaderPositionXTextBox.Size = new Size(64, 23);
+            this.BarcodeLabelHeaderPositionXTextBox.TabIndex = 7;
             // 
             // Label19
             // 
@@ -815,9 +815,9 @@
         private TextBox BarcodeWidthTextBox;
         private Label Label34;
         private CheckBox BarcodeCenterCheckBox;
-        private TextBox BarcodePostionYTextBox;
+        private TextBox BarcodePositionYTextBox;
         private Label Label33;
-        private TextBox BarcodePostionXTextBox;
+        private TextBox BarcodePositionXTextBox;
         private Label Label32;
         private TextBox BarcodeHeightTextBox;
         private Label Label31;
@@ -848,8 +848,8 @@
         private Label Label22;
         private Label Label21;
         private Label Label20;
-        private TextBox BarcodeLabelHeaderPostionYTextBox;
-        private TextBox BarcodeLabelHeaderPostionXTextBox;
+        private TextBox BarcodeLabelHeaderPositionYTextBox;
+        private TextBox BarcodeLabelHeaderPositionXTextBox;
         private Label Label19;
         private Label Label18;
         private Label Label17;
@@ -864,8 +864,8 @@
         private Label Label13;
         private Label Label12;
         private CheckBox FontCenterCheckBox;
-        private TextBox FontPostionYTextBox;
-        private TextBox FontPostionXTextBox;
+        private TextBox FontPositionYTextBox;
+        private TextBox FontPositionXTextBox;
         private Label Label37;
         private Label Label28;
         private Button CloseButton;

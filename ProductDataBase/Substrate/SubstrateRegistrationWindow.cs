@@ -70,7 +70,7 @@ namespace ProductDatabase {
                 if (IsLabelPrint == false) {
                     ExtraCheckBox7.Visible = false;
                     PrintRowLabel.Visible = false;
-                    PrintPostionNumericUpDown.Visible = false;
+                    PrintPositionNumericUpDown.Visible = false;
                     PrintOnlyCheckBox.Visible = false;
                     PrintButton.Visible = false;
                 }
@@ -155,7 +155,7 @@ namespace ProductDatabase {
 
                 if (!QuantityCheckBox.Checked && !DefectNumberCheckBox.Checked) { throw new Exception("追加量か減少数を入力してください。"); }
 
-                if (!DefectNumberCheckBox.Checked && string.IsNullOrEmpty(PrintPostionNumericUpDown.Text)) { PrintPostionNumericUpDown.Text = "1"; }
+                if (!DefectNumberCheckBox.Checked && string.IsNullOrEmpty(PrintPositionNumericUpDown.Text)) { PrintPositionNumericUpDown.Text = "1"; }
 
                 var result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) {
@@ -455,7 +455,7 @@ namespace ProductDatabase {
                 var headerPositionX = LabelPageSettings.HeaderPositionX;
                 var headerPositionY = LabelPageSettings.HeaderPositionY;
                 var headerFont = LabelPageSettings.HeaderFont;
-                var startLine = (int)PrintPostionNumericUpDown.Value - 1;
+                var startLine = (int)PrintPositionNumericUpDown.Value - 1;
 
                 // ハードマージンをミリメートルに変換
                 var hardMarginX = isPreview ? 0 : e.PageSettings.HardMarginX * MmPerInch / 100;
