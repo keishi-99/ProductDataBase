@@ -2,8 +2,6 @@
 using ProductDatabase.Product;
 using System.Data;
 using System.Data.SQLite;
-using ZXing;
-using ZXing.Windows.Compatibility;
 using static ProductDatabase.MainWindow;
 using static ProductDatabase.Other.CommonUtils;
 
@@ -22,19 +20,12 @@ namespace ProductDatabase {
 
         private string[] _useSubstrate = [];
 
-        private int _remainingCount = 0;
-        private int _labelProNSerial;
-        private int _labelProNumLabelsToPrint;
-
-        private const float MmPerInch = 25.4f;
-        private const float PointsPerInch = 72.0f;
-
-        private int _pageCount = 1;
-        private System.Drawing.Printing.PrintAction _printAction;
-        private string _printerName = string.Empty;
-
-        private string _serialType = string.Empty;
         private int _serialLastNumber;
+
+        private string _lastInsertRowid;
+        private string _printerName = string.Empty;
+        private string _serialType = string.Empty;
+
         private readonly List<string> _strSerial = [];
         private readonly List<string> _checkBoxNames = [
                         "Substrate1CheckBox", "Substrate2CheckBox", "Substrate3CheckBox", "Substrate4CheckBox","Substrate5CheckBox",
@@ -129,7 +120,6 @@ namespace ProductDatabase {
             }
         }
         private void SetSerialNumbers() {
-            _labelProNSerial = ProductInfo.SerialFirstNumber;
             _serialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
         }
         private void LoadSubstrateData(SQLiteConnection connection) {
@@ -345,6 +335,11 @@ namespace ProductDatabase {
             try {
                 InsertProduct(connection);
 
+                if (ProductInfo.RegType == 9) {
+                    using var command = new SQLiteCommand("SELECT last_insert_rowid();", connection);
+                    _lastInsertRowid = command.ExecuteScalar().ToString() ?? string.Empty;
+                }
+
                 switch (ProductInfo.RegType) {
                     case 0:
                         break;
@@ -392,6 +387,11 @@ namespace ProductDatabase {
                 ;
                 """;
 
+            var comment = ProductInfo.RegType switch {
+                9 => $"製品型式[{ProductInfo.ProductModel}]\n{ProductInfo.Comment}",
+                _ => ProductInfo.Comment,
+            };
+
             ExecuteNonQuery(connection, commandText,
                 ("@ProductName", ProductInfo.ProductName),
                 ("@OrderNumber", ProductInfo.OrderNumber),
@@ -406,7 +406,7 @@ namespace ProductDatabase {
                 ("@SerialFirst", ProductInfo.SerialFirst),
                 ("@SerialLast", ProductInfo.SerialLast),
                 ("@SerialLastNumber", ProductInfo.IsSerialGeneration ? _serialLastNumber : DBNull.Value),
-                ("@Comment", ProductInfo.Comment)
+                ("@Comment", comment)
                 );
 
             ProductInfo.ProductID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {productTableName};"));
@@ -465,7 +465,7 @@ namespace ProductDatabase {
             }
         }
         private static (string substrateName, string substrateModel, string orderNumber) GetSubstrateInfo(SQLiteConnection connection, int index, string categoryName, string stockName, string substrateNumber, string[] useSubstrate) {
-                var substrateTableName = $"[{categoryName}_Substrate]";
+            var substrateTableName = $"[{categoryName}_Substrate]";
             var commandText =
                 $"""
                 SELECT
@@ -506,6 +506,10 @@ namespace ProductDatabase {
                 ;
                 """;
 
+            var comment = ProductInfo.RegType switch {
+                9 => $"サービスID[{_lastInsertRowid}]\n{ProductInfo.Comment}",
+                _ => ProductInfo.Comment,
+            };
             ExecuteNonQuery(connection, commandText,
                 ("@StockName", stockName),
                 ("@SubstrateName", substrateName),
@@ -515,7 +519,7 @@ namespace ProductDatabase {
                 ("@Decrease", 0 - useValue),
                 ("@Person", ProductInfo.Person),
                 ("@RegDate", ProductInfo.RegDate),
-                ("@Comment", ProductInfo.Comment),
+                ("@Comment", comment),
                 ("@UseID", useID)
                 );
         }
@@ -867,11 +871,6 @@ namespace ProductDatabase {
         }
         public ServiceInformation ServiceInfo { get; set; } = new();
 
-        // ミリメートルをピクセルに変換するヘルパーメソッド
-        private static float ConvertMmToPixel(double mm, float dpi) {
-            const float MmPerInch = 25.4f;
-            return (float)(mm / MmPerInch * dpi);
-        }
         // 印刷処理
         private bool Print(bool isPrint) {
             try {
@@ -890,13 +889,12 @@ namespace ProductDatabase {
                     CommonUtils.PrintManager.Reset(ProductInfo, ProductPrintSettings);
                 };
                 pd.PrintPage += (sender, e) => {
-                    bool hasMore = CommonUtils.PrintManager.PrintSerial(e, isPreview, serialType, startLine);
+                    var hasMore = CommonUtils.PrintManager.PrintSerial(e, isPreview, serialType, startLine);
                     e.HasMorePages = hasMore;
                 };
 
 
                 _printerName = pd.PrinterSettings.PrinterName;
-                _pageCount = 1;
 
                 switch (isPreview) {
                     case false:
