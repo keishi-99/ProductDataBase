@@ -1,5 +1,5 @@
 ﻿namespace ProductDatabase {
-    partial class ProductPrintSettingsWindow {
+    partial class ProductLabelSettingsWindow {
         /// <summary>
         /// Required designer variable.
         /// </summary>
