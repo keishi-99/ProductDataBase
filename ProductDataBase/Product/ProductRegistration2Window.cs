@@ -9,10 +9,10 @@ namespace ProductDatabase {
     public partial class ProductRegistration2Window : Form {
 
         public ProductPrintSettings ProductPrintSettings { get; set; } = new ProductPrintSettings();
-        public LabelPageSettings LabelPageSettings => ProductPrintSettings.LabelPageSettings ?? new LabelPageSettings();
-        public BarcodePageSettings BarcodePageSettings => ProductPrintSettings.BarcodePageSettings ?? new BarcodePageSettings();
-        public LabelLayoutSettings LabelLayoutSettings => ProductPrintSettings.LabelLayoutSettings ?? new LabelLayoutSettings();
-        public BarcodeLayoutSettings BarcodeLayoutSettings => ProductPrintSettings.BarcodeLayoutSettings ?? new BarcodeLayoutSettings();
+        public PrintPageSettings LabelPageSettings => ProductPrintSettings.LabelPageSettings ?? new PrintPageSettings();
+        public PrintPageSettings BarcodePageSettings => ProductPrintSettings.BarcodePageSettings ?? new PrintPageSettings();
+        public PrintLayoutSettings LabelLayoutSettings => ProductPrintSettings.LabelLayoutSettings ?? new PrintLayoutSettings();
+        public PrintLayoutSettings BarcodeLayoutSettings => ProductPrintSettings.BarcodeLayoutSettings ?? new PrintLayoutSettings();
 
         public string printSettingPath = string.Empty;
 
@@ -886,7 +886,7 @@ namespace ProductDatabase {
                 };
 
                 pd.BeginPrint += (sender, e) => {
-                    CommonUtils.PrintManager.Reset(ProductInfo, ProductPrintSettings);
+                    CommonUtils.PrintManager.Initialize(ProductInfo, ProductPrintSettings);
                 };
                 pd.PrintPage += (sender, e) => {
                     var hasMore = CommonUtils.PrintManager.PrintSerial(e, isPreview, serialType, startLine);
