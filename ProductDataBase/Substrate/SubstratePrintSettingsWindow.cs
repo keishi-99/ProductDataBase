@@ -1,13 +1,13 @@
-﻿using ProductDatabase.Substrate;
-using System.Text.Encodings.Web;
+﻿using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
+using static ProductDatabase.Other.PrintOptions;
 
 namespace ProductDatabase {
     public partial class SubstratePrintSettingsWindow : Form {
 
-        public SubstratePrintSettings SubstratePrintSettings { get; set; } = new SubstratePrintSettings();
+        public DocumentPrintSettings SubstratePrintSettings { get; set; } = new DocumentPrintSettings();
         public static readonly string s_substratePrintSettingFilePath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
         private JsonSerializerOptions? _jsonSerializerOptions;
 
@@ -17,17 +17,27 @@ namespace ProductDatabase {
 
         private void LoadSettings() {
             if (Owner is SubstrateRegistrationWindow substrateWindow) {
-                SubstratePrintSettings = substrateWindow.SubstratePrintSettings;
-                SetPageSettings(SubstratePrintSettings.LabelPageSettings);
-                SetLabelSettings(SubstratePrintSettings.LabelLayoutSettings);
+                LoadSettingsFromWindow(substrateWindow.SubstratePrintSettings);
             }
             else {
                 MessageBox.Show("この画面を開くには正しいウィンドウから開いてください。");
                 Close();
             }
         }
+        private void LoadSettingsFromWindow(DocumentPrintSettings settings) {
+            SubstratePrintSettings = settings;
 
-        private void SetPageSettings(Substrate.LabelPageSettings pageSettings) {
+            if (SubstratePrintSettings.LabelPageSettings == null || SubstratePrintSettings.LabelLayoutSettings == null) {
+                MessageBox.Show("設定が読み込まれませんでした。");
+                Close();
+                return;
+            }
+
+            SetPageSettings(SubstratePrintSettings.LabelPageSettings);
+            SetLabelSettings(SubstratePrintSettings.LabelLayoutSettings);
+        }
+
+        private void SetPageSettings(PrintPageSettings pageSettings) {
             LabelWidthTextBox.Text = pageSettings.LabelWidth.ToString();
             LabelHeightTextBox.Text = pageSettings.LabelHeight.ToString();
             LabelsPerRowTextBox.Text = pageSettings.LabelsPerRow.ToString();
@@ -45,7 +55,7 @@ namespace ProductDatabase {
                 HeaderFontTextBox.Text = $"{HeaderFontDialog.Font.Name} {HeaderFontDialog.Font.SizeInPoints}pt";
             }
         }
-        private void SetLabelSettings(Substrate.LabelLayoutSettings labelSettings) {
+        private void SetLabelSettings(PrintLayoutSettings labelSettings) {
             CopiesPerLabelTextBox.Text = labelSettings.CopiesPerLabel.ToString();
             LabelFormatTextBox.Text = labelSettings.TextFormat;
 
@@ -113,27 +123,38 @@ namespace ProductDatabase {
             return true;
         }
         private void UpdateSubstratePrintSettings() {
-            SubstratePrintSettings.LabelPageSettings.LabelWidth = ParseDouble(LabelWidthTextBox.Text);
-            SubstratePrintSettings.LabelPageSettings.LabelHeight = ParseDouble(LabelHeightTextBox.Text);
-            SubstratePrintSettings.LabelPageSettings.LabelsPerRow = ParseInt(LabelsPerRowTextBox.Text);
-            SubstratePrintSettings.LabelPageSettings.LabelsPerColumn = ParseInt(LabelsPerColumnTextBox.Text);
-            SubstratePrintSettings.LabelPageSettings.MarginX = ParseDouble(LabelMarginXTextBox.Text);
-            SubstratePrintSettings.LabelPageSettings.MarginY = ParseDouble(LabelMarginYTextBox.Text);
-            SubstratePrintSettings.LabelPageSettings.IntervalX = ParseDouble(LabelIntervalXTextBox.Text);
-            SubstratePrintSettings.LabelPageSettings.IntervalY = ParseDouble(LabelIntervalYTextBox.Text);
-            SubstratePrintSettings.LabelPageSettings.HeaderPositionX = ParseDouble(HeaderPositionXTextBox.Text);
-            SubstratePrintSettings.LabelPageSettings.HeaderPositionY = ParseDouble(HeaderPositionYTextBox.Text);
-            SubstratePrintSettings.LabelPageSettings.HeaderTextFormat = HeaderTextTextBox.Text;
-            SubstratePrintSettings.LabelPageSettings.HeaderFont = HeaderFontDialog.Font;
+            if (SubstratePrintSettings.LabelPageSettings != null) {
+                SubstratePrintSettings.LabelPageSettings.LabelWidth = ParseDouble(LabelWidthTextBox.Text);
+                SubstratePrintSettings.LabelPageSettings.LabelHeight = ParseDouble(LabelHeightTextBox.Text);
+                SubstratePrintSettings.LabelPageSettings.LabelsPerRow = ParseInt(LabelsPerRowTextBox.Text);
+                SubstratePrintSettings.LabelPageSettings.LabelsPerColumn = ParseInt(LabelsPerColumnTextBox.Text);
+                SubstratePrintSettings.LabelPageSettings.MarginX = ParseDouble(LabelMarginXTextBox.Text);
+                SubstratePrintSettings.LabelPageSettings.MarginY = ParseDouble(LabelMarginYTextBox.Text);
+                SubstratePrintSettings.LabelPageSettings.IntervalX = ParseDouble(LabelIntervalXTextBox.Text);
+                SubstratePrintSettings.LabelPageSettings.IntervalY = ParseDouble(LabelIntervalYTextBox.Text);
+                SubstratePrintSettings.LabelPageSettings.HeaderPositionX = ParseDouble(HeaderPositionXTextBox.Text);
+                SubstratePrintSettings.LabelPageSettings.HeaderPositionY = ParseDouble(HeaderPositionYTextBox.Text);
+                SubstratePrintSettings.LabelPageSettings.HeaderTextFormat = HeaderTextTextBox.Text;
+                SubstratePrintSettings.LabelPageSettings.HeaderFont = HeaderFontDialog.Font;
+            }
 
-            SubstratePrintSettings.LabelLayoutSettings.TextFormat = LabelFormatTextBox.Text;
-            SubstratePrintSettings.LabelLayoutSettings.TextFont = LabelFontDialog.Font;
-            SubstratePrintSettings.LabelLayoutSettings.TextPositionX = ParseDouble(LabelTextPositionXTextBox.Text);
-            SubstratePrintSettings.LabelLayoutSettings.TextPositionY = ParseDouble(LabelTextPositionYTextBox.Text);
-            SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterX = AlignTextXCenterCheckBox.Checked;
-            SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterY = AlignTextYCenterCheckBox.Checked;
-            SubstratePrintSettings.LabelLayoutSettings.CopiesPerLabel = ParseInt(CopiesPerLabelTextBox.Text);
+            if (SubstratePrintSettings.LabelLayoutSettings != null) {
+                SubstratePrintSettings.LabelLayoutSettings.TextFont = LabelFontDialog.Font;
+                SubstratePrintSettings.LabelLayoutSettings.TextPositionX = ParseDouble(LabelTextPositionXTextBox.Text);
+                SubstratePrintSettings.LabelLayoutSettings.TextPositionY = ParseDouble(LabelTextPositionYTextBox.Text);
+                SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterX = AlignTextXCenterCheckBox.Checked;
+                SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterY = AlignTextYCenterCheckBox.Checked;
+                SubstratePrintSettings.LabelLayoutSettings.CopiesPerLabel = ParseInt(CopiesPerLabelTextBox.Text);
+                SubstratePrintSettings.LabelLayoutSettings.TextFormat = LabelFormatTextBox.Text;
+                SubstratePrintSettings.LabelLayoutSettings.TextFont = LabelFontDialog.Font;
+                SubstratePrintSettings.LabelLayoutSettings.TextPositionX = ParseDouble(LabelTextPositionXTextBox.Text);
+                SubstratePrintSettings.LabelLayoutSettings.TextPositionY = ParseDouble(LabelTextPositionYTextBox.Text);
+                SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterX = AlignTextXCenterCheckBox.Checked;
+                SubstratePrintSettings.LabelLayoutSettings.AlignTextCenterY = AlignTextYCenterCheckBox.Checked;
+                SubstratePrintSettings.LabelLayoutSettings.CopiesPerLabel = ParseInt(CopiesPerLabelTextBox.Text);
+            }
         }
+
         private static double ParseDouble(string text) {
             if (double.TryParse(text, out var value)) {
                 return value;

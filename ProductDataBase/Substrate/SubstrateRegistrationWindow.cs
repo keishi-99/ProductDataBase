@@ -1,18 +1,17 @@
 ﻿using ProductDatabase.Other;
-using ProductDatabase.Product;
-using ProductDatabase.Substrate;
 using System.Data;
 using System.Data.SQLite;
 using static ProductDatabase.MainWindow;
+using static ProductDatabase.Other.PrintOptions;
 
 namespace ProductDatabase {
     public partial class SubstrateRegistrationWindow : Form {
 
         public ProductInformation ProductInfo { get; }
 
-        public SubstratePrintSettings SubstratePrintSettings { get; set; } = new SubstratePrintSettings();
-        public Substrate.LabelPageSettings LabelPageSettings => SubstratePrintSettings.LabelPageSettings ?? new Substrate.LabelPageSettings();
-        public Substrate.LabelLayoutSettings LabelLayoutSettings => SubstratePrintSettings.LabelLayoutSettings ?? new Substrate.LabelLayoutSettings();
+        public DocumentPrintSettings SubstratePrintSettings { get; set; } = new DocumentPrintSettings();
+        public PrintPageSettings LabelPageSettings => SubstratePrintSettings.LabelPageSettings ?? new PrintPageSettings();
+        public PrintLayoutSettings LabelLayoutSettings => SubstratePrintSettings.LabelLayoutSettings ?? new PrintLayoutSettings();
         private readonly string _printSettingPath = SubstratePrintSettingsWindow.s_substratePrintSettingFilePath;
 
         private string _labelSubNSerial = string.Empty;
@@ -76,7 +75,7 @@ namespace ProductDatabase {
                 }
 
                 if (File.Exists(_printSettingPath) == false) { throw new Exception("印刷設定ファイルが見つかりませんでした"); }
-                SubstratePrintSettings = new SubstratePrintSettings();
+                SubstratePrintSettings = new DocumentPrintSettings();
                 LoadSettings(_printSettingPath);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -87,7 +86,7 @@ namespace ProductDatabase {
         private void LoadSettings(string settingFilePath) {
             try {
                 var jsonString = File.ReadAllText(settingFilePath);
-                SubstratePrintSettings = System.Text.Json.JsonSerializer.Deserialize<SubstratePrintSettings>(jsonString) ?? new SubstratePrintSettings();
+                SubstratePrintSettings = System.Text.Json.JsonSerializer.Deserialize<DocumentPrintSettings>(jsonString) ?? new DocumentPrintSettings();
             } catch (Exception ex) {
                 MessageBox.Show($"設定ファイルの読み込みに失敗しました。{Environment.NewLine}{ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
