@@ -11,20 +11,15 @@ namespace ProductDatabase {
     public partial class RePrintWindow : Form {
 
         public ProductPrintSettings ProductPrintSettings { get; set; } = new ProductPrintSettings();
-        public LabelPageSettings LabelPageSettings => ProductPrintSettings.LabelPageSettings ?? new LabelPageSettings();
-        public BarcodePageSettings BarcodePageSettings => ProductPrintSettings.BarcodePageSettings ?? new BarcodePageSettings();
-        public LabelLayoutSettings LabelLayoutSettings => ProductPrintSettings.LabelLayoutSettings ?? new LabelLayoutSettings();
-        public BarcodeLayoutSettings BarcodeLayoutSettings => ProductPrintSettings.BarcodeLayoutSettings ?? new BarcodeLayoutSettings();
+        public PrintPageSettings LabelPageSettings => this.ProductPrintSettings.LabelPageSettings ?? new PrintPageSettings();
+        public PrintPageSettings BarcodePageSettings => ProductPrintSettings.BarcodePageSettings ?? new PrintPageSettings();
+        public PrintLayoutSettings LabelLayoutSettings => this.ProductPrintSettings.LabelLayoutSettings ?? new PrintLayoutSettings();
+        public PrintLayoutSettings BarcodeLayoutSettings => ProductPrintSettings.BarcodeLayoutSettings ?? new PrintLayoutSettings();
 
         public string printSettingPath = string.Empty;
 
         public ProductInformation ProductInfo { get; }
 
-        private int _remainingCount;
-        private int _labelProNSerial;
-        private int _labelProNumLabelsToPrint;
-
-        private int _pageCount = 1;
         //private System.Drawing.Printing.PrintAction _printAction;
         private string _printerName = string.Empty;
 
@@ -294,11 +289,7 @@ namespace ProductDatabase {
             _strSerialLastNumber = GenerateCode(ProductInfo.SerialLastNumber);
             return true;
         }
-        // ミリメートルをピクセルに変換するヘルパーメソッド
-        private static float ConvertMmToPixel(double mm, float dpi) {
-            const float MmPerInch = 25.4f;
-            return (float)(mm / MmPerInch * dpi);
-        }
+
         // 印刷処理
         private bool Print(bool isPrint) {
             try {
@@ -311,16 +302,14 @@ namespace ProductDatabase {
 
                 pd.BeginPrint += (sender, e) =>
                 {
-                    CommonUtils.PrintManager.Reset(ProductInfo, ProductPrintSettings);
+                    CommonUtils.PrintManager.Initialize(ProductInfo, ProductPrintSettings);
                 };
                 pd.PrintPage += (sender, e) => {
                     bool hasMore = CommonUtils.PrintManager.PrintSerial(e, isPreview, serialType, startLine);
                     e.HasMorePages = hasMore;
                 };
 
-
                 _printerName = pd.PrinterSettings.PrinterName;
-                _pageCount = 1;
 
                 switch (isPreview) {
                     case false:

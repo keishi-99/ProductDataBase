@@ -38,7 +38,7 @@ namespace ProductDatabase {
             SetLabelSettings(ProductPrintSettings.BarcodeLayoutSettings);
         }
 
-        private void SetLabelSettings(BarcodeLayoutSettings? labelSettings) {
+        private void SetLabelSettings(PrintLayoutSettings? labelSettings) {
             if (labelSettings != null) {
                 BarcodeHeightTextBox.Text = labelSettings.BarcodeHeight.ToString();
                 BarcodeWidthTextBox.Text = labelSettings.BarcodeWidth.ToString();
@@ -61,7 +61,7 @@ namespace ProductDatabase {
             BarcodePositionXTextBox.Enabled = !BarcodeCenterCheckBox.Checked;
             FontPositionXTextBox.Enabled = !FontCenterCheckBox.Checked;
         }
-        private void SetPageSettings(BarcodePageSettings? pageSettings) {
+        private void SetPageSettings(PrintPageSettings? pageSettings) {
             if (pageSettings != null) {
                 BarcodeLabelWidthTextBox.Text = pageSettings.LabelWidth.ToString();
                 BarcodeLabelHeightTextBox.Text = pageSettings.LabelHeight.ToString();

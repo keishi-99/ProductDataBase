@@ -38,7 +38,7 @@ namespace ProductDatabase {
             SetLabelSettings(ProductPrintSettings.LabelLayoutSettings);
         }
 
-        private void SetLabelSettings(Product.LabelLayoutSettings? labelSettings) {
+        private void SetLabelSettings(PrintLayoutSettings? labelSettings) {
             if (labelSettings != null) {
                 CopiesPerLabelTextBox.Text = labelSettings.CopiesPerLabel.ToString();
                 LabelFormatTextBox.Text = labelSettings.TextFormat;
@@ -55,7 +55,7 @@ namespace ProductDatabase {
             }
             LabelTextPositionXTextBox.Enabled = !AlignTextXCenterCheckBox.Checked;
         }
-        private void SetPageSettings(Product.LabelPageSettings? pageSettings) {
+        private void SetPageSettings(PrintPageSettings? pageSettings) {
             if (pageSettings != null) {
                 LabelWidthTextBox.Text = pageSettings.LabelWidth.ToString();
                 LabelHeightTextBox.Text = pageSettings.LabelHeight.ToString();
