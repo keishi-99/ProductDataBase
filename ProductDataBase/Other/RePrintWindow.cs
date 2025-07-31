@@ -549,7 +549,7 @@ namespace ProductDatabase {
             RegisterCheck(false);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            ProductPrintSettingsWindow ls = new() {
+            ProductLabelSettingsWindow ls = new() {
                 ProductInfo = ProductInfo
             };
             ls.ShowDialog(this);

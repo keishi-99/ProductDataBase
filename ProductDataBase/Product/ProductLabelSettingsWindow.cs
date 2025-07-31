@@ -6,7 +6,7 @@ using System.Text.Unicode;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
-    public partial class ProductPrintSettingsWindow : Form {
+    public partial class ProductLabelSettingsWindow : Form {
 
         public ProductPrintSettings ProductPrintSettings { get; set; } = new ProductPrintSettings();
         private string _productPrintSettingFilePath = string.Empty;
@@ -14,7 +14,7 @@ namespace ProductDatabase {
 
         public ProductInformation ProductInfo { get; set; } = new ProductInformation();
 
-        public ProductPrintSettingsWindow() {
+        public ProductLabelSettingsWindow() {
             InitializeComponent();
         }
 
