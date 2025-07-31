@@ -1,14 +1,14 @@
-﻿using ProductDatabase.Product;
-using System.Text.Encodings.Web;
+﻿using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using static ProductDatabase.MainWindow;
+using static ProductDatabase.Other.PrintOptions;
 
 namespace ProductDatabase {
     public partial class ProductBarcodeSettingsWindow : Form {
 
-        public ProductPrintSettings ProductPrintSettings { get; set; } = new ProductPrintSettings();
+        public DocumentPrintSettings  ProductPrintSettings { get; set; } = new DocumentPrintSettings ();
         private string _productPrintSettingFilePath = string.Empty;
         private JsonSerializerOptions? _jsonSerializerOptions;
 
@@ -30,7 +30,7 @@ namespace ProductDatabase {
                 Close();
             }
         }
-        private void LoadSettingsFromWindow(ProductPrintSettings settings, string filePath) {
+        private void LoadSettingsFromWindow(DocumentPrintSettings  settings, string filePath) {
             ProductPrintSettings = settings;
             _productPrintSettingFilePath = filePath;
 

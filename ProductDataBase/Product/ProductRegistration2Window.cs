@@ -1,14 +1,14 @@
 ﻿using ProductDatabase.Other;
-using ProductDatabase.Product;
 using System.Data;
 using System.Data.SQLite;
 using static ProductDatabase.MainWindow;
 using static ProductDatabase.Other.CommonUtils;
+using static ProductDatabase.Other.PrintOptions;
 
 namespace ProductDatabase {
     public partial class ProductRegistration2Window : Form {
 
-        public ProductPrintSettings ProductPrintSettings { get; set; } = new ProductPrintSettings();
+        public DocumentPrintSettings  ProductPrintSettings { get; set; } = new DocumentPrintSettings ();
         public PrintPageSettings LabelPageSettings => ProductPrintSettings.LabelPageSettings ?? new PrintPageSettings();
         public PrintPageSettings BarcodePageSettings => ProductPrintSettings.BarcodePageSettings ?? new PrintPageSettings();
         public PrintLayoutSettings LabelLayoutSettings => ProductPrintSettings.LabelLayoutSettings ?? new PrintLayoutSettings();
@@ -279,13 +279,13 @@ namespace ProductDatabase {
         }
         private void LoadSettings() {
             try {
-                ProductPrintSettings = new ProductPrintSettings();
+                ProductPrintSettings = new DocumentPrintSettings ();
                 printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", ProductInfo.CategoryName, ProductInfo.ProductName, $"PrintConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.json");
                 if (!File.Exists(printSettingPath)) {
                     throw new DirectoryNotFoundException($"印刷用設定ファイルがありません。");
                 }
                 var jsonString = File.ReadAllText(printSettingPath);
-                ProductPrintSettings = System.Text.Json.JsonSerializer.Deserialize<ProductPrintSettings>(jsonString) ?? new ProductPrintSettings();
+                ProductPrintSettings = System.Text.Json.JsonSerializer.Deserialize<DocumentPrintSettings >(jsonString) ?? new DocumentPrintSettings ();
             } catch (Exception ex) {
                 MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -886,10 +886,10 @@ namespace ProductDatabase {
                 };
 
                 pd.BeginPrint += (sender, e) => {
-                    CommonUtils.PrintManager.Initialize(ProductInfo, ProductPrintSettings);
+                    PrintManager.Initialize(ProductInfo, ProductPrintSettings);
                 };
                 pd.PrintPage += (sender, e) => {
-                    var hasMore = CommonUtils.PrintManager.PrintSerial(e, isPreview, serialType, startLine);
+                    var hasMore = PrintManager.PrintSerial(e, isPreview, serialType, startLine);
                     e.HasMorePages = hasMore;
                 };
 

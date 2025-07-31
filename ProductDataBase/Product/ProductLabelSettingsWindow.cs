@@ -1,14 +1,15 @@
-﻿using ProductDatabase.Product;
+﻿
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using static ProductDatabase.MainWindow;
+using static ProductDatabase.Other.PrintOptions;
 
 namespace ProductDatabase {
     public partial class ProductLabelSettingsWindow : Form {
 
-        public ProductPrintSettings ProductPrintSettings { get; set; } = new ProductPrintSettings();
+        public DocumentPrintSettings  ProductPrintSettings { get; set; } = new DocumentPrintSettings ();
         private string _productPrintSettingFilePath = string.Empty;
         private JsonSerializerOptions? _jsonSerializerOptions;
 
@@ -30,49 +31,53 @@ namespace ProductDatabase {
                 Close();
             }
         }
-        private void LoadSettingsFromWindow(ProductPrintSettings settings, string filePath) {
+        private void LoadSettingsFromWindow(DocumentPrintSettings  settings, string filePath) {
             ProductPrintSettings = settings;
             _productPrintSettingFilePath = filePath;
+
+            if (ProductPrintSettings.LabelPageSettings == null || ProductPrintSettings.LabelLayoutSettings == null) {
+                MessageBox.Show("設定が読み込まれませんでした。");
+                Close();
+                return;
+            }
 
             SetPageSettings(ProductPrintSettings.LabelPageSettings);
             SetLabelSettings(ProductPrintSettings.LabelLayoutSettings);
         }
 
-        private void SetLabelSettings(PrintLayoutSettings? labelSettings) {
-            if (labelSettings != null) {
-                CopiesPerLabelTextBox.Text = labelSettings.CopiesPerLabel.ToString();
-                LabelFormatTextBox.Text = labelSettings.TextFormat;
+        private void SetLabelSettings(PrintLayoutSettings labelSettings) {
+            CopiesPerLabelTextBox.Text = labelSettings.CopiesPerLabel.ToString();
+            LabelFormatTextBox.Text = labelSettings.TextFormat;
 
-                if (labelSettings.TextFont != null) {
-                    LabelFontDialog.Font = labelSettings.TextFont;
-                    PrintTextFontTextBox.Text = $"{LabelFontDialog.Font.Name} {LabelFontDialog.Font.SizeInPoints}pt";
-                }
-
-                LabelTextPositionXTextBox.Text = labelSettings.TextPositionX.ToString();
-                LabelTextPositionYTextBox.Text = labelSettings.TextPositionY.ToString();
-                AlignTextXCenterCheckBox.Checked = labelSettings.AlignTextCenterX;
-                AlignTextYCenterCheckBox.Checked = labelSettings.AlignTextCenterY;
+            if (labelSettings.TextFont != null) {
+                LabelFontDialog.Font = labelSettings.TextFont;
+                PrintTextFontTextBox.Text = $"{LabelFontDialog.Font.Name} {LabelFontDialog.Font.SizeInPoints}pt";
             }
+
+            LabelTextPositionXTextBox.Text = labelSettings.TextPositionX.ToString();
+            LabelTextPositionYTextBox.Text = labelSettings.TextPositionY.ToString();
+            AlignTextXCenterCheckBox.Checked = labelSettings.AlignTextCenterX;
+            AlignTextYCenterCheckBox.Checked = labelSettings.AlignTextCenterY;
+
             LabelTextPositionXTextBox.Enabled = !AlignTextXCenterCheckBox.Checked;
         }
-        private void SetPageSettings(PrintPageSettings? pageSettings) {
-            if (pageSettings != null) {
-                LabelWidthTextBox.Text = pageSettings.LabelWidth.ToString();
-                LabelHeightTextBox.Text = pageSettings.LabelHeight.ToString();
-                LabelsPerColumnTextBox.Text = pageSettings.LabelsPerColumn.ToString();
-                LabelsPerRowTextBox.Text = pageSettings.LabelsPerRow.ToString();
-                LabelMarginXTextBox.Text = pageSettings.MarginX.ToString();
-                LabelMarginYTextBox.Text = pageSettings.MarginY.ToString();
-                LabelIntervalXTextBox.Text = pageSettings.IntervalX.ToString();
-                LabelIntervalYTextBox.Text = pageSettings.IntervalY.ToString();
-                HeaderTextTextBox.Text = pageSettings.HeaderTextFormat;
-                HeaderPositionXTextBox.Text = pageSettings.HeaderPositionX.ToString();
-                HeaderPositionYTextBox.Text = pageSettings.HeaderPositionY.ToString();
+        private void SetPageSettings(PrintPageSettings pageSettings) {
+            LabelWidthTextBox.Text = pageSettings.LabelWidth.ToString();
+            LabelHeightTextBox.Text = pageSettings.LabelHeight.ToString();
+            LabelsPerColumnTextBox.Text = pageSettings.LabelsPerColumn.ToString();
+            LabelsPerRowTextBox.Text = pageSettings.LabelsPerRow.ToString();
+            LabelMarginXTextBox.Text = pageSettings.MarginX.ToString();
+            LabelMarginYTextBox.Text = pageSettings.MarginY.ToString();
+            LabelIntervalXTextBox.Text = pageSettings.IntervalX.ToString();
+            LabelIntervalYTextBox.Text = pageSettings.IntervalY.ToString();
+            HeaderTextTextBox.Text = pageSettings.HeaderTextFormat;
+            HeaderPositionXTextBox.Text = pageSettings.HeaderPositionX.ToString();
+            HeaderPositionYTextBox.Text = pageSettings.HeaderPositionY.ToString();
 
-                if (pageSettings.HeaderFont != null) {
-                    HeaderFontDialog.Font = pageSettings.HeaderFont;
-                    HeaderFontTextBox.Text = $"{HeaderFontDialog.Font.Name} {HeaderFontDialog.Font.SizeInPoints}pt";
-                }
+            if (pageSettings.HeaderFont != null) {
+                HeaderFontDialog.Font = pageSettings.HeaderFont;
+                HeaderFontTextBox.Text = $"{HeaderFontDialog.Font.Name} {HeaderFontDialog.Font.SizeInPoints}pt";
+
             }
         }
 
