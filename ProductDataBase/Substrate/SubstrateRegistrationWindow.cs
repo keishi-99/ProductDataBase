@@ -14,15 +14,6 @@ namespace ProductDatabase {
         public PrintLayoutSettings LabelLayoutSettings => SubstratePrintSettings.LabelLayoutSettings ?? new PrintLayoutSettings();
         private readonly string _printSettingPath = SubstratePrintSettingsWindow.s_substratePrintSettingFilePath;
 
-        private string _labelSubNSerial = string.Empty;
-
-        private int _labelSubNumLabelsToPrint;
-
-        private const float MmPerInch = 25.4f;
-
-        private int _pageCount;
-        private System.Drawing.Printing.PrintAction _printAction;
-
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectNumberCheckBox",
                     "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
@@ -93,96 +84,34 @@ namespace ProductDatabase {
             }
         }
         // 登録処理
-        private void RegisterCheck() {
+        private void RegisterCheck(bool isPrint) {
             try {
                 // 印刷のみにチェックがある場合処理をしない
                 if (PrintOnlyCheckBox.Checked) { return; }
 
-                // 入力フォームのチェック
-                var anyTextBoxEnabled = false;
-                var allTextBoxesFilled = true;
-
-                foreach (Control control in Controls) {
-                    if (control is TextBoxBase textBox && textBox.Enabled) {
-                        anyTextBoxEnabled = true;
-                        if (string.IsNullOrWhiteSpace(textBox.Text) && textBox.Name != "QrCodeTextBox") {
-                            allTextBoxesFilled = false;
-                            break;
-                        }
-                    }
-                }
-                if (!anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
-                if (!allTextBoxesFilled || (PersonCheckBox.Checked && string.IsNullOrWhiteSpace(PersonComboBox.Text))) { throw new Exception("空欄があります。"); }
-
-                if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
-
-                if (QuantityCheckBox.Checked) {
-                    if (string.IsNullOrWhiteSpace(QuantityTextBox.Text)) {
-                        MessageBox.Show("数量を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        QuantityTextBox.Focus();
-                        return;
-                    }
-                    if (!int.TryParse(QuantityTextBox.Text, out var quantity)) {
-                        MessageBox.Show("数量は有効な数値を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        QuantityTextBox.Focus();
-                        return;
-                    }
-                    if (quantity <= 0) {
-                        MessageBox.Show("1台以上入力して下さい。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        QuantityTextBox.Focus();
-                        return;
-                    }
-                }
-
-                if (DefectNumberCheckBox.Checked) {
-                    if (string.IsNullOrWhiteSpace(DefectNumberTextBox.Text)) {
-                        MessageBox.Show("数量を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        DefectNumberTextBox.Focus();
-                        return;
-                    }
-                    if (!int.TryParse(DefectNumberTextBox.Text, out var quantity)) {
-                        MessageBox.Show("数量は有効な数値を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        DefectNumberTextBox.Focus();
-                        return;
-                    }
-                    if (quantity <= 0) {
-                        MessageBox.Show("1台以上入力して下さい。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        DefectNumberTextBox.Focus();
-                        return;
-                    }
-                }
-
-                if (!QuantityCheckBox.Checked && !DefectNumberCheckBox.Checked) { throw new Exception("追加量か減少数を入力してください。"); }
-
-                if (!DefectNumberCheckBox.Checked && string.IsNullOrEmpty(PrintPositionNumericUpDown.Text)) { PrintPositionNumericUpDown.Text = "1"; }
-
-                var result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                if (result == DialogResult.Cancel) {
-                    return;
-                }
+                FormCheck();
+                if (!DataCheck()) { return; }
 
                 RegisterButton.Enabled = false;
 
-                if (!Registration()) { return; }
-
-                ProductInfo.Person = PersonComboBox.Text;
+                if (isPrint && !Registration()) {
+                    return;
+                }
 
                 if (IsLabelPrint) {
                     if (QuantityCheckBox.Checked) {
-                        MessageBox.Show("登録完了 続けて印刷します。");
-                        PrintStart();
-                        MessageBox.Show("印刷完了");
-                        Close();
+                        if (isPrint) { MessageBox.Show("登録完了 続けて印刷します。"); }
+                        PrintStart(isPrint);
                     }
-                    if (DefectNumberCheckBox.Checked) {
+                    if (DefectQuantityCheckBox.Checked) {
                         MessageBox.Show("登録完了");
-                        Close();
                     }
                 }
                 else {
                     MessageBox.Show("登録完了");
-                    Close();
                 }
+                Close();
+
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
@@ -195,13 +124,13 @@ namespace ProductDatabase {
             using var transaction = connection.BeginTransaction();
             try {
                 var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
-                var substrateNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
-                var orderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
-                var quantity = string.IsNullOrWhiteSpace(QuantityTextBox.Text) ? 0 : Convert.ToInt32(QuantityTextBox.Text);
-                var defectNumber = string.IsNullOrWhiteSpace(DefectNumberTextBox.Text) ? 0 : Convert.ToInt32(DefectNumberTextBox.Text);
-                var registrationDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
-                var person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
-                var comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
+                var orderNumber = ProductInfo.OrderNumber;
+                var substrateNumber = ProductInfo.ProductNumber;
+                var quantity = ProductInfo.Quantity;
+                var defectQuantity = string.IsNullOrWhiteSpace(DefectQuantityTextBox.Text) ? 0 : Convert.ToInt32(DefectQuantityTextBox.Text);
+                var registrationDate = ProductInfo.RegDate;
+                var person = ProductInfo.Person;
+                var comment = ProductInfo.Comment;
                 var rowId = string.Empty;
                 var commandText = string.Empty;
 
@@ -234,7 +163,7 @@ namespace ProductDatabase {
 
                     if (substrateName != string.Empty) {
                         if (ProductInfo.SubstrateName == substrateName) {
-                            if (QuantityCheckBox.Checked && !DefectNumberCheckBox.Checked) {
+                            if (QuantityCheckBox.Checked && !DefectQuantityCheckBox.Checked) {
                                 var result = MessageBox.Show($"[{substrateNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
                                 if (result == DialogResult.No) { return false; }
                             }
@@ -243,7 +172,7 @@ namespace ProductDatabase {
                 }
 
                 // 不良処理時在庫チェック
-                if (DefectNumberCheckBox.Checked) {
+                if (DefectQuantityCheckBox.Checked) {
                     commandText =
                         $"""
                         SELECT
@@ -265,7 +194,7 @@ namespace ProductDatabase {
                         ("@SubstrateNumber", substrateNumber)
                     );
                     if (dr.Read()) {
-                        if (Convert.ToInt32(dr["Stock"]) < defectNumber) {
+                        if (Convert.ToInt32(dr["Stock"]) < defectQuantity) {
                             throw new Exception($"[{substrateNumber}]は在庫が[{dr["Stock"]}]です。");
                         }
                     }
@@ -293,7 +222,7 @@ namespace ProductDatabase {
                     ("@SubstrateNumber", string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber),
                     ("@OrderNumber", string.IsNullOrWhiteSpace(orderNumber) ? DBNull.Value : orderNumber),
                     ("@Increase", QuantityCheckBox.Checked ? quantity : DBNull.Value),
-                    ("@Defect", DefectNumberCheckBox.Checked ? $"-{defectNumber}" : DBNull.Value),
+                    ("@Defect", DefectQuantityCheckBox.Checked ? $"-{defectQuantity}" : DBNull.Value),
                     ("@RegDate", string.IsNullOrWhiteSpace(registrationDate) ? DBNull.Value : registrationDate),
                     ("@Person", string.IsNullOrWhiteSpace(person) ? DBNull.Value : person),
                     ("@Comment", string.IsNullOrWhiteSpace(comment) ? DBNull.Value : comment)
@@ -302,7 +231,7 @@ namespace ProductDatabase {
                 rowId = ExecuteScalar(connection, commandText).ToString() ?? string.Empty;
 
                 // ログ出力
-                var number = QuantityCheckBox.Checked ? quantity : 0 - defectNumber;
+                var number = QuantityCheckBox.Checked ? quantity : 0 - defectQuantity;
 
                 string[] logMessageArray = [
                     $"[基板登録]",
@@ -337,6 +266,57 @@ namespace ProductDatabase {
                 return false;
             }
         }
+        private bool FormCheck() {
+            // 入力フォームのチェック
+            var anyTextBoxEnabled = false;
+            var allTextBoxesFilled = true;
+
+            foreach (Control control in Controls) {
+                if (control is TextBoxBase textBox && textBox.Enabled) {
+                    anyTextBoxEnabled = true;
+                    if (string.IsNullOrWhiteSpace(textBox.Text) && textBox.Name != "QrCodeTextBox") {
+                        allTextBoxesFilled = false;
+                        break;
+                    }
+                }
+            }
+            return !anyTextBoxEnabled
+                ? throw new Exception("何も入力されていません")
+                : !allTextBoxesFilled
+                ? throw new Exception("空欄があります。")
+                : ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15
+                ? throw new Exception("製番を10桁+4桁で入力して下さい。")
+                : true;
+        }
+        private bool DataCheck() {
+
+            var quantity = 0;
+
+            if (QuantityCheckBox.Checked) {
+                if (!int.TryParse(QuantityTextBox.Text, out quantity) || quantity <= 0) {
+                    MessageBox.Show("数量は1以上の有効な数値を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    QuantityTextBox.Focus();
+                    return false;
+                }
+            }
+            if (DefectQuantityCheckBox.Checked) {
+                if (!int.TryParse(QuantityTextBox.Text, out var defectQuantity) || defectQuantity <= 0) {
+                    MessageBox.Show("数量は1以上の有効な数値を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    QuantityTextBox.Focus();
+                    return false;
+                }
+            }
+
+            ProductInfo.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
+            ProductInfo.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
+            ProductInfo.Quantity = quantity;
+            ProductInfo.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
+            ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
+            ProductInfo.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
+
+            return true;
+        }
+
         private static void ExecuteNonQuery(SQLiteConnection con, string commandText, params (string, object?)[] parameters) {
             using var command = con.CreateCommand();
             command.CommandText = commandText;
@@ -367,256 +347,72 @@ namespace ProductDatabase {
             return command.ExecuteReader();
         }
         // 印刷処理
-        private void PrintStart() {
+        private void PrintStart(bool isPrint) {
             try {
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
-                pd.BeginPrint += (sender, e) => _printAction = e.PrintAction;
-                pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
 
-                _labelSubNumLabelsToPrint = int.TryParse(QuantityTextBox.Text, out var quantity) ? quantity : 0;
-                if (_labelSubNumLabelsToPrint == 0) {
-                    throw new Exception("数量が入力されていません。");
-                }
-                _pageCount = 1;
-
-                SubstrateRegistrationPrintDialog.Document = pd;
-
-                if (SubstrateRegistrationPrintDialog.ShowDialog() == DialogResult.OK) {
-                    // ローディング画面の表示
-                    using var loadingForm = new LoadingForm();
-                    // 別スレッドで印刷処理を実行
-                    Task.Run(() => {
-                        try {
-                            SubstrateRegistrationPrintDialog.Document.Print();
-                        } finally {
-                            // 印刷が終了したらローディング画面を閉じる
-                            loadingForm.Invoke(new Action(() => loadingForm.Close()));
-                        }
-                    });
-
-                    // ローディング画面をモーダルとして表示
-                    loadingForm.ShowDialog();
-                }
-                else {
-                    return;
-                }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        private bool PreviewPrint() {
-            try {
-                // PrintDocumentオブジェクトの作成
-                using System.Drawing.Printing.PrintDocument pd = new();
-                pd.BeginPrint += (sender, e) => _printAction = e.PrintAction;
-                pd.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(PrintDocumentPrintPage);
-
-                _labelSubNumLabelsToPrint = int.TryParse(QuantityTextBox.Text, out var quantity) ? quantity : 0;
-                if (_labelSubNumLabelsToPrint == 0) {
-                    throw new Exception("数量が入力されていません。");
-                }
-
-                _pageCount = 1;
-
-                // 最大で表示
-                SubstrateRegistrationPrintPreviewDialog.Shown += (sender, e) => {
-                    if (sender is Form form) {
-                        form.WindowState = FormWindowState.Maximized;
-                    }
-                };
-                SubstrateRegistrationPrintPreviewDialog.PrintPreviewControl.Zoom = 3;
-                SubstrateRegistrationPrintPreviewDialog.Document = pd;
-                SubstrateRegistrationPrintPreviewDialog.ShowDialog();
-
-                return true;
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
-        private void PrintDocumentPrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
-            try {
-                if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
-                var dpiX = e.Graphics.DpiX;
-                var dpiY = e.Graphics.DpiY;
-                e.Graphics.PageUnit = GraphicsUnit.Millimeter;
-
-                // プレビューかどうかの判定
-                var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
-
-                var labelWidth = (float)LabelPageSettings.LabelWidth;
-                var labelHeight = (float)LabelPageSettings.LabelHeight;
-                var marginX = LabelPageSettings.MarginX;
-                var marginY = LabelPageSettings.MarginY;
-                var intervalX = LabelPageSettings.IntervalX;
-                var intervalY = LabelPageSettings.IntervalY;
-                var headerPositionX = LabelPageSettings.HeaderPositionX;
-                var headerPositionY = LabelPageSettings.HeaderPositionY;
-                var headerFont = LabelPageSettings.HeaderFont;
+                var substrateNumber = ManufacturingNumberMaskedTextBox.Text.Substring(5, 5);
+                var isPreview = !isPrint;
                 var startLine = (int)PrintPositionNumericUpDown.Value - 1;
 
-                // ハードマージンをミリメートルに変換
-                var hardMarginX = isPreview ? 0 : e.PageSettings.HardMarginX * MmPerInch / 100;
-                var hardMarginY = isPreview ? 0 : e.PageSettings.HardMarginY * MmPerInch / 100;
-
-                var headerString = ConvertHeaderString(LabelPageSettings.HeaderTextFormat);
-
-                _labelSubNSerial = ManufacturingNumberMaskedTextBox.Text;
-
-                if (_pageCount >= 2) {
-                    startLine = 0;
-                }
-
-                // 最初のページのみオフセットを調整
-                var verticalOffset = _pageCount == 1 ? startLine * (intervalY + labelHeight) : 0;
-                // ヘッダーの描画
-                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, (float)headerPositionX, (float)(verticalOffset + headerPositionY - hardMarginY));
-
-                var labelCountX = LabelPageSettings.LabelsPerColumn;
-                var labelCountY = LabelPageSettings.LabelsPerRow;
-                int y;
-                var copiesPerLabel = LabelLayoutSettings.CopiesPerLabel;
-                if (labelCountX == 0 || labelCountY == 0 || copiesPerLabel == 0) { throw new Exception("印刷設定が異常です。"); }
-                for (y = startLine; y < labelCountY; y++) {
-                    int x;
-                    for (x = 0; x < labelCountX; x++) {
-                        var posX = (float)(marginX - hardMarginX + (x * (intervalX + labelWidth)));
-                        var posY = (float)(marginY - hardMarginY + (y * (intervalY + labelHeight)));
-
-                        var generatedCode = GenerateCode(_labelSubNSerial);
-                        var labelImage = MakeLabelImage(generatedCode, dpiX, dpiY);
-                        e.Graphics.DrawImage(labelImage, posX, posY, labelWidth, labelHeight);
-
-                        _labelSubNumLabelsToPrint--;
-
-                        if (_labelSubNumLabelsToPrint <= 0) {
-                            copiesPerLabel--;
-                            if (copiesPerLabel <= 0) {
-                                // 最終行の行番号を描画
-                                var sf = new StringFormat {
-                                    Alignment = StringAlignment.Near,
-                                    LineAlignment = StringAlignment.Center
-                                };
-                                var layoutRect = new RectangleF(0, posY, 0, labelHeight);
-                                var rowNumber = (y + 1).ToString();
-                                e.Graphics.DrawString(rowNumber, headerFont, Brushes.Black, layoutRect, sf);
-                                // 次のページがあるかどうかの判定
-                                e.HasMorePages = false;
-                                _pageCount = 0;
-                                _labelSubNumLabelsToPrint = 0;
-                                return;
-                            }
-                            else {
-                                _labelSubNumLabelsToPrint += x + 1;
-                                break;
-                            }
-                        }
-
-                        if (x >= labelCountX - 1) {
-                            copiesPerLabel--;
-                            if (copiesPerLabel <= 0) {
-                                copiesPerLabel = LabelLayoutSettings.CopiesPerLabel;
-                            }
-                            else if (copiesPerLabel > 0) {
-                                _labelSubNumLabelsToPrint += x + 1;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (_labelSubNumLabelsToPrint > 0) {
-                    _pageCount++;
-                    e.HasMorePages = true;
-                }
-
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } finally {
-            }
-        }
-        private string ConvertHeaderString(string s) {
-            s = s.Replace("%P", ProductInfo.SubstrateName)
-                 .Replace("%T", ProductInfo.SubstrateModel)
-                 .Replace("%D", DateTime.Today.ToShortDateString())
-                 .Replace("%M", ManufacturingNumberMaskedTextBox.Text)
-                 .Replace("%O", OrderNumberTextBox.Text)
-                 .Replace("%N", QuantityTextBox.Text)
-                 .Replace("%U", ProductInfo.Person);
-            return s;
-        }
-        private string GenerateCode(string serial) {
-            var monthCode = RegistrationDateTimePicker.Value.Month.ToString("MM");
-
-            monthCode = monthCode switch {
-                "10" => "X",
-                "11" => "Y",
-                "12" => "Z",
-                _ => monthCode
-            };
-
-            var outputCode = LabelLayoutSettings.TextFormat;
-            var serialCode = serial.Substring(5, 5);
-            outputCode = outputCode.Replace("%T", ProductInfo.Initial)
-                                    .Replace("%Y", RegistrationDateTimePicker.Value.Year.ToString("yy"))
-                                    .Replace("%MM", RegistrationDateTimePicker.Value.Month.ToString("MM"))
-                                    .Replace("%M", string.IsNullOrEmpty(monthCode) ? string.Empty : monthCode[^1..])
-                                    .Replace("%S", serialCode);
-
-            return outputCode;
-        }
-        private Bitmap MakeLabelImage(string text, float dpiX, float dpiY) {
-
-            var labelWidth = (float)LabelPageSettings.LabelWidth;
-            var labelHeight = (float)LabelPageSettings.LabelHeight;
-
-            // ビットマップのサイズをピクセル単位で計算
-            var pixelWidth = (int)(labelWidth / MmPerInch * dpiX);
-            var pixelHeight = (int)(labelHeight / MmPerInch * dpiY);
-
-            var labelImage = new Bitmap(pixelWidth, pixelHeight);
-            labelImage.SetResolution(dpiX, dpiY);
-
-            //Bitmap labelImage = new(sizeX, sizeY);
-            using (var g = Graphics.FromImage(labelImage)) {
-                g.PageUnit = GraphicsUnit.Millimeter;
-                // アンチエイリアス処理を改善
-                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-
-                var fontName = LabelLayoutSettings.TextFont.Name;
-                var fontSize = LabelLayoutSettings.TextFont.SizeInPoints;
-                using Font fnt = new(fontName, fontSize);
-
-                // StringFormat を使用して中心に配置
-                var sf = new StringFormat {
-                    Alignment = LabelLayoutSettings.AlignTextCenterX ? StringAlignment.Center : StringAlignment.Near,
-                    LineAlignment = LabelLayoutSettings.AlignTextCenterY ? StringAlignment.Center : StringAlignment.Near
+                pd.BeginPrint += (sender, e) => {
+                    PrintManager.Initialize(ProductInfo, SubstratePrintSettings, substrateNumber);
+                };
+                pd.PrintPage += (sender, e) => {
+                    var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, "Substrate");
+                    e.HasMorePages = hasMore;
                 };
 
-                var stringPosX = LabelLayoutSettings.AlignTextCenterX ? 0f : (float)LabelLayoutSettings.TextPositionX;
-                var stringPosY = LabelLayoutSettings.AlignTextCenterY ? 0f : (float)LabelLayoutSettings.TextPositionY;
-
-                var pageWidth = (float)LabelPageSettings.LabelWidth;
-                var pageHeight = (float)LabelPageSettings.LabelHeight;
-
-                // 矩形領域を計算 (文字列を配置する領域)
-                var layoutRect = new RectangleF(stringPosX, stringPosY, pageWidth - stringPosX, pageHeight - stringPosY);
-                g.DrawString(text, fnt, Brushes.Black, layoutRect, sf);
-
-                // プレビューかどうかの判定
-                var isPreview = _printAction == System.Drawing.Printing.PrintAction.PrintToPreview;
-                // プレビュー時、黒枠を描画
-                if (isPreview) {
-                    // 0.1mmの黒いペンで枠線を描画
-                    using var p = new Pen(Color.Black, 0.1f);
-                    g.DrawRectangle(p, 0, 0, labelWidth - 0.1f, labelHeight - 0.1f);
+                ProductInfo.Quantity = int.TryParse(QuantityTextBox.Text, out var quantity) ? quantity : 0;
+                if (ProductInfo.Quantity == 0) {
+                    throw new Exception("数量が入力されていません。");
                 }
-            }
 
-            return labelImage;
+                switch (isPrint) {
+                    case true:
+                        //PrintDialogクラスの作成
+                        var pdlg = new PrintDialog {
+                            Document = pd
+                        };
+                        if (pdlg.ShowDialog() == DialogResult.OK) {
+                            // ローディング画面の表示
+                            using var loadingForm = new LoadingForm();
+                            // 別スレッドで印刷処理を実行
+                            Task.Run(() => {
+                                try {
+                                    pd.Print();
+                                } finally {
+                                    // 印刷が終了したらローディング画面を閉じる
+                                    loadingForm.Invoke(new System.Action(() => loadingForm.Close()));
+                                }
+                            });
+
+                            // ローディング画面をモーダルとして表示
+                            loadingForm.ShowDialog();
+                        }
+                        break;
+                    case false:
+                        ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
+                        //PrintPreviewDialogオブジェクトの作成
+                        var ppd = new PrintPreviewDialog();
+                        ppd.Shown += (sender, e) => {
+                            var tool = (ToolStrip)ppd.Controls[1];
+                            tool.Items[0].Visible = false;
+                            if (sender is Form form) {
+                                form.WindowState = FormWindowState.Maximized;
+                            }
+                        };
+                        ppd.PrintPreviewControl.Zoom = 3;
+                        ppd.Document = pd;
+                        ppd.ShowDialog();
+                        break;
+                }
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
         // コメント用テンプレート
         private void TemplateComment() {
             var templateWord = CommentComboBox.SelectedIndex switch {
@@ -638,10 +434,10 @@ namespace ProductDatabase {
                     break;
                 case "QuantityCheckBox":
                     QuantityTextBox.Enabled = checkBox.Checked;
-                    if (checkBox.Checked) { DefectNumberCheckBox.Checked = false; }
+                    if (checkBox.Checked) { DefectQuantityCheckBox.Checked = false; }
                     break;
                 case "DefectNumberCheckBox":
-                    DefectNumberTextBox.Enabled = checkBox.Checked;
+                    DefectQuantityTextBox.Enabled = checkBox.Checked;
                     if (checkBox.Checked) { QuantityCheckBox.Checked = false; }
                     break;
                 case "RevisionCheckBox":
@@ -788,25 +584,20 @@ namespace ProductDatabase {
 
         private void SubstrateRegistrationWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
-        private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
-        private void PrintButton_Click(object sender, EventArgs e) { PrintStart(); }
+        private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(true); }
+        private void PrintButton_Click(object sender, EventArgs e) { RegisterCheck(true); }
         private void OpenSubstrateInformationButton_Click(object sender, EventArgs e) { OpenSubstrateInformation(); }
-        private void SubstrateRegistrationPrintDocument_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) { PrintDocumentPrintPage(sender, e); }
         private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
         private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
-        private void DefectNumberTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
-        private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { PreviewPrint(); }
+        private void DefectQuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
+        private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { RegisterCheck(false); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             SubstratePrintSettingsWindow ls = new();
             ls.ShowDialog(this);
             LoadSettings(_printSettingPath);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
-        private void SubstrateRegistrationPrintPreviewDialog_Load(object sender, EventArgs e) {
-            var tool = (ToolStrip)SubstrateRegistrationPrintPreviewDialog.Controls[1];
-            tool.Items[0].Visible = false;
-        }
         private void QrCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
     }
 }
