@@ -889,7 +889,7 @@ namespace ProductDatabase {
                     PrintManager.Initialize(ProductInfo, ProductPrintSettings);
                 };
                 pd.PrintPage += (sender, e) => {
-                    var hasMore = PrintManager.PrintSerial(e, isPreview, serialType, startLine);
+                    var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, serialType);
                     e.HasMorePages = hasMore;
                 };
 

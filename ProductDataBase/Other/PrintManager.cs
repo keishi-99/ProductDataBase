@@ -13,7 +13,7 @@ namespace ProductDatabase.Other {
 
         // 状態保持用プロパティ（外部からは読み取り専用）
         public static ProductInformation ProductInfo { get; private set; } = default!;
-        public static DocumentPrintSettings  ProductPrintSettings { get; private set; } = new();
+        public static DocumentPrintSettings ProductPrintSettings { get; private set; } = new();
 
         // 各種設定へのアクセスプロパティ（nullチェック済）
         public static PrintPageSettings LabelPageSettings =>
@@ -35,6 +35,8 @@ namespace ProductDatabase.Other {
         public static int PageCount { get; private set; }
         public static int PrintType => ProductInfo?.PrintType ?? throw new InvalidOperationException("PrintManager が初期化されていません。");
 
+        public static string SubstrateNumber { get; private set; } = string.Empty;
+
         public static bool IsUnderlinePrint => ProductInfo.IsUnderlinePrint;
 
         // 4桁以上の型式番号の下4桁を取得するプロパティ
@@ -43,13 +45,14 @@ namespace ProductDatabase.Other {
                 ? ProductInfo.ProductModel[^4..]
                 : string.Empty;
 
-        public static void Initialize(ProductInformation productInfo, DocumentPrintSettings  productPrintSettings) {
+        public static void Initialize(ProductInformation productInfo, DocumentPrintSettings productPrintSettings, string? substrateNumber = null) {
             ProductInfo = productInfo;
             ProductPrintSettings = productPrintSettings ?? throw new ArgumentNullException(nameof(productPrintSettings));
 
             PageCount = 1;
             RemainingLabelCount = productInfo.Quantity;
             SerialNumber = productInfo.SerialFirstNumber;
+            SubstrateNumber = substrateNumber ?? string.Empty;
         }
 
         // ミリメートルをピクセルに変換するヘルパーメソッド
@@ -58,20 +61,21 @@ namespace ProductDatabase.Other {
             return (float)(mm / MmPerInch * dpi);
         }
 
-        public static bool PrintSerial(PrintPageEventArgs e, bool isPreview, string serialType, int startLine) {
+        public static bool PrintSerialCommon(PrintPageEventArgs e, bool isPreview, int startLine, string serialType) {
             try {
-                if (e.Graphics == null) { throw new Exception("e.Graphicsがnullです。"); }
+                if (e.Graphics == null) {
+                    throw new Exception("e.Graphicsがnullです。");
+                }
 
-                // Graphicsオブジェクトの描画単位をピクセルに設定
                 e.Graphics.PageUnit = GraphicsUnit.Pixel;
 
-                // プリンターのDPIを取得
                 var dpiX = e.Graphics.DpiX;
                 var dpiY = e.Graphics.DpiY;
 
-                var pageSettings = serialType switch {
-                    "Label" => LabelPageSettings,
-                    "Barcode" => BarcodePageSettings,
+                var (pageSettings, layoutSettings) = serialType switch {
+                    "Label" => (LabelPageSettings, LabelLayoutSettings),
+                    "Barcode" => (BarcodePageSettings, BarcodeLayoutSettings),
+                    "Substrate" => (LabelPageSettings, LabelLayoutSettings),
                     _ => throw new ArgumentException($"不明なシリアルタイプ: {serialType}")
                 };
 
@@ -86,77 +90,51 @@ namespace ProductDatabase.Other {
                 var headerPositionXPx = ConvertMmToPixel(pageSettings.HeaderPositionX, dpiX);
                 var headerPositionYPx = ConvertMmToPixel(pageSettings.HeaderPositionY, dpiY);
                 var headerString = ConvertHeaderString(pageSettings.HeaderTextFormat);
-                var headerFont = LabelPageSettings.HeaderFont;
-                var copiesPerLabel = LabelLayoutSettings.CopiesPerLabel;
+                var headerFont = pageSettings.HeaderFont;
 
-                if (labelCountX == 0 || labelCountY == 0 || copiesPerLabel == 0) { throw new Exception("印刷設定が異常です。"); }
-
-                // ハードマージンをpixelに変換
-                var hardMarginX = 0f;
-                var hardMarginY = 0f;
-                if (!isPreview) {
-                    (hardMarginX, hardMarginY) = (e.PageSettings.HardMarginX * e.Graphics.DpiX / 100.0f, e.PageSettings.HardMarginY * e.Graphics.DpiY / 100.0f);
-                    //(hardMarginX, hardMarginY) = _printerName switch {
-                    //    _ => (e.PageSettings.HardMarginX * e.Graphics.DpiX / 100.0f, e.PageSettings.HardMarginY * e.Graphics.DpiY / 100.0f)
-                    //};
+                var copiesPerLabel = layoutSettings.CopiesPerLabel;
+                if (labelCountX == 0 || labelCountY == 0 || copiesPerLabel == 0) {
+                    throw new Exception("印刷設定が異常です。");
                 }
 
-                if (PageCount == 1) {
-                    CopiesRemainingPerSerial = copiesPerLabel;
-                }
+                var (hardMarginX, hardMarginY) = isPreview
+                    ? (0, 0)
+                    : (e.PageSettings.HardMarginX * dpiX / 100.0f, e.PageSettings.HardMarginY * dpiY / 100.0f);
+
                 if (PageCount >= 2) { startLine = 0; }
 
-                // 最初のページのみオフセットを調整
                 var verticalOffsetPx = PageCount == 1 ? startLine * (intervalYPx + labelHeightPx) : 0;
-                // ヘッダーの描画
-                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, headerPositionXPx, (float)(verticalOffsetPx + headerPositionYPx - hardMarginY));
+                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, headerPositionXPx, (verticalOffsetPx + headerPositionYPx - hardMarginY));
 
-                var y = 0;
-                for (y = startLine; y < labelCountY; y++) {
-                    var x = 0;
-                    for (x = 0; x < labelCountX; x++) {
-                        // ピクセル単位の座標を使用
+                for (var y = startLine; y < labelCountY; y++) {
+                    for (var x = 0; x < labelCountX; x++) {
                         var posX = marginXPx - hardMarginX + (x * (intervalXPx + labelWidthPx));
                         var posY = marginYPx - hardMarginY + (y * (intervalYPx + labelHeightPx));
 
+                        if (CopiesRemainingPerSerial == 0) { CopiesRemainingPerSerial = copiesPerLabel; }
+                        var isLastCopy = CopiesRemainingPerSerial == 1;
                         // タイプ4で残り1の場合、最後のラベルに下線をつける
-                        var fontUnderline = IsUnderlinePrint && CopiesRemainingPerSerial == 1;
+                        var fontUnderline = IsUnderlinePrint && isLastCopy;
 
-                        // シリアル生成、PrintTypeが9かつ最終行の場合は型式下4桁、それ以外はシリアルを生成
-                        string generatedCode;
-                        if (PrintType != 9 || CopiesRemainingPerSerial != 1) {
-                            generatedCode = GenerateCode(SerialNumber, serialType); // シリアルコードを生成
-                        }
-                        else {
-                            generatedCode = Last4ProductModel; // 型式の下4桁を使用
-                        }
+                        var generatedCode = GenerateSerial(serialType, isLastCopy);
 
-                        // MakeLabelImageにdpiX, dpiYを渡す
                         using var labelImage = MakeLabelImage(generatedCode, serialType, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY, isPreview);
-                        // DrawImageにピクセル単位の座標とサイズを渡す
+
                         e.Graphics.DrawImage(labelImage, posX, posY, labelWidthPx, labelHeightPx);
 
                         CopiesRemainingPerSerial--;
-                        if (CopiesRemainingPerSerial <= 0) {
-                            SerialNumber++;
-                            RemainingLabelCount--;
-                            //印刷するラベルがなくなった場合の処理
-                            if (RemainingLabelCount <= 0) {
-                                // 最終行の行番号を表示
-                                var sf = new StringFormat {
-                                    Alignment = StringAlignment.Near,
-                                    LineAlignment = StringAlignment.Center
-                                };
-                                var layoutRect = new RectangleF(0, posY, 0, (float)labelHeightPx);
-                                var rowNumber = (y + 1).ToString();
-                                e.Graphics.DrawString(rowNumber, headerFont, Brushes.Black, layoutRect, sf);
 
-                                //e.HasMorePages = false;
+                        if (CopiesRemainingPerSerial <= 0) {
+                            RemainingLabelCount--;
+                            SerialNumber++;
+
+                            if (RemainingLabelCount <= 0) {
+                                // 最後の行にマークを描画
+                                DrawFinalRowMark(e.Graphics, y + 1, 0, posY, 0, labelHeightPx, headerFont);
                                 PageCount = 1;
                                 RemainingLabelCount = 0;
                                 return false;
                             }
-                            CopiesRemainingPerSerial = copiesPerLabel;
                         }
                     }
                 }
@@ -165,11 +143,11 @@ namespace ProductDatabase.Other {
                     PageCount++;
                     return true;
                 }
-                else {
-                    return false;
-                }
+
+                return false;
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -196,9 +174,11 @@ namespace ProductDatabase.Other {
                     case "Label":
                         DrawLabel(g, text, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY);
                         break;
-
                     case "Barcode":
                         DrawBarcode(g, text, labelWidthPx, labelHeightPx, dpiX, dpiY);
+                        break;
+                    case "Substrate":
+                        DrawLabel(g, text, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY);
                         break;
                 }
 
@@ -303,7 +283,19 @@ namespace ProductDatabase.Other {
                  .Replace("%U", ProductInfo.Person);
             return s;
         }
-        private static string GenerateCode(int serialCode, string serialType) {
+        private static string GenerateSerial(string serialType, bool isLastCopy) {
+            if (serialType == "Substrate") {
+                return GenerateCode(SubstrateNumber, serialType);
+            }
+
+            if (PrintType == 9 && isLastCopy) {
+                return Last4ProductModel;
+            }
+
+            var serialNumberString = SerialNumber.ToString($"D{ProductInfo.SerialDigit}");
+            return GenerateCode(serialNumberString, serialType);
+        }
+        private static string GenerateCode(string serialCode, string serialType) {
             if (ProductInfo == null) { throw new Exception("ProductInfoがnullです。"); }
             var monthCode = DateTime.Parse(ProductInfo.RegDate).ToString("MM");
 
@@ -317,7 +309,8 @@ namespace ProductDatabase.Other {
             var outputCode = serialType switch {
                 "Label" => LabelLayoutSettings.TextFormat ?? string.Empty,
                 "Barcode" => BarcodeLayoutSettings.TextFormat ?? string.Empty,
-                _ => string.Empty
+                "Substrate" => LabelLayoutSettings.TextFormat ?? string.Empty,
+                _ => throw new ArgumentException($"不明なシリアルタイプ: {serialType}")
             };
 
             outputCode = outputCode.Replace("%Y", DateTime.Parse(ProductInfo.RegDate).ToString("yy"))
@@ -325,20 +318,28 @@ namespace ProductDatabase.Other {
                                     .Replace("%T", ProductInfo.Initial)
                                     .Replace("%R", ProductInfo.Revision)
                                     .Replace("%M", monthCode[^1..])
-                                    .Replace("%S", Convert.ToInt32(serialCode).ToString($"D{ProductInfo.SerialDigit}"));
+                                    .Replace("%S", serialCode);
 
             return outputCode;
+        }
+        private static void DrawFinalRowMark(Graphics graphics, int rowNumber, float posX, float posY,float width, float height, Font font) {
+            var sf = new StringFormat {
+                Alignment = StringAlignment.Near,
+                LineAlignment = StringAlignment.Center
+            };
+            var layoutRect = new RectangleF(posX, posY, width, height);
+            graphics.DrawString(rowNumber.ToString(), font, Brushes.Black, layoutRect, sf);
         }
     }
     public class PrintOptions {
 
-        public class DocumentPrintSettings  {
+        public class DocumentPrintSettings {
             public PrintPageSettings? LabelPageSettings { get; set; }
             public PrintLayoutSettings? LabelLayoutSettings { get; set; }
             public PrintPageSettings? BarcodePageSettings { get; set; }
             public PrintLayoutSettings? BarcodeLayoutSettings { get; set; }
 
-            public DocumentPrintSettings () {
+            public DocumentPrintSettings() {
                 LabelPageSettings = new PrintPageSettings();
                 LabelLayoutSettings = new PrintLayoutSettings();
                 BarcodePageSettings = new PrintPageSettings();

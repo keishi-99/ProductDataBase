@@ -23,7 +23,6 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            var resources = new System.ComponentModel.ComponentResourceManager(typeof(SubstrateRegistrationWindow));
             this.SubstrateRegistrationMenuStrip = new MenuStrip();
             this.ファイルToolStripMenuItem = new ToolStripMenuItem();
             this.印刷プレビューToolStripMenuItem = new ToolStripMenuItem();
@@ -42,8 +41,8 @@
             this.ManufacturingNumberMaskedTextBox = new MaskedTextBox();
             this.QuantityTextBox = new TextBox();
             this.QuantityCheckBox = new CheckBox();
-            this.DefectNumberTextBox = new TextBox();
-            this.DefectNumberCheckBox = new CheckBox();
+            this.DefectQuantityTextBox = new TextBox();
+            this.DefectQuantityCheckBox = new CheckBox();
             this.RevisionTextBox = new TextBox();
             this.ExtraCheckBox7 = new CheckBox();
             this.ExtraTextBox1 = new TextBox();
@@ -70,9 +69,6 @@
             this.RegisterButton = new Button();
             this.PrintOnlyCheckBox = new CheckBox();
             this.PrintButton = new Button();
-            this.SubstrateRegistrationPrintDialog = new PrintDialog();
-            this.SubstrateRegistrationPrintDocument = new System.Drawing.Printing.PrintDocument();
-            this.SubstrateRegistrationPrintPreviewDialog = new PrintPreviewDialog();
             this.panelCommentTexrBox = new Panel();
             this.label1 = new Label();
             this.QrCodeButton = new Button();
@@ -264,29 +260,29 @@
             this.QuantityCheckBox.UseVisualStyleBackColor = true;
             this.QuantityCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
-            // DefectNumberTextBox
+            // DefectQuantityTextBox
             // 
-            this.DefectNumberTextBox.Enabled = false;
-            this.DefectNumberTextBox.Location = new Point(19, 291);
-            this.DefectNumberTextBox.Margin = new Padding(0);
-            this.DefectNumberTextBox.MaxLength = 4;
-            this.DefectNumberTextBox.Name = "DefectNumberTextBox";
-            this.DefectNumberTextBox.Size = new Size(120, 23);
-            this.DefectNumberTextBox.TabIndex = 14;
-            this.DefectNumberTextBox.TextAlign = HorizontalAlignment.Right;
-            this.DefectNumberTextBox.KeyPress += this.DefectNumberTextBox_KeyPress;
+            this.DefectQuantityTextBox.Enabled = false;
+            this.DefectQuantityTextBox.Location = new Point(19, 291);
+            this.DefectQuantityTextBox.Margin = new Padding(0);
+            this.DefectQuantityTextBox.MaxLength = 4;
+            this.DefectQuantityTextBox.Name = "DefectQuantityTextBox";
+            this.DefectQuantityTextBox.Size = new Size(120, 23);
+            this.DefectQuantityTextBox.TabIndex = 14;
+            this.DefectQuantityTextBox.TextAlign = HorizontalAlignment.Right;
+            this.DefectQuantityTextBox.KeyPress += this.DefectQuantityTextBox_KeyPress;
             // 
-            // DefectNumberCheckBox
+            // DefectQuantityCheckBox
             // 
-            this.DefectNumberCheckBox.Location = new Point(19, 268);
-            this.DefectNumberCheckBox.Margin = new Padding(0);
-            this.DefectNumberCheckBox.Name = "DefectNumberCheckBox";
-            this.DefectNumberCheckBox.Size = new Size(62, 19);
-            this.DefectNumberCheckBox.TabIndex = 13;
-            this.DefectNumberCheckBox.TabStop = false;
-            this.DefectNumberCheckBox.Text = "減少量";
-            this.DefectNumberCheckBox.UseVisualStyleBackColor = true;
-            this.DefectNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
+            this.DefectQuantityCheckBox.Location = new Point(19, 268);
+            this.DefectQuantityCheckBox.Margin = new Padding(0);
+            this.DefectQuantityCheckBox.Name = "DefectQuantityCheckBox";
+            this.DefectQuantityCheckBox.Size = new Size(62, 19);
+            this.DefectQuantityCheckBox.TabIndex = 13;
+            this.DefectQuantityCheckBox.TabStop = false;
+            this.DefectQuantityCheckBox.Text = "減少量";
+            this.DefectQuantityCheckBox.UseVisualStyleBackColor = true;
+            this.DefectQuantityCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // RevisionTextBox
             // 
@@ -590,21 +586,6 @@
             this.PrintButton.UseVisualStyleBackColor = true;
             this.PrintButton.Click += this.PrintButton_Click;
             // 
-            // SubstrateRegistrationPrintDialog
-            // 
-            this.SubstrateRegistrationPrintDialog.UseEXDialog = true;
-            // 
-            // SubstrateRegistrationPrintPreviewDialog
-            // 
-            this.SubstrateRegistrationPrintPreviewDialog.AutoScrollMargin = new Size(0, 0);
-            this.SubstrateRegistrationPrintPreviewDialog.AutoScrollMinSize = new Size(0, 0);
-            this.SubstrateRegistrationPrintPreviewDialog.ClientSize = new Size(400, 300);
-            this.SubstrateRegistrationPrintPreviewDialog.Enabled = true;
-            this.SubstrateRegistrationPrintPreviewDialog.Icon = (Icon)resources.GetObject("SubstrateRegistrationPrintPreviewDialog.Icon");
-            this.SubstrateRegistrationPrintPreviewDialog.Name = "SubstrateRegistrationPrintPreviewDialog";
-            this.SubstrateRegistrationPrintPreviewDialog.Visible = false;
-            this.SubstrateRegistrationPrintPreviewDialog.Load += this.SubstrateRegistrationPrintPreviewDialog_Load;
-            // 
             // panelCommentTexrBox
             // 
             this.panelCommentTexrBox.Controls.Add(this.CommentTextBox);
@@ -708,8 +689,8 @@
             this.Controls.Add(this.ExtraCheckBox1);
             this.Controls.Add(this.RevisionTextBox);
             this.Controls.Add(this.ExtraCheckBox7);
-            this.Controls.Add(this.DefectNumberTextBox);
-            this.Controls.Add(this.DefectNumberCheckBox);
+            this.Controls.Add(this.DefectQuantityTextBox);
+            this.Controls.Add(this.DefectQuantityCheckBox);
             this.Controls.Add(this.QuantityTextBox);
             this.Controls.Add(this.QuantityCheckBox);
             this.Controls.Add(this.ManufacturingNumberMaskedTextBox);
@@ -762,8 +743,8 @@
         private MaskedTextBox ManufacturingNumberMaskedTextBox;
         private TextBox QuantityTextBox;
         private CheckBox QuantityCheckBox;
-        private TextBox DefectNumberTextBox;
-        private CheckBox DefectNumberCheckBox;
+        private TextBox DefectQuantityTextBox;
+        private CheckBox DefectQuantityCheckBox;
         private TextBox RevisionTextBox;
         private CheckBox ExtraCheckBox7;
         private TextBox ExtraTextBox1;
@@ -790,9 +771,6 @@
         private Button RegisterButton;
         private CheckBox PrintOnlyCheckBox;
         private Button PrintButton;
-        private PrintDialog SubstrateRegistrationPrintDialog;
-        private System.Drawing.Printing.PrintDocument SubstrateRegistrationPrintDocument;
-        private PrintPreviewDialog SubstrateRegistrationPrintPreviewDialog;
         private Panel panelCommentTexrBox;
         private Label label1;
         private Button QrCodeButton;

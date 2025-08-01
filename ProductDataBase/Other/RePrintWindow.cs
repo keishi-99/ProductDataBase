@@ -302,14 +302,14 @@ namespace ProductDatabase {
                     PrintManager.Initialize(ProductInfo, ProductPrintSettings);
                 };
                 pd.PrintPage += (sender, e) => {
-                    bool hasMore = PrintManager.PrintSerial(e, isPreview, serialType, startLine);
+                    bool hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, serialType);
                     e.HasMorePages = hasMore;
                 };
 
                 _printerName = pd.PrinterSettings.PrinterName;
 
-                switch (isPreview) {
-                    case false:
+                switch (isPrint) {
+                    case true:
                         //PrintDialogクラスの作成
                         var pdlg = new PrintDialog {
                             Document = pd
@@ -334,7 +334,7 @@ namespace ProductDatabase {
                             return false;
                         }
                         return true;
-                    case true:
+                    case false:
                         //PrintPreviewDialogオブジェクトの作成
                         var ppd = new PrintPreviewDialog();
                         ppd.Shown += (sender, e) => {
