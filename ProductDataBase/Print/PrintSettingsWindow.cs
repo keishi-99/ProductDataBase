@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using static ProductDatabase.MainWindow;
-using static ProductDatabase.Other.PrintOptions;
+using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase {
     public partial class PrintSettingsWindow : Form {
