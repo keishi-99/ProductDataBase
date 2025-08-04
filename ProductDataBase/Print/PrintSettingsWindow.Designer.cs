@@ -306,6 +306,7 @@
             this.AlignTextYCenterCheckBox.TabIndex = 36;
             this.AlignTextYCenterCheckBox.Text = "中心";
             this.AlignTextYCenterCheckBox.UseVisualStyleBackColor = true;
+            this.AlignTextYCenterCheckBox.CheckedChanged += this.AlignTextYCenterCheckBox_CheckedChanged;
             // 
             // AlignTextXCenterCheckBox
             // 
@@ -316,7 +317,7 @@
             this.AlignTextXCenterCheckBox.TabIndex = 35;
             this.AlignTextXCenterCheckBox.Text = "中心";
             this.AlignTextXCenterCheckBox.UseVisualStyleBackColor = true;
-            this.AlignTextXCenterCheckBox.CheckedChanged += this.FontCenterCheckBox_CheckedChanged;
+            this.AlignTextXCenterCheckBox.CheckedChanged += this.AlignTextXCenterCheckBox_CheckedChanged;
             // 
             // FontPositionYTextBox
             // 
