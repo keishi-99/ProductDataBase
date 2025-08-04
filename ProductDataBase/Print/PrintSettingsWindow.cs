@@ -289,7 +289,8 @@ namespace ProductDatabase {
 
         private void ProductBarcodePrintSetting_Load(object sender, EventArgs e) { LoadSettings(); }
         private void BarcodeCenterCheckBox_CheckedChanged(object sender, EventArgs e) { BarcodePositionXTextBox.Enabled = !BarcodeCenterCheckBox.Checked; }
-        private void FontCenterCheckBox_CheckedChanged(object sender, EventArgs e) { FontPositionXTextBox.Enabled = !AlignTextXCenterCheckBox.Checked; }
+        private void AlignTextXCenterCheckBox_CheckedChanged(object sender, EventArgs e) { FontPositionXTextBox.Enabled = !AlignTextXCenterCheckBox.Checked; }
+        private void AlignTextYCenterCheckBox_CheckedChanged(object sender, EventArgs e) { FontPositionYTextBox.Enabled = !AlignTextYCenterCheckBox.Checked; }
         private void BarcodeHeaderFontButton_Click(object sender, EventArgs e) {
             var r = HeaderFontDialog.ShowDialog();
             if (r == DialogResult.Cancel) {
@@ -312,5 +313,6 @@ namespace ProductDatabase {
             SaveProductPrintSettings();
         }
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
+
     }
 }
