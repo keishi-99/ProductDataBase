@@ -51,6 +51,7 @@ namespace ProductDatabase {
                     break;
                 case "Barcode":
                     BarcodePanel.Visible = true;
+
                     SetPageSettings(DocumentPrintSettings.BarcodePageSettings);
                     SetLabelSettings(DocumentPrintSettings.BarcodeLayoutSettings);
                     break;
@@ -76,14 +77,16 @@ namespace ProductDatabase {
 
                 BarcodePositionXTextBox.Text = printLayoutSettings.BarcodePositionX.ToString();
                 BarcodePositionYTextBox.Text = printLayoutSettings.BarcodePositionY.ToString();
-                BarcodeCenterCheckBox.Checked = printLayoutSettings.AlignBarcodeCenterX;
+                AlignBarcodeCenterXCheckBox.Checked = printLayoutSettings.AlignBarcodeCenterX;
 
-                FontPositionXTextBox.Text = printLayoutSettings.TextPositionX.ToString();
-                FontPositionYTextBox.Text = printLayoutSettings.TextPositionY.ToString();
-                AlignTextXCenterCheckBox.Checked = printLayoutSettings.AlignTextCenterX;
+                TextPositionXTextBox.Text = printLayoutSettings.TextPositionX.ToString();
+                TextPositionYTextBox.Text = printLayoutSettings.TextPositionY.ToString();
+                AlignTextCenterXCheckBox.Checked = printLayoutSettings.AlignTextCenterX;
+                AlignTextCenterYCheckBox.Checked = printLayoutSettings.AlignTextCenterY;
             }
-            BarcodePositionXTextBox.Enabled = !BarcodeCenterCheckBox.Checked;
-            FontPositionXTextBox.Enabled = !AlignTextXCenterCheckBox.Checked;
+            BarcodePositionXTextBox.Enabled = !AlignBarcodeCenterXCheckBox.Checked;
+            TextPositionXTextBox.Enabled = !AlignTextCenterXCheckBox.Checked;
+            TextPositionYTextBox.Enabled = !AlignTextCenterYCheckBox.Checked;
         }
         private void SetPageSettings(PrintPageSettings? printPageSettings) {
             if (printPageSettings != null) {
@@ -120,8 +123,8 @@ namespace ProductDatabase {
                 { LabelIntervalYTextBox, "間隔Y" },
                 { BarcodePositionXTextBox, "バーコード位置X" },
                 { BarcodePositionYTextBox, "バーコード位置Y" },
-                { FontPositionXTextBox, "フォント位置X" },
-                { FontPositionYTextBox, "フォント位置Y" },
+                { TextPositionXTextBox, "フォント位置X" },
+                { TextPositionYTextBox, "フォント位置Y" },
                 { HeaderPositionXTextBox, "ヘッダー位置X" },
                 { HeaderPositionYTextBox, "ヘッダー位置Y" }
             };
@@ -180,10 +183,10 @@ namespace ProductDatabase {
                     if (DocumentPrintSettings.LabelLayoutSettings != null) {
                         DocumentPrintSettings.LabelLayoutSettings.TextFormat = FormatTextBox.Text;
                         DocumentPrintSettings.LabelLayoutSettings.TextFont = FontDialog.Font;
-                        DocumentPrintSettings.LabelLayoutSettings.TextPositionX = ParseDouble(FontPositionXTextBox.Text);
-                        DocumentPrintSettings.LabelLayoutSettings.TextPositionY = ParseDouble(FontPositionYTextBox.Text);
-                        DocumentPrintSettings.LabelLayoutSettings.AlignTextCenterX = AlignTextXCenterCheckBox.Checked;
-                        DocumentPrintSettings.LabelLayoutSettings.AlignTextCenterY = AlignTextYCenterCheckBox.Checked;
+                        DocumentPrintSettings.LabelLayoutSettings.TextPositionX = ParseDouble(TextPositionXTextBox.Text);
+                        DocumentPrintSettings.LabelLayoutSettings.TextPositionY = ParseDouble(TextPositionYTextBox.Text);
+                        DocumentPrintSettings.LabelLayoutSettings.AlignTextCenterX = AlignTextCenterXCheckBox.Checked;
+                        DocumentPrintSettings.LabelLayoutSettings.AlignTextCenterY = AlignTextCenterYCheckBox.Checked;
                         DocumentPrintSettings.LabelLayoutSettings.CopiesPerLabel = ParseInt(CopiesPerLabelTextBox.Text);
                     }
                     break;
@@ -208,12 +211,13 @@ namespace ProductDatabase {
                         DocumentPrintSettings.BarcodeLayoutSettings.BarcodeWidth = ParseDouble(BarcodeWidthTextBox.Text);
                         DocumentPrintSettings.BarcodeLayoutSettings.BarcodePositionX = ParseDouble(BarcodePositionXTextBox.Text);
                         DocumentPrintSettings.BarcodeLayoutSettings.BarcodePositionY = ParseDouble(BarcodePositionYTextBox.Text);
-                        DocumentPrintSettings.BarcodeLayoutSettings.AlignBarcodeCenterX = BarcodeCenterCheckBox.Checked;
+                        DocumentPrintSettings.BarcodeLayoutSettings.AlignBarcodeCenterX = AlignBarcodeCenterXCheckBox.Checked;
                         DocumentPrintSettings.BarcodeLayoutSettings.TextFormat = FormatTextBox.Text;
                         DocumentPrintSettings.BarcodeLayoutSettings.TextFont = FontDialog.Font;
-                        DocumentPrintSettings.BarcodeLayoutSettings.TextPositionX = ParseDouble(FontPositionXTextBox.Text);
-                        DocumentPrintSettings.BarcodeLayoutSettings.TextPositionY = ParseDouble(FontPositionYTextBox.Text);
-                        DocumentPrintSettings.BarcodeLayoutSettings.AlignTextCenterX = AlignTextXCenterCheckBox.Checked;
+                        DocumentPrintSettings.BarcodeLayoutSettings.TextPositionX = ParseDouble(TextPositionXTextBox.Text);
+                        DocumentPrintSettings.BarcodeLayoutSettings.TextPositionY = ParseDouble(TextPositionYTextBox.Text);
+                        DocumentPrintSettings.BarcodeLayoutSettings.AlignTextCenterX = AlignTextCenterXCheckBox.Checked;
+                        DocumentPrintSettings.BarcodeLayoutSettings.AlignTextCenterY = AlignTextCenterYCheckBox.Checked;
                         DocumentPrintSettings.BarcodeLayoutSettings.CopiesPerLabel = ParseInt(CopiesPerLabelTextBox.Text);
                     }
                     break;
@@ -236,10 +240,10 @@ namespace ProductDatabase {
                     if (DocumentPrintSettings.LabelLayoutSettings != null) {
                         DocumentPrintSettings.LabelLayoutSettings.TextFormat = FormatTextBox.Text;
                         DocumentPrintSettings.LabelLayoutSettings.TextFont = FontDialog.Font;
-                        DocumentPrintSettings.LabelLayoutSettings.TextPositionX = ParseDouble(FontPositionXTextBox.Text);
-                        DocumentPrintSettings.LabelLayoutSettings.TextPositionY = ParseDouble(FontPositionYTextBox.Text);
-                        DocumentPrintSettings.LabelLayoutSettings.AlignTextCenterX = AlignTextXCenterCheckBox.Checked;
-                        DocumentPrintSettings.LabelLayoutSettings.AlignTextCenterY = AlignTextYCenterCheckBox.Checked;
+                        DocumentPrintSettings.LabelLayoutSettings.TextPositionX = ParseDouble(TextPositionXTextBox.Text);
+                        DocumentPrintSettings.LabelLayoutSettings.TextPositionY = ParseDouble(TextPositionYTextBox.Text);
+                        DocumentPrintSettings.LabelLayoutSettings.AlignTextCenterX = AlignTextCenterXCheckBox.Checked;
+                        DocumentPrintSettings.LabelLayoutSettings.AlignTextCenterY = AlignTextCenterYCheckBox.Checked;
                         DocumentPrintSettings.LabelLayoutSettings.CopiesPerLabel = ParseInt(CopiesPerLabelTextBox.Text);
                     }
                     break;
@@ -288,9 +292,9 @@ namespace ProductDatabase {
         }
 
         private void ProductBarcodePrintSetting_Load(object sender, EventArgs e) { LoadSettings(); }
-        private void BarcodeCenterCheckBox_CheckedChanged(object sender, EventArgs e) { BarcodePositionXTextBox.Enabled = !BarcodeCenterCheckBox.Checked; }
-        private void AlignTextXCenterCheckBox_CheckedChanged(object sender, EventArgs e) { FontPositionXTextBox.Enabled = !AlignTextXCenterCheckBox.Checked; }
-        private void AlignTextYCenterCheckBox_CheckedChanged(object sender, EventArgs e) { FontPositionYTextBox.Enabled = !AlignTextYCenterCheckBox.Checked; }
+        private void BarcodeCenterCheckBox_CheckedChanged(object sender, EventArgs e) { BarcodePositionXTextBox.Enabled = !AlignBarcodeCenterXCheckBox.Checked; }
+        private void AlignTextXCenterCheckBox_CheckedChanged(object sender, EventArgs e) { TextPositionXTextBox.Enabled = !AlignTextCenterXCheckBox.Checked; }
+        private void AlignTextYCenterCheckBox_CheckedChanged(object sender, EventArgs e) { TextPositionYTextBox.Enabled = !AlignTextCenterYCheckBox.Checked; }
         private void BarcodeHeaderFontButton_Click(object sender, EventArgs e) {
             var r = HeaderFontDialog.ShowDialog();
             if (r == DialogResult.Cancel) {
