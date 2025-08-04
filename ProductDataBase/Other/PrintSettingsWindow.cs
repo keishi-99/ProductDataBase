@@ -54,6 +54,11 @@ namespace ProductDatabase {
                     SetPageSettings(DocumentPrintSettings.BarcodePageSettings);
                     SetLabelSettings(DocumentPrintSettings.BarcodeLayoutSettings);
                     break;
+                case "Substrate":
+                    BarcodePanel.Visible = false;
+                    SetPageSettings(DocumentPrintSettings.LabelPageSettings);
+                    SetLabelSettings(DocumentPrintSettings.LabelLayoutSettings);
+                    break;
             }
         }
 
@@ -182,6 +187,7 @@ namespace ProductDatabase {
                         DocumentPrintSettings.LabelLayoutSettings.CopiesPerLabel = ParseInt(CopiesPerLabelTextBox.Text);
                     }
                     break;
+
                 case "Barcode":
                     if (DocumentPrintSettings.BarcodePageSettings != null) {
                         DocumentPrintSettings.BarcodePageSettings.LabelWidth = ParseDouble(LabelWidthTextBox.Text);
@@ -211,6 +217,33 @@ namespace ProductDatabase {
                         DocumentPrintSettings.BarcodeLayoutSettings.CopiesPerLabel = ParseInt(CopiesPerLabelTextBox.Text);
                     }
                     break;
+
+                case "Substrate":
+                    if (DocumentPrintSettings.LabelPageSettings != null) {
+                        DocumentPrintSettings.LabelPageSettings.LabelWidth = ParseDouble(LabelWidthTextBox.Text);
+                        DocumentPrintSettings.LabelPageSettings.LabelHeight = ParseDouble(LabelHeightTextBox.Text);
+                        DocumentPrintSettings.LabelPageSettings.LabelsPerRow = ParseInt(LabelsPerRowTextBox.Text);
+                        DocumentPrintSettings.LabelPageSettings.LabelsPerColumn = ParseInt(LabelsPerColumnTextBox.Text);
+                        DocumentPrintSettings.LabelPageSettings.MarginX = ParseDouble(LabelMarginXTextBox.Text);
+                        DocumentPrintSettings.LabelPageSettings.MarginY = ParseDouble(LabelMarginYTextBox.Text);
+                        DocumentPrintSettings.LabelPageSettings.IntervalX = ParseDouble(LabelIntervalXTextBox.Text);
+                        DocumentPrintSettings.LabelPageSettings.IntervalY = ParseDouble(LabelIntervalYTextBox.Text);
+                        DocumentPrintSettings.LabelPageSettings.HeaderPositionX = ParseDouble(HeaderPositionXTextBox.Text);
+                        DocumentPrintSettings.LabelPageSettings.HeaderPositionY = ParseDouble(HeaderPositionYTextBox.Text);
+                        DocumentPrintSettings.LabelPageSettings.HeaderTextFormat = HeaderFormatTextBox.Text;
+                        DocumentPrintSettings.LabelPageSettings.HeaderFont = HeaderFontDialog.Font;
+                    }
+                    if (DocumentPrintSettings.LabelLayoutSettings != null) {
+                        DocumentPrintSettings.LabelLayoutSettings.TextFormat = FormatTextBox.Text;
+                        DocumentPrintSettings.LabelLayoutSettings.TextFont = FontDialog.Font;
+                        DocumentPrintSettings.LabelLayoutSettings.TextPositionX = ParseDouble(FontPositionXTextBox.Text);
+                        DocumentPrintSettings.LabelLayoutSettings.TextPositionY = ParseDouble(FontPositionYTextBox.Text);
+                        DocumentPrintSettings.LabelLayoutSettings.AlignTextCenterX = AlignTextXCenterCheckBox.Checked;
+                        DocumentPrintSettings.LabelLayoutSettings.AlignTextCenterY = AlignTextYCenterCheckBox.Checked;
+                        DocumentPrintSettings.LabelLayoutSettings.CopiesPerLabel = ParseInt(CopiesPerLabelTextBox.Text);
+                    }
+                    break;
+
                 default:
                     MessageBox.Show("不正なシリアルタイプです。");
                     return;

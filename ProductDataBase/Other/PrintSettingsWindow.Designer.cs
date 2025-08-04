@@ -639,20 +639,20 @@
             // Label30
             // 
             this.Label30.AutoSize = true;
-            this.Label30.Location = new Point(113, 216);
+            this.Label30.Location = new Point(118, 216);
             this.Label30.Name = "Label30";
-            this.Label30.Size = new Size(68, 45);
+            this.Label30.Size = new Size(73, 45);
             this.Label30.TabIndex = 23;
-            this.Label30.Text = "%P 製品名\r\n%N 台数\r\n%U 担当者";
+            this.Label30.Text = "%P: 製品名\r\n%N: 台数\r\n%U: 担当者";
             // 
             // Label29
             // 
             this.Label29.AutoSize = true;
             this.Label29.Location = new Point(39, 216);
             this.Label29.Name = "Label29";
-            this.Label29.Size = new Size(68, 60);
+            this.Label29.Size = new Size(73, 60);
             this.Label29.TabIndex = 22;
-            this.Label29.Text = "%D 印刷日\r\n%M 製番\r\n%O 注番\r\n%T 型式";
+            this.Label29.Text = "%D: 印刷日\r\n%M: 製番\r\n%O: 注番\r\n%T: 型式";
             // 
             // HeaderFormatTextBox
             // 
@@ -848,7 +848,7 @@
             this.MinimizeBox = false;
             this.Name = "PrintSettingsWindow";
             this.StartPosition = FormStartPosition.CenterParent;
-            this.Text = "製品バーコード設定";
+            this.Text = "印刷設定";
             this.Load += this.ProductBarcodePrintSetting_Load;
             this.PrintStringGroupBox.ResumeLayout(false);
             this.PrintStringGroupBox.PerformLayout();

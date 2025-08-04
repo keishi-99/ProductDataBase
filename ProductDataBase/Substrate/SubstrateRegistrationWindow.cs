@@ -12,7 +12,7 @@ namespace ProductDatabase {
         public DocumentPrintSettings SubstratePrintSettings { get; set; } = new DocumentPrintSettings();
         public PrintPageSettings LabelPageSettings => SubstratePrintSettings.LabelPageSettings ?? new PrintPageSettings();
         public PrintLayoutSettings LabelLayoutSettings => SubstratePrintSettings.LabelLayoutSettings ?? new PrintLayoutSettings();
-        public readonly string printSettingPath = SubstratePrintSettingsWindow.s_substratePrintSettingFilePath;
+        public readonly string printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
 
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectNumberCheckBox",
@@ -593,8 +593,10 @@ namespace ProductDatabase {
         private void DefectQuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { RegisterCheck(false); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            //SubstratePrintSettingsWindow ls = new();
-            PrintSettingsWindow ls = new();
+            PrintSettingsWindow ls = new() {
+                ProductInfo = ProductInfo,
+                serialType = "Substrate"
+            };
             ls.ShowDialog(this);
             LoadSettings(printSettingPath);
         }
