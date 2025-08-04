@@ -38,13 +38,13 @@
             this.BarcodePositionXTextBox = new TextBox();
             this.Label33 = new Label();
             this.BarcodePositionYTextBox = new TextBox();
-            this.BarcodeCenterCheckBox = new CheckBox();
+            this.AlignBarcodeCenterXCheckBox = new CheckBox();
             this.Label34 = new Label();
             this.BarcodeWidthTextBox = new TextBox();
-            this.AlignTextYCenterCheckBox = new CheckBox();
-            this.AlignTextXCenterCheckBox = new CheckBox();
-            this.FontPositionYTextBox = new TextBox();
-            this.FontPositionXTextBox = new TextBox();
+            this.AlignTextCenterYCheckBox = new CheckBox();
+            this.AlignTextCenterXCheckBox = new CheckBox();
+            this.TextPositionYTextBox = new TextBox();
+            this.TextPositionXTextBox = new TextBox();
             this.Label37 = new Label();
             this.Label28 = new Label();
             this.CopiesPerLabelTextBox = new TextBox();
@@ -123,10 +123,10 @@
             this.PrintStringGroupBox.Controls.Add(this.label23);
             this.PrintStringGroupBox.Controls.Add(this.label17);
             this.PrintStringGroupBox.Controls.Add(this.BarcodePanel);
-            this.PrintStringGroupBox.Controls.Add(this.AlignTextYCenterCheckBox);
-            this.PrintStringGroupBox.Controls.Add(this.AlignTextXCenterCheckBox);
-            this.PrintStringGroupBox.Controls.Add(this.FontPositionYTextBox);
-            this.PrintStringGroupBox.Controls.Add(this.FontPositionXTextBox);
+            this.PrintStringGroupBox.Controls.Add(this.AlignTextCenterYCheckBox);
+            this.PrintStringGroupBox.Controls.Add(this.AlignTextCenterXCheckBox);
+            this.PrintStringGroupBox.Controls.Add(this.TextPositionYTextBox);
+            this.PrintStringGroupBox.Controls.Add(this.TextPositionXTextBox);
             this.PrintStringGroupBox.Controls.Add(this.Label37);
             this.PrintStringGroupBox.Controls.Add(this.Label28);
             this.PrintStringGroupBox.Controls.Add(this.CopiesPerLabelTextBox);
@@ -174,7 +174,7 @@
             this.BarcodePanel.Controls.Add(this.BarcodePositionXTextBox);
             this.BarcodePanel.Controls.Add(this.Label33);
             this.BarcodePanel.Controls.Add(this.BarcodePositionYTextBox);
-            this.BarcodePanel.Controls.Add(this.BarcodeCenterCheckBox);
+            this.BarcodePanel.Controls.Add(this.AlignBarcodeCenterXCheckBox);
             this.BarcodePanel.Controls.Add(this.Label34);
             this.BarcodePanel.Controls.Add(this.BarcodeWidthTextBox);
             this.BarcodePanel.Location = new Point(6, 135);
@@ -269,16 +269,16 @@
             this.BarcodePositionYTextBox.Size = new Size(100, 23);
             this.BarcodePositionYTextBox.TabIndex = 5;
             // 
-            // BarcodeCenterCheckBox
+            // AlignBarcodeCenterXCheckBox
             // 
-            this.BarcodeCenterCheckBox.AutoSize = true;
-            this.BarcodeCenterCheckBox.Location = new Point(62, 97);
-            this.BarcodeCenterCheckBox.Name = "BarcodeCenterCheckBox";
-            this.BarcodeCenterCheckBox.Size = new Size(50, 19);
-            this.BarcodeCenterCheckBox.TabIndex = 6;
-            this.BarcodeCenterCheckBox.Text = "中心";
-            this.BarcodeCenterCheckBox.UseVisualStyleBackColor = true;
-            this.BarcodeCenterCheckBox.CheckedChanged += this.BarcodeCenterCheckBox_CheckedChanged;
+            this.AlignBarcodeCenterXCheckBox.AutoSize = true;
+            this.AlignBarcodeCenterXCheckBox.Location = new Point(62, 97);
+            this.AlignBarcodeCenterXCheckBox.Name = "AlignBarcodeCenterXCheckBox";
+            this.AlignBarcodeCenterXCheckBox.Size = new Size(50, 19);
+            this.AlignBarcodeCenterXCheckBox.TabIndex = 6;
+            this.AlignBarcodeCenterXCheckBox.Text = "中心";
+            this.AlignBarcodeCenterXCheckBox.UseVisualStyleBackColor = true;
+            this.AlignBarcodeCenterXCheckBox.CheckedChanged += this.BarcodeCenterCheckBox_CheckedChanged;
             // 
             // Label34
             // 
@@ -297,43 +297,43 @@
             this.BarcodeWidthTextBox.Size = new Size(100, 23);
             this.BarcodeWidthTextBox.TabIndex = 8;
             // 
-            // AlignTextYCenterCheckBox
+            // AlignTextCenterYCheckBox
             // 
-            this.AlignTextYCenterCheckBox.AutoSize = true;
-            this.AlignTextYCenterCheckBox.Location = new Point(206, 110);
-            this.AlignTextYCenterCheckBox.Name = "AlignTextYCenterCheckBox";
-            this.AlignTextYCenterCheckBox.Size = new Size(50, 19);
-            this.AlignTextYCenterCheckBox.TabIndex = 36;
-            this.AlignTextYCenterCheckBox.Text = "中心";
-            this.AlignTextYCenterCheckBox.UseVisualStyleBackColor = true;
-            this.AlignTextYCenterCheckBox.CheckedChanged += this.AlignTextYCenterCheckBox_CheckedChanged;
+            this.AlignTextCenterYCheckBox.AutoSize = true;
+            this.AlignTextCenterYCheckBox.Location = new Point(206, 110);
+            this.AlignTextCenterYCheckBox.Name = "AlignTextCenterYCheckBox";
+            this.AlignTextCenterYCheckBox.Size = new Size(50, 19);
+            this.AlignTextCenterYCheckBox.TabIndex = 36;
+            this.AlignTextCenterYCheckBox.Text = "中心";
+            this.AlignTextCenterYCheckBox.UseVisualStyleBackColor = true;
+            this.AlignTextCenterYCheckBox.CheckedChanged += this.AlignTextYCenterCheckBox_CheckedChanged;
             // 
-            // AlignTextXCenterCheckBox
+            // AlignTextCenterXCheckBox
             // 
-            this.AlignTextXCenterCheckBox.AutoSize = true;
-            this.AlignTextXCenterCheckBox.Location = new Point(68, 110);
-            this.AlignTextXCenterCheckBox.Name = "AlignTextXCenterCheckBox";
-            this.AlignTextXCenterCheckBox.Size = new Size(50, 19);
-            this.AlignTextXCenterCheckBox.TabIndex = 35;
-            this.AlignTextXCenterCheckBox.Text = "中心";
-            this.AlignTextXCenterCheckBox.UseVisualStyleBackColor = true;
-            this.AlignTextXCenterCheckBox.CheckedChanged += this.AlignTextXCenterCheckBox_CheckedChanged;
+            this.AlignTextCenterXCheckBox.AutoSize = true;
+            this.AlignTextCenterXCheckBox.Location = new Point(68, 110);
+            this.AlignTextCenterXCheckBox.Name = "AlignTextCenterXCheckBox";
+            this.AlignTextCenterXCheckBox.Size = new Size(50, 19);
+            this.AlignTextCenterXCheckBox.TabIndex = 35;
+            this.AlignTextCenterXCheckBox.Text = "中心";
+            this.AlignTextCenterXCheckBox.UseVisualStyleBackColor = true;
+            this.AlignTextCenterXCheckBox.CheckedChanged += this.AlignTextXCenterCheckBox_CheckedChanged;
             // 
-            // FontPositionYTextBox
+            // TextPositionYTextBox
             // 
-            this.FontPositionYTextBox.Location = new Point(156, 81);
-            this.FontPositionYTextBox.MaxLength = 5;
-            this.FontPositionYTextBox.Name = "FontPositionYTextBox";
-            this.FontPositionYTextBox.Size = new Size(100, 23);
-            this.FontPositionYTextBox.TabIndex = 34;
+            this.TextPositionYTextBox.Location = new Point(156, 81);
+            this.TextPositionYTextBox.MaxLength = 5;
+            this.TextPositionYTextBox.Name = "TextPositionYTextBox";
+            this.TextPositionYTextBox.Size = new Size(100, 23);
+            this.TextPositionYTextBox.TabIndex = 34;
             // 
-            // FontPositionXTextBox
+            // TextPositionXTextBox
             // 
-            this.FontPositionXTextBox.Location = new Point(18, 81);
-            this.FontPositionXTextBox.MaxLength = 5;
-            this.FontPositionXTextBox.Name = "FontPositionXTextBox";
-            this.FontPositionXTextBox.Size = new Size(100, 23);
-            this.FontPositionXTextBox.TabIndex = 33;
+            this.TextPositionXTextBox.Location = new Point(18, 81);
+            this.TextPositionXTextBox.MaxLength = 5;
+            this.TextPositionXTextBox.Name = "TextPositionXTextBox";
+            this.TextPositionXTextBox.Size = new Size(100, 23);
+            this.TextPositionXTextBox.TabIndex = 33;
             // 
             // Label37
             // 
@@ -882,7 +882,7 @@
         private Label Label35;
         private TextBox BarcodeWidthTextBox;
         private Label Label34;
-        private CheckBox BarcodeCenterCheckBox;
+        private CheckBox AlignBarcodeCenterXCheckBox;
         private TextBox BarcodePositionYTextBox;
         private Label Label33;
         private TextBox BarcodePositionXTextBox;
@@ -930,15 +930,15 @@
         private TextBox LabelIntervalXTextBox;
         private Label Label13;
         private Label Label12;
-        private CheckBox AlignTextXCenterCheckBox;
-        private TextBox FontPositionYTextBox;
-        private TextBox FontPositionXTextBox;
+        private CheckBox AlignTextCenterXCheckBox;
+        private TextBox TextPositionYTextBox;
+        private TextBox TextPositionXTextBox;
         private Label Label37;
         private Label Label28;
         private Button CloseButton;
         private FontDialog HeaderFontDialog;
         private FontDialog FontDialog;
-        private CheckBox AlignTextYCenterCheckBox;
+        private CheckBox AlignTextCenterYCheckBox;
         private Panel BarcodePanel;
         private Label label23;
         private Label label17;
