@@ -177,15 +177,15 @@
             this.BarcodePanel.Controls.Add(this.BarcodeCenterCheckBox);
             this.BarcodePanel.Controls.Add(this.Label34);
             this.BarcodePanel.Controls.Add(this.BarcodeWidthTextBox);
-            this.BarcodePanel.Location = new Point(0, 135);
+            this.BarcodePanel.Location = new Point(6, 135);
             this.BarcodePanel.Name = "BarcodePanel";
-            this.BarcodePanel.Size = new Size(311, 125);
+            this.BarcodePanel.Size = new Size(305, 119);
             this.BarcodePanel.TabIndex = 37;
             // 
             // label27
             // 
             this.label27.AutoSize = true;
-            this.label27.Location = new Point(262, 76);
+            this.label27.Location = new Point(256, 76);
             this.label27.Name = "label27";
             this.label27.Size = new Size(31, 15);
             this.label27.TabIndex = 12;
@@ -194,7 +194,7 @@
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new Point(124, 76);
+            this.label26.Location = new Point(118, 76);
             this.label26.Name = "label26";
             this.label26.Size = new Size(31, 15);
             this.label26.TabIndex = 11;
@@ -203,7 +203,7 @@
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new Point(262, 32);
+            this.label25.Location = new Point(256, 32);
             this.label25.Name = "label25";
             this.label25.Size = new Size(31, 15);
             this.label25.TabIndex = 10;
@@ -212,7 +212,7 @@
             // label24
             // 
             this.label24.AutoSize = true;
-            this.label24.Location = new Point(124, 32);
+            this.label24.Location = new Point(118, 32);
             this.label24.Name = "label24";
             this.label24.Size = new Size(31, 15);
             this.label24.TabIndex = 9;
@@ -220,7 +220,7 @@
             // 
             // BarcodeHeightTextBox
             // 
-            this.BarcodeHeightTextBox.Location = new Point(18, 24);
+            this.BarcodeHeightTextBox.Location = new Point(12, 24);
             this.BarcodeHeightTextBox.MaxLength = 5;
             this.BarcodeHeightTextBox.Name = "BarcodeHeightTextBox";
             this.BarcodeHeightTextBox.Size = new Size(100, 23);
@@ -229,7 +229,7 @@
             // Label31
             // 
             this.Label31.AutoSize = true;
-            this.Label31.Location = new Point(18, 6);
+            this.Label31.Location = new Point(12, 6);
             this.Label31.Name = "Label31";
             this.Label31.Size = new Size(73, 15);
             this.Label31.TabIndex = 1;
@@ -238,7 +238,7 @@
             // Label32
             // 
             this.Label32.AutoSize = true;
-            this.Label32.Location = new Point(18, 50);
+            this.Label32.Location = new Point(12, 50);
             this.Label32.Name = "Label32";
             this.Label32.Size = new Size(43, 15);
             this.Label32.TabIndex = 2;
@@ -246,7 +246,7 @@
             // 
             // BarcodePositionXTextBox
             // 
-            this.BarcodePositionXTextBox.Location = new Point(18, 68);
+            this.BarcodePositionXTextBox.Location = new Point(12, 68);
             this.BarcodePositionXTextBox.MaxLength = 5;
             this.BarcodePositionXTextBox.Name = "BarcodePositionXTextBox";
             this.BarcodePositionXTextBox.Size = new Size(100, 23);
@@ -255,7 +255,7 @@
             // Label33
             // 
             this.Label33.AutoSize = true;
-            this.Label33.Location = new Point(156, 50);
+            this.Label33.Location = new Point(150, 50);
             this.Label33.Name = "Label33";
             this.Label33.Size = new Size(43, 15);
             this.Label33.TabIndex = 4;
@@ -263,7 +263,7 @@
             // 
             // BarcodePositionYTextBox
             // 
-            this.BarcodePositionYTextBox.Location = new Point(156, 68);
+            this.BarcodePositionYTextBox.Location = new Point(150, 68);
             this.BarcodePositionYTextBox.MaxLength = 5;
             this.BarcodePositionYTextBox.Name = "BarcodePositionYTextBox";
             this.BarcodePositionYTextBox.Size = new Size(100, 23);
@@ -272,7 +272,7 @@
             // BarcodeCenterCheckBox
             // 
             this.BarcodeCenterCheckBox.AutoSize = true;
-            this.BarcodeCenterCheckBox.Location = new Point(68, 97);
+            this.BarcodeCenterCheckBox.Location = new Point(62, 97);
             this.BarcodeCenterCheckBox.Name = "BarcodeCenterCheckBox";
             this.BarcodeCenterCheckBox.Size = new Size(50, 19);
             this.BarcodeCenterCheckBox.TabIndex = 6;
@@ -283,7 +283,7 @@
             // Label34
             // 
             this.Label34.AutoSize = true;
-            this.Label34.Location = new Point(156, 6);
+            this.Label34.Location = new Point(150, 6);
             this.Label34.Name = "Label34";
             this.Label34.Size = new Size(65, 15);
             this.Label34.TabIndex = 7;
@@ -291,7 +291,7 @@
             // 
             // BarcodeWidthTextBox
             // 
-            this.BarcodeWidthTextBox.Location = new Point(156, 24);
+            this.BarcodeWidthTextBox.Location = new Point(150, 24);
             this.BarcodeWidthTextBox.MaxLength = 5;
             this.BarcodeWidthTextBox.Name = "BarcodeWidthTextBox";
             this.BarcodeWidthTextBox.Size = new Size(100, 23);
