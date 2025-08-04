@@ -546,15 +546,17 @@ namespace ProductDatabase {
             RegisterCheck(false);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            ProductLabelSettingsWindow ls = new() {
-                ProductInfo = ProductInfo
+            PrintSettingsWindow ls = new() {
+                ProductInfo = ProductInfo,
+                serialType = "Label"
             };
             ls.ShowDialog(this);
             LoadSettings();
         }
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            ProductBarcodeSettingsWindow ls = new() {
-                ProductInfo = ProductInfo
+            PrintSettingsWindow ls = new() {
+                ProductInfo = ProductInfo,
+                serialType = "Barcode"
             };
             ls.ShowDialog(this);
             LoadSettings();

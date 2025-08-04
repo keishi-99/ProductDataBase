@@ -12,7 +12,7 @@ namespace ProductDatabase {
         public DocumentPrintSettings SubstratePrintSettings { get; set; } = new DocumentPrintSettings();
         public PrintPageSettings LabelPageSettings => SubstratePrintSettings.LabelPageSettings ?? new PrintPageSettings();
         public PrintLayoutSettings LabelLayoutSettings => SubstratePrintSettings.LabelLayoutSettings ?? new PrintLayoutSettings();
-        private readonly string _printSettingPath = SubstratePrintSettingsWindow.s_substratePrintSettingFilePath;
+        public readonly string printSettingPath = SubstratePrintSettingsWindow.s_substratePrintSettingFilePath;
 
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectNumberCheckBox",
@@ -65,9 +65,9 @@ namespace ProductDatabase {
                     PrintButton.Visible = false;
                 }
 
-                if (File.Exists(_printSettingPath) == false) { throw new Exception("印刷設定ファイルが見つかりませんでした"); }
+                if (File.Exists(printSettingPath) == false) { throw new Exception("印刷設定ファイルが見つかりませんでした"); }
                 SubstratePrintSettings = new DocumentPrintSettings();
-                LoadSettings(_printSettingPath);
+                LoadSettings(printSettingPath);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
@@ -593,9 +593,10 @@ namespace ProductDatabase {
         private void DefectQuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { RegisterCheck(false); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            SubstratePrintSettingsWindow ls = new();
+            //SubstratePrintSettingsWindow ls = new();
+            PrintSettingsWindow ls = new();
             ls.ShowDialog(this);
-            LoadSettings(_printSettingPath);
+            LoadSettings(printSettingPath);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
         private void QrCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
