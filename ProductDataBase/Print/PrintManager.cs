@@ -5,9 +5,9 @@ using System.Text.Json.Serialization;
 using ZXing;
 using ZXing.Windows.Compatibility;
 using static ProductDatabase.MainWindow;
-using static ProductDatabase.Other.PrintOptions;
+using static ProductDatabase.Print.PrintOptions;
 
-namespace ProductDatabase.Other {
+namespace ProductDatabase.Print {
     // シリアル印刷管理クラス
     public static class PrintManager {
 
@@ -104,12 +104,12 @@ namespace ProductDatabase.Other {
                 if (PageCount >= 2) { startLine = 0; }
 
                 var verticalOffsetPx = PageCount == 1 ? startLine * (intervalYPx + labelHeightPx) : 0;
-                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, headerPositionXPx, (verticalOffsetPx + headerPositionYPx - hardMarginY));
+                e.Graphics.DrawString(headerString, headerFont, Brushes.Gray, headerPositionXPx, verticalOffsetPx + headerPositionYPx - hardMarginY);
 
                 for (var y = startLine; y < labelCountY; y++) {
                     for (var x = 0; x < labelCountX; x++) {
-                        var posX = marginXPx - hardMarginX + (x * (intervalXPx + labelWidthPx));
-                        var posY = marginYPx - hardMarginY + (y * (intervalYPx + labelHeightPx));
+                        var posX = marginXPx - hardMarginX + x * (intervalXPx + labelWidthPx);
+                        var posY = marginYPx - hardMarginY + y * (intervalYPx + labelHeightPx);
 
                         if (CopiesRemainingPerSerial == 0) { CopiesRemainingPerSerial = copiesPerLabel; }
                         var isLastCopy = CopiesRemainingPerSerial == 1;
@@ -199,7 +199,7 @@ namespace ProductDatabase.Other {
             var fontSize = LabelLayoutSettings.TextFont.SizeInPoints;
             var style = fontUnderline ? FontStyle.Underline : FontStyle.Regular;
 
-            using var textFont = new System.Drawing.Font(fontName, fontSize, style);
+            using var textFont = new Font(fontName, fontSize, style);
             // テキストの配置設定
             using var sf = new StringFormat {
                 Alignment = LabelLayoutSettings.AlignTextCenterX ? StringAlignment.Center : StringAlignment.Near,
@@ -221,7 +221,7 @@ namespace ProductDatabase.Other {
             var fontName = BarcodeLayoutSettings.TextFont.Name;
             var fontSize = BarcodeLayoutSettings.TextFont.SizeInPoints;
 
-            using (var textFont = new System.Drawing.Font(fontName, fontSize, FontStyle.Regular)) {
+            using (var textFont = new Font(fontName, fontSize, FontStyle.Regular)) {
                 // テキストの配置設定
                 using var sf = new StringFormat {
                     Alignment = BarcodeLayoutSettings.AlignTextCenterX ? StringAlignment.Center : StringAlignment.Near
@@ -265,7 +265,7 @@ namespace ProductDatabase.Other {
 
             // X座標を中央に調整 (ピクセル単位で計算)
             if (BarcodeLayoutSettings.AlignBarcodeCenterX) {
-                barcodePosX = (labelWidthPx / 2f) - (barcodeWidthPx / 2f);
+                barcodePosX = labelWidthPx / 2f - barcodeWidthPx / 2f;
             }
 
             var layoutRectBarcode = new RectangleF(barcodePosX, barcodePosY, barcodeWidthPx, barcodeHeightPx);

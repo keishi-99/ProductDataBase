@@ -1,8 +1,9 @@
 ﻿using ProductDatabase.Other;
+using ProductDatabase.Print;
 using System.Data;
 using System.Data.SQLite;
 using static ProductDatabase.MainWindow;
-using static ProductDatabase.Other.PrintOptions;
+using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase {
     public partial class RePrintWindow : Form {
