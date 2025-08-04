@@ -381,33 +381,33 @@ namespace ProductDatabase.Print {
         }
 
         public class PrintPageSettings {
-            public int LabelsPerRow { get; set; }
-            public int LabelsPerColumn { get; set; }
             public double LabelWidth { get; set; }
             public double LabelHeight { get; set; }
+            public int LabelsPerRow { get; set; }
+            public int LabelsPerColumn { get; set; }
             public double MarginX { get; set; }
             public double MarginY { get; set; }
             public double IntervalX { get; set; }
             public double IntervalY { get; set; }
-            public string HeaderTextFormat { get; set; } = string.Empty;
             public double HeaderPositionX { get; set; }
             public double HeaderPositionY { get; set; }
+            public string HeaderTextFormat { get; set; } = string.Empty;
 
             [JsonConverter(typeof(FontJsonConverter))]
             public Font HeaderFont { get; set; } = SystemFonts.DefaultFont;
         }
         public class PrintLayoutSettings {
-            public string TextFormat { get; set; } = string.Empty;
-            public bool AlignTextCenterX { get; set; }
-            public bool AlignTextCenterY { get; set; }
+            public int CopiesPerLabel { get; set; }
             public double TextPositionX { get; set; }
             public double TextPositionY { get; set; }
-            public bool AlignBarcodeCenterX { get; set; }
+            public bool AlignTextCenterX { get; set; }
+            public bool AlignTextCenterY { get; set; }
             public double BarcodeHeight { get; set; }
             public double BarcodeWidth { get; set; }
             public double BarcodePositionX { get; set; }
             public double BarcodePositionY { get; set; }
-            public int CopiesPerLabel { get; set; }
+            public bool AlignBarcodeCenterX { get; set; }
+            public string TextFormat { get; set; } = string.Empty;
 
             [JsonConverter(typeof(FontJsonConverter))]
             public Font TextFont { get; set; } = SystemFonts.DefaultFont;
