@@ -101,6 +101,9 @@ namespace ProductDatabase.Print {
                     ? (0, 0)
                     : (e.PageSettings.HardMarginX * dpiX / 100.0f, e.PageSettings.HardMarginY * dpiY / 100.0f);
 
+                if (marginXPx <= hardMarginX) { throw new Exception($"上余白の値がプリンター上余白より小さい値になっています。\n{marginXPx} <= {hardMarginX}"); }
+                if (marginYPx <= hardMarginY) { throw new Exception($"左余白の値がプリンター左余白より小さい値になっています。\n{marginYPx} <= {hardMarginY}"); }
+
                 if (PageCount >= 2) { startLine = 0; }
 
                 var verticalOffsetPx = PageCount == 1 ? startLine * (intervalYPx + labelHeightPx) : 0;
