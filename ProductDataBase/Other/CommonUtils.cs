@@ -269,7 +269,32 @@ namespace ProductDatabase.Other {
                 if (filePaths.Length == 0) {
                     throw new FileNotFoundException($"指定されたファイル名 '{searchFileName}' のファイルが '{directoryPath}' に見つかりません。");
                 }
-                var filePath = filePaths[0]; // 最初のファイルを使用
+
+                string filePath;
+
+                if (filePaths.Length == 1) {
+                    // ファイルが1つだけ見つかった場合は、それを自動的に選択
+                    filePath = filePaths[0];
+                }
+                else {
+                    MessageBox.Show("複数のファイルが見つかりました。1つ選択してください。");
+                    // 複数のファイルが見つかった場合は、OpenFileDialog を使用してユーザーに選択させる
+                    using var openFileDialog = new OpenFileDialog();
+                    openFileDialog.InitialDirectory = directoryPath;
+                    openFileDialog.Filter = "Excel ファイル (*.xlsx)|*.xlsx|すべてのファイル (*.*)|*.*";
+
+                    // 複数ファイル選択を無効にする
+                    openFileDialog.Multiselect = false;
+
+                    // ファイル選択ダイアログを表示
+                    if (openFileDialog.ShowDialog() == DialogResult.OK) {
+                        filePath = openFileDialog.FileName;
+                    }
+                    else {
+                        // キャンセルされた場合は、処理を中止
+                        throw new OperationCanceledException("ファイル選択がキャンセルされました。");
+                    }
+                }
 
                 try {
                     FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
