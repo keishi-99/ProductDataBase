@@ -87,16 +87,17 @@ namespace ProductDatabase {
         // 登録処理
         private void RegisterCheck(bool isPrint) {
             try {
-                // 印刷のみにチェックがある場合処理をしない
-                if (PrintOnlyCheckBox.Checked) { return; }
 
                 FormCheck();
                 if (!DataCheck()) { return; }
 
                 RegisterButton.Enabled = false;
 
-                if (isPrint && !Registration()) {
-                    return;
+                // 印刷のみにチェックがある場合登録処理をしない
+                if (!PrintOnlyCheckBox.Checked) {
+                    if (isPrint && !Registration()) {
+                        return;
+                    }
                 }
 
                 if (IsLabelPrint) {
