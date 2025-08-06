@@ -16,7 +16,7 @@ namespace ProductDatabase {
         public readonly string printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
 
         private readonly List<string> _checkBoxNames = [
-                    "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectNumberCheckBox",
+                    "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectQuantityCheckBox",
                     "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
                     "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
 
@@ -438,7 +438,7 @@ namespace ProductDatabase {
                     QuantityTextBox.Enabled = checkBox.Checked;
                     if (checkBox.Checked) { DefectQuantityCheckBox.Checked = false; }
                     break;
-                case "DefectNumberCheckBox":
+                case "DefectQuantityCheckBox":
                     DefectQuantityTextBox.Enabled = checkBox.Checked;
                     if (checkBox.Checked) { QuantityCheckBox.Checked = false; }
                     break;
