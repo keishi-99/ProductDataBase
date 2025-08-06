@@ -302,9 +302,9 @@ namespace ProductDatabase {
                 }
             }
             if (DefectQuantityCheckBox.Checked) {
-                if (!int.TryParse(QuantityTextBox.Text, out var defectQuantity) || defectQuantity <= 0) {
+                if (!int.TryParse(DefectQuantityTextBox.Text, out var defectQuantity) || defectQuantity <= 0) {
                     MessageBox.Show("数量は1以上の有効な数値を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    QuantityTextBox.Focus();
+                    DefectQuantityTextBox.Focus();
                     return false;
                 }
             }
