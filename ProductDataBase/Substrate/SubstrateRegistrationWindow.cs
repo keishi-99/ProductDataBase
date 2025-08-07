@@ -282,11 +282,14 @@ namespace ProductDatabase {
                     }
                 }
             }
+            string manufacturingNumber = ManufacturingNumberMaskedTextBox.Text.Trim();
             return !anyTextBoxEnabled
                 ? throw new Exception("何も入力されていません")
                 : !allTextBoxesFilled
                 ? throw new Exception("空欄があります。")
-                : ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15
+                : ManufacturingNumberCheckBox.Checked &&
+                  !manufacturingNumber.StartsWith("R", StringComparison.OrdinalIgnoreCase) &&
+                  manufacturingNumber.Length != 15
                 ? throw new Exception("製番を10桁+4桁で入力して下さい。")
                 : true;
         }
@@ -433,6 +436,10 @@ namespace ProductDatabase {
                     break;
                 case "ManufacturingNumberCheckBox":
                     ManufacturingNumberMaskedTextBox.Enabled = checkBox.Checked;
+                    RNumberCheckBox.Enabled = checkBox.Checked;
+                    break;
+                case "RNumberCheckBox":
+                    ManufacturingNumberMaskedTextBox.Mask = checkBox.Checked ? "R00000000000000" : ">LA00A00000-0000";
                     break;
                 case "QuantityCheckBox":
                     QuantityTextBox.Enabled = checkBox.Checked;
