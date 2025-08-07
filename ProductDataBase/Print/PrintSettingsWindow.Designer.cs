@@ -535,18 +535,18 @@
             this.Label6.AutoSize = true;
             this.Label6.Location = new Point(156, 18);
             this.Label6.Name = "Label6";
-            this.Label6.Size = new Size(19, 15);
+            this.Label6.Size = new Size(31, 15);
             this.Label6.TabIndex = 2;
-            this.Label6.Text = "縦";
+            this.Label6.Text = "列数";
             // 
             // Label5
             // 
             this.Label5.AutoSize = true;
             this.Label5.Location = new Point(18, 18);
             this.Label5.Name = "Label5";
-            this.Label5.Size = new Size(19, 15);
+            this.Label5.Size = new Size(31, 15);
             this.Label5.TabIndex = 1;
-            this.Label5.Text = "横";
+            this.Label5.Text = "行数";
             // 
             // BarcodeSizeGroupBox
             // 
