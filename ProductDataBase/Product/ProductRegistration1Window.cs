@@ -113,7 +113,14 @@ namespace ProductDatabase {
                     }
                 }
 
-                if (ManufacturingNumberCheckBox.Checked && ManufacturingNumberMaskedTextBox.Text.Length != 15) { throw new Exception("製番を10桁+4桁で入力して下さい。"); }
+                if (ManufacturingNumberCheckBox.Checked) {
+                    string text = ManufacturingNumberMaskedTextBox.Text.Trim();
+
+                    // 先頭が "R" の場合はスキップ
+                    if (!text.StartsWith("R", StringComparison.OrdinalIgnoreCase) && text.Length != 15) {
+                        throw new Exception("製番を10桁+4桁で入力して下さい。");
+                    }
+                }
 
                 if (string.IsNullOrWhiteSpace(QuantityTextBox.Text)) {
                     MessageBox.Show("数量を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -300,6 +307,10 @@ namespace ProductDatabase {
                     break;
                 case "ManufacturingNumberCheckBox":
                     ManufacturingNumberMaskedTextBox.Enabled = checkBox.Checked;
+                    RNumberCheckBox.Enabled = checkBox.Checked;
+                    break;
+                case "RNumberCheckBox":
+                    ManufacturingNumberMaskedTextBox.Mask = checkBox.Checked ? "R00000000000000" : ">LA00000000-0000";
                     break;
                 case "QuantityCheckBox":
                     QuantityTextBox.Enabled = checkBox.Checked;

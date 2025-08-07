@@ -71,6 +71,7 @@
             this.textToUpperCheckBox = new CheckBox();
             this.RevisionChangeButton = new Button();
             this.RegistrationDateTimePicker = new DateTimePicker();
+            this.RNumberCheckBox = new CheckBox();
             this.ProductRegistration1MenuStrip.SuspendLayout();
             this.panelCommentTextBox.SuspendLayout();
             this.SuspendLayout();
@@ -384,7 +385,7 @@
             // 
             this.ManufacturingNumberMaskedTextBox.Enabled = false;
             this.ManufacturingNumberMaskedTextBox.Location = new Point(19, 191);
-            this.ManufacturingNumberMaskedTextBox.Mask = ">LA00L00000-0000";
+            this.ManufacturingNumberMaskedTextBox.Mask = ">LA00000000-0000";
             this.ManufacturingNumberMaskedTextBox.Name = "ManufacturingNumberMaskedTextBox";
             this.ManufacturingNumberMaskedTextBox.PromptChar = '*';
             this.ManufacturingNumberMaskedTextBox.Size = new Size(120, 23);
@@ -605,11 +606,23 @@
             this.RegistrationDateTimePicker.Size = new Size(120, 23);
             this.RegistrationDateTimePicker.TabIndex = 612;
             // 
+            // RNumberCheckBox
+            // 
+            this.RNumberCheckBox.AutoSize = true;
+            this.RNumberCheckBox.Location = new Point(96, 168);
+            this.RNumberCheckBox.Name = "RNumberCheckBox";
+            this.RNumberCheckBox.Size = new Size(46, 19);
+            this.RNumberCheckBox.TabIndex = 613;
+            this.RNumberCheckBox.Text = "R番";
+            this.RNumberCheckBox.UseVisualStyleBackColor = true;
+            this.RNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
+            // 
             // ProductRegistration1Window
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.RNumberCheckBox);
             this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.RevisionChangeButton);
             this.Controls.Add(this.textToUpperCheckBox);
@@ -722,5 +735,6 @@
         private CheckBox textToUpperCheckBox;
         private Button RevisionChangeButton;
         private DateTimePicker RegistrationDateTimePicker;
+        private CheckBox RNumberCheckBox;
     }
 }
