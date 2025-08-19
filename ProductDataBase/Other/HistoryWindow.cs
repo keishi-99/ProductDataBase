@@ -45,7 +45,6 @@ namespace ProductDatabase {
 
                 switch (ProductInfo.RadioButtonNumber) {
                     case 1:
-                        if (ProductInfo.RegType == 0) { CategoryRadioButton2.Visible = false; }
                         CategoryRadioButton2.Text = "在庫";
                         CategoryRadioButton3.Visible = false;
                         StockCheckBox.Visible = false;
