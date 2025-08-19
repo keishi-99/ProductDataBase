@@ -18,7 +18,7 @@ namespace ProductDatabase {
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectQuantityCheckBox",
                     "ExtraCheckBox7", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
-                    "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox"
+                    "PersonCheckBox", "CommentCheckBox"
         ];
 
         // プロパティ設定
@@ -466,15 +466,6 @@ namespace ProductDatabase {
                     break;
                 case "PersonCheckBox":
                     PersonComboBox.Enabled = checkBox.Checked;
-                    break;
-                case "ExtraCheckBox4":
-                    ExtraTextBox4.Enabled = checkBox.Checked;
-                    break;
-                case "ExtraCheckBox5":
-                    ExtraTextBox5.Enabled = checkBox.Checked;
-                    break;
-                case "ExtraCheckBox6":
-                    ExtraTextBox6.Enabled = checkBox.Checked;
                     break;
                 case "CommentCheckBox":
                     CommentTextBox.Enabled = checkBox.Checked;
