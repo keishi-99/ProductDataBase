@@ -17,8 +17,9 @@ namespace ProductDatabase {
 
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectQuantityCheckBox",
-                    "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
-                    "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
+                    "ExtraCheckBox7", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
+                    "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox"
+        ];
 
         // プロパティ設定
         private bool IsLabelPrint => ProductInfo.PrintType is 1;
@@ -59,7 +60,6 @@ namespace ProductDatabase {
 
                 // 印刷しない場合は関連コントロール非表示に
                 if (IsLabelPrint == false) {
-                    ExtraCheckBox7.Visible = false;
                     PrintRowLabel.Visible = false;
                     PrintPositionNumericUpDown.Visible = false;
                     PrintOnlyCheckBox.Visible = false;
@@ -449,8 +449,8 @@ namespace ProductDatabase {
                     DefectQuantityTextBox.Enabled = checkBox.Checked;
                     if (checkBox.Checked) { QuantityCheckBox.Checked = false; }
                     break;
-                case "RevisionCheckBox":
-                    //RevisionTextBox.Enabled = checkBox.Checked;
+                case "ExtraCheckBox7":
+                    ExtraTextBox7.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox1":
                     ExtraTextBox1.Enabled = checkBox.Checked;
