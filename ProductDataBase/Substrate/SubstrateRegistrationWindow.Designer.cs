@@ -54,12 +54,6 @@
             this.RegistrationDateCheckBox = new CheckBox();
             this.PersonCheckBox = new CheckBox();
             this.PersonComboBox = new ComboBox();
-            this.ExtraTextBox4 = new TextBox();
-            this.ExtraCheckBox4 = new CheckBox();
-            this.ExtraTextBox5 = new TextBox();
-            this.ExtraCheckBox5 = new CheckBox();
-            this.ExtraTextBox6 = new TextBox();
-            this.ExtraCheckBox6 = new CheckBox();
             this.CommentCheckBox = new CheckBox();
             this.CommentTextBox = new TextBox();
             this.CommentComboBox = new ComboBox();
@@ -415,81 +409,9 @@
             this.PersonComboBox.Size = new Size(121, 23);
             this.PersonComboBox.TabIndex = 26;
             // 
-            // ExtraTextBox4
-            // 
-            this.ExtraTextBox4.Enabled = false;
-            this.ExtraTextBox4.Location = new Point(313, 141);
-            this.ExtraTextBox4.Margin = new Padding(0);
-            this.ExtraTextBox4.MaxLength = 20;
-            this.ExtraTextBox4.Name = "ExtraTextBox4";
-            this.ExtraTextBox4.Size = new Size(120, 23);
-            this.ExtraTextBox4.TabIndex = 28;
-            this.ExtraTextBox4.TextAlign = HorizontalAlignment.Right;
-            // 
-            // ExtraCheckBox4
-            // 
-            this.ExtraCheckBox4.Location = new Point(313, 118);
-            this.ExtraCheckBox4.Margin = new Padding(0);
-            this.ExtraCheckBox4.Name = "ExtraCheckBox4";
-            this.ExtraCheckBox4.Size = new Size(50, 19);
-            this.ExtraCheckBox4.TabIndex = 27;
-            this.ExtraCheckBox4.TabStop = false;
-            this.ExtraCheckBox4.Text = "予備";
-            this.ExtraCheckBox4.UseVisualStyleBackColor = true;
-            this.ExtraCheckBox4.Visible = false;
-            this.ExtraCheckBox4.CheckedChanged += this.CheckBoxChecked;
-            // 
-            // ExtraTextBox5
-            // 
-            this.ExtraTextBox5.Enabled = false;
-            this.ExtraTextBox5.Location = new Point(313, 191);
-            this.ExtraTextBox5.Margin = new Padding(0);
-            this.ExtraTextBox5.MaxLength = 20;
-            this.ExtraTextBox5.Name = "ExtraTextBox5";
-            this.ExtraTextBox5.Size = new Size(120, 23);
-            this.ExtraTextBox5.TabIndex = 30;
-            this.ExtraTextBox5.TextAlign = HorizontalAlignment.Right;
-            // 
-            // ExtraCheckBox5
-            // 
-            this.ExtraCheckBox5.Location = new Point(313, 168);
-            this.ExtraCheckBox5.Margin = new Padding(0);
-            this.ExtraCheckBox5.Name = "ExtraCheckBox5";
-            this.ExtraCheckBox5.Size = new Size(50, 19);
-            this.ExtraCheckBox5.TabIndex = 29;
-            this.ExtraCheckBox5.TabStop = false;
-            this.ExtraCheckBox5.Text = "予備";
-            this.ExtraCheckBox5.UseVisualStyleBackColor = true;
-            this.ExtraCheckBox5.Visible = false;
-            this.ExtraCheckBox5.CheckedChanged += this.CheckBoxChecked;
-            // 
-            // ExtraTextBox6
-            // 
-            this.ExtraTextBox6.Enabled = false;
-            this.ExtraTextBox6.Location = new Point(313, 241);
-            this.ExtraTextBox6.Margin = new Padding(0);
-            this.ExtraTextBox6.MaxLength = 20;
-            this.ExtraTextBox6.Name = "ExtraTextBox6";
-            this.ExtraTextBox6.Size = new Size(120, 23);
-            this.ExtraTextBox6.TabIndex = 32;
-            this.ExtraTextBox6.TextAlign = HorizontalAlignment.Right;
-            // 
-            // ExtraCheckBox6
-            // 
-            this.ExtraCheckBox6.Location = new Point(313, 218);
-            this.ExtraCheckBox6.Margin = new Padding(0);
-            this.ExtraCheckBox6.Name = "ExtraCheckBox6";
-            this.ExtraCheckBox6.Size = new Size(50, 19);
-            this.ExtraCheckBox6.TabIndex = 31;
-            this.ExtraCheckBox6.TabStop = false;
-            this.ExtraCheckBox6.Text = "予備";
-            this.ExtraCheckBox6.UseVisualStyleBackColor = true;
-            this.ExtraCheckBox6.Visible = false;
-            this.ExtraCheckBox6.CheckedChanged += this.CheckBoxChecked;
-            // 
             // CommentCheckBox
             // 
-            this.CommentCheckBox.Location = new Point(464, 118);
+            this.CommentCheckBox.Location = new Point(313, 118);
             this.CommentCheckBox.Margin = new Padding(0);
             this.CommentCheckBox.Name = "CommentCheckBox";
             this.CommentCheckBox.Size = new Size(59, 19);
@@ -501,6 +423,7 @@
             // 
             // CommentTextBox
             // 
+            this.CommentTextBox.Dock = DockStyle.Fill;
             this.CommentTextBox.Enabled = false;
             this.CommentTextBox.Location = new Point(0, 0);
             this.CommentTextBox.Margin = new Padding(0);
@@ -508,7 +431,7 @@
             this.CommentTextBox.Multiline = true;
             this.CommentTextBox.Name = "CommentTextBox";
             this.CommentTextBox.ScrollBars = ScrollBars.Vertical;
-            this.CommentTextBox.Size = new Size(150, 175);
+            this.CommentTextBox.Size = new Size(305, 193);
             this.CommentTextBox.TabIndex = 34;
             // 
             // CommentComboBox
@@ -517,15 +440,15 @@
             this.CommentComboBox.DropDownWidth = 150;
             this.CommentComboBox.Enabled = false;
             this.CommentComboBox.FormattingEnabled = true;
-            this.CommentComboBox.Location = new Point(464, 320);
+            this.CommentComboBox.Location = new Point(313, 341);
             this.CommentComboBox.Name = "CommentComboBox";
-            this.CommentComboBox.Size = new Size(150, 23);
+            this.CommentComboBox.Size = new Size(224, 23);
             this.CommentComboBox.TabIndex = 35;
             // 
             // TemplateButton
             // 
             this.TemplateButton.Enabled = false;
-            this.TemplateButton.Location = new Point(539, 347);
+            this.TemplateButton.Location = new Point(543, 340);
             this.TemplateButton.Name = "TemplateButton";
             this.TemplateButton.Size = new Size(75, 25);
             this.TemplateButton.TabIndex = 36;
@@ -591,15 +514,15 @@
             // panelCommentTexrBox
             // 
             this.panelCommentTexrBox.Controls.Add(this.CommentTextBox);
-            this.panelCommentTexrBox.Location = new Point(464, 141);
+            this.panelCommentTexrBox.Location = new Point(313, 141);
             this.panelCommentTexrBox.Name = "panelCommentTexrBox";
-            this.panelCommentTexrBox.Size = new Size(150, 175);
+            this.panelCommentTexrBox.Size = new Size(305, 193);
             this.panelCommentTexrBox.TabIndex = 42;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new Point(298, 24);
+            this.label1.Location = new Point(313, 21);
             this.label1.Name = "label1";
             this.label1.Size = new Size(86, 15);
             this.label1.TabIndex = 90;
@@ -617,10 +540,10 @@
             // 
             // QrCodeTextBox
             // 
-            this.QrCodeTextBox.Location = new Point(298, 39);
+            this.QrCodeTextBox.Location = new Point(313, 39);
             this.QrCodeTextBox.MaxLength = 100;
             this.QrCodeTextBox.Name = "QrCodeTextBox";
-            this.QrCodeTextBox.Size = new Size(320, 23);
+            this.QrCodeTextBox.Size = new Size(305, 23);
             this.QrCodeTextBox.TabIndex = 88;
             this.QrCodeTextBox.Enter += this.QrCodeTextBox_Enter;
             // 
@@ -686,12 +609,6 @@
             this.Controls.Add(this.TemplateButton);
             this.Controls.Add(this.CommentComboBox);
             this.Controls.Add(this.CommentCheckBox);
-            this.Controls.Add(this.ExtraTextBox6);
-            this.Controls.Add(this.ExtraCheckBox6);
-            this.Controls.Add(this.ExtraTextBox5);
-            this.Controls.Add(this.ExtraCheckBox5);
-            this.Controls.Add(this.ExtraTextBox4);
-            this.Controls.Add(this.ExtraCheckBox4);
             this.Controls.Add(this.PersonComboBox);
             this.Controls.Add(this.PersonCheckBox);
             this.Controls.Add(this.RegistrationDateCheckBox);
@@ -770,12 +687,6 @@
         private CheckBox RegistrationDateCheckBox;
         private CheckBox PersonCheckBox;
         private ComboBox PersonComboBox;
-        private TextBox ExtraTextBox4;
-        private CheckBox ExtraCheckBox4;
-        private TextBox ExtraTextBox5;
-        private CheckBox ExtraCheckBox5;
-        private TextBox ExtraTextBox6;
-        private CheckBox ExtraCheckBox6;
         private CheckBox CommentCheckBox;
         private TextBox CommentTextBox;
         private ComboBox CommentComboBox;

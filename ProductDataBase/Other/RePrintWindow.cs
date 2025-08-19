@@ -27,7 +27,7 @@ namespace ProductDatabase {
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
                     "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
-                    "PersonCheckBox", "ExtraCheckBox4", "ExtraCheckBox5", "ExtraCheckBox6", "CommentCheckBox" ];
+                    "PersonCheckBox", "CommentCheckBox" ];
 
         public RePrintWindow(ProductInformation productInfo) {
             InitializeComponent();
@@ -422,15 +422,6 @@ namespace ProductDatabase {
                     break;
                 case "PersonCheckBox":
                     PersonComboBox.Enabled = checkBox.Checked;
-                    break;
-                case "ExtraCheckBox4":
-                    ExtraTextBox4.Enabled = checkBox.Checked;
-                    break;
-                case "ExtraCheckBox5":
-                    ExtraTextBox5.Enabled = checkBox.Checked;
-                    break;
-                case "ExtraCheckBox6":
-                    ExtraTextBox6.Enabled = checkBox.Checked;
                     break;
                 case "CommentCheckBox":
                     CommentTextBox.Enabled = checkBox.Checked;
