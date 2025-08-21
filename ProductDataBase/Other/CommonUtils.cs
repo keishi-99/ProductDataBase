@@ -363,12 +363,12 @@ namespace ProductDatabase.Other {
                     // 1. Excel設定の読み込みとワークブックの準備
                     var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsx");
                     using var workBook = new ExcelPackage(new FileInfo(configPath));
-                    var (targetSheetName, resultRow, workSheetMain) = LoadExcelConfiguration(workBook, productInfo.ProductModel);
+                    var (targetSheetName, productName, resultRow, workSheetMain) = LoadExcelConfiguration(workBook, productInfo.ProductModel);
 
                     // 2. 製品情報の設定とExcelへの書き込み
                     var productCellRanges = GetProductCellRanges(workSheetMain, resultRow);
                     var workSheetTemp = workBook.Workbook.Worksheets[targetSheetName] ?? throw new Exception($"テンプレートシート:[{targetSheetName}]が見つかりません。");
-                    PopulateProductDetails(workSheetTemp, productInfo, productCellRanges);
+                    PopulateProductDetails(workSheetTemp, productInfo, productCellRanges, productName);
 
                     // 3. データベースから使用済み基板情報を取得
                     var usedSubstrate = GetUsedSubstrateData(productInfo);
@@ -390,20 +390,21 @@ namespace ProductDatabase.Other {
             }
 
             // Excel設定を読み込むメソッド
-            private static (string sheetName, int resultRow, ExcelWorksheet workSheetMain) LoadExcelConfiguration(ExcelPackage workBook, string productModel) {
+            private static (string sheetName, string productName, int resultRow, ExcelWorksheet workSheetMain) LoadExcelConfiguration(ExcelPackage workBook, string productModel) {
                 var sheet = workBook.Workbook.Worksheets;
                 var targetSheetName = "Sheet1";
                 var workSheetMain = sheet[targetSheetName] ?? throw new Exception($"設定シート:[{targetSheetName}]が見つかりません。");
 
                 // セル検索
                 var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == productModel)
-                                          ?? throw new Exception($"Configに品目番号:[{productModel}]が見つかりません。");
+                    ?? throw new Exception($"Configに品目番号:[{productModel}]が見つかりません。");
                 var resultRow = searchAddressResult.Start.Row;
 
                 var sheetName = workSheetMain.Cells[resultRow, 2].Value?.ToString()
-                                ?? throw new Exception($"設定シートの行 {resultRow}, 列 2 にシート名が設定されていません。");
+                    ?? throw new Exception($"設定シートの行 {resultRow}, 列 2 にシート名が設定されていません。");
+                var productName = workSheetMain.Cells[resultRow, 3].Value?.ToString() ?? string.Empty;
 
-                return (sheetName, resultRow, workSheetMain);
+                return (sheetName, productName, resultRow, workSheetMain);
             }
 
             // 製品情報に関連するExcelのセル範囲を取得するヘルパーメソッド
@@ -440,8 +441,8 @@ namespace ProductDatabase.Other {
 
 
             // 製品情報をExcelシートに書き込むメソッド
-            private static void PopulateProductDetails(ExcelWorksheet workSheetTemp, ProductInformation productInfo, ProductCellRanges ranges) {
-                if (!string.IsNullOrEmpty(ranges.ProductNameRange)) { workSheetTemp.Cells[ranges.ProductNameRange].Value = productInfo.ProductModel; } // ProductNameはProductModelから取得
+            private static void PopulateProductDetails(ExcelWorksheet workSheetTemp, ProductInformation productInfo, ProductCellRanges ranges, string productName) {
+                if (!string.IsNullOrEmpty(ranges.ProductNameRange)) { workSheetTemp.Cells[ranges.ProductNameRange].Value = productName; }
                 if (!string.IsNullOrEmpty(ranges.ProductNumberRange)) { workSheetTemp.Cells[ranges.ProductNumberRange].Value = productInfo.ProductNumber; }
                 if (!string.IsNullOrEmpty(ranges.OrderNumberRange)) { workSheetTemp.Cells[ranges.OrderNumberRange].Value = productInfo.OrderNumber; }
                 if (!string.IsNullOrEmpty(ranges.RegDateRange)) { workSheetTemp.Cells[ranges.RegDateRange].Value = productInfo.RegDate; }
