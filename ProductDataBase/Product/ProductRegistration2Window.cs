@@ -127,7 +127,7 @@ namespace ProductDatabase {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = ProductInfo.RegType == 9;
             var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : _useSubstrate)
-                ?? throw new Exception("ArrUseSubstrateがnullです。");
+                ?? throw new Exception("ArrUseSubstrateが nullです。");
 
             var shortageSubstrateName = string.Empty;
 
@@ -199,12 +199,12 @@ namespace ProductDatabase {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = ProductInfo.RegType == 9;
             var categoryName = (isServiceRegistration ? ServiceInfo.ServiceCategoryName : ProductInfo.CategoryName)
-                ?? throw new Exception("CategoryNameがnullです。");
+                ?? throw new Exception("CategoryNameが nullです。");
             var substrateTableName = $"[{categoryName}_Substrate]";
             var stockName = (isServiceRegistration ? ServiceInfo.ServiceStockName : ProductInfo.StockName)
-                ?? throw new Exception("StockNameがnullです。");
+                ?? throw new Exception("StockNameが nullです。");
             var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : _useSubstrate)
-                ?? throw new Exception("ArrUseSubstrateがnullです。");
+                ?? throw new Exception("ArrUseSubstrateが nullです。");
 
             var intQuantity = ProductInfo.Quantity;
 
@@ -437,11 +437,11 @@ namespace ProductDatabase {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = ProductInfo.RegType == 9;
             var categoryName = (isServiceRegistration ? ServiceInfo.ServiceCategoryName : ProductInfo.CategoryName)
-                ?? throw new Exception("CategoryNameがnullです。");
+                ?? throw new Exception("CategoryNameが nullです。");
             var stockName = (isServiceRegistration ? ServiceInfo.ServiceStockName : ProductInfo.StockName)
-                ?? throw new Exception("StockNameがnullです。");
+                ?? throw new Exception("StockNameが nullです。");
             var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : _useSubstrate)
-                ?? throw new Exception("ArrUseSubstrateがnullです。");
+                ?? throw new Exception("ArrUseSubstrateが nullです。");
             int? useID = isServiceRegistration ? null : ProductInfo.ProductID;
 
             for (var i = 0; i < useSubstrate.Length; i++) {
@@ -450,7 +450,7 @@ namespace ProductDatabase {
                 }
 
                 if (Controls[_dataGridViewNames[i]] as DataGridView is not DataGridView objDgv) {
-                    throw new Exception("DataGridViewがnullです。");
+                    throw new Exception("DataGridViewが nullです。");
                 }
 
                 foreach (DataGridViewRow row in objDgv.Rows) {
@@ -704,9 +704,9 @@ namespace ProductDatabase {
                         }
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
 
-                            var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxがnullです。");
+                            var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxが nullです。");
 
-                            var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
+                            var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvが nullです。");
                             objDgv.Columns[2].ReadOnly = false;
                             objDgv.Columns[3].ReadOnly = false;
 
