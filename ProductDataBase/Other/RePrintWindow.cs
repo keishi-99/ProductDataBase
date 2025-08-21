@@ -118,7 +118,7 @@ namespace ProductDatabase {
                     if (result == DialogResult.Cancel) { return; }
 
                     ProductInfo.Person = PersonComboBox.Text;
-                    if (!Registeration()) { throw new Exception("登録できませんでした。"); }
+                    if (!Registration()) { throw new Exception("登録できませんでした。"); }
                 }
 
                 if (!Print(isPrint)) { throw new Exception("キャンセルしました。"); }
@@ -127,7 +127,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private bool Registeration() {
+        private bool Registration() {
             try {
                 // 再印刷登録テーブルへ追加
                 using SQLiteConnection con = new(GetConnectionRegistration());
@@ -270,7 +270,7 @@ namespace ProductDatabase {
                 _ => throw new InvalidOperationException("不明なシリアル桁数です。") // より具体的な例外
             };
 
-            if (calculatedLastSerial > maxNumber || firstSerial < minNumber) {// あるいは firstSerialがminNumber未満の場合も対象に
+            if (calculatedLastSerial > maxNumber || firstSerial < minNumber) {// あるいは firstSerialが minNumber未満の場合も対象に
                 MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 FirstSerialNumberTextBox.Text = minNumber.ToString();
             }

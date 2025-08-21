@@ -508,8 +508,8 @@ namespace ProductDatabase.Other {
                     var foundColumn = 0;
 
                     var searchAddressResult2 = workSheetMain.Cells
-                                                .Where(x => x.Start.Row == targetRow && x.Value?.ToString() == searchValue)
-                                                .FirstOrDefault();
+                        .Where(x => x.Start.Row == targetRow && x.Value?.ToString() == searchValue)
+                        .FirstOrDefault();
 
                     foundColumn = searchAddressResult2 != null
                         ? searchAddressResult2.Start.Column
@@ -518,7 +518,7 @@ namespace ProductDatabase.Other {
                     var mainCellValue = workSheetMain.Cells[resultRow, foundColumn + 1].Value?.ToString()
                         ?? throw new Exception($"Configシートの行 {resultRow}, 列 {foundColumn + 1} にセル範囲が設定されていません。");
 
-                    var tempCellValue = string.Join("   ", substrateNumbers.Select((subStrateNumber, k) => $"{subStrateNumber}({decreases[k]})"));
+                    var tempCellValue = string.Join("   ", substrateNumbers.Select((substrateNumber, k) => $"{substrateNumber}({decreases[k]})"));
 
                     workSheetTemp.Cells[mainCellValue].Value = tempCellValue;
                 }
@@ -782,7 +782,7 @@ namespace ProductDatabase.Other {
             // 指定されたシートのセルに値を書き込みます。
             private static void WriteCellValue(ISheet sheet, CellReference? reference, string value) {
                 if (reference == null) {
-                    return; // 参照がnullの場合は何もしない
+                    return; // 参照が nullの場合は何もしない
                 }
 
                 // 指定した行を取得できない時はエラーとならないよう新規作成している

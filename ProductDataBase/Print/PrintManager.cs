@@ -64,7 +64,7 @@ namespace ProductDatabase.Print {
         public static bool PrintSerialCommon(PrintPageEventArgs e, bool isPreview, int startLine, string serialType) {
             try {
                 if (e.Graphics == null) {
-                    throw new Exception("e.Graphicsがnullです。");
+                    throw new Exception("e.Graphicsが nullです。");
                 }
 
                 e.Graphics.PageUnit = GraphicsUnit.Pixel;
@@ -241,11 +241,11 @@ namespace ProductDatabase.Print {
 
             // --- バーコードの描画 ---
 
-            // ZXingはピクセル単位で画像を生成するため、mmからpixelへの変換が必要
+            // ZXingはピクセル単位で画像を生成するため、mmから pixelへの変換が必要
             var barcodePixelWidth = ConvertMmToPixel(BarcodeLayoutSettings.BarcodeWidth, dpiX);
             var barcodePixelHeight = ConvertMmToPixel(BarcodeLayoutSettings.BarcodeHeight, dpiY);
 
-            // ZXing用にint型に変換
+            // ZXing用に int型に変換
             var qrWidthPx = (int)Math.Round(barcodePixelWidth);
             var qrHeightPx = (int)Math.Round(barcodePixelHeight);
 
@@ -276,7 +276,7 @@ namespace ProductDatabase.Print {
             g.DrawImage(barcodeBitmap, layoutRectBarcode);
         }
         private static string ConvertHeaderString(string s) {
-            if (ProductInfo == null) { throw new Exception("ProductInfoがnullです。"); }
+            if (ProductInfo == null) { throw new Exception("ProductInfoが nullです。"); }
             s = s.Replace("%P", ProductInfo.ProductName)
                  .Replace("%T", ProductInfo.ProductModel)
                  .Replace("%D", DateTime.Today.ToShortDateString())
@@ -299,7 +299,7 @@ namespace ProductDatabase.Print {
             return GenerateCode(serialNumberString, serialType);
         }
         private static string GenerateCode(string serialCode, string serialType) {
-            if (ProductInfo == null) { throw new Exception("ProductInfoがnullです。"); }
+            if (ProductInfo == null) { throw new Exception("ProductInfoが nullです。"); }
             var monthCode = DateTime.Parse(ProductInfo.RegDate).ToString("MM");
 
             monthCode = monthCode switch {

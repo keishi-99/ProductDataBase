@@ -243,10 +243,10 @@ namespace ProductDatabase {
                         if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
 
-                            var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                            var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
                             objCbx.Enabled = true;
 
-                            var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
+                            var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvが nullです。");
                             objDgv.Columns[3].ReadOnly = false;
                             objDgv.Columns[4].ReadOnly = false;
 
@@ -300,13 +300,13 @@ namespace ProductDatabase {
                             con.Open();
                             using var transaction = con.BeginTransaction();
 
-                            if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateがnullです。"); }
+                            if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateが nullです。"); }
                             for (var i = 0; i <= _useSubstrate.Length; i++) {
 
-                                var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxがnullです。");
+                                var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
 
                                 if (objCbx.Checked) {
-                                    var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvがnullです。");
+                                    var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvが nullです。");
                                     var dgvRowCnt = objDgv.Rows.Count;
 
                                     for (var j = 0; j <= dgvRowCnt - 1; j++) {
