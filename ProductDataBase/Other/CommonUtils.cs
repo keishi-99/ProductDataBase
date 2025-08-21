@@ -889,7 +889,7 @@ namespace ProductDatabase.Other {
 
             // 設定ワークブックから製品に対応する設定を抽出する
             private static (string filePaths, string sheetName) GetSubstrateConfig(ExcelPackage configWorkbook, string substrateModel) {
-                var workSheetMain = configWorkbook.Workbook.Worksheets["Sheet1"] ?? throw new Exception("設定ファイルのシールに Sheet1 が見つかりません。");
+                var workSheetMain = configWorkbook.Workbook.Worksheets["Sheet1"] ?? throw new Exception("設定ファイルのシートに Sheet1 が見つかりません。");
 
                 // セル検索
                 var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == substrateModel)
