@@ -70,7 +70,6 @@
             this.textToUpperCheckBox = new CheckBox();
             this.RegistrationDateTimePicker = new DateTimePicker();
             this.OpenSubstrateInformationButton = new Button();
-            this.RNumberCheckBox = new CheckBox();
             this.SubstrateRegistrationMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPositionNumericUpDown).BeginInit();
             this.panelCommentTexrBox.SuspendLayout();
@@ -578,23 +577,11 @@
             this.OpenSubstrateInformationButton.UseVisualStyleBackColor = true;
             this.OpenSubstrateInformationButton.Click += this.OpenSubstrateInformationButton_Click;
             // 
-            // RNumberCheckBox
-            // 
-            this.RNumberCheckBox.AutoSize = true;
-            this.RNumberCheckBox.Location = new Point(96, 168);
-            this.RNumberCheckBox.Name = "RNumberCheckBox";
-            this.RNumberCheckBox.Size = new Size(46, 19);
-            this.RNumberCheckBox.TabIndex = 614;
-            this.RNumberCheckBox.Text = "R番";
-            this.RNumberCheckBox.UseVisualStyleBackColor = true;
-            this.RNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
-            // 
             // SubstrateRegistrationWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
-            this.Controls.Add(this.RNumberCheckBox);
             this.Controls.Add(this.OpenSubstrateInformationButton);
             this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.textToUpperCheckBox);
@@ -703,6 +690,5 @@
         private CheckBox textToUpperCheckBox;
         private DateTimePicker RegistrationDateTimePicker;
         private Button OpenSubstrateInformationButton;
-        private CheckBox RNumberCheckBox;
     }
 }

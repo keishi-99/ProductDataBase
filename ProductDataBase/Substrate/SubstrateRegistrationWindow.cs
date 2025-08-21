@@ -436,10 +436,6 @@ namespace ProductDatabase {
                     break;
                 case "ManufacturingNumberCheckBox":
                     ManufacturingNumberMaskedTextBox.Enabled = checkBox.Checked;
-                    RNumberCheckBox.Enabled = checkBox.Checked;
-                    break;
-                case "RNumberCheckBox":
-                    ManufacturingNumberMaskedTextBox.Mask = checkBox.Checked ? "R00000000000000" : ">LA00A00000-0000";
                     break;
                 case "QuantityCheckBox":
                     QuantityTextBox.Enabled = checkBox.Checked;
