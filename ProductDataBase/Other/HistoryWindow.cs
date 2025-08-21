@@ -285,13 +285,15 @@ namespace ProductDatabase {
             if (string.IsNullOrEmpty(ProductInfo.ProductModel)) {
                 GenerateListButton.Visible = true;
                 GenerateCheckSheetButton.Visible = true;
+                CategoryRadioButton1.Visible = false;
+                CategoryRadioButton2.Checked = true;
             }
             else {
                 GenerateListButton.Visible = ProductInfo.IsListPrint;
                 GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
             }
 
-            var filterByProductModel = !string.IsNullOrEmpty(ProductInfo.ProductModel);
+            var filterByProductModel = CategoryRadioButton1.Checked && !string.IsNullOrEmpty(ProductInfo.ProductModel);
 
             var productTableName = $"[{ProductInfo.CategoryName}_Product]";
             var query = filterByProductModel
