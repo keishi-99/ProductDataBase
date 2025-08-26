@@ -369,19 +369,25 @@ namespace ProductDatabase {
             try {
                 DataRow[]? selectedRow = null;
 
+                var listBox2 = CategoryListBox2.SelectedIndex == -1 ? string.Empty : $"AND ProductName = '{CategoryListBox2.SelectedItem}'";
+
                 var listBox3 = ProductInfo.RadioButtonNumber switch {
                     1 => CategoryListBox3.SelectedIndex == -1 ? string.Empty : $"AND SubstrateName = '{CategoryListBox3.SelectedItem}'",
                     2 or 3 or 4 => CategoryListBox3.SelectedIndex == -1 ? string.Empty : $"AND ProductType = '{CategoryListBox3.SelectedItem}'",
                     _ => string.Empty
                 };
-                selectedRow = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' {listBox3}");
+                selectedRow = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' {listBox2} {listBox3}");
+                //selectedRow = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' {listBox3}");
 
                 if (selectedRow != null && selectedRow.Length > 0) {
                     switch (ProductInfo.RadioButtonNumber) {
                         case 1:
                             ProductInfo.CategoryName = selectedRow[0]["CategoryName"].ToString() ?? string.Empty;
-                            ProductInfo.ProductName = selectedRow[0]["ProductName"].ToString() ?? string.Empty;
-                            ProductInfo.StockName = selectedRow[0]["StockName"].ToString() ?? string.Empty;
+
+                            if (!string.IsNullOrEmpty(listBox2)) {
+                                ProductInfo.ProductName = selectedRow[0]["ProductName"].ToString() ?? string.Empty;
+                                ProductInfo.StockName = selectedRow[0]["StockName"].ToString() ?? string.Empty;
+                            }
 
                             if (!string.IsNullOrEmpty(listBox3)) {
                                 ProductInfo.SubstrateName = selectedRow[0]["SubstrateName"].ToString() ?? string.Empty;
@@ -393,8 +399,11 @@ namespace ProductDatabase {
                         case 2:
                         case 3:
                             ProductInfo.CategoryName = selectedRow[0]["CategoryName"].ToString() ?? string.Empty;
-                            ProductInfo.ProductName = selectedRow[0]["ProductName"].ToString() ?? string.Empty;
-                            ProductInfo.StockName = selectedRow[0]["StockName"].ToString() ?? string.Empty;
+
+                            if (!string.IsNullOrEmpty(listBox2)) {
+                                ProductInfo.ProductName = selectedRow[0]["ProductName"].ToString() ?? string.Empty;
+                                ProductInfo.StockName = selectedRow[0]["StockName"].ToString() ?? string.Empty;
+                            }
 
                             if (!string.IsNullOrEmpty(listBox3)) {
                                 ProductInfo.ProductType = selectedRow[0]["ProductType"].ToString() ?? string.Empty;
@@ -468,7 +477,8 @@ namespace ProductDatabase {
         private void CategoryListBox1Select() {
             try {
                 RegisterButton.Enabled = false;
-                HistoryButton.Enabled = false;
+                if (ProductInfo.RadioButtonNumber == 4) { HistoryButton.Enabled = false; }
+                else { HistoryButton.Enabled = true; }
                 CategoryListBox2.Items.Clear();
                 CategoryListBox3.Items.Clear();
 

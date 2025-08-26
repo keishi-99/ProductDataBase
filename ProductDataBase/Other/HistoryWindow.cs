@@ -125,6 +125,7 @@ namespace ProductDatabase {
                 {
                     "SubstrateStock", new Dictionary<string, string>
                     {
+                        { "StockName", "在庫名" },
                         { "SubstrateName", "基板名" },
                         { "SubstrateModel", "基板型式" },
                         { "SubstrateNumber", "製造番号" },
@@ -159,6 +160,7 @@ namespace ProductDatabase {
                         { "Serial", "シリアル" },
                         { "OrderNumber", "注文番号" },
                         { "ProductNumber", "製造番号" },
+                        { "ProductName", "製品名" },
                         { "ProductType", "タイプ" },
                         { "ProductModel", "製品型式" },
                         { "RegDate", "登録日" },
@@ -212,7 +214,8 @@ namespace ProductDatabase {
 
                 var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
                 var productTableName = $"[{ProductInfo.CategoryName}_Product]";
-                var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND s.SubstrateModel = @SubstrateModel" : string.Empty;
+                var stockFilter = !string.IsNullOrEmpty(ProductInfo.StockName) ? " AND s.StockName = @StockName" : string.Empty;
+                var substrateFilter = !AllSubstrateCheckBox.Checked ? " AND s.SubstrateModel = @SubstrateModel" : string.Empty;
 
                 var query =
                     $"""
@@ -225,7 +228,7 @@ namespace ProductDatabase {
                     ON
                         s.UseID = p.ID
                     WHERE
-                        s.StockName = @StockName{otherSubstrate}
+                        1=1{stockFilter}{substrateFilter}
                     ORDER BY
                         s.ID DESC
                     ;
@@ -241,12 +244,13 @@ namespace ProductDatabase {
                 GroupModelCheckBox.Visible = true;
 
                 var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
-                var otherSubstrate = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
+                var stockFilter = !string.IsNullOrEmpty(ProductInfo.StockName) ? " AND StockName = @StockName" : string.Empty;
+                var substrateFilter = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
                 var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
 
                 var selectClause = GroupModelCheckBox.Checked
-                    ? "SubstrateName, SubstrateModel, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock"
-                    : "SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock";
+                    ? "StockName, SubstrateName, SubstrateModel, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock"
+                    : "StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock";
 
                 var groupByClause = GroupModelCheckBox.Checked
                     ? "SubstrateName, SubstrateModel"
@@ -263,7 +267,7 @@ namespace ProductDatabase {
                     FROM
                         {substrateTableName}
                     WHERE
-                        StockName = @StockName{otherSubstrate}
+                        1=1{stockFilter}{substrateFilter}
                     GROUP BY
                         {groupByClause}
                     HAVING
@@ -293,19 +297,20 @@ namespace ProductDatabase {
                 GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
             }
 
-            var filterByProductModel = CategoryRadioButton1.Checked && !string.IsNullOrEmpty(ProductInfo.ProductModel);
-
             var productTableName = $"[{ProductInfo.CategoryName}_Product]";
-            var query = filterByProductModel
-                ? $"SELECT * FROM {productTableName} WHERE ProductName = @ProductName AND ProductModel = @ProductModel ORDER BY ID DESC;"
-                : $"SELECT * FROM {productTableName} WHERE ProductName = @ProductName ORDER BY ID DESC;";
+            var productNameFilter = !string.IsNullOrEmpty(ProductInfo.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
+            var productModel = CategoryRadioButton1.Checked ? ProductInfo.ProductModel : string.Empty;
+            var productModelFilter = !string.IsNullOrEmpty(productModel) ? " AND ProductModel = @ProductModel" : string.Empty;
 
-            if (filterByProductModel) {
-                LoadDataAndDisplay("Product", query, ("@ProductName", ProductInfo.ProductName), ("@ProductModel", ProductInfo.ProductModel));
-            }
-            else {
-                LoadDataAndDisplay("Product", query, ("@ProductName", ProductInfo.ProductName));
-            }
+            var query =
+                $"""
+                SELECT *
+                FROM {productTableName}
+                WHERE 1=1{productNameFilter}{productModelFilter}
+                ORDER BY ID DESC;
+                """;
+
+            LoadDataAndDisplay("Product", query, ("@ProductName", ProductInfo.ProductName), ("@ProductModel", ProductInfo.ProductModel));
         }
         private void ViewSerialLog() {
             _tableName = "Serial";
@@ -317,6 +322,8 @@ namespace ProductDatabase {
 
             var serialTableName = $"[{ProductInfo.CategoryName}_Serial]";
             var productTableName = $"[{ProductInfo.CategoryName}_Product]";
+            var productNameFilter = !string.IsNullOrEmpty(ProductInfo.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
+
             var query =
                 $"""
                 SELECT
@@ -336,7 +343,7 @@ namespace ProductDatabase {
                 ON
                     s.UsedID = p.ID
                 WHERE
-                    s.ProductName = @ProductName
+                    1=1{productNameFilter}
                 ORDER BY
                     s.rowid DESC
                 ;
@@ -348,6 +355,8 @@ namespace ProductDatabase {
         private void ViewReprintLog() {
             編集モードToolStripMenuItem.Enabled = false;
 
+            var productModelFilter = !string.IsNullOrEmpty(ProductInfo.ProductModel) ? " AND ProductModel = @ProductModel" : string.Empty;
+
             var query =
                 $"""
                 SELECT
@@ -355,7 +364,7 @@ namespace ProductDatabase {
                 FROM
                     Reprint
                 WHERE
-                    ProductModel = @ProductModel
+                    1=1{productModelFilter}
                 ORDER BY
                     ID DESC
                 ;
@@ -776,6 +785,7 @@ namespace ProductDatabase {
 
         private void CategorySelect(object sender) {
             var selectedRadioButton = (RadioButton)sender;
+            if (!selectedRadioButton.Checked) { return; }
             var tag = selectedRadioButton.Tag?.ToString() ?? string.Empty;
 
             // 動作マッピング用の辞書を定義
