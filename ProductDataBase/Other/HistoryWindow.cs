@@ -322,7 +322,7 @@ namespace ProductDatabase {
 
             var serialTableName = $"[{ProductInfo.CategoryName}_Serial]";
             var productTableName = $"[{ProductInfo.CategoryName}_Product]";
-            var productNameFilter = !string.IsNullOrEmpty(ProductInfo.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
+            var productNameFilter = !string.IsNullOrEmpty(ProductInfo.ProductName) ? " AND s.ProductName = @ProductName" : string.Empty;
 
             var query =
                 $"""
