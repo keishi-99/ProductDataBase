@@ -25,8 +25,8 @@ namespace ProductDatabase {
         private string _strSerialFirstNumber = string.Empty;
         private string _strSerialLastNumber = string.Empty;
         private readonly List<string> _checkBoxNames = [
-                    "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
-                    "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
+                    "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox",  "FirstSerialNumberCheckBox",
+                    "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
                     "PersonCheckBox", "CommentCheckBox" ];
 
         public RePrintWindow(ProductInformation productInfo) {
@@ -403,13 +403,13 @@ namespace ProductDatabase {
                     QuantityTextBox.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox1":
-                    ExtraTextBox2.Enabled = checkBox.Checked;
+                    ExtraTextBox1.Enabled = checkBox.Checked;
                     break;
                 case "RevisionCheckBox":
                     RevisionTextBox.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox2":
-                    ExtraTextBox3.Enabled = checkBox.Checked;
+                    ExtraTextBox2.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox3":
                     ExtraTextBox3.Enabled = checkBox.Checked;

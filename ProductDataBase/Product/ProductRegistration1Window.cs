@@ -328,9 +328,12 @@ namespace ProductDatabase {
                     RevisionTextBox.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox1":
-                    ExtraTextBox2.Enabled = checkBox.Checked;
+                    ExtraTextBox1.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox2":
+                    ExtraTextBox2.Enabled = checkBox.Checked;
+                    break;
+                case "ExtraCheckBox3":
                     ExtraTextBox3.Enabled = checkBox.Checked;
                     break;
                 case "FirstSerialNumberCheckBox":
