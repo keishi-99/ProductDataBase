@@ -956,12 +956,13 @@ namespace ProductDatabase {
                 _ => string.Empty
             };
 
-            outputCode = outputCode.Replace("%Y", DateTime.Parse(ProductInfo.RegDate).ToString("yy"))
-                                    .Replace("%MM", DateTime.Parse(ProductInfo.RegDate).ToString("MM"))
-                                    .Replace("%T", ProductInfo.Initial)
-                                    .Replace("%R", ProductInfo.Revision)
-                                    .Replace("%M", monthCode[^1..])
-                                    .Replace("%S", Convert.ToInt32(serialCode).ToString($"D{ProductInfo.SerialDigit}"));
+            outputCode = outputCode
+                .Replace("%Y", DateTime.Parse(ProductInfo.RegDate).ToString("yy"))
+                .Replace("%MM", DateTime.Parse(ProductInfo.RegDate).ToString("MM"))
+                .Replace("%T", ProductInfo.Initial)
+                .Replace("%R", ProductInfo.Revision)
+                .Replace("%M", monthCode[^1..])
+                .Replace("%S", Convert.ToInt32(serialCode).ToString($"D{ProductInfo.SerialDigit}"));
 
             return outputCode;
         }
