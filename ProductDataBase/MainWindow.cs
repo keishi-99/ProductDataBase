@@ -81,9 +81,9 @@ namespace ProductDatabase {
 
                 // PrintType に基づく設定
                 IsLabelPrint = IsTypeIn(PrintType, 1, 3, 4, 5, 6, 7, 9);
-                IsBarcodePrint = IsTypeIn(PrintType, 2, 3);
+                IsBarcodePrint = IsTypeIn(PrintType, 2, 3, 8);
                 IsListPrint = IsTypeIn(PrintType, 5, 6) && !IsRegType9;
-                IsCheckSheetPrint = IsTypeIn(PrintType, 6, 7) && !IsRegType9;
+                IsCheckSheetPrint = IsTypeIn(PrintType, 6, 7, 8) && !IsRegType9;
                 IsLast4Digits = IsTypeIn(PrintType, 9) && !IsRegType9;
                 IsUnderlinePrint = PrintType == 4 && !IsRegType9;
             }
