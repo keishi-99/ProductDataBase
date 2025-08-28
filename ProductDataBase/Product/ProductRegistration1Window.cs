@@ -68,14 +68,24 @@ namespace ProductDatabase {
                     var serialResult = cmd.ExecuteScalar();
                     if (!int.TryParse(serialResult?.ToString(), out var serialLastNum)) { throw new Exception("シリアル番号の取得に失敗しました。"); }
 
-                    // シリアル番号の初期値を設定
-                    if (ProductInfo.RegType == 0) { return; }
-                    var formatString = ProductInfo.SerialDigit switch {
-                        3 => "000",
-                        4 => "0000",
-                        _ => ""
+                    var nextSerialNumber = serialLastNum + 1;
+
+                    // シリアル番号の桁数に応じて、閾値とリセット値を設定
+                    (var minNumber, var maxNumber, var digit) = ProductInfo.SerialType switch {
+                        3 => (1, 999, 3),
+                        4 => (1, 9999, 4),
+                        101 => (1, 899, 3),
+                        102 => (901, 999, 3),
+                        _ => throw new InvalidOperationException("不明なシリアル桁数です。") // より具体的な例外
                     };
-                    FirstSerialNumberTextBox.Text = (serialLastNum + 1).ToString(formatString);
+
+                    if (nextSerialNumber > maxNumber || nextSerialNumber < minNumber) {// あるいは firstSerialが minNumber未満の場合も対象に
+                        MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        FirstSerialNumberTextBox.Text = minNumber.ToString();
+                        nextSerialNumber = minNumber;
+                    }
+
+                    FirstSerialNumberTextBox.Text = (nextSerialNumber).ToString();
                 }
 
             } catch (Exception ex) {
