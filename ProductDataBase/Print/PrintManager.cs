@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -169,8 +170,11 @@ namespace ProductDatabase.Print {
                 g.PageUnit = GraphicsUnit.Pixel;
 
                 // 高品質な描画設定
-                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                // Graphicsオブジェクトの描画品質を設定
+                g.SmoothingMode = SmoothingMode.None;
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic; // 画像の拡大・縮小品質を設定
+                //g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+                //g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 
                 // --- 3. 印刷タイプに応じた描画処理 ---
                 switch (serialType) {
@@ -252,8 +256,8 @@ namespace ProductDatabase.Print {
             var writer = new BarcodeWriter<Bitmap> {
                 Format = BarcodeFormat.CODE_128,
                 Options = new ZXing.Common.EncodingOptions {
-                    Height = qrWidthPx,
-                    Width = qrHeightPx,
+                    Width = qrWidthPx,
+                    Height = qrHeightPx,
                     PureBarcode = true // テキストを含まないバーコードのみを生成
                 },
                 Renderer = new BitmapRenderer()
