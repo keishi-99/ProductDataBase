@@ -9,8 +9,8 @@ namespace ProductDatabase {
         public ProductInformation ProductInfo { get; }
 
         private readonly List<string> _checkBoxNames = [
-                    "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "ExtraCheckBox1",
-                    "RevisionCheckBox", "ExtraCheckBox2", "ExtraCheckBox3", "FirstSerialNumberCheckBox", "RegistrationDateCheckBox",
+                    "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "FirstSerialNumberCheckBox",
+                    "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
                     "PersonCheckBox", "CommentCheckBox" ];
 
         public ProductRegistration1Window(ProductInformation productInfo) {
