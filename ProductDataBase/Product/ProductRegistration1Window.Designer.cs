@@ -206,7 +206,6 @@
             this.ExtraCheckBox3.TabStop = false;
             this.ExtraCheckBox3.Text = "予備";
             this.ExtraCheckBox3.UseVisualStyleBackColor = true;
-            this.ExtraCheckBox3.Visible = false;
             this.ExtraCheckBox3.CheckedChanged += this.CheckBoxChecked;
             // 
             // ExtraTextBox2
@@ -230,7 +229,6 @@
             this.ExtraCheckBox2.TabStop = false;
             this.ExtraCheckBox2.Text = "予備";
             this.ExtraCheckBox2.UseVisualStyleBackColor = true;
-            this.ExtraCheckBox2.Visible = false;
             this.ExtraCheckBox2.CheckedChanged += this.CheckBoxChecked;
             // 
             // RevisionTextBox
@@ -277,7 +275,6 @@
             this.ExtraCheckBox1.TabStop = false;
             this.ExtraCheckBox1.Text = "予備";
             this.ExtraCheckBox1.UseVisualStyleBackColor = true;
-            this.ExtraCheckBox1.Visible = false;
             this.ExtraCheckBox1.CheckedChanged += this.CheckBoxChecked;
             // 
             // QuantityTextBox
