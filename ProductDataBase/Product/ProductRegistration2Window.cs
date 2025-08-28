@@ -24,7 +24,6 @@ namespace ProductDatabase {
         private int _serialLastNumber;
 
         private string _lastInsertRowid = string.Empty;
-        private string _printerName = string.Empty;
         private string _serialType = string.Empty;
 
         private readonly List<string> _strSerial = [];
@@ -894,8 +893,6 @@ namespace ProductDatabase {
                     e.HasMorePages = hasMore;
                 };
 
-                _printerName = pd.PrinterSettings.PrinterName;
-
                 switch (isPreview) {
                     case false:
                         //PrintDialogクラスの作成
@@ -1034,7 +1031,6 @@ namespace ProductDatabase {
         // 成績書作成
         private void GenerateReport() {
             try {
-                //CommonUtils.GenerateReport(ProductInfo);
                 ReportGenerator.GenerateReport(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1107,7 +1103,6 @@ namespace ProductDatabase {
 
             // データを追加
             foreach (var kvp in items) {
-                //var item = new ListViewItem(kvp.Key);
                 var item = new ListViewItem("");  // ダミー1列目
                 item.SubItems.Add(kvp.Key);
                 item.SubItems.Add(kvp.Value);

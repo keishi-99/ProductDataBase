@@ -463,7 +463,6 @@ namespace ProductDatabase {
 
             // データを追加
             foreach (var kvp in items) {
-                //var item = new ListViewItem(kvp.Key);
                 var item = new ListViewItem("");  // ダミー1列目
                 item.SubItems.Add(kvp.Key);
                 item.SubItems.Add(kvp.Value);
