@@ -8,14 +8,17 @@ namespace ProductDatabase {
     public partial class HistoryWindow : Form {
         public ProductInformation ProductInfo { get; }
 
+        private readonly int _radioButtonNumber = 0;
+
         private System.Data.DataTable _historyTable = new();
 
         private readonly List<string> _listColFilter = [];
         private string _tableName = string.Empty;
 
-        public HistoryWindow(ProductInformation productInfo) {
+        public HistoryWindow(ProductInformation productInfo, int radioButtonNumber) {
             InitializeComponent();
             ProductInfo = productInfo;
+            _radioButtonNumber = radioButtonNumber;
             // 最大サイズをディスプレイサイズに合わせる
             if (Screen.PrimaryScreen != null) {
                 var h = Screen.PrimaryScreen.Bounds.Height;
@@ -43,7 +46,7 @@ namespace ProductDatabase {
 
                 編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
 
-                switch (ProductInfo.RadioButtonNumber) {
+                switch (_radioButtonNumber) {
                     case 1:
                         CategoryRadioButton2.Text = "在庫";
                         CategoryRadioButton3.Visible = false;
@@ -800,7 +803,7 @@ namespace ProductDatabase {
             };
 
             // Tag と RadioButtonFlg の組み合わせに応じた動作を実行
-            if (actionMap.TryGetValue((ProductInfo.RadioButtonNumber, tag), out var action)) {
+            if (actionMap.TryGetValue((_radioButtonNumber, tag), out var action)) {
                 action();
             }
             else {

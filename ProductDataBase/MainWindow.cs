@@ -8,6 +8,9 @@ using System.Text.RegularExpressions;
 namespace ProductDatabase {
     public partial class MainWindow : Form {
 
+        public int RadioButtonNumber { get; set; }
+        private DataTable MainDataTable { get; } = new();
+
         public class ProductInformation {
             public int ProductID { get; set; }
             public string CategoryName { get; set; } = string.Empty;
@@ -32,10 +35,9 @@ namespace ProductDatabase {
             public List<string> CategorySubstrateName { get; set; } = [];
             public List<string> CategoryProductType { get; set; } = [];
             public List<string> CategoryType { get; set; } = [];
-            public int RadioButtonNumber { get; set; }
+            public List<string> PersonList { get; set; } = [];
             public string FontName { get; } = "Meiryo UI";
             public int FontSize { get; set; } = 9;
-            public List<string> PersonList { get; set; } = [];
 
             public string OrderNumber { get; set; } = string.Empty;
             public string ProductNumber { get; set; } = string.Empty;
@@ -75,21 +77,22 @@ namespace ProductDatabase {
             public bool IsUnderlinePrint { get; private set; }
 
             private void UpdatePrintFlags() {
-                // RegType に基づく設定
-                IsRegType9 = RegType == 9;
-                IsSerialGeneration = IsTypeIn(RegType, 1, 2, 3, 9);
-
-                // PrintType に基づく設定
-                IsLabelPrint = IsTypeIn(PrintType, 1, 3, 4, 5, 6, 7, 9);
-                IsBarcodePrint = IsTypeIn(PrintType, 2, 3, 8);
-                IsListPrint = IsTypeIn(PrintType, 5, 6) && !IsRegType9;
-                IsCheckSheetPrint = IsTypeIn(PrintType, 6, 7, 8) && !IsRegType9;
-                IsLast4Digits = IsTypeIn(PrintType, 9) && !IsRegType9;
-                IsUnderlinePrint = PrintType == 4 && !IsRegType9;
+                UpdateRegTypeFlags();
+                UpdatePrintTypeFlags();
             }
 
-            private static bool IsTypeIn(int value, params int[] values) {
-                return values.Contains(value);
+            private void UpdateRegTypeFlags() {
+                IsRegType9 = RegType == 9;
+                IsSerialGeneration = RegType is 1 or 2 or 3 or 9;
+            }
+
+            private void UpdatePrintTypeFlags() {
+                IsLabelPrint = PrintType is 1 or 3 or 4 or 5 or 6 or 7 or 9;
+                IsBarcodePrint = PrintType is 2 or 3 or 8;
+                IsListPrint = (PrintType is 5 or 6) && !IsRegType9;
+                IsCheckSheetPrint = (PrintType is 6 or 7 or 8) && !IsRegType9;
+                IsLast4Digits = (PrintType == 9) && !IsRegType9;
+                IsUnderlinePrint = (PrintType == 4) && !IsRegType9;
             }
 
             public int Quantity { get; set; }
@@ -104,45 +107,6 @@ namespace ProductDatabase {
                 4 => 4,
                 _ => 0
             };
-
-            public void Reset() {
-                ProductID = 0;
-                CategoryName = string.Empty;
-                ProductName = string.Empty;
-                StockName = string.Empty;
-                ProductType = string.Empty;
-                ProductModel = string.Empty;
-                SubstrateName = string.Empty;
-                SubstrateModel = string.Empty;
-                UseSubstrate = string.Empty;
-                Initial = string.Empty;
-                SerialType = 0;
-                RegType = 0;
-                PrintType = 0;
-                RevisionGroup = 0;
-                CheckBin = 0;
-                Proness1 = string.Empty;
-                Proness2 = string.Empty;
-                Proness3 = string.Empty;
-                Proness4 = 0;
-                Proness5 = string.Empty;
-                CategoryItemNumber = [];
-                CategoryProductName = [];
-                CategoryProductType = [];
-                CategorySubstrateName = [];
-                CategoryType = [];
-                OrderNumber = string.Empty;
-                ProductNumber = string.Empty;
-                RegDate = string.Empty;
-                Person = string.Empty;
-                Revision = string.Empty;
-                Comment = string.Empty;
-                SerialFirst = string.Empty;
-                SerialLast = string.Empty;
-                SerialLastNumber = 0;
-                Quantity = 0;
-                SerialFirstNumber = 0;
-            }
         }
         public static class Auth {
             private static bool s_isAdministrator = false;
@@ -253,7 +217,7 @@ namespace ProductDatabase {
                 CategoryListBox1.Items.Clear();
                 CategoryListBox2.Items.Clear();
                 CategoryListBox3.Items.Clear();
-                ProductInfo.ProductDataTable.Clear();
+                MainDataTable.Clear();
 
                 this.Activate();
                 QRCodeTextBox.Select();
@@ -262,7 +226,22 @@ namespace ProductDatabase {
             }
         }
         private void ResetFields() {
-            ProductInfo.Reset();
+            ProductInfo= new ProductInformation();
+
+            using SQLiteConnection con = new(GetConnectionInformation());
+            using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
+            using (SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con)) { adapter.Fill(ProductInfo.SubstrateDataTable); }
+
+            // DB1へ接続し担当者取得
+            ProductInfo.PersonList.Clear();
+            con.Open();
+            using var cmd = con.CreateCommand();
+            // テーブル検索SQL - 担当者をPersonListへ追加
+            cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
+            using var dr = cmd.ExecuteReader();
+            while (dr.Read()) {
+                ProductInfo.PersonList.Add($"{dr["PersonName"]}");
+            }
         }
         // 登録ボタン処理
         private void Registration() {
@@ -270,7 +249,7 @@ namespace ProductDatabase {
                 ResetFields();
 
                 if (CategoryListBox3.SelectedIndex == -1) { return; }
-                switch (ProductInfo.RadioButtonNumber) {
+                switch (RadioButtonNumber) {
                     case 1:
                         HandleSubstrateRegistration();
                         break;
@@ -293,7 +272,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateRegistration() {
-            var selectedRows = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND SubstrateName = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND SubstrateName = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
                 ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
@@ -309,7 +288,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleProductRegistration1() {
-            var selectedRows = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
                 ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
@@ -329,7 +308,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleRePrint() {
-            var selectedRows = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
                 ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
@@ -347,7 +326,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateChange1() {
-            var selectedRows = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
                 ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
@@ -371,16 +350,15 @@ namespace ProductDatabase {
 
                 var listBox2 = CategoryListBox2.SelectedIndex == -1 ? string.Empty : $"AND ProductName = '{CategoryListBox2.SelectedItem}'";
 
-                var listBox3 = ProductInfo.RadioButtonNumber switch {
+                var listBox3 = RadioButtonNumber switch {
                     1 => CategoryListBox3.SelectedIndex == -1 ? string.Empty : $"AND SubstrateName = '{CategoryListBox3.SelectedItem}'",
                     2 or 3 or 4 => CategoryListBox3.SelectedIndex == -1 ? string.Empty : $"AND ProductType = '{CategoryListBox3.SelectedItem}'",
                     _ => string.Empty
                 };
-                selectedRow = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' {listBox2} {listBox3}");
-                //selectedRow = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' {listBox3}");
+                selectedRow = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' {listBox2} {listBox3}");
 
                 if (selectedRow != null && selectedRow.Length > 0) {
-                    switch (ProductInfo.RadioButtonNumber) {
+                    switch (RadioButtonNumber) {
                         case 1:
                             ProductInfo.CategoryName = selectedRow[0]["CategoryName"].ToString() ?? string.Empty;
 
@@ -414,7 +392,7 @@ namespace ProductDatabase {
                             break;
                     }
 
-                    using HistoryWindow window = new(ProductInfo);
+                    using HistoryWindow window = new(ProductInfo, RadioButtonNumber);
                     window.ShowDialog(this);
                 }
             } catch (Exception ex) {
@@ -423,46 +401,33 @@ namespace ProductDatabase {
         }
         // 処理カテゴリセレクト
         private void CategorySelect(object sender) {
+            // Tagプロパティを使用してラジオボタンの識別子を取得
+            Dictionary<string, (int Number, string Sql)> radioButtonMap = new() {
+                ["1"] = (1, "SELECT * FROM Substrate WHERE Visible = 1 ORDER BY SortNumber ASC;"),
+                ["2"] = (2, "SELECT * FROM Product WHERE Visible = 1 ORDER BY SortNumber ASC;"),
+                ["3"] = (3, "SELECT * FROM Product WHERE Visible = 1 AND PrintType != 0 ORDER BY SortNumber ASC;"),
+                ["4"] = (4, "SELECT * FROM Product WHERE Visible = 1 AND (PrintType = 5 OR PrintType = 6) ORDER BY SortNumber ASC;")
+            };
+
             try {
                 RegisterButton.Enabled = false;
                 HistoryButton.Enabled = false;
                 CategoryListBox1.Items.Clear();
                 CategoryListBox2.Items.Clear();
                 CategoryListBox3.Items.Clear();
-                ProductInfo.ProductDataTable.Clear();
+                MainDataTable.Clear();
 
-                var selectedRadioButton = (RadioButton)sender;
-                var strSqlQuery = string.Empty;
-
-                switch (selectedRadioButton.Tag) {
-                    case "1":
-                        ProductInfo.RadioButtonNumber = 1;
-                        strSqlQuery = "SELECT * FROM Substrate WHERE Visible = 1 ORDER BY SortNumber ASC;";
-                        break;
-                    case "2":
-                        ProductInfo.RadioButtonNumber = 2;
-                        strSqlQuery = "SELECT * FROM Product WHERE Visible = 1 ORDER BY SortNumber ASC;";
-                        break;
-                    case "3":
-                        ProductInfo.RadioButtonNumber = 3;
-                        strSqlQuery = "SELECT * FROM Product WHERE Visible = 1 AND PrintType != 0 ORDER BY SortNumber ASC;";
-                        break;
-                    case "4":
-                        ProductInfo.RadioButtonNumber = 4;
-                        strSqlQuery = "SELECT * FROM Product WHERE Visible = 1 AND (PrintType = 5 OR PrintType = 6) ORDER BY SortNumber ASC;";
-                        break;
-                    default:
-                        break;
-                }
-
-                using (SQLiteConnection con = new(GetConnectionInformation()))
-                using (SQLiteDataAdapter adapter = new(strSqlQuery, con)) {
-                    adapter.Fill(ProductInfo.ProductDataTable);
+                if (sender is RadioButton selectedRadioButton && radioButtonMap.TryGetValue(selectedRadioButton.Tag?.ToString() ?? "", out var map)) {
+                    RadioButtonNumber = map.Number;
+                    using var con = new SQLiteConnection(GetConnectionInformation());
+                    using var adapter = new SQLiteDataAdapter(map.Sql, con);
+                    adapter.Fill(MainDataTable);
                 }
 
                 // CategoryName 列の重複を削除し、ソートする
-                var categoryNames = ProductInfo.ProductDataTable.AsEnumerable()
+                var categoryNames = MainDataTable.AsEnumerable()
                     .Select(row => row.Field<string?>("CategoryName") ?? string.Empty)
+                    .Where(name => !string.IsNullOrWhiteSpace(name))
                     .Distinct()
                     .ToList();
 
@@ -477,14 +442,14 @@ namespace ProductDatabase {
         private void CategoryListBox1Select() {
             try {
                 RegisterButton.Enabled = false;
-                if (ProductInfo.RadioButtonNumber == 4) { HistoryButton.Enabled = false; }
+                if (RadioButtonNumber == 4) { HistoryButton.Enabled = false; }
                 else { HistoryButton.Enabled = true; }
                 CategoryListBox2.Items.Clear();
                 CategoryListBox3.Items.Clear();
 
                 HashSet<string> productNames = [];
 
-                var selectedRows = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}'", "ProductName ASC");
+                var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}'", "ProductName ASC");
 
                 foreach (var row in selectedRows) {
                     var productName = row["ProductName"].ToString() ?? throw new Exception("ProductName is null");
@@ -500,15 +465,15 @@ namespace ProductDatabase {
         private void CategoryListBox2Select() {
             try {
                 RegisterButton.Enabled = false;
-                if (ProductInfo.RadioButtonNumber == 4) { HistoryButton.Enabled = false; }
+                if (RadioButtonNumber == 4) { HistoryButton.Enabled = false; }
                 else { HistoryButton.Enabled = true; }
                 CategoryListBox3.Items.Clear();
 
                 DataRow[] selectedRows;
 
-                switch (ProductInfo.RadioButtonNumber) {
+                switch (RadioButtonNumber) {
                     case 1:
-                        selectedRows = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "SubstrateName ASC");
+                        selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "SubstrateName ASC");
                         HashSet<string> substrateNames = [.. selectedRows.AsEnumerable()
                             .Select(x => x.Field<string>("SubstrateName"))
                             .Where(x => x != null)
@@ -520,7 +485,7 @@ namespace ProductDatabase {
                     case 2:
                     case 3:
                     case 4:
-                        selectedRows = ProductInfo.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductType ASC");
+                        selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductType ASC");
                         HashSet<string> productTypes = [.. selectedRows.AsEnumerable()
                             .Select(x => x.Field<string>("ProductType"))
                             .Where(x => x != null)
@@ -542,7 +507,7 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = Auth.IsAuthorizedUser;
                 HistoryButton.Enabled = true;
 
-                switch (ProductInfo.RadioButtonNumber) {
+                switch (RadioButtonNumber) {
                     case 1:
                         ProductInfo.SubstrateName = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
                         break;
@@ -722,10 +687,10 @@ namespace ProductDatabase {
         private void HandleSubstrateSelection(string productName, string substrateName) {
             using (SQLiteConnection con = new(GetConnectionInformation())) {
                 using SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con);
-                adapter.Fill(ProductInfo.ProductDataTable);
+                adapter.Fill(MainDataTable);
             }
 
-            var substrateRet = ProductInfo.ProductDataTable.Select($"ProductName = '{productName}' AND SubstrateName = '{substrateName}'");
+            var substrateRet = MainDataTable.Select($"ProductName = '{productName}' AND SubstrateName = '{substrateName}'");
             OpenSubstrateRegistrationWindow(substrateRet);
         }
         private void OpenSubstrateRegistrationWindow(DataRow[] substrateRet) {
@@ -744,10 +709,10 @@ namespace ProductDatabase {
         private void HandleProductSelection(string productName, string productType) {
             using (SQLiteConnection con = new(GetConnectionInformation())) {
                 using SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con);
-                adapter.Fill(ProductInfo.ProductDataTable);
+                adapter.Fill(MainDataTable);
             }
 
-            var productRet = ProductInfo.ProductDataTable.Select($"ProductName = '{productName}' AND ProductType = '{productType}'");
+            var productRet = MainDataTable.Select($"ProductName = '{productName}' AND ProductType = '{productType}'");
             OpenProductRegistrationWindow(productRet);
         }
         private void OpenProductRegistrationWindow(DataRow[] productRet) {
