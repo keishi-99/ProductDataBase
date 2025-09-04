@@ -233,7 +233,8 @@ namespace ProductDatabase {
                 rowId = ExecuteScalar(connection, commandText).ToString() ?? string.Empty;
 
                 // ログ出力
-                var number = QuantityCheckBox.Checked ? quantity : 0 - defectQuantity;
+                var logQuantity = QuantityCheckBox.Checked ? quantity.ToString() : string.Empty;
+                var logDefectQuantity = DefectQuantityCheckBox.Checked ? (0 - defectQuantity).ToString() : string.Empty;
 
                 string[] logMessageArray = [
                     $"[基板登録]",
@@ -244,9 +245,9 @@ namespace ProductDatabase {
                     $"製品名[{ProductInfo.ProductName}]",
                     $"基板名[{ProductInfo.SubstrateName}]",
                     $"型式[{ProductInfo.SubstrateModel}]",
-                    $"数量[{number}]",
-                    $"[]",
-                    $"[]",
+                    $"追加数[{logQuantity}]",
+                    $"使用数[]",
+                    $"減少数[{logDefectQuantity}]",
                     $"[]",
                     $"登録日[{registrationDate}]",
                     $"担当者[{person}]",
