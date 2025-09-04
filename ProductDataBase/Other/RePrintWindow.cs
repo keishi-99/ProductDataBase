@@ -18,9 +18,6 @@ namespace ProductDatabase {
 
         public ProductInformation ProductInfo { get; }
 
-        //private System.Drawing.Printing.PrintAction _printAction;
-        private string _printerName = string.Empty;
-
         private string _serialType = string.Empty;
         private string _strSerialFirstNumber = string.Empty;
         private string _strSerialLastNumber = string.Empty;
@@ -309,8 +306,6 @@ namespace ProductDatabase {
                     bool hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, serialType);
                     e.HasMorePages = hasMore;
                 };
-
-                _printerName = pd.PrinterSettings.PrinterName;
 
                 switch (isPrint) {
                     case true:
