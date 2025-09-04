@@ -226,7 +226,7 @@ namespace ProductDatabase {
             }
         }
         private void ResetFields() {
-            ProductInfo= new ProductInformation();
+            ProductInfo = new ProductInformation();
 
             using SQLiteConnection con = new(GetConnectionInformation());
             using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
