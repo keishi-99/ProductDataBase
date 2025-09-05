@@ -17,17 +17,13 @@ namespace ProductDatabase.Print {
         public static DocumentPrintSettings ProductPrintSettings { get; private set; } = new();
 
         // 各種設定へのアクセスプロパティ（nullチェック済）
-        public static PrintPageSettings LabelPageSettings =>
-            ProductPrintSettings.LabelPageSettings ?? throw new InvalidOperationException("LabelPageSettings が null です。");
+        public static LabelPrintSettings LabelPrintSettings =>
+            ProductPrintSettings.LabelPrintSettings ?? throw new InvalidOperationException("LabelPageSettings が null です。");
 
-        public static PrintLayoutSettings LabelLayoutSettings =>
-            ProductPrintSettings.LabelLayoutSettings ?? throw new InvalidOperationException("LabelLayoutSettings が null です。");
+        public static BarcodePrintSettings BarcodePrintSettings =>
+            ProductPrintSettings.BarcodePrintSettings ?? throw new InvalidOperationException("BarcodePageSettings が null です。");
 
-        public static PrintPageSettings BarcodePageSettings =>
-            ProductPrintSettings.BarcodePageSettings ?? throw new InvalidOperationException("BarcodePageSettings が null です。");
-
-        public static PrintLayoutSettings BarcodeLayoutSettings =>
-            ProductPrintSettings.BarcodeLayoutSettings ?? throw new InvalidOperationException("BarcodeLayoutSettings が null です。");
+        private static DocumentPrintSettings PrintSettings => ProductPrintSettings ?? throw new InvalidOperationException("ProductPrintSettings が null です。");
 
         // 印刷状態を保持するプロパティ
         public static int RemainingLabelCount { get; private set; }
@@ -73,27 +69,27 @@ namespace ProductDatabase.Print {
                 var dpiX = e.Graphics.DpiX;
                 var dpiY = e.Graphics.DpiY;
 
-                var (pageSettings, layoutSettings) = serialType switch {
-                    "Label" => (LabelPageSettings, LabelLayoutSettings),
-                    "Barcode" => (BarcodePageSettings, BarcodeLayoutSettings),
-                    "Substrate" => (LabelPageSettings, LabelLayoutSettings),
+                PrintSettingsBase printSettings = serialType switch {
+                    "Label" => PrintSettings.LabelPrintSettings!,
+                    "Barcode" => PrintSettings.BarcodePrintSettings!,
+                    "Substrate" => PrintSettings.LabelPrintSettings!,
                     _ => throw new ArgumentException($"不明なシリアルタイプ: {serialType}")
                 };
 
-                var labelCountX = pageSettings.LabelsPerColumn;
-                var labelCountY = pageSettings.LabelsPerRow;
-                var labelWidthPx = ConvertMmToPixel(pageSettings.LabelWidth, dpiX);
-                var labelHeightPx = ConvertMmToPixel(pageSettings.LabelHeight, dpiY);
-                var marginXPx = ConvertMmToPixel(pageSettings.MarginX, dpiX);
-                var marginYPx = ConvertMmToPixel(pageSettings.MarginY, dpiY);
-                var intervalXPx = ConvertMmToPixel(pageSettings.IntervalX, dpiX);
-                var intervalYPx = ConvertMmToPixel(pageSettings.IntervalY, dpiY);
-                var headerPositionXPx = ConvertMmToPixel(pageSettings.HeaderPositionX, dpiX);
-                var headerPositionYPx = ConvertMmToPixel(pageSettings.HeaderPositionY, dpiY);
-                var headerString = ConvertHeaderString(pageSettings.HeaderTextFormat);
-                var headerFont = pageSettings.HeaderFont;
+                var labelCountX = printSettings.LabelsPerColumn;
+                var labelCountY = printSettings.LabelsPerRow;
+                var labelWidthPx = ConvertMmToPixel(printSettings.LabelWidth, dpiX);
+                var labelHeightPx = ConvertMmToPixel(printSettings.LabelHeight, dpiY);
+                var marginXPx = ConvertMmToPixel(printSettings.MarginX, dpiX);
+                var marginYPx = ConvertMmToPixel(printSettings.MarginY, dpiY);
+                var intervalXPx = ConvertMmToPixel(printSettings.IntervalX, dpiX);
+                var intervalYPx = ConvertMmToPixel(printSettings.IntervalY, dpiY);
+                var headerPositionXPx = ConvertMmToPixel(printSettings.HeaderPositionX, dpiX);
+                var headerPositionYPx = ConvertMmToPixel(printSettings.HeaderPositionY, dpiY);
+                var headerString = ConvertHeaderString(printSettings.HeaderTextFormat);
+                var headerFont = printSettings.HeaderFont;
 
-                var copiesPerLabel = layoutSettings.CopiesPerLabel;
+                var copiesPerLabel = printSettings.CopiesPerLabel;
                 if (labelCountX == 0 || labelCountY == 0 || copiesPerLabel == 0) {
                     throw new Exception("印刷設定が異常です。");
                 }
@@ -112,8 +108,8 @@ namespace ProductDatabase.Print {
 
                 for (var y = startLine; y < labelCountY; y++) {
                     for (var x = 0; x < labelCountX; x++) {
-                        var posX = marginXPx - hardMarginX + x * (intervalXPx + labelWidthPx);
-                        var posY = marginYPx - hardMarginY + y * (intervalYPx + labelHeightPx);
+                        var posX = marginXPx - hardMarginX + (x * (intervalXPx + labelWidthPx));
+                        var posY = marginYPx - hardMarginY + (y * (intervalYPx + labelHeightPx));
 
                         if (CopiesRemainingPerSerial == 0) { CopiesRemainingPerSerial = copiesPerLabel; }
                         var isLastCopy = CopiesRemainingPerSerial == 1;
@@ -201,21 +197,22 @@ namespace ProductDatabase.Print {
         }
         private static void DrawLabel(Graphics g, string text, bool fontUnderline, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY) {
 
+            if (PrintSettings.LabelPrintSettings == null) { return; }
             // フォントサイズはポイント単位でそのまま使用
-            var fontName = LabelLayoutSettings.TextFont.Name;
-            var fontSize = LabelLayoutSettings.TextFont.SizeInPoints;
+            var fontName = PrintSettings.LabelPrintSettings.TextFont.Name;
+            var fontSize = PrintSettings.LabelPrintSettings.TextFont.SizeInPoints;
             var style = fontUnderline ? FontStyle.Underline : FontStyle.Regular;
 
             using var textFont = new Font(fontName, fontSize, style);
             // テキストの配置設定
             using var sf = new StringFormat {
-                Alignment = LabelLayoutSettings.AlignTextCenterX ? StringAlignment.Center : StringAlignment.Near,
-                LineAlignment = LabelLayoutSettings.AlignTextCenterY ? StringAlignment.Center : StringAlignment.Near
+                Alignment = PrintSettings.LabelPrintSettings.AlignTextCenterX ? StringAlignment.Center : StringAlignment.Near,
+                LineAlignment = PrintSettings.LabelPrintSettings.AlignTextCenterY ? StringAlignment.Center : StringAlignment.Near
             };
             // 描画領域をピクセル単位で計算
             // TextPositionX, TextPositionY はミリメートル単位なのでピクセルに変換
-            var textPosX = LabelLayoutSettings.AlignTextCenterX ? 0f : ConvertMmToPixel(LabelLayoutSettings.TextPositionX, dpiX);
-            var textPosY = LabelLayoutSettings.AlignTextCenterY ? 0f : ConvertMmToPixel(LabelLayoutSettings.TextPositionY, dpiY);
+            var textPosX = PrintSettings.LabelPrintSettings.AlignTextCenterX ? 0f : ConvertMmToPixel(PrintSettings.LabelPrintSettings.TextPositionX, dpiX);
+            var textPosY = PrintSettings.LabelPrintSettings.AlignTextCenterY ? 0f : ConvertMmToPixel(PrintSettings.LabelPrintSettings.TextPositionY, dpiY);
 
             var layoutRect = new RectangleF(textPosX, textPosY, labelWidthPx - textPosX, labelHeightPx - textPosY);
 
@@ -223,20 +220,21 @@ namespace ProductDatabase.Print {
         }
         private static void DrawBarcode(Graphics g, string text, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY) {
 
+            if (PrintSettings.BarcodePrintSettings == null) { return; }
             // --- テキストの描画 ---
             // フォントサイズはポイント単位でそのまま使用
-            var fontName = BarcodeLayoutSettings.TextFont.Name;
-            var fontSize = BarcodeLayoutSettings.TextFont.SizeInPoints;
+            var fontName = PrintSettings.BarcodePrintSettings.TextFont.Name;
+            var fontSize = PrintSettings.BarcodePrintSettings.TextFont.SizeInPoints;
 
             using (var textFont = new Font(fontName, fontSize, FontStyle.Regular)) {
                 // テキストの配置設定
                 using var sf = new StringFormat {
-                    Alignment = BarcodeLayoutSettings.AlignTextCenterX ? StringAlignment.Center : StringAlignment.Near
+                    Alignment = PrintSettings.BarcodePrintSettings.AlignTextCenterX ? StringAlignment.Center : StringAlignment.Near
                 };
 
                 // TextPositionX, TextPositionY はミリメートル単位なのでピクセルに変換
-                var textPosX = BarcodeLayoutSettings.AlignTextCenterX ? 0f : ConvertMmToPixel(BarcodeLayoutSettings.TextPositionX, dpiX);
-                var textPosY = ConvertMmToPixel(BarcodeLayoutSettings.TextPositionY, dpiY);
+                var textPosX = PrintSettings.BarcodePrintSettings.AlignTextCenterX ? 0f : ConvertMmToPixel(PrintSettings.BarcodePrintSettings.TextPositionX, dpiX);
+                var textPosY = ConvertMmToPixel(PrintSettings.BarcodePrintSettings.TextPositionY, dpiY);
 
                 var layoutRectString = new RectangleF(textPosX, textPosY, labelWidthPx - textPosX, labelHeightPx - textPosY);
 
@@ -244,10 +242,9 @@ namespace ProductDatabase.Print {
             }
 
             // --- バーコードの描画 ---
-
             // ZXingはピクセル単位で画像を生成するため、mmから pixelへの変換が必要
-            var barcodePixelWidth = ConvertMmToPixel(BarcodeLayoutSettings.BarcodeWidth, dpiX);
-            var barcodePixelHeight = ConvertMmToPixel(BarcodeLayoutSettings.BarcodeHeight, dpiY);
+            var barcodePixelWidth = ConvertMmToPixel(PrintSettings.BarcodePrintSettings.BarcodeWidth, dpiX);
+            var barcodePixelHeight = ConvertMmToPixel(PrintSettings.BarcodePrintSettings.BarcodeHeight, dpiY);
 
             // ZXing用に int型に変換
             var qrWidthPx = (int)Math.Round(barcodePixelWidth);
@@ -265,14 +262,14 @@ namespace ProductDatabase.Print {
 
             using var barcodeBitmap = writer.Write(text);
             // BarcodePositionX, BarcodePositionY はミリメートル単位なのでピクセルに変換
-            var barcodePosX = ConvertMmToPixel(BarcodeLayoutSettings.BarcodePositionX, dpiX);
-            var barcodePosY = ConvertMmToPixel(BarcodeLayoutSettings.BarcodePositionY, dpiY);
-            var barcodeWidthPx = ConvertMmToPixel(BarcodeLayoutSettings.BarcodeWidth, dpiX);
-            var barcodeHeightPx = ConvertMmToPixel(BarcodeLayoutSettings.BarcodeHeight, dpiY);
+            var barcodePosX = ConvertMmToPixel(PrintSettings.BarcodePrintSettings.BarcodePositionX, dpiX);
+            var barcodePosY = ConvertMmToPixel(PrintSettings.BarcodePrintSettings.BarcodePositionY, dpiY);
+            var barcodeWidthPx = ConvertMmToPixel(PrintSettings.BarcodePrintSettings.BarcodeWidth, dpiX);
+            var barcodeHeightPx = ConvertMmToPixel(PrintSettings.BarcodePrintSettings.BarcodeHeight, dpiY);
 
             // X座標を中央に調整 (ピクセル単位で計算)
-            if (BarcodeLayoutSettings.AlignBarcodeCenterX) {
-                barcodePosX = labelWidthPx / 2f - barcodeWidthPx / 2f;
+            if (PrintSettings.BarcodePrintSettings.AlignBarcodeCenterX) {
+                barcodePosX = (labelWidthPx / 2f) - (barcodeWidthPx / 2f);
             }
 
             var layoutRectBarcode = new RectangleF(barcodePosX, barcodePosY, barcodeWidthPx, barcodeHeightPx);
@@ -314,22 +311,23 @@ namespace ProductDatabase.Print {
             };
 
             var outputCode = serialType switch {
-                "Label" => LabelLayoutSettings.TextFormat ?? string.Empty,
-                "Barcode" => BarcodeLayoutSettings.TextFormat ?? string.Empty,
-                "Substrate" => LabelLayoutSettings.TextFormat ?? string.Empty,
+                "Label" => PrintSettings.LabelPrintSettings?.TextFormat ?? string.Empty,
+                "Barcode" => PrintSettings.BarcodePrintSettings?.TextFormat ?? string.Empty,
+                "Substrate" => PrintSettings.LabelPrintSettings?.TextFormat ?? string.Empty,
                 _ => throw new ArgumentException($"不明なシリアルタイプ: {serialType}")
             };
 
-            outputCode = outputCode.Replace("%Y", DateTime.Parse(ProductInfo.RegDate).ToString("yy"))
-                                    .Replace("%MM", DateTime.Parse(ProductInfo.RegDate).ToString("MM"))
-                                    .Replace("%T", ProductInfo.Initial)
-                                    .Replace("%R", ProductInfo.Revision)
-                                    .Replace("%M", monthCode[^1..])
-                                    .Replace("%S", serialCode);
+            outputCode = outputCode
+                .Replace("%Y", DateTime.Parse(ProductInfo.RegDate).ToString("yy"))
+                .Replace("%MM", DateTime.Parse(ProductInfo.RegDate).ToString("MM"))
+                .Replace("%T", ProductInfo.Initial)
+                .Replace("%R", ProductInfo.Revision)
+                .Replace("%M", monthCode[^1..])
+                .Replace("%S", serialCode);
 
             return outputCode;
         }
-        private static void DrawFinalRowMark(Graphics graphics, int rowNumber, float posX, float posY,float width, float height, Font font) {
+        private static void DrawFinalRowMark(Graphics graphics, int rowNumber, float posX, float posY, float width, float height, Font font) {
             var sf = new StringFormat {
                 Alignment = StringAlignment.Near,
                 LineAlignment = StringAlignment.Center
@@ -341,84 +339,82 @@ namespace ProductDatabase.Print {
     public class PrintOptions {
 
         public class DocumentPrintSettings {
-            public PrintPageSettings? LabelPageSettings { get; set; }
-            public PrintLayoutSettings? LabelLayoutSettings { get; set; }
-            public PrintPageSettings? BarcodePageSettings { get; set; }
-            public PrintLayoutSettings? BarcodeLayoutSettings { get; set; }
+            public LabelPrintSettings? LabelPrintSettings { get; set; }
+            public BarcodePrintSettings? BarcodePrintSettings { get; set; }
 
             public DocumentPrintSettings() {
-                LabelPageSettings = new PrintPageSettings();
-                LabelLayoutSettings = new PrintLayoutSettings();
-                BarcodePageSettings = new PrintPageSettings();
-                BarcodeLayoutSettings = new PrintLayoutSettings();
-            }
-
-            public bool ShouldSerializeLabelPageSettings() {
-                return LabelPageSettings != null;
-            }
-            public bool ShouldSerializeLabelLayoutSettings() {
-                return LabelLayoutSettings != null;
-            }
-            public bool ShouldSerializeBarcodePageSettings() {
-                return BarcodePageSettings != null;
-            }
-            public bool ShouldSerializeBarcodeLayoutSettings() {
-                return BarcodeLayoutSettings != null;
+                LabelPrintSettings = new LabelPrintSettings();
+                BarcodePrintSettings = new BarcodePrintSettings();
             }
 
             public void SetSettingsType(bool isLabelPrint, bool isBarcodePrint) {
-                if (!isLabelPrint) {
-                    LabelPageSettings = null;
-                    LabelLayoutSettings = null;
-                }
-                else {
-                    LabelPageSettings ??= new PrintPageSettings();
-                    LabelLayoutSettings ??= new PrintLayoutSettings();
-                }
-
-                if (!isBarcodePrint) {
-                    BarcodePageSettings = null;
-                    BarcodeLayoutSettings = null;
-                }
-                else {
-                    BarcodePageSettings ??= new PrintPageSettings();
-                    BarcodeLayoutSettings ??= new PrintLayoutSettings();
-                }
+                LabelPrintSettings = isLabelPrint ? new LabelPrintSettings() : null;
+                BarcodePrintSettings = isBarcodePrint ? new BarcodePrintSettings() : null;
             }
         }
 
-        public class PrintPageSettings {
+        public abstract class PrintSettingsBase {
+            [Category("\t用紙設定"), DisplayName("ラベル幅 (mm)")]
             public double LabelWidth { get; set; }
+            [Category("\t用紙設定"), DisplayName("ラベル高さ (mm)")]
             public double LabelHeight { get; set; }
+            [Category("\t用紙設定"), DisplayName("配置数 (行)")]
             public int LabelsPerRow { get; set; }
+            [Category("\t用紙設定"), DisplayName("配置数 (列)")]
             public int LabelsPerColumn { get; set; }
+            [Category("\t用紙設定"), DisplayName("余白左 (mm)")]
             public double MarginX { get; set; }
+            [Category("\t用紙設定"), DisplayName("余白上 (mm)")]
             public double MarginY { get; set; }
+            [Category("\t用紙設定"), DisplayName("間隔 横 (mm)")]
             public double IntervalX { get; set; }
+            [Category("\t用紙設定"), DisplayName("間隔 縦 (mm)")]
             public double IntervalY { get; set; }
+            [Category("\t用紙設定"), DisplayName("ヘッダー開始位置 上 (mm)")]
             public double HeaderPositionX { get; set; }
+            [Category("\t用紙設定"), DisplayName("ヘッダー開始位置 左 (mm)")]
             public double HeaderPositionY { get; set; }
+            [Category("\t用紙設定"), DisplayName("ヘッダー フォーマット"), Description("%D(印刷日)  %M(製番)  %O(注番)  %T(型式)  %P(製品名)  %N(台数)  %U(担当者)")]
             public string HeaderTextFormat { get; set; } = string.Empty;
 
-            [JsonConverter(typeof(FontJsonConverter))]
+            [Category("\t用紙設定"), DisplayName("ヘッダー フォント"), JsonConverter(typeof(FontJsonConverter))]
             public Font HeaderFont { get; set; } = SystemFonts.DefaultFont;
-        }
-        public class PrintLayoutSettings {
+
+            [Category("印字設定"), DisplayName("発行枚数")]
             public int CopiesPerLabel { get; set; }
+            [Category("印字設定"), DisplayName("印字位置 左 (mm)")]
             public double TextPositionX { get; set; }
+            [Category("印字設定"), DisplayName("印字位置 上 (mm)")]
             public double TextPositionY { get; set; }
+            [Category("印字設定"), DisplayName("中心に配置 (横)")]
             public bool AlignTextCenterX { get; set; }
+            [Category("印字設定"), DisplayName("中心に配置 (縦)")]
             public bool AlignTextCenterY { get; set; }
-            public double BarcodeHeight { get; set; }
-            public double BarcodeWidth { get; set; }
-            public double BarcodePositionX { get; set; }
-            public double BarcodePositionY { get; set; }
-            public bool AlignBarcodeCenterX { get; set; }
+            [Category("印字設定"), DisplayName("印字フォーマット"), Description("%T(型式)  %R(リビジョン)  %S(シリアル)  %Y(製造年)  %M(製造月(1桁))  %MM(製造月(2桁))")]
             public string TextFormat { get; set; } = string.Empty;
 
-            [JsonConverter(typeof(FontJsonConverter))]
+            [Category("印字設定"), DisplayName("印字フォント"), JsonConverter(typeof(FontJsonConverter))]
             public Font TextFont { get; set; } = SystemFonts.DefaultFont;
+
         }
+
+        public class LabelPrintSettings : PrintSettingsBase {
+            // ラベル固有の設定（今後増える場合にここに追加）
+        }
+
+        public class BarcodePrintSettings : PrintSettingsBase {
+            [Category("印字設定"), DisplayName("バーコード幅 (mm)")]
+            public double BarcodeWidth { get; set; }
+            [Category("印字設定"), DisplayName("バーコード高さ (mm)")]
+            public double BarcodeHeight { get; set; }
+            [Category("印字設定"), DisplayName("バーコード位置 左 (mm)")]
+            public double BarcodePositionX { get; set; }
+            [Category("印字設定"), DisplayName("バーコード位置 上 (mm)")]
+            public double BarcodePositionY { get; set; }
+            [Category("印字設定"), DisplayName("中心に配置 (横)")]
+            public bool AlignBarcodeCenterX { get; set; }
+        }
+
         public class FontJsonConverter : JsonConverter<Font> {
             public override Font Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
                 var fontString = reader.GetString()!;
