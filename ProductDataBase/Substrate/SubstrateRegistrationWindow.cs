@@ -11,8 +11,7 @@ namespace ProductDatabase {
         public ProductInformation ProductInfo { get; }
 
         public DocumentPrintSettings SubstratePrintSettings { get; set; } = new DocumentPrintSettings();
-        public PrintPageSettings LabelPageSettings => SubstratePrintSettings.LabelPageSettings ?? new PrintPageSettings();
-        public PrintLayoutSettings LabelLayoutSettings => SubstratePrintSettings.LabelLayoutSettings ?? new PrintLayoutSettings();
+        public LabelPrintSettings LabelPrintSettings => SubstratePrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
         public readonly string printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
 
         private readonly List<string> _checkBoxNames = [

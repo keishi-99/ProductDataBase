@@ -9,10 +9,12 @@ namespace ProductDatabase {
     public partial class RePrintWindow : Form {
 
         public DocumentPrintSettings  ProductPrintSettings { get; set; } = new DocumentPrintSettings ();
-        public PrintPageSettings LabelPageSettings => this.ProductPrintSettings.LabelPageSettings ?? new PrintPageSettings();
-        public PrintPageSettings BarcodePageSettings => ProductPrintSettings.BarcodePageSettings ?? new PrintPageSettings();
-        public PrintLayoutSettings LabelLayoutSettings => this.ProductPrintSettings.LabelLayoutSettings ?? new PrintLayoutSettings();
-        public PrintLayoutSettings BarcodeLayoutSettings => ProductPrintSettings.BarcodeLayoutSettings ?? new PrintLayoutSettings();
+        public LabelPrintSettings LabelPrintSettings => this.ProductPrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
+        public BarcodePrintSettings BarcodePrintSettings => ProductPrintSettings.BarcodePrintSettings ?? new BarcodePrintSettings();
+        //public PrintPageSettings LabelPageSettings => this.ProductPrintSettings.LabelPageSettings ?? new PrintPageSettings();
+        //public PrintPageSettings BarcodePageSettings => ProductPrintSettings.BarcodePageSettings ?? new PrintPageSettings();
+        //public PrintLayoutSettings LabelLayoutSettings => this.ProductPrintSettings.LabelLayoutSettings ?? new PrintLayoutSettings();
+        //public PrintLayoutSettings BarcodeLayoutSettings => ProductPrintSettings.BarcodeLayoutSettings ?? new PrintLayoutSettings();
 
         public string printSettingPath = string.Empty;
 
@@ -365,8 +367,8 @@ namespace ProductDatabase {
             };
 
             var outputCode = _serialType switch {
-                "Label" => LabelLayoutSettings.TextFormat ?? string.Empty,
-                "Barcode" => BarcodeLayoutSettings.TextFormat ?? string.Empty,
+                "Label" => LabelPrintSettings.TextFormat ?? string.Empty,
+                "Barcode" => BarcodePrintSettings.TextFormat ?? string.Empty,
                 _ => string.Empty
             };
 
