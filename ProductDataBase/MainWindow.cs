@@ -10,7 +10,7 @@ namespace ProductDatabase {
 
         public int RadioButtonNumber { get; set; }
         private DataTable MainDataTable { get; } = new();
-        private int _fontSize;
+        private float _fontSize = SystemFonts.DefaultFont.Size;
 
         public class ProductInformation {
             public int ProductID { get; set; }
@@ -38,7 +38,7 @@ namespace ProductDatabase {
             public List<string> CategoryType { get; set; } = [];
             public List<string> PersonList { get; set; } = [];
             public string FontName { get; } = "Meiryo UI";
-            public int FontSize { get; set; } = 9;
+            public float FontSize { get; set; } = 9;
 
             public string OrderNumber { get; set; } = string.Empty;
             public string ProductNumber { get; set; } = string.Empty;
