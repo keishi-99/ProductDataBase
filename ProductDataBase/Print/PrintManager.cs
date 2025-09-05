@@ -348,8 +348,8 @@ namespace ProductDatabase.Print {
             }
 
             public void SetSettingsType(bool isLabelPrint, bool isBarcodePrint) {
-                LabelPrintSettings = isLabelPrint ? new LabelPrintSettings() : null;
-                BarcodePrintSettings = isBarcodePrint ? new BarcodePrintSettings() : null;
+                LabelPrintSettings = isLabelPrint ? (LabelPrintSettings ?? new LabelPrintSettings()) : null;
+                BarcodePrintSettings = isBarcodePrint ? (BarcodePrintSettings ?? new BarcodePrintSettings()) : null;
             }
         }
 

@@ -63,11 +63,9 @@ namespace ProductDatabase {
                 };
                 var jsonString = JsonSerializer.Serialize(DocumentPrintSettings, _jsonSerializerOptions);
                 File.WriteAllText(_documentPrintSettingFilePath, jsonString);
-                DialogResult = DialogResult.OK;
                 Close();
             } catch (Exception ex) {
                 MessageBox.Show($"設定の保存中にエラーが発生しました。{Environment.NewLine}{ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                DialogResult = DialogResult.None;
             }
         }
 
