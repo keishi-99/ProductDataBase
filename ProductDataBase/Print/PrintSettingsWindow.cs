@@ -21,6 +21,7 @@ namespace ProductDatabase {
         }
 
         private void LoadSettings() {
+            Font = new System.Drawing.Font(ProductInfo.FontName, ProductInfo.FontSize);
             switch (Owner) {
                 case ProductRegistration2Window productWindow:
                     ProductInfo = productWindow.ProductInfo;

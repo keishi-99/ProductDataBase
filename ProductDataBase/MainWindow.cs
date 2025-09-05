@@ -10,6 +10,7 @@ namespace ProductDatabase {
 
         public int RadioButtonNumber { get; set; }
         private DataTable MainDataTable { get; } = new();
+        private int _fontSize;
 
         public class ProductInformation {
             public int ProductID { get; set; }
@@ -242,6 +243,8 @@ namespace ProductDatabase {
             while (dr.Read()) {
                 ProductInfo.PersonList.Add($"{dr["PersonName"]}");
             }
+
+            ProductInfo.FontSize = _fontSize;
         }
         // 登録ボタン処理
         private void Registration() {
@@ -738,23 +741,22 @@ namespace ProductDatabase {
         // フォント変更
         private void FontChange(object sender) {
             var radioButton = (RadioButton)sender;
-            int fontSize;
 
             switch (radioButton.Name) {
                 case "FontSize9RadioButton":
-                    fontSize = 9;
+                    _fontSize = 9;
                     break;
                 case "FontSize12RadioButton":
-                    fontSize = 12;
+                    _fontSize = 12;
                     break;
                 case "FontSize14RadioButton":
-                    fontSize = 14;
+                    _fontSize = 14;
                     break;
                 default:
                     return;
             }
 
-            ProductInfo.FontSize = fontSize;
+            ProductInfo.FontSize = _fontSize;
             Font = new System.Drawing.Font(ProductInfo.FontName, ProductInfo.FontSize);
         }
         // excel
