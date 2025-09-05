@@ -742,19 +742,12 @@ namespace ProductDatabase {
         private void FontChange(object sender) {
             var radioButton = (RadioButton)sender;
 
-            switch (radioButton.Name) {
-                case "FontSize9RadioButton":
-                    _fontSize = 9;
-                    break;
-                case "FontSize12RadioButton":
-                    _fontSize = 12;
-                    break;
-                case "FontSize14RadioButton":
-                    _fontSize = 14;
-                    break;
-                default:
-                    return;
-            }
+            _fontSize = radioButton.Name switch {
+                "FontSize9RadioButton" => 9,
+                "FontSize12RadioButton" => 12,
+                "FontSize14RadioButton" => 14,
+                _ => _fontSize
+            };
 
             ProductInfo.FontSize = _fontSize;
             Font = new System.Drawing.Font(ProductInfo.FontName, ProductInfo.FontSize);
