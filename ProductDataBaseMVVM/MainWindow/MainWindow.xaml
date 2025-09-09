@@ -1,0 +1,18 @@
+﻿<Window x:Class="ProductDataBaseMVVM.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ProductDataBaseMVVM"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <RadioButton Content="RadioButton" HorizontalAlignment="Left" Margin="60,39,0,0" VerticalAlignment="Top"/>
+        <RadioButton Content="RadioButton" HorizontalAlignment="Left" Margin="179,40,0,0" VerticalAlignment="Top"/>
+        <ListBox d:ItemsSource="{d:SampleData ItemCount=5}" Margin="45,93,626,123"/>
+        <ListBox d:ItemsSource="{d:SampleData ItemCount=5}" Margin="282,98,309,126"/>
+        <ListBox d:ItemsSource="{d:SampleData ItemCount=5}" Margin="537,101,54,123"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="59,354,0,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>
