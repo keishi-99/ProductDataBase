@@ -9,7 +9,7 @@ using static ProductDatabase.Print.PrintOptions;
 namespace ProductDatabase {
     public partial class ProductRegistration2Window : Form {
 
-        public DocumentPrintSettings  ProductPrintSettings { get; set; } = new DocumentPrintSettings ();
+        public DocumentPrintSettings ProductPrintSettings { get; set; } = new DocumentPrintSettings();
         public LabelPrintSettings LabelPrintSettings => ProductPrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
         public BarcodePrintSettings BarcodePrintSettings => ProductPrintSettings.BarcodePrintSettings ?? new BarcodePrintSettings();
         //public PrintPageSettings LabelPageSettings => ProductPrintSettings.LabelPageSettings ?? new PrintPageSettings();
@@ -281,13 +281,13 @@ namespace ProductDatabase {
         }
         private void LoadSettings() {
             try {
-                ProductPrintSettings = new DocumentPrintSettings ();
+                ProductPrintSettings = new DocumentPrintSettings();
                 printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", ProductInfo.CategoryName, ProductInfo.ProductName, $"PrintConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.json");
                 if (!File.Exists(printSettingPath)) {
                     throw new DirectoryNotFoundException($"印刷用設定ファイルがありません。");
                 }
                 var jsonString = File.ReadAllText(printSettingPath);
-                ProductPrintSettings = System.Text.Json.JsonSerializer.Deserialize<DocumentPrintSettings >(jsonString) ?? new DocumentPrintSettings ();
+                ProductPrintSettings = System.Text.Json.JsonSerializer.Deserialize<DocumentPrintSettings>(jsonString) ?? new DocumentPrintSettings();
             } catch (Exception ex) {
                 MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -390,7 +390,7 @@ namespace ProductDatabase {
                 """;
 
             var comment = ProductInfo.RegType switch {
-                9 => $"製品型式[{ProductInfo.ProductModel}]\n{ProductInfo.Comment}",
+                9 => $"製品型式[{ServiceInfo.ServiceProductModel}]\n{ProductInfo.Comment}",
                 _ => ProductInfo.Comment,
             };
 
