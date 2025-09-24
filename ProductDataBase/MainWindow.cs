@@ -130,19 +130,19 @@ namespace ProductDatabase {
         public static string GetConnectionInformation() {
             var informationPath = Path.Combine(Environment.CurrentDirectory, "db", "information.db");
             if (!File.Exists(informationPath)) { throw new FileNotFoundException("ファイルが見つかりません。", informationPath); }
-            var u = new Uri(informationPath);
-            if (u.IsUnc) {
-                informationPath = @"\" + informationPath; // UNCパス
-            }
+            //var u = new Uri(informationPath);
+            //if (u.IsUnc) {
+            //    informationPath = @"\" + informationPath; // UNCパス
+            //}
             return new SqliteConnectionStringBuilder() { DataSource = informationPath }.ToString();
         }
         public static string GetConnectionRegistration() {
             var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
             if (!File.Exists(registrationPath)) { throw new FileNotFoundException("ファイルが見つかりません。", registrationPath); }
-            var u = new Uri(registrationPath);
-            if (u.IsUnc) {
-                registrationPath = @"\" + registrationPath; // UNCパス
-            }
+            //var u = new Uri(registrationPath);
+            //if (u.IsUnc) {
+            //    registrationPath = @"\" + registrationPath; // UNCパス
+            //}
             return new SqliteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
         }
 
