@@ -36,8 +36,8 @@ namespace ProductDatabase {
                         "Substrate11DataGridView", "Substrate12DataGridView", "Substrate13DataGridView", "Substrate14DataGridView","Substrate15DataGridView"
                         ];
 
-        private SqliteConnection? _SqliteConnection; // 編集モード用の接続
-        private SqliteTransaction? _SqliteTransaction; // 編集モード用のトランザクション
+        private SqliteConnection? _sqliteConnection; // 編集モード用の接続
+        private SqliteTransaction? _sqliteTransaction; // 編集モード用のトランザクション
 
         public ProductRegistration2Window() {
             InitializeComponent();
@@ -45,9 +45,9 @@ namespace ProductDatabase {
 
         private void LoadEvents() {
             try {
-                _SqliteConnection = new SqliteConnection(GetConnectionRegistration());
-                _SqliteConnection.Open();
-                _SqliteTransaction = _SqliteConnection.BeginTransaction(); // トランザクション開始（ロック）
+                _sqliteConnection = new SqliteConnection(GetConnectionRegistration());
+                _sqliteConnection.Open();
+                _sqliteTransaction = _sqliteConnection.BeginTransaction(); // トランザクション開始（ロック）
 
                 SetFont();
                 InitializeUIControls();
@@ -68,7 +68,7 @@ namespace ProductDatabase {
                             }
                             ServiceInfo = window.ServiceInfo;
                         }
-                        LoadSubstrateData(_SqliteConnection);
+                        LoadSubstrateData(_sqliteConnection);
                         break;
                     default:
                         HideAllControls();
@@ -87,14 +87,14 @@ namespace ProductDatabase {
         }
         private void ClosingEvents() {
             // 編集モードのトランザクションをコミットしてロック解除
-            if (_SqliteTransaction != null) {
-                _SqliteTransaction.Dispose();
-                _SqliteTransaction = null;
+            if (_sqliteTransaction != null) {
+                _sqliteTransaction.Dispose();
+                _sqliteTransaction = null;
             }
-            if (_SqliteConnection != null) {
-                _SqliteConnection.Close();
-                _SqliteConnection.Dispose();
-                _SqliteConnection = null;
+            if (_sqliteConnection != null) {
+                _sqliteConnection.Close();
+                _sqliteConnection.Dispose();
+                _sqliteConnection = null;
             }
         }
         private void SetFont() {
@@ -293,27 +293,27 @@ namespace ProductDatabase {
             try {
                 _strSerial.Clear();
 
-                if (_SqliteConnection == null || _SqliteTransaction == null) {
+                if (_sqliteConnection == null || _sqliteTransaction == null) {
                     throw new InvalidOperationException("編集モード用の接続が初期化されていません。");
                 }
 
-                if (!NumberCheck(_SqliteConnection) || !QuantityCheck()) {
+                if (!NumberCheck(_sqliteConnection) || !QuantityCheck()) {
                     return;
                 }
                 if (ProductInfo.IsSerialGeneration) {
-                    SerialCheck(_SqliteConnection);
+                    SerialCheck(_sqliteConnection);
                     GenerateSerialCodes();
                 }
 
                 DisableControls();
 
-                Registration(_SqliteConnection, _SqliteTransaction);
+                Registration(_sqliteConnection, _sqliteTransaction);
 
                 LogRegistration(ProductInfo);
                 BackupManager.CreateBackup();
 
                 // 登録チェック
-                RegistrationCheck(_SqliteConnection);
+                RegistrationCheck(_sqliteConnection);
 
                 // 登録完了メッセージ
                 MessageBox.Show("登録しました。");
