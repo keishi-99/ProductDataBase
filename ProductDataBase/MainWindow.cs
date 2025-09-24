@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Configuration;
 using ProductDatabase.Other;
 using System.Data;
 using System.Data.Odbc;
-using System.Data.SQLite;
 using System.Text.RegularExpressions;
 
 namespace ProductDatabase {
@@ -134,7 +134,7 @@ namespace ProductDatabase {
             if (u.IsUnc) {
                 informationPath = @"\" + informationPath; // UNCパス
             }
-            return new SQLiteConnectionStringBuilder() { DataSource = informationPath }.ToString();
+            return new SqliteConnectionStringBuilder() { DataSource = informationPath }.ToString();
         }
         public static string GetConnectionRegistration() {
             var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
@@ -143,7 +143,7 @@ namespace ProductDatabase {
             if (u.IsUnc) {
                 registrationPath = @"\" + registrationPath; // UNCパス
             }
-            return new SQLiteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
+            return new SqliteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
         }
 
         // ロードイベント
@@ -180,19 +180,27 @@ namespace ProductDatabase {
                     File.Copy(registrationPath, backupFilePath, false);
                 }
 
-                using SQLiteConnection con = new(GetConnectionInformation());
-                using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
-                using (SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con)) { adapter.Fill(ProductInfo.SubstrateDataTable); }
+                using SqliteConnection con = new(GetConnectionInformation());
+                con.Open();
+                using (var cmd = new SqliteCommand("SELECT * FROM Product;", con)) {
+                    using var reader = cmd.ExecuteReader();
+                    ProductInfo.ProductDataTable.Load(reader);
+                }
+                using (var cmd = new SqliteCommand("SELECT * FROM Substrate;", con)) {
+                    using var reader = cmd.ExecuteReader();
+                    ProductInfo.SubstrateDataTable.Load(reader);
+                }
 
                 // DB1へ接続し担当者取得
                 ProductInfo.PersonList.Clear();
                 con.Open();
-                using var cmd = con.CreateCommand();
-                // テーブル検索SQL - 担当者をPersonListへ追加
-                cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
-                using var dr = cmd.ExecuteReader();
-                while (dr.Read()) {
-                    ProductInfo.PersonList.Add($"{dr["PersonName"]}");
+                using (var cmd = con.CreateCommand()) {
+                    // テーブル検索SQL - 担当者をPersonListへ追加
+                    cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
+                    using var dr = cmd.ExecuteReader();
+                    while (dr.Read()) {
+                        ProductInfo.PersonList.Add($"{dr["PersonName"]}");
+                    }
                 }
 
                 // 認証ユーザー名を取得
@@ -229,19 +237,27 @@ namespace ProductDatabase {
         private void ResetFields() {
             ProductInfo = new ProductInformation();
 
-            using SQLiteConnection con = new(GetConnectionInformation());
-            using (SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con)) { adapter.Fill(ProductInfo.ProductDataTable); }
-            using (SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con)) { adapter.Fill(ProductInfo.SubstrateDataTable); }
+            using var con = new SqliteConnection(GetConnectionInformation());
+            con.Open();
+            using (var cmd = new SqliteCommand("SELECT * FROM Product;", con)) {
+                using var reader = cmd.ExecuteReader();
+                ProductInfo.ProductDataTable.Load(reader);
+            }
+            using (var cmd = new SqliteCommand("SELECT * FROM Substrate;", con)) {
+                using var reader = cmd.ExecuteReader();
+                ProductInfo.SubstrateDataTable.Load(reader);
+            }
 
             // DB1へ接続し担当者取得
             ProductInfo.PersonList.Clear();
             con.Open();
-            using var cmd = con.CreateCommand();
-            // テーブル検索SQL - 担当者をPersonListへ追加
-            cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
-            using var dr = cmd.ExecuteReader();
-            while (dr.Read()) {
-                ProductInfo.PersonList.Add($"{dr["PersonName"]}");
+            using (var cmd = con.CreateCommand()) {
+                // テーブル検索SQL - 担当者をPersonListへ追加
+                cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
+                using var dr = cmd.ExecuteReader();
+                while (dr.Read()) {
+                    ProductInfo.PersonList.Add($"{dr["PersonName"]}");
+                }
             }
 
             ProductInfo.FontSize = _fontSize;
@@ -422,9 +438,12 @@ namespace ProductDatabase {
 
                 if (sender is RadioButton selectedRadioButton && radioButtonMap.TryGetValue(selectedRadioButton.Tag?.ToString() ?? "", out var map)) {
                     RadioButtonNumber = map.Number;
-                    using var con = new SQLiteConnection(GetConnectionInformation());
-                    using var adapter = new SQLiteDataAdapter(map.Sql, con);
-                    adapter.Fill(MainDataTable);
+                    using var con = new SqliteConnection(GetConnectionInformation());
+                    con.Open();
+
+                    using var cmd = new SqliteCommand(map.Sql, con);
+                    using var reader = cmd.ExecuteReader();
+                    MainDataTable.Load(reader);
                 }
 
                 // CategoryName 列の重複を削除し、ソートする
@@ -612,10 +631,9 @@ namespace ProductDatabase {
                 .Replace("-DCGH", "-DC");
         }
         private void FetchDataFromSQLite() {
-            using SQLiteConnection con = new(GetConnectionInformation());
+            using var con = new SqliteConnection(GetConnectionInformation());
             con.Open();
             using var cmd = con.CreateCommand();
-
             cmd.CommandText =
                 $"""
                 SELECT
@@ -638,7 +656,7 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            cmd.Parameters.Add("@StrProness2", DbType.String).Value = ProductInfo.Proness2;
+            cmd.Parameters.Add("@StrProness2", SqliteType.Text).Value = ProductInfo.Proness2;
             using var dr = cmd.ExecuteReader();
             if (!dr.HasRows) { throw new Exception($"品目番号が見つかりません。\n品目番号:[{ProductInfo.Proness2}]"); }
             while (dr.Read()) {
@@ -688,9 +706,10 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateSelection(string productName, string substrateName) {
-            using (SQLiteConnection con = new(GetConnectionInformation())) {
-                using SQLiteDataAdapter adapter = new("SELECT * FROM Substrate;", con);
-                adapter.Fill(MainDataTable);
+            using SqliteConnection con = new(GetConnectionInformation());
+            using (var cmd = new SqliteCommand("SELECT * FROM Substrate;", con)) {
+                using var reader = cmd.ExecuteReader();
+                MainDataTable.Load(reader);
             }
 
             var substrateRet = MainDataTable.Select($"ProductName = '{productName}' AND SubstrateName = '{substrateName}'");
@@ -710,9 +729,10 @@ namespace ProductDatabase {
             window.ShowDialog(this);
         }
         private void HandleProductSelection(string productName, string productType) {
-            using (SQLiteConnection con = new(GetConnectionInformation())) {
-                using SQLiteDataAdapter adapter = new("SELECT * FROM Product;", con);
-                adapter.Fill(MainDataTable);
+            using SqliteConnection con = new(GetConnectionInformation());
+            using (var cmd = new SqliteCommand("SELECT * FROM Product;", con)) {
+                using var reader = cmd.ExecuteReader();
+                MainDataTable.Load(reader);
             }
 
             var productRet = MainDataTable.Select($"ProductName = '{productName}' AND ProductType = '{productType}'");

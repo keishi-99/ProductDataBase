@@ -1,7 +1,7 @@
-﻿using ProductDatabase.Other;
+﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.Other;
 using ProductDatabase.Print;
 using System.Data;
-using System.Data.SQLite;
 using static ProductDatabase.MainWindow;
 using static ProductDatabase.Other.CommonUtils;
 using static ProductDatabase.Print.PrintOptions;
@@ -12,10 +12,6 @@ namespace ProductDatabase {
         public DocumentPrintSettings ProductPrintSettings { get; set; } = new DocumentPrintSettings();
         public LabelPrintSettings LabelPrintSettings => ProductPrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
         public BarcodePrintSettings BarcodePrintSettings => ProductPrintSettings.BarcodePrintSettings ?? new BarcodePrintSettings();
-        //public PrintPageSettings LabelPageSettings => ProductPrintSettings.LabelPageSettings ?? new PrintPageSettings();
-        //public PrintPageSettings BarcodePageSettings => ProductPrintSettings.BarcodePageSettings ?? new PrintPageSettings();
-        //public PrintLayoutSettings LabelLayoutSettings => ProductPrintSettings.LabelLayoutSettings ?? new PrintLayoutSettings();
-        //public PrintLayoutSettings BarcodeLayoutSettings => ProductPrintSettings.BarcodeLayoutSettings ?? new PrintLayoutSettings();
 
         public string printSettingPath = string.Empty;
 
@@ -40,8 +36,8 @@ namespace ProductDatabase {
                         "Substrate11DataGridView", "Substrate12DataGridView", "Substrate13DataGridView", "Substrate14DataGridView","Substrate15DataGridView"
                         ];
 
-        private SQLiteConnection? _sqLiteConnection; // 編集モード用の接続
-        private SQLiteTransaction? _sqLiteTransaction; // 編集モード用のトランザクション
+        private SqliteConnection? _SqliteConnection; // 編集モード用の接続
+        private SqliteTransaction? _SqliteTransaction; // 編集モード用のトランザクション
 
         public ProductRegistration2Window() {
             InitializeComponent();
@@ -49,9 +45,9 @@ namespace ProductDatabase {
 
         private void LoadEvents() {
             try {
-                _sqLiteConnection = new SQLiteConnection(GetConnectionRegistration());
-                _sqLiteConnection.Open();
-                _sqLiteTransaction = _sqLiteConnection.BeginTransaction(); // トランザクション開始（ロック）
+                _SqliteConnection = new SqliteConnection(GetConnectionRegistration());
+                _SqliteConnection.Open();
+                _SqliteTransaction = _SqliteConnection.BeginTransaction(); // トランザクション開始（ロック）
 
                 SetFont();
                 InitializeUIControls();
@@ -72,7 +68,7 @@ namespace ProductDatabase {
                             }
                             ServiceInfo = window.ServiceInfo;
                         }
-                        LoadSubstrateData(_sqLiteConnection);
+                        LoadSubstrateData(_SqliteConnection);
                         break;
                     default:
                         HideAllControls();
@@ -81,7 +77,7 @@ namespace ProductDatabase {
 
                 ConfigurePrintSettings();
 
-            } catch (SQLiteException ex) {
+            } catch (SqliteException ex) {
                 MessageBox.Show($"データベースがロックされています。: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
             } catch (Exception ex) {
@@ -91,14 +87,14 @@ namespace ProductDatabase {
         }
         private void ClosingEvents() {
             // 編集モードのトランザクションをコミットしてロック解除
-            if (_sqLiteTransaction != null) {
-                _sqLiteTransaction.Dispose();
-                _sqLiteTransaction = null;
+            if (_SqliteTransaction != null) {
+                _SqliteTransaction.Dispose();
+                _SqliteTransaction = null;
             }
-            if (_sqLiteConnection != null) {
-                _sqLiteConnection.Close();
-                _sqLiteConnection.Dispose();
-                _sqLiteConnection = null;
+            if (_SqliteConnection != null) {
+                _SqliteConnection.Close();
+                _SqliteConnection.Dispose();
+                _SqliteConnection = null;
             }
         }
         private void SetFont() {
@@ -124,7 +120,7 @@ namespace ProductDatabase {
         private void SetSerialNumbers() {
             _serialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
         }
-        private void LoadSubstrateData(SQLiteConnection connection) {
+        private void LoadSubstrateData(SqliteConnection connection) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = ProductInfo.RegType == 9;
             var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : _useSubstrate)
@@ -196,7 +192,7 @@ namespace ProductDatabase {
                     break;
             }
         }
-        private bool FetchAndDisplaySubstrateData(SQLiteConnection connection, DataGridView? objDgv, int index) {
+        private bool FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, int index) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = ProductInfo.RegType == 9;
             var categoryName = (isServiceRegistration ? ServiceInfo.ServiceCategoryName : ProductInfo.CategoryName)
@@ -297,27 +293,27 @@ namespace ProductDatabase {
             try {
                 _strSerial.Clear();
 
-                if (_sqLiteConnection == null || _sqLiteTransaction == null) {
+                if (_SqliteConnection == null || _SqliteTransaction == null) {
                     throw new InvalidOperationException("編集モード用の接続が初期化されていません。");
                 }
 
-                if (!NumberCheck(_sqLiteConnection) || !QuantityCheck()) {
+                if (!NumberCheck(_SqliteConnection) || !QuantityCheck()) {
                     return;
                 }
                 if (ProductInfo.IsSerialGeneration) {
-                    SerialCheck(_sqLiteConnection);
+                    SerialCheck(_SqliteConnection);
                     GenerateSerialCodes();
                 }
 
                 DisableControls();
 
-                Registration(_sqLiteConnection, _sqLiteTransaction);
+                Registration(_SqliteConnection, _SqliteTransaction);
 
                 LogRegistration(ProductInfo);
                 BackupManager.CreateBackup();
 
                 // 登録チェック
-                RegistrationCheck(_sqLiteConnection);
+                RegistrationCheck(_SqliteConnection);
 
                 // 登録完了メッセージ
                 MessageBox.Show("登録しました。");
@@ -333,13 +329,13 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void Registration(SQLiteConnection connection, SQLiteTransaction transaction) {
+        private void Registration(SqliteConnection connection, SqliteTransaction transaction) {
             try {
                 InsertProduct(connection);
 
                 if (ProductInfo.RegType == 9) {
-                    using var command = new SQLiteCommand("SELECT last_insert_rowid();", connection);
-                    _lastInsertRowid = command.ExecuteScalar().ToString() ?? string.Empty;
+                    using var command = new SqliteCommand("SELECT last_insert_rowid();", connection);
+                    _lastInsertRowid = command.ExecuteScalar()?.ToString() ?? string.Empty;
                 }
 
                 switch (ProductInfo.RegType) {
@@ -372,7 +368,7 @@ namespace ProductDatabase {
             }
         }
 
-        private void InsertProduct(SQLiteConnection connection) {
+        private void InsertProduct(SqliteConnection connection) {
             var productTableName = $"[{ProductInfo.CategoryName}_Product]";
             var commandText =
                 $"""
@@ -413,7 +409,7 @@ namespace ProductDatabase {
 
             ProductInfo.ProductID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {productTableName};"));
         }
-        private void InsertSerial(SQLiteConnection connection) {
+        private void InsertSerial(SqliteConnection connection) {
             var serialTableName = $"[{ProductInfo.CategoryName}_Serial]";
             var commandText =
                 $"""
@@ -434,7 +430,7 @@ namespace ProductDatabase {
                 );
             }
         }
-        private void RegisterSubstrate(SQLiteConnection connection) {
+        private void RegisterSubstrate(SqliteConnection connection) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = ProductInfo.RegType == 9;
             var categoryName = (isServiceRegistration ? ServiceInfo.ServiceCategoryName : ProductInfo.CategoryName)
@@ -466,7 +462,7 @@ namespace ProductDatabase {
                 }
             }
         }
-        private static (string substrateName, string substrateModel, string orderNumber) GetSubstrateInfo(SQLiteConnection connection, int index, string categoryName, string stockName, string substrateNumber, string[] useSubstrate) {
+        private static (string substrateName, string substrateModel, string orderNumber) GetSubstrateInfo(SqliteConnection connection, int index, string categoryName, string stockName, string substrateNumber, string[] useSubstrate) {
             var substrateTableName = $"[{categoryName}_Substrate]";
             var commandText =
                 $"""
@@ -493,7 +489,7 @@ namespace ProductDatabase {
                 ? ($"{dr["SubstrateName"]}", $"{dr["SubstrateModel"]}", $"{dr["OrderNumber"]}")
                 : (string.Empty, string.Empty, string.Empty);
         }
-        private void InsertSubstrate(SQLiteConnection connection, string categoryName, string stockName, string substrateName, string substrateModel, string substrateNumber, string orderNumber, int useValue, int? useID) {
+        private void InsertSubstrate(SqliteConnection connection, string categoryName, string stockName, string substrateName, string substrateModel, string substrateNumber, string orderNumber, int useValue, int? useID) {
             var substrateTableName = $"[{categoryName}_Substrate]";
             var commandText =
                 $"""
@@ -526,38 +522,38 @@ namespace ProductDatabase {
                 );
         }
 
-        private static void ExecuteNonQuery(SQLiteConnection connection, string commandText, params (string, object?)[] parameters) {
-            using var command = connection.CreateCommand();
+        private static void ExecuteNonQuery(SqliteConnection connection, string commandText, params (string, object?)[] parameters) {
+            var command = connection.CreateCommand();
             command.CommandText = commandText;
             foreach (var (name, value) in parameters) {
                 // 空の文字列の場合にNULLを設定
                 var sqlValue = value is string strValue && string.IsNullOrEmpty(strValue) ? DBNull.Value : value ?? DBNull.Value;
-                command.Parameters.Add(name, DbType.String).Value = sqlValue;
+                command.Parameters.Add(name, SqliteType.Text).Value = sqlValue;
             }
 
             command.ExecuteNonQuery();
         }
-        private static object ExecuteScalar(SQLiteConnection connection, string commandText, params (string, object)[] parameters) {
-            using var command = connection.CreateCommand();
+        private static object ExecuteScalar(SqliteConnection connection, string commandText, params (string, object)[] parameters) {
+            var command = connection.CreateCommand();
             command.CommandText = commandText;
             foreach (var (name, value) in parameters) {
-                command.Parameters.Add(name, DbType.String).Value = value ?? DBNull.Value;
+                command.Parameters.Add(name, SqliteType.Text).Value = value ?? DBNull.Value;
             }
 
             return command.ExecuteScalar() ?? 0;
         }
-        private static SQLiteDataReader ExecuteReader(SQLiteConnection connection, string commandText, params (string, object)[] parameters) {
-            using var command = connection.CreateCommand();
+        private static SqliteDataReader ExecuteReader(SqliteConnection connection, string commandText, params (string, object)[] parameters) {
+            var command = connection.CreateCommand();
             command.CommandText = commandText;
             foreach (var (name, value) in parameters) {
-                command.Parameters.Add(name, DbType.String).Value = value ?? DBNull.Value;
+                command.Parameters.Add(name, SqliteType.Text).Value = value ?? DBNull.Value;
             }
 
             return command.ExecuteReader();
         }
 
         // 登録チェック
-        private void RegistrationCheck(SQLiteConnection connection) {
+        private void RegistrationCheck(SqliteConnection connection) {
 
             var productTableName = $"[{ProductInfo.CategoryName}_Product]";
             var commandText = $@"SELECT * FROM {productTableName} WHERE Id = @Id;";
@@ -601,7 +597,7 @@ namespace ProductDatabase {
             CommonUtils.Logger.AppendLog(logMessageArray);
         }
 
-        private bool NumberCheck(SQLiteConnection connection) {
+        private bool NumberCheck(SqliteConnection connection) {
             var productModel = string.Empty;
 
             if (!string.IsNullOrEmpty(ProductInfo.ProductNumber)) {
@@ -749,7 +745,7 @@ namespace ProductDatabase {
                 return false;
             }
         }
-        private void SerialCheck(SQLiteConnection connection) {
+        private void SerialCheck(SqliteConnection connection) {
             if (ProductInfo.IsLabelPrint) {
                 for (var i = 0; i < ProductInfo.Quantity; i++) {
                     _serialType = "Label";
@@ -800,11 +796,11 @@ namespace ProductDatabase {
                     s.Serial IN ({string.Join(",", _strSerial.Select((_, i) => $"@Serial{i}"))})
                 ;
                 """;
-            cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
+            cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = ProductInfo.ProductName;
             _strSerial
                 .Select((serial, i) => new { ParamName = $"@Serial{i}", Value = serial.Trim() })
                 .ToList()
-                .ForEach(p => cmd.Parameters.Add(p.ParamName, System.Data.DbType.String).Value = p.Value);
+                .ForEach(p => cmd.Parameters.Add(p.ParamName, SqliteType.Text).Value = p.Value);
 
             using var dr = cmd.ExecuteReader();
             while (dr.Read()) {
