@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Data.SQLite;
+﻿using Microsoft.Data.Sqlite;
+using System.Data;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
@@ -23,7 +23,8 @@ namespace ProductDatabase {
             try {
                 Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
 
-                using SQLiteConnection con = new(GetConnectionRegistration());
+                using SqliteConnection con = new(GetConnectionRegistration());
+                con.Open();
                 HistoryTable.Clear();
 
                 using var cmd = con.CreateCommand();
@@ -41,11 +42,11 @@ namespace ProductDatabase {
                     ;
                     """;
 
-                cmd.Parameters.Add("@ProductModel", DbType.String).Value = ProductInfo.ProductModel;
+                cmd.Parameters.Add("@ProductModel", SqliteType.Text).Value = ProductInfo.ProductModel;
 
-                using var adapter = new SQLiteDataAdapter(cmd);
-
-                adapter.Fill(HistoryTable);
+                using (var reader = cmd.ExecuteReader()) {
+                    HistoryTable.Load(reader);
+                }
 
                 SubstrateChangeDataGridView.DataSource = HistoryTable;
 

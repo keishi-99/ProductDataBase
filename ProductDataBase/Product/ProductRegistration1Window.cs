@@ -1,6 +1,5 @@
-﻿using ProductDatabase.Other;
-using System.Data;
-using System.Data.SQLite;
+﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.Other;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
@@ -49,13 +48,13 @@ namespace ProductDatabase {
                 PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
 
                 // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
-                using SQLiteConnection con = new(GetConnectionRegistration());
+                using SqliteConnection con = new(GetConnectionRegistration());
                 con.Open();
                 using var cmd = con.CreateCommand();
 
                 // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
-                cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
-                cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
+                cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = ProductInfo.ProductName;
+                cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = ProductInfo.RevisionGroup;
                 var productTableName = $"[{ProductInfo.CategoryName}_Product]";
                 cmd.CommandText = $"SELECT Revision FROM {productTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
                 var revisionResult = cmd.ExecuteScalar();
@@ -63,7 +62,7 @@ namespace ProductDatabase {
 
                 if (ProductInfo.IsSerialGeneration) {
                     cmd.Parameters.Clear();
-                    cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
+                    cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = ProductInfo.ProductName;
                     cmd.CommandText = $"SELECT SerialLastNumber FROM {productTableName} WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;";
                     var serialResult = cmd.ExecuteScalar();
                     if (!int.TryParse(serialResult?.ToString(), out var serialLastNum)) { throw new Exception("シリアル番号の取得に失敗しました。"); }
@@ -237,7 +236,7 @@ namespace ProductDatabase {
             ProductInfo.RegDate = RegistrationDateTimePicker.Value.ToShortDateString();
             ProductInfo.Comment = CommentTextBox.Text.Trim();
 
-            using var connection = new SQLiteConnection(GetConnectionRegistration());
+            using var connection = new SqliteConnection(GetConnectionRegistration());
             connection.Open();
             using var transaction = connection.BeginTransaction();
             try {
@@ -279,22 +278,22 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private static void ExecuteNonQuery(SQLiteConnection connection, string commandText, params (string, object?)[] parameters) {
+        private static void ExecuteNonQuery(SqliteConnection connection, string commandText, params (string, object?)[] parameters) {
             using var command = connection.CreateCommand();
             command.CommandText = commandText;
             foreach (var (name, value) in parameters) {
                 // 空の文字列の場合にNULLを設定
                 var sqlValue = value is string strValue && string.IsNullOrEmpty(strValue) ? DBNull.Value : value ?? DBNull.Value;
-                command.Parameters.Add(name, DbType.String).Value = sqlValue;
+                command.Parameters.Add(name, SqliteType.Text).Value = sqlValue;
             }
 
             command.ExecuteNonQuery();
         }
-        private static object ExecuteScalar(SQLiteConnection connection, string commandText, params (string, object)[] parameters) {
+        private static object ExecuteScalar(SqliteConnection connection, string commandText, params (string, object)[] parameters) {
             using var command = connection.CreateCommand();
             command.CommandText = commandText;
             foreach (var (name, value) in parameters) {
-                command.Parameters.Add(name, DbType.String).Value = value ?? DBNull.Value;
+                command.Parameters.Add(name, SqliteType.Text).Value = value ?? DBNull.Value;
             }
 
             return command.ExecuteScalar() ?? 0;

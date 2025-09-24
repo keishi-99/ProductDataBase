@@ -1,7 +1,6 @@
-﻿using ProductDatabase.Other;
+﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.Other;
 using ProductDatabase.Print;
-using System.Data;
-using System.Data.SQLite;
 using static ProductDatabase.MainWindow;
 using static ProductDatabase.Print.PrintOptions;
 
@@ -120,9 +119,10 @@ namespace ProductDatabase {
             }
         }
         private bool Registration() {
-            using SQLiteConnection connection = new(GetConnectionRegistration());
-            connection.Open();
-            using var transaction = connection.BeginTransaction();
+            using var con = new SqliteConnection(GetConnectionRegistration());
+            con.Open();
+
+            using var transaction = con.BeginTransaction();
             try {
                 var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
                 var orderNumber = ProductInfo.OrderNumber;
@@ -153,7 +153,7 @@ namespace ProductDatabase {
                         LIMIT 1
                         ;
                         """;
-                    using var dr = ExecuteReader(connection, commandText,
+                    using var dr = ExecuteReader(con, commandText,
                         ("@StockName", ProductInfo.StockName),
                         ("@SubstrateModel", ProductInfo.SubstrateModel),
                         ("@SubstrateNumber", substrateNumber)
@@ -189,7 +189,7 @@ namespace ProductDatabase {
                         LIMIT 1
                         ;
                         """;
-                    using var dr = ExecuteReader(connection, commandText,
+                    using var dr = ExecuteReader(con, commandText,
                         ("@StockName", ProductInfo.StockName),
                         ("@SubstrateModel", ProductInfo.SubstrateModel),
                         ("@SubstrateNumber", substrateNumber)
@@ -216,7 +216,7 @@ namespace ProductDatabase {
                         )
                     ;
                     """;
-                ExecuteNonQuery(connection, commandText,
+                ExecuteNonQuery(con, commandText,
                     ("@StockName", ProductInfo.StockName),
                     ("@SubstrateName", ProductInfo.SubstrateName),
                     ("@SubstrateModel", ProductInfo.SubstrateModel),
@@ -229,7 +229,7 @@ namespace ProductDatabase {
                     ("@Comment", string.IsNullOrWhiteSpace(comment) ? DBNull.Value : comment)
                     );
                 commandText = $@"SELECT MAX(ID) FROM {substrateTableName};";
-                rowId = ExecuteScalar(connection, commandText).ToString() ?? string.Empty;
+                rowId = ExecuteScalar(con, commandText).ToString() ?? string.Empty;
 
                 // ログ出力
                 var logQuantity = QuantityCheckBox.Checked ? quantity.ToString() : string.Empty;
@@ -267,6 +267,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+
         }
         private bool FormCheck() {
             // 入力フォームのチェック
@@ -322,31 +323,31 @@ namespace ProductDatabase {
             return true;
         }
 
-        private static void ExecuteNonQuery(SQLiteConnection con, string commandText, params (string, object?)[] parameters) {
-            using var command = con.CreateCommand();
+        private static void ExecuteNonQuery(SqliteConnection con, string commandText, params (string, object?)[] parameters) {
+            var command = con.CreateCommand();
             command.CommandText = commandText;
             foreach (var (name, value) in parameters) {
                 // 空の文字列の場合にNULLを設定
                 var sqlValue = value is string strValue && string.IsNullOrEmpty(strValue) ? DBNull.Value : value ?? DBNull.Value;
-                command.Parameters.Add(name, DbType.String).Value = sqlValue;
+                command.Parameters.Add(name, SqliteType.Text).Value = sqlValue;
             }
 
             command.ExecuteNonQuery();
         }
-        private static object ExecuteScalar(SQLiteConnection con, string commandText, params (string, object)[] parameters) {
-            using var command = con.CreateCommand();
+        private static object ExecuteScalar(SqliteConnection con, string commandText, params (string, object)[] parameters) {
+            var command = con.CreateCommand();
             command.CommandText = commandText;
             foreach (var (name, value) in parameters) {
-                command.Parameters.Add(name, DbType.String).Value = value ?? DBNull.Value;
+                command.Parameters.Add(name, SqliteType.Text).Value = value ?? DBNull.Value;
             }
 
             return command.ExecuteScalar() ?? 0;
         }
-        private static SQLiteDataReader ExecuteReader(SQLiteConnection con, string commandText, params (string, object)[] parameters) {
-            using var command = con.CreateCommand();
+        private static SqliteDataReader ExecuteReader(SqliteConnection con, string commandText, params (string, object)[] parameters) {
+            var command = con.CreateCommand();
             command.CommandText = commandText;
             foreach (var (name, value) in parameters) {
-                command.Parameters.Add(name, DbType.String).Value = value ?? DBNull.Value;
+                command.Parameters.Add(name, SqliteType.Text).Value = value ?? DBNull.Value;
             }
 
             return command.ExecuteReader();

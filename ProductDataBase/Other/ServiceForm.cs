@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Data.SQLite;
+﻿using Microsoft.Data.Sqlite;
+using System.Data;
 using static ProductDatabase.MainWindow;
 using static ProductDatabase.ProductRegistration2Window;
 
@@ -15,9 +15,10 @@ namespace ProductDatabase.Other {
         private void LoadEvents() {
             var strSqlQuery = "SELECT * FROM Product WHERE Visible = 1 ORDER BY SortNumber ASC;";
 
-            using (SQLiteConnection con = new(GetConnectionInformation()))
-            using (SQLiteDataAdapter adapter = new(strSqlQuery, con)) {
-                adapter.Fill(ServiceInfo.ServiceDataTable);
+            using (SqliteConnection con = new(GetConnectionInformation()))
+            using (var cmd = new SqliteCommand(strSqlQuery, con))
+            using (var reader = cmd.ExecuteReader()) {
+                ServiceInfo.ServiceDataTable.Load(reader);
             }
 
             // CategoryName 列の重複を削除し、ソートする

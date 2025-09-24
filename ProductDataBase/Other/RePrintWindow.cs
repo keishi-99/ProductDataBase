@@ -1,20 +1,15 @@
-﻿using ProductDatabase.Other;
+﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.Other;
 using ProductDatabase.Print;
-using System.Data;
-using System.Data.SQLite;
 using static ProductDatabase.MainWindow;
 using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase {
     public partial class RePrintWindow : Form {
 
-        public DocumentPrintSettings  ProductPrintSettings { get; set; } = new DocumentPrintSettings ();
+        public DocumentPrintSettings ProductPrintSettings { get; set; } = new DocumentPrintSettings();
         public LabelPrintSettings LabelPrintSettings => this.ProductPrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
         public BarcodePrintSettings BarcodePrintSettings => ProductPrintSettings.BarcodePrintSettings ?? new BarcodePrintSettings();
-        //public PrintPageSettings LabelPageSettings => this.ProductPrintSettings.LabelPageSettings ?? new PrintPageSettings();
-        //public PrintPageSettings BarcodePageSettings => ProductPrintSettings.BarcodePageSettings ?? new PrintPageSettings();
-        //public PrintLayoutSettings LabelLayoutSettings => this.ProductPrintSettings.LabelLayoutSettings ?? new PrintLayoutSettings();
-        //public PrintLayoutSettings BarcodeLayoutSettings => ProductPrintSettings.BarcodeLayoutSettings ?? new PrintLayoutSettings();
 
         public string printSettingPath = string.Empty;
 
@@ -60,14 +55,14 @@ namespace ProductDatabase {
                 PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
 
                 // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
-                using (SQLiteConnection con = new(GetConnectionRegistration())) {
+                using (SqliteConnection con = new(GetConnectionRegistration())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [ProductName]テーブルの[SubstrateModel]列の[Revision]を取得
                     var productTableName = $"[{ProductInfo.CategoryName}_Product]";
                     cmd.CommandText = $"SELECT Revision FROM {productTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
-                    cmd.Parameters.Add("@ProductName", DbType.String).Value = ProductInfo.ProductName;
-                    cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
+                    cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = ProductInfo.ProductName;
+                    cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = ProductInfo.RevisionGroup;
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
                 }
@@ -93,11 +88,11 @@ namespace ProductDatabase {
         }
         private void LoadSettings() {
             try {
-                ProductPrintSettings = new DocumentPrintSettings ();
+                ProductPrintSettings = new DocumentPrintSettings();
                 printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", ProductInfo.CategoryName, ProductInfo.ProductName, $"PrintConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.json");
                 if (!File.Exists(printSettingPath)) { throw new DirectoryNotFoundException($"ラベル印刷用設定ファイルがありません。"); }
                 var jsonString = File.ReadAllText(printSettingPath);
-                ProductPrintSettings = System.Text.Json.JsonSerializer.Deserialize<DocumentPrintSettings >(jsonString) ?? new DocumentPrintSettings ();
+                ProductPrintSettings = System.Text.Json.JsonSerializer.Deserialize<DocumentPrintSettings>(jsonString) ?? new DocumentPrintSettings();
             } catch (Exception ex) {
                 MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -129,7 +124,7 @@ namespace ProductDatabase {
         private bool Registration() {
             try {
                 // 再印刷登録テーブルへ追加
-                using SQLiteConnection con = new(GetConnectionRegistration());
+                using SqliteConnection con = new(GetConnectionRegistration());
                 con.Open();
                 using var cmd = con.CreateCommand();
                 cmd.CommandText =
@@ -144,19 +139,19 @@ namespace ProductDatabase {
                     """;
 
                 // チェックボックスにチェックがない場合はNullを
-                cmd.Parameters.Add("@PrintType", DbType.String).Value = string.IsNullOrWhiteSpace(_serialType) ? DBNull.Value : _serialType;
-                cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-                cmd.Parameters.Add("@ProductName", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductName) ? DBNull.Value : ProductInfo.ProductName;
-                cmd.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
-                cmd.Parameters.Add("@Quantity", DbType.String).Value = ProductInfo.Quantity;
-                cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
-                cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(_strSerialFirstNumber) ? DBNull.Value : _strSerialFirstNumber;
-                cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(_strSerialLastNumber) ? DBNull.Value : _strSerialLastNumber;
-                cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                cmd.Parameters.Add("@PrintType", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_serialType) ? DBNull.Value : _serialType;
+                cmd.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductName) ? DBNull.Value : ProductInfo.ProductName;
+                cmd.Parameters.Add("@ProductNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+                cmd.Parameters.Add("@ProductType", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                cmd.Parameters.Add("@ProductModel", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
+                cmd.Parameters.Add("@Quantity", SqliteType.Text).Value = ProductInfo.Quantity;
+                cmd.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+                cmd.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                cmd.Parameters.Add("@Revision", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
+                cmd.Parameters.Add("@SerialFirst", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_strSerialFirstNumber) ? DBNull.Value : _strSerialFirstNumber;
+                cmd.Parameters.Add("@SerialLast", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_strSerialLastNumber) ? DBNull.Value : _strSerialLastNumber;
+                cmd.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                 cmd.ExecuteNonQuery();
 
@@ -300,8 +295,7 @@ namespace ProductDatabase {
 
                 var startLine = (int)PrintPositionNumericUpDown.Value - 1;
 
-                pd.BeginPrint += (sender, e) =>
-                {
+                pd.BeginPrint += (sender, e) => {
                     PrintManager.Initialize(ProductInfo, ProductPrintSettings);
                 };
                 pd.PrintPage += (sender, e) => {

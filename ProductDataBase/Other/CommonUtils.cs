@@ -1,8 +1,8 @@
-﻿using NPOI.SS.UserModel;
+﻿using Microsoft.Data.Sqlite;
+using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using OfficeOpenXml;
 using System.Data;
-using System.Data.SQLite;
 using System.Runtime.InteropServices;
 using ZXing;
 using ZXing.QrCode;
@@ -457,7 +457,7 @@ namespace ProductDatabase.Other {
             private static List<(string SubstrateModel, List<string> SubstrateNumbers, List<int> Decreases)> GetUsedSubstrateData(ProductInformation productInfo) {
                 List<(string, List<string>, List<int>)> usedSubstrate = [];
 
-                using SQLiteConnection con = new(GetConnectionRegistration());
+                using SqliteConnection con = new(GetConnectionRegistration());
                 con.Open();
                 using var cmd = con.CreateCommand();
 
@@ -476,7 +476,7 @@ namespace ProductDatabase.Other {
                         SubstrateModel ASC
                     ;
                     """;
-                cmd.Parameters.Add("@ID", DbType.String).Value = productInfo.ProductID;
+                cmd.Parameters.Add("@ID", SqliteType.Text).Value = productInfo.ProductID;
                 using var dr = cmd.ExecuteReader();
 
                 while (dr.Read()) {

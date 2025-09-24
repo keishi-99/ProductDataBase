@@ -1,6 +1,6 @@
-﻿using ProductDatabase.Other;
+﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.Other;
 using System.Data;
-using System.Data.SQLite;
 using static ProductDatabase.MainWindow;
 using static ProductDatabase.Other.CommonUtils;
 
@@ -102,7 +102,7 @@ namespace ProductDatabase {
                                 }
                             }
 
-                            using SQLiteConnection con = new(GetConnectionRegistration());
+                            using SqliteConnection con = new(GetConnectionRegistration());
                             con.Open();
                             using var cmd = con.CreateCommand();
 
@@ -160,8 +160,8 @@ namespace ProductDatabase {
                                 """;
 
                             cmd.Parameters.Clear();
-                            cmd.Parameters.Add("@ID", DbType.Int64).Value = ProductInfo.ProductID;
-                            cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = substrateModel;
+                            cmd.Parameters.Add("@ID", SqliteType.Integer).Value = ProductInfo.ProductID;
+                            cmd.Parameters.Add("@SubstrateModel", SqliteType.Text).Value = substrateModel;
 
                             using var dr = cmd.ExecuteReader();
                             var j = 0;
@@ -296,7 +296,7 @@ namespace ProductDatabase {
                 switch (ProductInfo.RegType) {
                     case 2:
                     case 3:
-                        using (SQLiteConnection con = new(GetConnectionRegistration())) {
+                        using (SqliteConnection con = new(GetConnectionRegistration())) {
                             con.Open();
                             using var transaction = con.BeginTransaction();
 
@@ -336,8 +336,8 @@ namespace ProductDatabase {
                                                         MIN(ID)
                                                     ;
                                                     """;
-                                                cmd.Parameters.Add("@SubstrateModel", DbType.String).Value = _useSubstrate[i];
-                                                cmd.Parameters.Add("@SubstrateNumber", DbType.String).Value = substrateNum;
+                                                cmd.Parameters.Add("@SubstrateModel", SqliteType.Text).Value = _useSubstrate[i];
+                                                cmd.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = substrateNum;
                                                 using var dr = cmd.ExecuteReader();
                                                 while (dr.Read()) {
                                                     substrateName = $"{dr["SubstrateName"]}";
@@ -361,12 +361,12 @@ namespace ProductDatabase {
                                                     ;
                                                     """;
 
-                                                cmdUpdate.Parameters.Add("@Decrease", DbType.Int64).Value = 0 - useValue;
-                                                cmdUpdate.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                                                cmdUpdate.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                                                cmdUpdate.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
-                                                cmdUpdate.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
-                                                cmdUpdate.Parameters.Add("@UseID", DbType.String).Value = ProductInfo.ProductID;
+                                                cmdUpdate.Parameters.Add("@Decrease", SqliteType.Integer).Value = 0 - useValue;
+                                                cmdUpdate.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+                                                cmdUpdate.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                                                cmdUpdate.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                                                cmdUpdate.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
+                                                cmdUpdate.Parameters.Add("@UseID", SqliteType.Text).Value = ProductInfo.ProductID;
 
                                                 var affectedRows = cmdUpdate.ExecuteNonQuery();
 
@@ -384,16 +384,16 @@ namespace ProductDatabase {
                                                     ;
                                                     """;
 
-                                                    cmdInsert.Parameters.Add("@StockName", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.StockName) ? DBNull.Value : ProductInfo.StockName;
-                                                    cmdInsert.Parameters.Add("@SubstrateName", DbType.String).Value = string.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
-                                                    cmdInsert.Parameters.Add("@SubstrateModel", DbType.String).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
-                                                    cmdInsert.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
-                                                    cmdInsert.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(orderNum) ? DBNull.Value : orderNum;
-                                                    cmdInsert.Parameters.Add("@Decrease", DbType.Int64).Value = 0 - useValue;
-                                                    cmdInsert.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                                                    cmdInsert.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                                                    cmdInsert.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
-                                                    cmdInsert.Parameters.Add("@UseID", DbType.String).Value = ProductInfo.ProductID;
+                                                    cmdInsert.Parameters.Add("@StockName", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.StockName) ? DBNull.Value : ProductInfo.StockName;
+                                                    cmdInsert.Parameters.Add("@SubstrateName", SqliteType.Text).Value = string.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
+                                                    cmdInsert.Parameters.Add("@SubstrateModel", SqliteType.Text).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
+                                                    cmdInsert.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
+                                                    cmdInsert.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(orderNum) ? DBNull.Value : orderNum;
+                                                    cmdInsert.Parameters.Add("@Decrease", SqliteType.Integer).Value = 0 - useValue;
+                                                    cmdInsert.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+                                                    cmdInsert.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                                                    cmdInsert.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                                                    cmdInsert.Parameters.Add("@UseID", SqliteType.Text).Value = ProductInfo.ProductID;
 
                                                     cmdInsert.ExecuteNonQuery();
                                                 }
@@ -419,8 +419,8 @@ namespace ProductDatabase {
                                                 ;
                                                 """;
                                             cmdDelete.Parameters.Clear(); // パラメータをクリア
-                                            cmdDelete.Parameters.Add("@SubstrateNumber", DbType.String).Value = objDgv.Rows[j].Cells[0].Value;
-                                            cmdDelete.Parameters.Add("@ID", DbType.Int64).Value = ProductInfo.ProductID;
+                                            cmdDelete.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
+                                            cmdDelete.Parameters.Add("@ID", SqliteType.Integer).Value = ProductInfo.ProductID;
 
                                             cmdDelete.Connection = con;
                                             cmdDelete.ExecuteNonQuery();
@@ -446,19 +446,19 @@ namespace ProductDatabase {
                                     ;
                                     """;
 
-                                cmd.Parameters.Add("@ProductType", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                                cmd.Parameters.Add("@ProductModel", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
-                                cmd.Parameters.Add("@OrderNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-                                cmd.Parameters.Add("@ProductNumber", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                                cmd.Parameters.Add("@Quantity", DbType.String).Value = ProductInfo.Quantity;
-                                cmd.Parameters.Add("@Person", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                                cmd.Parameters.Add("@RegDate", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                                cmd.Parameters.Add("@Revision", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
-                                cmd.Parameters.Add("@RevisionGroup", DbType.String).Value = ProductInfo.RevisionGroup;
-                                cmd.Parameters.Add("@SerialFirst", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialFirst) ? DBNull.Value : ProductInfo.SerialFirst;
-                                cmd.Parameters.Add("@SerialLast", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
-                                cmd.Parameters.Add("@SerialLastNumber", DbType.String).Value = ProductInfo.SerialLastNumber;
-                                cmd.Parameters.Add("@Comment", DbType.String).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                                cmd.Parameters.Add("@ProductType", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
+                                cmd.Parameters.Add("@ProductModel", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
+                                cmd.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
+                                cmd.Parameters.Add("@ProductNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
+                                cmd.Parameters.Add("@Quantity", SqliteType.Text).Value = ProductInfo.Quantity;
+                                cmd.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
+                                cmd.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
+                                cmd.Parameters.Add("@Revision", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
+                                cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = ProductInfo.RevisionGroup;
+                                cmd.Parameters.Add("@SerialFirst", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialFirst) ? DBNull.Value : ProductInfo.SerialFirst;
+                                cmd.Parameters.Add("@SerialLast", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
+                                cmd.Parameters.Add("@SerialLastNumber", SqliteType.Text).Value = ProductInfo.SerialLastNumber;
+                                cmd.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                                 cmd.ExecuteNonQuery();
                                 transaction.Commit();

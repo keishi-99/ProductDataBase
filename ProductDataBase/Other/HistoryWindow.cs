@@ -1,6 +1,6 @@
-﻿using ProductDatabase.Other;
+﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.Other;
 using System.Data;
-using System.Data.SQLite;
 using static ProductDatabase.MainWindow;
 using static ProductDatabase.Other.CommonUtils;
 
@@ -85,16 +85,18 @@ namespace ProductDatabase {
         }
 
         private void LoadDataAndDisplay(string categoryName, string query, params (string name, object value)[] parameters) {
-            using SQLiteConnection con = new(GetConnectionRegistration());
-            using SQLiteCommand command = new(query, con);
-            using SQLiteDataAdapter adapter = new(command);
-            command.Parameters.AddRange([.. parameters.Select(p => new SQLiteParameter(p.name, p.value))]);
+            using SqliteConnection con = new(GetConnectionRegistration());
+            con.Open();
+            using SqliteCommand cmd = new(query, con);
+            cmd.Parameters.AddRange([.. parameters.Select(p => new SqliteParameter(p.name, p.value))]);
+            using (var reader = cmd.ExecuteReader()) {
 
-            _historyTable = new DataTable();
-            adapter.Fill(_historyTable);
+                _historyTable = new DataTable();
+                _historyTable.Load(reader);
 
-            DataBaseDataGridView.Columns.Clear();
-            DataBaseDataGridView.DataSource = _historyTable;
+                DataBaseDataGridView.Columns.Clear();
+                DataBaseDataGridView.DataSource = _historyTable;
+            }
 
             _listColFilter.Clear();
             _listColFilter.Add("");
@@ -376,15 +378,15 @@ namespace ProductDatabase {
             LoadDataAndDisplay("Reprint", query, ("@ProductModel", ProductInfo.ProductModel));
         }
 
-        private SQLiteConnection? _editModeConnection; // 編集モード用の接続
-        private SQLiteTransaction? _editModeTransaction; // 編集モード用のトランザクション
+        private SqliteConnection? _editModeConnection; // 編集モード用の接続
+        private SqliteTransaction? _editModeTransaction; // 編集モード用のトランザクション
         private void EditMode() {
             // 編集モード用の接続とトランザクションを開始
             try {
-                _editModeConnection = new SQLiteConnection(GetConnectionRegistration());
+                _editModeConnection = new SqliteConnection(GetConnectionRegistration());
                 _editModeConnection.Open();
                 _editModeTransaction = _editModeConnection.BeginTransaction(); // トランザクション開始（ロック）
-            } catch (SQLiteException ex) {
+            } catch (SqliteException ex) {
                 MessageBox.Show($"データベースがロックされています。: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
@@ -502,16 +504,16 @@ namespace ProductDatabase {
                                     """;
 
                                 command.Parameters.Clear(); // パラメータをクリア
-                                command.Parameters.Add("@SubstrateNumber", DbType.String).Value = row["SubstrateNumber"];
-                                command.Parameters.Add("@OrderNumber", DbType.String).Value = row["OrderNumber"];
-                                command.Parameters.Add("@Increase", DbType.Int32).Value = row["Increase"];
-                                command.Parameters.Add("@Decrease", DbType.Int32).Value = row["Decrease"];
-                                command.Parameters.Add("@Defect", DbType.Int32).Value = row["Defect"];
-                                command.Parameters.Add("@RegDate", DbType.String).Value = row["RegDate"];
-                                command.Parameters.Add("@Person", DbType.String).Value = row["Person"];
-                                command.Parameters.Add("@Comment", DbType.String).Value = row["Comment"];
-                                command.Parameters.Add("@UseId", DbType.Int32).Value = row["UseId"];
-                                command.Parameters.Add("@ID", DbType.Int32).Value = row["ID"];
+                                command.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = row["SubstrateNumber"];
+                                command.Parameters.Add("@OrderNumber", SqliteType.Text).Value = row["OrderNumber"];
+                                command.Parameters.Add("@Increase", SqliteType.Integer).Value = row["Increase"];
+                                command.Parameters.Add("@Decrease", SqliteType.Integer).Value = row["Decrease"];
+                                command.Parameters.Add("@Defect", SqliteType.Integer).Value = row["Defect"];
+                                command.Parameters.Add("@RegDate", SqliteType.Text).Value = row["RegDate"];
+                                command.Parameters.Add("@Person", SqliteType.Text).Value = row["Person"];
+                                command.Parameters.Add("@Comment", SqliteType.Text).Value = row["Comment"];
+                                command.Parameters.Add("@UseId", SqliteType.Integer).Value = row["UseId"];
+                                command.Parameters.Add("@ID", SqliteType.Integer).Value = row["ID"];
 
                                 command.ExecuteNonQuery();
                                 // ログ出力
@@ -570,7 +572,7 @@ namespace ProductDatabase {
                                     ;
                                     """;
                                 command.Parameters.Clear(); // パラメータをクリア
-                                command.Parameters.Add("@ID", DbType.Int32).Value = row["ID", DataRowVersion.Original];
+                                command.Parameters.Add("@ID", SqliteType.Integer).Value = row["ID", DataRowVersion.Original];
 
                                 command.ExecuteNonQuery();
                                 // ログ出力
@@ -620,14 +622,14 @@ namespace ProductDatabase {
                                     """;
 
                                 command.Parameters.Clear(); // パラメータをクリア
-                                command.Parameters.Add("@ID", DbType.Int32).Value = row["ID"];
-                                command.Parameters.Add("@OrderNumber", DbType.String).Value = row["OrderNumber"];
-                                command.Parameters.Add("@ProductNumber", DbType.String).Value = row["ProductNumber"];
-                                command.Parameters.Add("@Person", DbType.String).Value = row["Person"];
-                                command.Parameters.Add("@RegDate", DbType.String).Value = row["RegDate"];
-                                command.Parameters.Add("@Revision", DbType.String).Value = row["Revision"];
-                                command.Parameters.Add("@RevisionGroup", DbType.String).Value = row["RevisionGroup"];
-                                command.Parameters.Add("@Comment", DbType.String).Value = row["Comment"];
+                                command.Parameters.Add("@ID", SqliteType.Integer).Value = row["ID"];
+                                command.Parameters.Add("@OrderNumber", SqliteType.Text).Value = row["OrderNumber"];
+                                command.Parameters.Add("@ProductNumber", SqliteType.Text).Value = row["ProductNumber"];
+                                command.Parameters.Add("@Person", SqliteType.Text).Value = row["Person"];
+                                command.Parameters.Add("@RegDate", SqliteType.Text).Value = row["RegDate"];
+                                command.Parameters.Add("@Revision", SqliteType.Text).Value = row["Revision"];
+                                command.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = row["RevisionGroup"];
+                                command.Parameters.Add("@Comment", SqliteType.Text).Value = row["Comment"];
 
                                 command.ExecuteNonQuery();
                                 // ログ出力
@@ -685,7 +687,7 @@ namespace ProductDatabase {
                                     ;
                                     """;
                                 command.Parameters.Clear(); // パラメータをクリア
-                                command.Parameters.Add("@ID", DbType.Int32).Value = row["ID", DataRowVersion.Original];
+                                command.Parameters.Add("@ID", SqliteType.Integer).Value = row["ID", DataRowVersion.Original];
 
                                 command.ExecuteNonQuery();
                                 // ログ出力
@@ -728,7 +730,7 @@ namespace ProductDatabase {
                                     ;
                                     """;
                                 command.Parameters.Clear(); // パラメータをクリア
-                                command.Parameters.Add("@rowid", DbType.Int32).Value = row["rowid", DataRowVersion.Original];
+                                command.Parameters.Add("@rowid", SqliteType.Integer).Value = row["rowid", DataRowVersion.Original];
 
                                 command.ExecuteNonQuery();
                                 // ログ出力
@@ -859,7 +861,7 @@ namespace ProductDatabase {
             dataForm.Controls.Add(dataGridView);
 
             // データベース接続とSQLクエリの実行
-            using SQLiteConnection con = new(GetConnectionRegistration());
+            using SqliteConnection con = new(GetConnectionRegistration());
             {
                 con.Open();
                 using var cmd = con.CreateCommand();
@@ -880,13 +882,13 @@ namespace ProductDatabase {
 
                 var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 var id = Convert.ToInt32(DataBaseDataGridView.Rows[i].Cells["ID"].Value);
-                cmd.Parameters.Add("@StockName", DbType.String).Value = ProductInfo.StockName;
-                cmd.Parameters.Add("@ID", DbType.Int64).Value = id;
+                cmd.Parameters.Add("@StockName", SqliteType.Text).Value = ProductInfo.StockName;
+                cmd.Parameters.Add("@ID", SqliteType.Integer).Value = id;
 
-                using var adapter = new SQLiteDataAdapter(cmd);
+                using var reader = cmd.ExecuteReader();
                 var dt = new DataTable();
-                adapter.Fill(dt);
 
+                dt.Load(reader);
                 // DataGridViewにデータを表示
                 dataGridView.DataSource = dt;
             }
