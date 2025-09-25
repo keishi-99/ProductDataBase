@@ -707,6 +707,7 @@ namespace ProductDatabase {
         }
         private void HandleSubstrateSelection(string productName, string substrateName) {
             using SqliteConnection con = new(GetConnectionInformation());
+            con.Open();
             using (var cmd = new SqliteCommand("SELECT * FROM Substrate;", con)) {
                 using var reader = cmd.ExecuteReader();
                 MainDataTable.Load(reader);
@@ -730,6 +731,7 @@ namespace ProductDatabase {
         }
         private void HandleProductSelection(string productName, string productType) {
             using SqliteConnection con = new(GetConnectionInformation());
+            con.Open();
             using (var cmd = new SqliteCommand("SELECT * FROM Product;", con)) {
                 using var reader = cmd.ExecuteReader();
                 MainDataTable.Load(reader);
