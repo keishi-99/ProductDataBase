@@ -24,7 +24,7 @@ namespace ProductDatabase {
         private string _lastInsertRowid = string.Empty;
         private string _serialType = string.Empty;
 
-        private readonly List<string> _strSerial = [];
+        private readonly List<string> _serialList = [];
         private readonly List<string> _checkBoxNames = [
                         "Substrate1CheckBox", "Substrate2CheckBox", "Substrate3CheckBox", "Substrate4CheckBox","Substrate5CheckBox",
                         "Substrate6CheckBox", "Substrate7CheckBox", "Substrate8CheckBox", "Substrate9CheckBox","Substrate10CheckBox",
@@ -291,7 +291,7 @@ namespace ProductDatabase {
         // 登録処理
         private void RegisterCheck() {
             try {
-                _strSerial.Clear();
+                _serialList.Clear();
 
                 if (_sqliteConnection == null || _sqliteTransaction == null) {
                     throw new InvalidOperationException("編集モード用の接続が初期化されていません。");
@@ -422,7 +422,7 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            foreach (var serial in _strSerial) {
+            foreach (var serial in _serialList) {
                 ExecuteNonQuery(connection, commandText,
                     ("@Serial", serial),
                     ("@productRowId", ProductInfo.ProductID),
@@ -746,26 +746,11 @@ namespace ProductDatabase {
             }
         }
         private void SerialCheck(SqliteConnection connection) {
-            if (ProductInfo.IsLabelPrint) {
-                for (var i = 0; i < ProductInfo.Quantity; i++) {
-                    _serialType = "Label";
-                    _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
-                }
-            }
-            else if (ProductInfo.IsBarcodePrint) {
-                for (var i = 0; i < ProductInfo.Quantity; i++) {
-                    _serialType = "Barcode";
-                    _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
-                }
-            }
-            else if (ProductInfo.IsSerialGeneration) {
-                for (var i = 0; i < ProductInfo.Quantity; i++) {
-                    _serialType = "Label";
-                    _strSerial.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
-                }
-            }
-            else {
-                throw new Exception("PrintType unknown");
+
+            _serialType = ProductInfo.IsBarcodePrint ? "Barcode" : "Label";
+
+            for (var i = 0; i < ProductInfo.Quantity; i++) {
+                _serialList.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
             }
 
             List<string> strSerialDuplication = [];
@@ -793,11 +778,11 @@ namespace ProductDatabase {
                 WHERE
                     s.ProductName = @ProductName
                 AND
-                    s.Serial IN ({string.Join(",", _strSerial.Select((_, i) => $"@Serial{i}"))})
+                    s.Serial IN ({string.Join(",", _serialList.Select((_, i) => $"@Serial{i}"))})
                 ;
                 """;
             cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = ProductInfo.ProductName;
-            _strSerial
+            _serialList
                 .Select((serial, i) => new { ParamName = $"@Serial{i}", Value = serial.Trim() })
                 .ToList()
                 .ForEach(p => cmd.Parameters.Add(p.ParamName, SqliteType.Text).Value = p.Value);
