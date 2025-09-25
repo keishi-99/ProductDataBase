@@ -26,13 +26,15 @@ namespace ProductDatabase.Print {
         private static DocumentPrintSettings PrintSettings => ProductPrintSettings ?? throw new InvalidOperationException("ProductPrintSettings が null です。");
 
         // 印刷状態を保持するプロパティ
-        public static int RemainingLabelCount { get; private set; }
+        public static int PrintCount { get; private set; }
         public static int CopiesRemainingPerSerial { get; private set; }
         public static int SerialNumber { get; private set; }
         public static int PageCount { get; private set; }
         public static int PrintType => ProductInfo?.PrintType ?? throw new InvalidOperationException("PrintManager が初期化されていません。");
 
         public static string SubstrateNumber { get; private set; } = string.Empty;
+
+        private static List<string> s_serialList = [];
 
         public static bool IsUnderlinePrint => ProductInfo.IsUnderlinePrint;
 
@@ -42,12 +44,13 @@ namespace ProductDatabase.Print {
                 ? ProductInfo.ProductModel[^4..]
                 : string.Empty;
 
-        public static void Initialize(ProductInformation productInfo, DocumentPrintSettings productPrintSettings, string? substrateNumber = null) {
+        public static void Initialize(ProductInformation productInfo, DocumentPrintSettings productPrintSettings, List<string> serialList, string? substrateNumber = null) {
             ProductInfo = productInfo;
             ProductPrintSettings = productPrintSettings ?? throw new ArgumentNullException(nameof(productPrintSettings));
 
             PageCount = 1;
-            RemainingLabelCount = productInfo.Quantity;
+            PrintCount = 0;
+            s_serialList = serialList;
             SerialNumber = productInfo.SerialFirstNumber;
             SubstrateNumber = substrateNumber ?? string.Empty;
         }
@@ -116,30 +119,30 @@ namespace ProductDatabase.Print {
                         // タイプ4で残り1の場合、最後のラベルに下線をつける
                         var fontUnderline = IsUnderlinePrint && isLastCopy;
 
-                        var generatedCode = GenerateSerial(serialType, isLastCopy);
+                        var printText = s_serialList[PrintCount];
 
-                        using var labelImage = MakeLabelImage(generatedCode, serialType, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY, isPreview);
+                        using var labelImage = MakeLabelImage(printText, serialType, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY, isPreview);
 
                         e.Graphics.DrawImage(labelImage, posX, posY, labelWidthPx, labelHeightPx);
 
                         CopiesRemainingPerSerial--;
 
                         if (CopiesRemainingPerSerial <= 0) {
-                            RemainingLabelCount--;
+                            PrintCount++;
                             SerialNumber++;
 
-                            if (RemainingLabelCount <= 0) {
+                            if (s_serialList.Count <= PrintCount) {
                                 // 最後の行にマークを描画
                                 DrawFinalRowMark(e.Graphics, y + 1, 0, posY, 0, labelHeightPx, headerFont);
                                 PageCount = 1;
-                                RemainingLabelCount = 0;
+                                //PrintCount = 0;
                                 return false;
                             }
                         }
                     }
                 }
 
-                if (RemainingLabelCount > 0) {
+                if (s_serialList.Count > PrintCount) {
                     PageCount++;
                     return true;
                 }
@@ -286,46 +289,6 @@ namespace ProductDatabase.Print {
                  .Replace("%N", ProductInfo.Quantity.ToString())
                  .Replace("%U", ProductInfo.Person);
             return s;
-        }
-        private static string GenerateSerial(string serialType, bool isLastCopy) {
-            if (serialType == "Substrate") {
-                return GenerateCode(SubstrateNumber, serialType);
-            }
-
-            if (PrintType == 9 && isLastCopy) {
-                return Last4ProductModel;
-            }
-
-            var serialNumberString = SerialNumber.ToString($"D{ProductInfo.SerialDigit}");
-            return GenerateCode(serialNumberString, serialType);
-        }
-        private static string GenerateCode(string serialCode, string serialType) {
-            if (ProductInfo == null) { throw new Exception("ProductInfoが nullです。"); }
-            var monthCode = DateTime.Parse(ProductInfo.RegDate).ToString("MM");
-
-            monthCode = monthCode switch {
-                "10" => "X",
-                "11" => "Y",
-                "12" => "Z",
-                _ => monthCode
-            };
-
-            var outputCode = serialType switch {
-                "Label" => PrintSettings.LabelPrintSettings?.TextFormat ?? string.Empty,
-                "Barcode" => PrintSettings.BarcodePrintSettings?.TextFormat ?? string.Empty,
-                "Substrate" => PrintSettings.LabelPrintSettings?.TextFormat ?? string.Empty,
-                _ => throw new ArgumentException($"不明なシリアルタイプ: {serialType}")
-            };
-
-            outputCode = outputCode
-                .Replace("%Y", DateTime.Parse(ProductInfo.RegDate).ToString("yy"))
-                .Replace("%MM", DateTime.Parse(ProductInfo.RegDate).ToString("MM"))
-                .Replace("%T", ProductInfo.Initial)
-                .Replace("%R", ProductInfo.Revision)
-                .Replace("%M", monthCode[^1..])
-                .Replace("%S", serialCode);
-
-            return outputCode;
         }
         private static void DrawFinalRowMark(Graphics graphics, int rowNumber, float posX, float posY, float width, float height, Font font) {
             var sf = new StringFormat {

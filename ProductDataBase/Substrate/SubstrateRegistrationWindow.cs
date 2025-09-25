@@ -13,6 +13,7 @@ namespace ProductDatabase {
         public LabelPrintSettings LabelPrintSettings => SubstratePrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
         public readonly string printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
 
+        private readonly List<string> _serialList = [];
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "DefectQuantityCheckBox",
                     "ExtraCheckBox7", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
@@ -320,6 +321,13 @@ namespace ProductDatabase {
             ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
             ProductInfo.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
 
+            _serialList.Clear();
+            var substrateNumber = ManufacturingNumberMaskedTextBox.Text.Substring(5, 5);
+
+            for (var i = 0; i < quantity; i++) {
+                _serialList.Add(substrateNumber);
+            }
+
             return true;
         }
 
@@ -358,12 +366,11 @@ namespace ProductDatabase {
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
 
-                var substrateNumber = ManufacturingNumberMaskedTextBox.Text.Substring(5, 5);
                 var isPreview = !isPrint;
                 var startLine = (int)PrintPositionNumericUpDown.Value - 1;
 
                 pd.BeginPrint += (sender, e) => {
-                    PrintManager.Initialize(ProductInfo, SubstratePrintSettings, substrateNumber);
+                    PrintManager.Initialize(ProductInfo, SubstratePrintSettings, _serialList);
                 };
                 pd.PrintPage += (sender, e) => {
                     var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, "Substrate");

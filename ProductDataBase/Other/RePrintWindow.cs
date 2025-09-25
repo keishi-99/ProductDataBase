@@ -16,8 +16,9 @@ namespace ProductDatabase {
         public ProductInformation ProductInfo { get; }
 
         private string _serialType = string.Empty;
-        private string _strSerialFirstNumber = string.Empty;
-        private string _strSerialLastNumber = string.Empty;
+        private string _serialFirstNumber = string.Empty;
+        private string _serialLastNumber = string.Empty;
+        private readonly List<string> _serialList = [];
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox",  "FirstSerialNumberCheckBox",
                     "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
@@ -149,8 +150,8 @@ namespace ProductDatabase {
                 cmd.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
                 cmd.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
                 cmd.Parameters.Add("@Revision", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
-                cmd.Parameters.Add("@SerialFirst", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_strSerialFirstNumber) ? DBNull.Value : _strSerialFirstNumber;
-                cmd.Parameters.Add("@SerialLast", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_strSerialLastNumber) ? DBNull.Value : _strSerialLastNumber;
+                cmd.Parameters.Add("@SerialFirst", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_serialFirstNumber) ? DBNull.Value : _serialFirstNumber;
+                cmd.Parameters.Add("@SerialLast", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_serialLastNumber) ? DBNull.Value : _serialLastNumber;
                 cmd.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
 
                 cmd.ExecuteNonQuery();
@@ -168,8 +169,8 @@ namespace ProductDatabase {
                     $"タイプ[{ProductInfo.ProductType}]",
                     $"型式[{ProductInfo.ProductModel}]",
                     $"数量[{ProductInfo.Quantity}]",
-                    $"シリアル先頭[{_strSerialFirstNumber}]",
-                    $"シリアル末尾[{_strSerialLastNumber}]",
+                    $"シリアル先頭[{_serialFirstNumber}]",
+                    $"シリアル末尾[{_serialLastNumber}]",
                     $"Revision[{ProductInfo.Revision}]",
                     $"登録日[{ProductInfo.RegDate}]",
                     $"担当者[{ProductInfo.Person}]",
@@ -280,8 +281,14 @@ namespace ProductDatabase {
             ProductInfo.SerialFirstNumber = firstSerial;
             ProductInfo.SerialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
 
-            _strSerialFirstNumber = GenerateCode(ProductInfo.SerialFirstNumber);
-            _strSerialLastNumber = GenerateCode(ProductInfo.SerialLastNumber);
+            _serialList.Clear();
+
+            for (var i = 0; i < quantity; i++) {
+                _serialList.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
+            }
+
+            _serialFirstNumber = GenerateCode(ProductInfo.SerialFirstNumber);
+            _serialLastNumber = GenerateCode(ProductInfo.SerialLastNumber);
             return true;
         }
 
@@ -296,7 +303,7 @@ namespace ProductDatabase {
                 var startLine = (int)PrintPositionNumericUpDown.Value - 1;
 
                 pd.BeginPrint += (sender, e) => {
-                    PrintManager.Initialize(ProductInfo, ProductPrintSettings);
+                    PrintManager.Initialize(ProductInfo, ProductPrintSettings, _serialList);
                 };
                 pd.PrintPage += (sender, e) => {
                     bool hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, serialType);
