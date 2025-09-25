@@ -745,12 +745,16 @@ namespace ProductDatabase {
                 return false;
             }
         }
-        private void SerialCheck(SqliteConnection connection) {
+        private void SerialCheck(SqliteConnection connection, bool print = true) {
 
             _serialType = ProductInfo.IsBarcodePrint ? "Barcode" : "Label";
 
             for (var i = 0; i < ProductInfo.Quantity; i++) {
                 _serialList.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
+            }
+
+            if (!print) {
+                return;
             }
 
             List<string> strSerialDuplication = [];
@@ -869,7 +873,7 @@ namespace ProductDatabase {
                 };
 
                 pd.BeginPrint += (sender, e) => {
-                    PrintManager.Initialize(ProductInfo, ProductPrintSettings);
+                    PrintManager.Initialize(ProductInfo, ProductPrintSettings, _serialList);
                 };
                 pd.PrintPage += (sender, e) => {
                     var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, serialType);
@@ -1121,10 +1125,12 @@ namespace ProductDatabase {
         }
         private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Label";
+            SerialCheck(_sqliteConnection ?? throw new Exception("_sqliteConnectionがnullです。"), false);
             Print(false);
         }
         private void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Barcode";
+            SerialCheck(_sqliteConnection ?? throw new Exception("_sqliteConnectionがnullです。"), false);
             Print(false);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
