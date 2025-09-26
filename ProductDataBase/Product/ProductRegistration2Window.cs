@@ -64,7 +64,7 @@ namespace ProductDatabase {
                         if (ProductInfo.RegType == 9) {
                             using ServiceForm window = new(ServiceInfo);
                             if (window.ShowDialog(this) != DialogResult.OK) {
-                                return;
+                                Close();
                             }
                             ServiceInfo = window.ServiceInfo;
                         }
