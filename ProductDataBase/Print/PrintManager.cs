@@ -119,7 +119,10 @@ namespace ProductDatabase.Print {
                         // タイプ4で残り1の場合、最後のラベルに下線をつける
                         var fontUnderline = IsUnderlinePrint && isLastCopy;
 
-                        var printText = s_serialList[PrintCount];
+                        var printText = PrintType switch {
+                            9 when isLastCopy => Last4ProductModel,
+                            _ => s_serialList[PrintCount]
+                        };
 
                         using var labelImage = MakeLabelImage(printText, serialType, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY, isPreview);
 
