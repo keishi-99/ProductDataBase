@@ -42,7 +42,7 @@ namespace ProductDatabase.Other {
 
                 HashSet<string> productNames = [];
 
-                var selectedRows = ServiceInfo.ServiceDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}'", "ProductName ASC");
+                var selectedRows = ServiceInfo.ServiceDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductModel <> 'SERVICE'", "ProductName ASC");
 
                 foreach (var row in selectedRows) {
                     var productName = row["ProductName"].ToString() ?? throw new Exception("ProductName is null");
@@ -99,7 +99,7 @@ namespace ProductDatabase.Other {
             else { DialogResult = DialogResult.Cancel; }
 
             Close();
-            return DialogResult;
+            return DialogResult.OK;
         }
 
         private void ServiceForm_Load(object sender, EventArgs e) { LoadEvents(); }
