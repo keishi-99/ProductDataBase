@@ -93,6 +93,7 @@ namespace ProductDatabase.Print {
                 var headerFont = printSettings.HeaderFont;
 
                 var copiesPerLabel = printSettings.CopiesPerLabel;
+                CopiesRemainingPerSerial = copiesPerLabel;
                 if (labelCountX == 0 || labelCountY == 0 || copiesPerLabel == 0) {
                     throw new Exception("印刷設定が異常です。");
                 }
@@ -114,7 +115,6 @@ namespace ProductDatabase.Print {
                         var posX = marginXPx - hardMarginX + (x * (intervalXPx + labelWidthPx));
                         var posY = marginYPx - hardMarginY + (y * (intervalYPx + labelHeightPx));
 
-                        if (CopiesRemainingPerSerial == 0) { CopiesRemainingPerSerial = copiesPerLabel; }
                         var isLastCopy = CopiesRemainingPerSerial == 1;
                         // タイプ4で残り1の場合、最後のラベルに下線をつける
                         var fontUnderline = IsUnderlinePrint && isLastCopy;
@@ -128,6 +128,7 @@ namespace ProductDatabase.Print {
                         CopiesRemainingPerSerial--;
 
                         if (CopiesRemainingPerSerial <= 0) {
+                            CopiesRemainingPerSerial = copiesPerLabel;
                             PrintCount++;
                             SerialNumber++;
 
