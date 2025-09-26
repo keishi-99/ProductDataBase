@@ -272,7 +272,7 @@ namespace ProductDatabase {
 
                 MessageBox.Show("Revision変更完了", "Revision変更", MessageBoxButtons.OK, MessageBoxIcon.Information);
             } catch (Exception ex) {
-                if (transaction.Connection != null) { //接続が開いているか確認する。
+                if (transaction.Connection != null) { // 接続が開いているか確認する。
                     transaction.Rollback();
                 }
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);

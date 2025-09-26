@@ -136,7 +136,6 @@ namespace ProductDatabase.Print {
                                 // 最後の行にマークを描画
                                 DrawFinalRowMark(e.Graphics, y + 1, 0, posY, 0, labelHeightPx, headerFont);
                                 PageCount = 1;
-                                //PrintCount = 0;
                                 return false;
                             }
                         }

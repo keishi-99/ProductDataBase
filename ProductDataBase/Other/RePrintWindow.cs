@@ -312,7 +312,7 @@ namespace ProductDatabase {
 
                 switch (isPrint) {
                     case true:
-                        //PrintDialogクラスの作成
+                        // PrintDialogクラスの作成
                         var pdlg = new PrintDialog {
                             Document = pd
                         };
@@ -337,7 +337,7 @@ namespace ProductDatabase {
                         }
                         return true;
                     case false:
-                        //PrintPreviewDialogオブジェクトの作成
+                        // PrintPreviewDialogオブジェクトの作成
                         var ppd = new PrintPreviewDialog();
                         ppd.Shown += (sender, e) => {
                             var tool = (ToolStrip)ppd.Controls[1];

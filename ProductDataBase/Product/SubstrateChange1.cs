@@ -65,7 +65,7 @@ namespace ProductDatabase {
                 SubstrateChangeDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(SubstrateChangeDataGridView.Font, FontStyle.Bold);
                 SubstrateChangeDataGridView.RowHeadersVisible = true;
                 SubstrateChangeDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
-                //ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
+                // ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
                 SubstrateChangeDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
                 SubstrateChangeDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 

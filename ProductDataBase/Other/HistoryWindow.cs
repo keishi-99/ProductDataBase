@@ -557,7 +557,7 @@ namespace ProductDatabase {
                             }
                             else if (row.RowState == DataRowState.Deleted) // 削除行の処理
                             {
-                                //DELETE文の設定
+                                // DELETE文の設定
 
                                 var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
                                 command.CommandText =
@@ -673,7 +673,7 @@ namespace ProductDatabase {
                             }
                             else if (row.RowState == DataRowState.Deleted) // 削除行の処理
                             {
-                                //DELETE文の設定
+                                // DELETE文の設定
                                 var productTableName = $"[{ProductInfo.CategoryName}_Product]";
                                 command.CommandText =
                                     $"""
