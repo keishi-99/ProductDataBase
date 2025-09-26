@@ -15,7 +15,8 @@ namespace ProductDatabase.Other {
         private void LoadEvents() {
             var strSqlQuery = "SELECT * FROM Product WHERE Visible = 1 ORDER BY SortNumber ASC;";
 
-            using (SqliteConnection con = new(GetConnectionInformation()))
+            using SqliteConnection con = new(GetConnectionInformation());
+            con.Open();
             using (var cmd = new SqliteCommand(strSqlQuery, con))
             using (var reader = cmd.ExecuteReader()) {
                 ServiceInfo.ServiceDataTable.Load(reader);
