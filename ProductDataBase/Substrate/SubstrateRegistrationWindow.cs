@@ -262,7 +262,7 @@ namespace ProductDatabase {
 
                 return true;
             } catch (Exception ex) {
-                if (transaction.Connection != null) { //接続が開いているか確認する。
+                if (transaction.Connection != null) { // 接続が開いているか確認する。
                     transaction.Rollback();
                 }
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -384,7 +384,7 @@ namespace ProductDatabase {
 
                 switch (isPrint) {
                     case true:
-                        //PrintDialogクラスの作成
+                        // PrintDialogクラスの作成
                         var pdlg = new PrintDialog {
                             Document = pd
                         };
@@ -407,7 +407,7 @@ namespace ProductDatabase {
                         break;
                     case false:
                         ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
-                        //PrintPreviewDialogオブジェクトの作成
+                        // PrintPreviewDialogオブジェクトの作成
                         var ppd = new PrintPreviewDialog();
                         ppd.Shown += (sender, e) => {
                             var tool = (ToolStrip)ppd.Controls[1];

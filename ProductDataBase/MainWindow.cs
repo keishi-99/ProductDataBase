@@ -130,19 +130,13 @@ namespace ProductDatabase {
         public static string GetConnectionInformation() {
             var informationPath = Path.Combine(Environment.CurrentDirectory, "db", "information.db");
             if (!File.Exists(informationPath)) { throw new FileNotFoundException("ファイルが見つかりません。", informationPath); }
-            //var u = new Uri(informationPath);
-            //if (u.IsUnc) {
-            //    informationPath = @"\" + informationPath; // UNCパス
-            //}
+
             return new SqliteConnectionStringBuilder() { DataSource = informationPath }.ToString();
         }
         public static string GetConnectionRegistration() {
             var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
             if (!File.Exists(registrationPath)) { throw new FileNotFoundException("ファイルが見つかりません。", registrationPath); }
-            //var u = new Uri(registrationPath);
-            //if (u.IsUnc) {
-            //    registrationPath = @"\" + registrationPath; // UNCパス
-            //}
+
             return new SqliteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
         }
 
@@ -776,9 +770,9 @@ namespace ProductDatabase {
         }
         // excel
         private void OpenExcel(string filePath) {
-            //Excel実行ファイルの場所を取得
+            // Excel実行ファイルの場所を取得
             var xlApp = new Microsoft.Office.Interop.Excel.Application();
-            var excelFullPath = System.IO.Path.Combine(xlApp.Path, "EXCEL.EXE"); //フルパス作成
+            var excelFullPath = System.IO.Path.Combine(xlApp.Path, "EXCEL.EXE");
             xlApp.Quit();
             System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
             // ファイルを実行
