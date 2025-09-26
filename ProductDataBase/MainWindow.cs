@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using ProductDatabase.Other;
 using System.Data;
 using System.Data.Odbc;
@@ -109,7 +110,10 @@ namespace ProductDatabase {
                 _ => 0
             };
         }
-        public static class Auth {
+        public class Config {
+            public string NetworkFolderPath { get; set; } = string.Empty;
+            public string[] Administrators { get; set; } = [];
+            public string[] AuthorizedUsers { get; set; } = [];
             private static bool s_isAdministrator = false;
             public static bool IsAdministrator {
                 get => s_isAdministrator; set => s_isAdministrator = value;
@@ -151,13 +155,11 @@ namespace ProductDatabase {
                 if (string.IsNullOrEmpty(basePath) || !Directory.Exists(basePath)) {
                     throw new DirectoryNotFoundException($"The directory '{basePath}' does not exist.");
                 }
-                // JSONファイルを読み込む
-                var config = new ConfigurationBuilder()
-                    .SetBasePath(basePath)
-                    .AddJsonFile(Path.GetFileName(jsonFilePath), optional: false, reloadOnChange: true)
-                    .Build();
+                string json = File.ReadAllText(jsonFilePath);
+                var config = JsonConvert.DeserializeObject<Config>(json);
+
                 // CloneFolderPathを取得
-                CommonUtils.s_networkPath = config["NetworkFolderPath"] ?? throw new Exception("フォルダが設定されてません。");
+                CommonUtils.s_networkPath = config?.NetworkFolderPath ?? throw new Exception("フォルダが設定されてません。");
                 if (string.IsNullOrEmpty(CommonUtils.s_networkPath)) { throw new Exception("フォルダが設定されてません。"); }
                 if (!Directory.Exists(CommonUtils.s_networkPath)) {
                     throw new DirectoryNotFoundException($"フォルダ '{CommonUtils.s_networkPath}' が見つかりません。");
@@ -198,16 +200,16 @@ namespace ProductDatabase {
                 }
 
                 // 認証ユーザー名を取得
-                var userNames = config.GetSection("AuthorizedUsers").Get<string[]>() ?? [];
+                var userNames = config.AuthorizedUsers;
                 // 現在のユーザー名がリストに含まれるかチェック
-                Auth.IsAuthorizedUser = userNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
+                Config.IsAuthorizedUser = userNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
 
                 // 管理者ユーザー名を取得
-                var adminUserNames = config.GetSection("Administrator").Get<string[]>() ?? [];
+                var adminUserNames = config.Administrators;
                 // 現在のユーザー名がリストに含まれるかチェック
-                Auth.IsAdministrator = adminUserNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
+                Config.IsAdministrator = adminUserNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
 
-                QRCodePanel.Enabled = Auth.IsAuthorizedUser;
+                QRCodePanel.Enabled = Config.IsAuthorizedUser;
 
                 RegisterButton.Enabled = false;
                 HistoryButton.Enabled = false;
@@ -520,7 +522,7 @@ namespace ProductDatabase {
         private void CategoryListBox3Select() {
             try {
                 if (CategoryListBox3.SelectedIndex == -1) { return; }
-                RegisterButton.Enabled = Auth.IsAuthorizedUser;
+                RegisterButton.Enabled = Config.IsAuthorizedUser;
                 HistoryButton.Enabled = true;
 
                 switch (RadioButtonNumber) {

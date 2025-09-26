@@ -44,7 +44,7 @@ namespace ProductDatabase {
                 CategoryRadioButton1.Checked = true;
                 CategoryComboBox.SelectedIndex = 0;
 
-                編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
+                編集モードToolStripMenuItem.Enabled = Config.IsAdministrator;
 
                 switch (_radioButtonNumber) {
                     case 1:
@@ -212,7 +212,7 @@ namespace ProductDatabase {
         private void ViewSubstrateRegistrationLog() {
             if (CategoryRadioButton1.Checked) {
                 _tableName = "Substrate";
-                編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
+                編集モードToolStripMenuItem.Enabled = Config.IsAdministrator;
                 StockCheckBox.Visible = false;
                 AllSubstrateCheckBox.Visible = true;
                 GroupModelCheckBox.Visible = false;
@@ -288,7 +288,7 @@ namespace ProductDatabase {
 
         private void ViewProductRegistration() {
             _tableName = "Product";
-            編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator;
+            編集モードToolStripMenuItem.Enabled = Config.IsAdministrator;
             GenerateReportButton.Visible = true;
             ShowUsedSubstrateButton.Visible = true;
             if (string.IsNullOrEmpty(ProductInfo.ProductModel)) {
@@ -319,7 +319,7 @@ namespace ProductDatabase {
         }
         private void ViewSerialLog() {
             _tableName = "Serial";
-            編集モードToolStripMenuItem.Enabled = Auth.IsAdministrator; ;
+            編集モードToolStripMenuItem.Enabled = Config.IsAdministrator; ;
             GenerateReportButton.Visible = false;
             ShowUsedSubstrateButton.Visible = false;
             GenerateListButton.Visible = false;
@@ -392,7 +392,7 @@ namespace ProductDatabase {
             }
 
             編集モードToolStripMenuItem.Enabled = false;
-            編集終了ToolStripMenuItem.Enabled = Auth.IsAdministrator;
+            編集終了ToolStripMenuItem.Enabled = Config.IsAdministrator;
             DataBaseDataGridView.AllowUserToDeleteRows = true;
             DataBaseDataGridView.ReadOnly = false;
             CategoryRadioButton1.Enabled = false;
