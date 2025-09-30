@@ -262,7 +262,7 @@ namespace ProductDatabase {
 
                 return true;
             } catch (Exception ex) {
-                if (transaction.Connection != null) { // 接続が開いているか確認する。
+                if (transaction.Connection is not null) { // 接続が開いているか確認する。
                     transaction.Rollback();
                 }
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -504,7 +504,7 @@ namespace ProductDatabase {
                     MessageBox.Show("QRコードが正しくありません。");
                     return;
                 }
-                if (arr != null) {
+                if (arr is not null) {
                     ProductInfo.Proness1 = arr[0];
                     ProductInfo.Proness2 = arr[1];
                     ProductInfo.Proness4 = Convert.ToInt32(arr[2] ?? throw new Exception());

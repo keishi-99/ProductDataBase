@@ -24,6 +24,7 @@ namespace ProductDatabase.Print {
         public static int PrintCount { get; private set; }
         public static int CopiesRemainingPerSerial { get; private set; }
         public static int PageCount { get; private set; }
+
         public static int PrintType => ProductInfo?.PrintType ?? throw new InvalidOperationException("PrintManager が初期化されていません。");
 
         private static List<string> s_serialList = [];
@@ -53,9 +54,7 @@ namespace ProductDatabase.Print {
 
         public static bool PrintSerialCommon(PrintPageEventArgs e, bool isPreview, int startLine, string serialType) {
             try {
-                if (e.Graphics == null) {
-                    throw new Exception("e.Graphicsが nullです。");
-                }
+                if (e.Graphics is null) { throw new InvalidOperationException("Graphics オブジェクトを取得できません。"); }
 
                 e.Graphics.PageUnit = GraphicsUnit.Pixel;
 
@@ -128,7 +127,6 @@ namespace ProductDatabase.Print {
                             if (s_serialList.Count <= PrintCount) {
                                 // 最後の行にマークを描画
                                 DrawFinalRowMark(e.Graphics, y + 1, 0, posY, 0, labelHeightPx, headerFont);
-                                PageCount = 1;
                                 return false;
                             }
                         }
@@ -191,7 +189,7 @@ namespace ProductDatabase.Print {
         }
         private static void DrawLabel(Graphics g, string text, bool fontUnderline, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY) {
 
-            if (PrintSettings.LabelPrintSettings == null) { return; }
+            if (PrintSettings.LabelPrintSettings is null) { return; }
             // フォントサイズはポイント単位でそのまま使用
             var fontName = PrintSettings.LabelPrintSettings.TextFont.Name;
             var fontSize = PrintSettings.LabelPrintSettings.TextFont.SizeInPoints;
@@ -214,7 +212,7 @@ namespace ProductDatabase.Print {
         }
         private static void DrawBarcode(Graphics g, string text, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY) {
 
-            if (PrintSettings.BarcodePrintSettings == null) { return; }
+            if (PrintSettings.BarcodePrintSettings is null) { return; }
             // --- テキストの描画 ---
             // フォントサイズはポイント単位でそのまま使用
             var fontName = PrintSettings.BarcodePrintSettings.TextFont.Name;
@@ -271,7 +269,7 @@ namespace ProductDatabase.Print {
             g.DrawImage(barcodeBitmap, layoutRectBarcode);
         }
         private static string ConvertHeaderString(string s) {
-            if (ProductInfo == null) { throw new Exception("ProductInfoが nullです。"); }
+            if (ProductInfo is null) { throw new Exception("ProductInfoが nullです。"); }
             s = s.Replace("%P", ProductInfo.ProductName)
                  .Replace("%T", ProductInfo.ProductModel)
                  .Replace("%D", DateTime.Today.ToShortDateString())
@@ -320,9 +318,9 @@ namespace ProductDatabase.Print {
             public double MarginX { get; set; }
             [Category("\t用紙設定"), DisplayName("余白上 (mm)")]
             public double MarginY { get; set; }
-            [Category("\t用紙設定"), DisplayName("間隔 横 (mm)")]
+            [Category("\t用紙設定"), DisplayName("ラベル間隔 横 (mm)")]
             public double IntervalX { get; set; }
-            [Category("\t用紙設定"), DisplayName("間隔 縦 (mm)")]
+            [Category("\t用紙設定"), DisplayName("ラベル間隔 縦 (mm)")]
             public double IntervalY { get; set; }
             [Category("\t用紙設定"), DisplayName("ヘッダー開始位置 上 (mm)")]
             public double HeaderPositionX { get; set; }

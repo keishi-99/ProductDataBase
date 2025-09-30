@@ -20,7 +20,7 @@ namespace ProductDatabase {
             ProductInfo = productInfo;
             _radioButtonNumber = radioButtonNumber;
             // 最大サイズをディスプレイサイズに合わせる
-            if (Screen.PrimaryScreen != null) {
+            if (Screen.PrimaryScreen is not null) {
                 var h = Screen.PrimaryScreen.Bounds.Height;
                 var w = Screen.PrimaryScreen.Bounds.Width;
                 DataBaseDataGridView.MaximumSize = new Size(w, h);
@@ -471,7 +471,7 @@ namespace ProductDatabase {
         private void SaveRegistrationLog() {
             try {
                 // 編集モードで使用している接続を使用
-                if (_editModeConnection == null) {
+                if (_editModeConnection is null) {
                     MessageBox.Show("編集モードが開始されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
@@ -760,12 +760,12 @@ namespace ProductDatabase {
                 CommonUtils.BackupManager.CreateBackup();
 
                 // 編集モードのトランザクションをコミットしてロック解除
-                if (_editModeTransaction != null) {
+                if (_editModeTransaction is not null) {
                     _editModeTransaction.Commit();
                     _editModeTransaction.Dispose();
                     _editModeTransaction = null;
                 }
-                if (_editModeConnection != null) {
+                if (_editModeConnection is not null) {
                     _editModeConnection.Close();
                     _editModeConnection.Dispose();
                     _editModeConnection = null;
@@ -775,12 +775,12 @@ namespace ProductDatabase {
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 // エラー発生時のロールバック（トランザクションが存在する場合）
-                if (_editModeTransaction != null) {
+                if (_editModeTransaction is not null) {
                     _editModeTransaction.Rollback();
                     _editModeTransaction.Dispose();
                     _editModeTransaction = null;
                 }
-                if (_editModeConnection != null) {
+                if (_editModeConnection is not null) {
                     _editModeConnection.Close();
                     _editModeConnection.Dispose();
                     _editModeConnection = null;
@@ -837,7 +837,7 @@ namespace ProductDatabase {
         private void ShowDataForm() {
 
             // 選択されたセルがない場合は処理を終了
-            if (DataBaseDataGridView.CurrentCell == null) { return; }
+            if (DataBaseDataGridView.CurrentCell is null) { return; }
 
             // 新しいフォームクラスを作成
             var dataForm = new Form {
@@ -900,7 +900,7 @@ namespace ProductDatabase {
         private void GenerateReport() {
             try {
                 // 選択されたセルがない場合は処理を終了
-                if (DataBaseDataGridView.CurrentCell == null) { return; }
+                if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
                 ProductInfo.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
@@ -920,7 +920,7 @@ namespace ProductDatabase {
         private void GenerateList() {
             try {
                 // 選択されたセルがない場合は処理を終了
-                if (DataBaseDataGridView.CurrentCell == null) { return; }
+                if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 ProductInfo.ProductID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
                 ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
@@ -942,7 +942,7 @@ namespace ProductDatabase {
         private void GenerateCheckSheet() {
             try {
                 // 選択されたセルがない場合は処理を終了
-                if (DataBaseDataGridView.CurrentCell == null) { return; }
+                if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 ProductInfo.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
                 ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
@@ -961,12 +961,12 @@ namespace ProductDatabase {
 
         private void ClosedEvents() {
             // 編集モードのトランザクションをコミットしてロック解除
-            if (_editModeTransaction != null) {
+            if (_editModeTransaction is not null) {
                 _editModeTransaction.Commit();
                 _editModeTransaction.Dispose();
                 _editModeTransaction = null;
             }
-            if (_editModeConnection != null) {
+            if (_editModeConnection is not null) {
                 _editModeConnection.Close();
                 _editModeConnection.Dispose();
                 _editModeConnection = null;

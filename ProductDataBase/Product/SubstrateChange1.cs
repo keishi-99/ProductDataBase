@@ -53,11 +53,11 @@ namespace ProductDatabase {
                 _colFilter.Add("");
                 for (var i = 0; i < SubstrateChangeDataGridView.ColumnCount; i++) {
                     var headerValue = SubstrateChangeDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
-                    if (headerValue != null) { _colFilter.Add(headerValue); }
+                    if (headerValue is not null) { _colFilter.Add(headerValue); }
                 }
 
                 // 最大サイズをディスプレイサイズに合わせる
-                if (Screen.PrimaryScreen != null) {
+                if (Screen.PrimaryScreen is not null) {
                     var h = Screen.PrimaryScreen.Bounds.Height;
                     var w = Screen.PrimaryScreen.Bounds.Width;
                     SubstrateChangeDataGridView.MaximumSize = new Size(w, h);

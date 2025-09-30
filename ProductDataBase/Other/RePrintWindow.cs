@@ -447,7 +447,7 @@ namespace ProductDatabase {
                     MessageBox.Show("QRコードが正しくありません。");
                     return;
                 }
-                if (arr != null) {
+                if (arr is not null) {
                     ProductInfo.Proness1 = arr[0];
                     ProductInfo.Proness2 = arr[1];
                     ProductInfo.Proness4 = Convert.ToInt32(arr[2] ?? throw new Exception());
