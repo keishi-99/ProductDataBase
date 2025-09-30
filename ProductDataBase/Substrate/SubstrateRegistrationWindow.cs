@@ -368,12 +368,13 @@ namespace ProductDatabase {
 
                 var isPreview = !isPrint;
                 var startLine = (int)PrintPositionNumericUpDown.Value - 1;
+                var serialType = "Substrate";
 
                 pd.BeginPrint += (sender, e) => {
                     PrintManager.Initialize(ProductInfo, SubstratePrintSettings, _serialList);
                 };
                 pd.PrintPage += (sender, e) => {
-                    var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, "Substrate");
+                    var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, serialType);
                     e.HasMorePages = hasMore;
                 };
 

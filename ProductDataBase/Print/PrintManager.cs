@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -17,22 +16,15 @@ namespace ProductDatabase.Print {
         public static DocumentPrintSettings ProductPrintSettings { get; private set; } = new();
 
         // 各種設定へのアクセスプロパティ（nullチェック済）
-        public static LabelPrintSettings LabelPrintSettings =>
-            ProductPrintSettings.LabelPrintSettings ?? throw new InvalidOperationException("LabelPageSettings が null です。");
-
-        public static BarcodePrintSettings BarcodePrintSettings =>
-            ProductPrintSettings.BarcodePrintSettings ?? throw new InvalidOperationException("BarcodePageSettings が null です。");
-
+        public static LabelPrintSettings LabelPrintSettings => ProductPrintSettings.LabelPrintSettings ?? throw new InvalidOperationException("LabelPageSettings が null です。");
+        public static BarcodePrintSettings BarcodePrintSettings => ProductPrintSettings.BarcodePrintSettings ?? throw new InvalidOperationException("BarcodePageSettings が null です。");
         private static DocumentPrintSettings PrintSettings => ProductPrintSettings ?? throw new InvalidOperationException("ProductPrintSettings が null です。");
 
         // 印刷状態を保持するプロパティ
         public static int PrintCount { get; private set; }
         public static int CopiesRemainingPerSerial { get; private set; }
-        public static int SerialNumber { get; private set; }
         public static int PageCount { get; private set; }
         public static int PrintType => ProductInfo?.PrintType ?? throw new InvalidOperationException("PrintManager が初期化されていません。");
-
-        public static string SubstrateNumber { get; private set; } = string.Empty;
 
         private static List<string> s_serialList = [];
 
@@ -44,15 +36,13 @@ namespace ProductDatabase.Print {
                 ? ProductInfo.ProductModel[^4..]
                 : string.Empty;
 
-        public static void Initialize(ProductInformation productInfo, DocumentPrintSettings productPrintSettings, List<string> serialList, string? substrateNumber = null) {
+        public static void Initialize(ProductInformation productInfo, DocumentPrintSettings productPrintSettings, List<string> serialList) {
             ProductInfo = productInfo;
             ProductPrintSettings = productPrintSettings ?? throw new ArgumentNullException(nameof(productPrintSettings));
 
+            s_serialList = serialList;
             PageCount = 1;
             PrintCount = 0;
-            s_serialList = serialList;
-            SerialNumber = productInfo.SerialFirstNumber;
-            SubstrateNumber = substrateNumber ?? string.Empty;
         }
 
         // ミリメートルをピクセルに変換するヘルパーメソッド
@@ -116,6 +106,7 @@ namespace ProductDatabase.Print {
                         var posY = marginYPx - hardMarginY + (y * (intervalYPx + labelHeightPx));
 
                         var isLastCopy = CopiesRemainingPerSerial == 1;
+
                         // タイプ4で残り1の場合、最後のラベルに下線をつける
                         var fontUnderline = IsUnderlinePrint && isLastCopy;
 
@@ -133,7 +124,6 @@ namespace ProductDatabase.Print {
                         if (CopiesRemainingPerSerial <= 0) {
                             CopiesRemainingPerSerial = copiesPerLabel;
                             PrintCount++;
-                            SerialNumber++;
 
                             if (s_serialList.Count <= PrintCount) {
                                 // 最後の行にマークを描画
@@ -166,19 +156,17 @@ namespace ProductDatabase.Print {
             var labelImage = new Bitmap(widthPx, heightPx);
             labelImage.SetResolution(dpiX, dpiY);
 
-            // 'using'ステートメントでGraphicsオブジェクトを確実に破棄
+            // usingステートメントでGraphicsオブジェクトを確実に破棄
             using (var g = Graphics.FromImage(labelImage)) {
                 // すべての描画操作をピクセル単位で行うように設定
                 g.PageUnit = GraphicsUnit.Pixel;
 
                 // 高品質な描画設定
-                // Graphicsオブジェクトの描画品質を設定
-                g.SmoothingMode = SmoothingMode.None;
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic; // 画像の拡大・縮小品質を設定
-                //g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-                //g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
 
-                // --- 3. 印刷タイプに応じた描画処理 ---
+                // 印刷タイプに応じた描画処理
                 switch (serialType) {
                     case "Label":
                         DrawLabel(g, text, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY);
@@ -191,7 +179,7 @@ namespace ProductDatabase.Print {
                         break;
                 }
 
-                // --- 4. プレビュー用の枠を描画 ---
+                // プレビュー用の枠を描画
                 if (isPreview) {
                     // 0.1mmの黒いペンで枠線を描画
                     using var p = new Pen(Color.Black, ConvertMmToPixel(0.1, dpiX));
