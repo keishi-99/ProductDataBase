@@ -62,13 +62,13 @@ namespace ProductDatabase {
 
                             // チェックボックスとDgvを有効に
                             _objCbx = Controls[_checkBoxNames[i]] as CheckBox;
-                            if (_objCbx != null) {
+                            if (_objCbx is not null) {
                                 _objCbx.Enabled = true;
                                 _objCbx.Checked = true;
                             }
 
                             _objDgv = Controls[_dataGridViewNames[i]] as DataGridView;
-                            if (_objDgv != null) {
+                            if (_objDgv is not null) {
                                 _objDgv.Columns[1].DefaultCellStyle.BackColor = Color.LightGray;
                                 _objDgv.Columns[2].DefaultCellStyle.BackColor = Color.LightGray;
                                 _objDgv.Columns[2].ReadOnly = true;
@@ -166,7 +166,7 @@ namespace ProductDatabase {
                             using var dr = cmd.ExecuteReader();
                             var j = 0;
 
-                            if (_objCbx != null) {
+                            if (_objCbx is not null) {
                                 var substrateName = ProductInfo.SubstrateDataTable
                                     .AsEnumerable()
                                     .FirstOrDefault(row => row.Field<string>("SubstrateModel") == substrateModel)?
@@ -181,7 +181,7 @@ namespace ProductDatabase {
                                 var intStock = Convert.ToInt32(dr["Stock"]);
                                 var intUsedQuantity = Convert.ToInt32(dr["UsedDecrease"]); ;
 
-                                if (_objDgv == null) {
+                                if (_objDgv is null) {
                                     break;
                                 }
 
@@ -219,12 +219,12 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = false;
                 for (var i = 0; i <= 9; i++) {
                     _objCbx = Controls[_checkBoxNames[i]] as CheckBox;
-                    if (_objCbx != null) {
+                    if (_objCbx is not null) {
                         _objCbx.Enabled = false;
                     }
 
                     _objDgv = Controls[_dataGridViewNames[i]] as DataGridView;
-                    if (_objDgv != null) {
+                    if (_objDgv is not null) {
                         _objDgv.Enabled = false;
                     }
                 }
@@ -240,7 +240,7 @@ namespace ProductDatabase {
                 switch (ProductInfo.RegType) {
                     case 2:
                     case 3:
-                        if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateが空です"); }
+                        if (_useSubstrate is null) { throw new Exception("ArrUseSubstrateが空です"); }
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
 
                             var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
@@ -255,7 +255,7 @@ namespace ProductDatabase {
                                 var dgvRowCnt = objDgv.Rows.Count;
 
                                 for (var j = 0; j < dgvRowCnt; j++) {
-                                    var boolCbx = objDgv.Rows[j].Cells[4].Value != null && (bool)objDgv.Rows[j].Cells[4].Value;
+                                    var boolCbx = objDgv.Rows[j].Cells[4].Value is not null && (bool)objDgv.Rows[j].Cells[4].Value;
                                     if (boolCbx) {
                                         var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value.ToString());
                                         var usedValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value.ToString());
@@ -300,7 +300,7 @@ namespace ProductDatabase {
                             con.Open();
                             using var transaction = con.BeginTransaction();
 
-                            if (_useSubstrate == null) { throw new Exception("ArrUseSubstrateが nullです。"); }
+                            if (_useSubstrate is null) { throw new Exception("ArrUseSubstrateが nullです。"); }
                             for (var i = 0; i <= _useSubstrate.Length; i++) {
 
                                 var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
@@ -401,7 +401,7 @@ namespace ProductDatabase {
 
                                             if (ProductInfo.IsListPrint) {
                                                 _listUsedSubstrate.Add(_useSubstrate[i]);
-                                                if (substrateNum != null) { _listUsedProductNumber.Add(substrateNum); }
+                                                if (substrateNum is not null) { _listUsedProductNumber.Add(substrateNum); }
                                                 _listUsedQuantity.Add(useValue);
                                             }
                                         }

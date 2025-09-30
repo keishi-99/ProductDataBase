@@ -65,7 +65,7 @@ namespace ProductDatabase.Other {
                 selectedRows = ServiceInfo.ServiceDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductType ASC");
                 HashSet<string> productTypes = [.. selectedRows.AsEnumerable()
                     .Select(x => x.Field<string>("ProductType"))
-                    .Where(x => x != null)
+                    .Where(x => x is not null)
                     .Select(x => x!)];
 
                 CategoryListBox3.Items.AddRange([.. productTypes]);

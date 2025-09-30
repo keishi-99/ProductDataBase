@@ -372,7 +372,7 @@ namespace ProductDatabase {
                 };
                 selectedRow = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' {listBox2} {listBox3}");
 
-                if (selectedRow != null && selectedRow.Length > 0) {
+                if (selectedRow is not null && selectedRow.Length > 0) {
                     switch (RadioButtonNumber) {
                         case 1:
                             ProductInfo.CategoryName = selectedRow[0]["CategoryName"].ToString() ?? string.Empty;
@@ -494,7 +494,7 @@ namespace ProductDatabase {
                         selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "SubstrateName ASC");
                         HashSet<string> substrateNames = [.. selectedRows.AsEnumerable()
                             .Select(x => x.Field<string>("SubstrateName"))
-                            .Where(x => x != null)
+                            .Where(x => x is not null)
                             .Select(x => x!)];
 
                         CategoryListBox3.Items.AddRange([.. substrateNames]);
@@ -506,7 +506,7 @@ namespace ProductDatabase {
                         selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductType ASC");
                         HashSet<string> productTypes = [.. selectedRows.AsEnumerable()
                             .Select(x => x.Field<string>("ProductType"))
-                            .Where(x => x != null)
+                            .Where(x => x is not null)
                             .Select(x => x!)];
 
                         CategoryListBox3.Items.AddRange([.. productTypes]);

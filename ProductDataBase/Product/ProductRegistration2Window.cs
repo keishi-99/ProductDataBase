@@ -87,11 +87,11 @@ namespace ProductDatabase {
         }
         private void ClosingEvents() {
             // 編集モードのトランザクションをコミットしてロック解除
-            if (_sqliteTransaction != null) {
+            if (_sqliteTransaction is not null) {
                 _sqliteTransaction.Dispose();
                 _sqliteTransaction = null;
             }
-            if (_sqliteConnection != null) {
+            if (_sqliteConnection is not null) {
                 _sqliteConnection.Close();
                 _sqliteConnection.Dispose();
                 _sqliteConnection = null;
@@ -152,7 +152,7 @@ namespace ProductDatabase {
             }
         }
         private static void SetupCheckBox(CheckBox? objCbx, int index, string substrateName, string[] useSubstrate) {
-            if (objCbx != null) {
+            if (objCbx is not null) {
                 objCbx.Enabled = true;
                 objCbx.Checked = true;
                 var splitSubstrateName = substrateName.Split(':');
@@ -160,7 +160,7 @@ namespace ProductDatabase {
             }
         }
         private void SetupDataGridView(DataGridView? objDgv) {
-            if (objDgv != null) {
+            if (objDgv is not null) {
                 objDgv.Columns[1].DefaultCellStyle.BackColor = Color.LightGray;
                 objDgv.Columns[2].ReadOnly = false;
                 objDgv.Columns[3].ReadOnly = false;
@@ -234,7 +234,7 @@ namespace ProductDatabase {
 
                 objDgv?.Rows.Add(strSubstrateNumber, intStock);
 
-                if (objDgv != null) {
+                if (objDgv is not null) {
                     if (intQuantity >= intStock) {
                         intQuantity -= intStock;
                         objDgv.Rows[^1].Cells[2].Value = intStock;
@@ -293,7 +293,7 @@ namespace ProductDatabase {
             try {
                 _serialList.Clear();
 
-                if (_sqliteConnection == null || _sqliteTransaction == null) {
+                if (_sqliteConnection is null || _sqliteTransaction is null) {
                     throw new InvalidOperationException("編集モード用の接続が初期化されていません。");
                 }
 
@@ -696,7 +696,7 @@ namespace ProductDatabase {
                     case 3:
                     case 4:
                     case 9:
-                        if (_useSubstrate == null) {
+                        if (_useSubstrate is null) {
                             throw new Exception("ArrUseSubstrateが空です");
                         }
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
@@ -712,10 +712,10 @@ namespace ProductDatabase {
                                 var dgvRowCnt = objDgv.Rows.Count;
 
                                 for (var j = 0; j < dgvRowCnt; j++) {
-                                    var boolCbx = objDgv.Rows[j].Cells[3].Value != null && (bool)objDgv.Rows[j].Cells[3].Value;
+                                    var boolCbx = objDgv.Rows[j].Cells[3].Value is not null && (bool)objDgv.Rows[j].Cells[3].Value;
                                     if (boolCbx) {
                                         var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value.ToString());
-                                        if (objDgv.Rows[j].Cells[2].Value == null) {
+                                        if (objDgv.Rows[j].Cells[2].Value is null) {
                                             throw new Exception("使用数が入力されていません。");
                                         }
                                         var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value.ToString());

@@ -511,7 +511,7 @@ namespace ProductDatabase.Other {
                         .Where(x => x.Start.Row == targetRow && x.Value?.ToString() == searchValue)
                         .FirstOrDefault();
 
-                    foundColumn = searchAddressResult2 != null
+                    foundColumn = searchAddressResult2 is not null
                         ? searchAddressResult2.Start.Column
                         : throw new Exception($"Configに基板モデル:[{searchValue}]が見つかりません。");
 
@@ -586,23 +586,23 @@ namespace ProductDatabase.Other {
                     // xlApp.Quit();
                 } finally {
                     // COMオブジェクトの解放
-                    if (xlSheet != null) {
+                    if (xlSheet is not null) {
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
                     }
 
-                    if (xlSheets != null) {
+                    if (xlSheets is not null) {
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
                     }
 
-                    if (xlBook != null) {
+                    if (xlBook is not null) {
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook);
                     }
 
-                    if (xlBooks != null) {
+                    if (xlBooks is not null) {
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks);
                     }
 
-                    if (xlApp != null) {
+                    if (xlApp is not null) {
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
                     }
                 }
@@ -781,7 +781,7 @@ namespace ProductDatabase.Other {
 
             // 指定されたシートのセルに値を書き込みます。
             private static void WriteCellValue(ISheet sheet, CellReference? reference, string value) {
-                if (reference == null) {
+                if (reference is null) {
                     return; // 参照が nullの場合は何もしない
                 }
 
@@ -848,9 +848,9 @@ namespace ProductDatabase.Other {
                     throw new Exception($"エラーが発生しました。詳細: {ex.Message}", ex);
                 } finally {
                     // COMオブジェクトの解放
-                    if (xlBook != null) { System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook); }
-                    if (xlBooks != null) { System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks); }
-                    if (xlApp != null) { System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp); }
+                    if (xlBook is not null) { System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook); }
+                    if (xlBooks is not null) { System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks); }
+                    if (xlApp is not null) { System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp); }
                 }
             }
         }
@@ -936,23 +936,23 @@ namespace ProductDatabase.Other {
 
                 } finally {
                     // COMオブジェクトの解放
-                    if (xlSheet != null) {
+                    if (xlSheet is not null) {
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
                     }
 
-                    if (xlSheets != null) {
+                    if (xlSheets is not null) {
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
                     }
 
-                    if (xlBook != null) {
+                    if (xlBook is not null) {
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook);
                     }
 
-                    if (xlBooks != null) {
+                    if (xlBooks is not null) {
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks);
                     }
 
-                    if (xlApp != null) {
+                    if (xlApp is not null) {
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
                     }
                 }
