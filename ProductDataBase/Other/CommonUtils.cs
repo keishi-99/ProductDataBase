@@ -308,25 +308,18 @@ namespace ProductDatabase.Other {
             private static void PopulateReportSheet(ExcelPackage reportWorkbook, ProductInformation productInfo, ReportConfig config) {
                 var workSheetTemp = reportWorkbook.Workbook.Worksheets[config.SheetName] ?? throw new Exception($"シート '{config.SheetName}' が見つかりません。");
 
-                // セルに値を挿入
-                if (!string.IsNullOrEmpty(config.ProductNumberRange) && !string.IsNullOrEmpty(productInfo.ProductNumber)) {
-                    var productNumbers = productInfo.ProductNumber.Split('-');
-                    workSheetTemp.Cells[config.ProductNumberRange].Value = productNumbers[0];
-                }
-                if (!string.IsNullOrEmpty(config.OrderNumberRange) && !string.IsNullOrEmpty(productInfo.OrderNumber)) {
-                    workSheetTemp.Cells[config.OrderNumberRange].Value = productInfo.OrderNumber;
-                }
-                if (!string.IsNullOrEmpty(config.QuantityRange) && productInfo.Quantity != 0) {
-                    workSheetTemp.Cells[config.QuantityRange].Value = productInfo.Quantity;
-                }
-                if (!string.IsNullOrEmpty(config.SerialFirstRange) && !string.IsNullOrEmpty(productInfo.SerialFirst)) {
-                    workSheetTemp.Cells[config.SerialFirstRange].Value = productInfo.SerialFirst;
-                }
-                if (!string.IsNullOrEmpty(config.SerialLastRange) && !string.IsNullOrEmpty(productInfo.SerialLast)) {
-                    workSheetTemp.Cells[config.SerialLastRange].Value = productInfo.SerialLast;
-                }
-                if (!string.IsNullOrEmpty(config.ProductModelRange) && !string.IsNullOrEmpty(productInfo.ProductModel)) {
-                    workSheetTemp.Cells[config.ProductModelRange].Value = productInfo.ProductModel;
+                var productNumber = productInfo.ProductNumber.Split('-')[0] ?? string.Empty;
+                SetValue(config.ProductNumberRange, productNumber);
+                SetValue(config.OrderNumberRange, productInfo.OrderNumber);
+                SetValue(config.QuantityRange, productInfo.Quantity.ToString());
+                SetValue(config.SerialFirstRange, productInfo.SerialFirst);
+                SetValue(config.SerialLastRange, productInfo.SerialLast);
+                SetValue(config.ProductModelRange, productInfo.ProductModel);
+
+                void SetValue(string? range, string? value) {
+                    if (!string.IsNullOrEmpty(range) && !string.IsNullOrEmpty(value)) {
+                        workSheetTemp.Cells[range].Value = value;
+                    }
                 }
             }
 
@@ -357,7 +350,7 @@ namespace ProductDatabase.Other {
 
         // リスト生成
         public static class ListGenerator {
-            // メインのオーケストレーションメソッド
+            // リストを生成するメインメソッド
             public static void GenerateList(ProductInformation productInfo) {
                 try {
                     // 1. Excel設定の読み込みとワークブックの準備
@@ -439,18 +432,24 @@ namespace ProductDatabase.Other {
                 public string? QrCodeRange { get; set; }
             }
 
-
             // 製品情報をExcelシートに書き込むメソッド
             private static void PopulateProductDetails(ExcelWorksheet workSheetTemp, ProductInformation productInfo, ProductCellRanges ranges, string productName) {
-                if (!string.IsNullOrEmpty(ranges.ProductNameRange)) { workSheetTemp.Cells[ranges.ProductNameRange].Value = productName; }
-                if (!string.IsNullOrEmpty(ranges.ProductNumberRange)) { workSheetTemp.Cells[ranges.ProductNumberRange].Value = productInfo.ProductNumber; }
-                if (!string.IsNullOrEmpty(ranges.OrderNumberRange)) { workSheetTemp.Cells[ranges.OrderNumberRange].Value = productInfo.OrderNumber; }
-                if (!string.IsNullOrEmpty(ranges.RegDateRange)) { workSheetTemp.Cells[ranges.RegDateRange].Value = productInfo.RegDate; }
-                if (!string.IsNullOrEmpty(ranges.ProductModelRange)) { workSheetTemp.Cells[ranges.ProductModelRange].Value = productInfo.ProductModel; }
-                if (!string.IsNullOrEmpty(ranges.QuantityRange)) { workSheetTemp.Cells[ranges.QuantityRange].Value = productInfo.Quantity; }
-                if (!string.IsNullOrEmpty(ranges.SerialFirstRange)) { workSheetTemp.Cells[ranges.SerialFirstRange].Value = productInfo.SerialFirst; }
-                if (!string.IsNullOrEmpty(ranges.SerialLastRange)) { workSheetTemp.Cells[ranges.SerialLastRange].Value = productInfo.SerialLast; }
-                if (!string.IsNullOrEmpty(ranges.CommentRange)) { workSheetTemp.Cells[ranges.CommentRange].Value = productInfo.Comment; }
+
+                SetValue(ranges.ProductNameRange, productName);
+                SetValue(ranges.ProductNumberRange, productInfo.ProductNumber);
+                SetValue(ranges.OrderNumberRange, productInfo.OrderNumber);
+                SetValue(ranges.RegDateRange, productInfo.RegDate);
+                SetValue(ranges.ProductModelRange, productInfo.ProductModel);
+                SetValue(ranges.QuantityRange, productInfo.Quantity.ToString());
+                SetValue(ranges.SerialFirstRange, productInfo.SerialFirst);
+                SetValue(ranges.SerialLastRange, productInfo.SerialLast);
+                SetValue(ranges.CommentRange, productInfo.Comment);
+
+                void SetValue(string? range, string? value) {
+                    if (!string.IsNullOrEmpty(range) && !string.IsNullOrEmpty(value)) {
+                        workSheetTemp.Cells[range].Value = value;
+                    }
+                }
             }
 
             // データベースから使用済み基板情報を取得するメソッド
@@ -586,24 +585,16 @@ namespace ProductDatabase.Other {
                     // xlApp.Quit();
                 } finally {
                     // COMオブジェクトの解放
-                    if (xlSheet is not null) {
-                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
-                    }
+                    ReleaseComObject(xlSheet);
+                    ReleaseComObject(xlSheets);
+                    ReleaseComObject(xlBook);
+                    ReleaseComObject(xlBooks);
+                    ReleaseComObject(xlApp);
 
-                    if (xlSheets is not null) {
-                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
-                    }
-
-                    if (xlBook is not null) {
-                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook);
-                    }
-
-                    if (xlBooks is not null) {
-                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks);
-                    }
-
-                    if (xlApp is not null) {
-                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
+                    static void ReleaseComObject(object? comObj) {
+                        if (comObj is not null) {
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(comObj);
+                        }
                     }
                 }
             }
@@ -682,7 +673,7 @@ namespace ProductDatabase.Other {
 
                 // セル検索: ProductModelに基づいて行を特定
                 var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == productInfo.ProductModel)
-                                          ?? throw new Exception($"Configに品目番号:[{productInfo.ProductModel}]が見つかりません。");
+                     ?? throw new Exception($"Configに品目番号:[{productInfo.ProductModel}]が見つかりません。");
                 var resultRow = searchAddressResult.Start.Row;
 
                 // ワークシートのセルから値を取得し、ExcelConfigDataオブジェクトに格納
@@ -698,8 +689,8 @@ namespace ProductDatabase.Other {
                     RegTemperatureRange = workSheetMain.Cells[resultRow, 11].Value?.ToString() ?? string.Empty,
                     RegHumidityRange = workSheetMain.Cells[resultRow, 12].Value?.ToString() ?? string.Empty,
                     SheetNames = [.. Enumerable.Range(13, 20)
-                                       .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString() ?? string.Empty)
-                                       .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName))]
+                        .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString() ?? string.Empty)
+                        .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName))]
                 };
 
                 return excelData.SheetNames.Count == 0 ? throw new Exception("対象シートがConfigファイルに設定されていません。") : excelData;
@@ -800,10 +791,11 @@ namespace ProductDatabase.Other {
                     allSheetNames.Add(workBookNPOI.GetSheetName(i));
                 }
 
-                var sheetIndicesToHide = allSheetNames.Select((name, index) => new { Name = name, Index = index })
-                                                      .Where(sheet => !sheetsToKeep.Contains(sheet.Name))
-                                                      .Select(sheet => sheet.Index)
-                                                      .ToList();
+                var sheetIndicesToHide = allSheetNames
+                    .Select((name, index) => new { Name = name, Index = index })
+                    .Where(sheet => !sheetsToKeep.Contains(sheet.Name))
+                    .Select(sheet => sheet.Index)
+                    .ToList();
 
                 // シート（"Sheet1"）を非表示にする
                 if (workBookNPOI.GetSheetIndex("Sheet1") != -1 && !sheetIndicesToHide.Contains(workBookNPOI.GetSheetIndex("Sheet1"))) {
@@ -848,9 +840,15 @@ namespace ProductDatabase.Other {
                     throw new Exception($"エラーが発生しました。詳細: {ex.Message}", ex);
                 } finally {
                     // COMオブジェクトの解放
-                    if (xlBook is not null) { System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook); }
-                    if (xlBooks is not null) { System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks); }
-                    if (xlApp is not null) { System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp); }
+                    ReleaseComObject(xlBook);
+                    ReleaseComObject(xlBooks);
+                    ReleaseComObject(xlApp);
+
+                    static void ReleaseComObject(object? comObj) {
+                        if (comObj is not null) {
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(comObj);
+                        }
+                    }
                 }
             }
         }
@@ -936,24 +934,16 @@ namespace ProductDatabase.Other {
 
                 } finally {
                     // COMオブジェクトの解放
-                    if (xlSheet is not null) {
-                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheet);
-                    }
+                    ReleaseComObject(xlSheet);
+                    ReleaseComObject(xlSheets);
+                    ReleaseComObject(xlBook);
+                    ReleaseComObject(xlBooks);
+                    ReleaseComObject(xlApp);
 
-                    if (xlSheets is not null) {
-                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlSheets);
-                    }
-
-                    if (xlBook is not null) {
-                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBook);
-                    }
-
-                    if (xlBooks is not null) {
-                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlBooks);
-                    }
-
-                    if (xlApp is not null) {
-                        System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
+                    static void ReleaseComObject(object? comObj) {
+                        if (comObj is not null) {
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(comObj);
+                        }
                     }
                 }
             }
