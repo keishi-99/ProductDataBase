@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
+using NPOI.XSSF.UserModel;
 using OfficeOpenXml;
 using System.Data;
 using System.Runtime.InteropServices;
@@ -183,9 +184,222 @@ namespace ProductDatabase.Other {
             public string? SaveDirectory { get; set; }
         }
         // 成績書生成
-        public static class ReportGenerator {
+        public static class ReportGeneratorNPOI {
+            //// レポートを生成するメインメソッド
+            public static void GenerateReportNPOI(ProductInformation productInfo) {
+                try {
+                    // 1. 設定ファイルを読み込み、レポート設定を取得
+                    var configWorkbook = LoadConfigWorkbook();
+                    var reportConfig = GetReportConfig(configWorkbook, productInfo.ProductModel);
+
+                    // 2. レポートテンプレートを読み込み
+                    var reportWorkbook = LoadReportTemplate(reportConfig.DirectoryPath, reportConfig.SearchFileName);
+
+                    // 3. レポートシートにデータを挿入
+                    PopulateReportSheet(reportWorkbook, productInfo, reportConfig);
+
+                    // 4. レポートを保存
+                    SaveReport(reportWorkbook, productInfo, reportConfig);
+
+                    MessageBox.Show("成績書が正常に生成されました。", "完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                } catch (Exception ex) {
+                    // エラーメッセージをユーザーに表示
+                    MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            // 設定Excelワークブックを読み込む
+            private static XSSFWorkbook LoadConfigWorkbook() {
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsx");
+                if (!File.Exists(configPath)) {
+                    throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
+                }
+
+                try {
+                    FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    return new XSSFWorkbook(fileStreamConfig);
+                } catch (Exception ex) {
+                    throw new Exception($"設定ファイルの読み込み中にエラーが発生しました: {ex.Message}", ex);
+                }
+            }
+
+            // 設定ワークブックから製品に対応する設定を抽出する
+            private static ReportConfig GetReportConfig(XSSFWorkbook configWorkbook, string productModel) {
+                var workSheetMain = configWorkbook.GetSheet("Sheet1") ?? throw new Exception("設定ファイルに 'Sheet1' が見つかりません。");
+
+                var targetColumnIndex = 0;
+                var searchText = productModel;
+                var resultRowIndex = -1;
+
+                // 対象列だけ走査
+                for (int rowIndex = workSheetMain.FirstRowNum; rowIndex <= workSheetMain.LastRowNum; rowIndex++) {
+                    IRow row = workSheetMain.GetRow(rowIndex);
+                    if (row == null) continue;
+
+                    ICell cell = row.GetCell(targetColumnIndex);
+                    if (cell == null) continue;
+
+                    string cellValue = GetCellValue(cell) ?? string.Empty;
+
+                    if (cellValue.Equals(searchText, StringComparison.OrdinalIgnoreCase)) {
+                        resultRowIndex = rowIndex;
+                    }
+                }
+
+                if (resultRowIndex == -1) { throw new Exception($"Configに品目番号:[{searchText}]が見つかりません。"); }
+
+                // ワークシートのセルから値を取得し、ReportConfigオブジェクトに格納
+                IRow resultRow = workSheetMain.GetRow(resultRowIndex);
+                var directoryPath = GetCellValue(resultRow.GetCell(2))?.Trim('"') ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(directoryPath)) { throw new Exception("Configのファイルパスが無効です。"); }
+                if (!Directory.Exists(directoryPath)) { throw new FileNotFoundException($"指定されたフォルダが存在しません: {directoryPath}"); }
+
+                var searchName = GetCellValue(resultRow.GetCell(3))?.Trim('"') ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(searchName)) { throw new Exception("Configのファイル名が無効です。"); }
+
+                var filePaths = Directory.GetFiles(directoryPath, $"*{searchName}*", SearchOption.TopDirectoryOnly);
+                var filePath = filePaths[0];
+                var fileName = Path.GetFileNameWithoutExtension(filePath);
+                var fileExtension = Path.GetExtension(filePath).ToLower();
+
+                var sheetName = GetCellValue(resultRow.GetCell(4)) ?? string.Empty;
+                return string.IsNullOrWhiteSpace(sheetName)
+                    ? throw new Exception("シート名がありません。")
+                    : new ReportConfig {
+                        DirectoryPath = directoryPath,
+                        FileName = fileName,
+                        FileExtension = fileExtension,
+                        SearchFileName = searchName,
+                        SheetName = sheetName,
+                        ProductNumberRange = GetCellValue(resultRow.GetCell(5)) ?? string.Empty,
+                        OrderNumberRange = GetCellValue(resultRow.GetCell(6)) ?? string.Empty,
+                        QuantityRange = GetCellValue(resultRow.GetCell(7)) ?? string.Empty,
+                        SerialFirstRange = GetCellValue(resultRow.GetCell(8)) ?? string.Empty,
+                        SerialLastRange = GetCellValue(resultRow.GetCell(9)) ?? string.Empty,
+                        ProductModelRange = GetCellValue(resultRow.GetCell(10)) ?? string.Empty,
+                        SaveDirectory = GetCellValue(resultRow.GetCell(11)) ?? string.Empty
+                    };
+
+                static string? GetCellValue(ICell cell) {
+                    if (cell == null) return string.Empty;
+                    return cell.CellType switch {
+                        CellType.String => cell.StringCellValue,
+                        CellType.Numeric => cell.NumericCellValue.ToString(),
+                        CellType.Boolean => cell.BooleanCellValue.ToString(),
+                        CellType.Formula => cell.ToString(),
+                        _ => cell.ToString()
+                    };
+                }
+            }
+
+            // レポートテンプレートExcelワークブックを読み込む
+            private static XSSFWorkbook LoadReportTemplate(string directoryPath, string searchFileName) {
+                var filePaths = Directory.GetFiles(directoryPath, $"*{searchFileName}*", SearchOption.TopDirectoryOnly);
+                if (filePaths.Length == 0) {
+                    throw new FileNotFoundException($"指定されたファイル名 '{searchFileName}' のファイルが '{directoryPath}' に見つかりません。");
+                }
+
+                string filePath;
+
+                if (filePaths.Length == 1) {
+                    // ファイルが1つだけ見つかった場合は、それを自動的に選択
+                    filePath = filePaths[0];
+                }
+                else {
+                    MessageBox.Show("複数のファイルが見つかりました。1つ選択してください。");
+                    // 複数のファイルが見つかった場合は、OpenFileDialog を使用してユーザーに選択させる
+                    using var openFileDialog = new OpenFileDialog();
+                    openFileDialog.InitialDirectory = directoryPath;
+                    openFileDialog.Filter = "Excel ファイル (*.xlsx)|*.xlsx|すべてのファイル (*.*)|*.*";
+
+                    // 複数ファイル選択を無効にする
+                    openFileDialog.Multiselect = false;
+
+                    // ファイル選択ダイアログを表示
+                    if (openFileDialog.ShowDialog() == DialogResult.OK) {
+                        filePath = openFileDialog.FileName;
+                    }
+                    else {
+                        // キャンセルされた場合は、処理を中止
+                        throw new OperationCanceledException("ファイル選択がキャンセルされました。");
+                    }
+                }
+
+                try {
+                    FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    return new XSSFWorkbook(fileStreamReport);
+                } catch (Exception ex) {
+                    throw new Exception($"レポートテンプレートの読み込み中にエラーが発生しました: {ex.Message}", ex);
+                }
+            }
+
+            // レポートシートに製品情報を挿入する
+            private static void PopulateReportSheet(XSSFWorkbook reportWorkbook, ProductInformation productInfo, ReportConfig config) {
+                var workSheetTemp = reportWorkbook.GetSheet(config.SheetName) ?? throw new Exception($"シート '{config.SheetName}' が見つかりません。");
+
+                var productNumber = productInfo.ProductNumber.Split('-')[0] ?? string.Empty;
+                SetValue(config.ProductNumberRange, productNumber);
+                SetValue(config.OrderNumberRange, productInfo.OrderNumber);
+                SetValue(config.QuantityRange, productInfo.Quantity.ToString());
+                SetValue(config.SerialFirstRange, productInfo.SerialFirst);
+                SetValue(config.SerialLastRange, productInfo.SerialLast);
+                SetValue(config.ProductModelRange, productInfo.ProductModel);
+
+                void SetValue(string? address, string? value) {
+                    if (string.IsNullOrEmpty(address) || string.IsNullOrEmpty(value)) { return; }
+                    GetRowColFromAddress(address, out int rowIndex, out int colIndex);
+                    IRow row = workSheetTemp.GetRow(rowIndex) ?? workSheetTemp.CreateRow(rowIndex);
+                    ICell cell = row.GetCell(colIndex) ?? row.CreateCell(colIndex);
+                    cell.SetCellValue(value);
+                }
+                static int ColumnNameToIndex(string columnName) {
+                    int index = 0;
+                    foreach (char c in columnName.ToUpper()) {
+                        if (c < 'A' || c > 'Z') throw new ArgumentException("Invalid column name");
+                        index = index * 26 + (c - 'A' + 1);
+                    }
+                    return index - 1; // 0始まり
+                }
+                static void GetRowColFromAddress(string address, out int rowIndex, out int colIndex) {
+                    // 数字の位置を検索
+                    int i = 0;
+                    while (i < address.Length && char.IsLetter(address[i])) i++;
+
+                    string colPart = address.Substring(0, i);   // "A"
+                    string rowPart = address.Substring(i);      // "2"
+
+                    colIndex = ColumnNameToIndex(colPart);
+                    rowIndex = int.Parse(rowPart) - 1; // 0始まり
+                }
+            }
+
+            // 変更されたレポートをファイルに保存する
+            private static void SaveReport(XSSFWorkbook reportWorkbook, ProductInformation productInfo, ReportConfig config) {
+                var fileName = config.FileName;
+                var fileExtension = config.FileExtension;
+                var initialDirectory = config.SaveDirectory;
+
+                using SaveFileDialog saveFileDialog = new() {
+                    Filter = $"Excel Files (*{fileExtension})|*{fileExtension}|All Files (*.*)|*.*",
+                    FileName = $"{fileName} のコピー{productInfo.ProductNumber}{fileExtension}",
+                    Title = "保存先を選択してください",
+                    InitialDirectory = initialDirectory ?? Environment.CurrentDirectory // Nullの場合はデフォルトディレクトリを使用
+                };
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK) {
+                    var outputPath = saveFileDialog.FileName;
+
+                    using var fs3 = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
+                    reportWorkbook.Write(fs3);
+                }
+                else {
+                    // ユーザーが保存をキャンセルした場合の処理
+                    throw new OperationCanceledException("キャンセルされました。");
+                }
+            }
+        }
+        public static class ReportGeneratorEPPlus {
             // レポートを生成するメインメソッド
-            public static void GenerateReport(ProductInformation productInfo) {
+            public static void GenerateReportEPPlus(ProductInformation productInfo) {
                 try {
                     // 1. 設定ファイルを読み込み、レポート設定を取得
                     var configWorkbook = LoadConfigWorkbook();
