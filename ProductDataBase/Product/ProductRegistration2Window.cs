@@ -1019,7 +1019,7 @@ namespace ProductDatabase {
         // 成績書作成
         private void GenerateReport() {
             try {
-                ReportGenerator.GenerateReport(ProductInfo);
+                ReportGeneratorNPOI.GenerateReportNPOI(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
