@@ -21,7 +21,7 @@ namespace ProductDatabase {
         ];
 
         // プロパティ設定
-        private bool IsLabelPrint => ProductInfo.PrintType is 1;
+        private bool IsLabelPrint => ProductInfo.SerialPrintType is 1;
         private bool IsRegistration => ProductInfo.RegType is 0 or 1;
 
         public SubstrateRegistrationWindow(ProductInformation productInfo) {
@@ -533,7 +533,8 @@ namespace ProductDatabase {
                     {"ProductNumber", $"{ProductInfo.ProductNumber}"},
                     {"Initial", $"{ProductInfo.Initial}"},
                     {"RegType", $"{ProductInfo.RegType}"},
-                    {"PrintType", $"{ProductInfo.PrintType}"}
+                    {"SerialPrintType", $"{ProductInfo.SerialPrintType}"},
+                    {"SheetPrintType", $"{ProductInfo.SheetPrintType}"},
                 };
 
             var form = new Form {

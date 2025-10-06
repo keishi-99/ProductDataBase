@@ -477,7 +477,8 @@ namespace ProductDatabase {
                     {"SerialFirstNumber", $"{ProductInfo.SerialFirstNumber}"},
                     {"SerialLastNumber", $"{ProductInfo.SerialLastNumber}"},
                     {"Initial", $"{ProductInfo.Initial}"},
-                    {"PrintType", $"{ProductInfo.PrintType}"},
+                    {"SerialPrintType", $"{ProductInfo.SerialPrintType}"},
+                    {"SheetPrintType", $"{ProductInfo.SheetPrintType}"},
                     {"SerialDigit", $"{ProductInfo.SerialDigit}"}
                 };
 

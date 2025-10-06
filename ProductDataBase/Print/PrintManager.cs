@@ -25,7 +25,7 @@ namespace ProductDatabase.Print {
         public static int CopiesRemainingPerSerial { get; private set; }
         public static int PageCount { get; private set; }
 
-        public static int PrintType => ProductInfo?.PrintType ?? throw new InvalidOperationException("PrintManager が初期化されていません。");
+        public static int SerialPrintType => ProductInfo?.SerialPrintType ?? throw new InvalidOperationException("PrintManager が初期化されていません。");
 
         private static List<string> s_serialList = [];
 
@@ -109,7 +109,7 @@ namespace ProductDatabase.Print {
                         // タイプ4で残り1の場合、最後のラベルに下線をつける
                         var fontUnderline = IsUnderlinePrint && isLastCopy;
 
-                        var printText = PrintType switch {
+                        var printText = SerialPrintType switch {
                             9 when isLastCopy => Last4ProductModel,
                             _ => s_serialList[PrintCount]
                         };
