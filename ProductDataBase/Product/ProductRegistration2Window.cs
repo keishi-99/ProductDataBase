@@ -869,7 +869,7 @@ namespace ProductDatabase {
                 var startLine = serialType switch {
                     "Label" => (int)SerialPrintPositionNumericUpDown.Value - 1,
                     "Barcode" => (int)BarcodePrintPositionNumericUpDown.Value - 1,
-                    _ => throw new Exception("PrintType unknown")
+                    _ => throw new Exception("SerialPrintType unknown")
                 };
 
                 pd.BeginPrint += (sender, e) => {
