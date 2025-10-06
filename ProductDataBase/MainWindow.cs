@@ -51,7 +51,8 @@ namespace ProductDatabase {
             public string SerialLast { get; set; } = string.Empty;
 
             private int _regType;
-            private int _printType;
+            private int _serialPrintType;
+            private int _sheetPrintType;
 
             public int RegType {
                 get => _regType;
@@ -61,18 +62,26 @@ namespace ProductDatabase {
                 }
             }
 
-            public int PrintType {
-                get => _printType;
+            public int SerialPrintType {
+                get => _serialPrintType;
                 set {
-                    _printType = value;
+                    _serialPrintType = value;
+                    UpdatePrintFlags();
+                }
+            }
+
+            public int SheetPrintType {
+                get => _sheetPrintType;
+                set {
+                    _sheetPrintType = value;
                     UpdatePrintFlags();
                 }
             }
 
             public bool IsLabelPrint { get; private set; }
             public bool IsBarcodePrint { get; private set; }
-            public bool IsListPrint { get; private set; }
             public bool IsCheckSheetPrint { get; private set; }
+            public bool IsListPrint { get; private set; }
             public bool IsLast4Digits { get; private set; }
             public bool IsRegType9 { get; private set; }
             public bool IsSerialGeneration { get; private set; }
@@ -80,7 +89,8 @@ namespace ProductDatabase {
 
             private void UpdatePrintFlags() {
                 UpdateRegTypeFlags();
-                UpdatePrintTypeFlags();
+                UpdateSerialPrintTypeFlags();
+                UpdateSheetPrintTypeFlags();
             }
 
             private void UpdateRegTypeFlags() {
@@ -88,13 +98,16 @@ namespace ProductDatabase {
                 IsSerialGeneration = RegType is 1 or 2 or 3 or 9;
             }
 
-            private void UpdatePrintTypeFlags() {
-                IsLabelPrint = PrintType is 1 or 3 or 4 or 5 or 6 or 7 or 9;
-                IsBarcodePrint = PrintType is 2 or 3 or 8;
-                IsListPrint = (PrintType is 5 or 6) && !IsRegType9;
-                IsCheckSheetPrint = (PrintType is 6 or 7 or 8) && !IsRegType9;
-                IsLast4Digits = (PrintType == 9) && !IsRegType9;
-                IsUnderlinePrint = (PrintType == 4) && !IsRegType9;
+            private void UpdateSerialPrintTypeFlags() {
+                IsLabelPrint = SerialPrintType is 1 or 3 or 4 or 5 or 6 or 7 or 9;
+                IsBarcodePrint = SerialPrintType is 2 or 3 or 8;
+                IsLast4Digits = (SerialPrintType == 9) && !IsRegType9;
+                IsUnderlinePrint = (SerialPrintType == 4) && !IsRegType9;
+            }
+
+            private void UpdateSheetPrintTypeFlags() {
+                IsCheckSheetPrint = (SheetPrintType is 1 or 3) && !IsRegType9;
+                IsListPrint = (SheetPrintType is 2 or 3) && !IsRegType9;
             }
 
             public int Quantity { get; set; }
@@ -296,7 +309,8 @@ namespace ProductDatabase {
                 ProductInfo.SubstrateName = selectedRows[0]["SubstrateName"].ToString() ?? string.Empty;
                 ProductInfo.SubstrateModel = selectedRows[0]["SubstrateModel"].ToString() ?? string.Empty;
                 ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
-                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["PrintType"] ?? throw new Exception("PrintType is null"));
+                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+                ProductInfo.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
                 ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
                 using SubstrateRegistrationWindow window = new(ProductInfo);
                 window.ShowDialog(this);
@@ -311,7 +325,8 @@ namespace ProductDatabase {
                 ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
                 ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
                 ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
-                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["PrintType"] ?? throw new Exception("PrintType is null"));
+                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+                ProductInfo.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
                 ProductInfo.SerialType = Convert.ToInt32(selectedRows[0]["SerialType"] ?? throw new Exception("SerialType is null"));
                 ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
                 ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
@@ -330,7 +345,8 @@ namespace ProductDatabase {
                 ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
                 ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
                 ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
-                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["PrintType"] ?? throw new Exception("PrintType is null"));
+                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+                ProductInfo.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
                 ProductInfo.SerialType = Convert.ToInt32(selectedRows[0]["SerialType"] ?? throw new Exception("SerialType is null"));
                 ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
                 ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
@@ -345,7 +361,8 @@ namespace ProductDatabase {
 
             if (selectedRows.Length > 0) {
                 ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
-                ProductInfo.PrintType = Convert.ToInt32(selectedRows[0]["PrintType"] ?? throw new Exception("PrintType is null"));
+                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+                ProductInfo.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
                 ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
                 ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
                 ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
@@ -385,7 +402,8 @@ namespace ProductDatabase {
                             if (!string.IsNullOrEmpty(listBox3)) {
                                 ProductInfo.SubstrateName = selectedRow[0]["SubstrateName"].ToString() ?? string.Empty;
                                 ProductInfo.SubstrateModel = selectedRow[0]["SubstrateModel"].ToString() ?? string.Empty;
-                                ProductInfo.PrintType = Convert.ToInt32(selectedRow[0]["PrintType"] ?? throw new Exception("RegType is null"));
+                                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRow[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+                                ProductInfo.SheetPrintType = Convert.ToInt32(selectedRow[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
                                 ProductInfo.RegType = Convert.ToInt32(selectedRow[0]["RegType"] ?? throw new Exception("RegType is null"));
                             }
                             break;
@@ -401,7 +419,8 @@ namespace ProductDatabase {
                             if (!string.IsNullOrEmpty(listBox3)) {
                                 ProductInfo.ProductType = selectedRow[0]["ProductType"].ToString() ?? string.Empty;
                                 ProductInfo.ProductModel = selectedRow[0]["ProductModel"].ToString() ?? string.Empty;
-                                ProductInfo.PrintType = Convert.ToInt32(selectedRow[0]["PrintType"] ?? throw new Exception("RegType is null"));
+                                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRow[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+                                ProductInfo.SheetPrintType = Convert.ToInt32(selectedRow[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
                                 ProductInfo.RegType = Convert.ToInt32(selectedRow[0]["RegType"] ?? throw new Exception("RegType is null"));
                             }
                             break;
@@ -720,7 +739,8 @@ namespace ProductDatabase {
             ProductInfo.SubstrateModel = substrateRet[0]["SubstrateModel"].ToString() ?? string.Empty;
             ProductInfo.Initial = string.Empty;
             ProductInfo.RegType = Convert.ToInt32(substrateRet[0]["RegType"] ?? throw new Exception("RegType is null"));
-            ProductInfo.PrintType = Convert.ToInt32(substrateRet[0]["PrintType"] ?? throw new Exception("PrintType is null"));
+            ProductInfo.SerialPrintType = Convert.ToInt32(substrateRet[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+            ProductInfo.SheetPrintType = Convert.ToInt32(substrateRet[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
             ProductInfo.CheckBin = Convert.ToInt32(substrateRet[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
             using SubstrateRegistrationWindow window = new(ProductInfo);
             window.ShowDialog(this);
@@ -746,7 +766,8 @@ namespace ProductDatabase {
             ProductInfo.Initial = productRet[0]["Initial"].ToString() ?? string.Empty;
             ProductInfo.RevisionGroup = Convert.ToInt32(productRet[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
             ProductInfo.RegType = Convert.ToInt32(productRet[0]["RegType"] ?? throw new Exception("RegType is null"));
-            ProductInfo.PrintType = Convert.ToInt32(productRet[0]["PrintType"] ?? throw new Exception("PrintType is null"));
+            ProductInfo.SerialPrintType = Convert.ToInt32(productRet[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+            ProductInfo.SheetPrintType = Convert.ToInt32(productRet[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
             ProductInfo.CheckBin = Convert.ToInt32(productRet[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
             ProductInfo.SerialType = Convert.ToInt32(productRet[0]["SerialType"] ?? throw new Exception("SerialType is null"));
             using ProductRegistration1Window window = new(ProductInfo);

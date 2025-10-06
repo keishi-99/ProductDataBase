@@ -1059,7 +1059,8 @@ namespace ProductDatabase {
                     {"SerialLastNumber", $"{_serialLastNumber}"},
                     {"Initial", $"{ProductInfo.Initial}"},
                     {"RegType", $"{ProductInfo.RegType}"},
-                    {"PrintType", $"{ProductInfo.PrintType}"},
+                    {"SerialPrintType", $"{ProductInfo.SerialPrintType}"},
+                    {"SheetPrintType", $"{ProductInfo.SheetPrintType}"},
                     {"SerialDigit", $"{ProductInfo.SerialDigit}"}
                 };
 
