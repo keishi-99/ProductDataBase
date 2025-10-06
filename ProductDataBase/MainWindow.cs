@@ -439,8 +439,8 @@ namespace ProductDatabase {
             Dictionary<string, (int Number, string Sql)> radioButtonMap = new() {
                 ["1"] = (1, "SELECT * FROM Substrate WHERE Visible = 1 ORDER BY SortNumber ASC;"),
                 ["2"] = (2, "SELECT * FROM Product WHERE Visible = 1 ORDER BY SortNumber ASC;"),
-                ["3"] = (3, "SELECT * FROM Product WHERE Visible = 1 AND PrintType != 0 ORDER BY SortNumber ASC;"),
-                ["4"] = (4, "SELECT * FROM Product WHERE Visible = 1 AND (PrintType = 5 OR PrintType = 6) ORDER BY SortNumber ASC;")
+                ["3"] = (3, "SELECT * FROM Product WHERE Visible = 1 AND SerialPrintType != 0 ORDER BY SortNumber ASC;"),
+                ["4"] = (4, "SELECT * FROM Product WHERE Visible = 1 AND (SerialPrintType = 5 OR SerialPrintType = 6) ORDER BY SortNumber ASC;")
             };
 
             try {

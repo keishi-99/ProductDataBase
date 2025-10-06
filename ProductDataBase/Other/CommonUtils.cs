@@ -294,7 +294,7 @@ namespace ProductDatabase.Other {
 
             // レポートテンプレートExcelワークブックを読み込む
             private static XSSFWorkbook LoadReportTemplate(string directoryPath, string searchFileName) {
-                var filePaths = Directory.GetFiles(directoryPath, $"*{searchFileName}*", SearchOption.TopDirectoryOnly);
+                var filePaths = Directory.GetFiles(directoryPath, $"{searchFileName}*", SearchOption.TopDirectoryOnly);
                 if (filePaths.Length == 0) {
                     throw new FileNotFoundException($"指定されたファイル名 '{searchFileName}' のファイルが '{directoryPath}' に見つかりません。");
                 }
@@ -310,7 +310,7 @@ namespace ProductDatabase.Other {
                     // 複数のファイルが見つかった場合は、OpenFileDialog を使用してユーザーに選択させる
                     using var openFileDialog = new OpenFileDialog();
                     openFileDialog.InitialDirectory = directoryPath;
-                    openFileDialog.Filter = "Excel ファイル (*.xlsx)|*.xlsx|すべてのファイル (*.*)|*.*";
+                    openFileDialog.Filter = "Excel ファイル|*.xlsx,*.xlsm|すべてのファイル (*.*)|*.*";
 
                     // 複数ファイル選択を無効にする
                     openFileDialog.Multiselect = false;
@@ -380,7 +380,7 @@ namespace ProductDatabase.Other {
                 var initialDirectory = config.SaveDirectory;
 
                 using SaveFileDialog saveFileDialog = new() {
-                    Filter = $"Excel Files (*{fileExtension})|*{fileExtension}|All Files (*.*)|*.*",
+                    Filter = $"Excel Files|*.xlsx,*.xlsm|All Files (*.*)|*.*",
                     FileName = $"{fileName} のコピー{productInfo.ProductNumber}{fileExtension}",
                     Title = "保存先を選択してください",
                     InitialDirectory = initialDirectory ?? Environment.CurrentDirectory // Nullの場合はデフォルトディレクトリを使用

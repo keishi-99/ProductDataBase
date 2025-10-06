@@ -176,7 +176,7 @@ namespace ProductDatabase {
                     "Reprint", new Dictionary<string, string>
                     {
                         { "ID", "ID" },
-                        { "PrintType", "印刷対象" },
+                        { "SerialPrintType", "印刷対象" },
                         { "ProductName", "製品名" },
                         { "OrderNumber", "注文番号" },
                         { "ProductNumber", "製造番号" },

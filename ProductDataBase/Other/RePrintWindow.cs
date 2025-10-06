@@ -131,16 +131,16 @@ namespace ProductDatabase {
                 cmd.CommandText =
                     $"""
                     INSERT INTO Reprint (
-                        PrintType, OrderNumber, ProductName, ProductNumber, ProductType, ProductModel, Quantity, Person, RegDate, Revision, SerialFirst, SerialLast, Comment
+                        SerialPrintType, OrderNumber, ProductName, ProductNumber, ProductType, ProductModel, Quantity, Person, RegDate, Revision, SerialFirst, SerialLast, Comment
                         )
                     VALUES (
-                        @PrintType, @OrderNumber, @ProductName, @ProductNumber, @ProductType, @ProductModel, @Quantity, @Person, @RegDate, @Revision, @SerialFirst, @SerialLast, @Comment
+                        @SerialPrintType, @OrderNumber, @ProductName, @ProductNumber, @ProductType, @ProductModel, @Quantity, @Person, @RegDate, @Revision, @SerialFirst, @SerialLast, @Comment
                         )
                     ;
                     """;
 
                 // チェックボックスにチェックがない場合はNullを
-                cmd.Parameters.Add("@PrintType", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_serialType) ? DBNull.Value : _serialType;
+                cmd.Parameters.Add("@SerialPrintType", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_serialType) ? DBNull.Value : _serialType;
                 cmd.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
                 cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductName) ? DBNull.Value : ProductInfo.ProductName;
                 cmd.Parameters.Add("@ProductNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
