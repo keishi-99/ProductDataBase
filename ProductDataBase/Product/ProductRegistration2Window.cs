@@ -1019,7 +1019,7 @@ namespace ProductDatabase {
         // 成績書作成
         private void GenerateReport() {
             try {
-                ReportGeneratorNPOI.GenerateReportNPOI(ProductInfo);
+                ReportGeneratorNPOI.GenerateReport(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -1027,7 +1027,7 @@ namespace ProductDatabase {
         // リスト作成
         private void GenerateList() {
             try {
-                ListGenerator.GenerateList(ProductInfo);
+                ListGeneratorNPOI.GenerateList(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -1035,7 +1035,7 @@ namespace ProductDatabase {
         // チェックシート作成
         private void GenerateCheckSheet() {
             try {
-                CheckSheetGenerator.GenerateCheckSheetNPOI(ProductInfo);
+                CheckSheetGeneratorNPOI.GenerateCheckSheet(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
