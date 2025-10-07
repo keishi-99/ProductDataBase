@@ -738,7 +738,6 @@ namespace ProductDatabase {
             ProductInfo.Initial = string.Empty;
             ProductInfo.RegType = Convert.ToInt32(substrateRet[0]["RegType"] ?? throw new Exception("RegType is null"));
             ProductInfo.SerialPrintType = Convert.ToInt32(substrateRet[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-            ProductInfo.SheetPrintType = Convert.ToInt32(substrateRet[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
             ProductInfo.CheckBin = Convert.ToInt32(substrateRet[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
             using SubstrateRegistrationWindow window = new(ProductInfo);
             window.ShowDialog(this);
