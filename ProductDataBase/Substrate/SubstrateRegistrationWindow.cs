@@ -534,7 +534,6 @@ namespace ProductDatabase {
                     {"Initial", $"{ProductInfo.Initial}"},
                     {"RegType", $"{ProductInfo.RegType}"},
                     {"SerialPrintType", $"{ProductInfo.SerialPrintType}"},
-                    {"SheetPrintType", $"{ProductInfo.SheetPrintType}"},
                 };
 
             var form = new Form {
