@@ -301,7 +301,7 @@ namespace ProductDatabase.Other {
 
                 string filePath;
 
-                if (filePaths.Length == 0) {
+                if (filePaths.Length == 1) {
                     // ファイルが1つだけ見つかった場合は、それを自動的に選択
                     filePath = filePaths[0];
                 }
@@ -481,7 +481,7 @@ namespace ProductDatabase.Other {
 
             // レポートテンプレートExcelワークブックを読み込む
             private static ExcelPackage LoadReportTemplate(string directoryPath, string searchFileName) {
-                var filePaths = Directory.GetFiles(directoryPath, $"*{searchFileName}*", SearchOption.AllDirectories);
+                var filePaths = Directory.GetFiles(directoryPath, $"{searchFileName}*", SearchOption.AllDirectories);
                 if (filePaths.Length == 0) {
                     throw new FileNotFoundException($"指定されたファイル名 '{searchFileName}' のファイルが '{directoryPath}' に見つかりません。");
                 }
