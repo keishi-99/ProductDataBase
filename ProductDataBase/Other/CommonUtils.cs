@@ -301,7 +301,7 @@ namespace ProductDatabase.Other {
 
                 string filePath;
 
-                if (filePaths.Length == 1) {
+                if (filePaths.Length == 0) {
                     // ファイルが1つだけ見つかった場合は、それを自動的に選択
                     filePath = filePaths[0];
                 }
@@ -310,7 +310,7 @@ namespace ProductDatabase.Other {
                     // 複数のファイルが見つかった場合は、OpenFileDialog を使用してユーザーに選択させる
                     using var openFileDialog = new OpenFileDialog();
                     openFileDialog.InitialDirectory = directoryPath;
-                    openFileDialog.Filter = "Excel ファイル|*.xlsx,*.xlsm|すべてのファイル (*.*)|*.*";
+                    openFileDialog.Filter = "Excel ファイル|*.xlsx;*.xlsm|すべてのファイル (*.*)|*.*";
 
                     // 複数ファイル選択を無効にする
                     openFileDialog.Multiselect = false;
@@ -380,7 +380,7 @@ namespace ProductDatabase.Other {
                 var initialDirectory = config.SaveDirectory;
 
                 using SaveFileDialog saveFileDialog = new() {
-                    Filter = $"Excel Files|*.xlsx,*.xlsm|All Files (*.*)|*.*",
+                    Filter = $"*{fileExtension}|*{fileExtension}|All Files (*.*)|*.*",
                     FileName = $"{fileName} のコピー{productInfo.ProductNumber}{fileExtension}",
                     Title = "保存先を選択してください",
                     InitialDirectory = initialDirectory ?? Environment.CurrentDirectory // Nullの場合はデフォルトディレクトリを使用
@@ -497,7 +497,7 @@ namespace ProductDatabase.Other {
                     // 複数のファイルが見つかった場合は、OpenFileDialog を使用してユーザーに選択させる
                     using var openFileDialog = new OpenFileDialog();
                     openFileDialog.InitialDirectory = directoryPath;
-                    openFileDialog.Filter = "Excel ファイル (*.xlsx)|*.xlsx|すべてのファイル (*.*)|*.*";
+                    openFileDialog.Filter = "Excel ファイル|*.xlsx;*.xlsm|すべてのファイル (*.*)|*.*";
 
                     // 複数ファイル選択を無効にする
                     openFileDialog.Multiselect = false;
