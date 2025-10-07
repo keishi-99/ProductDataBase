@@ -257,7 +257,7 @@ namespace ProductDatabase.Other {
                 var searchName = GetCellValue(resultRow.GetCell(3))?.Trim('"') ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(searchName)) { throw new Exception("Configのファイル名が無効です。"); }
 
-                var filePaths = Directory.GetFiles(directoryPath, $"*{searchName}*", SearchOption.TopDirectoryOnly);
+                var filePaths = Directory.GetFiles(directoryPath, $"*{searchName}*", SearchOption.AllDirectories);
                 var filePath = filePaths[0];
                 var fileName = Path.GetFileNameWithoutExtension(filePath);
                 var fileExtension = Path.GetExtension(filePath).ToLower();
@@ -294,7 +294,7 @@ namespace ProductDatabase.Other {
 
             // レポートテンプレートExcelワークブックを読み込む
             private static XSSFWorkbook LoadReportTemplate(string directoryPath, string searchFileName) {
-                var filePaths = Directory.GetFiles(directoryPath, $"{searchFileName}*", SearchOption.TopDirectoryOnly);
+                var filePaths = Directory.GetFiles(directoryPath, $"{searchFileName}*", SearchOption.AllDirectories);
                 if (filePaths.Length == 0) {
                     throw new FileNotFoundException($"指定されたファイル名 '{searchFileName}' のファイルが '{directoryPath}' に見つかりません。");
                 }
@@ -455,7 +455,7 @@ namespace ProductDatabase.Other {
                 var searchName = workSheetMain.Cells[searchAddressResultRow, 4].Value?.ToString()?.Trim('"');
                 if (string.IsNullOrWhiteSpace(searchName)) { throw new Exception("Configのファイル名が無効です。"); }
 
-                var filePaths = Directory.GetFiles(directoryPath, $"*{searchName}*", SearchOption.TopDirectoryOnly);
+                var filePaths = Directory.GetFiles(directoryPath, $"*{searchName}*", SearchOption.AllDirectories);
                 var filePath = filePaths[0];
                 var fileName = Path.GetFileNameWithoutExtension(filePath);
                 var fileExtension = Path.GetExtension(filePath).ToLower();
@@ -481,7 +481,7 @@ namespace ProductDatabase.Other {
 
             // レポートテンプレートExcelワークブックを読み込む
             private static ExcelPackage LoadReportTemplate(string directoryPath, string searchFileName) {
-                var filePaths = Directory.GetFiles(directoryPath, $"*{searchFileName}*", SearchOption.TopDirectoryOnly);
+                var filePaths = Directory.GetFiles(directoryPath, $"*{searchFileName}*", SearchOption.AllDirectories);
                 if (filePaths.Length == 0) {
                     throw new FileNotFoundException($"指定されたファイル名 '{searchFileName}' のファイルが '{directoryPath}' に見つかりません。");
                 }
