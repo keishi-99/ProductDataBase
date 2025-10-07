@@ -402,7 +402,6 @@ namespace ProductDatabase {
                                 ProductInfo.SubstrateName = selectedRow[0]["SubstrateName"].ToString() ?? string.Empty;
                                 ProductInfo.SubstrateModel = selectedRow[0]["SubstrateModel"].ToString() ?? string.Empty;
                                 ProductInfo.SerialPrintType = Convert.ToInt32(selectedRow[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-                                ProductInfo.SheetPrintType = Convert.ToInt32(selectedRow[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
                                 ProductInfo.RegType = Convert.ToInt32(selectedRow[0]["RegType"] ?? throw new Exception("RegType is null"));
                             }
                             break;
