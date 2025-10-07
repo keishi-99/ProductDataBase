@@ -170,7 +170,24 @@ namespace ProductDatabase.Other {
         }
 
         // 成績書生成データを保持するクラス
-        public class ReportConfig {
+        public class ReportConfigNPOI {
+            public required string DirectoryPath { get; set; }
+            public required string FilePath { get; set; }
+            public required string FileName { get; set; }
+            public required string FileExtension { get; set; }
+            public required string SearchFileName { get; set; }
+            public required string SheetName { get; set; }
+            public string? ProductNumberRange { get; set; }
+            public string? OrderNumberRange { get; set; }
+            public string? QuantityRange { get; set; }
+            public string? SerialFirstRange { get; set; }
+            public string? SerialLastRange { get; set; }
+            public string? ProductModelRange { get; set; }
+            public string? SaveDirectory { get; set; }
+        }
+        public class ReportConfigEPPlus {
+            public required ExcelWorksheet Sheet { get; set; }
+            public required int Row { get; set; }
             public required string DirectoryPath { get; set; }
             public required string FilePath { get; set; }
             public required string FileName { get; set; }
@@ -225,7 +242,7 @@ namespace ProductDatabase.Other {
             }
 
             // 設定ワークブックから製品に対応する設定を抽出する
-            private static ReportConfig GetReportConfig(XSSFWorkbook configWorkbook, string productModel) {
+            private static ReportConfigNPOI GetReportConfig(XSSFWorkbook configWorkbook, string productModel) {
                 var workSheetMain = configWorkbook.GetSheet("Sheet1") ?? throw new Exception("設定ファイルに 'Sheet1' が見つかりません。");
 
                 var targetColumnIndex = 0;
@@ -266,7 +283,7 @@ namespace ProductDatabase.Other {
                 var sheetName = GetCellValue(resultRow.GetCell(4)) ?? string.Empty;
                 return string.IsNullOrWhiteSpace(sheetName)
                     ? throw new Exception("シート名がありません。")
-                    : new ReportConfig {
+                    : new ReportConfigNPOI {
                         DirectoryPath = directoryPath,
                         FilePath = filePath,
                         FileName = fileName,
@@ -336,7 +353,7 @@ namespace ProductDatabase.Other {
             }
 
             // レポートシートに製品情報を挿入する
-            private static void PopulateReportSheet(XSSFWorkbook reportWorkbook, ProductInformation productInfo, ReportConfig config) {
+            private static void PopulateReportSheet(XSSFWorkbook reportWorkbook, ProductInformation productInfo, ReportConfigNPOI config) {
                 var workSheetTemp = reportWorkbook.GetSheet(config.SheetName) ?? throw new Exception($"シート '{config.SheetName}' が見つかりません。");
 
                 var productNumber = productInfo.ProductNumber.Split('-')[0] ?? string.Empty;
@@ -376,7 +393,7 @@ namespace ProductDatabase.Other {
             }
 
             // 変更されたレポートをファイルに保存する
-            private static void SaveReport(XSSFWorkbook reportWorkbook, ProductInformation productInfo, ReportConfig config) {
+            private static void SaveReport(XSSFWorkbook reportWorkbook, ProductInformation productInfo, ReportConfigNPOI config) {
                 var fileName = config.FileName;
                 var fileExtension = config.FileExtension;
                 var initialDirectory = config.SaveDirectory;
@@ -415,7 +432,13 @@ namespace ProductDatabase.Other {
                     // 3. レポートシートにデータを挿入
                     PopulateReportSheet(reportWorkbook, productInfo, reportConfig);
 
-                    // 4. レポートを保存
+                    // 4. データベースから使用済み基板情報を取得
+                    var usedSubstrate = GetUsedSubstrateData(productInfo);
+
+                    // 5. 基板情報のExcelへの書き込み
+                    UpdateSubstrateDetailsInExcel(reportWorkbook, reportConfig, usedSubstrate);
+
+                    // 6. レポートを保存
                     SaveReport(reportWorkbook, productInfo, reportConfig);
 
                     MessageBox.Show("成績書が正常に生成されました。", "完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -441,7 +464,7 @@ namespace ProductDatabase.Other {
             }
 
             // 設定ワークブックから製品に対応する設定を抽出する
-            private static ReportConfig GetReportConfig(ExcelPackage configWorkbook, string productModel) {
+            private static ReportConfigEPPlus GetReportConfig(ExcelPackage configWorkbook, string productModel) {
                 var sheet = configWorkbook.Workbook.Worksheets["Sheet1"]
                     ?? throw new Exception("設定ファイルに 'Sheet1' が見つかりません。");
 
@@ -476,7 +499,9 @@ namespace ProductDatabase.Other {
                 }
 
                 // --- ReportConfig を構築 ---
-                return new ReportConfig {
+                return new ReportConfigEPPlus {
+                    Sheet = sheet,
+                    Row = row,
                     DirectoryPath = directoryPath,
                     FilePath = filePath,
                     FileName = fileName,
@@ -517,7 +542,7 @@ namespace ProductDatabase.Other {
             }
 
             // レポートテンプレートExcelワークブックを読み込む
-            private static ExcelPackage LoadReportTemplate(ReportConfig config) {
+            private static ExcelPackage LoadReportTemplate(ReportConfigEPPlus config) {
                 var filePath = config.FilePath;
 
                 try {
@@ -529,7 +554,7 @@ namespace ProductDatabase.Other {
             }
 
             // レポートシートに製品情報を挿入する
-            private static void PopulateReportSheet(ExcelPackage reportWorkbook, ProductInformation productInfo, ReportConfig config) {
+            private static void PopulateReportSheet(ExcelPackage reportWorkbook, ProductInformation productInfo, ReportConfigEPPlus config) {
                 var workSheetTemp = reportWorkbook.Workbook.Worksheets[config.SheetName] ?? throw new Exception($"シート '{config.SheetName}' が見つかりません。");
 
                 var productNumber = productInfo.ProductNumber.Split('-')[0] ?? string.Empty;
@@ -547,8 +572,79 @@ namespace ProductDatabase.Other {
                 }
             }
 
+            // データベースから使用済み基板情報を取得するメソッド
+            private static List<(string SubstrateModel, List<string> SubstrateNumbers)> GetUsedSubstrateData(ProductInformation productInfo) {
+                List<(string, List<string>)> usedSubstrate = [];
+
+                using SqliteConnection con = new(GetConnectionRegistration());
+                con.Open();
+                using var cmd = con.CreateCommand();
+
+                var tableName = $"[{productInfo.CategoryName}_Substrate]";
+                cmd.CommandText =
+                    $"""
+                    SELECT
+                        SubstrateModel,
+                        SubstrateNumber,
+                        Decrease
+                    FROM
+                        {tableName}
+                    WHERE
+                        UseID = @ID
+                    ORDER BY
+                        SubstrateModel ASC
+                    ;
+                    """;
+                cmd.Parameters.Add("@ID", SqliteType.Text).Value = productInfo.ProductID;
+                using var dr = cmd.ExecuteReader();
+
+                while (dr.Read()) {
+                    var substrateModel = dr.GetString(0);
+                    var substrateNumber = dr.GetString(1);
+
+                    // 既存の substrateModel を検索し、見つかればリストに追加、なければ新しいエントリを作成
+                    var existingSubstrateIndex = usedSubstrate.FindIndex(x => x.Item1 == substrateModel);
+
+                    if (existingSubstrateIndex != -1) {
+                        usedSubstrate[existingSubstrateIndex].Item2.Add(substrateNumber);
+                    }
+                    else {
+                        List<string> substrateNumbers = [substrateNumber];
+                        usedSubstrate.Add((substrateModel, substrateNumbers));
+                    }
+                }
+                return usedSubstrate;
+            }
+
+            // 基板情報をExcelシートに書き込むメソッド
+            private static void UpdateSubstrateDetailsInExcel(ExcelPackage reportWorkbook, ReportConfigEPPlus config, List<(string SubstrateModel, List<string> SubstrateNumbers)> usedSubstrate) {
+                foreach (var (substrateModel, substrateNumbers) in usedSubstrate) {
+                    var targetRow = config.Row;
+                    var searchValue = substrateModel;
+                    var foundColumn = 0;
+
+                    var workSheetMain = config.Sheet;
+                    var searchAddressResult2 = workSheetMain.Cells
+                        .Where(x => x.Start.Row == targetRow && x.Value?.ToString() == searchValue)
+                        .FirstOrDefault();
+
+                    if (searchAddressResult2 == null) { continue; }
+
+                    foundColumn = searchAddressResult2.Start.Column;
+
+                    var mainCellValue = workSheetMain.Cells[targetRow, foundColumn + 1].Value?.ToString()
+                        ?? throw new Exception($"Configシートの行 {targetRow}, 列 {foundColumn + 1} にセル範囲が設定されていません。");
+
+                    var tempCellValue = string.Join(",", substrateNumbers.Select(substrateNumber => substrateNumber.Split('-')[0]));
+
+                    var workSheetTemp = reportWorkbook.Workbook.Worksheets[config.SheetName]
+                        ?? throw new Exception($"シート '{config.SheetName}' が見つかりません。");
+                    workSheetTemp.Cells[mainCellValue].Value = tempCellValue;
+                }
+            }
+
             // 変更されたレポートをファイルに保存する
-            private static void SaveReport(ExcelPackage reportWorkbook, ProductInformation productInfo, ReportConfig config) {
+            private static void SaveReport(ExcelPackage reportWorkbook, ProductInformation productInfo, ReportConfigEPPlus config) {
                 var fileName = config.FileName;
                 var fileExtension = config.FileExtension;
                 var initialDirectory = config.SaveDirectory;
