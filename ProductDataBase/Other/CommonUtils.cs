@@ -172,6 +172,7 @@ namespace ProductDatabase.Other {
         // 成績書生成データを保持するクラス
         public class ReportConfig {
             public required string DirectoryPath { get; set; }
+            public required string FilePath { get; set; }
             public required string FileName { get; set; }
             public required string FileExtension { get; set; }
             public required string SearchFileName { get; set; }
@@ -267,6 +268,7 @@ namespace ProductDatabase.Other {
                     ? throw new Exception("シート名がありません。")
                     : new ReportConfig {
                         DirectoryPath = directoryPath,
+                        FilePath = filePath,
                         FileName = fileName,
                         FileExtension = fileExtension,
                         SearchFileName = searchName,
@@ -365,8 +367,8 @@ namespace ProductDatabase.Other {
                     int i = 0;
                     while (i < address.Length && char.IsLetter(address[i])) i++;
 
-                    string colPart = address.Substring(0, i);   // "A"
-                    string rowPart = address.Substring(i);      // "2"
+                    string colPart = address[..i];   // "A"
+                    string rowPart = address[i..];      // "2"
 
                     colIndex = ColumnNameToIndex(colPart);
                     rowIndex = int.Parse(rowPart) - 1; // 0始まり
@@ -408,7 +410,7 @@ namespace ProductDatabase.Other {
                     var reportConfig = GetReportConfig(configWorkbook, productInfo.ProductModel);
 
                     // 2. レポートテンプレートを読み込み
-                    var reportWorkbook = LoadReportTemplate(reportConfig.DirectoryPath, reportConfig.SearchFileName);
+                    var reportWorkbook = LoadReportTemplate(reportConfig);
 
                     // 3. レポートシートにデータを挿入
                     PopulateReportSheet(reportWorkbook, productInfo, reportConfig);
@@ -440,77 +442,83 @@ namespace ProductDatabase.Other {
 
             // 設定ワークブックから製品に対応する設定を抽出する
             private static ReportConfig GetReportConfig(ExcelPackage configWorkbook, string productModel) {
-                var workSheetMain = configWorkbook.Workbook.Worksheets["Sheet1"] ?? throw new Exception("設定ファイルに 'Sheet1' が見つかりません。");
+                var sheet = configWorkbook.Workbook.Worksheets["Sheet1"]
+                    ?? throw new Exception("設定ファイルに 'Sheet1' が見つかりません。");
 
-                // セル検索
-                var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == productModel)
+                // --- 品目番号の検索 ---
+                var targetCell = sheet.Cells.FirstOrDefault(c => c.Start.Column == 1 && c.Value?.ToString() == productModel)
                     ?? throw new Exception($"Configに品目番号:[{productModel}]が見つかりません。");
-                var searchAddressResultRow = searchAddressResult.Start.Row;
+                int row = targetCell.Start.Row;
 
-                // ワークシートのセルから値を取得し、ReportConfigオブジェクトに格納
-                var directoryPath = workSheetMain.Cells[searchAddressResultRow, 3].Value?.ToString()?.Trim('"');
+                // --- パスとファイル名の取得 ---
+                string? directoryPath = sheet.Cells[row, 3].Value?.ToString()?.Trim('"')
+                    ?? sheet.Cells[2, 3].Value?.ToString()?.Trim('"');
                 if (string.IsNullOrWhiteSpace(directoryPath)) { throw new Exception("Configのファイルパスが無効です。"); }
-                if (!Directory.Exists(directoryPath)) { throw new FileNotFoundException($"指定されたフォルダが存在しません: {directoryPath}"); }
 
-                var searchName = workSheetMain.Cells[searchAddressResultRow, 4].Value?.ToString()?.Trim('"');
-                if (string.IsNullOrWhiteSpace(searchName)) { throw new Exception("Configのファイル名が無効です。"); }
+                if (!Directory.Exists(directoryPath)) {
+                    throw new DirectoryNotFoundException($"指定されたフォルダが存在しません: {directoryPath}");
+                }
 
-                var filePaths = Directory.GetFiles(directoryPath, $"*{searchName}*", SearchOption.AllDirectories);
-                var filePath = filePaths[0];
-                var fileName = Path.GetFileNameWithoutExtension(filePath);
-                var fileExtension = Path.GetExtension(filePath).ToLower();
+                string searchName = sheet.Cells[row, 4].Text.Trim('"');
+                if (string.IsNullOrWhiteSpace(searchName)) {
+                    throw new Exception("Configのファイル名が無効です。");
+                }
 
-                var sheetName = workSheetMain.Cells[searchAddressResultRow, 5].Value?.ToString();
-                return string.IsNullOrWhiteSpace(sheetName)
-                    ? throw new Exception("シート名がありません。")
-                    : new ReportConfig {
-                        DirectoryPath = directoryPath,
-                        FileName = fileName,
-                        FileExtension = fileExtension,
-                        SearchFileName = searchName,
-                        SheetName = sheetName,
-                        ProductNumberRange = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString() ?? string.Empty,
-                        OrderNumberRange = workSheetMain.Cells[searchAddressResultRow, 7].Value?.ToString() ?? string.Empty,
-                        QuantityRange = workSheetMain.Cells[searchAddressResultRow, 8].Value?.ToString() ?? string.Empty,
-                        SerialFirstRange = workSheetMain.Cells[searchAddressResultRow, 9].Value?.ToString() ?? string.Empty,
-                        SerialLastRange = workSheetMain.Cells[searchAddressResultRow, 10].Value?.ToString() ?? string.Empty,
-                        ProductModelRange = workSheetMain.Cells[searchAddressResultRow, 11].Value?.ToString() ?? string.Empty,
-                        SaveDirectory = workSheetMain.Cells[searchAddressResultRow, 12].Value?.ToString() ?? string.Empty
-                    };
+                // --- ファイル検索 ---
+                string filePath = FindExcelFile(directoryPath, searchName);
+                string fileName = Path.GetFileNameWithoutExtension(filePath);
+                string fileExtension = Path.GetExtension(filePath).ToLowerInvariant();
+
+                // --- シート名 ---
+                string sheetName = sheet.Cells[row, 5].Text;
+                if (string.IsNullOrWhiteSpace(sheetName)) {
+                    throw new Exception($"シート名 {sheetName} がありません。");
+                }
+
+                // --- ReportConfig を構築 ---
+                return new ReportConfig {
+                    DirectoryPath = directoryPath,
+                    FilePath = filePath,
+                    FileName = fileName,
+                    FileExtension = fileExtension,
+                    SearchFileName = searchName,
+                    SheetName = sheetName,
+                    ProductNumberRange = sheet.Cells[row, 6].Text ?? string.Empty,
+                    OrderNumberRange = sheet.Cells[row, 7].Text ?? string.Empty,
+                    QuantityRange = sheet.Cells[row, 8].Text ?? string.Empty,
+                    SerialFirstRange = sheet.Cells[row, 9].Text ?? string.Empty,
+                    SerialLastRange = sheet.Cells[row, 10].Text ?? string.Empty,
+                    ProductModelRange = sheet.Cells[row, 11].Text ?? string.Empty,
+                    SaveDirectory = sheet.Cells[row, 12].Text ?? string.Empty
+                };
+            }
+            private static string FindExcelFile(string directoryPath, string searchName) {
+                var filePaths = Directory.GetFiles(directoryPath, $"{searchName}*", SearchOption.AllDirectories);
+
+                if (filePaths.Length == 0)
+                    throw new FileNotFoundException($"'{searchName}' に一致するファイルが見つかりません ({directoryPath})");
+
+                if (filePaths.Length == 1)
+                    return Path.GetFullPath(filePaths[0]);
+
+                MessageBox.Show("複数のファイルが見つかりました。1つ選択してください。",
+                    "ファイル選択", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                using var dialog = new OpenFileDialog {
+                    InitialDirectory = directoryPath,
+                    Filter = "Excel ファイル|*.xlsx;*.xlsm|すべてのファイル (*.*)|*.*",
+                    Multiselect = false
+                };
+
+                if (dialog.ShowDialog() == DialogResult.OK)
+                    return dialog.FileName;
+
+                throw new OperationCanceledException("ファイル選択がキャンセルされました。");
             }
 
             // レポートテンプレートExcelワークブックを読み込む
-            private static ExcelPackage LoadReportTemplate(string directoryPath, string searchFileName) {
-                var filePaths = Directory.GetFiles(directoryPath, $"{searchFileName}*", SearchOption.AllDirectories);
-                if (filePaths.Length == 0) {
-                    throw new FileNotFoundException($"指定されたファイル名 '{searchFileName}' のファイルが '{directoryPath}' に見つかりません。");
-                }
-
-                string filePath;
-
-                if (filePaths.Length == 1) {
-                    // ファイルが1つだけ見つかった場合は、それを自動的に選択
-                    filePath = filePaths[0];
-                }
-                else {
-                    MessageBox.Show("複数のファイルが見つかりました。1つ選択してください。");
-                    // 複数のファイルが見つかった場合は、OpenFileDialog を使用してユーザーに選択させる
-                    using var openFileDialog = new OpenFileDialog();
-                    openFileDialog.InitialDirectory = directoryPath;
-                    openFileDialog.Filter = "Excel ファイル|*.xlsx;*.xlsm|すべてのファイル (*.*)|*.*";
-
-                    // 複数ファイル選択を無効にする
-                    openFileDialog.Multiselect = false;
-
-                    // ファイル選択ダイアログを表示
-                    if (openFileDialog.ShowDialog() == DialogResult.OK) {
-                        filePath = openFileDialog.FileName;
-                    }
-                    else {
-                        // キャンセルされた場合は、処理を中止
-                        throw new OperationCanceledException("ファイル選択がキャンセルされました。");
-                    }
-                }
+            private static ExcelPackage LoadReportTemplate(ReportConfig config) {
+                var filePath = config.FilePath;
 
                 try {
                     FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -575,7 +583,7 @@ namespace ProductDatabase.Other {
                     var (targetSheetName, productName, resultRow, resultRowIndex, workSheetMain) = LoadExcelConfiguration(workbook, productInfo.ProductModel);
 
                     // 2. 製品情報の設定とExcelへの書き込み
-                    var productCellRanges = GetProductCellRanges(workSheetMain, resultRow);
+                    var productCellRanges = GetProductCellRanges(resultRow);
                     var workSheetTemp = workbook.GetSheet(targetSheetName) ?? throw new Exception($"テンプレートシート:[{targetSheetName}]が見つかりません。");
                     PopulateProductDetails(workSheetTemp, productInfo, productCellRanges, productName);
 
@@ -647,7 +655,7 @@ namespace ProductDatabase.Other {
             }
 
             // 製品情報に関連するExcelのセル範囲を取得するヘルパーメソッド
-            private static ProductCellRanges GetProductCellRanges(ISheet workSheetMain, IRow resultRow) {
+            private static ProductCellRanges GetProductCellRanges(IRow resultRow) {
                 return new ProductCellRanges {
                     ProductNameRange = GetCellValue(resultRow.GetCell(3)) ?? string.Empty,
                     ProductNumberRange = GetCellValue(resultRow.GetCell(4)) ?? string.Empty,
@@ -891,7 +899,7 @@ namespace ProductDatabase.Other {
                 anchor.AnchorType = AnchorType.DontMoveAndResize;
 
                 // 画像を作成
-                var picture = drawing.CreatePicture(anchor, pictureIdx);
+                drawing.CreatePicture(anchor, pictureIdx);
 
                 anchor.Col1 = colIndex;   // 左上列
                 anchor.Row1 = rowIndex;   // 左上行
@@ -912,8 +920,8 @@ namespace ProductDatabase.Other {
                 int i = 0;
                 while (i < address.Length && char.IsLetter(address[i])) i++;
 
-                string colPart = address.Substring(0, i);   // "A"
-                string rowPart = address.Substring(i);      // "2"
+                string colPart = address[..i];   // "A"
+                string rowPart = address[i..];      // "2"
 
                 colIndex = ColumnNameToIndex(colPart);
                 rowIndex = int.Parse(rowPart) - 1; // 0始まり
@@ -1436,8 +1444,8 @@ namespace ProductDatabase.Other {
                 int i = 0;
                 while (i < address.Length && char.IsLetter(address[i])) i++;
 
-                string colPart = address.Substring(0, i);   // "A"
-                string rowPart = address.Substring(i);      // "2"
+                string colPart = address[..i];   // "A"
+                string rowPart = address[i..];      // "2"
 
                 colIndex = ColumnNameToIndex(colPart);
                 rowIndex = int.Parse(rowPart) - 1; // 0始まり
