@@ -310,7 +310,6 @@ namespace ProductDatabase {
                 ProductInfo.SubstrateModel = selectedRows[0]["SubstrateModel"].ToString() ?? string.Empty;
                 ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
                 ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-                ProductInfo.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
                 ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
                 using SubstrateRegistrationWindow window = new(ProductInfo);
                 window.ShowDialog(this);
@@ -440,7 +439,7 @@ namespace ProductDatabase {
                 ["1"] = (1, "SELECT * FROM Substrate WHERE Visible = 1 ORDER BY SortNumber ASC;"),
                 ["2"] = (2, "SELECT * FROM Product WHERE Visible = 1 ORDER BY SortNumber ASC;"),
                 ["3"] = (3, "SELECT * FROM Product WHERE Visible = 1 AND SerialPrintType != 0 ORDER BY SortNumber ASC;"),
-                ["4"] = (4, "SELECT * FROM Product WHERE Visible = 1 AND (SerialPrintType = 5 OR SerialPrintType = 6) ORDER BY SortNumber ASC;")
+                ["4"] = (4, "SELECT * FROM Product WHERE Visible = 1 AND (SheetPrintType = 2 OR SheetPrintType = 3) ORDER BY SortNumber ASC;")
             };
 
             try {
