@@ -933,7 +933,7 @@ namespace ProductDatabase {
                 ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
                 ProductInfo.Comment = DataBaseDataGridView.Rows[selectRow].Cells["Comment"].Value.ToString() ?? string.Empty;
 
-                ListGeneratorEPPlus.GenerateList(ProductInfo);
+                ListGeneratorNPOI.GenerateList(ProductInfo);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
