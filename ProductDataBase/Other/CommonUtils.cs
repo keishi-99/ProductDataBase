@@ -228,7 +228,7 @@ namespace ProductDatabase.Other {
             }
             // 設定Excelワークブックを読み込む
             private static XSSFWorkbook LoadConfigWorkbook() {
-                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsx");
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsm");
                 if (!File.Exists(configPath)) {
                     throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
                 }
@@ -450,7 +450,7 @@ namespace ProductDatabase.Other {
 
             // 設定Excelワークブックを読み込む
             private static ExcelPackage LoadConfigWorkbook() {
-                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsx");
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsm");
                 if (!File.Exists(configPath)) {
                     throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
                 }
@@ -695,7 +695,7 @@ namespace ProductDatabase.Other {
                     }
 
                     // 6. Excelファイルの保存と印刷
-                    var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyList.xlsx");
+                    var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyList.xlsm");
                     SaveAndPrintExcel(workbook, temporarilyPath, targetSheetName);
                 } catch (Exception ex) {
                     MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -703,7 +703,7 @@ namespace ProductDatabase.Other {
             }
             // 設定Excelワークブックを読み込む
             private static XSSFWorkbook LoadConfigWorkbook() {
-                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsx");
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsm");
                 if (!File.Exists(configPath)) {
                     throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
                 }
@@ -1028,7 +1028,7 @@ namespace ProductDatabase.Other {
             public static void GenerateList(ProductInformation productInfo) {
                 try {
                     // 1. Excel設定の読み込みとワークブックの準備
-                    var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsx");
+                    var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsm");
                     using var workBook = new ExcelPackage(new FileInfo(configPath));
                     var (targetSheetName, productName, resultRow, workSheetMain) = LoadExcelConfiguration(workBook, productInfo.ProductModel);
 
@@ -1049,7 +1049,7 @@ namespace ProductDatabase.Other {
                     }
 
                     // 6. Excelファイルの保存と印刷
-                    var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyList.xlsx");
+                    var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyList.xlsm");
                     SaveAndPrintExcel(workBook, temporarilyPath, targetSheetName);
                 } catch (Exception ex) {
                     MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1317,7 +1317,7 @@ namespace ProductDatabase.Other {
                     HideSheets(workbook, productCellRanges.SheetNames);
 
                     // 7. Excelファイルの保存と印刷
-                    var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsx");
+                    var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsm");
                     SaveAndPrintExcel(workbook, temporarilyPath);
                 } catch (Exception ex) {
                     MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1325,7 +1325,7 @@ namespace ProductDatabase.Other {
             }
             // 設定Excelワークブックを読み込む
             private static XSSFWorkbook LoadConfigWorkbook() {
-                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsx");
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
                 if (!File.Exists(configPath)) {
                     throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
                 }
@@ -1552,8 +1552,8 @@ namespace ProductDatabase.Other {
             public static void GenerateCheckSheet(ProductInformation productInfo) {
                 try {
                     // 設定ファイルのパスを構築
-                    var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsx");
-                    var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsx");
+                    var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
+                    var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsm");
 
                     // 1. 設定ファイルの読み込みとメインシートの取得
                     // EPPlusを使用して設定ファイルを読み込み、必要な情報を抽出
@@ -1804,7 +1804,7 @@ namespace ProductDatabase.Other {
 
             // 設定Excelワークブックを読み込む
             private static ExcelPackage LoadConfigWorkbook() {
-                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsx");
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsm");
                 if (!File.Exists(configPath)) {
                     throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
                 }
