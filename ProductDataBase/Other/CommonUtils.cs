@@ -269,11 +269,11 @@ namespace ProductDatabase.Other {
                 // ワークシートのセルから値を取得し、ReportConfigオブジェクトに格納
                 IRow resultRow = workSheetMain.GetRow(resultRowIndex);
                 var directoryPath = GetCellValue(resultRow.GetCell(2))?.Trim('"') ?? string.Empty;
-                if (string.IsNullOrWhiteSpace(directoryPath)) { throw new Exception("Configのファイルパスが無効です。"); }
+                if (string.IsNullOrEmpty(directoryPath)) { throw new Exception("Configのファイルパスが無効です。"); }
                 if (!Directory.Exists(directoryPath)) { throw new FileNotFoundException($"指定されたフォルダが存在しません: {directoryPath}"); }
 
                 var searchName = GetCellValue(resultRow.GetCell(3))?.Trim('"') ?? string.Empty;
-                if (string.IsNullOrWhiteSpace(searchName)) { throw new Exception("Configのファイル名が無効です。"); }
+                if (string.IsNullOrEmpty(searchName)) { throw new Exception("検索ファイル名が空です。"); }
 
                 var filePaths = Directory.GetFiles(directoryPath, $"*{searchName}*", SearchOption.AllDirectories);
                 var filePath = filePaths[0];
@@ -281,7 +281,7 @@ namespace ProductDatabase.Other {
                 var fileExtension = Path.GetExtension(filePath).ToLower();
 
                 var sheetName = GetCellValue(resultRow.GetCell(4)) ?? string.Empty;
-                return string.IsNullOrWhiteSpace(sheetName)
+                return string.IsNullOrEmpty(sheetName)
                     ? throw new Exception("シート名がありません。")
                     : new ReportConfigNPOI {
                         DirectoryPath = directoryPath,
@@ -324,12 +324,7 @@ namespace ProductDatabase.Other {
                 }
                 else {
                     if (filePaths.Length > 1) {
-                        MessageBox.Show(
-                            "複数のファイルが見つかりました。1つ選択してください。",
-                            "ファイル選択",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Information
-                        );
+                        MessageBox.Show("複数のファイルが見つかりました。1つ選択してください。", "ファイル選択", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
 
                     filePath = ShowExcelFileDialog(directoryPath)
@@ -474,20 +469,25 @@ namespace ProductDatabase.Other {
 
                 // --- シート名 ---
                 string sheetName = sheet.Cells[row, 5].Text;
-                if (string.IsNullOrWhiteSpace(sheetName)) {
+                if (string.IsNullOrEmpty(sheetName)) {
                     throw new Exception($"設定ファイルのシート名が空です。");
                 }
 
                 // --- パスとファイル名の取得 ---
                 string? directoryPath = sheet.Cells[row, 3].Value?.ToString()?.Trim('"')
                     ?? sheet.Cells[2, 3].Value?.ToString()?.Trim('"');
-                if (string.IsNullOrWhiteSpace(directoryPath)) { throw new Exception("Configのファイルパスが無効です。"); }
+
+                if (string.IsNullOrEmpty(directoryPath)) { throw new Exception("Configのファイルパスが無効です。"); }
 
                 if (!Directory.Exists(directoryPath)) {
                     throw new DirectoryNotFoundException($"指定されたフォルダが存在しません: {directoryPath}");
                 }
 
+                string? saveDirectory = sheet.Cells[row, 12].Value?.ToString()?.Trim('"')
+                    ?? sheet.Cells[2, 12].Value?.ToString()?.Trim('"');
+
                 string searchName = sheet.Cells[row, 4].Text.Trim('"');
+                if (string.IsNullOrEmpty(searchName)) { throw new DirectoryNotFoundException($"検索ファイル名が空です。"); }
 
                 // --- ファイル検索 ---
                 string filePath = FindExcelFile(directoryPath, searchName);
@@ -510,7 +510,7 @@ namespace ProductDatabase.Other {
                     SerialFirstRange = sheet.Cells[row, 9].Text ?? string.Empty,
                     SerialLastRange = sheet.Cells[row, 10].Text ?? string.Empty,
                     ProductModelRange = sheet.Cells[row, 11].Text ?? string.Empty,
-                    SaveDirectory = sheet.Cells[row, 12].Text ?? string.Empty
+                    SaveDirectory = saveDirectory
                 };
             }
             private static string FindExcelFile(string directoryPath, string searchName) {
@@ -655,11 +655,17 @@ namespace ProductDatabase.Other {
                 var fileExtension = config.FileExtension;
                 var initialDirectory = config.SaveDirectory;
 
+                if (!Directory.Exists(initialDirectory)) {
+                    MessageBox.Show($"設定されている保存先が見つかりませんでした。\r\n{initialDirectory}", "ファイル選択", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
                 using SaveFileDialog saveFileDialog = new() {
                     Filter = $"Excel Files (*{fileExtension})|*{fileExtension}|All Files (*.*)|*.*",
                     FileName = $"{fileName} のコピー{productInfo.ProductNumber}{fileExtension}",
                     Title = "保存先を選択してください",
-                    InitialDirectory = initialDirectory ?? Environment.CurrentDirectory // Nullの場合はデフォルトディレクトリを使用
+                    InitialDirectory = string.IsNullOrWhiteSpace(initialDirectory)
+                        ? Environment.CurrentDirectory  // Nullの場合はデフォルトディレクトリを使用
+                        : initialDirectory
                 };
 
                 if (saveFileDialog.ShowDialog() == DialogResult.OK) {
@@ -1421,7 +1427,7 @@ namespace ProductDatabase.Other {
                     RegHumidityRange = GetCellValue(resultRow.GetCell(11)) ?? string.Empty,
                     SheetNames = [.. Enumerable.Range(12, 20)
                         .Select(column => GetCellValue(resultRow.GetCell(column)) ?? string.Empty)
-                        .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName))],
+                        .TakeWhile(sheetName => !string.IsNullOrEmpty(sheetName))],
                 };
             }
 
@@ -1628,7 +1634,7 @@ namespace ProductDatabase.Other {
                     RegHumidityRange = workSheetMain.Cells[resultRow, 12].Value?.ToString() ?? string.Empty,
                     SheetNames = [.. Enumerable.Range(13, 20)
                         .Select(column => workSheetMain.Cells[resultRow, column].Value?.ToString() ?? string.Empty)
-                        .TakeWhile(sheetName => !string.IsNullOrWhiteSpace(sheetName))]
+                        .TakeWhile(sheetName => !string.IsNullOrEmpty(sheetName))]
                 };
 
                 return excelData.SheetNames.Count == 0 ? throw new Exception("対象シートがConfigファイルに設定されていません。") : excelData;
