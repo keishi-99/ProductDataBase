@@ -1444,7 +1444,7 @@ namespace ProductDatabase.Other {
                 SetValue(workSheetTemp, ranges.RegHumidityRange, humidity);
             }
 
-            // 指定されたEPPlusワークブックの不要なシートを非表示にします。
+            // 指定されたワークブックの不要なシートを非表示にします。
             private static void HideSheets(XSSFWorkbook workBook, List<string> sheetsToKeep) {
                 // 非表示にするシートのインデックスを特定
                 var allSheetNames = new List<string>();
@@ -1458,14 +1458,16 @@ namespace ProductDatabase.Other {
                     .Select(sheet => sheet.Index)
                     .ToList();
 
-                // シート（"Sheet1"）を非表示リストに追加
-                if (workBook.GetSheetIndex("Sheet1") != -1 && !sheetIndicesToHide.Contains(workBook.GetSheetIndex("Sheet1"))) {
-                    sheetIndicesToHide.Add(workBook.GetSheetIndex("Sheet1"));
+                // "Sheet1" は常に非表示にする
+                int sheet1Index = workBook.GetSheetIndex("Sheet1");
+                if (sheet1Index != -1 && !sheetIndicesToHide.Contains(sheet1Index)) {
+                    sheetIndicesToHide.Add(sheet1Index);
                 }
+
 
                 // シートを非表示に設定
                 foreach (var sheetIndex in sheetIndicesToHide) {
-                    workBook.SetSheetHidden(sheetIndex, true);
+                    workBook.SetSheetVisibility(sheetIndex, SheetVisibility.VeryHidden);
                 }
             }
 
@@ -1689,14 +1691,7 @@ namespace ProductDatabase.Other {
             }
 
             // 指定されたEPPlusワークブックの各シートに製品情報を書き込みます。
-            private static void PopulateExcelSheets(
-                IWorkbook workBookEPPlus,
-                ProductInformation productInfo,
-                dynamic cellReferences,
-                string temperature,
-                string humidity,
-                string formattedDate,
-                List<string> sheetNames) {
+            private static void PopulateExcelSheets(IWorkbook workBookEPPlus, ProductInformation productInfo, dynamic cellReferences, string temperature, string humidity, string formattedDate, List<string> sheetNames) {
                 foreach (var sheetName in sheetNames) {
                     var sheetEPPlus = workBookEPPlus.GetSheet(sheetName) ?? throw new Exception($"シート[{sheetName}]が見つかりません。");
                     sheetEPPlus.ForceFormulaRecalculation = true; // 数式の再計算を強制
@@ -1727,7 +1722,7 @@ namespace ProductDatabase.Other {
                 cell.SetCellValue(value);
             }
 
-            // 指定されたEPPlusワークブックの不要なシートを非表示にします。
+            // 指定されたワークブックの不要なシートを非表示にします。
             private static void HideSheets(IWorkbook workBookEPPlus, List<string> sheetsToKeep) {
                 // 非表示にするシートのインデックスを特定
                 var allSheetNames = new List<string>();
@@ -1741,14 +1736,15 @@ namespace ProductDatabase.Other {
                     .Select(sheet => sheet.Index)
                     .ToList();
 
-                // シート（"Sheet1"）を非表示にする
-                if (workBookEPPlus.GetSheetIndex("Sheet1") != -1 && !sheetIndicesToHide.Contains(workBookEPPlus.GetSheetIndex("Sheet1"))) {
-                    sheetIndicesToHide.Add(workBookEPPlus.GetSheetIndex("Sheet1"));
+                // "Sheet1" は常に非表示にする
+                int sheet1Index = workBookEPPlus.GetSheetIndex("Sheet1");
+                if (sheet1Index != -1 && !sheetIndicesToHide.Contains(sheet1Index)) {
+                    sheetIndicesToHide.Add(sheet1Index);
                 }
 
                 // シートを非表示に設定
                 foreach (var sheetIndex in sheetIndicesToHide) {
-                    workBookEPPlus.SetSheetHidden(sheetIndex, SheetVisibility.VeryHidden);
+                    workBookEPPlus.SetSheetVisibility(sheetIndex, SheetVisibility.VeryHidden);
                 }
             }
 
