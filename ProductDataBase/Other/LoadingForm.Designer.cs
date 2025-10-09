@@ -38,14 +38,8 @@
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ControlBox = false;
             this.Controls.Add(this.pictureBox1);
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "LoadingForm";
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
             this.TopMost = true;
             ((System.ComponentModel.ISupportInitialize)this.pictureBox1).EndInit();
             this.ResumeLayout(false);

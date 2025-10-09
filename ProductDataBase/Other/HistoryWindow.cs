@@ -899,6 +899,9 @@ namespace ProductDatabase {
         // 成績書作成
         private void GenerateReport() {
             try {
+                // --- 処理中カーソルに変更 ---
+                Cursor.Current = Cursors.WaitCursor;
+
                 // 選択されたセルがない場合は処理を終了
                 if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
@@ -915,11 +918,17 @@ namespace ProductDatabase {
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            } finally {
+                // --- 通常カーソルに戻す ---
+                Cursor.Current = Cursors.Default;
             }
         }
         // リスト作成
         private void GenerateList() {
             try {
+                // --- 処理中カーソルに変更 ---
+                Cursor.Current = Cursors.WaitCursor;
+
                 // 選択されたセルがない場合は処理を終了
                 if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
@@ -937,11 +946,17 @@ namespace ProductDatabase {
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            } finally {
+                // --- 通常カーソルに戻す ---
+                Cursor.Current = Cursors.Default;
             }
         }
         // チェックシート作成
         private void GenerateCheckSheet() {
             try {
+                // --- 処理中カーソルに変更 ---
+                Cursor.Current = Cursors.WaitCursor;
+
                 // 選択されたセルがない場合は処理を終了
                 if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
@@ -957,6 +972,9 @@ namespace ProductDatabase {
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            } finally {
+                // --- 通常カーソルに戻す ---
+                Cursor.Current = Cursors.Default;
             }
         }
 
