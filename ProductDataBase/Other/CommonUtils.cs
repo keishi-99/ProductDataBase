@@ -313,42 +313,41 @@ namespace ProductDatabase.Other {
 
             // レポートテンプレートExcelワークブックを読み込む
             private static XSSFWorkbook LoadReportTemplate(string directoryPath, string searchFileName) {
-                var filePaths = Directory.GetFiles(directoryPath, $"{searchFileName}*", SearchOption.AllDirectories);
-                if (filePaths.Length == 0) {
-                    throw new FileNotFoundException($"指定されたファイル名 '{searchFileName}' のファイルが '{directoryPath}' に見つかりません。");
-                }
+                var filePaths = !string.IsNullOrEmpty(searchFileName)
+                    ? Directory.GetFiles(directoryPath, $"{searchFileName}*", SearchOption.AllDirectories)
+                    : [];
 
                 string filePath;
 
                 if (filePaths.Length == 1) {
-                    // ファイルが1つだけ見つかった場合は、それを自動的に選択
-                    filePath = filePaths[0];
+                    filePath = Path.GetFullPath(filePaths[0]);
                 }
                 else {
-                    MessageBox.Show("複数のファイルが見つかりました。1つ選択してください。");
-                    // 複数のファイルが見つかった場合は、OpenFileDialog を使用してユーザーに選択させる
-                    using var openFileDialog = new OpenFileDialog();
-                    openFileDialog.InitialDirectory = directoryPath;
-                    openFileDialog.Filter = "Excel ファイル|*.xlsx;*.xlsm|すべてのファイル (*.*)|*.*";
-
-                    // 複数ファイル選択を無効にする
-                    openFileDialog.Multiselect = false;
-
-                    // ファイル選択ダイアログを表示
-                    if (openFileDialog.ShowDialog() == DialogResult.OK) {
-                        filePath = openFileDialog.FileName;
+                    if (filePaths.Length > 1) {
+                        MessageBox.Show(
+                            "複数のファイルが見つかりました。1つ選択してください。",
+                            "ファイル選択",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information
+                        );
                     }
-                    else {
-                        // キャンセルされた場合は、処理を中止
-                        throw new OperationCanceledException("ファイル選択がキャンセルされました。");
-                    }
+
+                    filePath = ShowExcelFileDialog(directoryPath)
+                        ?? throw new OperationCanceledException("ファイル選択がキャンセルされました。");
                 }
 
-                try {
-                    FileStream fileStreamReport = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    return new XSSFWorkbook(fileStreamReport);
-                } catch (Exception ex) {
-                    throw new Exception($"レポートテンプレートの読み込み中にエラーが発生しました: {ex.Message}", ex);
+                // --- FileStreamはusingで自動解放 ---
+                using var fileStreamReport = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                return new XSSFWorkbook(fileStreamReport);
+
+                static string? ShowExcelFileDialog(string initialDirectory) {
+                    using var dialog = new OpenFileDialog {
+                        InitialDirectory = initialDirectory,
+                        Filter = "Excel ファイル|*.xlsx;*.xlsm|すべてのファイル (*.*)|*.*",
+                        Multiselect = false
+                    };
+
+                    return dialog.ShowDialog() == DialogResult.OK ? dialog.FileName : null;
                 }
             }
 
@@ -473,6 +472,12 @@ namespace ProductDatabase.Other {
                     ?? throw new Exception($"Configに品目番号:[{productModel}]が見つかりません。");
                 int row = targetCell.Start.Row;
 
+                // --- シート名 ---
+                string sheetName = sheet.Cells[row, 5].Text;
+                if (string.IsNullOrWhiteSpace(sheetName)) {
+                    throw new Exception($"設定ファイルのシート名が空です。");
+                }
+
                 // --- パスとファイル名の取得 ---
                 string? directoryPath = sheet.Cells[row, 3].Value?.ToString()?.Trim('"')
                     ?? sheet.Cells[2, 3].Value?.ToString()?.Trim('"');
@@ -483,20 +488,11 @@ namespace ProductDatabase.Other {
                 }
 
                 string searchName = sheet.Cells[row, 4].Text.Trim('"');
-                if (string.IsNullOrWhiteSpace(searchName)) {
-                    throw new Exception("Configのファイル名が無効です。");
-                }
 
                 // --- ファイル検索 ---
                 string filePath = FindExcelFile(directoryPath, searchName);
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
                 string fileExtension = Path.GetExtension(filePath).ToLowerInvariant();
-
-                // --- シート名 ---
-                string sheetName = sheet.Cells[row, 5].Text;
-                if (string.IsNullOrWhiteSpace(sheetName)) {
-                    throw new Exception($"シート名 {sheetName} がありません。");
-                }
 
                 // --- ReportConfig を構築 ---
                 return new ReportConfigEPPlus {
@@ -518,27 +514,37 @@ namespace ProductDatabase.Other {
                 };
             }
             private static string FindExcelFile(string directoryPath, string searchName) {
-                var filePaths = Directory.GetFiles(directoryPath, $"{searchName}*", SearchOption.AllDirectories);
+                var filePaths = !string.IsNullOrEmpty(searchName)
+                    ? Directory.GetFiles(directoryPath, $"{searchName}*", SearchOption.AllDirectories)
+                    : [];
 
-                if (filePaths.Length == 0)
-                    throw new FileNotFoundException($"'{searchName}' に一致するファイルが見つかりません ({directoryPath})");
-
-                if (filePaths.Length == 1)
+                if (filePaths.Length == 1) {
                     return Path.GetFullPath(filePaths[0]);
+                }
 
-                MessageBox.Show("複数のファイルが見つかりました。1つ選択してください。",
-                    "ファイル選択", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (filePaths.Length > 1) {
+                    MessageBox.Show(
+                        "複数のファイルが見つかりました。1つ選択してください。",
+                        "ファイル選択",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
+                }
 
-                using var dialog = new OpenFileDialog {
-                    InitialDirectory = directoryPath,
-                    Filter = "Excel ファイル|*.xlsx;*.xlsm|すべてのファイル (*.*)|*.*",
-                    Multiselect = false
-                };
+                var filePath = ShowExcelFileDialog(directoryPath)
+                    ?? throw new OperationCanceledException("ファイル選択がキャンセルされました。");
 
-                if (dialog.ShowDialog() == DialogResult.OK)
-                    return dialog.FileName;
+                return filePath;
 
-                throw new OperationCanceledException("ファイル選択がキャンセルされました。");
+                static string? ShowExcelFileDialog(string initialDirectory) {
+                    using var dialog = new OpenFileDialog {
+                        InitialDirectory = initialDirectory,
+                        Filter = "Excel ファイル|*.xlsx;*.xlsm|すべてのファイル (*.*)|*.*",
+                        Multiselect = false
+                    };
+
+                    return dialog.ShowDialog() == DialogResult.OK ? dialog.FileName : null;
+                }
             }
 
             // レポートテンプレートExcelワークブックを読み込む

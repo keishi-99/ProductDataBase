@@ -496,9 +496,15 @@ namespace ProductDatabase {
         // リスト印刷
         private void GenerateList() {
             try {
+                // --- 処理中カーソルに変更 ---
+                Cursor.Current = Cursors.WaitCursor;
+
                 ListGeneratorEPPlus.GenerateList(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            } finally {
+                // --- 通常カーソルに戻す ---
+                Cursor.Current = Cursors.Default;
             }
         }
 
