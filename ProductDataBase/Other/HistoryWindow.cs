@@ -1,8 +1,8 @@
 ﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using System.Data;
 using static ProductDatabase.MainWindow;
-using static ProductDatabase.Other.CommonUtils;
 
 namespace ProductDatabase {
     public partial class HistoryWindow : Form {
@@ -914,7 +914,7 @@ namespace ProductDatabase {
                 ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
                 ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
 
-                ReportGeneratorEPPlus.GenerateReport(ProductInfo);
+                ExcelServiceClosedXml.ReportGeneratorClosedXml.GenerateReport(ProductInfo);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -942,7 +942,7 @@ namespace ProductDatabase {
                 ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
                 ProductInfo.Comment = DataBaseDataGridView.Rows[selectRow].Cells["Comment"].Value.ToString() ?? string.Empty;
 
-                ListGeneratorEPPlus.GenerateList(ProductInfo);
+                ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(ProductInfo);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -968,7 +968,7 @@ namespace ProductDatabase {
                 ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
                 ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
 
-                CheckSheetGeneratorNPOI.GenerateCheckSheet(ProductInfo);
+                ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.GenerateCheckSheet(ProductInfo);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);

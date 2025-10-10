@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
 using static ProductDatabase.MainWindow;
@@ -580,7 +581,7 @@ namespace ProductDatabase {
         // 基板設定を開く
         private void OpenSubstrateInformation() {
             try {
-                CommonUtils.SubstrateInformation.OpenSubstrateInformation(ProductInfo);
+                ExcelServiceClosedXml.SubstrateInformationClosedXml.OpenSubstrateInformationClosedXml(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
