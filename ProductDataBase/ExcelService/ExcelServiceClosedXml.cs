@@ -28,6 +28,7 @@ namespace ProductDatabase.ExcelService {
                 public string? SerialLastRange { get; set; }
                 public string? ProductModelRange { get; set; }
                 public string? SaveDirectory { get; set; }
+                public bool HasSubstrateInput { get; set; }
             }
 
             // レポートを生成するメインメソッド
@@ -43,11 +44,14 @@ namespace ProductDatabase.ExcelService {
                     // 3. レポートシートにデータを挿入
                     PopulateReportSheet(reportWorkbook, productInfo, reportConfig);
 
-                    // 4. データベースから使用済み基板情報を取得
-                    var usedSubstrate = GetUsedSubstrateData(productInfo);
+                    // 基板情報の入力がある場合のみ処理を実行
+                    if (reportConfig.HasSubstrateInput) {
+                        // 4. データベースから使用済み基板情報を取得
+                        var usedSubstrate = GetUsedSubstrateData(productInfo);
 
-                    // 5. 基板情報のExcelへの書き込み
-                    UpdateSubstrateDetailsInExcel(reportWorkbook, reportConfig, usedSubstrate);
+                        // 5. 基板情報のExcelへの書き込み
+                        UpdateSubstrateDetailsInExcel(reportWorkbook, reportConfig, usedSubstrate);
+                    }
 
                     // 6. レポートを保存
                     SaveReport(reportWorkbook, productInfo, reportConfig);
@@ -111,6 +115,13 @@ namespace ProductDatabase.ExcelService {
                 var fileName = Path.GetFileNameWithoutExtension(filePath);
                 var fileExtension = Path.GetExtension(filePath).ToLowerInvariant();
 
+                // ---  基板入力があるか確認 ---
+                int startColumn = 12;
+                int endColumn = 27;
+
+                var targetRowCells = configSheet.Row(reslutRow).Cells(startColumn, endColumn);
+                bool hasValue = targetRowCells.Any(c => !string.IsNullOrWhiteSpace(c.GetValue<string>()));
+
                 // --- ReportConfig を構築 ---
                 return new ReportConfigClosedXml {
                     Sheet = configSheet,
@@ -127,7 +138,8 @@ namespace ProductDatabase.ExcelService {
                     SerialFirstRange = configSheet.Cell(reslutRow, 9).GetString() ?? string.Empty,
                     SerialLastRange = configSheet.Cell(reslutRow, 10).GetString() ?? string.Empty,
                     ProductModelRange = configSheet.Cell(reslutRow, 11).GetString() ?? string.Empty,
-                    SaveDirectory = saveDirectory
+                    SaveDirectory = saveDirectory,
+                    HasSubstrateInput = hasValue,
                 };
             }
             private static string FindExcelFile(string directoryPath, string searchName) {
@@ -244,24 +256,25 @@ namespace ProductDatabase.ExcelService {
                     var targetRow = config.ResultRow;
                     var searchValue = substrateModel;
 
-                    var workSheetMain = config.Sheet;
-                    var searchAddressResult = workSheetMain
-                        .Row(targetRow)
-                        .CellsUsed()
+                    var configSheet = config.Sheet;
+                    var startColumn = 12;
+                    var endColumn = 27;
+                    var targetRowCells = configSheet.Row(targetRow).Cells(startColumn, endColumn);
+                    var searchAddressResult = targetRowCells
                         .FirstOrDefault(c => c.GetValue<string>() == searchValue);
 
                     if (searchAddressResult == null) { continue; }
 
                     var foundColumn = searchAddressResult.Address.ColumnNumber;
 
-                    var configCellValue = workSheetMain.Cell(targetRow, foundColumn + 1).GetString()
+                    var configCellValue = configSheet.Cell(targetRow, foundColumn + 1).GetString()
                         ?? throw new Exception($"Configシートの行 {targetRow}, 列 {foundColumn + 1} にセル範囲が設定されていません。");
 
                     var targetCellValue = string.Join(",", substrateNumbers.Select(substrateNumber => substrateNumber.Split('-')[0]));
 
-                    var workSheetTemp = reportWorkbook.Worksheet(config.SheetName)
+                    var targetSheet = reportWorkbook.Worksheet(config.SheetName)
                         ?? throw new Exception($"シート '{config.SheetName}' が見つかりません。");
-                    workSheetTemp.Cell(configCellValue).Value = targetCellValue;
+                    targetSheet.Cell(configCellValue).Value = targetCellValue;
                 }
             }
 
@@ -310,6 +323,7 @@ namespace ProductDatabase.ExcelService {
                 public string? SerialLastRange { get; set; }
                 public string? CommentRange { get; set; }
                 public string? QrCodeRange { get; set; }
+                public bool HasSubstrateInput { get; set; }
             }
             // リストを生成するメインメソッド
             public static void GenerateList(ProductInformation productInfo) {
