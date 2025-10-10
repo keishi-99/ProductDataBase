@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
 using System.Data;
@@ -1022,7 +1023,7 @@ namespace ProductDatabase {
                 // --- 処理中カーソルに変更 ---
                 Cursor.Current = Cursors.WaitCursor;
 
-                ReportGeneratorEPPlus.GenerateReport(ProductInfo);
+                ExcelServiceClosedXml.ReportGeneratorClosedXml.GenerateReport(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
@@ -1036,7 +1037,7 @@ namespace ProductDatabase {
                 // --- 処理中カーソルに変更 ---
                 Cursor.Current = Cursors.WaitCursor;
 
-                ListGeneratorEPPlus.GenerateList(ProductInfo);
+                ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
@@ -1050,7 +1051,7 @@ namespace ProductDatabase {
                 // --- 処理中カーソルに変更 ---
                 Cursor.Current = Cursors.WaitCursor;
 
-                CheckSheetGeneratorNPOI.GenerateCheckSheet(ProductInfo);
+                ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.GenerateCheckSheet(ProductInfo);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
