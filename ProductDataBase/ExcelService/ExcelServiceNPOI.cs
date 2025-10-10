@@ -123,17 +123,6 @@ namespace ProductDatabase.ExcelService {
                         ProductModelRange = GetCellValue(resultRow.GetCell(10)) ?? string.Empty,
                         SaveDirectory = GetCellValue(resultRow.GetCell(11)) ?? string.Empty
                     };
-
-                static string? GetCellValue(ICell cell) {
-                    if (cell == null) return string.Empty;
-                    return cell.CellType switch {
-                        CellType.String => cell.StringCellValue,
-                        CellType.Numeric => cell.NumericCellValue.ToString(),
-                        CellType.Boolean => cell.BooleanCellValue.ToString(),
-                        CellType.Formula => cell.ToString(),
-                        _ => cell.ToString()
-                    };
-                }
             }
 
             // レポートテンプレートExcelワークブックを読み込む
@@ -176,39 +165,12 @@ namespace ProductDatabase.ExcelService {
                 var workSheetTemp = reportWorkbook.GetSheet(config.SheetName) ?? throw new Exception($"シート '{config.SheetName}' が見つかりません。");
 
                 var productNumber = productInfo.ProductNumber.Split('-')[0] ?? string.Empty;
-                SetValue(config.ProductNumberRange, productNumber);
-                SetValue(config.OrderNumberRange, productInfo.OrderNumber);
-                SetValue(config.QuantityRange, productInfo.Quantity.ToString());
-                SetValue(config.SerialFirstRange, productInfo.SerialFirst);
-                SetValue(config.SerialLastRange, productInfo.SerialLast);
-                SetValue(config.ProductModelRange, productInfo.ProductModel);
-
-                void SetValue(string? address, string? value) {
-                    if (string.IsNullOrEmpty(address) || string.IsNullOrEmpty(value)) { return; }
-                    GetRowColFromAddress(address, out var rowIndex, out var colIndex);
-                    var row = workSheetTemp.GetRow(rowIndex) ?? workSheetTemp.CreateRow(rowIndex);
-                    var cell = row.GetCell(colIndex) ?? row.CreateCell(colIndex);
-                    cell.SetCellValue(value);
-                }
-                static int ColumnNameToIndex(string columnName) {
-                    var index = 0;
-                    foreach (var c in columnName.ToUpper()) {
-                        if (c < 'A' || c > 'Z') throw new ArgumentException("Invalid column name");
-                        index = index * 26 + c - 'A' + 1;
-                    }
-                    return index - 1; // 0始まり
-                }
-                static void GetRowColFromAddress(string address, out int rowIndex, out int colIndex) {
-                    // 数字の位置を検索
-                    var i = 0;
-                    while (i < address.Length && char.IsLetter(address[i])) i++;
-
-                    var colPart = address[..i];   // "A"
-                    var rowPart = address[i..];      // "2"
-
-                    colIndex = ColumnNameToIndex(colPart);
-                    rowIndex = int.Parse(rowPart) - 1; // 0始まり
-                }
+                SetValue(workSheetTemp, config.ProductNumberRange, productNumber);
+                SetValue(workSheetTemp, config.OrderNumberRange, productInfo.OrderNumber);
+                SetValue(workSheetTemp, config.QuantityRange, productInfo.Quantity.ToString());
+                SetValue(workSheetTemp, config.SerialFirstRange, productInfo.SerialFirst);
+                SetValue(workSheetTemp, config.SerialLastRange, productInfo.SerialLast);
+                SetValue(workSheetTemp, config.ProductModelRange, productInfo.ProductModel);
             }
 
             // 変更されたレポートをファイルに保存する
@@ -527,71 +489,6 @@ namespace ProductDatabase.ExcelService {
                     }
                 }
             }
-
-            private static string? GetCellValue(ICell cell) {
-                if (cell == null) return string.Empty;
-                return cell.CellType switch {
-                    CellType.String => cell.StringCellValue,
-                    CellType.Numeric => cell.NumericCellValue.ToString(),
-                    CellType.Boolean => cell.BooleanCellValue.ToString(),
-                    CellType.Formula => cell.ToString(),
-                    _ => cell.ToString()
-                };
-            }
-            private static void SetValue(ISheet sheet, string? address, string? value) {
-                if (string.IsNullOrEmpty(address) || string.IsNullOrEmpty(value)) { return; }
-                GetRowColFromAddress(address, out var rowIndex, out var colIndex);
-                var row = sheet.GetRow(rowIndex) ?? sheet.CreateRow(rowIndex);
-                var cell = row.GetCell(colIndex) ?? row.CreateCell(colIndex);
-                cell.SetCellValue(value);
-            }
-            private static void InsertImageOriginalSize(ISheet sheet, Bitmap bitmap, int rowIndex, int colIndex) {
-                var workbook = sheet.Workbook;
-
-                // Bitmap をメモリストリームに保存 → バイト配列化
-                byte[] bytes;
-                using (var ms = new MemoryStream()) {
-                    bitmap.Save(ms, ImageFormat.Png); // PNG形式で保存
-                    bytes = ms.ToArray();
-                }
-
-                // ワークブックに画像を追加
-                var pictureIdx = workbook.AddPicture(bytes, PictureType.PNG);
-
-                // 描画オブジェクトを取得
-                var drawing = sheet.CreateDrawingPatriarch();
-                var helper = workbook.GetCreationHelper();
-                var anchor = helper.CreateClientAnchor();
-                anchor.AnchorType = AnchorType.DontMoveAndResize;
-
-                // 画像を作成
-                drawing.CreatePicture(anchor, pictureIdx);
-
-                anchor.Col1 = colIndex;   // 左上列
-                anchor.Row1 = rowIndex;   // 左上行
-                anchor.Col2 = anchor.Col1;
-                anchor.Row2 = anchor.Row1;
-
-            }
-            private static int ColumnNameToIndex(string columnName) {
-                var index = 0;
-                foreach (var c in columnName.ToUpper()) {
-                    if (c < 'A' || c > 'Z') throw new ArgumentException("Invalid column name");
-                    index = index * 26 + c - 'A' + 1;
-                }
-                return index - 1; // 0始まり
-            }
-            private static void GetRowColFromAddress(string address, out int rowIndex, out int colIndex) {
-                // 数字の位置を検索
-                var i = 0;
-                while (i < address.Length && char.IsLetter(address[i])) i++;
-
-                var colPart = address[..i];   // "A"
-                var rowPart = address[i..];      // "2"
-
-                colIndex = ColumnNameToIndex(colPart);
-                rowIndex = int.Parse(rowPart) - 1; // 0始まり
-            }
         }
 
         // チェックシート
@@ -831,139 +728,191 @@ namespace ProductDatabase.ExcelService {
                     }
                 }
             }
-
-            private static string? GetCellValue(ICell cell) {
-                if (cell == null) return string.Empty;
-                return cell.CellType switch {
-                    CellType.String => cell.StringCellValue,
-                    CellType.Numeric => cell.NumericCellValue.ToString(),
-                    CellType.Boolean => cell.BooleanCellValue.ToString(),
-                    CellType.Formula => cell.ToString(),
-                    _ => cell.ToString()
-                };
-            }
-            private static void SetValue(ISheet sheet, string? address, string? value) {
-                if (string.IsNullOrEmpty(address) || string.IsNullOrEmpty(value)) { return; }
-                GetRowColFromAddress(address, out var rowIndex, out var colIndex);
-                var row = sheet.GetRow(rowIndex) ?? sheet.CreateRow(rowIndex);
-                var cell = row.GetCell(colIndex) ?? row.CreateCell(colIndex);
-                cell.SetCellValue(value);
-            }
-            private static int ColumnNameToIndex(string columnName) {
-                var index = 0;
-                foreach (var c in columnName.ToUpper()) {
-                    if (c < 'A' || c > 'Z') throw new ArgumentException("Invalid column name");
-                    index = index * 26 + c - 'A' + 1;
-                }
-                return index - 1; // 0始まり
-            }
-            private static void GetRowColFromAddress(string address, out int rowIndex, out int colIndex) {
-                // 数字の位置を検索
-                var i = 0;
-                while (i < address.Length && char.IsLetter(address[i])) i++;
-
-                var colPart = address[..i];   // "A"
-                var rowPart = address[i..];      // "2"
-
-                colIndex = ColumnNameToIndex(colPart);
-                rowIndex = int.Parse(rowPart) - 1; // 0始まり
-            }
         }
 
         // 基板設定を開く
         public static class SubstrateInformationNPOI {
-            //// 基板設定ファイルを開くメソッド
-            //public static void OpenSubstrateInformationNPOI(ProductInformation productInfo) {
-            //    try {
-            //        // 1. 設定ファイルを読み込み、レポート設定を取得
-            //        var configWorkbook = LoadConfigWorkbook();
-            //        var (filePaths, fileName) = GetSubstrateConfig(configWorkbook, productInfo.SubstrateModel);
+            // 基板設定ファイルを開くメソッド
+            public static void OpenSubstrateInformationNPOI(ProductInformation productInfo) {
+                try {
+                    // 1. 設定ファイルを読み込み、レポート設定を取得
+                    var configWorkbook = LoadConfigWorkbook();
+                    var (filePaths, fileName) = GetSubstrateConfig(configWorkbook, productInfo.SubstrateModel);
 
-            //        OpenExcel(filePaths, fileName);
+                    OpenExcel(filePaths, fileName);
 
-            //    } catch (Exception ex) {
-            //        // エラーメッセージを表示
-            //        MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //    }
-            //}
+                } catch (Exception ex) {
+                    // エラーメッセージを表示
+                    MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
 
-            //// 設定Excelワークブックを読み込む
-            //private static ExcelPackage LoadConfigWorkbook() {
-            //    var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsm");
-            //    if (!File.Exists(configPath)) {
-            //        throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
-            //    }
+            // 設定Excelワークブックを読み込む
+            private static XSSFWorkbook LoadConfigWorkbook() {
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsm");
+                if (!File.Exists(configPath)) {
+                    throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
+                }
 
-            //    try {
-            //        FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            //        return new ExcelPackage(fileStreamConfig);
-            //    } catch (Exception ex) {
-            //        throw new Exception($"設定ファイルの読み込み中にエラーが発生しました: {ex.Message}", ex);
-            //    }
-            //}
+                try {
+                    FileStream fileStreamConfig = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    return new XSSFWorkbook(fileStreamConfig);
+                } catch (Exception ex) {
+                    throw new Exception($"設定ファイルの読み込み中にエラーが発生しました: {ex.Message}", ex);
+                }
+            }
 
-            //// 設定ワークブックから製品に対応する設定を抽出する
-            //private static (string filePaths, string sheetName) GetSubstrateConfig(ExcelPackage configWorkbook, string substrateModel) {
-            //    var workSheetMain = configWorkbook.Workbook.Worksheets["Sheet1"] ?? throw new Exception("設定ファイルのシートに Sheet1 が見つかりません。");
+            // 設定ワークブックから製品に対応する設定を抽出する
+            private static (string filePaths, string sheetName) GetSubstrateConfig(XSSFWorkbook configWorkbook, string substrateModel) {
+                var workSheetMain = configWorkbook.GetSheet("Sheet1") ?? throw new Exception("設定ファイルのシートに Sheet1 が見つかりません。");
 
-            //    // セル検索
-            //    var searchAddressResult = workSheetMain.Cells.FirstOrDefault(x => x.Start.Column == 1 && x.Value?.ToString() == substrateModel)
-            //        ?? throw new Exception($"Configに型式:[{substrateModel}]が見つかりません。");
-            //    var searchAddressResultRow = searchAddressResult.Start.Row;
+                var targetColumnIndex = 0;
+                var searchText = substrateModel;
+                var resultRowIndex = -1;
 
-            //    // ディレクトリパスとファイル名を取得(ディレクトリパスが空の場合は、Configの2行目の値を使用する)
-            //    var directoryPath = workSheetMain.Cells[searchAddressResultRow, 4].Value?.ToString()?.Trim('"') ?? workSheetMain.Cells[2, 4].Value?.ToString()?.Trim('"') ?? string.Empty;
-            //    var fileName = workSheetMain.Cells[searchAddressResultRow, 5].Value?.ToString()?.Trim('"') ?? string.Empty;
-            //    if (string.IsNullOrEmpty(fileName)) { throw new Exception($"設定ファイルの型式 {substrateModel} の シート名 が空です。"); }
-            //    var filePaths = Path.Combine(directoryPath, fileName);
-            //    if (!File.Exists(filePaths)) { throw new FileNotFoundException($"指定されたファイルが存在しません: {filePaths}"); }
+                // 対象列だけ走査
+                for (var rowIndex = workSheetMain.FirstRowNum; rowIndex <= workSheetMain.LastRowNum; rowIndex++) {
+                    var row = workSheetMain.GetRow(rowIndex);
+                    if (row == null) continue;
 
-            //    var sheetName = workSheetMain.Cells[searchAddressResultRow, 6].Value?.ToString()?.Trim('"') ?? string.Empty;
+                    var cell = row.GetCell(targetColumnIndex);
+                    if (cell == null) continue;
 
-            //    return (filePaths, sheetName);
-            //}
+                    var cellValue = GetCellValue(cell) ?? string.Empty;
 
-            //// Excelファイルを開くメソッド
-            //private static void OpenExcel(string filePath, string sheetName) {
+                    if (cellValue.Equals(searchText, StringComparison.OrdinalIgnoreCase)) {
+                        resultRowIndex = rowIndex;
+                    }
+                }
 
-            //    // COM Interopを使用してExcelを開く
-            //    Microsoft.Office.Interop.Excel.Application? xlApp = null;
-            //    Microsoft.Office.Interop.Excel.Workbooks? xlBooks = null;
-            //    Microsoft.Office.Interop.Excel.Workbook? xlBook = null;
-            //    Microsoft.Office.Interop.Excel.Sheets? xlSheets = null;
-            //    Microsoft.Office.Interop.Excel.Worksheet? xlSheet = null;
+                if (resultRowIndex == -1) { throw new Exception($"Configに品目番号:[{searchText}]が見つかりません。"); }
 
-            //    try {
-            //        xlApp = new Microsoft.Office.Interop.Excel.Application {
-            //            Visible = true // Excelウィンドウを表示します。
-            //        };
+                var resultRow = workSheetMain.GetRow(resultRowIndex);
+                var defaultRow = workSheetMain.GetRow(1);
 
-            //        // ワークブック開く
-            //        xlBooks = xlApp.Workbooks;
-            //        xlBook = xlBooks.Open(filePath, ReadOnly: true);
 
-            //        // ワークシート選択
-            //        xlSheets = xlBook.Sheets;
-            //        xlSheet = string.IsNullOrEmpty(sheetName) ? xlSheets[1] : xlSheets[sheetName];
+                // ディレクトリパスとファイル名を取得(ディレクトリパスが空の場合は、Configの2行目の値を使用する)
+                var directoryPath = GetCellValue(resultRow.GetCell(3))?.Trim('"');
+                if (string.IsNullOrEmpty(directoryPath)) { directoryPath = GetCellValue(defaultRow.GetCell(3))?.Trim('"'); }
+                if (!Directory.Exists(directoryPath)) { throw new FileNotFoundException($"指定されたフォルダが存在しません: {directoryPath}"); }
 
-            //        // ワークシート表示
-            //        xlSheet.Activate();
+                var fileName = GetCellValue(resultRow.GetCell(4))?.Trim('"');
+                if (string.IsNullOrEmpty(fileName)) { throw new Exception($"設定ファイルの型式 {substrateModel} の ファイル名 が空です。"); }
 
-            //    } finally {
-            //        // COMオブジェクトの解放
-            //        ReleaseComObject(xlSheet);
-            //        ReleaseComObject(xlSheets);
-            //        ReleaseComObject(xlBook);
-            //        ReleaseComObject(xlBooks);
-            //        ReleaseComObject(xlApp);
+                var filePaths = Path.Combine(directoryPath, fileName);
+                if (!File.Exists(filePaths)) { throw new FileNotFoundException($"指定されたファイルが存在しません: {filePaths}"); }
 
-            //        static void ReleaseComObject(object? comObj) {
-            //            if (comObj is not null) {
-            //                System.Runtime.InteropServices.Marshal.ReleaseComObject(comObj);
-            //            }
-            //        }
-            //    }
-            //}
+                var sheetName = GetCellValue(resultRow.GetCell(5)) ?? string.Empty;
+
+                return (filePaths, sheetName);
+            }
+
+            // Excelファイルを開くメソッド
+            private static void OpenExcel(string filePath, string sheetName) {
+
+                // COM Interopを使用してExcelを開く
+                Microsoft.Office.Interop.Excel.Application? xlApp = null;
+                Microsoft.Office.Interop.Excel.Workbooks? xlBooks = null;
+                Microsoft.Office.Interop.Excel.Workbook? xlBook = null;
+                Microsoft.Office.Interop.Excel.Sheets? xlSheets = null;
+                Microsoft.Office.Interop.Excel.Worksheet? xlSheet = null;
+
+                try {
+                    xlApp = new Microsoft.Office.Interop.Excel.Application {
+                        Visible = true // Excelウィンドウを表示します。
+                    };
+
+                    // ワークブック開く
+                    xlBooks = xlApp.Workbooks;
+                    xlBook = xlBooks.Open(filePath, ReadOnly: true);
+
+                    // ワークシート選択
+                    xlSheets = xlBook.Sheets;
+                    xlSheet = string.IsNullOrEmpty(sheetName) ? xlSheets[1] : xlSheets[sheetName];
+
+                    // ワークシート表示
+                    xlSheet.Activate();
+
+                } finally {
+                    // COMオブジェクトの解放
+                    ReleaseComObject(xlSheet);
+                    ReleaseComObject(xlSheets);
+                    ReleaseComObject(xlBook);
+                    ReleaseComObject(xlBooks);
+                    ReleaseComObject(xlApp);
+
+                    static void ReleaseComObject(object? comObj) {
+                        if (comObj is not null) {
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(comObj);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private static string? GetCellValue(ICell cell) {
+            if (cell == null) return string.Empty;
+            return cell.CellType switch {
+                CellType.String => cell.StringCellValue,
+                CellType.Numeric => cell.NumericCellValue.ToString(),
+                CellType.Boolean => cell.BooleanCellValue.ToString(),
+                CellType.Formula => cell.ToString(),
+                _ => cell.ToString()
+            };
+        }
+        private static void SetValue(ISheet sheet, string? address, string? value) {
+            if (string.IsNullOrEmpty(address) || string.IsNullOrEmpty(value)) { return; }
+            GetRowColFromAddress(address, out var rowIndex, out var colIndex);
+            var row = sheet.GetRow(rowIndex) ?? sheet.CreateRow(rowIndex);
+            var cell = row.GetCell(colIndex) ?? row.CreateCell(colIndex);
+            cell.SetCellValue(value);
+        }
+        private static int ColumnNameToIndex(string columnName) {
+            var index = 0;
+            foreach (var c in columnName.ToUpper()) {
+                if (c < 'A' || c > 'Z') throw new ArgumentException("Invalid column name");
+                index = index * 26 + c - 'A' + 1;
+            }
+            return index - 1; // 0始まり
+        }
+        private static void GetRowColFromAddress(string address, out int rowIndex, out int colIndex) {
+            // 数字の位置を検索
+            var i = 0;
+            while (i < address.Length && char.IsLetter(address[i])) i++;
+
+            var colPart = address[..i];   // "A"
+            var rowPart = address[i..];      // "2"
+
+            colIndex = ColumnNameToIndex(colPart);
+            rowIndex = int.Parse(rowPart) - 1; // 0始まり
+        }
+        private static void InsertImageOriginalSize(ISheet sheet, Bitmap bitmap, int rowIndex, int colIndex) {
+            var workbook = sheet.Workbook;
+
+            // Bitmap をメモリストリームに保存 → バイト配列化
+            byte[] bytes;
+            using (var ms = new MemoryStream()) {
+                bitmap.Save(ms, ImageFormat.Png); // PNG形式で保存
+                bytes = ms.ToArray();
+            }
+
+            // ワークブックに画像を追加
+            var pictureIdx = workbook.AddPicture(bytes, PictureType.PNG);
+
+            // 描画オブジェクトを取得
+            var drawing = sheet.CreateDrawingPatriarch();
+            var helper = workbook.GetCreationHelper();
+            var anchor = helper.CreateClientAnchor();
+            anchor.AnchorType = AnchorType.DontMoveAndResize;
+
+            // 画像を作成
+            drawing.CreatePicture(anchor, pictureIdx);
+
+            anchor.Col1 = colIndex;   // 左上列
+            anchor.Row1 = rowIndex;   // 左上行
+            anchor.Col2 = anchor.Col1;
+            anchor.Row2 = anchor.Row1;
 
         }
     }
