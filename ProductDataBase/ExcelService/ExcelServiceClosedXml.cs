@@ -178,7 +178,9 @@ namespace ProductDatabase.ExcelService {
                         Multiselect = false
                     };
 
-                    return dialog.ShowDialog() == DialogResult.OK ? dialog.FileName : null;
+                    return dialog.ShowDialog() == DialogResult.OK
+                        ? dialog.FileName
+                        : null;
                 }
             }
 
