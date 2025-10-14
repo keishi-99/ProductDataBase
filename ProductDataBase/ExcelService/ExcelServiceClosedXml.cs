@@ -98,17 +98,23 @@ namespace ProductDatabase.ExcelService {
 
                 // --- パスとファイル名の取得 ---
                 var directoryPath = configSheet.Cell(reslutRow, 3).GetString().Trim('"');
-                if (string.IsNullOrEmpty(directoryPath)) { directoryPath = configSheet.Cell(2, 3).GetString().Trim('"'); }
+                if (string.IsNullOrEmpty(directoryPath)) {
+                    directoryPath = configSheet.Cell(2, 3).GetString().Trim('"');
+                }
 
                 if (!Directory.Exists(directoryPath)) {
                     throw new DirectoryNotFoundException($"指定されたフォルダが存在しません: {directoryPath}");
                 }
 
                 var saveDirectory = configSheet.Cell(reslutRow, 12).GetString().Trim('"');
-                if (string.IsNullOrEmpty(saveDirectory)) { saveDirectory = configSheet.Cell(2, 12).GetString().Trim('"'); }
+                if (string.IsNullOrEmpty(saveDirectory)) {
+                    saveDirectory = configSheet.Cell(2, 12).GetString().Trim('"');
+                }
 
                 var searchName = configSheet.Cell(reslutRow, 4).GetString().Trim('"');
-                if (string.IsNullOrEmpty(searchName)) { throw new DirectoryNotFoundException($"検索ファイル名が空です。"); }
+                if (string.IsNullOrEmpty(searchName)) {
+                    throw new DirectoryNotFoundException($"検索ファイル名が空です。");
+                }
 
                 // --- ファイル検索 ---
                 var filePath = FindExcelFile(directoryPath, searchName);
@@ -132,12 +138,12 @@ namespace ProductDatabase.ExcelService {
                     FileExtension = fileExtension,
                     SearchFileName = searchName,
                     SheetName = sheetName,
-                    ProductNumberRange = configSheet.Cell(reslutRow, 6).GetString() ?? string.Empty,
-                    OrderNumberRange = configSheet.Cell(reslutRow, 7).GetString() ?? string.Empty,
-                    QuantityRange = configSheet.Cell(reslutRow, 8).GetString() ?? string.Empty,
-                    SerialFirstRange = configSheet.Cell(reslutRow, 9).GetString() ?? string.Empty,
-                    SerialLastRange = configSheet.Cell(reslutRow, 10).GetString() ?? string.Empty,
-                    ProductModelRange = configSheet.Cell(reslutRow, 11).GetString() ?? string.Empty,
+                    ProductNumberRange = configSheet.Cell(reslutRow, 6).GetString(),
+                    OrderNumberRange = configSheet.Cell(reslutRow, 7).GetString(),
+                    QuantityRange = configSheet.Cell(reslutRow, 8).GetString(),
+                    SerialFirstRange = configSheet.Cell(reslutRow, 9).GetString(),
+                    SerialLastRange = configSheet.Cell(reslutRow, 10).GetString(),
+                    ProductModelRange = configSheet.Cell(reslutRow, 11).GetString(),
                     SaveDirectory = saveDirectory,
                     HasSubstrateInput = hasValue,
                 };
@@ -189,7 +195,8 @@ namespace ProductDatabase.ExcelService {
 
             // レポートシートに製品情報を挿入する
             private static void PopulateReportSheet(XLWorkbook reportWorkbook, ProductInformation productInfo, ReportConfigClosedXml config) {
-                var workSheetTemp = reportWorkbook.Worksheet(config.SheetName) ?? throw new Exception($"シート '{config.SheetName}' が見つかりません。");
+                var workSheetTemp = reportWorkbook.Worksheet(config.SheetName)
+                    ?? throw new Exception($"シート '{config.SheetName}' が見つかりません。");
 
                 var productNumber = productInfo.ProductNumber.Split('-')[0] ?? string.Empty;
                 SetValue(config.ProductNumberRange, productNumber);
@@ -252,14 +259,16 @@ namespace ProductDatabase.ExcelService {
 
             // 基板情報をExcelシートに書き込むメソッド
             private static void UpdateSubstrateDetailsInExcel(XLWorkbook reportWorkbook, ReportConfigClosedXml config, List<(string SubstrateModel, List<string> SubstrateNumbers)> usedSubstrate) {
+
+                var targetRow = config.ResultRow;
+                var configSheet = config.Sheet;
+                var startColumn = 12;
+                var endColumn = 27;
+                var targetRowCells = configSheet.Row(targetRow).Cells(startColumn, endColumn);
+
                 foreach (var (substrateModel, substrateNumbers) in usedSubstrate) {
-                    var targetRow = config.ResultRow;
                     var searchValue = substrateModel;
 
-                    var configSheet = config.Sheet;
-                    var startColumn = 12;
-                    var endColumn = 27;
-                    var targetRowCells = configSheet.Row(targetRow).Cells(startColumn, endColumn);
                     var searchAddressResult = targetRowCells
                         .FirstOrDefault(c => c.GetValue<string>() == searchValue);
 
@@ -363,7 +372,8 @@ namespace ProductDatabase.ExcelService {
             // Excel設定を読み込むメソッド
             private static (string sheetName, string productName, int resultRow, IXLWorksheet configSheet) LoadExcelConfiguration(XLWorkbook workBook, string productModel) {
                 var configSheetName = "Sheet1";
-                var configSheet = workBook.Worksheet(configSheetName) ?? throw new Exception($"設定シート:[{configSheetName}]が見つかりません。");
+                var configSheet = workBook.Worksheet(configSheetName)
+                    ?? throw new Exception($"設定シート:[{configSheetName}]が見つかりません。");
 
                 // --- 品目番号の検索 ---
                 var targetCell = configSheet
@@ -471,8 +481,10 @@ namespace ProductDatabase.ExcelService {
 
             // 基板情報をExcelシートに書き込むメソッド
             private static void UpdateSubstrateDetailsInExcel(IXLWorksheet configSheet, IXLWorksheet targetSheet, int resultRow, List<(string SubstrateModel, List<string> SubstrateNumbers, List<int> Decreases)> usedSubstrate) {
+
+                var targetRow = resultRow;
+
                 foreach (var (substrateModel, substrateNumbers, decreases) in usedSubstrate) {
-                    var targetRow = resultRow;
                     var searchValue = substrateModel;
 
                     var searchAddressResult = configSheet
@@ -753,7 +765,6 @@ namespace ProductDatabase.ExcelService {
             // EPPlusワークブックをファイルに保存します。
             private static void SaveWorkbook(XLWorkbook configBook, string outputPath) {
                 try {
-                    ;
                     configBook.SaveAs(outputPath);
                 } catch (IOException ex) {
                     throw new IOException($"Excelファイルの保存に失敗しました: {outputPath}. 詳細: {ex.Message}", ex);
@@ -841,11 +852,19 @@ namespace ProductDatabase.ExcelService {
 
                 // ディレクトリパスとファイル名を取得(ディレクトリパスが空の場合は、Configの2行目の値を使用する)
                 var directoryPath = configSheet.Cell(reslutRow, 4).GetString().Trim('"');
-                if (string.IsNullOrEmpty(directoryPath)) { directoryPath = configSheet.Cell(2, 4).GetString().Trim('"'); }
+                if (string.IsNullOrEmpty(directoryPath)) {
+                    directoryPath = configSheet.Cell(2, 4).GetString().Trim('"');
+                }
+
                 var fileName = configSheet.Cell(reslutRow, 5).GetString().Trim('"');
-                if (string.IsNullOrEmpty(fileName)) { throw new Exception($"設定ファイルの型式 {substrateModel} の シート名 が空です。"); }
+                if (string.IsNullOrEmpty(fileName)) {
+                    throw new Exception($"設定ファイルの型式 {substrateModel} の シート名 が空です。");
+                }
+
                 var filePath = Path.Combine(directoryPath, fileName);
-                if (!File.Exists(filePath)) { throw new FileNotFoundException($"指定されたファイルが存在しません: {filePath}"); }
+                if (!File.Exists(filePath)) {
+                    throw new FileNotFoundException($"指定されたファイルが存在しません: {filePath}");
+                }
 
                 var sheetName = configSheet.Cell(reslutRow, 6).GetString().Trim('"');
 
