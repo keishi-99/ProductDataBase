@@ -150,9 +150,14 @@ namespace ProductDatabase {
                 : new SqliteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
         }
 
+        private static FileStream? _lockStream;
+
         // ロードイベント
         private void LoadEvents() {
             try {
+                // ファイルロック
+                LockSelf();
+
                 // JSONファイルのパス
                 var jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "General", "appsettings.json");
 
@@ -263,6 +268,14 @@ namespace ProductDatabase {
             }
 
             ProductInfo.FontSize = _fontSize;
+        }
+        private static void LockSelf() {
+            try {
+                string exePath = Application.ExecutablePath;
+                _lockStream = new FileStream(exePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            } catch {
+                // 失敗しても無視
+            }
         }
         // 登録ボタン処理
         private void Registration() {
