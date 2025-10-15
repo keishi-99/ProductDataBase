@@ -67,10 +67,7 @@ namespace ProductDatabase.ExcelService {
             private static XLWorkbook LoadConfigWorkbook() {
                 try {
                     var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsm");
-                    if (!File.Exists(configPath)) {
-                        throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
-                    }
-                    return new XLWorkbook(configPath);
+                    return File.Exists(configPath) ? new XLWorkbook(configPath) : throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
                 } catch (Exception ex) {
                     throw new Exception($"設定ファイルの読み込み中にエラーが発生しました: {ex.Message}", ex);
                 }
@@ -149,9 +146,9 @@ namespace ProductDatabase.ExcelService {
                 };
             }
             private static string FindExcelFile(string directoryPath, string searchName) {
-                var filePaths = !string.IsNullOrEmpty(searchName)
-                    ? Directory.GetFiles(directoryPath, $"{searchName}*", SearchOption.AllDirectories)
-                    : [];
+                var filePaths = string.IsNullOrEmpty(searchName)
+                    ? []
+                    : Directory.GetFiles(directoryPath, $"{searchName}*", SearchOption.AllDirectories);
 
                 if (filePaths.Length == 1) {
                     return Path.GetFullPath(filePaths[0]);
@@ -209,9 +206,8 @@ namespace ProductDatabase.ExcelService {
                 SetValue(config.ProductModelRange, productInfo.ProductModel);
 
                 void SetValue(string? range, string? value) {
-                    if (!string.IsNullOrEmpty(range) && !string.IsNullOrEmpty(value)) {
-                        workSheetTemp.Cell(range).Value = value;
-                    }
+                    if (string.IsNullOrEmpty(range) || string.IsNullOrEmpty(value)) { return; }
+                    workSheetTemp.Cell(range).Value = value;
                 }
             }
 
@@ -428,9 +424,8 @@ namespace ProductDatabase.ExcelService {
                 SetValue(ranges.CommentRange, productInfo.Comment);
 
                 void SetValue(string? range, string? value) {
-                    if (!string.IsNullOrEmpty(range) && !string.IsNullOrEmpty(value)) {
-                        targetSheet.Cell(range).Value = value;
-                    }
+                    if (string.IsNullOrEmpty(range) || string.IsNullOrEmpty(value)) { return; }
+                    targetSheet.Cell(range).Value = value;
                 }
             }
 
@@ -615,7 +610,7 @@ namespace ProductDatabase.ExcelService {
                     var (configBook, excelData) = LoadAndExtractConfig(configPath, productInfo);
 
                     // 2. 温度・湿度入力ダイアログの表示と値の取得
-                    (var temperature, var humidity) = GetTemperatureAndHumidity(excelData);
+                    (string temperature, string humidity) = GetTemperatureAndHumidity(excelData);
 
                     // 3. 日付のフォーマット
                     var formattedDate = FormatDate(productInfo.RegDate, excelData.DateFormat);
@@ -682,22 +677,18 @@ namespace ProductDatabase.ExcelService {
             }
 
             // 温度と湿度の入力ダイアログを表示し、ユーザーからの値を取得します。
-            private static (string temperature, string humidity) GetTemperatureAndHumidity(CheckSheetConfigData excelData) {
-                var temperature = string.Empty;
-                var humidity = string.Empty;
-
-                // 温度セルか湿度セルが設定されている場合、ダイアログを表示
-                if (!string.IsNullOrEmpty(excelData.RegTemperatureRange) || !string.IsNullOrEmpty(excelData.RegHumidityRange)) {
-                    var dialog = new InputDialog1();
-                    var result = dialog.ShowDialog();
-                    if (result != DialogResult.OK) {
-                        // キャンセルされた場合は処理を中断
-                        throw new OperationCanceledException("ユーザーによって温度・湿度入力がキャンセルされました。");
-                    }
-                    temperature = dialog.Temperature;
-                    humidity = dialog.Humidity;
+            private static (string, string) GetTemperatureAndHumidity(CheckSheetConfigData excelData) {
+                // 温度セルまたは湿度セルが設定されていない場合は空を返す
+                if (string.IsNullOrEmpty(excelData.RegTemperatureRange) && string.IsNullOrEmpty(excelData.RegHumidityRange)) {
+                    return (string.Empty, string.Empty);
                 }
-                return (temperature, humidity);
+
+                using var dialog = new InputDialog1();
+                if (dialog.ShowDialog() != DialogResult.OK) {
+                    throw new OperationCanceledException("ユーザーによって温度・湿度入力がキャンセルされました。");
+                }
+
+                return (dialog.Temperature, dialog.Humidity);
             }
 
             // 日付を指定されたフォーマットで文字列に変換します。
@@ -829,11 +820,7 @@ namespace ProductDatabase.ExcelService {
             private static XLWorkbook LoadConfigWorkbook() {
                 try {
                     var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsm");
-                    if (!File.Exists(configPath)) {
-                        throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
-                    }
-
-                    return new XLWorkbook(configPath);
+                    return File.Exists(configPath) ? new XLWorkbook(configPath) : throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
                 } catch (Exception ex) {
                     throw new Exception($"設定ファイルの読み込み中にエラーが発生しました: {ex.Message}", ex);
                 }
