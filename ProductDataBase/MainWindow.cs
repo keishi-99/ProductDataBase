@@ -127,15 +127,8 @@ namespace ProductDatabase {
             public string NetworkFolderPath { get; set; } = string.Empty;
             public string[] Administrators { get; set; } = [];
             public string[] AuthorizedUsers { get; set; } = [];
-            private static bool s_isAdministrator = false;
-            public static bool IsAdministrator {
-                get => s_isAdministrator; set => s_isAdministrator = value;
-            }
-
-            private static bool s_isAuthorizedUser = false;
-            public static bool IsAuthorizedUser {
-                get => s_isAuthorizedUser; set => s_isAuthorizedUser = value;
-            }
+            public static bool IsAdministrator { get; set; } = false;
+            public static bool IsAuthorizedUser { get; set; } = false;
         }
 
         public ProductInformation ProductInfo { get; set; } = new();
@@ -146,15 +139,15 @@ namespace ProductDatabase {
 
         public static string GetConnectionInformation() {
             var informationPath = Path.Combine(Environment.CurrentDirectory, "db", "information.db");
-            if (!File.Exists(informationPath)) { throw new FileNotFoundException("ファイルが見つかりません。", informationPath); }
-
-            return new SqliteConnectionStringBuilder() { DataSource = informationPath }.ToString();
+            return !File.Exists(informationPath)
+                ? throw new FileNotFoundException("ファイルが見つかりません。", informationPath)
+                : new SqliteConnectionStringBuilder() { DataSource = informationPath }.ToString();
         }
         public static string GetConnectionRegistration() {
             var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
-            if (!File.Exists(registrationPath)) { throw new FileNotFoundException("ファイルが見つかりません。", registrationPath); }
-
-            return new SqliteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
+            return !File.Exists(registrationPath)
+                ? throw new FileNotFoundException("ファイルが見つかりません。", registrationPath)
+                : new SqliteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
         }
 
         // ロードイベント
@@ -477,8 +470,7 @@ namespace ProductDatabase {
         private void CategoryListBox1Select() {
             try {
                 RegisterButton.Enabled = false;
-                if (RadioButtonNumber == 4) { HistoryButton.Enabled = false; }
-                else { HistoryButton.Enabled = true; }
+                HistoryButton.Enabled = RadioButtonNumber != 4;
                 CategoryListBox2.Items.Clear();
                 CategoryListBox3.Items.Clear();
 
@@ -500,8 +492,7 @@ namespace ProductDatabase {
         private void CategoryListBox2Select() {
             try {
                 RegisterButton.Enabled = false;
-                if (RadioButtonNumber == 4) { HistoryButton.Enabled = false; }
-                else { HistoryButton.Enabled = true; }
+                HistoryButton.Enabled = RadioButtonNumber != 4;
                 CategoryListBox3.Items.Clear();
 
                 DataRow[] selectedRows;
