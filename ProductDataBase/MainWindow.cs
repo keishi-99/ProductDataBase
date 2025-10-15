@@ -141,16 +141,16 @@ namespace ProductDatabase {
             var informationPath = Path.Combine(Environment.CurrentDirectory, "db", "information.db");
             return !File.Exists(informationPath)
                 ? throw new FileNotFoundException("ファイルが見つかりません。", informationPath)
-                : new SqliteConnectionStringBuilder() { DataSource = informationPath }.ToString();
+                : new SqliteConnectionStringBuilder() { DataSource = informationPath, Pooling = false }.ToString();
         }
         public static string GetConnectionRegistration() {
             var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
             return !File.Exists(registrationPath)
                 ? throw new FileNotFoundException("ファイルが見つかりません。", registrationPath)
-                : new SqliteConnectionStringBuilder() { DataSource = registrationPath }.ToString();
+                : new SqliteConnectionStringBuilder() { DataSource = registrationPath, Pooling = false }.ToString();
         }
 
-        private static FileStream? _lockStream;
+        private static FileStream? s_lockStream;
 
         // ロードイベント
         private void LoadEvents() {
@@ -272,7 +272,7 @@ namespace ProductDatabase {
         private static void LockSelf() {
             try {
                 string exePath = Application.ExecutablePath;
-                _lockStream = new FileStream(exePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                s_lockStream = new FileStream(exePath, FileMode.Open, FileAccess.Read, FileShare.Read);
             } catch {
                 // 失敗しても無視
             }
