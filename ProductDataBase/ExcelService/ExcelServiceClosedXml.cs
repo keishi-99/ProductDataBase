@@ -67,7 +67,16 @@ namespace ProductDatabase.ExcelService {
             private static XLWorkbook LoadConfigWorkbook() {
                 try {
                     var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsm");
-                    return File.Exists(configPath) ? new XLWorkbook(configPath) : throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
+
+                    if (!File.Exists(configPath)) {
+                        throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
+                    }
+
+                    // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
+                    using var fs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+                    // FileStreamからXLWorkbookを読み込む
+                    return new XLWorkbook(fs);
                 } catch (Exception ex) {
                     throw new Exception($"設定ファイルの読み込み中にエラーが発生しました: {ex.Message}", ex);
                 }
@@ -186,7 +195,15 @@ namespace ProductDatabase.ExcelService {
                 var filePath = config.FilePath;
 
                 try {
-                    return new XLWorkbook(filePath);
+                    if (!File.Exists(filePath)) {
+                        throw new FileNotFoundException($"設定ファイルが見つかりません: {filePath}");
+                    }
+
+                    // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
+                    using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+                    // FileStreamからXLWorkbookを読み込む
+                    return new XLWorkbook(fs);
                 } catch (Exception ex) {
                     throw new Exception($"レポートテンプレートの読み込み中にエラーが発生しました: {ex.Message}", ex);
                 }
@@ -340,7 +357,12 @@ namespace ProductDatabase.ExcelService {
                     if (!File.Exists(configPath)) {
                         throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
                     }
-                    using var workBook = new XLWorkbook(configPath);
+
+                    // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
+                    using var fs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+                    // FileStreamからXLWorkbookを読み込む
+                    using var workBook = new XLWorkbook(fs);
                     var (targetSheetName, productName, resultRow, configSheet) = LoadExcelConfiguration(workBook, productInfo.ProductModel);
 
                     // 2. 製品情報の設定とExcelへの書き込み
@@ -640,7 +662,11 @@ namespace ProductDatabase.ExcelService {
                     throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
                 }
 
-                var workBook = new XLWorkbook(configPath);
+                // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
+                using var fs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+                // FileStreamからXLWorkbookを読み込む
+                var workBook = new XLWorkbook(fs);
                 var productModel = productInfo.ProductModel;
 
                 // 既存ワークシートを取得
@@ -820,7 +846,16 @@ namespace ProductDatabase.ExcelService {
             private static XLWorkbook LoadConfigWorkbook() {
                 try {
                     var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsm");
-                    return File.Exists(configPath) ? new XLWorkbook(configPath) : throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
+
+                    if (!File.Exists(configPath)) {
+                        throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
+                    }
+
+                    // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
+                    using var fs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+                    // FileStreamからXLWorkbookを読み込む
+                    return new XLWorkbook(fs);
                 } catch (Exception ex) {
                     throw new Exception($"設定ファイルの読み込み中にエラーが発生しました: {ex.Message}", ex);
                 }
