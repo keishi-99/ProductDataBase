@@ -628,8 +628,16 @@ namespace ProductDatabase.ExcelService {
                     var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
                     var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsm");
 
+                    if (!File.Exists(configPath)) {
+                        throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
+                    }
+
+                    // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
+                    using var fs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using var workBook = new XLWorkbook(fs);
+
                     // 1. 設定ファイルの読み込みとメインシートの取得
-                    var (configBook, excelData) = LoadAndExtractConfig(configPath, productInfo);
+                    var (configBook, excelData) = LoadAndExtractConfig(workBook, configPath, productInfo);
 
                     // 2. 温度・湿度入力ダイアログの表示と値の取得
                     (string temperature, string humidity) = GetTemperatureAndHumidity(excelData);
@@ -657,16 +665,8 @@ namespace ProductDatabase.ExcelService {
             }
 
             // Excel設定ファイルを読み込み、メインシートから設定データを抽出します。
-            private static (XLWorkbook workBook, CheckSheetConfigData excelData) LoadAndExtractConfig(string configPath, ProductInformation productInfo) {
-                if (!File.Exists(configPath)) {
-                    throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
-                }
+            private static (XLWorkbook workBook, CheckSheetConfigData excelData) LoadAndExtractConfig(XLWorkbook workBook, string configPath, ProductInformation productInfo) {
 
-                // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
-                using var fs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-                // FileStreamからXLWorkbookを読み込む
-                var workBook = new XLWorkbook(fs);
                 var productModel = productInfo.ProductModel;
 
                 // 既存ワークシートを取得
@@ -730,7 +730,7 @@ namespace ProductDatabase.ExcelService {
                 return formattedDate;
             }
 
-            // 指定されたEPPlusワークブックの各シートに製品情報を書き込みます。
+            // 指定されたワークブックの各シートに製品情報を書き込みます。
             private static void PopulateExcelSheets(XLWorkbook configBook, ProductInformation productInfo, string temperature, string humidity, string formattedDate, CheckSheetConfigData excelData) {
                 var sheetNames = excelData.SheetNames;
                 foreach (var sheetName in sheetNames) {
@@ -781,7 +781,7 @@ namespace ProductDatabase.ExcelService {
                 }
             }
 
-            // EPPlusワークブックをファイルに保存します。
+            // ワークブックをファイルに保存します。
             private static void SaveWorkbook(XLWorkbook configBook, string outputPath) {
                 try {
                     configBook.SaveAs(outputPath);
