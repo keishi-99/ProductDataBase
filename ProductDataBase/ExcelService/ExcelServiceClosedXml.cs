@@ -637,7 +637,7 @@ namespace ProductDatabase.ExcelService {
                     using var workBook = new XLWorkbook(fs);
 
                     // 1. 設定ファイルの読み込みとメインシートの取得
-                    var (configBook, excelData) = LoadAndExtractConfig(workBook, configPath, productInfo);
+                    var (configBook, excelData) = LoadAndExtractConfig(workBook, productInfo);
 
                     // 2. 温度・湿度入力ダイアログの表示と値の取得
                     (string temperature, string humidity) = GetTemperatureAndHumidity(excelData);
@@ -665,7 +665,7 @@ namespace ProductDatabase.ExcelService {
             }
 
             // Excel設定ファイルを読み込み、メインシートから設定データを抽出します。
-            private static (XLWorkbook workBook, CheckSheetConfigData excelData) LoadAndExtractConfig(XLWorkbook workBook, string configPath, ProductInformation productInfo) {
+            private static (XLWorkbook workBook, CheckSheetConfigData excelData) LoadAndExtractConfig(XLWorkbook workBook, ProductInformation productInfo) {
 
                 var productModel = productInfo.ProductModel;
 
