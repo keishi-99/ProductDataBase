@@ -39,7 +39,13 @@ namespace ProductDatabase.ExcelService {
                     var reportConfig = GetReportConfig(configWorkbook, productInfo.ProductModel);
 
                     // 2. レポートテンプレートを読み込み
-                    var reportWorkbook = LoadReportTemplate(reportConfig);
+                    var filePath = reportConfig.FilePath;
+                    if (!File.Exists(filePath)) {
+                        throw new FileNotFoundException($"設定ファイルが見つかりません: {filePath}");
+                    }
+
+                    using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    var reportWorkbook = new XLWorkbook(fs);
 
                     // 3. レポートシートにデータを挿入
                     PopulateReportSheet(reportWorkbook, productInfo, reportConfig);
@@ -187,25 +193,6 @@ namespace ProductDatabase.ExcelService {
                     return dialog.ShowDialog() == DialogResult.OK
                         ? dialog.FileName
                         : null;
-                }
-            }
-
-            // レポートテンプレートExcelワークブックを読み込む
-            private static XLWorkbook LoadReportTemplate(ReportConfigClosedXml config) {
-                var filePath = config.FilePath;
-
-                try {
-                    if (!File.Exists(filePath)) {
-                        throw new FileNotFoundException($"設定ファイルが見つかりません: {filePath}");
-                    }
-
-                    // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
-                    using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-                    // FileStreamからXLWorkbookを読み込む
-                    return new XLWorkbook(fs);
-                } catch (Exception ex) {
-                    throw new Exception($"レポートテンプレートの読み込み中にエラーが発生しました: {ex.Message}", ex);
                 }
             }
 
