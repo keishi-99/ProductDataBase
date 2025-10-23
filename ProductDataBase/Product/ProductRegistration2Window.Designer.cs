@@ -236,6 +236,7 @@
             this.Substrate1CheckBox.TabIndex = 41;
             this.Substrate1CheckBox.Text = "-";
             this.Substrate1CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate1CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // GenerateReportButton
             // 
@@ -366,6 +367,7 @@
             this.Substrate2CheckBox.TabStop = false;
             this.Substrate2CheckBox.Text = "-";
             this.Substrate2CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate2CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // Substrate15CheckBox
             // 
@@ -377,6 +379,7 @@
             this.Substrate15CheckBox.TabIndex = 77;
             this.Substrate15CheckBox.Text = "-";
             this.Substrate15CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate15CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // Substrate2DataGridView
             // 
@@ -497,6 +500,7 @@
             this.Substrate3CheckBox.TabStop = false;
             this.Substrate3CheckBox.Text = "-";
             this.Substrate3CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate3CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // Substrate14CheckBox
             // 
@@ -508,6 +512,7 @@
             this.Substrate14CheckBox.TabIndex = 75;
             this.Substrate14CheckBox.Text = "-";
             this.Substrate14CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate14CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // Substrate3DataGridView
             // 
@@ -628,6 +633,7 @@
             this.Substrate4CheckBox.TabStop = false;
             this.Substrate4CheckBox.Text = "-";
             this.Substrate4CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate4CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // Substrate13CheckBox
             // 
@@ -639,6 +645,7 @@
             this.Substrate13CheckBox.TabIndex = 73;
             this.Substrate13CheckBox.Text = "-";
             this.Substrate13CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate13CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // Substrate4DataGridView
             // 
@@ -759,6 +766,7 @@
             this.Substrate5CheckBox.TabStop = false;
             this.Substrate5CheckBox.Text = "-";
             this.Substrate5CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate5CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // Substrate12CheckBox
             // 
@@ -770,6 +778,7 @@
             this.Substrate12CheckBox.TabIndex = 71;
             this.Substrate12CheckBox.Text = "-";
             this.Substrate12CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate12CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // Substrate5DataGridView
             // 
@@ -889,6 +898,7 @@
             this.Substrate6CheckBox.TabIndex = 51;
             this.Substrate6CheckBox.Text = "-";
             this.Substrate6CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate6CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // Substrate11CheckBox
             // 
@@ -900,6 +910,7 @@
             this.Substrate11CheckBox.TabIndex = 69;
             this.Substrate11CheckBox.Text = "-";
             this.Substrate11CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate11CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // Substrate6DataGridView
             // 
@@ -975,6 +986,7 @@
             this.Substrate7CheckBox.TabIndex = 53;
             this.Substrate7CheckBox.Text = "-";
             this.Substrate7CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate7CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // RegisterButton
             // 
@@ -1062,6 +1074,7 @@
             this.Substrate8CheckBox.TabIndex = 55;
             this.Substrate8CheckBox.Text = "-";
             this.Substrate8CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate8CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // SubstrateListPrintButton
             // 
@@ -1149,6 +1162,7 @@
             this.Substrate9CheckBox.TabIndex = 57;
             this.Substrate9CheckBox.Text = "-";
             this.Substrate9CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate9CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // BarcodePrintPositionLabel
             // 
@@ -1234,6 +1248,7 @@
             this.Substrate10CheckBox.TabIndex = 59;
             this.Substrate10CheckBox.Text = "-";
             this.Substrate10CheckBox.UseVisualStyleBackColor = true;
+            this.Substrate10CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
             // SerialPrintPositionLabel
             // 
