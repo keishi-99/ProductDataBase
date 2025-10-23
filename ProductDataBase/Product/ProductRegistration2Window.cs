@@ -109,11 +109,11 @@ namespace ProductDatabase {
         }
         private void HideAllControls() {
             for (var i = 0; i <= 14; i++) {
-                if (Controls[_checkBoxNames[i]] is CheckBox objCbx) {
+                if (MainPanel.Controls[_checkBoxNames[i]] is CheckBox objCbx) {
                     objCbx.Visible = false;
                 }
 
-                if (Controls[_dataGridViewNames[i]] is DataGridView objDgv) {
+                if (MainPanel.Controls[_dataGridViewNames[i]] is DataGridView objDgv) {
                     objDgv.Visible = false;
                 }
             }
@@ -130,8 +130,8 @@ namespace ProductDatabase {
             var shortageSubstrateName = string.Empty;
 
             for (var i = 0; i < useSubstrate.Length; i++) {
-                var objCbx = Controls[_checkBoxNames[i]] as CheckBox;
-                var objDgv = Controls[_dataGridViewNames[i]] as DataGridView;
+                var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
+                var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
 
                 var selectedRows = ProductInfo.SubstrateDataTable.Select($"SubstrateModel = '{useSubstrate[i]}'");
                 var substrateName = string.Empty;
@@ -443,11 +443,11 @@ namespace ProductDatabase {
             int? useID = isServiceRegistration ? null : ProductInfo.ProductID;
 
             for (var i = 0; i < useSubstrate.Length; i++) {
-                if (!(Controls[_checkBoxNames[i]] as CheckBox)?.Checked ?? true) {
+                if (!(MainPanel.Controls[_checkBoxNames[i]] as CheckBox)?.Checked ?? true) {
                     continue;
                 }
 
-                if (Controls[_dataGridViewNames[i]] as DataGridView is not DataGridView objDgv) {
+                if (MainPanel.Controls[_dataGridViewNames[i]] as DataGridView is not DataGridView objDgv) {
                     throw new Exception("DataGridViewが nullです。");
                 }
 
@@ -702,9 +702,9 @@ namespace ProductDatabase {
                         }
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
 
-                            var objCbx = Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxが nullです。");
+                            var objCbx = MainPanel.Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxが nullです。");
 
-                            var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvが nullです。");
+                            var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvが nullです。");
                             objDgv.Columns[2].ReadOnly = false;
                             objDgv.Columns[3].ReadOnly = false;
 
@@ -833,7 +833,7 @@ namespace ProductDatabase {
             ProductInfo.SerialLast = GenerateCode(_serialLastNumber);
         }
         private void HandlePostRegistration() {
-            foreach (Control control in Controls) {
+            foreach (Control control in MainPanel.Controls) {
                 switch (control) {
                     case DataGridView dgv:
                         dgv.Enabled = false;
