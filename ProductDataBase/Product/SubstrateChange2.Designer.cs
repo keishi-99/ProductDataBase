@@ -1508,7 +1508,7 @@
             this.ClientSize = new Size(1238, 645);
             this.Controls.Add(this.MainPanel);
             this.Font = new Font("Meiryo UI", 9F);
-            this.FormBorderStyle = FormBorderStyle.SizableToolWindow;
+            this.FormBorderStyle = FormBorderStyle.FixedToolWindow;
             this.MinimizeBox = false;
             this.Name = "SubstrateChange2";
             this.ShowIcon = false;

@@ -1355,7 +1355,7 @@
             this.Controls.Add(this.MainPanel);
             this.Controls.Add(this.ProductRegistration2MenuStrip);
             this.Font = new Font("Meiryo UI", 9F);
-            this.FormBorderStyle = FormBorderStyle.SizableToolWindow;
+            this.FormBorderStyle = FormBorderStyle.FixedToolWindow;
             this.MainMenuStrip = this.ProductRegistration2MenuStrip;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
