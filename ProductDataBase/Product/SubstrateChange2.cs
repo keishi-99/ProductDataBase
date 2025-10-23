@@ -61,13 +61,13 @@ namespace ProductDatabase {
                             var quantity = ProductInfo.Quantity;
 
                             // チェックボックスとDgvを有効に
-                            _objCbx = Controls[_checkBoxNames[i]] as CheckBox;
+                            _objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
                             if (_objCbx is not null) {
                                 _objCbx.Enabled = true;
                                 _objCbx.Checked = true;
                             }
 
-                            _objDgv = Controls[_dataGridViewNames[i]] as DataGridView;
+                            _objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
                             if (_objDgv is not null) {
                                 _objDgv.Columns[1].DefaultCellStyle.BackColor = Color.LightGray;
                                 _objDgv.Columns[2].DefaultCellStyle.BackColor = Color.LightGray;
@@ -218,12 +218,12 @@ namespace ProductDatabase {
                 PersonComboBox.Enabled = false;
                 RegisterButton.Enabled = false;
                 for (var i = 0; i <= 9; i++) {
-                    _objCbx = Controls[_checkBoxNames[i]] as CheckBox;
+                    _objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
                     if (_objCbx is not null) {
                         _objCbx.Enabled = false;
                     }
 
-                    _objDgv = Controls[_dataGridViewNames[i]] as DataGridView;
+                    _objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
                     if (_objDgv is not null) {
                         _objDgv.Enabled = false;
                     }
@@ -243,10 +243,10 @@ namespace ProductDatabase {
                         if (_useSubstrate is null) { throw new Exception("ArrUseSubstrateが空です"); }
                         for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
 
-                            var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
+                            var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
                             objCbx.Enabled = true;
 
-                            var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvが nullです。");
+                            var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvが nullです。");
                             objDgv.Columns[3].ReadOnly = false;
                             objDgv.Columns[4].ReadOnly = false;
 
@@ -303,10 +303,10 @@ namespace ProductDatabase {
                             if (_useSubstrate is null) { throw new Exception("ArrUseSubstrateが nullです。"); }
                             for (var i = 0; i <= _useSubstrate.Length; i++) {
 
-                                var objCbx = Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
+                                var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
 
                                 if (objCbx.Checked) {
-                                    var objDgv = Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvが nullです。");
+                                    var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView ?? throw new Exception("objDgvが nullです。");
                                     var dgvRowCnt = objDgv.Rows.Count;
 
                                     for (var j = 0; j <= dgvRowCnt - 1; j++) {

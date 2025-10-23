@@ -146,6 +146,7 @@
             this.dataGridViewCheckBoxColumn5 = new DataGridViewCheckBoxColumn();
             this.Substrate11CheckBox = new CheckBox();
             this.RegistrationDateTimePicker = new DateTimePicker();
+            this.MainPanel = new Panel();
             ((System.ComponentModel.ISupportInitialize)this.Substrate10DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate9DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate8DataGridView).BeginInit();
@@ -162,13 +163,13 @@
             ((System.ComponentModel.ISupportInitialize)this.Substrate13DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate12DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate11DataGridView).BeginInit();
+            this.MainPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // CloseButton
             // 
-            this.CloseButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             this.CloseButton.Enabled = false;
-            this.CloseButton.Location = new Point(872, 586);
+            this.CloseButton.Location = new Point(1126, 608);
             this.CloseButton.Name = "CloseButton";
             this.CloseButton.Size = new Size(100, 25);
             this.CloseButton.TabIndex = 57;
@@ -178,9 +179,8 @@
             // 
             // RegisterButton
             // 
-            this.RegisterButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             this.RegisterButton.Enabled = false;
-            this.RegisterButton.Location = new Point(660, 586);
+            this.RegisterButton.Location = new Point(1020, 608);
             this.RegisterButton.Name = "RegisterButton";
             this.RegisterButton.Size = new Size(100, 25);
             this.RegisterButton.TabIndex = 56;
@@ -190,9 +190,8 @@
             // 
             // SubstrateListPrintButton
             // 
-            this.SubstrateListPrintButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             this.SubstrateListPrintButton.Enabled = false;
-            this.SubstrateListPrintButton.Location = new Point(766, 586);
+            this.SubstrateListPrintButton.Location = new Point(1126, 577);
             this.SubstrateListPrintButton.Name = "SubstrateListPrintButton";
             this.SubstrateListPrintButton.Size = new Size(100, 25);
             this.SubstrateListPrintButton.TabIndex = 54;
@@ -212,12 +211,12 @@
             this.Substrate10DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn1001, this.dataGridViewTextBoxColumn1002, this.dataGridViewTextBoxColumn1003, this.dataGridViewTextBoxColumn1004, this.dataGridViewCheckBoxColumn1001 });
             this.Substrate10DataGridView.Enabled = false;
             this.Substrate10DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate10DataGridView.Location = new Point(357, 433);
+            this.Substrate10DataGridView.Location = new Point(636, 159);
             this.Substrate10DataGridView.MultiSelect = false;
             this.Substrate10DataGridView.Name = "Substrate10DataGridView";
             this.Substrate10DataGridView.RowHeadersVisible = false;
             this.Substrate10DataGridView.RowTemplate.Height = 21;
-            this.Substrate10DataGridView.Size = new Size(270, 74);
+            this.Substrate10DataGridView.Size = new Size(270, 100);
             this.Substrate10DataGridView.TabIndex = 49;
             // 
             // dataGridViewTextBoxColumn1001
@@ -265,7 +264,7 @@
             // 
             this.Substrate10CheckBox.AutoSize = true;
             this.Substrate10CheckBox.Enabled = false;
-            this.Substrate10CheckBox.Location = new Point(357, 410);
+            this.Substrate10CheckBox.Location = new Point(636, 134);
             this.Substrate10CheckBox.Name = "Substrate10CheckBox";
             this.Substrate10CheckBox.Size = new Size(31, 19);
             this.Substrate10CheckBox.TabIndex = 48;
@@ -285,12 +284,12 @@
             this.Substrate9DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0901, this.dataGridViewTextBoxColumn0902, this.dataGridViewTextBoxColumn0903, this.dataGridViewTextBoxColumn0904, this.dataGridViewCheckBoxColumn0901 });
             this.Substrate9DataGridView.Enabled = false;
             this.Substrate9DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate9DataGridView.Location = new Point(357, 332);
+            this.Substrate9DataGridView.Location = new Point(636, 28);
             this.Substrate9DataGridView.MultiSelect = false;
             this.Substrate9DataGridView.Name = "Substrate9DataGridView";
             this.Substrate9DataGridView.RowHeadersVisible = false;
             this.Substrate9DataGridView.RowTemplate.Height = 21;
-            this.Substrate9DataGridView.Size = new Size(270, 74);
+            this.Substrate9DataGridView.Size = new Size(270, 100);
             this.Substrate9DataGridView.TabIndex = 47;
             // 
             // dataGridViewTextBoxColumn0901
@@ -339,7 +338,7 @@
             // 
             this.Substrate9CheckBox.AutoSize = true;
             this.Substrate9CheckBox.Enabled = false;
-            this.Substrate9CheckBox.Location = new Point(357, 309);
+            this.Substrate9CheckBox.Location = new Point(636, 3);
             this.Substrate9CheckBox.Name = "Substrate9CheckBox";
             this.Substrate9CheckBox.Size = new Size(31, 19);
             this.Substrate9CheckBox.TabIndex = 46;
@@ -359,12 +358,12 @@
             this.Substrate8DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0801, this.dataGridViewTextBoxColumn0802, this.dataGridViewTextBoxColumn0803, this.dataGridViewTextBoxColumn0804, this.dataGridViewCheckBoxColumn0801 });
             this.Substrate8DataGridView.Enabled = false;
             this.Substrate8DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate8DataGridView.Location = new Point(357, 231);
+            this.Substrate8DataGridView.Location = new Point(332, 421);
             this.Substrate8DataGridView.MultiSelect = false;
             this.Substrate8DataGridView.Name = "Substrate8DataGridView";
             this.Substrate8DataGridView.RowHeadersVisible = false;
             this.Substrate8DataGridView.RowTemplate.Height = 21;
-            this.Substrate8DataGridView.Size = new Size(270, 74);
+            this.Substrate8DataGridView.Size = new Size(270, 100);
             this.Substrate8DataGridView.TabIndex = 45;
             // 
             // dataGridViewTextBoxColumn0801
@@ -412,7 +411,7 @@
             // 
             this.Substrate8CheckBox.AutoSize = true;
             this.Substrate8CheckBox.Enabled = false;
-            this.Substrate8CheckBox.Location = new Point(357, 208);
+            this.Substrate8CheckBox.Location = new Point(332, 396);
             this.Substrate8CheckBox.Name = "Substrate8CheckBox";
             this.Substrate8CheckBox.Size = new Size(31, 19);
             this.Substrate8CheckBox.TabIndex = 44;
@@ -432,12 +431,12 @@
             this.Substrate7DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0701, this.dataGridViewTextBoxColumn0702, this.dataGridViewTextBoxColumn0703, this.dataGridViewTextBoxColumn0704, this.dataGridViewCheckBoxColumn0701 });
             this.Substrate7DataGridView.Enabled = false;
             this.Substrate7DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate7DataGridView.Location = new Point(357, 130);
+            this.Substrate7DataGridView.Location = new Point(332, 290);
             this.Substrate7DataGridView.MultiSelect = false;
             this.Substrate7DataGridView.Name = "Substrate7DataGridView";
             this.Substrate7DataGridView.RowHeadersVisible = false;
             this.Substrate7DataGridView.RowTemplate.Height = 21;
-            this.Substrate7DataGridView.Size = new Size(270, 74);
+            this.Substrate7DataGridView.Size = new Size(270, 100);
             this.Substrate7DataGridView.TabIndex = 43;
             // 
             // dataGridViewTextBoxColumn0701
@@ -486,7 +485,7 @@
             // 
             this.Substrate7CheckBox.AutoSize = true;
             this.Substrate7CheckBox.Enabled = false;
-            this.Substrate7CheckBox.Location = new Point(357, 107);
+            this.Substrate7CheckBox.Location = new Point(332, 265);
             this.Substrate7CheckBox.Name = "Substrate7CheckBox";
             this.Substrate7CheckBox.Size = new Size(31, 19);
             this.Substrate7CheckBox.TabIndex = 42;
@@ -506,12 +505,12 @@
             this.Substrate6DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0601, this.dataGridViewTextBoxColumn0602, this.dataGridViewTextBoxColumn0603, this.dataGridViewTextBoxColumn0604, this.dataGridViewCheckBoxColumn0601 });
             this.Substrate6DataGridView.Enabled = false;
             this.Substrate6DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate6DataGridView.Location = new Point(357, 29);
+            this.Substrate6DataGridView.Location = new Point(332, 159);
             this.Substrate6DataGridView.MultiSelect = false;
             this.Substrate6DataGridView.Name = "Substrate6DataGridView";
             this.Substrate6DataGridView.RowHeadersVisible = false;
             this.Substrate6DataGridView.RowTemplate.Height = 21;
-            this.Substrate6DataGridView.Size = new Size(270, 74);
+            this.Substrate6DataGridView.Size = new Size(270, 100);
             this.Substrate6DataGridView.TabIndex = 41;
             // 
             // dataGridViewTextBoxColumn0601
@@ -559,7 +558,7 @@
             // 
             this.Substrate6CheckBox.AutoSize = true;
             this.Substrate6CheckBox.Enabled = false;
-            this.Substrate6CheckBox.Location = new Point(357, 6);
+            this.Substrate6CheckBox.Location = new Point(332, 134);
             this.Substrate6CheckBox.Name = "Substrate6CheckBox";
             this.Substrate6CheckBox.Size = new Size(31, 19);
             this.Substrate6CheckBox.TabIndex = 40;
@@ -579,12 +578,12 @@
             this.Substrate5DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0501, this.dataGridViewTextBoxColumn0502, this.dataGridViewTextBoxColumn0503, this.dataGridViewTextBoxColumn0504, this.dataGridViewCheckBoxColumn0501 });
             this.Substrate5DataGridView.Enabled = false;
             this.Substrate5DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate5DataGridView.Location = new Point(45, 433);
+            this.Substrate5DataGridView.Location = new Point(332, 28);
             this.Substrate5DataGridView.MultiSelect = false;
             this.Substrate5DataGridView.Name = "Substrate5DataGridView";
             this.Substrate5DataGridView.RowHeadersVisible = false;
             this.Substrate5DataGridView.RowTemplate.Height = 21;
-            this.Substrate5DataGridView.Size = new Size(270, 74);
+            this.Substrate5DataGridView.Size = new Size(270, 100);
             this.Substrate5DataGridView.TabIndex = 39;
             // 
             // dataGridViewTextBoxColumn0501
@@ -632,7 +631,7 @@
             // 
             this.Substrate5CheckBox.AutoSize = true;
             this.Substrate5CheckBox.Enabled = false;
-            this.Substrate5CheckBox.Location = new Point(45, 410);
+            this.Substrate5CheckBox.Location = new Point(332, 3);
             this.Substrate5CheckBox.Name = "Substrate5CheckBox";
             this.Substrate5CheckBox.Size = new Size(31, 19);
             this.Substrate5CheckBox.TabIndex = 38;
@@ -653,12 +652,12 @@
             this.Substrate4DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0401, this.dataGridViewTextBoxColumn0402, this.dataGridViewTextBoxColumn0403, this.dataGridViewTextBoxColumn0404, this.dataGridViewCheckBoxColumn0401 });
             this.Substrate4DataGridView.Enabled = false;
             this.Substrate4DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate4DataGridView.Location = new Point(45, 332);
+            this.Substrate4DataGridView.Location = new Point(28, 421);
             this.Substrate4DataGridView.MultiSelect = false;
             this.Substrate4DataGridView.Name = "Substrate4DataGridView";
             this.Substrate4DataGridView.RowHeadersVisible = false;
             this.Substrate4DataGridView.RowTemplate.Height = 21;
-            this.Substrate4DataGridView.Size = new Size(270, 74);
+            this.Substrate4DataGridView.Size = new Size(270, 100);
             this.Substrate4DataGridView.TabIndex = 37;
             // 
             // dataGridViewTextBoxColumn0401
@@ -706,7 +705,7 @@
             // 
             this.Substrate4CheckBox.AutoSize = true;
             this.Substrate4CheckBox.Enabled = false;
-            this.Substrate4CheckBox.Location = new Point(45, 309);
+            this.Substrate4CheckBox.Location = new Point(27, 396);
             this.Substrate4CheckBox.Name = "Substrate4CheckBox";
             this.Substrate4CheckBox.Size = new Size(31, 19);
             this.Substrate4CheckBox.TabIndex = 36;
@@ -727,12 +726,12 @@
             this.Substrate3DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0301, this.dataGridViewTextBoxColumn0302, this.dataGridViewTextBoxColumn0303, this.dataGridViewTextBoxColumn0304, this.dataGridViewCheckBoxColumn0301 });
             this.Substrate3DataGridView.Enabled = false;
             this.Substrate3DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate3DataGridView.Location = new Point(45, 231);
+            this.Substrate3DataGridView.Location = new Point(28, 290);
             this.Substrate3DataGridView.MultiSelect = false;
             this.Substrate3DataGridView.Name = "Substrate3DataGridView";
             this.Substrate3DataGridView.RowHeadersVisible = false;
             this.Substrate3DataGridView.RowTemplate.Height = 21;
-            this.Substrate3DataGridView.Size = new Size(270, 74);
+            this.Substrate3DataGridView.Size = new Size(270, 100);
             this.Substrate3DataGridView.TabIndex = 35;
             // 
             // dataGridViewTextBoxColumn0301
@@ -780,7 +779,7 @@
             // 
             this.Substrate3CheckBox.AutoSize = true;
             this.Substrate3CheckBox.Enabled = false;
-            this.Substrate3CheckBox.Location = new Point(45, 208);
+            this.Substrate3CheckBox.Location = new Point(28, 265);
             this.Substrate3CheckBox.Name = "Substrate3CheckBox";
             this.Substrate3CheckBox.Size = new Size(31, 19);
             this.Substrate3CheckBox.TabIndex = 34;
@@ -801,12 +800,12 @@
             this.Substrate2DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0201, this.dataGridViewTextBoxColumn0202, this.dataGridViewTextBoxColumn0203, this.dataGridViewTextBoxColumn0204, this.dataGridViewCheckBoxColumn0201 });
             this.Substrate2DataGridView.Enabled = false;
             this.Substrate2DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate2DataGridView.Location = new Point(45, 130);
+            this.Substrate2DataGridView.Location = new Point(28, 159);
             this.Substrate2DataGridView.MultiSelect = false;
             this.Substrate2DataGridView.Name = "Substrate2DataGridView";
             this.Substrate2DataGridView.RowHeadersVisible = false;
             this.Substrate2DataGridView.RowTemplate.Height = 21;
-            this.Substrate2DataGridView.Size = new Size(270, 74);
+            this.Substrate2DataGridView.Size = new Size(270, 100);
             this.Substrate2DataGridView.TabIndex = 33;
             // 
             // dataGridViewTextBoxColumn0201
@@ -854,7 +853,7 @@
             // 
             this.Substrate2CheckBox.AutoSize = true;
             this.Substrate2CheckBox.Enabled = false;
-            this.Substrate2CheckBox.Location = new Point(45, 107);
+            this.Substrate2CheckBox.Location = new Point(28, 134);
             this.Substrate2CheckBox.Name = "Substrate2CheckBox";
             this.Substrate2CheckBox.Size = new Size(31, 19);
             this.Substrate2CheckBox.TabIndex = 32;
@@ -875,12 +874,12 @@
             this.Substrate1DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn0101, this.dataGridViewTextBoxColumn0102, this.dataGridViewTextBoxColumn0103, this.dataGridViewTextBoxColumn0104, this.dataGridViewCheckBoxColumn0101 });
             this.Substrate1DataGridView.Enabled = false;
             this.Substrate1DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate1DataGridView.Location = new Point(45, 29);
+            this.Substrate1DataGridView.Location = new Point(28, 28);
             this.Substrate1DataGridView.MultiSelect = false;
             this.Substrate1DataGridView.Name = "Substrate1DataGridView";
             this.Substrate1DataGridView.RowHeadersVisible = false;
             this.Substrate1DataGridView.RowTemplate.Height = 21;
-            this.Substrate1DataGridView.Size = new Size(270, 74);
+            this.Substrate1DataGridView.Size = new Size(270, 100);
             this.Substrate1DataGridView.TabIndex = 31;
             // 
             // dataGridViewTextBoxColumn0101
@@ -928,7 +927,7 @@
             // 
             this.Substrate1CheckBox.AutoSize = true;
             this.Substrate1CheckBox.Enabled = false;
-            this.Substrate1CheckBox.Location = new Point(45, 6);
+            this.Substrate1CheckBox.Location = new Point(28, 3);
             this.Substrate1CheckBox.Name = "Substrate1CheckBox";
             this.Substrate1CheckBox.Size = new Size(31, 19);
             this.Substrate1CheckBox.TabIndex = 30;
@@ -938,9 +937,8 @@
             // 
             // Label1
             // 
-            this.Label1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.Label1.AutoSize = true;
-            this.Label1.Location = new Point(45, 518);
+            this.Label1.Location = new Point(28, 542);
             this.Label1.Name = "Label1";
             this.Label1.Size = new Size(55, 15);
             this.Label1.TabIndex = 58;
@@ -948,9 +946,8 @@
             // 
             // OrderNumberTextBox
             // 
-            this.OrderNumberTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.OrderNumberTextBox.Enabled = false;
-            this.OrderNumberTextBox.Location = new Point(45, 536);
+            this.OrderNumberTextBox.Location = new Point(28, 560);
             this.OrderNumberTextBox.MaxLength = 50;
             this.OrderNumberTextBox.Name = "OrderNumberTextBox";
             this.OrderNumberTextBox.Size = new Size(110, 23);
@@ -959,9 +956,8 @@
             // 
             // label2
             // 
-            this.label2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.label2.AutoSize = true;
-            this.label2.Location = new Point(165, 518);
+            this.label2.Location = new Point(148, 542);
             this.label2.Name = "label2";
             this.label2.Size = new Size(55, 15);
             this.label2.TabIndex = 60;
@@ -969,9 +965,8 @@
             // 
             // ManufacturingNumberTextBox
             // 
-            this.ManufacturingNumberTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.ManufacturingNumberTextBox.Enabled = false;
-            this.ManufacturingNumberTextBox.Location = new Point(165, 536);
+            this.ManufacturingNumberTextBox.Location = new Point(148, 560);
             this.ManufacturingNumberTextBox.MaxLength = 50;
             this.ManufacturingNumberTextBox.Name = "ManufacturingNumberTextBox";
             this.ManufacturingNumberTextBox.Size = new Size(110, 23);
@@ -980,9 +975,8 @@
             // 
             // QuantityTextBox
             // 
-            this.QuantityTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.QuantityTextBox.Enabled = false;
-            this.QuantityTextBox.Location = new Point(45, 586);
+            this.QuantityTextBox.Location = new Point(28, 610);
             this.QuantityTextBox.MaxLength = 50;
             this.QuantityTextBox.Name = "QuantityTextBox";
             this.QuantityTextBox.Size = new Size(110, 23);
@@ -991,9 +985,8 @@
             // 
             // RevisionTextBox
             // 
-            this.RevisionTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.RevisionTextBox.Enabled = false;
-            this.RevisionTextBox.Location = new Point(165, 586);
+            this.RevisionTextBox.Location = new Point(148, 610);
             this.RevisionTextBox.Margin = new Padding(0);
             this.RevisionTextBox.MaxLength = 4;
             this.RevisionTextBox.Name = "RevisionTextBox";
@@ -1003,10 +996,9 @@
             // 
             // PersonComboBox
             // 
-            this.PersonComboBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.PersonComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             this.PersonComboBox.FormattingEnabled = true;
-            this.PersonComboBox.Location = new Point(285, 586);
+            this.PersonComboBox.Location = new Point(268, 610);
             this.PersonComboBox.Name = "PersonComboBox";
             this.PersonComboBox.Size = new Size(110, 23);
             this.PersonComboBox.TabIndex = 71;
@@ -1025,9 +1017,8 @@
             // 
             // label103
             // 
-            this.label103.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.label103.AutoSize = true;
-            this.label103.Location = new Point(45, 568);
+            this.label103.Location = new Point(28, 592);
             this.label103.Name = "label103";
             this.label103.Size = new Size(31, 15);
             this.label103.TabIndex = 79;
@@ -1035,9 +1026,8 @@
             // 
             // label105
             // 
-            this.label105.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.label105.AutoSize = true;
-            this.label105.Location = new Point(165, 568);
+            this.label105.Location = new Point(148, 592);
             this.label105.Name = "label105";
             this.label105.Size = new Size(49, 15);
             this.label105.TabIndex = 80;
@@ -1045,9 +1035,8 @@
             // 
             // label104
             // 
-            this.label104.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.label104.AutoSize = true;
-            this.label104.Location = new Point(285, 518);
+            this.label104.Location = new Point(268, 542);
             this.label104.Name = "label104";
             this.label104.Size = new Size(43, 15);
             this.label104.TabIndex = 81;
@@ -1055,9 +1044,8 @@
             // 
             // label106
             // 
-            this.label106.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.label106.AutoSize = true;
-            this.label106.Location = new Point(285, 568);
+            this.label106.Location = new Point(268, 592);
             this.label106.Name = "label106";
             this.label106.Size = new Size(43, 15);
             this.label106.TabIndex = 82;
@@ -1065,9 +1053,8 @@
             // 
             // label107
             // 
-            this.label107.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.label107.AutoSize = true;
-            this.label107.Location = new Point(412, 518);
+            this.label107.Location = new Point(395, 542);
             this.label107.Name = "label107";
             this.label107.Size = new Size(40, 15);
             this.label107.TabIndex = 83;
@@ -1075,9 +1062,8 @@
             // 
             // panelCommentTextBox
             // 
-            this.panelCommentTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.panelCommentTextBox.Controls.Add(this.CommentTextBox);
-            this.panelCommentTextBox.Location = new Point(412, 536);
+            this.panelCommentTextBox.Location = new Point(395, 560);
             this.panelCommentTextBox.Name = "panelCommentTextBox";
             this.panelCommentTextBox.Size = new Size(214, 73);
             this.panelCommentTextBox.TabIndex = 84;
@@ -1094,12 +1080,12 @@
             this.Substrate15DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn1, this.dataGridViewTextBoxColumn2, this.dataGridViewTextBoxColumn3, this.dataGridViewTextBoxColumn4, this.dataGridViewCheckBoxColumn1 });
             this.Substrate15DataGridView.Enabled = false;
             this.Substrate15DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate15DataGridView.Location = new Point(669, 433);
+            this.Substrate15DataGridView.Location = new Point(940, 290);
             this.Substrate15DataGridView.MultiSelect = false;
             this.Substrate15DataGridView.Name = "Substrate15DataGridView";
             this.Substrate15DataGridView.RowHeadersVisible = false;
             this.Substrate15DataGridView.RowTemplate.Height = 21;
-            this.Substrate15DataGridView.Size = new Size(270, 74);
+            this.Substrate15DataGridView.Size = new Size(270, 100);
             this.Substrate15DataGridView.TabIndex = 94;
             // 
             // dataGridViewTextBoxColumn1
@@ -1147,7 +1133,7 @@
             // 
             this.Substrate15CheckBox.AutoSize = true;
             this.Substrate15CheckBox.Enabled = false;
-            this.Substrate15CheckBox.Location = new Point(669, 410);
+            this.Substrate15CheckBox.Location = new Point(940, 265);
             this.Substrate15CheckBox.Name = "Substrate15CheckBox";
             this.Substrate15CheckBox.Size = new Size(31, 19);
             this.Substrate15CheckBox.TabIndex = 93;
@@ -1168,12 +1154,12 @@
             this.Substrate14DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn5, this.dataGridViewTextBoxColumn6, this.dataGridViewTextBoxColumn7, this.dataGridViewTextBoxColumn8, this.dataGridViewCheckBoxColumn2 });
             this.Substrate14DataGridView.Enabled = false;
             this.Substrate14DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate14DataGridView.Location = new Point(669, 332);
+            this.Substrate14DataGridView.Location = new Point(940, 159);
             this.Substrate14DataGridView.MultiSelect = false;
             this.Substrate14DataGridView.Name = "Substrate14DataGridView";
             this.Substrate14DataGridView.RowHeadersVisible = false;
             this.Substrate14DataGridView.RowTemplate.Height = 21;
-            this.Substrate14DataGridView.Size = new Size(270, 74);
+            this.Substrate14DataGridView.Size = new Size(270, 100);
             this.Substrate14DataGridView.TabIndex = 92;
             // 
             // dataGridViewTextBoxColumn5
@@ -1221,7 +1207,7 @@
             // 
             this.Substrate14CheckBox.AutoSize = true;
             this.Substrate14CheckBox.Enabled = false;
-            this.Substrate14CheckBox.Location = new Point(669, 309);
+            this.Substrate14CheckBox.Location = new Point(940, 134);
             this.Substrate14CheckBox.Name = "Substrate14CheckBox";
             this.Substrate14CheckBox.Size = new Size(31, 19);
             this.Substrate14CheckBox.TabIndex = 91;
@@ -1242,12 +1228,12 @@
             this.Substrate13DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn9, this.dataGridViewTextBoxColumn10, this.dataGridViewTextBoxColumn11, this.dataGridViewTextBoxColumn12, this.dataGridViewCheckBoxColumn3 });
             this.Substrate13DataGridView.Enabled = false;
             this.Substrate13DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate13DataGridView.Location = new Point(669, 231);
+            this.Substrate13DataGridView.Location = new Point(940, 28);
             this.Substrate13DataGridView.MultiSelect = false;
             this.Substrate13DataGridView.Name = "Substrate13DataGridView";
             this.Substrate13DataGridView.RowHeadersVisible = false;
             this.Substrate13DataGridView.RowTemplate.Height = 21;
-            this.Substrate13DataGridView.Size = new Size(270, 74);
+            this.Substrate13DataGridView.Size = new Size(270, 100);
             this.Substrate13DataGridView.TabIndex = 90;
             // 
             // dataGridViewTextBoxColumn9
@@ -1295,7 +1281,7 @@
             // 
             this.Substrate13CheckBox.AutoSize = true;
             this.Substrate13CheckBox.Enabled = false;
-            this.Substrate13CheckBox.Location = new Point(669, 208);
+            this.Substrate13CheckBox.Location = new Point(940, 3);
             this.Substrate13CheckBox.Name = "Substrate13CheckBox";
             this.Substrate13CheckBox.Size = new Size(31, 19);
             this.Substrate13CheckBox.TabIndex = 89;
@@ -1316,12 +1302,12 @@
             this.Substrate12DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn13, this.dataGridViewTextBoxColumn14, this.dataGridViewTextBoxColumn15, this.dataGridViewTextBoxColumn16, this.dataGridViewCheckBoxColumn4 });
             this.Substrate12DataGridView.Enabled = false;
             this.Substrate12DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate12DataGridView.Location = new Point(669, 130);
+            this.Substrate12DataGridView.Location = new Point(636, 421);
             this.Substrate12DataGridView.MultiSelect = false;
             this.Substrate12DataGridView.Name = "Substrate12DataGridView";
             this.Substrate12DataGridView.RowHeadersVisible = false;
             this.Substrate12DataGridView.RowTemplate.Height = 21;
-            this.Substrate12DataGridView.Size = new Size(270, 74);
+            this.Substrate12DataGridView.Size = new Size(270, 100);
             this.Substrate12DataGridView.TabIndex = 88;
             // 
             // dataGridViewTextBoxColumn13
@@ -1369,7 +1355,7 @@
             // 
             this.Substrate12CheckBox.AutoSize = true;
             this.Substrate12CheckBox.Enabled = false;
-            this.Substrate12CheckBox.Location = new Point(669, 107);
+            this.Substrate12CheckBox.Location = new Point(636, 396);
             this.Substrate12CheckBox.Name = "Substrate12CheckBox";
             this.Substrate12CheckBox.Size = new Size(31, 19);
             this.Substrate12CheckBox.TabIndex = 87;
@@ -1390,12 +1376,12 @@
             this.Substrate11DataGridView.Columns.AddRange(new DataGridViewColumn[] { this.dataGridViewTextBoxColumn17, this.dataGridViewTextBoxColumn18, this.dataGridViewTextBoxColumn19, this.dataGridViewTextBoxColumn20, this.dataGridViewCheckBoxColumn5 });
             this.Substrate11DataGridView.Enabled = false;
             this.Substrate11DataGridView.GridColor = SystemColors.ControlDark;
-            this.Substrate11DataGridView.Location = new Point(669, 29);
+            this.Substrate11DataGridView.Location = new Point(636, 290);
             this.Substrate11DataGridView.MultiSelect = false;
             this.Substrate11DataGridView.Name = "Substrate11DataGridView";
             this.Substrate11DataGridView.RowHeadersVisible = false;
             this.Substrate11DataGridView.RowTemplate.Height = 21;
-            this.Substrate11DataGridView.Size = new Size(270, 74);
+            this.Substrate11DataGridView.Size = new Size(270, 100);
             this.Substrate11DataGridView.TabIndex = 86;
             // 
             // dataGridViewTextBoxColumn17
@@ -1443,7 +1429,7 @@
             // 
             this.Substrate11CheckBox.AutoSize = true;
             this.Substrate11CheckBox.Enabled = false;
-            this.Substrate11CheckBox.Location = new Point(669, 6);
+            this.Substrate11CheckBox.Location = new Point(636, 265);
             this.Substrate11CheckBox.Name = "Substrate11CheckBox";
             this.Substrate11CheckBox.Size = new Size(31, 19);
             this.Substrate11CheckBox.TabIndex = 85;
@@ -1454,65 +1440,75 @@
             // RegistrationDateTimePicker
             // 
             this.RegistrationDateTimePicker.Format = DateTimePickerFormat.Short;
-            this.RegistrationDateTimePicker.Location = new Point(285, 536);
+            this.RegistrationDateTimePicker.Location = new Point(268, 560);
             this.RegistrationDateTimePicker.Name = "RegistrationDateTimePicker";
             this.RegistrationDateTimePicker.Size = new Size(110, 23);
             this.RegistrationDateTimePicker.TabIndex = 613;
+            // 
+            // MainPanel
+            // 
+            this.MainPanel.AutoScroll = true;
+            this.MainPanel.Controls.Add(this.Substrate1CheckBox);
+            this.MainPanel.Controls.Add(this.RegistrationDateTimePicker);
+            this.MainPanel.Controls.Add(this.panelCommentTextBox);
+            this.MainPanel.Controls.Add(this.Substrate15DataGridView);
+            this.MainPanel.Controls.Add(this.Substrate1DataGridView);
+            this.MainPanel.Controls.Add(this.Substrate15CheckBox);
+            this.MainPanel.Controls.Add(this.Substrate2CheckBox);
+            this.MainPanel.Controls.Add(this.Substrate14DataGridView);
+            this.MainPanel.Controls.Add(this.Substrate2DataGridView);
+            this.MainPanel.Controls.Add(this.Substrate14CheckBox);
+            this.MainPanel.Controls.Add(this.Substrate3CheckBox);
+            this.MainPanel.Controls.Add(this.Substrate13DataGridView);
+            this.MainPanel.Controls.Add(this.Substrate3DataGridView);
+            this.MainPanel.Controls.Add(this.Substrate13CheckBox);
+            this.MainPanel.Controls.Add(this.Substrate4CheckBox);
+            this.MainPanel.Controls.Add(this.Substrate12DataGridView);
+            this.MainPanel.Controls.Add(this.Substrate4DataGridView);
+            this.MainPanel.Controls.Add(this.Substrate12CheckBox);
+            this.MainPanel.Controls.Add(this.Substrate5CheckBox);
+            this.MainPanel.Controls.Add(this.Substrate11DataGridView);
+            this.MainPanel.Controls.Add(this.Substrate5DataGridView);
+            this.MainPanel.Controls.Add(this.Substrate11CheckBox);
+            this.MainPanel.Controls.Add(this.Substrate6CheckBox);
+            this.MainPanel.Controls.Add(this.label107);
+            this.MainPanel.Controls.Add(this.Substrate6DataGridView);
+            this.MainPanel.Controls.Add(this.label106);
+            this.MainPanel.Controls.Add(this.Substrate7CheckBox);
+            this.MainPanel.Controls.Add(this.label104);
+            this.MainPanel.Controls.Add(this.Substrate7DataGridView);
+            this.MainPanel.Controls.Add(this.label105);
+            this.MainPanel.Controls.Add(this.Substrate8CheckBox);
+            this.MainPanel.Controls.Add(this.label103);
+            this.MainPanel.Controls.Add(this.Substrate8DataGridView);
+            this.MainPanel.Controls.Add(this.PersonComboBox);
+            this.MainPanel.Controls.Add(this.Substrate9CheckBox);
+            this.MainPanel.Controls.Add(this.RevisionTextBox);
+            this.MainPanel.Controls.Add(this.Substrate9DataGridView);
+            this.MainPanel.Controls.Add(this.QuantityTextBox);
+            this.MainPanel.Controls.Add(this.Substrate10CheckBox);
+            this.MainPanel.Controls.Add(this.ManufacturingNumberTextBox);
+            this.MainPanel.Controls.Add(this.Substrate10DataGridView);
+            this.MainPanel.Controls.Add(this.label2);
+            this.MainPanel.Controls.Add(this.SubstrateListPrintButton);
+            this.MainPanel.Controls.Add(this.OrderNumberTextBox);
+            this.MainPanel.Controls.Add(this.RegisterButton);
+            this.MainPanel.Controls.Add(this.Label1);
+            this.MainPanel.Controls.Add(this.CloseButton);
+            this.MainPanel.Dock = DockStyle.Fill;
+            this.MainPanel.Location = new Point(0, 0);
+            this.MainPanel.Name = "MainPanel";
+            this.MainPanel.Size = new Size(1238, 645);
+            this.MainPanel.TabIndex = 614;
             // 
             // SubstrateChange2
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(984, 621);
-            this.Controls.Add(this.RegistrationDateTimePicker);
-            this.Controls.Add(this.Substrate15DataGridView);
-            this.Controls.Add(this.Substrate15CheckBox);
-            this.Controls.Add(this.Substrate14DataGridView);
-            this.Controls.Add(this.Substrate14CheckBox);
-            this.Controls.Add(this.Substrate13DataGridView);
-            this.Controls.Add(this.Substrate13CheckBox);
-            this.Controls.Add(this.Substrate12DataGridView);
-            this.Controls.Add(this.Substrate12CheckBox);
-            this.Controls.Add(this.Substrate11DataGridView);
-            this.Controls.Add(this.Substrate11CheckBox);
-            this.Controls.Add(this.label107);
-            this.Controls.Add(this.label106);
-            this.Controls.Add(this.label104);
-            this.Controls.Add(this.label105);
-            this.Controls.Add(this.label103);
-            this.Controls.Add(this.PersonComboBox);
-            this.Controls.Add(this.RevisionTextBox);
-            this.Controls.Add(this.QuantityTextBox);
-            this.Controls.Add(this.ManufacturingNumberTextBox);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.OrderNumberTextBox);
-            this.Controls.Add(this.Label1);
-            this.Controls.Add(this.CloseButton);
-            this.Controls.Add(this.RegisterButton);
-            this.Controls.Add(this.SubstrateListPrintButton);
-            this.Controls.Add(this.Substrate10DataGridView);
-            this.Controls.Add(this.Substrate10CheckBox);
-            this.Controls.Add(this.Substrate9DataGridView);
-            this.Controls.Add(this.Substrate9CheckBox);
-            this.Controls.Add(this.Substrate8DataGridView);
-            this.Controls.Add(this.Substrate8CheckBox);
-            this.Controls.Add(this.Substrate7DataGridView);
-            this.Controls.Add(this.Substrate7CheckBox);
-            this.Controls.Add(this.Substrate6DataGridView);
-            this.Controls.Add(this.Substrate6CheckBox);
-            this.Controls.Add(this.Substrate5DataGridView);
-            this.Controls.Add(this.Substrate5CheckBox);
-            this.Controls.Add(this.Substrate4DataGridView);
-            this.Controls.Add(this.Substrate4CheckBox);
-            this.Controls.Add(this.Substrate3DataGridView);
-            this.Controls.Add(this.Substrate3CheckBox);
-            this.Controls.Add(this.Substrate2DataGridView);
-            this.Controls.Add(this.Substrate2CheckBox);
-            this.Controls.Add(this.Substrate1DataGridView);
-            this.Controls.Add(this.Substrate1CheckBox);
-            this.Controls.Add(this.panelCommentTextBox);
+            this.ClientSize = new Size(1238, 645);
+            this.Controls.Add(this.MainPanel);
             this.Font = new Font("Meiryo UI", 9F);
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = FormBorderStyle.SizableToolWindow;
             this.MinimizeBox = false;
             this.Name = "SubstrateChange2";
             this.ShowIcon = false;
@@ -1537,8 +1533,9 @@
             ((System.ComponentModel.ISupportInitialize)this.Substrate13DataGridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate12DataGridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate11DataGridView).EndInit();
+            this.MainPanel.ResumeLayout(false);
+            this.MainPanel.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
         }
 
         #endregion
@@ -1666,5 +1663,6 @@
         private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn5;
         private CheckBox Substrate11CheckBox;
         private DateTimePicker RegistrationDateTimePicker;
+        private Panel MainPanel;
     }
 }
