@@ -846,6 +846,7 @@ namespace ProductDatabase {
             }
             SubstrateListPrintButton.Enabled = ProductInfo.IsListPrint;
             CheckSheetPrintButton.Enabled = ProductInfo.IsCheckSheetPrint;
+            NameplatePrintButton.Enabled = ProductInfo.IsNameplatePrint;
         }
 
         // サービス向け用処理
