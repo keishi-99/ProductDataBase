@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using bpac;
+using System.ComponentModel;
 using System.Drawing.Printing;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -286,6 +287,29 @@ namespace ProductDatabase.Print {
             };
             var layoutRect = new RectangleF(posX, posY, width, height);
             graphics.DrawString(rowNumber.ToString(), font, Brushes.Black, layoutRect, sf);
+        }
+
+        // b-pac印刷処理
+        public static void PrintUsingBPac(NameplatePrintSettings nameplatePrintSettings, List<string> serialList) {
+
+            int copiesPerLabel = nameplatePrintSettings.CopiesPerLabel;
+            var templatePath = nameplatePrintSettings.TemplatePath;
+
+            var doc = new Document();
+            if (doc.Open(templatePath) != false) {
+                doc.StartPrint("", PrintOptionConstants.bpoDefault);
+
+                foreach (var serialNumber in serialList) {
+                    doc.GetObject("SerialNo").Text = serialNumber;
+                    doc.PrintOut(copiesPerLabel, PrintOptionConstants.bpoDefault);
+                }
+
+                doc.EndPrint();
+                doc.Close();
+            }
+            else {
+                throw new Exception("テンプレートファイルが開けませんでした。");
+            }
         }
     }
     public class PrintOptions {
