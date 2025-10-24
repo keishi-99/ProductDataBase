@@ -1,5 +1,4 @@
-﻿using bpac;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
 using static ProductDatabase.MainWindow;
@@ -122,7 +121,7 @@ namespace ProductDatabase {
 
                 switch (_serialType) {
                     case "Nameplate":
-                        PrintUsingBPac();
+                        PrintManager.PrintUsingBPac(NameplatePrintSettings, _serialList);
                         break;
                     default:
                         if (!Print(isPrint)) { throw new Exception("キャンセルしました。"); }
@@ -393,28 +392,6 @@ namespace ProductDatabase {
                 .Replace("%S", Convert.ToInt32(serialCode).ToString($"D{ProductInfo.SerialDigit}"));
 
             return outputCode;
-        }
-        // b-pac印刷処理
-        private void PrintUsingBPac() {
-
-            int copiesPerLabel = NameplatePrintSettings.CopiesPerLabel;
-            var serialList = _serialList;
-            var templatePath = NameplatePrintSettings.TemplatePath;
-
-            foreach (var serialNumber in serialList) {
-                var doc = new Document();
-                if (doc.Open(templatePath) != false) {
-                    doc.GetObject("SerialNo").Text = serialNumber;
-
-                    doc.StartPrint("", PrintOptionConstants.bpoDefault);
-                    doc.PrintOut(copiesPerLabel, PrintOptionConstants.bpoDefault);
-                    doc.EndPrint();
-                    doc.Close();
-                }
-                else {
-                    throw new Exception("テンプレートファイルが開けませんでした。");
-                }
-            }
         }
         // チェックボックスイベント
         private void CheckBoxChecked(object sender, EventArgs e) {
