@@ -77,10 +77,14 @@ namespace ProductDatabase.ExcelService {
                 // 対象列だけ走査
                 for (var rowIndex = workSheetMain.FirstRowNum; rowIndex <= workSheetMain.LastRowNum; rowIndex++) {
                     var row = workSheetMain.GetRow(rowIndex);
-                    if (row == null) continue;
+                    if (row == null) {
+                        continue;
+                    }
 
                     var cell = row.GetCell(targetColumnIndex);
-                    if (cell == null) continue;
+                    if (cell == null) {
+                        continue;
+                    }
 
                     var cellValue = GetCellValue(cell) ?? string.Empty;
 
@@ -259,10 +263,14 @@ namespace ProductDatabase.ExcelService {
                 // 対象列だけ走査
                 for (var rowIndex = workSheetMain.FirstRowNum; rowIndex <= workSheetMain.LastRowNum; rowIndex++) {
                     var row = workSheetMain.GetRow(rowIndex);
-                    if (row == null) continue;
+                    if (row == null) {
+                        continue;
+                    }
 
                     var cell = row.GetCell(targetColumnIndex);
-                    if (cell == null) continue;
+                    if (cell == null) {
+                        continue;
+                    }
 
                     var cellValue = GetCellValue(cell) ?? string.Empty;
 
@@ -384,13 +392,17 @@ namespace ProductDatabase.ExcelService {
 
                     // 対象行だけ走査
                     var row = workSheetMain.GetRow(resultRowIndex);
-                    if (row == null) continue;
+                    if (row == null) {
+                        continue;
+                    }
 
 
                     // 各セルを走査
                     for (int colIndex = row.FirstCellNum; colIndex < row.LastCellNum; colIndex++) {
                         var cell = row.GetCell(colIndex);
-                        if (cell == null) continue;
+                        if (cell == null) {
+                            continue;
+                        }
 
                         var cellValue = GetCellValue(cell) ?? string.Empty;
 
@@ -463,10 +475,10 @@ namespace ProductDatabase.ExcelService {
 
                     // ワークシート選択
                     xlSheets = xlBook.Sheets;
-                    xlSheet = xlSheets[sheetName];
+                    xlSheet = (Microsoft.Office.Interop.Excel.Worksheet?)xlSheets[sheetName];
 
                     // ワークシート表示
-                    xlSheet.Activate();
+                    xlSheet?.Activate();
 
                     // 印刷処理が必要な場合は、ここに xlSheet.PrintOut() などを追加します。
                     // 例: xlSheet.PrintOut();
@@ -566,10 +578,14 @@ namespace ProductDatabase.ExcelService {
                 // 対象列だけ走査
                 for (var rowIndex = workSheetMain.FirstRowNum; rowIndex <= workSheetMain.LastRowNum; rowIndex++) {
                     var row = workSheetMain.GetRow(rowIndex);
-                    if (row == null) continue;
+                    if (row == null) {
+                        continue;
+                    }
 
                     var cell = row.GetCell(targetColumnIndex);
-                    if (cell == null) continue;
+                    if (cell == null) {
+                        continue;
+                    }
 
                     var cellValue = GetCellValue(cell) ?? string.Empty;
 
@@ -773,10 +789,14 @@ namespace ProductDatabase.ExcelService {
                 // 対象列だけ走査
                 for (var rowIndex = workSheetMain.FirstRowNum; rowIndex <= workSheetMain.LastRowNum; rowIndex++) {
                     var row = workSheetMain.GetRow(rowIndex);
-                    if (row == null) continue;
+                    if (row == null) {
+                        continue;
+                    }
 
                     var cell = row.GetCell(targetColumnIndex);
-                    if (cell == null) continue;
+                    if (cell == null) {
+                        continue;
+                    }
 
                     var cellValue = GetCellValue(cell) ?? string.Empty;
 
@@ -828,10 +848,10 @@ namespace ProductDatabase.ExcelService {
 
                     // ワークシート選択
                     xlSheets = xlBook.Sheets;
-                    xlSheet = string.IsNullOrEmpty(sheetName) ? xlSheets[1] : xlSheets[sheetName];
+                    xlSheet = (Microsoft.Office.Interop.Excel.Worksheet?)(string.IsNullOrEmpty(sheetName) ? xlSheets[1] : xlSheets[sheetName]);
 
                     // ワークシート表示
-                    xlSheet.Activate();
+                    xlSheet?.Activate();
 
                 } finally {
                     // COMオブジェクトの解放
@@ -852,7 +872,10 @@ namespace ProductDatabase.ExcelService {
 
 
         private static string? GetCellValue(ICell cell) {
-            if (cell == null) return string.Empty;
+            if (cell == null) {
+                return string.Empty;
+            }
+
             return cell.CellType switch {
                 CellType.String => cell.StringCellValue,
                 CellType.Numeric => cell.NumericCellValue.ToString(),
@@ -871,15 +894,20 @@ namespace ProductDatabase.ExcelService {
         private static int ColumnNameToIndex(string columnName) {
             var index = 0;
             foreach (var c in columnName.ToUpper()) {
-                if (c < 'A' || c > 'Z') throw new ArgumentException("Invalid column name");
-                index = index * 26 + c - 'A' + 1;
+                if (c < 'A' || c > 'Z') {
+                    throw new ArgumentException("Invalid column name");
+                }
+
+                index = (index * 26) + c - 'A' + 1;
             }
             return index - 1; // 0始まり
         }
         private static void GetRowColFromAddress(string address, out int rowIndex, out int colIndex) {
             // 数字の位置を検索
             var i = 0;
-            while (i < address.Length && char.IsLetter(address[i])) i++;
+            while (i < address.Length && char.IsLetter(address[i])) {
+                i++;
+            }
 
             var colPart = address[..i];   // "A"
             var rowPart = address[i..];      // "2"

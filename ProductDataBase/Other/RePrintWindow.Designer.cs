@@ -58,6 +58,7 @@
             this.設定ToolStripMenuItem = new ToolStripMenuItem();
             this.シリアルラベル印刷設定ToolStripMenuItem = new ToolStripMenuItem();
             this.バーコード印刷設定ToolStripMenuItem = new ToolStripMenuItem();
+            this.銘版印刷設定ToolStripMenuItem = new ToolStripMenuItem();
             this.ヘルプToolStripMenuItem = new ToolStripMenuItem();
             this.取得情報ToolStripMenuItem = new ToolStripMenuItem();
             this.BarcodePrintButton = new Button();
@@ -73,6 +74,7 @@
             this.textToUpperCheckBox = new CheckBox();
             this.RegistrationDateTimePicker = new DateTimePicker();
             this.RNumberCheckBox = new CheckBox();
+            this.NamePlatePrintButton = new Button();
             this.RePrintMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPositionNumericUpDown).BeginInit();
             this.panel1.SuspendLayout();
@@ -432,7 +434,7 @@
             // 
             // 設定ToolStripMenuItem
             // 
-            this.設定ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.シリアルラベル印刷設定ToolStripMenuItem, this.バーコード印刷設定ToolStripMenuItem });
+            this.設定ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.シリアルラベル印刷設定ToolStripMenuItem, this.バーコード印刷設定ToolStripMenuItem, this.銘版印刷設定ToolStripMenuItem });
             this.設定ToolStripMenuItem.Name = "設定ToolStripMenuItem";
             this.設定ToolStripMenuItem.Size = new Size(43, 20);
             this.設定ToolStripMenuItem.Text = "設定";
@@ -451,6 +453,13 @@
             this.バーコード印刷設定ToolStripMenuItem.Text = "バーコード印刷設定";
             this.バーコード印刷設定ToolStripMenuItem.Click += this.バーコード印刷設定ToolStripMenuItem_Click;
             // 
+            // 銘版印刷設定ToolStripMenuItem
+            // 
+            this.銘版印刷設定ToolStripMenuItem.Name = "銘版印刷設定ToolStripMenuItem";
+            this.銘版印刷設定ToolStripMenuItem.Size = new Size(186, 22);
+            this.銘版印刷設定ToolStripMenuItem.Text = "銘版印刷設定";
+            this.銘版印刷設定ToolStripMenuItem.Click += this.銘版印刷設定ToolStripMenuItem_Click;
+            // 
             // ヘルプToolStripMenuItem
             // 
             this.ヘルプToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.取得情報ToolStripMenuItem });
@@ -467,7 +476,7 @@
             // 
             // BarcodePrintButton
             // 
-            this.BarcodePrintButton.Location = new Point(450, 404);
+            this.BarcodePrintButton.Location = new Point(339, 407);
             this.BarcodePrintButton.Margin = new Padding(0);
             this.BarcodePrintButton.Name = "BarcodePrintButton";
             this.BarcodePrintButton.Size = new Size(100, 25);
@@ -478,7 +487,7 @@
             // 
             // LabelPrintButton
             // 
-            this.LabelPrintButton.Location = new Point(313, 404);
+            this.LabelPrintButton.Location = new Point(204, 407);
             this.LabelPrintButton.Margin = new Padding(0);
             this.LabelPrintButton.Name = "LabelPrintButton";
             this.LabelPrintButton.Size = new Size(100, 25);
@@ -489,7 +498,7 @@
             // 
             // PrintPositionNumericUpDown
             // 
-            this.PrintPositionNumericUpDown.Location = new Point(166, 406);
+            this.PrintPositionNumericUpDown.Location = new Point(57, 409);
             this.PrintPositionNumericUpDown.Margin = new Padding(0);
             this.PrintPositionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
             this.PrintPositionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
@@ -501,7 +510,7 @@
             // 
             // PrintRowLabel
             // 
-            this.PrintRowLabel.Location = new Point(178, 391);
+            this.PrintRowLabel.Location = new Point(69, 394);
             this.PrintRowLabel.Margin = new Padding(0);
             this.PrintRowLabel.Name = "PrintRowLabel";
             this.PrintRowLabel.Size = new Size(79, 15);
@@ -600,11 +609,22 @@
             this.RNumberCheckBox.UseVisualStyleBackColor = true;
             this.RNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
+            // NamePlatePrintButton
+            // 
+            this.NamePlatePrintButton.Location = new Point(474, 406);
+            this.NamePlatePrintButton.Name = "NamePlatePrintButton";
+            this.NamePlatePrintButton.Size = new Size(100, 25);
+            this.NamePlatePrintButton.TabIndex = 615;
+            this.NamePlatePrintButton.Text = "銘版印刷";
+            this.NamePlatePrintButton.UseVisualStyleBackColor = true;
+            this.NamePlatePrintButton.Click += this.NamePlatePrintButton_Click;
+            // 
             // RePrintWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.NamePlatePrintButton);
             this.Controls.Add(this.RNumberCheckBox);
             this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.textToUpperCheckBox);
@@ -716,5 +736,7 @@
         private CheckBox textToUpperCheckBox;
         private DateTimePicker RegistrationDateTimePicker;
         private CheckBox RNumberCheckBox;
+        private Button NamePlatePrintButton;
+        private ToolStripMenuItem 銘版印刷設定ToolStripMenuItem;
     }
 }

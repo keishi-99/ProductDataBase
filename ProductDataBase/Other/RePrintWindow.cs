@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using bpac;
+using Microsoft.Data.Sqlite;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
 using static ProductDatabase.MainWindow;
@@ -10,6 +11,7 @@ namespace ProductDatabase {
         public DocumentPrintSettings ProductPrintSettings { get; set; } = new DocumentPrintSettings();
         public LabelPrintSettings LabelPrintSettings => this.ProductPrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
         public BarcodePrintSettings BarcodePrintSettings => ProductPrintSettings.BarcodePrintSettings ?? new BarcodePrintSettings();
+        public NameplatePrintSettings NameplatePrintSettings => ProductPrintSettings.NameplatePrintSettings ?? new NameplatePrintSettings();
 
         public string printSettingPath = string.Empty;
 
@@ -79,11 +81,13 @@ namespace ProductDatabase {
             FirstSerialNumberCheckBox.Checked = true;
             LabelPrintButton.Enabled = ProductInfo.IsLabelPrint;
             BarcodePrintButton.Enabled = ProductInfo.IsBarcodePrint;
+            NamePlatePrintButton.Enabled = ProductInfo.IsNameplatePrint;
 
             シリアルラベル印刷プレビューToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;
             シリアルラベル印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;
             バーコード印刷プレビューToolStripMenuItem.Enabled = ProductInfo.IsBarcodePrint;
             バーコード印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsBarcodePrint;
+            銘版印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsNameplatePrint;
 
             LoadSettings();
         }
@@ -116,7 +120,14 @@ namespace ProductDatabase {
                     if (!Registration()) { throw new Exception("登録できませんでした。"); }
                 }
 
-                if (!Print(isPrint)) { throw new Exception("キャンセルしました。"); }
+                switch (_serialType) {
+                    case "Nameplate":
+                        PrintUsingBPac();
+                        break;
+                    default:
+                        if (!Print(isPrint)) { throw new Exception("キャンセルしました。"); }
+                        break;
+                }
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -383,6 +394,28 @@ namespace ProductDatabase {
 
             return outputCode;
         }
+        // b-pac印刷処理
+        private void PrintUsingBPac() {
+
+            int copiesPerLabel = NameplatePrintSettings.CopiesPerLabel;
+            var serialList = _serialList;
+            var templatePath = NameplatePrintSettings.TemplatePath;
+
+            foreach (var serialNumber in serialList) {
+                var doc = new Document();
+                if (doc.Open(templatePath) != false) {
+                    doc.GetObject("SerialNo").Text = serialNumber;
+
+                    doc.StartPrint("", PrintOptionConstants.bpoDefault);
+                    doc.PrintOut(copiesPerLabel, PrintOptionConstants.bpoDefault);
+                    doc.EndPrint();
+                    doc.Close();
+                }
+                else {
+                    throw new Exception("テンプレートファイルが開けませんでした。");
+                }
+            }
+        }
         // チェックボックスイベント
         private void CheckBoxChecked(object sender, EventArgs e) {
             var checkBox = (CheckBox)sender;
@@ -534,6 +567,10 @@ namespace ProductDatabase {
             _serialType = "Barcode";
             RegisterCheck(true);
         }
+        private void NamePlatePrintButton_Click(object sender, EventArgs e) {
+            _serialType = "Nameplate";
+            RegisterCheck(true);
+        }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
         private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Label";
@@ -555,6 +592,14 @@ namespace ProductDatabase {
             PrintSettingsWindow ls = new() {
                 ProductInfo = ProductInfo,
                 serialType = "Barcode"
+            };
+            ls.ShowDialog(this);
+            LoadSettings();
+        }
+        private void 銘版印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
+            PrintSettingsWindow ls = new() {
+                ProductInfo = ProductInfo,
+                serialType = "Nameplate"
             };
             ls.ShowDialog(this);
             LoadSettings();
