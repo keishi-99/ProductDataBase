@@ -74,7 +74,7 @@
             this.textToUpperCheckBox = new CheckBox();
             this.RegistrationDateTimePicker = new DateTimePicker();
             this.RNumberCheckBox = new CheckBox();
-            this.NamePlatePrintButton = new Button();
+            this.NameplatePrintButton = new Button();
             this.RePrintMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPositionNumericUpDown).BeginInit();
             this.panel1.SuspendLayout();
@@ -609,22 +609,22 @@
             this.RNumberCheckBox.UseVisualStyleBackColor = true;
             this.RNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
-            // NamePlatePrintButton
+            // NameplatePrintButton
             // 
-            this.NamePlatePrintButton.Location = new Point(474, 406);
-            this.NamePlatePrintButton.Name = "NamePlatePrintButton";
-            this.NamePlatePrintButton.Size = new Size(100, 25);
-            this.NamePlatePrintButton.TabIndex = 615;
-            this.NamePlatePrintButton.Text = "銘版印刷";
-            this.NamePlatePrintButton.UseVisualStyleBackColor = true;
-            this.NamePlatePrintButton.Click += this.NamePlatePrintButton_Click;
+            this.NameplatePrintButton.Location = new Point(474, 406);
+            this.NameplatePrintButton.Name = "NameplatePrintButton";
+            this.NameplatePrintButton.Size = new Size(100, 25);
+            this.NameplatePrintButton.TabIndex = 615;
+            this.NameplatePrintButton.Text = "銘版印刷";
+            this.NameplatePrintButton.UseVisualStyleBackColor = true;
+            this.NameplatePrintButton.Click += this.NamePlatePrintButton_Click;
             // 
             // RePrintWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
-            this.Controls.Add(this.NamePlatePrintButton);
+            this.Controls.Add(this.NameplatePrintButton);
             this.Controls.Add(this.RNumberCheckBox);
             this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.textToUpperCheckBox);
@@ -736,7 +736,7 @@
         private CheckBox textToUpperCheckBox;
         private DateTimePicker RegistrationDateTimePicker;
         private CheckBox RNumberCheckBox;
-        private Button NamePlatePrintButton;
+        private Button NameplatePrintButton;
         private ToolStripMenuItem 銘版印刷設定ToolStripMenuItem;
     }
 }

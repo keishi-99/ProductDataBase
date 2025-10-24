@@ -80,7 +80,7 @@ namespace ProductDatabase {
             FirstSerialNumberCheckBox.Checked = true;
             LabelPrintButton.Enabled = ProductInfo.IsLabelPrint;
             BarcodePrintButton.Enabled = ProductInfo.IsBarcodePrint;
-            NamePlatePrintButton.Enabled = ProductInfo.IsNameplatePrint;
+            NameplatePrintButton.Enabled = ProductInfo.IsNameplatePrint;
 
             シリアルラベル印刷プレビューToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;
             シリアルラベル印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;

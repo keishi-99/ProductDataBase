@@ -133,7 +133,7 @@
             this.dataGridViewTextBoxColumn1003 = new DataGridViewTextBoxColumn();
             this.dataGridViewCheckBoxColumn1001 = new DataGridViewCheckBoxColumn();
             this.MainPanel = new Panel();
-            this.NamePlatePrintButton = new Button();
+            this.NameplatePrintButton = new Button();
             this.ProductRegistration2MenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.Substrate1DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate15DataGridView).BeginInit();
@@ -1317,7 +1317,7 @@
             // MainPanel
             // 
             this.MainPanel.AutoScroll = true;
-            this.MainPanel.Controls.Add(this.NamePlatePrintButton);
+            this.MainPanel.Controls.Add(this.NameplatePrintButton);
             this.MainPanel.Controls.Add(this.Substrate1CheckBox);
             this.MainPanel.Controls.Add(this.Substrate10DataGridView);
             this.MainPanel.Controls.Add(this.GenerateReportButton);
@@ -1363,15 +1363,16 @@
             this.MainPanel.Size = new Size(1198, 621);
             this.MainPanel.TabIndex = 80;
             // 
-            // NamePlatePrintButton
+            // NameplatePrintButton
             // 
-            this.NamePlatePrintButton.Location = new Point(904, 483);
-            this.NamePlatePrintButton.Name = "NamePlatePrintButton";
-            this.NamePlatePrintButton.Size = new Size(90, 25);
-            this.NamePlatePrintButton.TabIndex = 80;
-            this.NamePlatePrintButton.Text = "銘版印刷";
-            this.NamePlatePrintButton.UseVisualStyleBackColor = true;
-            this.NamePlatePrintButton.Click += this.NamePlatePrintButton_Click;
+            this.NameplatePrintButton.Enabled = false;
+            this.NameplatePrintButton.Location = new Point(904, 483);
+            this.NameplatePrintButton.Name = "NameplatePrintButton";
+            this.NameplatePrintButton.Size = new Size(90, 25);
+            this.NameplatePrintButton.TabIndex = 80;
+            this.NameplatePrintButton.Text = "銘版印刷";
+            this.NameplatePrintButton.UseVisualStyleBackColor = true;
+            this.NameplatePrintButton.Click += this.NamePlatePrintButton_Click;
             // 
             // ProductRegistration2Window
             // 
@@ -1530,6 +1531,6 @@
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1003;
         private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn1001;
         private Panel MainPanel;
-        private Button NamePlatePrintButton;
+        private Button NameplatePrintButton;
     }
 }
