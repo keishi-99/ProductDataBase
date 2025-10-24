@@ -380,6 +380,7 @@ namespace ProductDatabase {
             var outputCode = _serialType switch {
                 "Label" => LabelPrintSettings.TextFormat ?? string.Empty,
                 "Barcode" => BarcodePrintSettings.TextFormat ?? string.Empty,
+                "Nameplate" => NameplatePrintSettings.TextFormat ?? string.Empty,
                 _ => string.Empty
             };
 
