@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using bpac;
+using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
@@ -13,6 +14,7 @@ namespace ProductDatabase {
         public DocumentPrintSettings ProductPrintSettings { get; set; } = new DocumentPrintSettings();
         public LabelPrintSettings LabelPrintSettings => ProductPrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
         public BarcodePrintSettings BarcodePrintSettings => ProductPrintSettings.BarcodePrintSettings ?? new BarcodePrintSettings();
+        public NameplatePrintSettings NameplatePrintSettings => ProductPrintSettings.NameplatePrintSettings ?? new NameplatePrintSettings();
 
         public string printSettingPath = string.Empty;
 
@@ -954,6 +956,24 @@ namespace ProductDatabase {
 
             return outputCode;
         }
+        // b-pac印刷処理
+        private void PrintUsingBPac() {
+
+            int copiesPerLabel = NameplatePrintSettings.CopiesPerLabel;
+            var serialList = _serialList;
+
+            foreach (var serialNumber in serialList) {
+                var doc = new Document();
+                if (doc.Open("") != false) {
+                    doc.GetObject("SerialNo").Text = serialNumber;
+
+                    doc.StartPrint("", PrintOptionConstants.bpoDefault);
+                    doc.PrintOut(copiesPerLabel, PrintOptionConstants.bpoDefault);
+                    doc.EndPrint();
+                    doc.Close();
+                }
+            }
+        }
         // チェックボックスイベント
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
             var checkBox = (System.Windows.Forms.CheckBox)sender;
@@ -1171,6 +1191,7 @@ namespace ProductDatabase {
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) {
             ShowInfo();
         }
+        private void NamePlatePrintButton_Click(object sender, EventArgs e) { PrintUsingBPac(); }
         private void GenerateReportButton_Click(object sender, EventArgs e) {
             GenerateReport();
         }

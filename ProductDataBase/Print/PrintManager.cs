@@ -30,6 +30,7 @@ namespace ProductDatabase.Print {
         private static List<string> s_serialList = [];
 
         public static bool IsUnderlinePrint => ProductInfo.IsUnderlinePrint;
+        public static bool IsLast4Digits => ProductInfo.IsLast4Digits;
 
         // 4桁以上の型式番号の下4桁を取得するプロパティ
         public static string Last4ProductModel =>
@@ -109,10 +110,9 @@ namespace ProductDatabase.Print {
                         // タイプ4で残り1の場合、最後のラベルに下線をつける
                         var fontUnderline = IsUnderlinePrint && isLastCopy;
 
-                        var printText = SerialPrintType switch {
-                            9 when isLastCopy => Last4ProductModel,
-                            _ => s_serialList[PrintCount]
-                        };
+                        var printText = IsLast4Digits && isLastCopy
+                            ? Last4ProductModel
+                            : s_serialList[PrintCount];
 
                         using var labelImage = MakeLabelImage(printText, serialType, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY, isPreview);
 
@@ -293,15 +293,18 @@ namespace ProductDatabase.Print {
         public class DocumentPrintSettings {
             public LabelPrintSettings? LabelPrintSettings { get; set; }
             public BarcodePrintSettings? BarcodePrintSettings { get; set; }
+            public NameplatePrintSettings? NameplatePrintSettings { get; set; }
 
             public DocumentPrintSettings() {
                 LabelPrintSettings = new LabelPrintSettings();
                 BarcodePrintSettings = new BarcodePrintSettings();
+                NameplatePrintSettings = new NameplatePrintSettings();
             }
 
-            public void SetSettingsType(bool isLabelPrint, bool isBarcodePrint) {
+            public void SetSettingsType(bool isLabelPrint, bool isBarcodePrint, bool isNameplatePrint) {
                 LabelPrintSettings = isLabelPrint ? (LabelPrintSettings ?? new LabelPrintSettings()) : null;
                 BarcodePrintSettings = isBarcodePrint ? (BarcodePrintSettings ?? new BarcodePrintSettings()) : null;
+                NameplatePrintSettings = isNameplatePrint ? (NameplatePrintSettings ?? new NameplatePrintSettings()) : null;
             }
         }
 
@@ -365,6 +368,15 @@ namespace ProductDatabase.Print {
             public double BarcodePositionY { get; set; }
             [Category("印字設定"), DisplayName("中心に配置 (横)")]
             public bool AlignBarcodeCenterX { get; set; }
+        }
+
+        public class NameplatePrintSettings {
+            [Category("印字設定"), DisplayName("発行枚数")]
+            public int CopiesPerLabel { get; set; }
+            [Category("印字設定"), DisplayName("印字フォーマット"), Description("%T(型式)  %R(リビジョン)  %S(シリアル)  %Y(製造年)  %M(製造月(1桁))  %MM(製造月(2桁))")]
+            public string TextFormat { get; set; } = string.Empty;
+            [Category("印字設定"), DisplayName("テンプレートファイルのパス")]
+            public string TemplatePath { get; set; } = string.Empty;
         }
 
         public class FontJsonConverter : JsonConverter<Font> {

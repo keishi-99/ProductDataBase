@@ -13,6 +13,23 @@ namespace ProductDatabase {
         private DataTable MainDataTable { get; } = new();
         private float _fontSize = SystemFonts.DefaultFont.Size;
 
+        [Flags]
+        public enum SerialPrintTypeFlags {
+            None = 0,
+            Label = 1 << 0,         // 00001
+            Barcode = 1 << 1,       // 00010
+            Nameplate = 1 << 2,     // 00100
+            Underline = 1 << 3,     // 01000
+            Last4Digits = 1 << 4    // 10000
+        }
+
+        [Flags]
+        public enum SheetPrintTypeFlags {
+            None = 0,
+            CheckSheet = 1 << 0,    // 00001
+            List = 1 << 1,          // 00010
+        }
+
         public class ProductInformation {
             public int ProductID { get; set; }
             public string CategoryName { get; set; } = string.Empty;
@@ -80,12 +97,15 @@ namespace ProductDatabase {
 
             public bool IsLabelPrint { get; private set; }
             public bool IsBarcodePrint { get; private set; }
+            public bool IsNameplatePrint { get; private set; }
+            public bool IsLast4Digits { get; private set; }
+            public bool IsUnderlinePrint { get; private set; }
+
             public bool IsCheckSheetPrint { get; private set; }
             public bool IsListPrint { get; private set; }
-            public bool IsLast4Digits { get; private set; }
-            public bool IsRegType9 { get; private set; }
+
             public bool IsSerialGeneration { get; private set; }
-            public bool IsUnderlinePrint { get; private set; }
+            public bool IsRegType9 { get; private set; }
 
             private void UpdatePrintFlags() {
                 UpdateRegTypeFlags();
@@ -99,15 +119,20 @@ namespace ProductDatabase {
             }
 
             private void UpdateSerialPrintTypeFlags() {
-                IsLabelPrint = SerialPrintType is 1 or 3 or 4 or 5 or 6 or 7 or 9;
-                IsBarcodePrint = SerialPrintType is 2 or 3 or 8;
-                IsLast4Digits = (SerialPrintType == 9) && !IsRegType9;
-                IsUnderlinePrint = (SerialPrintType == 4) && !IsRegType9;
+                var flags = (SerialPrintTypeFlags)_serialPrintType;
+
+                IsLabelPrint = flags.HasFlag(SerialPrintTypeFlags.Label);
+                IsBarcodePrint = flags.HasFlag(SerialPrintTypeFlags.Barcode);
+                IsNameplatePrint = flags.HasFlag(SerialPrintTypeFlags.Nameplate);
+                IsUnderlinePrint = flags.HasFlag(SerialPrintTypeFlags.Underline);
+                IsLast4Digits = flags.HasFlag(SerialPrintTypeFlags.Last4Digits);
             }
 
             private void UpdateSheetPrintTypeFlags() {
-                IsCheckSheetPrint = (SheetPrintType is 1 or 3) && !IsRegType9;
-                IsListPrint = (SheetPrintType is 2 or 3) && !IsRegType9;
+                var flags = (SheetPrintTypeFlags)_sheetPrintType;
+
+                IsCheckSheetPrint = flags.HasFlag(SheetPrintTypeFlags.CheckSheet);
+                IsListPrint = flags.HasFlag(SheetPrintTypeFlags.List);
             }
 
             public int Quantity { get; set; }
@@ -793,7 +818,7 @@ namespace ProductDatabase {
             Font = new System.Drawing.Font(ProductInfo.FontName, ProductInfo.FontSize);
         }
         // excel
-        private void OpenExcel(string filePath) {
+        private static void OpenExcel(string filePath) {
             // Excel実行ファイルの場所を取得
             var xlApp = new Microsoft.Office.Interop.Excel.Application();
             var excelFullPath = System.IO.Path.Combine(xlApp.Path, "EXCEL.EXE");

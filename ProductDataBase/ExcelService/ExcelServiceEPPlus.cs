@@ -519,10 +519,10 @@ namespace ProductDatabase.ExcelService {
 
                     // ワークシート選択
                     xlSheets = xlBook.Sheets;
-                    xlSheet = xlSheets[sheetName];
+                    xlSheet = (Microsoft.Office.Interop.Excel.Worksheet?)xlSheets[sheetName];
 
                     // ワークシート表示
-                    xlSheet.Activate();
+                    xlSheet?.Activate();
 
                     // 印刷処理が必要な場合は、ここに xlSheet.PrintOut() などを追加します。
                     // 例: xlSheet.PrintOut();
@@ -868,10 +868,10 @@ namespace ProductDatabase.ExcelService {
 
                     // ワークシート選択
                     xlSheets = xlBook.Sheets;
-                    xlSheet = string.IsNullOrEmpty(sheetName) ? xlSheets[1] : xlSheets[sheetName];
+                    xlSheet = (Microsoft.Office.Interop.Excel.Worksheet?)(string.IsNullOrEmpty(sheetName) ? xlSheets[1] : xlSheets[sheetName]);
 
                     // ワークシート表示
-                    xlSheet.Activate();
+                    xlSheet?.Activate();
 
                 } finally {
                     // COMオブジェクトの解放

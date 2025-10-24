@@ -47,13 +47,14 @@ namespace ProductDatabase {
             PrintPropertyGrid.SelectedObject = serialType switch {
                 "Label" => DocumentPrintSettings.LabelPrintSettings,
                 "Barcode" => DocumentPrintSettings.BarcodePrintSettings,
+                "Nameplate" => DocumentPrintSettings.NameplatePrintSettings,
                 "Substrate" => DocumentPrintSettings.LabelPrintSettings,
                 _ => null
             };
         }
         private void SaveProductPrintSettings() {
             try {
-                DocumentPrintSettings.SetSettingsType(ProductInfo.IsLabelPrint, ProductInfo.IsBarcodePrint);
+                DocumentPrintSettings.SetSettingsType(ProductInfo.IsLabelPrint, ProductInfo.IsBarcodePrint, ProductInfo.IsNameplatePrint);
                 // JsonSerializerOptions のインスタンスをキャッシュ
                 _jsonSerializerOptions ??= new JsonSerializerOptions {
                     WriteIndented = true,
