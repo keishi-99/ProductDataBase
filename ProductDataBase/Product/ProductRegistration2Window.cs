@@ -1171,6 +1171,14 @@ namespace ProductDatabase {
             ls.ShowDialog(this);
             LoadSettings();
         }
+        private void 銘版印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
+            PrintSettingsWindow ls = new() {
+                ProductInfo = ProductInfo,
+                serialType = "Nameplate"
+            };
+            ls.ShowDialog(this);
+            LoadSettings();
+        }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
         private void NamePlatePrintButton_Click(object sender, EventArgs e) { PrintManager.PrintUsingBPac(NameplatePrintSettings, _serialList); }
         private void GenerateReportButton_Click(object sender, EventArgs e) { GenerateReport(); }
