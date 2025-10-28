@@ -134,6 +134,7 @@
             this.dataGridViewCheckBoxColumn1001 = new DataGridViewCheckBoxColumn();
             this.MainPanel = new Panel();
             this.NameplatePrintButton = new Button();
+            this.銘版印刷設定ToolStripMenuItem = new ToolStripMenuItem();
             this.ProductRegistration2MenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.Substrate1DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate15DataGridView).BeginInit();
@@ -194,7 +195,7 @@
             // 
             // 設定ToolStripMenuItem
             // 
-            this.設定ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.シリアルラベル印刷設定ToolStripMenuItem, this.バーコード印刷設定ToolStripMenuItem });
+            this.設定ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.シリアルラベル印刷設定ToolStripMenuItem, this.バーコード印刷設定ToolStripMenuItem, this.銘版印刷設定ToolStripMenuItem });
             this.設定ToolStripMenuItem.Name = "設定ToolStripMenuItem";
             this.設定ToolStripMenuItem.Size = new Size(43, 20);
             this.設定ToolStripMenuItem.Text = "設定";
@@ -1374,6 +1375,13 @@
             this.NameplatePrintButton.UseVisualStyleBackColor = true;
             this.NameplatePrintButton.Click += this.NamePlatePrintButton_Click;
             // 
+            // 銘版印刷設定ToolStripMenuItem
+            // 
+            this.銘版印刷設定ToolStripMenuItem.Name = "銘版印刷設定ToolStripMenuItem";
+            this.銘版印刷設定ToolStripMenuItem.Size = new Size(186, 22);
+            this.銘版印刷設定ToolStripMenuItem.Text = "銘版印刷設定";
+            this.銘版印刷設定ToolStripMenuItem.Click += this.銘版印刷設定ToolStripMenuItem_Click;
+            // 
             // ProductRegistration2Window
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1532,5 +1540,6 @@
         private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn1001;
         private Panel MainPanel;
         private Button NameplatePrintButton;
+        private ToolStripMenuItem 銘版印刷設定ToolStripMenuItem;
     }
 }
