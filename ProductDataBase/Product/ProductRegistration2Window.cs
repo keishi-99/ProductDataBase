@@ -337,7 +337,7 @@ namespace ProductDatabase {
 
                 if (ProductInfo.RegType == 9) {
                     using var command = new SqliteCommand("SELECT last_insert_rowid();", connection);
-                    _lastInsertRowid = command.ExecuteScalar()?.ToString() ?? string.Empty;
+                    _lastInsertRowid = ExecuteScalar(connection, $"SELECT last_insert_rowid();").ToString() ?? string.Empty;
                 }
 
                 switch (ProductInfo.RegType) {
