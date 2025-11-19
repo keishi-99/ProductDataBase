@@ -5,7 +5,6 @@ using ZXing;
 using ZXing.QrCode;
 using ZXing.QrCode.Internal;
 using ZXing.Windows.Compatibility;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase.ExcelService {
