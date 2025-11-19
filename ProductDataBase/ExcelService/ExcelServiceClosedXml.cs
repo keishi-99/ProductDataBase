@@ -605,6 +605,7 @@ namespace ProductDatabase.ExcelService {
                 public string? DateFormat { get; set; }
                 public string? RegTemperatureRange { get; set; }
                 public string? RegHumidityRange { get; set; }
+                public string? BaseFilePath { get; set; }
                 public List<string> SheetNames { get; set; } = [];
             }
 
@@ -634,14 +635,19 @@ namespace ProductDatabase.ExcelService {
 
                     // 4. EPPlusでExcelファイルを編集
 
+                    // 対象のブックを読み込み
+                    XLWorkbook targetBook = string.IsNullOrWhiteSpace(excelData.BaseFilePath)
+                        ? configBook
+                        : new XLWorkbook(new FileStream(excelData.BaseFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
                     // 各シートに対して値を書き込む
-                    PopulateExcelSheets(configBook, productInfo, temperature, humidity, formattedDate, excelData);
+                    PopulateExcelSheets(targetBook, productInfo, temperature, humidity, formattedDate, excelData);
 
                     // 不要なシートを非表示にする
-                    HideSheets(configBook, excelData.SheetNames);
+                    HideSheets(targetBook, excelData.SheetNames);
 
                     // ブックを保存
-                    SaveWorkbook(configBook, temporarilyPath);
+                    SaveWorkbook(targetBook, temporarilyPath);
 
                     // 5. Excel Interopを使用して印刷
                     PrintExcelFile(temporarilyPath);
@@ -681,12 +687,24 @@ namespace ProductDatabase.ExcelService {
                     DateFormat = configSheet.Cell(resultRow, 10).GetString(),
                     RegTemperatureRange = configSheet.Cell(resultRow, 11).GetString(),
                     RegHumidityRange = configSheet.Cell(resultRow, 12).GetString(),
-                    SheetNames = [.. Enumerable.Range(13, 20)
+                    BaseFilePath = configSheet.Cell(resultRow, 13).GetString(),
+                    SheetNames = [.. Enumerable.Range(14, 21)
                         .Select(column => configSheet.Cell(resultRow, column).GetString())
                         .TakeWhile(sheetName => !string.IsNullOrEmpty(sheetName))]
                 };
 
                 return (workBook, excelData);
+            }
+
+            // BaseFilePath が有効ならそこから Workbook を読み込み、なければデフォルトの configBook を返す。
+            private static XLWorkbook LoadWorkbookOrDefault(XLWorkbook defaultBook, string? baseFilePath = null) {
+                if (string.IsNullOrWhiteSpace(baseFilePath)) {
+                    return defaultBook;
+                }
+
+                // ファイルを読み込んで ClosedXML の Workbook を作成する
+                using var fs = new FileStream(baseFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                return new XLWorkbook(fs);
             }
 
             // 温度と湿度の入力ダイアログを表示し、ユーザーからの値を取得します。
@@ -718,10 +736,10 @@ namespace ProductDatabase.ExcelService {
             }
 
             // 指定されたワークブックの各シートに製品情報を書き込みます。
-            private static void PopulateExcelSheets(XLWorkbook configBook, ProductInformation productInfo, string temperature, string humidity, string formattedDate, CheckSheetConfigData excelData) {
+            private static void PopulateExcelSheets(XLWorkbook targetBook, ProductInformation productInfo, string temperature, string humidity, string formattedDate, CheckSheetConfigData excelData) {
                 var sheetNames = excelData.SheetNames;
                 foreach (var sheetName in sheetNames) {
-                    var targetSheet = configBook.Worksheet(sheetName) ?? throw new Exception($"シート[{sheetName}]が見つかりません。");
+                    var targetSheet = targetBook.Worksheet(sheetName) ?? throw new Exception($"シート[{sheetName}]が見つかりません。");
 
                     // 各セルに値を書き込む
                     WriteCellValue(targetSheet, excelData.ProductModelRange, productInfo.ProductModel);
@@ -746,10 +764,10 @@ namespace ProductDatabase.ExcelService {
             }
 
             // 指定されたワークブックの不要なシートを非表示にします。
-            private static void HideSheets(XLWorkbook configBook, List<string> sheetsToKeep) {
+            private static void HideSheets(XLWorkbook targetBook, List<string> sheetsToKeep) {
 
                 // すべてのシート名を取得
-                var allSheetNames = configBook.Worksheets.Select(ws => ws.Name).ToList();
+                var allSheetNames = targetBook.Worksheets.Select(ws => ws.Name).ToList();
 
                 // 非表示にする対象シートを抽出
                 var sheetsToHide = allSheetNames
@@ -757,21 +775,21 @@ namespace ProductDatabase.ExcelService {
                     .ToList();
 
                 // "Sheet1" は常に非表示にする
-                if (!sheetsToHide.Contains("Sheet1") && configBook.Worksheets.Any(ws => ws.Name == "Sheet1")) {
+                if (!sheetsToHide.Contains("Sheet1") && targetBook.Worksheets.Any(ws => ws.Name == "Sheet1")) {
                     sheetsToHide.Add("Sheet1");
                 }
 
                 // 非表示に設定
                 foreach (var sheetName in sheetsToHide) {
-                    var ws = configBook.Worksheets.Worksheet(sheetName);
+                    var ws = targetBook.Worksheets.Worksheet(sheetName);
                     ws.Visibility = XLWorksheetVisibility.VeryHidden;
                 }
             }
 
             // ワークブックをファイルに保存します。
-            private static void SaveWorkbook(XLWorkbook configBook, string outputPath) {
+            private static void SaveWorkbook(XLWorkbook targetBook, string outputPath) {
                 try {
-                    configBook.SaveAs(outputPath);
+                    targetBook.SaveAs(outputPath);
                 } catch (IOException ex) {
                     throw new IOException($"Excelファイルの保存に失敗しました: {outputPath}. 詳細: {ex.Message}", ex);
                 }
