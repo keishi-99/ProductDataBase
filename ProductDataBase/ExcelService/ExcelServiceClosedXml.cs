@@ -5,6 +5,7 @@ using ZXing;
 using ZXing.QrCode;
 using ZXing.QrCode.Internal;
 using ZXing.Windows.Compatibility;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase.ExcelService {
@@ -611,18 +612,19 @@ namespace ProductDatabase.ExcelService {
 
             // Excelチェックシートを生成し、データを書き込み、印刷します。
             public static void GenerateCheckSheet(ProductInformation productInfo) {
+                // 設定ファイルのパスを構築
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
+                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsm");
+
+                if (!File.Exists(configPath)) {
+                    throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
+                }
+
+                // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
+                var fs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                var workBook = new XLWorkbook(fs);
+
                 try {
-                    // 設定ファイルのパスを構築
-                    var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
-                    var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsm");
-
-                    if (!File.Exists(configPath)) {
-                        throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
-                    }
-
-                    // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
-                    using var fs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    using var workBook = new XLWorkbook(fs);
 
                     // 1. 設定ファイルの読み込みとメインシートの取得
                     var (configBook, excelData) = LoadAndExtractConfig(workBook, productInfo);
@@ -636,24 +638,43 @@ namespace ProductDatabase.ExcelService {
                     // 4. EPPlusでExcelファイルを編集
 
                     // 対象のブックを読み込み
-                    XLWorkbook targetBook = string.IsNullOrWhiteSpace(excelData.BaseFilePath)
-                        ? configBook
-                        : new XLWorkbook(new FileStream(excelData.BaseFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+                    XLWorkbook targetBook;
+                    FileStream? targetFs = null; // FileStream を保持（Dispose 用）
 
-                    // 各シートに対して値を書き込む
-                    PopulateExcelSheets(targetBook, productInfo, temperature, humidity, formattedDate, excelData);
+                    if (string.IsNullOrWhiteSpace(excelData.BaseFilePath)) {
+                        targetBook = workBook; // 既存の configBook を使う
+                    }
+                    else {
+                        targetFs = new FileStream(excelData.BaseFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        targetBook = new XLWorkbook(targetFs);
+                    }
 
-                    // 不要なシートを非表示にする
-                    HideSheets(targetBook, excelData.SheetNames);
+                    try {
+                        // 各シートに対して値を書き込む
+                        PopulateExcelSheets(targetBook, productInfo, temperature, humidity, formattedDate, excelData);
 
-                    // ブックを保存
-                    SaveWorkbook(targetBook, temporarilyPath);
+                        // 不要なシートを非表示にする
+                        HideSheets(targetBook, excelData.SheetNames);
+
+                        // ブックを保存
+                        SaveWorkbook(targetBook, temporarilyPath);
+                    } finally {
+                        // 新規に作った場合だけ Dispose
+                        if (targetBook != workBook)
+                            targetBook.Dispose();
+
+                        // FileStream がある場合は Dispose
+                        targetFs?.Dispose();
+                    }
 
                     // 5. Excel Interopを使用して印刷
                     PrintExcelFile(temporarilyPath);
                 } catch (Exception ex) {
                     // エラーメッセージを表示
                     MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                } finally {
+                    workBook.Dispose();
+                    fs.Dispose();
                 }
             }
 
