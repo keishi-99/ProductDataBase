@@ -1,4 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ProductDatabase.Other;
 using static ProductDatabase.MainWindow;
 
@@ -7,6 +9,7 @@ namespace ProductDatabase {
 
         public ProductInformation ProductInfo { get; }
 
+        readonly string _messageFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config", "Product", "ProductMessages.json");
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "FirstSerialNumberCheckBox",
                     "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
@@ -85,6 +88,12 @@ namespace ProductDatabase {
                     }
 
                     FirstSerialNumberTextBox.Text = (nextSerialNumber).ToString();
+                }
+
+                // 機種別注意メッセージ表示
+                var productMessage = GetProductMessage(_messageFilePath, ProductInfo.ProductName);
+                if (!string.IsNullOrEmpty(productMessage)) {
+                    MessageBox.Show(productMessage, "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
             } catch (Exception ex) {
@@ -477,6 +486,92 @@ namespace ProductDatabase {
             form.ShowDialog();
         }
 
+        // JSON から機種別注意メッセージ取得
+        public static string? GetProductMessage(string filePath, string productName) {
+            JObject jsonObj;
+            // JSON 読み込み
+            var jsonText = File.ReadAllText(filePath);
+            jsonObj = JObject.Parse(jsonText);
+            // 機種名（キー）に対応するメッセージを取得
+            return jsonObj[productName]?.ToString();
+        }
+        // 注意メッセージ更新
+        private void ProductMessageChange() {
+
+            // JSON 読み込み
+            var json = JObject.Parse(File.ReadAllText(_messageFilePath));
+
+            // 既存メッセージ取得（無ければ空）
+            string currentMessage = json.ContainsKey(ProductInfo.ProductName)
+                ? json[ProductInfo.ProductName]!.ToString()
+                : "";
+
+            // ダイアログを表示（既存メッセージを初期値にする）
+            using var dialog = new InputDialog("メッセージ編集", "メッセージを入力してください", currentMessage);
+
+            if (dialog.ShowDialog() == DialogResult.OK) {
+                string newMessage = dialog.InputText;
+
+                // JSON に保存（追加 OR 上書き）
+                json[ProductInfo.ProductName] = newMessage;
+
+                File.WriteAllText(_messageFilePath, json.ToString());
+            }
+
+        }
+        public class InputDialog : Form {
+            private readonly TextBox _textBox;
+            public string InputText => _textBox.Text;
+
+            public InputDialog(string title, string message, string defaultText = "") {
+                Text = title;
+                Width = 400;
+                Height = 180;
+                StartPosition = FormStartPosition.CenterParent;
+                FormBorderStyle = FormBorderStyle.FixedDialog;
+                MaximizeBox = false;
+                MinimizeBox = false;
+
+                Label label = new Label() {
+                    Text = message,
+                    Left = 20,
+                    Top = 20,
+                    Width = 340
+                };
+
+                _textBox = new TextBox() {
+                    Left = 20,
+                    Top = 50,
+                    Width = 340,
+                    Text = defaultText   // ← 初期値をセット
+                };
+
+                Button ok = new Button() {
+                    Text = "OK",
+                    DialogResult = DialogResult.OK,
+                    Left = 180,
+                    Top = 85,
+                    Width = 80
+                };
+
+                Button cancel = new Button() {
+                    Text = "キャンセル",
+                    DialogResult = DialogResult.Cancel,
+                    Left = 280,
+                    Top = 85,
+                    Width = 80
+                };
+
+                Controls.Add(label);
+                Controls.Add(_textBox);
+                Controls.Add(ok);
+                Controls.Add(cancel);
+
+                AcceptButton = ok;
+                CancelButton = cancel;
+            }
+        }
+
         private void ProductRegistration1Window_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
         private void RevisionChangeButton_Click(object sender, EventArgs e) { RevisionChange(); }
@@ -484,6 +579,7 @@ namespace ProductDatabase {
         private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
         private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
+        private void メッセージ設定ToolStripMenuItem_Click(object sender, EventArgs e) { ProductMessageChange(); }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
         private void QrCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
 

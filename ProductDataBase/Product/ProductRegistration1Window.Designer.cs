@@ -54,6 +54,7 @@
             this.ProductNameLabel2 = new Label();
             this.ヘルプToolStripMenuItem = new ToolStripMenuItem();
             this.取得情報ToolStripMenuItem = new ToolStripMenuItem();
+            this.メッセージ設定ToolStripMenuItem = new ToolStripMenuItem();
             this.ProductNameLabel1 = new Label();
             this.ProductRegistration1MenuStrip = new MenuStrip();
             this.ProductTypeLabel2 = new Label();
@@ -400,7 +401,7 @@
             // 
             // ヘルプToolStripMenuItem
             // 
-            this.ヘルプToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.取得情報ToolStripMenuItem });
+            this.ヘルプToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.メッセージ設定ToolStripMenuItem, this.取得情報ToolStripMenuItem });
             this.ヘルプToolStripMenuItem.Name = "ヘルプToolStripMenuItem";
             this.ヘルプToolStripMenuItem.Size = new Size(48, 20);
             this.ヘルプToolStripMenuItem.Text = "ヘルプ";
@@ -408,9 +409,16 @@
             // 取得情報ToolStripMenuItem
             // 
             this.取得情報ToolStripMenuItem.Name = "取得情報ToolStripMenuItem";
-            this.取得情報ToolStripMenuItem.Size = new Size(122, 22);
+            this.取得情報ToolStripMenuItem.Size = new Size(143, 22);
             this.取得情報ToolStripMenuItem.Text = "取得情報";
             this.取得情報ToolStripMenuItem.Click += this.取得情報ToolStripMenuItem_Click;
+            // 
+            // メッセージ設定ToolStripMenuItem
+            // 
+            this.メッセージ設定ToolStripMenuItem.Name = "メッセージ設定ToolStripMenuItem";
+            this.メッセージ設定ToolStripMenuItem.Size = new Size(143, 22);
+            this.メッセージ設定ToolStripMenuItem.Text = "メッセージ設定";
+            this.メッセージ設定ToolStripMenuItem.Click += this.メッセージ設定ToolStripMenuItem_Click;
             // 
             // ProductNameLabel1
             // 
@@ -644,5 +652,6 @@
         private Button RevisionChangeButton;
         private DateTimePicker RegistrationDateTimePicker;
         private CheckBox RNumberCheckBox;
+        private ToolStripMenuItem メッセージ設定ToolStripMenuItem;
     }
 }
