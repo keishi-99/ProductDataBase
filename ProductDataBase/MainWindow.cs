@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ProductDatabase.Other;
 using System.Data;
 using System.Data.Odbc;
@@ -12,6 +13,8 @@ namespace ProductDatabase {
         public int RadioButtonNumber { get; set; }
         private DataTable MainDataTable { get; } = new();
         private float _fontSize = SystemFonts.DefaultFont.Size;
+
+        readonly string _jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "General", "appsettings.json");
 
         [Flags]
         public enum SerialPrintTypeFlags {
@@ -183,70 +186,6 @@ namespace ProductDatabase {
                 // ファイルロック
                 LockSelf();
 
-                // JSONファイルのパス
-                var jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "General", "appsettings.json");
-
-                // パスのディレクトリ部分を取得
-                var basePath = Path.GetDirectoryName(jsonFilePath);
-                if (string.IsNullOrEmpty(basePath) || !Directory.Exists(basePath)) {
-                    throw new DirectoryNotFoundException($"The directory '{basePath}' does not exist.");
-                }
-                string json = File.ReadAllText(jsonFilePath);
-                var config = JsonConvert.DeserializeObject<Config>(json);
-
-                // CloneFolderPathを取得
-                CommonUtils.s_networkPath = config?.NetworkFolderPath ?? throw new Exception("フォルダが設定されてません。");
-                if (string.IsNullOrEmpty(CommonUtils.s_networkPath)) { throw new Exception("フォルダが設定されてません。"); }
-                if (!Directory.Exists(CommonUtils.s_networkPath)) {
-                    throw new DirectoryNotFoundException($"フォルダ '{CommonUtils.s_networkPath}' が見つかりません。");
-                }
-
-                // その日の backupファイルがない場合バックアップ作成
-                var d = DateTime.Now;
-                var backupDir = Path.Combine(CommonUtils.s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}");
-                var backupFilePath = Path.Combine(CommonUtils.s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
-                var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
-
-                if (!File.Exists(backupFilePath)) {
-                    Directory.CreateDirectory(backupDir);  // ディレクトリが存在しない場合に作成
-                    File.Copy(registrationPath, backupFilePath, false);
-                }
-
-                using SqliteConnection con = new(GetConnectionInformation());
-                con.Open();
-                using (var cmd = new SqliteCommand("SELECT * FROM Product;", con)) {
-                    using var reader = cmd.ExecuteReader();
-                    ProductInfo.ProductDataTable.Load(reader);
-                }
-                using (var cmd = new SqliteCommand("SELECT * FROM Substrate;", con)) {
-                    using var reader = cmd.ExecuteReader();
-                    ProductInfo.SubstrateDataTable.Load(reader);
-                }
-
-                // DB1へ接続し担当者取得
-                ProductInfo.PersonList.Clear();
-                con.Open();
-                using (var cmd = con.CreateCommand()) {
-                    // テーブル検索SQL - 担当者をPersonListへ追加
-                    cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
-                    using var dr = cmd.ExecuteReader();
-                    while (dr.Read()) {
-                        ProductInfo.PersonList.Add($"{dr["PersonName"]}");
-                    }
-                }
-
-                // 認証ユーザー名を取得
-                var userNames = config.AuthorizedUsers;
-                // 現在のユーザー名がリストに含まれるかチェック
-                Config.IsAuthorizedUser = userNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
-
-                // 管理者ユーザー名を取得
-                var adminUserNames = config.Administrators;
-                // 現在のユーザー名がリストに含まれるかチェック
-                Config.IsAdministrator = adminUserNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
-
-                QRCodePanel.Enabled = Config.IsAuthorizedUser;
-
                 RegisterButton.Enabled = false;
                 HistoryButton.Enabled = false;
 
@@ -260,7 +199,64 @@ namespace ProductDatabase {
                 CategoryListBox3.Items.Clear();
                 MainDataTable.Clear();
 
+                // パスのディレクトリ部分を取得
+                var basePath = Path.GetDirectoryName(_jsonFilePath);
+                if (string.IsNullOrEmpty(basePath) || !Directory.Exists(basePath)) {
+                    throw new DirectoryNotFoundException($"The directory '{basePath}' does not exist.");
+                }
+                string json = File.ReadAllText(_jsonFilePath);
+                var config = JsonConvert.DeserializeObject<Config>(json);
+
+                // CloneFolderPathを取得
+                CommonUtils.s_networkPath = config?.NetworkFolderPath ?? throw new Exception("フォルダが設定されてません。");
+                if (string.IsNullOrEmpty(CommonUtils.s_networkPath)) { throw new Exception("フォルダが設定されてません。"); }
+                if (Directory.Exists(CommonUtils.s_networkPath)) {
+                    // その日の backupファイルがない場合バックアップ作成
+                    var d = DateTime.Now;
+                    var backupDir = Path.Combine(CommonUtils.s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}");
+                    var backupFilePath = Path.Combine(CommonUtils.s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
+                    var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
+
+                    if (!File.Exists(backupFilePath)) {
+                        Directory.CreateDirectory(backupDir);  // ディレクトリが存在しない場合に作成
+                        File.Copy(registrationPath, backupFilePath, false);
+                    }
+                }
+                else {
+                    MessageBox.Show($"'{CommonUtils.s_networkPath}'\n が見つかりません。バックアップは保存されません。", $"", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                using SqliteConnection con = new(GetConnectionInformation());
+                con.Open();
+                using (var cmd = new SqliteCommand("SELECT * FROM Product;", con)) {
+                    using var reader = cmd.ExecuteReader();
+                    ProductInfo.ProductDataTable.Load(reader);
+                }
+                using (var cmd = new SqliteCommand("SELECT * FROM Substrate;", con)) {
+                    using var reader = cmd.ExecuteReader();
+                    ProductInfo.SubstrateDataTable.Load(reader);
+                }
+
+                // 担当者取得
+                ProductInfo.PersonList.Clear();
+                var jsonText = File.ReadAllText(_jsonFilePath);
+                var jsonObj = JObject.Parse(jsonText);
+                foreach (var person in jsonObj["Persons"]!) {
+                    ProductInfo.PersonList.Add(person.ToString()!);
+                }
+
+                // 認証ユーザー名を取得
+                var userNames = config.AuthorizedUsers;
+                // 現在のユーザー名がリストに含まれるかチェック
+                Config.IsAuthorizedUser = userNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
+
+                // 管理者ユーザー名を取得
+                var adminUserNames = config.Administrators;
+                // 現在のユーザー名がリストに含まれるかチェック
+                Config.IsAdministrator = adminUserNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
+
                 this.Activate();
+                QRCodePanel.Enabled = Config.IsAuthorizedUser;
                 QRCodeTextBox.Select();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -280,16 +276,12 @@ namespace ProductDatabase {
                 ProductInfo.SubstrateDataTable.Load(reader);
             }
 
-            // DB1へ接続し担当者取得
+            // 担当者取得
             ProductInfo.PersonList.Clear();
-            con.Open();
-            using (var cmd = con.CreateCommand()) {
-                // テーブル検索SQL - 担当者をPersonListへ追加
-                cmd.CommandText = "SELECT * FROM Person ORDER BY _rowid_ ASC";
-                using var dr = cmd.ExecuteReader();
-                while (dr.Read()) {
-                    ProductInfo.PersonList.Add($"{dr["PersonName"]}");
-                }
+            var jsonText = File.ReadAllText(_jsonFilePath);
+            var jsonObj = JObject.Parse(jsonText);
+            foreach (var person in jsonObj["Persons"]!) {
+                ProductInfo.PersonList.Add(person.ToString()!);
             }
 
             ProductInfo.FontSize = _fontSize;

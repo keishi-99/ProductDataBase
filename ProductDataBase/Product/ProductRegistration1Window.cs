@@ -78,7 +78,7 @@ namespace ProductDatabase {
                         4 => (1, 9999, 4),
                         101 => (1, 899, 3),
                         102 => (901, 999, 3),
-                        _ => throw new InvalidOperationException("不明なシリアル桁数です。") // より具体的な例外
+                        _ => throw new InvalidOperationException("不明なシリアル桁数です。")
                     };
 
                     if (nextSerialNumber > maxNumber || nextSerialNumber < minNumber) {// あるいは firstSerialが minNumber未満の場合も対象に
@@ -91,6 +91,9 @@ namespace ProductDatabase {
                 }
 
                 // 機種別注意メッセージ表示
+                if (!File.Exists(_messageFilePath)) {
+                    File.WriteAllText(_messageFilePath, "{}");
+                }
                 var productMessage = GetProductMessage(_messageFilePath, ProductInfo.ProductName);
                 if (!string.IsNullOrEmpty(productMessage)) {
                     MessageBox.Show(productMessage, "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -488,36 +491,41 @@ namespace ProductDatabase {
 
         // JSON から機種別注意メッセージ取得
         public static string? GetProductMessage(string filePath, string productName) {
-            JObject jsonObj;
             // JSON 読み込み
             var jsonText = File.ReadAllText(filePath);
-            jsonObj = JObject.Parse(jsonText);
+            var jsonObj = JObject.Parse(jsonText);
             // 機種名（キー）に対応するメッセージを取得
             return jsonObj[productName]?.ToString();
         }
         // 注意メッセージ更新
         private void ProductMessageChange() {
+            try {
+                if (!File.Exists(_messageFilePath)) {
+                    throw new FileNotFoundException($"{_messageFilePath}\nが見つかりません。");
+                }
 
-            // JSON 読み込み
-            var json = JObject.Parse(File.ReadAllText(_messageFilePath));
+                // JSON 読み込み
+                var json = JObject.Parse(File.ReadAllText(_messageFilePath));
 
-            // 既存メッセージ取得（無ければ空）
-            string currentMessage = json.ContainsKey(ProductInfo.ProductName)
-                ? json[ProductInfo.ProductName]!.ToString()
-                : "";
+                // 既存メッセージ取得（無ければ空）
+                string currentMessage = json.ContainsKey(ProductInfo.ProductName)
+                    ? json[ProductInfo.ProductName]!.ToString()
+                    : "";
 
-            // ダイアログを表示（既存メッセージを初期値にする）
-            using var dialog = new InputDialog("メッセージ編集", "メッセージを入力してください", currentMessage);
+                // ダイアログを表示（既存メッセージを初期値にする）
+                using var dialog = new InputDialog("メッセージ編集", "メッセージを入力してください", currentMessage);
 
-            if (dialog.ShowDialog() == DialogResult.OK) {
-                string newMessage = dialog.InputText;
+                if (dialog.ShowDialog() == DialogResult.OK) {
+                    string newMessage = dialog.InputText;
 
-                // JSON に保存（追加 OR 上書き）
-                json[ProductInfo.ProductName] = newMessage;
+                    // JSON に保存（追加 OR 上書き）
+                    json[ProductInfo.ProductName] = newMessage;
 
-                File.WriteAllText(_messageFilePath, json.ToString());
+                    File.WriteAllText(_messageFilePath, json.ToString());
+                }
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
         }
         public class InputDialog : Form {
             private readonly TextBox _textBox;
