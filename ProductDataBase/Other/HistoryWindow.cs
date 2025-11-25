@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using System.Data;
@@ -874,15 +875,19 @@ namespace ProductDatabase {
                     FROM
                         {substrateTableName}
                     WHERE
-                        StockName = @StockName AND UseID = @ID
+                        UseID = @ID
                     ORDER BY
                         SubstrateModel ASC
                     ;
                     """;
 
+                // Sotck名とIDで特定
+                //WHERE
+                //    StockName = @StockName AND UseID = @ID
+
                 var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 var id = Convert.ToInt32(DataBaseDataGridView.Rows[i].Cells["ID"].Value);
-                cmd.Parameters.Add("@StockName", SqliteType.Text).Value = ProductInfo.StockName;
+                //cmd.Parameters.Add("@StockName", SqliteType.Text).Value = ProductInfo.StockName;
                 cmd.Parameters.Add("@ID", SqliteType.Integer).Value = id;
 
                 using var reader = cmd.ExecuteReader();
