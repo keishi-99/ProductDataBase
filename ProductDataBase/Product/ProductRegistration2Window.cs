@@ -3,6 +3,7 @@ using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
 using System.Data;
+using System.Text.RegularExpressions;
 using static ProductDatabase.MainWindow;
 using static ProductDatabase.Other.CommonUtils;
 using static ProductDatabase.Print.PrintOptions;
@@ -949,13 +950,20 @@ namespace ProductDatabase {
                 _ => string.Empty
             };
 
-            outputCode = outputCode
-                .Replace("%Y", DateTime.Parse(ProductInfo.RegDate).ToString("yy"))
-                .Replace("%MM", DateTime.Parse(ProductInfo.RegDate).ToString("MM"))
-                .Replace("%T", ProductInfo.Initial)
-                .Replace("%R", ProductInfo.Revision)
-                .Replace("%M", monthCode[^1..])
-                .Replace("%S", Convert.ToInt32(serialCode).ToString($"D{ProductInfo.SerialDigit}"));
+            var regDate = DateTime.Parse(ProductInfo.RegDate);
+
+            var map = new Dictionary<string, string> {
+                ["{T}"] = ProductInfo.Initial,
+                ["{Y}"] = regDate.ToString("yy"),
+                ["{MM}"] = regDate.ToString("MM"),
+                ["{R}"] = ProductInfo.Revision,
+                ["{M}"] = monthCode[^1..],
+                ["{S}"] = Convert.ToInt32(serialCode).ToString($"D{ProductInfo.SerialDigit}")
+            };
+
+            foreach (var kv in map) {
+                outputCode = outputCode.Replace(kv.Key, kv.Value);
+            }
 
             return outputCode;
         }
