@@ -325,8 +325,31 @@ namespace ProductDatabase {
             _serialList.Clear();
             var substrateNumber = ManufacturingNumberMaskedTextBox.Text.Substring(5, 5);
 
+            var monthCode = DateTime.Parse(ProductInfo.RegDate).ToString("MM");
+
+            monthCode = monthCode switch {
+                "10" => "X",
+                "11" => "Y",
+                "12" => "Z",
+                _ => monthCode
+            };
+            var regDate = DateTime.Parse(ProductInfo.RegDate);
+            var map = new Dictionary<string, string> {
+                ["{T}"] = ProductInfo.Initial,
+                ["{Y}"] = regDate.ToString("yy"),
+                ["{MM}"] = regDate.ToString("MM"),
+                ["{R}"] = ProductInfo.Revision,
+                ["{M}"] = monthCode[^1..],
+                ["{S}"] = substrateNumber
+            };
+
+            var outputCodes = LabelPrintSettings.TextFormat ?? string.Empty;
+            foreach (var kv in map) {
+                outputCodes = outputCodes.Replace(kv.Key, kv.Value);
+            }
+
             for (var i = 0; i < quantity; i++) {
-                _serialList.Add(substrateNumber);
+                _serialList.Add(outputCodes);
             }
 
             return true;

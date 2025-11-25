@@ -271,13 +271,20 @@ namespace ProductDatabase.Print {
         }
         private static string ConvertHeaderString(string s) {
             if (ProductInfo is null) { throw new Exception("ProductInfoが nullです。"); }
-            s = s.Replace("%P", ProductInfo.ProductName)
-                 .Replace("%T", ProductInfo.ProductModel)
-                 .Replace("%D", DateTime.Today.ToShortDateString())
-                 .Replace("%M", ProductInfo.ProductNumber)
-                 .Replace("%O", ProductInfo.OrderNumber)
-                 .Replace("%N", ProductInfo.Quantity.ToString())
-                 .Replace("%U", ProductInfo.Person);
+
+            var map = new Dictionary<string, string> {
+                ["{P}"] = ProductInfo.ProductName,
+                ["{T}"] = ProductInfo.ProductModel,
+                ["{D}"] = DateTime.Today.ToShortDateString(),
+                ["{M}"] = ProductInfo.ProductNumber,
+                ["{O}"] = ProductInfo.OrderNumber,
+                ["{N}"] = ProductInfo.Quantity.ToString(),
+                ["{U}"] = ProductInfo.Person,
+            };
+
+            foreach (var kv in map) {
+                s = s.Replace(kv.Key, kv.Value);
+            }
             return s;
         }
         private static void DrawFinalRowMark(Graphics graphics, int rowNumber, float posX, float posY, float width, float height, Font font) {
@@ -353,7 +360,7 @@ namespace ProductDatabase.Print {
             public double HeaderPositionX { get; set; }
             [Category("\t用紙設定"), DisplayName("ヘッダー開始位置 左 (mm)")]
             public double HeaderPositionY { get; set; }
-            [Category("\t用紙設定"), DisplayName("ヘッダー フォーマット"), Description("%D(印刷日)  %M(製番)  %O(注番)  %T(型式)  %P(製品名)  %N(台数)  %U(担当者)")]
+            [Category("\t用紙設定"), DisplayName("ヘッダー フォーマット"), Description("{D}(印刷日)  {M}(製番)  {O}(注番)  {T}(型式)  {P}(製品名)  {N}(台数)  {U}(担当者)")]
             public string HeaderTextFormat { get; set; } = string.Empty;
 
             [Category("\t用紙設定"), DisplayName("ヘッダー フォント"), JsonConverter(typeof(FontJsonConverter))]
