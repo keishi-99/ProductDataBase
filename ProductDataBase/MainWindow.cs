@@ -152,7 +152,7 @@ namespace ProductDatabase {
             };
         }
         public class Config {
-            public string NetworkFolderPath { get; set; } = string.Empty;
+            public string BackupFolderPath { get; set; } = string.Empty;
             public string[] Administrators { get; set; } = [];
             public string[] AuthorizedUsers { get; set; } = [];
             public static bool IsAdministrator { get; set; } = false;
@@ -199,33 +199,20 @@ namespace ProductDatabase {
                 CategoryListBox3.Items.Clear();
                 MainDataTable.Clear();
 
-                // パスのディレクトリ部分を取得
-                var basePath = Path.GetDirectoryName(_jsonFilePath);
-                if (string.IsNullOrEmpty(basePath) || !Directory.Exists(basePath)) {
-                    throw new DirectoryNotFoundException($"The directory '{basePath}' does not exist.");
+                // 設定ファイル読み込み
+                if (!File.Exists(_jsonFilePath)) {
+                    throw new DirectoryNotFoundException($"'{_jsonFilePath}'\nが見つかりません。");
                 }
-                string json = File.ReadAllText(_jsonFilePath);
-                var config = JsonConvert.DeserializeObject<Config>(json);
+                var jsonText = File.ReadAllText(_jsonFilePath);
+                var jsonObj = JObject.Parse(jsonText);
 
                 // CloneFolderPathを取得
-                CommonUtils.s_networkPath = config?.NetworkFolderPath ?? throw new Exception("フォルダが設定されてません。");
-                if (string.IsNullOrEmpty(CommonUtils.s_networkPath)) { throw new Exception("フォルダが設定されてません。"); }
-                if (Directory.Exists(CommonUtils.s_networkPath)) {
-                    // その日の backupファイルがない場合バックアップ作成
-                    var d = DateTime.Now;
-                    var backupDir = Path.Combine(CommonUtils.s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}");
-                    var backupFilePath = Path.Combine(CommonUtils.s_networkPath, "db", "backup", $"{d.Year}", $"{d.Month:00}", $"_bak_{d.Year}-{d.Month:00}-{d.Day:00}.db");
-                    var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
+                CommonUtils.s_BackupPath = jsonObj["BackupFolderPath"]?.ToString() ?? string.Empty;
 
-                    if (!File.Exists(backupFilePath)) {
-                        Directory.CreateDirectory(backupDir);  // ディレクトリが存在しない場合に作成
-                        File.Copy(registrationPath, backupFilePath, false);
-                    }
-                }
-                else {
-                    MessageBox.Show($"'{CommonUtils.s_networkPath}'\n が見つかりません。バックアップは保存されません。", $"", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
+                // バックアップ作成
+                CreateDailyBackup();
 
+                // 製品・基板データ取得
                 using SqliteConnection con = new(GetConnectionInformation());
                 con.Open();
                 using (var cmd = new SqliteCommand("SELECT * FROM Product;", con)) {
@@ -239,27 +226,62 @@ namespace ProductDatabase {
 
                 // 担当者取得
                 ProductInfo.PersonList.Clear();
-                var jsonText = File.ReadAllText(_jsonFilePath);
-                var jsonObj = JObject.Parse(jsonText);
                 foreach (var person in jsonObj["Persons"]!) {
                     ProductInfo.PersonList.Add(person.ToString()!);
                 }
 
                 // 認証ユーザー名を取得
-                var userNames = config.AuthorizedUsers;
-                // 現在のユーザー名がリストに含まれるかチェック
-                Config.IsAuthorizedUser = userNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
+                var userSet = (jsonObj["AuthorizedUsers"] as JArray)?
+                    .Select(u => (string)u!)
+                    .Where(u => u != null)
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                Config.IsAuthorizedUser = userSet?.Contains(Environment.UserName) ?? false;
 
                 // 管理者ユーザー名を取得
-                var adminUserNames = config.Administrators;
-                // 現在のユーザー名がリストに含まれるかチェック
-                Config.IsAdministrator = adminUserNames?.Any(name => name.Equals(Environment.UserName, StringComparison.OrdinalIgnoreCase)) ?? false;
+                var adminSet = (jsonObj["Administrators"] as JArray)?
+                    .Select(u => (string)u!)
+                    .Where(u => u != null)
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                Config.IsAdministrator = adminSet?.Contains(Environment.UserName) ?? false;
+
 
                 this.Activate();
                 QRCodePanel.Enabled = Config.IsAuthorizedUser;
                 QRCodeTextBox.Select();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private static void CreateDailyBackup() {
+            // フォルダ未設定
+            if (string.IsNullOrWhiteSpace(CommonUtils.s_BackupPath)) {
+                MessageBox.Show("フォルダが設定されていません。バックアップは保存されません。",
+                    "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // ネットワークフォルダが見つからない
+            if (!Directory.Exists(CommonUtils.s_BackupPath)) {
+                MessageBox.Show($"'{CommonUtils.s_BackupPath}'\nが見つかりません。バックアップは保存されません。",
+                    "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // バックアップ処理
+            var today = DateTime.Today;
+            var year = today.Year;
+            var month = today.Month;
+            var day = today.Day;
+
+            // パス生成
+            string backupFolder = Path.Combine(CommonUtils.s_BackupPath, "db", "backup", $"{year}", $"{month:00}");
+            string backupFile = Path.Combine(backupFolder, $"_bak_{year}-{month:00}-{day:00}.db");
+            string registrationFile = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
+
+            // 当日バックアップがなければ作成
+            if (!File.Exists(backupFile)) {
+                Directory.CreateDirectory(backupFolder);
+                File.Copy(registrationFile, backupFile, overwrite: false);
             }
         }
         private void ResetFields() {

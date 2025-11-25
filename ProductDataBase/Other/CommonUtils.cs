@@ -9,7 +9,7 @@ namespace ProductDatabase.Other {
     }
 
     internal partial class CommonUtils {
-        public static string s_networkPath = string.Empty; // ClonePathを保持する静的変数
+        public static string s_BackupPath = string.Empty;
         /// <summary>
         /// ファイルをコピーします。
         /// </summary>
@@ -72,8 +72,8 @@ namespace ProductDatabase.Other {
                         // ログ内容をファイルの末尾に追記
                         File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
 
-                        if (!string.IsNullOrEmpty(s_networkPath)) {
-                            var cloneFilePath = Path.Combine(s_networkPath, "db", "logs", logFileName);
+                        if (!string.IsNullOrEmpty(s_BackupPath)) {
+                            var cloneFilePath = Path.Combine(s_BackupPath, "db", "logs", logFileName);
                             if (cloneFilePath != logFilePath) {
                                 CopyWithRetry(logFilePath, cloneFilePath, true);
                             }
@@ -113,9 +113,9 @@ namespace ProductDatabase.Other {
                         ManageBackupFiles();
 
                         // ネットワークにバックアップ
-                        var networkFilePath = Path.Combine(s_networkPath, "db", "registration.db");
-                        if (Environment.CurrentDirectory != s_networkPath) {
-                            CopyWithRetry(s_originalFilePath, networkFilePath, true);
+                        var BackupPath = Path.Combine(s_BackupPath, "db", "registration.db");
+                        if (Environment.CurrentDirectory != s_BackupPath) {
+                            CopyWithRetry(s_originalFilePath, BackupPath, true);
                         }
 
                     }
