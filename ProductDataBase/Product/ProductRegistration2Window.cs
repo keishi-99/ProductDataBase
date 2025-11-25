@@ -261,6 +261,7 @@ namespace ProductDatabase {
         private void ConfigurePrintSettings() {
             SubstrateListPrintButton.Visible = ProductInfo.IsListPrint;
             CheckSheetPrintButton.Visible = ProductInfo.IsCheckSheetPrint;
+            NameplatePrintButton.Visible = ProductInfo.IsNameplatePrint;
 
             SerialPrintPositionLabel.Visible = ProductInfo.IsLabelPrint;
             SerialPrintPositionNumericUpDown.Visible = ProductInfo.IsLabelPrint;
@@ -272,6 +273,7 @@ namespace ProductDatabase {
             シリアルラベル印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;
             バーコード印刷プレビューToolStripMenuItem.Enabled = ProductInfo.IsBarcodePrint;
             バーコード印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsBarcodePrint;
+            銘版印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsNameplatePrint;
 
             if (ProductInfo.IsSerialGeneration) {
                 LoadSettings();
