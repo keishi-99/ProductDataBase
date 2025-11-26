@@ -97,6 +97,7 @@ namespace ProductDatabase {
                 var productMessage = GetProductMessage(_messageFilePath, ProductInfo.ProductName);
                 if (!string.IsNullOrEmpty(productMessage)) {
                     MessageBox.Show(productMessage, "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageTextBox.Text = productMessage;
                 }
 
             } catch (Exception ex) {
@@ -551,6 +552,7 @@ namespace ProductDatabase {
                     Left = 20,
                     Top = 50,
                     Width = 340,
+                    MaxLength = 80,
                     Text = defaultText   // ← 初期値をセット
                 };
 
