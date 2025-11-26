@@ -39,6 +39,9 @@ namespace ProductDatabase {
 
                 SubstrateModelLabel2.Text = $"{ProductInfo.SubstrateName} - {ProductInfo.SubstrateModel}";
 
+                var stockQuantity = GetStockQuantity();
+                StockLabel2.Text = stockQuantity;
+
                 OrderNumberTextBox.Text = ProductInfo.Proness5;
                 ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(ProductInfo.Proness1) ? ProductInfo.Proness1 : ManufacturingNumberMaskedTextBox.Text;
                 QuantityTextBox.Text = (ProductInfo.Proness4 != 0) ? ProductInfo.Proness4.ToString() : string.Empty;
@@ -448,6 +451,43 @@ namespace ProductDatabase {
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // 在庫数取得
+        private string GetStockQuantity() {
+
+            var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
+
+            using var con = new SqliteConnection(GetConnectionRegistration());
+            con.Open();
+
+            using var transaction = con.BeginTransaction();
+
+            var commandText =
+                $"""
+                SELECT
+                    StockName,SubstrateName,SubstrateModel,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                FROM
+                    {substrateTableName}
+                WHERE
+                    StockName = @StockName AND SubstrateModel = @SubstrateModel
+                GROUP BY
+                    StockName, SubstrateName, SubstrateModel
+                ;
+                """;
+            using var dr = ExecuteReader(con, commandText,
+                ("@StockName", ProductInfo.StockName),
+                ("@SubstrateModel", ProductInfo.SubstrateModel)
+            );
+
+            transaction.Commit();
+
+            if (dr.Read()) {
+                return dr["Stock"].ToString() ?? "0";
+            }
+            else {
+                return "0";
             }
         }
 
