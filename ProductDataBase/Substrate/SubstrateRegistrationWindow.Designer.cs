@@ -70,6 +70,8 @@
             this.textToUpperCheckBox = new CheckBox();
             this.RegistrationDateTimePicker = new DateTimePicker();
             this.OpenSubstrateInformationButton = new Button();
+            this.StockLabel1 = new Label();
+            this.StockLabel2 = new Label();
             this.SubstrateRegistrationMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPositionNumericUpDown).BeginInit();
             this.panelCommentTexrBox.SuspendLayout();
@@ -574,11 +576,38 @@
             this.OpenSubstrateInformationButton.UseVisualStyleBackColor = true;
             this.OpenSubstrateInformationButton.Click += this.OpenSubstrateInformationButton_Click;
             // 
+            // StockLabel1
+            // 
+            this.StockLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.StockLabel1.AutoSize = true;
+            this.StockLabel1.BorderStyle = BorderStyle.Fixed3D;
+            this.StockLabel1.Location = new Point(28, 85);
+            this.StockLabel1.Margin = new Padding(4, 0, 4, 0);
+            this.StockLabel1.Name = "StockLabel1";
+            this.StockLabel1.Size = new Size(54, 17);
+            this.StockLabel1.TabIndex = 612;
+            this.StockLabel1.Text = "在庫数 :";
+            this.StockLabel1.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // StockLabel2
+            // 
+            this.StockLabel2.AutoSize = true;
+            this.StockLabel2.BorderStyle = BorderStyle.Fixed3D;
+            this.StockLabel2.Location = new Point(90, 85);
+            this.StockLabel2.Margin = new Padding(4, 0, 4, 0);
+            this.StockLabel2.Name = "StockLabel2";
+            this.StockLabel2.Size = new Size(24, 17);
+            this.StockLabel2.TabIndex = 613;
+            this.StockLabel2.Text = "---";
+            this.StockLabel2.TextAlign = ContentAlignment.MiddleLeft;
+            // 
             // SubstrateRegistrationWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.StockLabel2);
+            this.Controls.Add(this.StockLabel1);
             this.Controls.Add(this.OpenSubstrateInformationButton);
             this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.textToUpperCheckBox);
@@ -687,5 +716,7 @@
         private CheckBox textToUpperCheckBox;
         private DateTimePicker RegistrationDateTimePicker;
         private Button OpenSubstrateInformationButton;
+        private Label StockLabel1;
+        private Label StockLabel2;
     }
 }
