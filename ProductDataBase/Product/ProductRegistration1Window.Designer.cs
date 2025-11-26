@@ -53,8 +53,8 @@
             this.終了ToolStripMenuItem = new ToolStripMenuItem();
             this.ProductNameLabel2 = new Label();
             this.ヘルプToolStripMenuItem = new ToolStripMenuItem();
-            this.取得情報ToolStripMenuItem = new ToolStripMenuItem();
             this.メッセージ設定ToolStripMenuItem = new ToolStripMenuItem();
+            this.取得情報ToolStripMenuItem = new ToolStripMenuItem();
             this.ProductNameLabel1 = new Label();
             this.ProductRegistration1MenuStrip = new MenuStrip();
             this.ProductTypeLabel2 = new Label();
@@ -67,6 +67,7 @@
             this.RevisionChangeButton = new Button();
             this.RegistrationDateTimePicker = new DateTimePicker();
             this.RNumberCheckBox = new CheckBox();
+            this.MessageTextBox = new RichTextBox();
             this.ProductRegistration1MenuStrip.SuspendLayout();
             this.panelCommentTextBox.SuspendLayout();
             this.SuspendLayout();
@@ -406,19 +407,19 @@
             this.ヘルプToolStripMenuItem.Size = new Size(48, 20);
             this.ヘルプToolStripMenuItem.Text = "ヘルプ";
             // 
-            // 取得情報ToolStripMenuItem
-            // 
-            this.取得情報ToolStripMenuItem.Name = "取得情報ToolStripMenuItem";
-            this.取得情報ToolStripMenuItem.Size = new Size(143, 22);
-            this.取得情報ToolStripMenuItem.Text = "取得情報";
-            this.取得情報ToolStripMenuItem.Click += this.取得情報ToolStripMenuItem_Click;
-            // 
             // メッセージ設定ToolStripMenuItem
             // 
             this.メッセージ設定ToolStripMenuItem.Name = "メッセージ設定ToolStripMenuItem";
             this.メッセージ設定ToolStripMenuItem.Size = new Size(143, 22);
             this.メッセージ設定ToolStripMenuItem.Text = "メッセージ設定";
             this.メッセージ設定ToolStripMenuItem.Click += this.メッセージ設定ToolStripMenuItem_Click;
+            // 
+            // 取得情報ToolStripMenuItem
+            // 
+            this.取得情報ToolStripMenuItem.Name = "取得情報ToolStripMenuItem";
+            this.取得情報ToolStripMenuItem.Size = new Size(143, 22);
+            this.取得情報ToolStripMenuItem.Text = "取得情報";
+            this.取得情報ToolStripMenuItem.Click += this.取得情報ToolStripMenuItem_Click;
             // 
             // ProductNameLabel1
             // 
@@ -545,11 +546,28 @@
             this.RNumberCheckBox.UseVisualStyleBackColor = true;
             this.RNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
+            // MessageTextBox
+            // 
+            this.MessageTextBox.Enabled = false;
+            this.MessageTextBox.ForeColor = Color.Red;
+            this.MessageTextBox.Location = new Point(168, 377);
+            this.MessageTextBox.MaxLength = 100;
+            this.MessageTextBox.Multiline = false;
+            this.MessageTextBox.Name = "MessageTextBox";
+            this.MessageTextBox.ReadOnly = true;
+            this.MessageTextBox.ScrollBars = RichTextBoxScrollBars.None;
+            this.MessageTextBox.Size = new Size(450, 25);
+            this.MessageTextBox.TabIndex = 615;
+            this.MessageTextBox.TabStop = false;
+            this.MessageTextBox.Text = "";
+            this.MessageTextBox.WordWrap = false;
+            // 
             // ProductRegistration1Window
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.MessageTextBox);
             this.Controls.Add(this.RNumberCheckBox);
             this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.RevisionChangeButton);
@@ -653,5 +671,6 @@
         private DateTimePicker RegistrationDateTimePicker;
         private CheckBox RNumberCheckBox;
         private ToolStripMenuItem メッセージ設定ToolStripMenuItem;
+        private RichTextBox MessageTextBox;
     }
 }
