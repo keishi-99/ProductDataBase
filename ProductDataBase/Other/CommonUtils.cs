@@ -87,7 +87,7 @@ namespace ProductDatabase.Other {
         // バックアップ作成
         public static class BackupManager {
             private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup"); // バックアップを保存するディレクトリ
-            private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db"); // 元ファイルパス
+            private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db"); // 元ファイルパス
             private static readonly int s_maxBackupFiles = 20; // 最大バックアップファイル数
             private static readonly object s_lockObject = new();
 
@@ -113,7 +113,7 @@ namespace ProductDatabase.Other {
                         ManageBackupFiles();
 
                         // ネットワークにバックアップ
-                        var BackupPath = Path.Combine(s_BackupPath, "db", "registration.db");
+                        var BackupPath = Path.Combine(s_BackupPath, "db", "ProductRegistry.db");
                         if (Environment.CurrentDirectory != s_BackupPath) {
                             CopyWithRetry(s_originalFilePath, BackupPath, true);
                         }
