@@ -165,14 +165,8 @@ namespace ProductDatabase {
             InitializeComponent();
         }
 
-        public static string GetConnectionInformation() {
-            var informationPath = Path.Combine(Environment.CurrentDirectory, "db", "information.db");
-            return !File.Exists(informationPath)
-                ? throw new FileNotFoundException("ファイルが見つかりません。", informationPath)
-                : new SqliteConnectionStringBuilder() { DataSource = informationPath, Pooling = false }.ToString();
-        }
         public static string GetConnectionRegistration() {
-            var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
+            var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
             return !File.Exists(registrationPath)
                 ? throw new FileNotFoundException("ファイルが見つかりません。", registrationPath)
                 : new SqliteConnectionStringBuilder() { DataSource = registrationPath, Pooling = false }.ToString();
@@ -213,13 +207,13 @@ namespace ProductDatabase {
                 CreateDailyBackup();
 
                 // 製品・基板データ取得
-                using SqliteConnection con = new(GetConnectionInformation());
+                using SqliteConnection con = new(GetConnectionRegistration());
                 con.Open();
-                using (var cmd = new SqliteCommand("SELECT * FROM Product;", con)) {
+                using (var cmd = new SqliteCommand("SELECT * FROM M_ProductDef;", con)) {
                     using var reader = cmd.ExecuteReader();
                     ProductInfo.ProductDataTable.Load(reader);
                 }
-                using (var cmd = new SqliteCommand("SELECT * FROM Substrate;", con)) {
+                using (var cmd = new SqliteCommand("SELECT * FROM M_SubstrateDef;", con)) {
                     using var reader = cmd.ExecuteReader();
                     ProductInfo.SubstrateDataTable.Load(reader);
                 }
@@ -287,13 +281,13 @@ namespace ProductDatabase {
         private void ResetFields() {
             ProductInfo = new ProductInformation();
 
-            using var con = new SqliteConnection(GetConnectionInformation());
+            using var con = new SqliteConnection(GetConnectionRegistration());
             con.Open();
-            using (var cmd = new SqliteCommand("SELECT * FROM Product;", con)) {
+            using (var cmd = new SqliteCommand("SELECT * FROM M_ProductDef;", con)) {
                 using var reader = cmd.ExecuteReader();
                 ProductInfo.ProductDataTable.Load(reader);
             }
-            using (var cmd = new SqliteCommand("SELECT * FROM Substrate;", con)) {
+            using (var cmd = new SqliteCommand("SELECT * FROM M_SubstrateDef;", con)) {
                 using var reader = cmd.ExecuteReader();
                 ProductInfo.SubstrateDataTable.Load(reader);
             }
@@ -480,10 +474,10 @@ namespace ProductDatabase {
         private void CategorySelect(object sender) {
             // Tagプロパティを使用してラジオボタンの識別子を取得
             Dictionary<string, (int Number, string Sql)> radioButtonMap = new() {
-                ["1"] = (1, "SELECT * FROM Substrate WHERE Visible = 1 ORDER BY SortNumber ASC;"),
-                ["2"] = (2, "SELECT * FROM Product WHERE Visible = 1 ORDER BY SortNumber ASC;"),
-                ["3"] = (3, "SELECT * FROM Product WHERE Visible = 1 AND SerialPrintType != 0 ORDER BY SortNumber ASC;"),
-                ["4"] = (4, "SELECT * FROM Product WHERE Visible = 1 AND (SheetPrintType = 2 OR SheetPrintType = 3) ORDER BY SortNumber ASC;")
+                ["1"] = (1, "SELECT * FROM M_SubstrateDef WHERE Visible = 1 ORDER BY SortNumber ASC;"),
+                ["2"] = (2, "SELECT * FROM M_ProductDef WHERE Visible = 1 ORDER BY SortNumber ASC;"),
+                ["3"] = (3, "SELECT * FROM M_ProductDef WHERE Visible = 1 AND SerialPrintType != 0 ORDER BY SortNumber ASC;"),
+                ["4"] = (4, "SELECT * FROM M_ProductDef WHERE Visible = 1 AND (SheetPrintType = 2 OR SheetPrintType = 3) ORDER BY SortNumber ASC;")
             };
 
             try {
@@ -496,7 +490,7 @@ namespace ProductDatabase {
 
                 if (sender is RadioButton selectedRadioButton && radioButtonMap.TryGetValue(selectedRadioButton.Tag?.ToString() ?? "", out var map)) {
                     RadioButtonNumber = map.Number;
-                    using var con = new SqliteConnection(GetConnectionInformation());
+                    using var con = new SqliteConnection(GetConnectionRegistration());
                     con.Open();
 
                     using var cmd = new SqliteCommand(map.Sql, con);
@@ -687,7 +681,7 @@ namespace ProductDatabase {
                 .Replace("-DCGH", "-DC");
         }
         private void FetchDataFromSQLite() {
-            using var con = new SqliteConnection(GetConnectionInformation());
+            using var con = new SqliteConnection(GetConnectionRegistration());
             con.Open();
             using var cmd = con.CreateCommand();
             cmd.CommandText =
@@ -700,9 +694,9 @@ namespace ProductDatabase {
                     p.ProductType,
                     p.ProItemNumber
                 FROM
-                    Substrate AS s
+                    M_SubstrateDef AS s
                 FULL JOIN
-                    Product AS p
+                    M_ProductDef AS p
                 ON
                     s.SubItemNumber = p.ProItemNumber
                 WHERE
@@ -762,9 +756,9 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateSelection(string productName, string substrateName) {
-            using SqliteConnection con = new(GetConnectionInformation());
+            using SqliteConnection con = new(GetConnectionRegistration());
             con.Open();
-            using (var cmd = new SqliteCommand("SELECT * FROM Substrate;", con)) {
+            using (var cmd = new SqliteCommand("SELECT * FROM M_SubstrateDef;", con)) {
                 using var reader = cmd.ExecuteReader();
                 MainDataTable.Load(reader);
             }
@@ -786,9 +780,9 @@ namespace ProductDatabase {
             window.ShowDialog(this);
         }
         private void HandleProductSelection(string productName, string productType) {
-            using SqliteConnection con = new(GetConnectionInformation());
+            using SqliteConnection con = new(GetConnectionRegistration());
             con.Open();
-            using (var cmd = new SqliteCommand("SELECT * FROM Product;", con)) {
+            using (var cmd = new SqliteCommand("SELECT * FROM M_ProductDef;", con)) {
                 using var reader = cmd.ExecuteReader();
                 MainDataTable.Load(reader);
             }

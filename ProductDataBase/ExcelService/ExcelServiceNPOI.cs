@@ -344,7 +344,7 @@ namespace ProductDatabase.ExcelService {
                 con.Open();
                 using var cmd = con.CreateCommand();
 
-                var tableName = $"[{productInfo.CategoryName}_Substrate]";
+                var tableName = $"[T{productInfo.CategoryName}_Substrate]";
                 cmd.CommandText =
                     $"""
                     SELECT

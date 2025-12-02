@@ -58,7 +58,7 @@ namespace ProductDatabase {
                 // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
                 cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = ProductInfo.ProductName;
                 cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = ProductInfo.RevisionGroup;
-                var productTableName = $"[{ProductInfo.CategoryName}_Product]";
+                var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
                 cmd.CommandText = $"SELECT Revision FROM {productTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
                 var revisionResult = cmd.ExecuteScalar();
                 RevisionTextBox.Text = revisionResult?.ToString() ?? "";
@@ -253,7 +253,7 @@ namespace ProductDatabase {
             connection.Open();
             using var transaction = connection.BeginTransaction();
             try {
-                var productTableName = $"[{ProductInfo.CategoryName}_Product]";
+                var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
                 var commandText =
                 $"""
                 INSERT INTO {productTableName} (
