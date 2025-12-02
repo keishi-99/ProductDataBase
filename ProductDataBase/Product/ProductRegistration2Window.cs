@@ -374,7 +374,7 @@ namespace ProductDatabase {
         }
 
         private void InsertProduct(SqliteConnection connection) {
-            var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
+            var productTableName = $"[T_Product]";
             var commandText =
                 $"""
                 INSERT INTO {productTableName} (
@@ -415,7 +415,7 @@ namespace ProductDatabase {
             ProductInfo.ProductID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {productTableName};"));
         }
         private void InsertSerial(SqliteConnection connection) {
-            var serialTableName = $"[T_{ProductInfo.CategoryName}_Serial]";
+            var serialTableName = $"[T_Serial]";
             var commandText =
                 $"""
                 INSERT INTO {serialTableName} (
@@ -560,7 +560,7 @@ namespace ProductDatabase {
         // 登録チェック
         private void RegistrationCheck(SqliteConnection connection) {
 
-            var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
+            var productTableName = $"[T_Product]";
             var commandText = $@"SELECT * FROM {productTableName} WHERE Id = @Id;";
 
             using var dr = ExecuteReader(connection, commandText, ("@Id", ProductInfo.ProductID));
@@ -607,7 +607,7 @@ namespace ProductDatabase {
 
             if (!string.IsNullOrEmpty(ProductInfo.ProductNumber)) {
                 // 製番が新規かチェック
-                var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
+                var productTableName = $"[T_Product]";
                 var commandText =
                     $"""
                     SELECT
@@ -649,7 +649,7 @@ namespace ProductDatabase {
 
             if (!string.IsNullOrEmpty(ProductInfo.OrderNumber)) {
                 // 注文番号が新規かチェック
-                var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
+                var productTableName = $"[T_Product]";
                 var commandText =
                     $"""
                     SELECT
@@ -765,8 +765,8 @@ namespace ProductDatabase {
             List<string> strSerialDuplication = [];
 
             using var cmd = connection.CreateCommand();
-            var serialTableName = $"[T_{ProductInfo.CategoryName}_Serial]";
-            var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
+            var serialTableName = $"[T_Serial]";
+            var productTableName = $"[T_Product]";
             cmd.CommandText =
                 $"""
                 SELECT

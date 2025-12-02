@@ -61,7 +61,7 @@ namespace ProductDatabase {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [ProductName]テーブルの[SubstrateModel]列の[Revision]を取得
-                    var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
+                    var productTableName = $"[T_Product]";
                     cmd.CommandText = $"SELECT Revision FROM {productTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
                     cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = ProductInfo.ProductName;
                     cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = ProductInfo.RevisionGroup;
