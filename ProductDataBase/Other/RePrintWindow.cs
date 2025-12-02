@@ -61,7 +61,7 @@ namespace ProductDatabase {
                     con.Open();
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [ProductName]テーブルの[SubstrateModel]列の[Revision]を取得
-                    var productTableName = $"[{ProductInfo.CategoryName}_Product]";
+                    var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
                     cmd.CommandText = $"SELECT Revision FROM {productTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
                     cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = ProductInfo.ProductName;
                     cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = ProductInfo.RevisionGroup;
@@ -140,7 +140,7 @@ namespace ProductDatabase {
                 using var cmd = con.CreateCommand();
                 cmd.CommandText =
                     $"""
-                    INSERT INTO Reprint (
+                    INSERT INTO T_Reprint (
                         SerialPrintType, OrderNumber, ProductName, ProductNumber, ProductType, ProductModel, Quantity, Person, RegDate, Revision, SerialFirst, SerialLast, Comment
                         )
                     VALUES (

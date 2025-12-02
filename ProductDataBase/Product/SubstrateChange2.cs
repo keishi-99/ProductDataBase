@@ -106,7 +106,7 @@ namespace ProductDatabase {
                             con.Open();
                             using var cmd = con.CreateCommand();
 
-                            var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
+                            var substrateTableName = $"[T_{ProductInfo.CategoryName}_Substrate]";
 
                             cmd.CommandText =
                                 $"""
@@ -321,7 +321,7 @@ namespace ProductDatabase {
                                             var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
 
                                             using (var cmd = con.CreateCommand()) {
-                                                var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
+                                                var substrateTableName = $"[T_{ProductInfo.CategoryName}_Substrate]";
                                                 cmd.CommandText =
                                                     $"""
                                                     SELECT
@@ -347,7 +347,7 @@ namespace ProductDatabase {
                                             }
                                             // 基板テーブルを更新、できない場合は挿入
                                             using (var cmdUpdate = con.CreateCommand()) {
-                                                var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
+                                                var substrateTableName = $"[T_{ProductInfo.CategoryName}_Substrate]";
                                                 cmdUpdate.CommandText =
                                                     $"""
                                                     UPDATE
@@ -408,7 +408,7 @@ namespace ProductDatabase {
                                         // 使用数が0になった場合、基板テーブルから削除
                                         else if (usedValue != useValue && useValue == 0) {
                                             using var cmdDelete = con.CreateCommand();
-                                            var substrateTableName = $"[{ProductInfo.CategoryName}_Substrate]";
+                                            var substrateTableName = $"[T_{ProductInfo.CategoryName}_Substrate]";
                                             cmdDelete.CommandText =
                                                 $"""
                                                 DELETE
@@ -431,7 +431,7 @@ namespace ProductDatabase {
 
                             // 製品テーブル更新
                             using (var cmd = con.CreateCommand()) {
-                                var productTableName = $"[{ProductInfo.CategoryName}_Product]";
+                                var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
                                 cmd.CommandText =
                                     $"""
                                     UPDATE
