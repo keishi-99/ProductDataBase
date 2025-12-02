@@ -270,7 +270,7 @@ namespace ProductDatabase {
             // パス生成
             string backupFolder = Path.Combine(CommonUtils.s_BackupPath, "db", "backup", $"{year}", $"{month:00}");
             string backupFile = Path.Combine(backupFolder, $"_bak_{year}-{month:00}-{day:00}.db");
-            string registrationFile = Path.Combine(Environment.CurrentDirectory, "db", "registration.db");
+            string registrationFile = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
 
             // 当日バックアップがなければ作成
             if (!File.Exists(backupFile)) {
