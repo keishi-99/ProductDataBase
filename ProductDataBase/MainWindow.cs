@@ -201,7 +201,7 @@ namespace ProductDatabase {
                 var jsonObj = JObject.Parse(jsonText);
 
                 // CloneFolderPathを取得
-                CommonUtils.s_BackupPath = jsonObj["BackupFolderPath"]?.ToString() ?? string.Empty;
+                CommonUtils.s_backupPath = jsonObj["BackupFolderPath"]?.ToString() ?? string.Empty;
 
                 // バックアップ作成
                 CreateDailyBackup();
@@ -248,15 +248,15 @@ namespace ProductDatabase {
         }
         private static void CreateDailyBackup() {
             // フォルダ未設定
-            if (string.IsNullOrWhiteSpace(CommonUtils.s_BackupPath)) {
+            if (string.IsNullOrWhiteSpace(CommonUtils.s_backupPath)) {
                 MessageBox.Show("フォルダが設定されていません。バックアップは保存されません。",
                     "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
             // ネットワークフォルダが見つからない
-            if (!Directory.Exists(CommonUtils.s_BackupPath)) {
-                MessageBox.Show($"'{CommonUtils.s_BackupPath}'\nが見つかりません。バックアップは保存されません。",
+            if (!Directory.Exists(CommonUtils.s_backupPath)) {
+                MessageBox.Show($"'{CommonUtils.s_backupPath}'\nが見つかりません。バックアップは保存されません。",
                     "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
@@ -268,7 +268,7 @@ namespace ProductDatabase {
             var day = today.Day;
 
             // パス生成
-            string backupFolder = Path.Combine(CommonUtils.s_BackupPath, "db", "backup", $"{year}", $"{month:00}");
+            string backupFolder = Path.Combine(CommonUtils.s_backupPath, "db", "backup", $"{year}", $"{month:00}");
             string backupFile = Path.Combine(backupFolder, $"_bak_{year}-{month:00}-{day:00}.db");
             string registrationFile = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
 
