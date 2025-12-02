@@ -201,7 +201,7 @@ namespace ProductDatabase.ExcelService {
                 con.Open();
                 using var cmd = con.CreateCommand();
 
-                var tableName = $"[T{productInfo.CategoryName}_Substrate]";
+                var tableName = $"[T_Substrate]";
                 cmd.CommandText =
                     $"""
                     SELECT
@@ -407,7 +407,7 @@ namespace ProductDatabase.ExcelService {
                 con.Open();
                 using var cmd = con.CreateCommand();
 
-                var tableName = $"[T{productInfo.CategoryName}_Substrate]";
+                var tableName = $"[T_Substrate]";
                 cmd.CommandText =
                     $"""
                     SELECT

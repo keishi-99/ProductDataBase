@@ -217,8 +217,8 @@ namespace ProductDatabase {
                 AllSubstrateCheckBox.Visible = true;
                 GroupModelCheckBox.Visible = false;
 
-                var substrateTableName = $"[T_{ProductInfo.CategoryName}_Substrate]";
-                var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
+                var substrateTableName = $"[T_Substrate]";
+                var productTableName = $"[T_Product]";
                 var stockFilter = !string.IsNullOrEmpty(ProductInfo.StockName) ? " AND s.StockName = @StockName" : string.Empty;
                 var substrateFilter = !AllSubstrateCheckBox.Checked ? " AND s.SubstrateModel = @SubstrateModel" : string.Empty;
 
@@ -248,7 +248,7 @@ namespace ProductDatabase {
                 AllSubstrateCheckBox.Visible = true;
                 GroupModelCheckBox.Visible = true;
 
-                var substrateTableName = $"[T_{ProductInfo.CategoryName}_Substrate]";
+                var substrateTableName = $"[T_Substrate]";
                 var stockFilter = !string.IsNullOrEmpty(ProductInfo.StockName) ? " AND StockName = @StockName" : string.Empty;
                 var substrateFilter = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
                 var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
@@ -302,7 +302,7 @@ namespace ProductDatabase {
                 GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
             }
 
-            var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
+            var productTableName = $"[T_Product]";
             var productNameFilter = !string.IsNullOrEmpty(ProductInfo.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
             var productModel = CategoryRadioButton1.Checked ? ProductInfo.ProductModel : string.Empty;
             var productModelFilter = !string.IsNullOrEmpty(productModel) ? " AND ProductModel = @ProductModel" : string.Empty;
@@ -325,8 +325,8 @@ namespace ProductDatabase {
             GenerateListButton.Visible = false;
             GenerateCheckSheetButton.Visible = false;
 
-            var serialTableName = $"[T_{ProductInfo.CategoryName}_Serial]";
-            var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
+            var serialTableName = $"[T_Serial]";
+            var productTableName = $"[T_Product]";
             var productNameFilter = !string.IsNullOrEmpty(ProductInfo.ProductName) ? " AND s.ProductName = @ProductName" : string.Empty;
 
             var query =
@@ -483,7 +483,7 @@ namespace ProductDatabase {
                         foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
                             if (row.RowState == DataRowState.Modified) {
                                 // UPDATE文の設定
-                                var substrateTableName = $"[T_{ProductInfo.CategoryName}_Substrate]";
+                                var substrateTableName = $"[T_Substrate]";
                                 command.CommandText =
                                     $"""
                                     UPDATE
@@ -559,7 +559,7 @@ namespace ProductDatabase {
                             {
                                 // DELETE文の設定
 
-                                var substrateTableName = $"[T_{ProductInfo.CategoryName}_Substrate]";
+                                var substrateTableName = $"[T_Substrate]";
                                 command.CommandText =
                                     $"""
                                     UPDATE
@@ -601,7 +601,7 @@ namespace ProductDatabase {
                         foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
                             if (row.RowState == DataRowState.Modified) {
                                 // UPDATE文の設定
-                                var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
+                                var productTableName = $"[T_Product]";
                                 command.CommandText =
                                     $"""
                                     UPDATE
@@ -674,7 +674,7 @@ namespace ProductDatabase {
                             else if (row.RowState == DataRowState.Deleted) // 削除行の処理
                             {
                                 // DELETE文の設定
-                                var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
+                                var productTableName = $"[T_Product]";
                                 command.CommandText =
                                     $"""
                                     UPDATE
@@ -720,7 +720,7 @@ namespace ProductDatabase {
                             else if (row.RowState == DataRowState.Deleted) // 削除行の処理
                             {
                                 // DELETE文の設定
-                                var serialTableName = $"[T_{ProductInfo.CategoryName}_Serial]";
+                                var serialTableName = $"[T_Serial]";
                                 command.CommandText =
                                     $"""
                                     DELETE FROM
@@ -866,7 +866,7 @@ namespace ProductDatabase {
                 con.Open();
                 using var cmd = con.CreateCommand();
 
-                var substrateTableName = $"[T_{ProductInfo.CategoryName}_Substrate]";
+                var substrateTableName = $"[T_Substrate]";
                 cmd.CommandText =
                     $"""
                     SELECT

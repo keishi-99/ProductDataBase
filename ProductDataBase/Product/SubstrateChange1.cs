@@ -28,7 +28,7 @@ namespace ProductDatabase {
                 HistoryTable.Clear();
 
                 using var cmd = con.CreateCommand();
-                var productTableName = $"[T_{ProductInfo.CategoryName}_Product]";
+                var productTableName = $"[T_Product]";
                 cmd.CommandText =
                     $"""
                     SELECT

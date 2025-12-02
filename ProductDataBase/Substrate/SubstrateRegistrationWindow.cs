@@ -129,7 +129,7 @@ namespace ProductDatabase {
 
             using var transaction = con.BeginTransaction();
             try {
-                var substrateTableName = $"[T_{ProductInfo.CategoryName}_Substrate]";
+                var substrateTableName = $"[T_Substrate]";
                 var orderNumber = ProductInfo.OrderNumber;
                 var substrateNumber = ProductInfo.ProductNumber;
                 var quantity = ProductInfo.Quantity;
@@ -457,7 +457,7 @@ namespace ProductDatabase {
         // 在庫数取得
         private string GetStockQuantity() {
 
-            var substrateTableName = $"[T_{ProductInfo.CategoryName}_Substrate]";
+            var substrateTableName = $"[T_Substrate]";
 
             using var con = new SqliteConnection(GetConnectionRegistration());
             con.Open();
