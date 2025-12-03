@@ -200,7 +200,7 @@ namespace ProductDatabase {
             var isServiceRegistration = ProductInfo.RegType == 9;
             var categoryName = (isServiceRegistration ? ServiceInfo.ServiceCategoryName : ProductInfo.CategoryName)
                 ?? throw new Exception("CategoryNameが nullです。");
-            var substrateTableName = $"[T_{categoryName}_Substrate]";
+            var substrateTableName = $"[T_Substrate]";
             var stockName = (isServiceRegistration ? ServiceInfo.ServiceStockName : ProductInfo.StockName)
                 ?? throw new Exception("StockNameが nullです。");
             var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : _useSubstrate)
@@ -468,7 +468,7 @@ namespace ProductDatabase {
             }
         }
         private static (string substrateName, string substrateModel, string orderNumber) GetSubstrateInfo(SqliteConnection connection, int index, string categoryName, string stockName, string substrateNumber, string[] useSubstrate) {
-            var substrateTableName = $"[T_{categoryName}_Substrate]";
+            var substrateTableName = $"[T_Substrate]";
             var commandText =
                 $"""
                 SELECT
@@ -495,7 +495,7 @@ namespace ProductDatabase {
                 : (string.Empty, string.Empty, string.Empty);
         }
         private void InsertSubstrate(SqliteConnection connection, string categoryName, string stockName, string substrateName, string substrateModel, string substrateNumber, string orderNumber, int useValue, int? useID) {
-            var substrateTableName = $"[T_{categoryName}_Substrate]";
+            var substrateTableName = $"[T_Substrate]";
             var commandText =
                 $"""
                 INSERT INTO {substrateTableName} (
