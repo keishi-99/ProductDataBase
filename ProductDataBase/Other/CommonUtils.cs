@@ -104,7 +104,7 @@ namespace ProductDatabase.Other {
 
                         // 日付と時間をファイル名に付加
                         var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                        var backupFileName = $"registration_{timestamp}.db";
+                        var backupFileName = $"ProductRegistry_{timestamp}.db";
                         var backupFilePath = Path.Combine(s_backupDirectory, backupFileName);
 
                         // 元ファイルをバックアップにコピー
@@ -113,9 +113,11 @@ namespace ProductDatabase.Other {
                         ManageBackupFiles();
 
                         // ネットワークにバックアップ
-                        var backupPath = Path.Combine(s_backupPath, "db", "ProductRegistry.db");
-                        if (Environment.CurrentDirectory != s_backupPath) {
-                            CopyWithRetry(s_originalFilePath, backupPath, true);
+                        if (!string.IsNullOrEmpty(s_backupPath)) {
+                            var backupPath = Path.Combine(s_backupPath, "db", "ProductRegistry.db");
+                            if (Environment.CurrentDirectory != s_backupPath) {
+                                CopyWithRetry(s_originalFilePath, backupPath, true);
+                            }
                         }
 
                     }
@@ -129,7 +131,7 @@ namespace ProductDatabase.Other {
             /// </summary>
             private static void ManageBackupFiles() {
                 try {
-                    var backupFiles = Directory.GetFiles(s_backupDirectory, "registration_*.db")
+                    var backupFiles = Directory.GetFiles(s_backupDirectory, "ProductRegistry_*.db")
                         .OrderBy(File.GetCreationTime) // 作成日時順に並べる
                         .ToList();
 
