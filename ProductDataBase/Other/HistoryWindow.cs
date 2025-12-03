@@ -87,6 +87,7 @@ namespace ProductDatabase {
         private void LoadDataAndDisplay(string categoryName, string query, params (string name, object value)[] parameters) {
             using SqliteConnection con = new(GetConnectionRegistration());
             con.Open();
+
             using SqliteCommand cmd = new(query, con);
             cmd.Parameters.AddRange([.. parameters.Select(p => new SqliteParameter(p.name, p.value))]);
             using (var reader = cmd.ExecuteReader()) {
@@ -217,8 +218,9 @@ namespace ProductDatabase {
                 AllSubstrateCheckBox.Visible = true;
                 GroupModelCheckBox.Visible = false;
 
-                var substrateTableName = $"[T_Substrate]";
+                var substrateTableName = $"[V_SubstrateWithCategory]";
                 var productTableName = $"[T_Product]";
+                var substrateCategoryFilter = !string.IsNullOrEmpty(ProductInfo.CategoryName) ? " AND s.CategoryName = @CategoryName" : string.Empty;
                 var stockFilter = !string.IsNullOrEmpty(ProductInfo.StockName) ? " AND s.StockName = @StockName" : string.Empty;
                 var substrateFilter = !AllSubstrateCheckBox.Checked ? " AND s.SubstrateModel = @SubstrateModel" : string.Empty;
 
@@ -233,13 +235,13 @@ namespace ProductDatabase {
                     ON
                         s.UseID = p.ID
                     WHERE
-                        1=1{stockFilter}{substrateFilter}
+                        1=1{substrateCategoryFilter}{stockFilter}{substrateFilter}
                     ORDER BY
                         s.ID DESC
                     ;
                     """;
 
-                LoadDataAndDisplay("Substrate", query, ("@StockName", ProductInfo.StockName), ("@SubstrateModel", ProductInfo.SubstrateModel));
+                LoadDataAndDisplay("Substrate", query, ("@CategoryName", ProductInfo.CategoryName), ("@StockName", ProductInfo.StockName), ("@SubstrateModel", ProductInfo.SubstrateModel));
             }
             if (CategoryRadioButton2.Checked) {
                 _tableName = string.Empty;
@@ -302,7 +304,8 @@ namespace ProductDatabase {
                 GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
             }
 
-            var productTableName = $"[T_Product]";
+            var productTableName = $"[V_ProductWithCategory]";
+            var productCategoryFilter = !string.IsNullOrEmpty(ProductInfo.CategoryName) ? " AND CategoryName = @CategoryName" : string.Empty;
             var productNameFilter = !string.IsNullOrEmpty(ProductInfo.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
             var productModel = CategoryRadioButton1.Checked ? ProductInfo.ProductModel : string.Empty;
             var productModelFilter = !string.IsNullOrEmpty(productModel) ? " AND ProductModel = @ProductModel" : string.Empty;
@@ -311,11 +314,11 @@ namespace ProductDatabase {
                 $"""
                 SELECT *
                 FROM {productTableName}
-                WHERE 1=1{productNameFilter}{productModelFilter}
+                WHERE 1=1{productCategoryFilter}{productNameFilter}{productModelFilter}
                 ORDER BY ID DESC;
                 """;
 
-            LoadDataAndDisplay("Product", query, ("@ProductName", ProductInfo.ProductName), ("@ProductModel", ProductInfo.ProductModel));
+            LoadDataAndDisplay("Product", query, ("@CategoryName", ProductInfo.CategoryName), ("@ProductName", ProductInfo.ProductName), ("@ProductModel", ProductInfo.ProductModel));
         }
         private void ViewSerialLog() {
             _tableName = "Serial";
