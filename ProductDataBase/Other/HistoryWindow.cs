@@ -250,7 +250,8 @@ namespace ProductDatabase {
                 AllSubstrateCheckBox.Visible = true;
                 GroupModelCheckBox.Visible = true;
 
-                var substrateTableName = $"[T_Substrate]";
+                var substrateTableName = $"[V_SubstrateWithCategory]";
+                var substrateCategoryFilter = !string.IsNullOrEmpty(ProductInfo.CategoryName) ? " AND CategoryName = @CategoryName" : string.Empty;
                 var stockFilter = !string.IsNullOrEmpty(ProductInfo.StockName) ? " AND StockName = @StockName" : string.Empty;
                 var substrateFilter = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
                 var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
@@ -274,7 +275,7 @@ namespace ProductDatabase {
                     FROM
                         {substrateTableName}
                     WHERE
-                        1=1{stockFilter}{substrateFilter}
+                        1=1{substrateCategoryFilter}{stockFilter}{substrateFilter}
                     GROUP BY
                         {groupByClause}
                     HAVING
@@ -284,7 +285,7 @@ namespace ProductDatabase {
                     ;
                     """;
 
-                LoadDataAndDisplay("SubstrateStock", query, ("@StockName", ProductInfo.StockName), ("@SubstrateModel", ProductInfo.SubstrateModel));
+                LoadDataAndDisplay("SubstrateStock", query, ("@CategoryName", ProductInfo.CategoryName), ("@StockName", ProductInfo.StockName), ("@SubstrateModel", ProductInfo.SubstrateModel));
             }
         }
 
@@ -329,7 +330,8 @@ namespace ProductDatabase {
             GenerateCheckSheetButton.Visible = false;
 
             var serialTableName = $"[T_Serial]";
-            var productTableName = $"[T_Product]";
+            var productTableName = $"[V_ProductWithCategory]";
+            var substrateCategoryFilter = !string.IsNullOrEmpty(ProductInfo.CategoryName) ? " AND p.CategoryName = @CategoryName" : string.Empty;
             var productNameFilter = !string.IsNullOrEmpty(ProductInfo.ProductName) ? " AND s.ProductName = @ProductName" : string.Empty;
 
             var query =
@@ -351,13 +353,13 @@ namespace ProductDatabase {
                 ON
                     s.UsedID = p.ID
                 WHERE
-                    1=1{productNameFilter}
+                    1=1{substrateCategoryFilter}{productNameFilter}
                 ORDER BY
                     s.rowid DESC
                 ;
                 """;
 
-            LoadDataAndDisplay("Serial", query, ("@ProductName", ProductInfo.ProductName));
+            LoadDataAndDisplay("Serial", query, ("@CategoryName", ProductInfo.CategoryName), ("@ProductName", ProductInfo.ProductName));
         }
 
         private void ViewReprintLog() {
