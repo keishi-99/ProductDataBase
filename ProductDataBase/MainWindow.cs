@@ -166,10 +166,10 @@ namespace ProductDatabase {
         }
 
         public static string GetConnectionRegistration() {
-            var registrationPath = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
-            return !File.Exists(registrationPath)
-                ? throw new FileNotFoundException("ファイルが見つかりません。", registrationPath)
-                : new SqliteConnectionStringBuilder() { DataSource = registrationPath, Pooling = false }.ToString();
+            var productRegistryPath = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
+            return !File.Exists(productRegistryPath)
+                ? throw new FileNotFoundException("ファイルが見つかりません。", productRegistryPath)
+                : new SqliteConnectionStringBuilder() { DataSource = productRegistryPath, Pooling = false }.ToString();
         }
 
         private static FileStream? s_lockStream;
@@ -270,12 +270,12 @@ namespace ProductDatabase {
             // パス生成
             string backupFolder = Path.Combine(CommonUtils.s_backupPath, "db", "backup", $"{year}", $"{month:00}");
             string backupFile = Path.Combine(backupFolder, $"_bak_{year}-{month:00}-{day:00}.db");
-            string registrationFile = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
+            string productRegistryFile = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
 
             // 当日バックアップがなければ作成
             if (!File.Exists(backupFile)) {
                 Directory.CreateDirectory(backupFolder);
-                File.Copy(registrationFile, backupFile, overwrite: false);
+                File.Copy(productRegistryFile, backupFile, overwrite: false);
             }
         }
         private void ResetFields() {
