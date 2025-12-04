@@ -914,7 +914,7 @@ namespace ProductDatabase {
                 // 選択されたセルがない場合は処理を終了
                 if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
-                ProductInfo.ProductID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
+                ProductInfo.ID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
                 ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
                 ProductInfo.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
                 ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
@@ -941,7 +941,7 @@ namespace ProductDatabase {
                 // 選択されたセルがない場合は処理を終了
                 if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
-                ProductInfo.ProductID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
+                ProductInfo.ID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
                 ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
                 ProductInfo.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
                 ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;

@@ -359,7 +359,7 @@ namespace ProductDatabase.ExcelService {
                         SubstrateModel ASC
                     ;
                     """;
-                cmd.Parameters.Add("@ID", SqliteType.Text).Value = productInfo.ProductID;
+                cmd.Parameters.Add("@ID", SqliteType.Text).Value = productInfo.ID;
                 using var dr = cmd.ExecuteReader();
 
                 while (dr.Read()) {

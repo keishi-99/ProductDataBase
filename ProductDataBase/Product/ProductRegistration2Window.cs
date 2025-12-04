@@ -412,7 +412,7 @@ namespace ProductDatabase {
                 ("@Comment", comment)
                 );
 
-            ProductInfo.ProductID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {productTableName};"));
+            ProductInfo.ID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {productTableName};"));
         }
         private void InsertSerial(SqliteConnection connection) {
             var serialTableName = $"[T_Serial]";
@@ -430,7 +430,7 @@ namespace ProductDatabase {
             foreach (var serial in _serialList) {
                 ExecuteNonQuery(connection, commandText,
                     ("@Serial", serial),
-                    ("@productRowId", ProductInfo.ProductID),
+                    ("@productRowId", ProductInfo.ID),
                     ("@ProductName", ProductInfo.ProductName)
                 );
             }
@@ -444,7 +444,7 @@ namespace ProductDatabase {
                 ?? throw new Exception("StockNameが nullです。");
             var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : _useSubstrate)
                 ?? throw new Exception("ArrUseSubstrateが nullです。");
-            int? useID = isServiceRegistration ? null : ProductInfo.ProductID;
+            int? useID = isServiceRegistration ? null : ProductInfo.ID;
 
             for (var i = 0; i < useSubstrate.Length; i++) {
                 if (!(MainPanel.Controls[_checkBoxNames[i]] as CheckBox)?.Checked ?? true) {
@@ -563,7 +563,7 @@ namespace ProductDatabase {
             var productTableName = $"[T_Product]";
             var commandText = $@"SELECT * FROM {productTableName} WHERE Id = @Id;";
 
-            using var dr = ExecuteReader(connection, commandText, ("@Id", ProductInfo.ProductID));
+            using var dr = ExecuteReader(connection, commandText, ("@Id", ProductInfo.ID));
 
             if (dr.HasRows && dr.Read()) {
                 // 1行のデータが存在する場合の処理
@@ -585,7 +585,7 @@ namespace ProductDatabase {
             string[] logMessageArray = [
                 $"[製品登録]",
                 $"[{productInfo.CategoryName}]",
-                $"ID[{productInfo.ProductID}]",
+                $"ID[{productInfo.ID}]",
                 $"注文番号[{productInfo.OrderNumber}]",
                 $"製造番号[{productInfo.ProductNumber}]",
                 $"製品名[{productInfo.ProductName}]",

@@ -103,7 +103,7 @@ namespace ProductDatabase {
 
             var i = SubstrateChangeDataGridView.SelectedCells[0].RowIndex;
 
-            ProductInfo.ProductID = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["ID"].Value);
+            ProductInfo.ID = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["ID"].Value);
             ProductInfo.OrderNumber = SubstrateChangeDataGridView.Rows[i].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
             ProductInfo.ProductNumber = SubstrateChangeDataGridView.Rows[i].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
             ProductInfo.Quantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["Quantity"].Value);

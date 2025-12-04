@@ -160,7 +160,7 @@ namespace ProductDatabase {
                                 """;
 
                             cmd.Parameters.Clear();
-                            cmd.Parameters.Add("@ID", SqliteType.Integer).Value = ProductInfo.ProductID;
+                            cmd.Parameters.Add("@ID", SqliteType.Integer).Value = ProductInfo.ID;
                             cmd.Parameters.Add("@SubstrateModel", SqliteType.Text).Value = substrateModel;
 
                             using var dr = cmd.ExecuteReader();
@@ -366,7 +366,7 @@ namespace ProductDatabase {
                                                 cmdUpdate.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
                                                 cmdUpdate.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
                                                 cmdUpdate.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
-                                                cmdUpdate.Parameters.Add("@UseID", SqliteType.Text).Value = ProductInfo.ProductID;
+                                                cmdUpdate.Parameters.Add("@UseID", SqliteType.Text).Value = ProductInfo.ID;
 
                                                 var affectedRows = cmdUpdate.ExecuteNonQuery();
 
@@ -393,7 +393,7 @@ namespace ProductDatabase {
                                                     cmdInsert.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
                                                     cmdInsert.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
                                                     cmdInsert.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
-                                                    cmdInsert.Parameters.Add("@UseID", SqliteType.Text).Value = ProductInfo.ProductID;
+                                                    cmdInsert.Parameters.Add("@UseID", SqliteType.Text).Value = ProductInfo.ID;
 
                                                     cmdInsert.ExecuteNonQuery();
                                                 }
@@ -420,7 +420,7 @@ namespace ProductDatabase {
                                                 """;
                                             cmdDelete.Parameters.Clear(); // パラメータをクリア
                                             cmdDelete.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
-                                            cmdDelete.Parameters.Add("@ID", SqliteType.Integer).Value = ProductInfo.ProductID;
+                                            cmdDelete.Parameters.Add("@ID", SqliteType.Integer).Value = ProductInfo.ID;
 
                                             cmdDelete.Connection = con;
                                             cmdDelete.ExecuteNonQuery();
@@ -473,7 +473,7 @@ namespace ProductDatabase {
                 string[] logMessageArray = [
                     $"[基板変更]",
                     $"[{ProductInfo.CategoryName}]",
-                    $"ID[{ProductInfo.ProductID}]",
+                    $"ID[{ProductInfo.ID}]",
                     $"注文番号[{ProductInfo.OrderNumber}]",
                     $"製造番号[{ProductInfo.ProductNumber}]",
                     $"製品名[{ProductInfo.ProductName}]",
