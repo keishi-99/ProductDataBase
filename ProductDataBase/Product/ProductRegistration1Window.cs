@@ -58,15 +58,14 @@ namespace ProductDatabase {
                 // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
                 cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = ProductInfo.ProductName;
                 cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = ProductInfo.RevisionGroup;
-                var productTableName = $"[T_Product]";
-                cmd.CommandText = $"SELECT Revision FROM {productTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
+                cmd.CommandText = $"SELECT Revision FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
                 var revisionResult = cmd.ExecuteScalar();
                 RevisionTextBox.Text = revisionResult?.ToString() ?? "";
 
                 if (ProductInfo.IsSerialGeneration) {
                     cmd.Parameters.Clear();
                     cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = ProductInfo.ProductName;
-                    cmd.CommandText = $"SELECT SerialLastNumber FROM {productTableName} WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;";
+                    cmd.CommandText = $"SELECT SerialLastNumber FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;";
                     var serialResult = cmd.ExecuteScalar();
                     if (!int.TryParse(serialResult?.ToString(), out var serialLastNum)) { throw new Exception("シリアル番号の取得に失敗しました。"); }
 
@@ -253,23 +252,20 @@ namespace ProductDatabase {
             connection.Open();
             using var transaction = connection.BeginTransaction();
             try {
-                var productTableName = $"[T_Product]";
                 var commandText =
                 $"""
-                INSERT INTO {productTableName} (
-                    ProductName, ProductType, ProductModel, RegDate, Revision, RevisionGroup, SerialLastNumber, Comment
+                INSERT INTO {Constants.TProductTableName} (
+                    ProductID, RegDate, Revision, RevisionGroup, SerialLastNumber, Comment
                 )
                 VALUES (
-                    @ProductName, @ProductType, @ProductModel, @RegDate, @Revision, @RevisionGroup, @SerialLastNumber, @Comment
+                    @ProductID, @RegDate, @Revision, @RevisionGroup, @SerialLastNumber, @Comment
                 );
                 """;
 
-                var serialLastNum = ExecuteScalar(connection, $"SELECT SerialLastNumber FROM {productTableName} WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;", ("@ProductName", ProductInfo.ProductName));
+                var serialLastNum = ExecuteScalar(connection, $"SELECT SerialLastNumber FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;", ("@ProductName", ProductInfo.ProductName));
 
                 ExecuteNonQuery(connection, commandText,
-                    ("@ProductName", ProductInfo.ProductName),
-                    ("@ProductType", ProductInfo.ProductType),
-                    ("@ProductModel", ProductInfo.ProductModel),
+                    ("@ProductID", ProductInfo.ProductID),
                     ("@Revision", ProductInfo.Revision),
                     ("@RegDate", ProductInfo.RegDate),
                     ("@RevisionGroup", ProductInfo.RevisionGroup),
@@ -277,7 +273,7 @@ namespace ProductDatabase {
                     ("@Comment", ProductInfo.Comment)
                 );
 
-                ProductInfo.ID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {productTableName};"));
+                ProductInfo.ID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {Constants.VProductTableName};"));
 
                 transaction.Commit();
 
