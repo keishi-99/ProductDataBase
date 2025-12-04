@@ -223,7 +223,6 @@ namespace ProductDatabase.ExcelService {
                 con.Open();
                 using var cmd = con.CreateCommand();
 
-                var tableName = $"[T_Substrate]";
                 cmd.CommandText =
                     $"""
                     SELECT
@@ -231,7 +230,7 @@ namespace ProductDatabase.ExcelService {
                         SubstrateNumber,
                         Decrease
                     FROM
-                        {tableName}
+                        {Constants.VSubstrateTableName}
                     WHERE
                         UseID = @ID
                     ORDER BY
@@ -446,7 +445,6 @@ namespace ProductDatabase.ExcelService {
                 con.Open();
                 using var cmd = con.CreateCommand();
 
-                var tableName = $"[T_Substrate]";
                 cmd.CommandText =
                     $"""
                     SELECT
@@ -454,7 +452,7 @@ namespace ProductDatabase.ExcelService {
                         SubstrateNumber,
                         Decrease
                     FROM
-                        {tableName}
+                        {Constants.VSubstrateTableName}
                     WHERE
                         UseID = @ID
                     ORDER BY
@@ -965,3 +963,4 @@ namespace ProductDatabase.ExcelService {
         }
     }
 }
+
