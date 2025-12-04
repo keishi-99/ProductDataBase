@@ -129,7 +129,6 @@ namespace ProductDatabase {
 
             using var transaction = con.BeginTransaction();
             try {
-                var substrateTableName = $"[T_Substrate]";
                 var orderNumber = ProductInfo.OrderNumber;
                 var substrateNumber = ProductInfo.ProductNumber;
                 var quantity = ProductInfo.Quantity;
@@ -148,7 +147,7 @@ namespace ProductDatabase {
                         SELECT
                             StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                         FROM
-                            {substrateTableName}
+                            {Constants.VSubstrateTableName}
                         WHERE
                             StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                         GROUP BY
@@ -184,7 +183,7 @@ namespace ProductDatabase {
                         SELECT
                             StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                         FROM
-                            {substrateTableName}
+                            {Constants.VSubstrateTableName}
                         WHERE
                             StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                         GROUP BY
@@ -213,18 +212,16 @@ namespace ProductDatabase {
                 // 基板登録テーブルへ追加
                 commandText =
                     $"""
-                    INSERT INTO {substrateTableName} (
-                        StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Increase,Defect,Person,RegDate,Comment
+                    INSERT INTO {Constants.TSubstrateTableName} (
+                        SubstrateID,SubstrateNumber,OrderNumber,Increase,Defect,Person,RegDate,Comment
                         )
                     VALUES (
-                        @StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,@Increase,@Defect,@Person,@RegDate,@Comment
+                        @SubstrateID,@SubstrateNumber,@OrderNumber,@Increase,@Defect,@Person,@RegDate,@Comment
                         )
                     ;
                     """;
                 ExecuteNonQuery(con, commandText,
-                    ("@StockName", ProductInfo.StockName),
-                    ("@SubstrateName", ProductInfo.SubstrateName),
-                    ("@SubstrateModel", ProductInfo.SubstrateModel),
+                    ("@SubstrateID", ProductInfo.SubstrateID),
                     ("@SubstrateNumber", string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber),
                     ("@OrderNumber", string.IsNullOrWhiteSpace(orderNumber) ? DBNull.Value : orderNumber),
                     ("@Increase", QuantityCheckBox.Checked ? quantity : DBNull.Value),
@@ -233,7 +230,7 @@ namespace ProductDatabase {
                     ("@Person", string.IsNullOrWhiteSpace(person) ? DBNull.Value : person),
                     ("@Comment", string.IsNullOrWhiteSpace(comment) ? DBNull.Value : comment)
                     );
-                commandText = $@"SELECT MAX(ID) FROM {substrateTableName};";
+                commandText = $@"SELECT MAX(ID) FROM {Constants.VSubstrateTableName};";
                 rowId = ExecuteScalar(con, commandText).ToString() ?? string.Empty;
 
                 // ログ出力
@@ -457,8 +454,6 @@ namespace ProductDatabase {
         // 在庫数取得
         private string GetStockQuantity() {
 
-            var substrateTableName = $"[T_Substrate]";
-
             using var con = new SqliteConnection(GetConnectionRegistration());
             con.Open();
 
@@ -469,7 +464,7 @@ namespace ProductDatabase {
                 SELECT
                     StockName,SubstrateName,SubstrateModel,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                 FROM
-                    {substrateTableName}
+                    {Constants.VSubstrateTableName}
                 WHERE
                     StockName = @StockName AND SubstrateModel = @SubstrateModel
                 GROUP BY

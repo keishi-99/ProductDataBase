@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ProductDatabase.Other;
 using System.Data;
@@ -34,7 +33,9 @@ namespace ProductDatabase {
         }
 
         public class ProductInformation {
-            public int ProductID { get; set; }
+            public int ID { get; set; }
+            public string ProductID { get; set; } = string.Empty;
+            public string SubstrateID { get; set; } = string.Empty;
             public string CategoryName { get; set; } = string.Empty;
             public string ProductName { get; set; } = string.Empty;
             public string StockName { get; set; } = string.Empty;
@@ -342,6 +343,7 @@ namespace ProductDatabase {
             var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND SubstrateName = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
+                ProductInfo.SubstrateID = selectedRows[0]["SubstrateID"].ToString() ?? string.Empty;
                 ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
                 ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
                 ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
@@ -358,6 +360,7 @@ namespace ProductDatabase {
             var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
+                ProductInfo.ProductID = selectedRows[0]["ProductID"].ToString() ?? string.Empty;
                 ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
                 ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
                 ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
@@ -379,6 +382,7 @@ namespace ProductDatabase {
             var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
+                ProductInfo.ProductID = selectedRows[0]["ProductID"].ToString() ?? string.Empty;
                 ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
                 ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
                 ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
@@ -398,6 +402,7 @@ namespace ProductDatabase {
             var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
+                ProductInfo.ProductID = selectedRows[0]["ProductID"].ToString() ?? string.Empty;
                 ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
                 ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
                 ProductInfo.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
@@ -416,7 +421,7 @@ namespace ProductDatabase {
         private void History() {
             ResetFields();
             try {
-                DataRow[]? selectedRow = null;
+                DataRow[]? selectedRows = null;
 
                 var listBox2 = CategoryListBox2.SelectedIndex == -1 ? string.Empty : $"AND ProductName = '{CategoryListBox2.SelectedItem}'";
 
@@ -425,40 +430,42 @@ namespace ProductDatabase {
                     2 or 3 or 4 => CategoryListBox3.SelectedIndex == -1 ? string.Empty : $"AND ProductType = '{CategoryListBox3.SelectedItem}'",
                     _ => string.Empty
                 };
-                selectedRow = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' {listBox2} {listBox3}");
+                selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' {listBox2} {listBox3}");
 
-                if (selectedRow is not null && selectedRow.Length > 0) {
+                if (selectedRows is not null && selectedRows.Length > 0) {
                     switch (RadioButtonNumber) {
                         case 1:
-                            ProductInfo.CategoryName = selectedRow[0]["CategoryName"].ToString() ?? string.Empty;
+                            ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
 
                             if (!string.IsNullOrEmpty(listBox2)) {
-                                ProductInfo.ProductName = selectedRow[0]["ProductName"].ToString() ?? string.Empty;
-                                ProductInfo.StockName = selectedRow[0]["StockName"].ToString() ?? string.Empty;
+                                ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
+                                ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
                             }
 
                             if (!string.IsNullOrEmpty(listBox3)) {
-                                ProductInfo.SubstrateName = selectedRow[0]["SubstrateName"].ToString() ?? string.Empty;
-                                ProductInfo.SubstrateModel = selectedRow[0]["SubstrateModel"].ToString() ?? string.Empty;
-                                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRow[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-                                ProductInfo.RegType = Convert.ToInt32(selectedRow[0]["RegType"] ?? throw new Exception("RegType is null"));
+                                ProductInfo.SubstrateID = selectedRows[0]["SubstrateID"].ToString() ?? string.Empty;
+                                ProductInfo.SubstrateName = selectedRows[0]["SubstrateName"].ToString() ?? string.Empty;
+                                ProductInfo.SubstrateModel = selectedRows[0]["SubstrateModel"].ToString() ?? string.Empty;
+                                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+                                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
                             }
                             break;
                         case 2:
                         case 3:
-                            ProductInfo.CategoryName = selectedRow[0]["CategoryName"].ToString() ?? string.Empty;
+                            ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
 
                             if (!string.IsNullOrEmpty(listBox2)) {
-                                ProductInfo.ProductName = selectedRow[0]["ProductName"].ToString() ?? string.Empty;
-                                ProductInfo.StockName = selectedRow[0]["StockName"].ToString() ?? string.Empty;
+                                ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
+                                ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
                             }
 
                             if (!string.IsNullOrEmpty(listBox3)) {
-                                ProductInfo.ProductType = selectedRow[0]["ProductType"].ToString() ?? string.Empty;
-                                ProductInfo.ProductModel = selectedRow[0]["ProductModel"].ToString() ?? string.Empty;
-                                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRow[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-                                ProductInfo.SheetPrintType = Convert.ToInt32(selectedRow[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
-                                ProductInfo.RegType = Convert.ToInt32(selectedRow[0]["RegType"] ?? throw new Exception("RegType is null"));
+                                ProductInfo.ProductID = selectedRows[0]["ProductID"].ToString() ?? string.Empty;
+                                ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
+                                ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
+                                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+                                ProductInfo.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
+                                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
                             }
                             break;
                     }

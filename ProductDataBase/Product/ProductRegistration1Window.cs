@@ -277,7 +277,7 @@ namespace ProductDatabase {
                     ("@Comment", ProductInfo.Comment)
                 );
 
-                ProductInfo.ProductID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {productTableName};"));
+                ProductInfo.ID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {productTableName};"));
 
                 transaction.Commit();
 
@@ -412,7 +412,7 @@ namespace ProductDatabase {
             string[] logMessageArray = [
                 $"[Rev変更]",
                 $"[{productInfo.CategoryName}]",
-                $"ID{productInfo.ProductID}]",
+                $"ID{productInfo.ID}]",
                 $"[]",
                 $"[]",
                 $"製品名[{productInfo.ProductName}]",
