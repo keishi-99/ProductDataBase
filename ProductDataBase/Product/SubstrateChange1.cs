@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.Other;
 using System.Data;
 using static ProductDatabase.MainWindow;
 
@@ -28,13 +29,12 @@ namespace ProductDatabase {
                 HistoryTable.Clear();
 
                 using var cmd = con.CreateCommand();
-                var productTableName = $"[T_Product]";
                 cmd.CommandText =
                     $"""
                     SELECT
                         *
                     FROM
-                        {productTableName}
+                        {Constants.VProductTableName}
                     WHERE
                         ProductModel = @ProductModel AND Quantity > 1
                     ORDER BY

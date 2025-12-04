@@ -106,8 +106,6 @@ namespace ProductDatabase {
                             con.Open();
                             using var cmd = con.CreateCommand();
 
-                            var substrateTableName = $"[T_Substrate]";
-
                             cmd.CommandText =
                                 $"""
                                 -- 使用履歴のある SubstrateNumber ごとの合計を別テーブルで集計
@@ -116,7 +114,7 @@ namespace ProductDatabase {
                                         SubstrateNumber,
                                         COALESCE(SUM(Decrease), 0) AS UsedDecrease
                                     FROM
-                                        {substrateTableName}
+                                        {Constants.VSubstrateTableName}
                                     WHERE
                                         SubstrateModel = @SubstrateModel
                                         AND UseID = @ID
@@ -132,7 +130,7 @@ namespace ProductDatabase {
                                         SubstrateNumber,
                                         COALESCE(SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)), 0) AS Stock
                                     FROM
-                                        {substrateTableName}
+                                        {Constants.VSubstrateTableName}
                                     WHERE
                                         SubstrateModel = @SubstrateModel
                                         AND SubstrateNumber NOTNULL
@@ -314,20 +312,18 @@ namespace ProductDatabase {
                                         var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[4].Value);
                                         var useValue = boolCbx ? Convert.ToInt32(objDgv.Rows[j].Cells[3].Value) : 0;
                                         if (boolCbx) {
-                                            var substrateName = string.Empty;
-                                            var substrateModel = string.Empty;
+                                            var substrateID = string.Empty;
                                             var orderNum = string.Empty;
                                             var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
                                             var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
 
                                             using (var cmd = con.CreateCommand()) {
-                                                var substrateTableName = $"[T_Substrate]";
                                                 cmd.CommandText =
                                                     $"""
                                                     SELECT
-                                                        SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                                                        SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock, SubstrateID
                                                     FROM
-                                                        {substrateTableName}
+                                                        {Constants.VSubstrateTableName}
                                                     WHERE
                                                         SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                                                     GROUP BY
@@ -340,18 +336,16 @@ namespace ProductDatabase {
                                                 cmd.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = substrateNum;
                                                 using var dr = cmd.ExecuteReader();
                                                 while (dr.Read()) {
-                                                    substrateName = $"{dr["SubstrateName"]}";
-                                                    substrateModel = $"{dr["SubstrateModel"]}";
+                                                    substrateID = $"{dr["SubstrateID"]}";
                                                     orderNum = $"{dr["OrderNumber"]}";
                                                 }
                                             }
                                             // 基板テーブルを更新、できない場合は挿入
                                             using (var cmdUpdate = con.CreateCommand()) {
-                                                var substrateTableName = $"[T_Substrate]";
                                                 cmdUpdate.CommandText =
                                                     $"""
                                                     UPDATE
-                                                        {substrateTableName}
+                                                        {Constants.TSubstrateTableName}
                                                     SET
                                                         Decrease = @Decrease,Person = @Person,RegDate = @RegDate,Comment = @Comment
                                                     WHERE
@@ -375,18 +369,16 @@ namespace ProductDatabase {
                                                     using var cmdInsert = con.CreateCommand();
                                                     cmdInsert.CommandText =
                                                     $"""
-                                                    INSERT INTO {substrateTableName}
-                                                        (StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,Decrease,
+                                                    INSERT INTO {Constants.TSubstrateTableName}
+                                                        (SubstrateID,SubstrateNumber,OrderNumber,Decrease,
                                                         Person,RegDate,Comment,UseID)
                                                     VALUES
-                                                        (@StockName,@SubstrateName,@SubstrateModel,@SubstrateNumber,@OrderNumber,
+                                                        (@SubstrateID,@SubstrateNumber,@OrderNumber,
                                                         @Decrease,@Person,@RegDate,@Comment,@UseID)
                                                     ;
                                                     """;
 
-                                                    cmdInsert.Parameters.Add("@StockName", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.StockName) ? DBNull.Value : ProductInfo.StockName;
-                                                    cmdInsert.Parameters.Add("@SubstrateName", SqliteType.Text).Value = string.IsNullOrWhiteSpace(substrateName) ? DBNull.Value : substrateName;
-                                                    cmdInsert.Parameters.Add("@SubstrateModel", SqliteType.Text).Value = string.IsNullOrWhiteSpace(substrateModel) ? DBNull.Value : substrateModel;
+                                                    cmdInsert.Parameters.Add("@SubstrateID", SqliteType.Text).Value = string.IsNullOrWhiteSpace(substrateID) ? DBNull.Value : substrateID;
                                                     cmdInsert.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
                                                     cmdInsert.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(orderNum) ? DBNull.Value : orderNum;
                                                     cmdInsert.Parameters.Add("@Decrease", SqliteType.Integer).Value = 0 - useValue;
@@ -408,12 +400,11 @@ namespace ProductDatabase {
                                         // 使用数が0になった場合、基板テーブルから削除
                                         else if (usedValue != useValue && useValue == 0) {
                                             using var cmdDelete = con.CreateCommand();
-                                            var substrateTableName = $"[T_Substrate]";
                                             cmdDelete.CommandText =
                                                 $"""
                                                 DELETE
                                                 FROM
-                                                    {substrateTableName}
+                                                    {Constants.TSubstrateTableName}
                                                 WHERE
                                                     SubstrateNumber = @SubstrateNumber AND UseID = @ID
                                                 ;
@@ -431,11 +422,10 @@ namespace ProductDatabase {
 
                             // 製品テーブル更新
                             using (var cmd = con.CreateCommand()) {
-                                var productTableName = $"[T_Product]";
                                 cmd.CommandText =
                                     $"""
                                     UPDATE
-                                        {productTableName}
+                                        {Constants.TProductTableName}
                                     SET
                                         Quantity = @Quantity,Person = @Person,RegDate = @RegDate,Revision = @Revision,RevisionGroup = @RevisionGroup,SerialLast = @SerialLast,
                                         SerialLastNumber = @SerialLastNumber,Comment = @Comment
@@ -445,9 +435,6 @@ namespace ProductDatabase {
                                         SerialFirst = @SerialFirst
                                     ;
                                     """;
-
-                                cmd.Parameters.Add("@ProductType", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                                cmd.Parameters.Add("@ProductModel", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
                                 cmd.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
                                 cmd.Parameters.Add("@ProductNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
                                 cmd.Parameters.Add("@Quantity", SqliteType.Text).Value = ProductInfo.Quantity;
