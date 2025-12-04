@@ -200,7 +200,6 @@ namespace ProductDatabase {
             var isServiceRegistration = ProductInfo.RegType == 9;
             var categoryName = (isServiceRegistration ? ServiceInfo.ServiceCategoryName : ProductInfo.CategoryName)
                 ?? throw new Exception("CategoryNameが nullです。");
-            var substrateTableName = $"[T_Substrate]";
             var stockName = (isServiceRegistration ? ServiceInfo.ServiceStockName : ProductInfo.StockName)
                 ?? throw new Exception("StockNameが nullです。");
             var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : _useSubstrate)
@@ -215,7 +214,7 @@ namespace ProductDatabase {
                     SubstrateNumber,
                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                 FROM
-                    {substrateTableName}
+                    {Constants.VSubstrateTableName}
                 WHERE
                     StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber NOTNULL
                 GROUP BY
@@ -374,16 +373,15 @@ namespace ProductDatabase {
         }
 
         private void InsertProduct(SqliteConnection connection) {
-            var productTableName = $"[T_Product]";
             var commandText =
                 $"""
-                INSERT INTO {productTableName} (
-                    ProductName, OrderNumber, ProductNumber, ProductType, ProductModel,
+                INSERT INTO {Constants.TProductTableName} (
+                    ProductID, OrderNumber, ProductNumber,
                     Quantity, Person, RegDate, Revision, RevisionGroup,
                     SerialFirst, SerialLast, SerialLastNumber, Comment
                     )
                 VALUES (
-                    @ProductName, @OrderNumber, @ProductNumber, @ProductType, @ProductModel,
+                    @ProductID, @OrderNumber, @ProductNumber,
                     @Quantity, @Person, @RegDate, @Revision, @RevisionGroup,
                     @SerialFirst, @SerialLast, @SerialLastNumber, @Comment
                     )
@@ -396,11 +394,9 @@ namespace ProductDatabase {
             };
 
             ExecuteNonQuery(connection, commandText,
-                ("@ProductName", ProductInfo.ProductName),
+                ("@ProductID", ProductInfo.ProductID),
                 ("@OrderNumber", ProductInfo.OrderNumber),
                 ("@ProductNumber", ProductInfo.ProductNumber),
-                ("@ProductType", ProductInfo.ProductType),
-                ("@ProductModel", ProductInfo.ProductModel),
                 ("@Quantity", ProductInfo.Quantity),
                 ("@Person", ProductInfo.Person),
                 ("@RegDate", ProductInfo.RegDate),
@@ -412,7 +408,7 @@ namespace ProductDatabase {
                 ("@Comment", comment)
                 );
 
-            ProductInfo.ID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {productTableName};"));
+            ProductInfo.ID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {Constants.VProductTableName};"));
         }
         private void InsertSerial(SqliteConnection connection) {
             var serialTableName = $"[T_Serial]";
@@ -462,19 +458,18 @@ namespace ProductDatabase {
 
                     var substrateNumber = row.Cells[0].Value.ToString() ?? string.Empty;
                     var useValue = Convert.ToInt32(row.Cells[2].Value);
-                    var (substrateName, substrateModel, orderNumber) = GetSubstrateInfo(connection, i, categoryName, stockName, substrateNumber, useSubstrate);
-                    InsertSubstrate(connection, categoryName, stockName, substrateName, substrateModel, substrateNumber, orderNumber, useValue, useID);
+                    var (substrateID, orderNumber) = GetSubstrateInfo(connection, i, stockName, substrateNumber, useSubstrate);
+                    InsertSubstrate(connection, substrateID, substrateNumber, orderNumber, useValue, useID);
                 }
             }
         }
-        private static (string substrateName, string substrateModel, string orderNumber) GetSubstrateInfo(SqliteConnection connection, int index, string categoryName, string stockName, string substrateNumber, string[] useSubstrate) {
-            var substrateTableName = $"[T_Substrate]";
+        private static (string substrateID, string orderNumber) GetSubstrateInfo(SqliteConnection connection, int index, string stockName, string substrateNumber, string[] useSubstrate) {
             var commandText =
                 $"""
                 SELECT
-                    SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                    SubstrateID, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                 FROM
-                    {substrateTableName}
+                    {Constants.VSubstrateTableName}
                 WHERE
                     StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                 GROUP BY
@@ -491,19 +486,18 @@ namespace ProductDatabase {
             );
 
             return dr.Read()
-                ? ($"{dr["SubstrateName"]}", $"{dr["SubstrateModel"]}", $"{dr["OrderNumber"]}")
-                : (string.Empty, string.Empty, string.Empty);
+                ? ($"{dr["SubstrateID"]}", $"{dr["OrderNumber"]}")
+                : (string.Empty, string.Empty);
         }
-        private void InsertSubstrate(SqliteConnection connection, string categoryName, string stockName, string substrateName, string substrateModel, string substrateNumber, string orderNumber, int useValue, int? useID) {
-            var substrateTableName = $"[T_Substrate]";
+        private void InsertSubstrate(SqliteConnection connection, string substrateID, string substrateNumber, string orderNumber, int useValue, int? useID) {
             var commandText =
                 $"""
-                INSERT INTO {substrateTableName} (
-                    StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber,
+                INSERT INTO {Constants.TSubstrateTableName} (
+                    SubstrateID, SubstrateNumber, OrderNumber,
                     Decrease, Person, RegDate, Comment, UseID
                     )
                 VALUES (
-                    @StockName, @SubstrateName, @SubstrateModel, @SubstrateNumber, @OrderNumber,
+                    @SubstrateID, @SubstrateNumber, @OrderNumber,
                     @Decrease, @Person, @RegDate, @Comment, @UseID
                     )
                 ;
@@ -514,9 +508,7 @@ namespace ProductDatabase {
                 _ => ProductInfo.Comment,
             };
             ExecuteNonQuery(connection, commandText,
-                ("@StockName", stockName),
-                ("@SubstrateName", substrateName),
-                ("@SubstrateModel", substrateModel),
+                ("@SubstrateID", substrateID),
                 ("@SubstrateNumber", substrateNumber),
                 ("@OrderNumber", orderNumber),
                 ("@Decrease", 0 - useValue),
@@ -560,8 +552,7 @@ namespace ProductDatabase {
         // 登録チェック
         private void RegistrationCheck(SqliteConnection connection) {
 
-            var productTableName = $"[T_Product]";
-            var commandText = $@"SELECT * FROM {productTableName} WHERE Id = @Id;";
+            var commandText = $@"SELECT * FROM {Constants.VProductTableName} WHERE Id = @Id;";
 
             using var dr = ExecuteReader(connection, commandText, ("@Id", ProductInfo.ID));
 
@@ -607,13 +598,12 @@ namespace ProductDatabase {
 
             if (!string.IsNullOrEmpty(ProductInfo.ProductNumber)) {
                 // 製番が新規かチェック
-                var productTableName = $"[T_Product]";
                 var commandText =
                     $"""
                     SELECT
                         *
                     FROM
-                        {productTableName}
+                        {Constants.VProductTableName}
                     WHERE
                         ProductName = @ProductName AND ProductNumber = @ProductNumber
                     ORDER BY
@@ -649,13 +639,12 @@ namespace ProductDatabase {
 
             if (!string.IsNullOrEmpty(ProductInfo.OrderNumber)) {
                 // 注文番号が新規かチェック
-                var productTableName = $"[T_Product]";
                 var commandText =
                     $"""
                     SELECT
                         *
                     FROM
-                        {productTableName}
+                        {Constants.VProductTableName}
                     WHERE
                         ProductName = @ProductName AND OrderNumber = @OrderNumber
                     ORDER BY
@@ -766,7 +755,6 @@ namespace ProductDatabase {
 
             using var cmd = connection.CreateCommand();
             var serialTableName = $"[T_Serial]";
-            var productTableName = $"[T_Product]";
             cmd.CommandText =
                 $"""
                 SELECT
@@ -781,7 +769,7 @@ namespace ProductDatabase {
                 FROM
                     {serialTableName} AS s
                 LEFT JOIN
-                    {productTableName} AS p
+                    {Constants.VProductTableName} AS p
                 ON
                     s.UsedID = p.ID
                 WHERE
