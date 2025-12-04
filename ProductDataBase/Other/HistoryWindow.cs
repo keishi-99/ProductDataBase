@@ -111,6 +111,7 @@ namespace ProductDatabase {
                     "Substrate", new Dictionary<string, string>
                     {
                         { "ID", "ID" },
+                        { "SubstrateID", "基板ID" },
                         { "StockName", "在庫名" },
                         { "SubstrateName", "基板名" },
                         { "SubstrateModel", "基板型式" },
@@ -132,6 +133,7 @@ namespace ProductDatabase {
                     "SubstrateStock", new Dictionary<string, string>
                     {
                         { "StockName", "在庫名" },
+                        { "SubstrateID", "基板ID" },
                         { "SubstrateName", "基板名" },
                         { "SubstrateModel", "基板型式" },
                         { "SubstrateNumber", "製造番号" },
@@ -143,6 +145,8 @@ namespace ProductDatabase {
                     "Product", new Dictionary<string, string>
                     {
                         { "ID", "ID" },
+                        { "ProductID", "製品ID" },
+                        { "CategoryName", "カテゴリ" },
                         { "OrderNumber", "注文番号" },
                         { "ProductNumber", "製造番号" },
                         { "ProductName", "製品名" },
@@ -225,7 +229,7 @@ namespace ProductDatabase {
                 var query =
                     $"""
                     SELECT
-                        s.ID, s.stockName, s.SubstrateName, s.SubstrateModel, s.SubstrateNumber, s.OrderNumber,s.Increase, s.Decrease, s.Defect, p.ProductType, p.ProductNumber, p.OrderNumber, s.Person, s.RegDate, s.Comment, s.UseID
+                        s.ID, s.SubstrateID, s.stockName, s.SubstrateName, s.SubstrateModel, s.SubstrateNumber, s.OrderNumber,s.Increase, s.Decrease, s.Defect, p.ProductType, p.ProductNumber, p.OrderNumber, s.Person, s.RegDate, s.Comment, s.UseID
                     FROM
                         {Constants.VSubstrateTableName} AS s
                     LEFT JOIN
@@ -254,8 +258,8 @@ namespace ProductDatabase {
                 var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
 
                 var selectClause = GroupModelCheckBox.Checked
-                    ? "StockName, SubstrateName, SubstrateModel, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock"
-                    : "StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock";
+                    ? "SubstrateID, StockName, SubstrateName, SubstrateModel, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock"
+                    : "SubstrateID, StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock";
 
                 var groupByClause = GroupModelCheckBox.Checked
                     ? "SubstrateName, SubstrateModel"
@@ -270,7 +274,7 @@ namespace ProductDatabase {
                     SELECT
                         {selectClause}
                     FROM
-                        {Constants.VProductTableName}
+                        {Constants.VSubstrateTableName}
                     WHERE
                         1=1{substrateCategoryFilter}{stockFilter}{substrateFilter}
                     GROUP BY
