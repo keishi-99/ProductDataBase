@@ -120,6 +120,11 @@ namespace ProductDatabase {
                         }
                     }
                 }
+
+                if (PersonComboBox.SelectedIndex == -1) {
+                    throw new Exception("担当者が選択されていません。");
+                }
+
                 if (!anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
                 if (!allTextBoxesFilled || (PersonCheckBox.Checked && string.IsNullOrWhiteSpace(PersonComboBox.Text))) { throw new Exception("空欄があります。"); }
 

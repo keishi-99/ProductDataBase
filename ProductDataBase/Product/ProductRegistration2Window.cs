@@ -3,7 +3,6 @@ using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
 using System.Data;
-using System.Text.RegularExpressions;
 using static ProductDatabase.MainWindow;
 using static ProductDatabase.Other.CommonUtils;
 using static ProductDatabase.Print.PrintOptions;

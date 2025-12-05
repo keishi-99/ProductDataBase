@@ -285,6 +285,11 @@ namespace ProductDatabase {
                     }
                 }
             }
+
+            if (PersonComboBox.SelectedIndex == -1) {
+                throw new Exception("担当者が選択されていません。");
+            }
+
             string manufacturingNumber = ManufacturingNumberMaskedTextBox.Text.Trim();
             return !anyTextBoxEnabled
                 ? throw new Exception("何も入力されていません")
