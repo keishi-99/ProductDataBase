@@ -34,8 +34,8 @@ namespace ProductDatabase {
 
         public class ProductInformation {
             public int ID { get; set; }
-            public string ProductID { get; set; } = string.Empty;
-            public string SubstrateID { get; set; } = string.Empty;
+            public long ProductID { get; set; } = 0;
+            public long SubstrateID { get; set; } = 0;
             public string CategoryName { get; set; } = string.Empty;
             public string ProductName { get; set; } = string.Empty;
             public string StockName { get; set; } = string.Empty;
@@ -43,8 +43,8 @@ namespace ProductDatabase {
             public string ProductModel { get; set; } = string.Empty;
             public string SubstrateName { get; set; } = string.Empty;
             public string SubstrateModel { get; set; } = string.Empty;
-            public string UseSubstrate { get; set; } = string.Empty;
             public string Initial { get; set; } = string.Empty;
+            public List<string> UseSubstrate { get; set; } = [];
             public int SerialType { get; set; }
             public int RevisionGroup { get; set; }
             public int CheckBin { get; set; }
@@ -145,6 +145,7 @@ namespace ProductDatabase {
 
             public DataTable ProductDataTable { get; } = new();
             public DataTable SubstrateDataTable { get; } = new();
+            public DataTable ProductUseSubstrate { get; } = new();
 
             public int SerialDigit => SerialType switch {
                 3 or 101 or 102 => 3,
@@ -217,6 +218,10 @@ namespace ProductDatabase {
                 using (var cmd = new SqliteCommand("SELECT * FROM M_SubstrateDef;", con)) {
                     using var reader = cmd.ExecuteReader();
                     ProductInfo.SubstrateDataTable.Load(reader);
+                }
+                using (var cmd = new SqliteCommand("SELECT * FROM T_ProductUseSubstrate;", con)) {
+                    using var reader = cmd.ExecuteReader();
+                    ProductInfo.ProductUseSubstrate.Load(reader);
                 }
 
                 // 担当者取得
@@ -292,6 +297,10 @@ namespace ProductDatabase {
                 using var reader = cmd.ExecuteReader();
                 ProductInfo.SubstrateDataTable.Load(reader);
             }
+            using (var cmd = new SqliteCommand("SELECT * FROM T_ProductUseSubstrate;", con)) {
+                using var reader = cmd.ExecuteReader();
+                ProductInfo.ProductUseSubstrate.Load(reader);
+            }
 
             // 担当者取得
             ProductInfo.PersonList.Clear();
@@ -343,7 +352,7 @@ namespace ProductDatabase {
             var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND SubstrateName = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
-                ProductInfo.SubstrateID = selectedRows[0]["SubstrateID"].ToString() ?? string.Empty;
+                ProductInfo.SubstrateID = Convert.ToInt64(selectedRows[0]["SubstrateID"]);
                 ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
                 ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
                 ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
@@ -360,7 +369,7 @@ namespace ProductDatabase {
             var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
-                ProductInfo.ProductID = selectedRows[0]["ProductID"].ToString() ?? string.Empty;
+                ProductInfo.ProductID = Convert.ToInt64(selectedRows[0]["ProductID"]);
                 ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
                 ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
                 ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
@@ -371,9 +380,9 @@ namespace ProductDatabase {
                 ProductInfo.SerialType = Convert.ToInt32(selectedRows[0]["SerialType"] ?? throw new Exception("SerialType is null"));
                 ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
                 ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
-                ProductInfo.UseSubstrate = selectedRows[0]["UseSubstrate"].ToString() ?? string.Empty;
                 ProductInfo.Initial = selectedRows[0]["Initial"].ToString() ?? string.Empty;
                 ProductInfo.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
+                ProductInfo.UseSubstrate = GetUseSubstrate(ProductInfo.ProductID);
                 using ProductRegistration1Window window = new(ProductInfo);
                 window.ShowDialog(this);
             }
@@ -382,7 +391,7 @@ namespace ProductDatabase {
             var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
-                ProductInfo.ProductID = selectedRows[0]["ProductID"].ToString() ?? string.Empty;
+                ProductInfo.ProductID = Convert.ToInt64(selectedRows[0]["ProductID"]);
                 ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
                 ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
                 ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
@@ -402,7 +411,7 @@ namespace ProductDatabase {
             var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
-                ProductInfo.ProductID = selectedRows[0]["ProductID"].ToString() ?? string.Empty;
+                ProductInfo.ProductID = Convert.ToInt64(selectedRows[0]["ProductID"]);
                 ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
                 ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
                 ProductInfo.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
@@ -412,10 +421,28 @@ namespace ProductDatabase {
                 ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
                 ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
                 ProductInfo.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
-                ProductInfo.UseSubstrate = selectedRows[0]["UseSubstrate"].ToString() ?? string.Empty;
+                ProductInfo.UseSubstrate = GetUseSubstrate(ProductInfo.ProductID);
                 using SubstrateChange1 window = new(ProductInfo);
                 window.ShowDialog(this);
             }
+        }
+        private List<string> GetUseSubstrate(long productId) {
+            // 使用基板リスト化+名前順にソート
+            var useSubstrate = new List<string>();
+            var useSubstrateRows = ProductInfo.ProductUseSubstrate.Select($"ProductID = '{productId}'");
+
+            foreach (var row in useSubstrateRows) {
+                var substrateId = row["SubstrateID"];
+
+                var substrateRows = ProductInfo.SubstrateDataTable
+                    .Select($"SubstrateID = {substrateId}");
+
+                if (substrateRows.Length > 0) {
+                    useSubstrate.Add(substrateRows[0]["SubstrateModel"].ToString() ?? string.Empty);
+                }
+            }
+            useSubstrate.Sort();
+            return useSubstrate;
         }
         // 履歴ボタン処理
         private void History() {
@@ -443,7 +470,7 @@ namespace ProductDatabase {
                             }
 
                             if (!string.IsNullOrEmpty(listBox3)) {
-                                ProductInfo.SubstrateID = selectedRows[0]["SubstrateID"].ToString() ?? string.Empty;
+                                ProductInfo.SubstrateID = Convert.ToInt64(selectedRows[0]["SubstrateID"]);
                                 ProductInfo.SubstrateName = selectedRows[0]["SubstrateName"].ToString() ?? string.Empty;
                                 ProductInfo.SubstrateModel = selectedRows[0]["SubstrateModel"].ToString() ?? string.Empty;
                                 ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
@@ -460,7 +487,7 @@ namespace ProductDatabase {
                             }
 
                             if (!string.IsNullOrEmpty(listBox3)) {
-                                ProductInfo.ProductID = selectedRows[0]["ProductID"].ToString() ?? string.Empty;
+                                ProductInfo.ProductID = Convert.ToInt64(selectedRows[0]["ProductID"]);
                                 ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
                                 ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
                                 ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
@@ -803,7 +830,6 @@ namespace ProductDatabase {
             ProductInfo.StockName = productRet[0]["StockName"].ToString() ?? string.Empty;
             ProductInfo.ProductType = productRet[0]["ProductType"].ToString() ?? string.Empty;
             ProductInfo.ProductModel = productRet[0]["ProductModel"].ToString() ?? string.Empty;
-            ProductInfo.UseSubstrate = productRet[0]["UseSubstrate"].ToString() ?? string.Empty;
             ProductInfo.Initial = productRet[0]["Initial"].ToString() ?? string.Empty;
             ProductInfo.RevisionGroup = Convert.ToInt32(productRet[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
             ProductInfo.RegType = Convert.ToInt32(productRet[0]["RegType"] ?? throw new Exception("RegType is null"));

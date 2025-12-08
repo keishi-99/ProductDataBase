@@ -6,10 +6,13 @@ using static ProductDatabase.ProductRegistration2Window;
 namespace ProductDatabase.Other {
     public partial class ServiceForm : Form {
 
+        public ProductInformation ProductInfo { get; }
         public ServiceInformation ServiceInfo { get; }
-        public ServiceForm(ServiceInformation serviceInfo) {
+
+        public ServiceForm(ProductInformation productInfo, ServiceInformation serviceInfo) {
             InitializeComponent();
             ServiceInfo = serviceInfo;
+            ProductInfo = productInfo;
         }
 
         private void LoadEvents() {
@@ -87,19 +90,38 @@ namespace ProductDatabase.Other {
             var selectedRows = ServiceInfo.ServiceDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
+                ServiceInfo.ServiceProductID = Convert.ToInt64(selectedRows[0]["ProductID"]);
                 ServiceInfo.ServiceCategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
                 ServiceInfo.ServiceProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
                 ServiceInfo.ServiceStockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
                 ServiceInfo.ServiceProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
                 ServiceInfo.ServiceProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
-                var useSubstrate = selectedRows[0]["UseSubstrate"].ToString() ?? string.Empty;
-                ServiceInfo.ServiceUseSubstrate = useSubstrate.Split(",");
+                ServiceInfo.ServiceUseSubstrate = GetUseSubstrate(ServiceInfo.ServiceProductID);
                 DialogResult = DialogResult.OK;
             }
             else { DialogResult = DialogResult.Cancel; }
 
             Close();
             return DialogResult.OK;
+        }
+        private List<string> GetUseSubstrate(long productId) {
+            // 使用基板リスト化+名前順にソート
+            var useSubstrate = new List<string>();
+
+            var useSubstrateRows = ProductInfo.ProductUseSubstrate.Select($"ProductID = '{productId}'");
+
+            foreach (var row in useSubstrateRows) {
+                var substrateId = row["SubstrateID"];
+
+                var substrateRows = ProductInfo.SubstrateDataTable
+                    .Select($"SubstrateID = {substrateId}");
+
+                if (substrateRows.Length > 0) {
+                    useSubstrate.Add(substrateRows[0]["SubstrateModel"].ToString() ?? string.Empty);
+                }
+            }
+            useSubstrate.Sort();
+            return useSubstrate;
         }
 
         private void ServiceForm_Load(object sender, EventArgs e) { LoadEvents(); }

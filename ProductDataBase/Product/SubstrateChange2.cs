@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using System.Data;
@@ -8,8 +9,6 @@ namespace ProductDatabase {
     public partial class SubstrateChange2 : Form {
 
         public ProductInformation ProductInfo { get; set; } = new ProductInformation();
-
-        private string[] _useSubstrate = [];
 
         private readonly List<string> _listUsedSubstrate = [];
         private readonly List<string> _listUsedProductNumber = [];
@@ -47,17 +46,13 @@ namespace ProductDatabase {
                 // ComboBoxへ担当者を追加
                 PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
 
-                // 使用基板リスト化+名前順にソート
-                _useSubstrate = ProductInfo.UseSubstrate.Split(",");
-                Array.Sort(_useSubstrate);
-
                 var strQuantity = string.Empty;
 
                 switch (ProductInfo.RegType) {
                     case 2:
                     case 3:
-                        for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
-                            var substrateModel = _useSubstrate[i];
+                        for (var i = 0; i <= ProductInfo.UseSubstrate.Count - 1; i++) {
+                            var substrateModel = ProductInfo.UseSubstrate[i];
                             var quantity = ProductInfo.Quantity;
 
                             // チェックボックスとDgvを有効に
@@ -238,8 +233,8 @@ namespace ProductDatabase {
                 switch (ProductInfo.RegType) {
                     case 2:
                     case 3:
-                        if (_useSubstrate is null) { throw new Exception("ArrUseSubstrateが空です"); }
-                        for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
+                        if (ProductInfo.UseSubstrate is null) { throw new Exception("ArrUseSubstrateが空です"); }
+                        for (var i = 0; i <= ProductInfo.UseSubstrate.Count - 1; i++) {
 
                             var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
                             objCbx.Enabled = true;
@@ -298,8 +293,8 @@ namespace ProductDatabase {
                             con.Open();
                             using var transaction = con.BeginTransaction();
 
-                            if (_useSubstrate is null) { throw new Exception("ArrUseSubstrateが nullです。"); }
-                            for (var i = 0; i <= _useSubstrate.Length; i++) {
+                            if (ProductInfo.UseSubstrate is null) { throw new Exception("ArrUseSubstrateが nullです。"); }
+                            for (var i = 0; i <= ProductInfo.UseSubstrate.Count; i++) {
 
                                 var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
 
@@ -332,7 +327,7 @@ namespace ProductDatabase {
                                                         MIN(ID)
                                                     ;
                                                     """;
-                                                cmd.Parameters.Add("@SubstrateModel", SqliteType.Text).Value = _useSubstrate[i];
+                                                cmd.Parameters.Add("@SubstrateModel", SqliteType.Text).Value = ProductInfo.UseSubstrate[i];
                                                 cmd.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = substrateNum;
                                                 using var dr = cmd.ExecuteReader();
                                                 while (dr.Read()) {
@@ -392,7 +387,7 @@ namespace ProductDatabase {
                                             }
 
                                             if (ProductInfo.IsListPrint) {
-                                                _listUsedSubstrate.Add(_useSubstrate[i]);
+                                                _listUsedSubstrate.Add(ProductInfo.UseSubstrate[i]);
                                                 if (substrateNum is not null) { _listUsedProductNumber.Add(substrateNum); }
                                                 _listUsedQuantity.Add(useValue);
                                             }
