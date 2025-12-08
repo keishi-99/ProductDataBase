@@ -286,7 +286,7 @@ namespace ProductDatabase {
                 }
             }
 
-            if (PersonComboBox.SelectedIndex == -1) {
+            if (PersonComboBox.SelectedIndex == -1 && PersonComboBox.Enabled) {
                 throw new Exception("担当者が選択されていません。");
             }
 

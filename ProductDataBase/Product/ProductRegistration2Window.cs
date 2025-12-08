@@ -19,8 +19,6 @@ namespace ProductDatabase {
 
         public ProductInformation ProductInfo { get; set; } = new ProductInformation();
 
-        private string[] _useSubstrate = [];
-
         private int _serialLastNumber;
 
         private string _lastInsertRowid = string.Empty;
@@ -64,7 +62,7 @@ namespace ProductDatabase {
                     case 3:
                     case 9:
                         if (ProductInfo.RegType == 9) {
-                            using ServiceForm window = new(ServiceInfo);
+                            using ServiceForm window = new(ProductInfo, ServiceInfo);
                             if (window.ShowDialog(this) != DialogResult.OK) {
                                 Close();
                             }
@@ -89,10 +87,8 @@ namespace ProductDatabase {
         }
         private void ClosingEvents() {
             // 編集モードのトランザクションをコミットしてロック解除
-            if (_sqliteTransaction is not null) {
-                _sqliteTransaction.Dispose();
-                _sqliteTransaction = null;
-            }
+            _sqliteTransaction?.Dispose();
+            _sqliteTransaction = null;
             if (_sqliteConnection is not null) {
                 _sqliteConnection.Close();
                 _sqliteConnection.Dispose();
@@ -105,8 +101,6 @@ namespace ProductDatabase {
         private void InitializeUIControls() {
             GenerateReportButton.Enabled = false;
             RegisterButton.Enabled = true;
-            _useSubstrate = ProductInfo.UseSubstrate.Split(",");
-            Array.Sort(_useSubstrate);
         }
         private void HideAllControls() {
             for (var i = 0; i <= 14; i++) {
@@ -125,12 +119,12 @@ namespace ProductDatabase {
         private void LoadSubstrateData(SqliteConnection connection) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = ProductInfo.RegType == 9;
-            var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : _useSubstrate)
+            var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : ProductInfo.UseSubstrate)
                 ?? throw new Exception("ArrUseSubstrateが nullです。");
 
             var shortageSubstrateName = string.Empty;
 
-            for (var i = 0; i < useSubstrate.Length; i++) {
+            for (var i = 0; i < useSubstrate.Count; i++) {
                 var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
                 var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
 
@@ -153,7 +147,7 @@ namespace ProductDatabase {
                 MessageBox.Show($"在庫が足りません。{Environment.NewLine}{shortageSubstrateName}", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
-        private static void SetupCheckBox(CheckBox? objCbx, int index, string substrateName, string[] useSubstrate) {
+        private static void SetupCheckBox(CheckBox? objCbx, int index, string substrateName, List<string> useSubstrate) {
             if (objCbx is not null) {
                 objCbx.Enabled = true;
                 objCbx.Checked = true;
@@ -197,11 +191,9 @@ namespace ProductDatabase {
         private bool FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, int index) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = ProductInfo.RegType == 9;
-            var categoryName = (isServiceRegistration ? ServiceInfo.ServiceCategoryName : ProductInfo.CategoryName)
-                ?? throw new Exception("CategoryNameが nullです。");
             var stockName = (isServiceRegistration ? ServiceInfo.ServiceStockName : ProductInfo.StockName)
                 ?? throw new Exception("StockNameが nullです。");
-            var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : _useSubstrate)
+            var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : ProductInfo.UseSubstrate)
                 ?? throw new Exception("ArrUseSubstrateが nullです。");
 
             var intQuantity = ProductInfo.Quantity;
@@ -433,15 +425,13 @@ namespace ProductDatabase {
         private void RegisterSubstrate(SqliteConnection connection) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = ProductInfo.RegType == 9;
-            var categoryName = (isServiceRegistration ? ServiceInfo.ServiceCategoryName : ProductInfo.CategoryName)
-                ?? throw new Exception("CategoryNameが nullです。");
             var stockName = (isServiceRegistration ? ServiceInfo.ServiceStockName : ProductInfo.StockName)
                 ?? throw new Exception("StockNameが nullです。");
-            var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : _useSubstrate)
+            var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : ProductInfo.UseSubstrate)
                 ?? throw new Exception("ArrUseSubstrateが nullです。");
             int? useID = isServiceRegistration ? null : ProductInfo.ID;
 
-            for (var i = 0; i < useSubstrate.Length; i++) {
+            for (var i = 0; i < useSubstrate.Count; i++) {
                 if (!(MainPanel.Controls[_checkBoxNames[i]] as CheckBox)?.Checked ?? true) {
                     continue;
                 }
@@ -462,7 +452,7 @@ namespace ProductDatabase {
                 }
             }
         }
-        private static (string substrateID, string orderNumber) GetSubstrateInfo(SqliteConnection connection, int index, string stockName, string substrateNumber, string[] useSubstrate) {
+        private static (string substrateID, string orderNumber) GetSubstrateInfo(SqliteConnection connection, int index, string stockName, string substrateNumber, List<string> useSubstrate) {
             var commandText =
                 $"""
                 SELECT
@@ -689,10 +679,10 @@ namespace ProductDatabase {
                     case 3:
                     case 4:
                     case 9:
-                        if (_useSubstrate is null) {
+                        if (ProductInfo.UseSubstrate is null) {
                             throw new Exception("ArrUseSubstrateが空です");
                         }
-                        for (var i = 0; i <= _useSubstrate.GetUpperBound(0); i++) {
+                        for (var i = 0; i <= ProductInfo.UseSubstrate.Count - 1; i++) {
 
                             var objCbx = MainPanel.Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxが nullです。");
 
@@ -842,12 +832,13 @@ namespace ProductDatabase {
         // サービス向け用処理
         public class ServiceInformation {
             public DataTable ServiceDataTable { get; } = new();
+            public long ServiceProductID { get; set; }
             public string ServiceCategoryName { get; set; } = string.Empty;
             public string ServiceProductName { get; set; } = string.Empty;
             public string ServiceStockName { get; set; } = string.Empty;
             public string ServiceProductType { get; set; } = string.Empty;
             public string ServiceProductModel { get; set; } = string.Empty;
-            public string[] ServiceUseSubstrate { get; set; } = [];
+            public List<string> ServiceUseSubstrate { get; set; } = [];
         }
         public ServiceInformation ServiceInfo { get; set; } = new();
 
