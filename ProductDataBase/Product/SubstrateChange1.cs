@@ -6,15 +6,20 @@ using static ProductDatabase.MainWindow;
 namespace ProductDatabase {
     public partial class SubstrateChange1 : Form {
 
-        public ProductInformation ProductInfo { get; }
+        private readonly ProductMaster _productMaster;
+        private readonly ProductRegisterWork _productRegisterWork;
+        private readonly AppSettings _appSettings;
 
         public DataTable HistoryTable { get; set; } = new();
 
         private readonly List<string> _colFilter = [];
 
-        public SubstrateChange1(ProductInformation productInfo) {
+        public SubstrateChange1(ProductMaster productMaster, ProductRegisterWork productRegisterWork, AppSettings appSettings) {
             InitializeComponent();
-            ProductInfo = productInfo;
+
+            _productMaster = productMaster;
+            _productRegisterWork = productRegisterWork;
+            _appSettings = appSettings;
 
             SubstrateChangeDataGridView.RowTemplate.DefaultCellStyle.Padding = new Padding(5);
         }
@@ -22,7 +27,7 @@ namespace ProductDatabase {
         // ロードイベント
         private void LoadEvents() {
             try {
-                Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
+                Font = new Font(_appSettings.FontName, _appSettings.FontSize);
 
                 using SqliteConnection con = new(GetConnectionRegistration());
                 con.Open();
@@ -42,7 +47,7 @@ namespace ProductDatabase {
                     ;
                     """;
 
-                cmd.Parameters.Add("@ProductModel", SqliteType.Text).Value = ProductInfo.ProductModel;
+                cmd.Parameters.Add("@ProductModel", SqliteType.Text).Value = _productMaster.ProductModel;
 
                 using (var reader = cmd.ExecuteReader()) {
                     HistoryTable.Load(reader);
@@ -103,17 +108,16 @@ namespace ProductDatabase {
 
             var i = SubstrateChangeDataGridView.SelectedCells[0].RowIndex;
 
-            ProductInfo.ID = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["ID"].Value);
-            ProductInfo.OrderNumber = SubstrateChangeDataGridView.Rows[i].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
-            ProductInfo.ProductNumber = SubstrateChangeDataGridView.Rows[i].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
-            ProductInfo.Quantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["Quantity"].Value);
-            ProductInfo.Revision = SubstrateChangeDataGridView.Rows[i].Cells["Revision"].Value.ToString() ?? string.Empty;
-            ProductInfo.SerialFirst = SubstrateChangeDataGridView.Rows[i].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
-            ProductInfo.SerialLast = SubstrateChangeDataGridView.Rows[i].Cells["SerialLast"].Value.ToString() ?? string.Empty;
-            ProductInfo.SerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["SerialLastNumber"].Value);
-            ProductInfo.Comment = SubstrateChangeDataGridView.Rows[i].Cells["Comment"].Value.ToString() ?? string.Empty;
-            using SubstrateChange2 window = new();
-            window.ProductInfo = ProductInfo;
+            _productRegisterWork.RowID = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["ID"].Value);
+            _productRegisterWork.OrderNumber = SubstrateChangeDataGridView.Rows[i].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.ProductNumber = SubstrateChangeDataGridView.Rows[i].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.Quantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["Quantity"].Value);
+            _productRegisterWork.Revision = SubstrateChangeDataGridView.Rows[i].Cells["Revision"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.SerialFirst = SubstrateChangeDataGridView.Rows[i].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.SerialLast = SubstrateChangeDataGridView.Rows[i].Cells["SerialLast"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.SerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["SerialLastNumber"].Value);
+            _productRegisterWork.Comment = SubstrateChangeDataGridView.Rows[i].Cells["Comment"].Value.ToString() ?? string.Empty;
+            using SubstrateChange2 window = new(_productMaster, _productRegisterWork, _appSettings);
             window.Closed += (s, e) => this.Close();
             window.ShowDialog(this);
         }

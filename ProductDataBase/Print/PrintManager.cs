@@ -12,40 +12,57 @@ namespace ProductDatabase.Print {
     // シリアル印刷管理クラス
     public static class PrintManager {
 
-        // 状態保持用プロパティ（外部からは読み取り専用）
-        public static ProductInformation ProductInfo { get; private set; } = default!;
-        public static DocumentPrintSettings ProductPrintSettings { get; private set; } = new();
+        // 状態保持用プロパティ(外部からは読み取り専用)
+        public static ProductMaster ProductMaster { get; private set; } = default!;
+        public static ProductRegisterWork ProductRegisterWork { get; private set; } = default!;
 
-        // 各種設定へのアクセスプロパティ（nullチェック済）
-        public static LabelPrintSettings LabelPrintSettings => ProductPrintSettings.LabelPrintSettings ?? throw new InvalidOperationException("LabelPageSettings が null です。");
-        public static BarcodePrintSettings BarcodePrintSettings => ProductPrintSettings.BarcodePrintSettings ?? throw new InvalidOperationException("BarcodePageSettings が null です。");
-        private static DocumentPrintSettings PrintSettings => ProductPrintSettings ?? throw new InvalidOperationException("ProductPrintSettings が null です。");
+        public static SubstrateMaster SubstrateMaster { get; private set; } = default!;
+        public static SubstrateRegisterWork SubstrateRegisterWork { get; private set; } = default!;
+
+        public static DocumentPrintSettings DocumentPrintSettings { get; private set; } = new();
+
+        // 各種設定へのアクセスプロパティ
+        public static LabelPrintSettings LabelPrintSettings => DocumentPrintSettings.LabelPrintSettings ?? throw new InvalidOperationException("LabelPageSettings が null です。");
+        public static BarcodePrintSettings BarcodePrintSettings => DocumentPrintSettings.BarcodePrintSettings ?? throw new InvalidOperationException("BarcodePageSettings が null です。");
+        private static DocumentPrintSettings PrintSettings => DocumentPrintSettings ?? throw new InvalidOperationException("ProductPrintSettings が null です。");
 
         // 印刷状態を保持するプロパティ
         public static int PrintCount { get; private set; }
         public static int CopiesRemainingPerSerial { get; private set; }
         public static int PageCount { get; private set; }
 
-        public static int SerialPrintType => ProductInfo?.SerialPrintType ?? throw new InvalidOperationException("PrintManager が初期化されていません。");
+        public static int SerialPrintType { get; private set; }
 
         private static List<string> s_serialList = [];
 
-        public static bool IsUnderlinePrint => ProductInfo.IsUnderlinePrint;
-        public static bool IsLast4Digits => ProductInfo.IsLast4Digits;
+        public static bool IsUnderlinePrint => ProductMaster.IsUnderlinePrint;
+        public static bool IsLast4Digits => ProductMaster.IsLast4Digits;
 
         // 4桁以上の型式番号の下4桁を取得するプロパティ
         public static string Last4ProductModel =>
-            ProductInfo.ProductModel.Length >= 4
-                ? ProductInfo.ProductModel[^4..]
+            ProductMaster.ProductModel.Length >= 4
+                ? ProductMaster.ProductModel[^4..]
                 : string.Empty;
 
-        public static void Initialize(ProductInformation productInfo, DocumentPrintSettings productPrintSettings, List<string> serialList) {
-            ProductInfo = productInfo;
-            ProductPrintSettings = productPrintSettings ?? throw new ArgumentNullException(nameof(productPrintSettings));
+        public static void ProductInitialize(ProductMaster productMaster, ProductRegisterWork productRegisterWork, DocumentPrintSettings productPrintSettings, List<string> serialList) {
+            ProductMaster = productMaster;
+            ProductRegisterWork = productRegisterWork;
+            DocumentPrintSettings = productPrintSettings ?? throw new ArgumentNullException(nameof(productPrintSettings));
 
             s_serialList = serialList;
             PageCount = 1;
             PrintCount = 0;
+            SerialPrintType = productMaster.SerialPrintType;
+        }
+        public static void SubstrateInitialize(SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork, DocumentPrintSettings documentPrintSettings, List<string> serialList) {
+            SubstrateMaster = substrateMaster;
+            SubstrateRegisterWork = substrateRegisterWork;
+            DocumentPrintSettings = documentPrintSettings ?? throw new ArgumentNullException(nameof(documentPrintSettings));
+
+            s_serialList = serialList;
+            PageCount = 1;
+            PrintCount = 0;
+            SerialPrintType = substrateMaster.SerialPrintType;
         }
 
         // ミリメートルをピクセルに変換するヘルパーメソッド
@@ -270,16 +287,16 @@ namespace ProductDatabase.Print {
             g.DrawImage(barcodeBitmap, layoutRectBarcode);
         }
         private static string ConvertHeaderString(string s) {
-            if (ProductInfo is null) { throw new Exception("ProductInfoが nullです。"); }
+            if (ProductMaster is null) { throw new Exception("ProductMaster nullです。"); }
 
             var map = new Dictionary<string, string> {
-                ["{P}"] = ProductInfo.ProductName,
-                ["{T}"] = ProductInfo.ProductModel,
+                ["{P}"] = ProductMaster.ProductName,
+                ["{T}"] = ProductMaster.ProductModel,
                 ["{D}"] = DateTime.Today.ToShortDateString(),
-                ["{M}"] = ProductInfo.ProductNumber,
-                ["{O}"] = ProductInfo.OrderNumber,
-                ["{N}"] = ProductInfo.Quantity.ToString(),
-                ["{U}"] = ProductInfo.Person,
+                ["{M}"] = ProductRegisterWork.ProductNumber,
+                ["{O}"] = ProductRegisterWork.OrderNumber,
+                ["{N}"] = ProductRegisterWork.Quantity.ToString(),
+                ["{U}"] = ProductRegisterWork.Person,
             };
 
             foreach (var kv in map) {

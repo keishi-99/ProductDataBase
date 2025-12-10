@@ -8,7 +8,9 @@ using static ProductDatabase.MainWindow;
 namespace ProductDatabase {
     public partial class SubstrateChange2 : Form {
 
-        public ProductInformation ProductInfo { get; set; } = new ProductInformation();
+        private readonly ProductMaster _productMaster;
+        private readonly ProductRegisterWork _productRegisterWork;
+        private readonly AppSettings _appSettings;
 
         private readonly List<string> _listUsedSubstrate = [];
         private readonly List<string> _listUsedProductNumber = [];
@@ -26,34 +28,39 @@ namespace ProductDatabase {
         private CheckBox? _objCbx;
         private DataGridView? _objDgv;
 
-        public SubstrateChange2() {
+        public SubstrateChange2(ProductMaster productMaster, ProductRegisterWork productRegisterWork, AppSettings appSettings) {
             InitializeComponent();
+
+            _productMaster = productMaster;
+            _productRegisterWork = productRegisterWork;
+            _appSettings = appSettings;
         }
 
         // ロードイベント
         private void LoadEvents() {
             try {
-                Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
+                Font = new Font(_appSettings.FontName, _appSettings.FontSize);
                 CloseButton.Enabled = true;
 
                 // テキストボックスに入力
-                OrderNumberTextBox.Text = ProductInfo.OrderNumber;
-                ManufacturingNumberTextBox.Text = ProductInfo.ProductNumber;
-                QuantityTextBox.Text = ProductInfo.Quantity.ToString();
-                RevisionTextBox.Text = ProductInfo.Revision;
-                CommentTextBox.Text = ProductInfo.Comment;
+                OrderNumberTextBox.Text = _productRegisterWork.OrderNumber;
+                ManufacturingNumberTextBox.Text = _productRegisterWork.ProductNumber;
+                QuantityTextBox.Text = _productRegisterWork.Quantity.ToString();
+                RevisionTextBox.Text = _productRegisterWork.Revision;
+                CommentTextBox.Text = _productRegisterWork.Comment;
 
                 // ComboBoxへ担当者を追加
-                PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
+                PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
 
                 var strQuantity = string.Empty;
 
-                switch (ProductInfo.RegType) {
+                switch (_productMaster.RegType) {
                     case 2:
                     case 3:
-                        for (var i = 0; i <= ProductInfo.UseSubstrate.Count - 1; i++) {
-                            var substrateModel = ProductInfo.UseSubstrate[i];
-                            var quantity = ProductInfo.Quantity;
+                        for (var i = 0; i <= _productMaster.UseSubstrates.Count - 1; i++) {
+                            var substrateName = _productMaster.UseSubstrates[i].SubstrateName;
+                            var substrateModel = _productMaster.UseSubstrates[i].SubstrateModel;
+                            var quantity = _productRegisterWork.Quantity;
 
                             // チェックボックスとDgvを有効に
                             _objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
@@ -153,20 +160,14 @@ namespace ProductDatabase {
                                 """;
 
                             cmd.Parameters.Clear();
-                            cmd.Parameters.Add("@ID", SqliteType.Integer).Value = ProductInfo.ID;
+                            cmd.Parameters.Add("@ID", SqliteType.Integer).Value = _productRegisterWork.RowID;
                             cmd.Parameters.Add("@SubstrateModel", SqliteType.Text).Value = substrateModel;
 
                             using var dr = cmd.ExecuteReader();
                             var j = 0;
 
                             if (_objCbx is not null) {
-                                var substrateName = ProductInfo.SubstrateDataTable
-                                    .AsEnumerable()
-                                    .FirstOrDefault(row => row.Field<string>("SubstrateModel") == substrateModel)?
-                                    .Field<string>("SubstrateName") ?? string.Empty;
-
                                 var splitSubstrateName = substrateName.Split(':');
-
                                 _objCbx.Text = $"{splitSubstrateName.Last()} - {substrateModel}";
                             }
                             while (dr.Read()) {
@@ -222,7 +223,7 @@ namespace ProductDatabase {
                     }
                 }
                 // リスト印刷ボタンを有効に
-                if (ProductInfo.IsListPrint) { SubstrateListPrintButton.Enabled = true; }
+                if (_productMaster.IsListPrint) { SubstrateListPrintButton.Enabled = true; }
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -230,11 +231,11 @@ namespace ProductDatabase {
         }
         private bool QuantityCheck() {
             try {
-                switch (ProductInfo.RegType) {
+                switch (_productMaster.RegType) {
                     case 2:
                     case 3:
-                        if (ProductInfo.UseSubstrate is null) { throw new Exception("ArrUseSubstrateが空です"); }
-                        for (var i = 0; i <= ProductInfo.UseSubstrate.Count - 1; i++) {
+                        if (_productMaster.UseSubstrates is null) { throw new Exception("ArrUseSubstrateが空です"); }
+                        for (var i = 0; i <= _productMaster.UseSubstrates.Count - 1; i++) {
 
                             var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
                             objCbx.Enabled = true;
@@ -244,7 +245,7 @@ namespace ProductDatabase {
                             objDgv.Columns[4].ReadOnly = false;
 
                             if (objCbx.Checked) {
-                                var intQuantityCheck = ProductInfo.Quantity;
+                                var intQuantityCheck = _productRegisterWork.Quantity;
                                 var dgvRowCnt = objDgv.Rows.Count;
 
                                 for (var j = 0; j < dgvRowCnt; j++) {
@@ -281,20 +282,20 @@ namespace ProductDatabase {
         }
         private void Registration() {
             try {
-                ProductInfo.RegDate = RegistrationDateTimePicker.Value.ToShortDateString();
-                ProductInfo.Person = PersonComboBox.Text;
-                ProductInfo.Comment = CommentTextBox.Text;
-                if (string.IsNullOrEmpty(ProductInfo.Person)) { throw new Exception("担当者を選択してください。"); }
+                _productRegisterWork.RegDate = RegistrationDateTimePicker.Value.ToShortDateString();
+                _productRegisterWork.Person = PersonComboBox.Text;
+                _productRegisterWork.Comment = CommentTextBox.Text;
+                if (string.IsNullOrEmpty(_productRegisterWork.Person)) { throw new Exception("担当者を選択してください。"); }
 
-                switch (ProductInfo.RegType) {
+                switch (_productMaster.RegType) {
                     case 2:
                     case 3:
                         using (SqliteConnection con = new(GetConnectionRegistration())) {
                             con.Open();
                             using var transaction = con.BeginTransaction();
 
-                            if (ProductInfo.UseSubstrate is null) { throw new Exception("ArrUseSubstrateが nullです。"); }
-                            for (var i = 0; i <= ProductInfo.UseSubstrate.Count; i++) {
+                            if (_productMaster.UseSubstrates is null) { throw new Exception("ArrUseSubstrateが nullです。"); }
+                            for (var i = 0; i <= _productMaster.UseSubstrates.Count; i++) {
 
                                 var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
 
@@ -327,7 +328,7 @@ namespace ProductDatabase {
                                                         MIN(ID)
                                                     ;
                                                     """;
-                                                cmd.Parameters.Add("@SubstrateModel", SqliteType.Text).Value = ProductInfo.UseSubstrate[i];
+                                                cmd.Parameters.Add("@SubstrateModel", SqliteType.Text).Value = _productMaster.UseSubstrates[i].SubstrateModel;
                                                 cmd.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = substrateNum;
                                                 using var dr = cmd.ExecuteReader();
                                                 while (dr.Read()) {
@@ -351,11 +352,11 @@ namespace ProductDatabase {
                                                     """;
 
                                                 cmdUpdate.Parameters.Add("@Decrease", SqliteType.Integer).Value = 0 - useValue;
-                                                cmdUpdate.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                                                cmdUpdate.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                                                cmdUpdate.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                                                cmdUpdate.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Person) ? DBNull.Value : _productRegisterWork.Person;
+                                                cmdUpdate.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.RegDate) ? DBNull.Value : _productRegisterWork.RegDate;
+                                                cmdUpdate.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Comment) ? DBNull.Value : _productRegisterWork.Comment;
                                                 cmdUpdate.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
-                                                cmdUpdate.Parameters.Add("@UseID", SqliteType.Text).Value = ProductInfo.ID;
+                                                cmdUpdate.Parameters.Add("@UseID", SqliteType.Text).Value = _productRegisterWork.RowID;
 
                                                 var affectedRows = cmdUpdate.ExecuteNonQuery();
 
@@ -377,17 +378,17 @@ namespace ProductDatabase {
                                                     cmdInsert.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
                                                     cmdInsert.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(orderNum) ? DBNull.Value : orderNum;
                                                     cmdInsert.Parameters.Add("@Decrease", SqliteType.Integer).Value = 0 - useValue;
-                                                    cmdInsert.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                                                    cmdInsert.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                                                    cmdInsert.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
-                                                    cmdInsert.Parameters.Add("@UseID", SqliteType.Text).Value = ProductInfo.ID;
+                                                    cmdInsert.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Person) ? DBNull.Value : _productRegisterWork.Person;
+                                                    cmdInsert.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.RegDate) ? DBNull.Value : _productRegisterWork.RegDate;
+                                                    cmdInsert.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Comment) ? DBNull.Value : _productRegisterWork.Comment;
+                                                    cmdInsert.Parameters.Add("@UseID", SqliteType.Text).Value = _productRegisterWork.RowID;
 
                                                     cmdInsert.ExecuteNonQuery();
                                                 }
                                             }
 
-                                            if (ProductInfo.IsListPrint) {
-                                                _listUsedSubstrate.Add(ProductInfo.UseSubstrate[i]);
+                                            if (_productMaster.IsListPrint) {
+                                                _listUsedSubstrate.Add(_productMaster.UseSubstrates[i].SubstrateName);
                                                 if (substrateNum is not null) { _listUsedProductNumber.Add(substrateNum); }
                                                 _listUsedQuantity.Add(useValue);
                                             }
@@ -406,7 +407,7 @@ namespace ProductDatabase {
                                                 """;
                                             cmdDelete.Parameters.Clear(); // パラメータをクリア
                                             cmdDelete.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
-                                            cmdDelete.Parameters.Add("@ID", SqliteType.Integer).Value = ProductInfo.ID;
+                                            cmdDelete.Parameters.Add("@ID", SqliteType.Integer).Value = _productRegisterWork.RowID;
 
                                             cmdDelete.Connection = con;
                                             cmdDelete.ExecuteNonQuery();
@@ -430,17 +431,17 @@ namespace ProductDatabase {
                                         SerialFirst = @SerialFirst
                                     ;
                                     """;
-                                cmd.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-                                cmd.Parameters.Add("@ProductNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                                cmd.Parameters.Add("@Quantity", SqliteType.Text).Value = ProductInfo.Quantity;
-                                cmd.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                                cmd.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                                cmd.Parameters.Add("@Revision", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
-                                cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = ProductInfo.RevisionGroup;
-                                cmd.Parameters.Add("@SerialFirst", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialFirst) ? DBNull.Value : ProductInfo.SerialFirst;
-                                cmd.Parameters.Add("@SerialLast", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.SerialLast) ? DBNull.Value : ProductInfo.SerialLast;
-                                cmd.Parameters.Add("@SerialLastNumber", SqliteType.Text).Value = ProductInfo.SerialLastNumber;
-                                cmd.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                                cmd.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.OrderNumber) ? DBNull.Value : _productRegisterWork.OrderNumber;
+                                cmd.Parameters.Add("@ProductNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.ProductNumber) ? DBNull.Value : _productRegisterWork.ProductNumber;
+                                cmd.Parameters.Add("@Quantity", SqliteType.Text).Value = _productRegisterWork.Quantity;
+                                cmd.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Person) ? DBNull.Value : _productRegisterWork.Person;
+                                cmd.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.RegDate) ? DBNull.Value : _productRegisterWork.RegDate;
+                                cmd.Parameters.Add("@Revision", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Revision) ? DBNull.Value : _productRegisterWork.Revision;
+                                cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = _productMaster.RevisionGroup;
+                                cmd.Parameters.Add("@SerialFirst", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.SerialFirst) ? DBNull.Value : _productRegisterWork.SerialFirst;
+                                cmd.Parameters.Add("@SerialLast", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.SerialLast) ? DBNull.Value : _productRegisterWork.SerialLast;
+                                cmd.Parameters.Add("@SerialLastNumber", SqliteType.Text).Value = _productRegisterWork.SerialLastNumber;
+                                cmd.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Comment) ? DBNull.Value : _productRegisterWork.Comment;
 
                                 cmd.ExecuteNonQuery();
                                 transaction.Commit();
@@ -454,20 +455,20 @@ namespace ProductDatabase {
                 // ログ出力
                 string[] logMessageArray = [
                     $"[基板変更]",
-                    $"[{ProductInfo.CategoryName}]",
-                    $"ID[{ProductInfo.ID}]",
-                    $"注文番号[{ProductInfo.OrderNumber}]",
-                    $"製造番号[{ProductInfo.ProductNumber}]",
-                    $"製品名[{ProductInfo.ProductName}]",
-                    $"タイプ[{ProductInfo.ProductType}]",
-                    $"型式[{ProductInfo.ProductModel}]",
-                    $"数量[{ProductInfo.Quantity}]",
-                    $"シリアル先頭[{ProductInfo.SerialFirst}]",
-                    $"シリアル末尾[{ProductInfo.SerialLast}]",
-                    $"Revision[{ProductInfo.Revision}]",
-                    $"登録日[{ProductInfo.RegDate}]",
-                    $"担当者[{ProductInfo.Person}]",
-                    $"コメント[{ProductInfo.Comment}]"
+                    $"[{_productMaster.CategoryName}]",
+                    $"ID[{_productRegisterWork.RowID}]",
+                    $"注文番号[{_productRegisterWork.OrderNumber}]",
+                    $"製造番号[{_productRegisterWork.ProductNumber}]",
+                    $"製品名[{_productMaster.ProductName}]",
+                    $"タイプ[{_productMaster.ProductType}]",
+                    $"型式[{_productMaster.ProductModel}]",
+                    $"数量[{_productRegisterWork.Quantity}]",
+                    $"シリアル先頭[{_productRegisterWork.SerialFirst}]",
+                    $"シリアル末尾[{_productRegisterWork.SerialLast}]",
+                    $"Revision[{_productRegisterWork.Revision}]",
+                    $"登録日[{_productRegisterWork.RegDate}]",
+                    $"担当者[{_productRegisterWork.Person}]",
+                    $"コメント[{_productRegisterWork.Comment}]"
                 ];
                 CommonUtils.Logger.AppendLog(logMessageArray);
             } catch (Exception) {
@@ -481,7 +482,7 @@ namespace ProductDatabase {
                 // --- 処理中カーソルに変更 ---
                 Cursor.Current = Cursors.WaitCursor;
 
-                ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(ProductInfo);
+                ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(_productMaster, _productRegisterWork);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {

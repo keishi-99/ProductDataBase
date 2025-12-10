@@ -3,28 +3,30 @@
 namespace ProductDatabase {
     public partial class SeveralDialogWindow : Form {
 
-        public ProductInformation ProductInfo { get; }
+        private readonly QrSettings _qrSettings;
+        private readonly AppSettings _appSettings;
 
         public int SelectedIndex { get; private set; } = -1;
 
-        public SeveralDialogWindow(ProductInformation productInfo) {
+        public SeveralDialogWindow(QrSettings qrSettings, AppSettings appSettings) {
             InitializeComponent();
-            ProductInfo = productInfo;
+            _qrSettings = qrSettings;
+            _appSettings = appSettings;
         }
 
         // ロードイベント
         private void LoadEvents() {
             SeveralListBox.Items.Clear();
-            Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
+            Font = new Font(_appSettings.FontName, _appSettings.FontSize);
             var j = 0;
 
-            foreach (var category in ProductInfo.CategoryItemNumber) {
-                var isSubstrate = ProductInfo.CategoryType[j] == "1";
+            foreach (var category in _qrSettings.CategoryItemNumber) {
+                var isSubstrate = _qrSettings.CategoryType[j] == "1";
                 var type = isSubstrate ? "基板登録" : "製品登録";
-                var textString = isSubstrate ? ProductInfo.CategorySubstrateName[j] : ProductInfo.CategoryProductType[j];
+                var textString = isSubstrate ? _qrSettings.CategorySubstrateName[j] : _qrSettings.CategoryProductType[j];
 
-                if (!string.IsNullOrEmpty(ProductInfo.CategoryItemNumber[j])) {
-                    var itemText = $"[{type}]  [{ProductInfo.CategoryProductName[j]}]  [{textString}]  [{category}]";
+                if (!string.IsNullOrEmpty(_qrSettings.CategoryItemNumber[j])) {
+                    var itemText = $"[{type}]  [{_qrSettings.CategoryProductName[j]}]  [{textString}]  [{category}]";
 
                     // 重複チェック
                     if (!SeveralListBox.Items.Contains(itemText)) {

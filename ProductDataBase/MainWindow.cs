@@ -10,7 +10,6 @@ namespace ProductDatabase {
     public partial class MainWindow : Form {
 
         public int RadioButtonNumber { get; set; }
-        private DataTable MainDataTable { get; } = new();
         private float _fontSize = SystemFonts.DefaultFont.Size;
 
         readonly string _jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "General", "appsettings.json");
@@ -32,49 +31,74 @@ namespace ProductDatabase {
             List = 1 << 1,          // 00010
         }
 
-        public class ProductInformation {
-            public int ID { get; set; }
-            public long ProductID { get; set; } = 0;
-            public long SubstrateID { get; set; } = 0;
+        public class ProductRepository {
+
+            public DataTable ProductDataTable { get; } = new();
+            public DataTable SubstrateDataTable { get; } = new();
+            public DataTable ProductUseSubstrate { get; } = new();
+
+            public void LoadAll() {
+
+                ProductDataTable.Clear();
+                SubstrateDataTable.Clear();
+                ProductUseSubstrate.Clear();
+
+                using var con = new SqliteConnection(GetConnectionRegistration());
+                con.Open();
+
+                using (var cmd = new SqliteCommand("SELECT * FROM M_ProductDef;", con))
+                using (var reader = cmd.ExecuteReader()) {
+                    ProductDataTable.Load(reader);
+                }
+
+                using (var cmd = new SqliteCommand("SELECT * FROM M_SubstrateDef;", con))
+                using (var reader = cmd.ExecuteReader()) {
+                    SubstrateDataTable.Load(reader);
+                }
+
+                using (var cmd = new SqliteCommand("SELECT * FROM V_ProductUseSubstrate;", con))
+                using (var reader = cmd.ExecuteReader()) {
+                    ProductUseSubstrate.Load(reader);
+                }
+            }
+
+            // 製品IDから使用基板リストを取得
+            public List<SubstrateInfo> GetUseSubstrates(int productKey) {
+
+                return [.. ProductUseSubstrate.AsEnumerable()
+                    .Where(r => Convert.ToInt32(r["ProductKey"]) == productKey)
+                    .Select(r => new SubstrateInfo {
+                        SubstrateID = Convert.ToInt32(r["SubstrateKey"]),
+                        SubstrateName = r["SubstrateName"]?.ToString() ?? "",
+                        SubstrateModel = r["SubstrateModel"]?.ToString() ?? ""
+                    })];
+            }
+
+            public void Clear() {
+                ProductDataTable.Clear();
+                SubstrateDataTable.Clear();
+                ProductUseSubstrate.Clear();
+            }
+        }
+
+        public class ProductMaster {
+            public int ProductID { get; set; }
             public string CategoryName { get; set; } = string.Empty;
             public string ProductName { get; set; } = string.Empty;
-            public string StockName { get; set; } = string.Empty;
-            public string ProductType { get; set; } = string.Empty;
             public string ProductModel { get; set; } = string.Empty;
-            public string SubstrateName { get; set; } = string.Empty;
-            public string SubstrateModel { get; set; } = string.Empty;
+            public string ProductType { get; set; } = string.Empty;
             public string Initial { get; set; } = string.Empty;
-            public List<string> UseSubstrate { get; set; } = [];
-            public int SerialType { get; set; }
+            public int SerialDigitType { get; set; }
+            public int SerialDigit => SerialDigitType switch {
+                3 or 101 or 102 => 3,
+                4 => 4,
+                _ => 0
+            };
             public int RevisionGroup { get; set; }
             public int CheckBin { get; set; }
-            public string Proness1 { get; set; } = string.Empty;
-            public string Proness2 { get; set; } = string.Empty;
-            public string Proness3 { get; set; } = string.Empty;
-            public int Proness4 { get; set; }
-            public string Proness5 { get; set; } = string.Empty;
-            public List<string> CategoryItemNumber { get; set; } = [];
-            public List<string> CategoryProductName { get; set; } = [];
-            public List<string> CategorySubstrateName { get; set; } = [];
-            public List<string> CategoryProductType { get; set; } = [];
-            public List<string> CategoryType { get; set; } = [];
-            public List<string> PersonList { get; set; } = [];
-            public string FontName { get; } = "Meiryo UI";
-            public float FontSize { get; set; } = 9;
-
-            public string OrderNumber { get; set; } = string.Empty;
-            public string ProductNumber { get; set; } = string.Empty;
-            public string RegDate { get; set; } = string.Empty;
-            public string Person { get; set; } = string.Empty;
-            public string Revision { get; set; } = string.Empty;
-            public string Comment { get; set; } = string.Empty;
-            public string SerialFirst { get; set; } = string.Empty;
-            public string SerialLast { get; set; } = string.Empty;
+            public List<SubstrateInfo> UseSubstrates { get; set; } = [];
 
             private int _regType;
-            private int _serialPrintType;
-            private int _sheetPrintType;
-
             public int RegType {
                 get => _regType;
                 set {
@@ -83,6 +107,7 @@ namespace ProductDatabase {
                 }
             }
 
+            private int _serialPrintType;
             public int SerialPrintType {
                 get => _serialPrintType;
                 set {
@@ -91,6 +116,7 @@ namespace ProductDatabase {
                 }
             }
 
+            private int _sheetPrintType;
             public int SheetPrintType {
                 get => _sheetPrintType;
                 set {
@@ -98,6 +124,8 @@ namespace ProductDatabase {
                     UpdatePrintFlags();
                 }
             }
+
+            // ===== 結果フラグ =====
 
             public bool IsLabelPrint { get; private set; }
             public bool IsBarcodePrint { get; private set; }
@@ -110,6 +138,8 @@ namespace ProductDatabase {
 
             public bool IsSerialGeneration { get; private set; }
             public bool IsRegType9 { get; private set; }
+
+            // ===== 内部更新処理 =====
 
             private void UpdatePrintFlags() {
                 UpdateRegTypeFlags();
@@ -139,20 +169,161 @@ namespace ProductDatabase {
                 IsListPrint = flags.HasFlag(SheetPrintTypeFlags.List);
             }
 
+            public void Reset() {
+                ProductID = 0;
+                CategoryName = string.Empty;
+                ProductName = string.Empty;
+                ProductModel = string.Empty;
+                ProductType = string.Empty;
+                Initial = string.Empty;
+                SerialDigitType = 0;
+                RevisionGroup = 0;
+                CheckBin = 0;
+                UseSubstrates = [];
+                RegType = 0;
+                SerialPrintType = 0;
+                SheetPrintType = 0;
+            }
+        }
+        public class SubstrateInfo {
+            public int SubstrateID { get; set; }
+            public string SubstrateName { get; set; } = string.Empty;
+            public string SubstrateModel { get; set; } = string.Empty;
+        }
+        public class ProductRegisterWork {
+            public int RowID { get; set; }
+            public int ProductID { get; set; }
+            public string ProductNumber { get; set; } = string.Empty;
+            public string OrderNumber { get; set; } = string.Empty;
+            public string SerialFirst { get; set; } = string.Empty;
+            public string SerialLast { get; set; } = string.Empty;
             public int Quantity { get; set; }
+            public string RegDate { get; set; } = string.Empty;
+            public string Person { get; set; } = string.Empty;
+            public string Revision { get; set; } = string.Empty;
+            public string Comment { get; set; } = string.Empty;
+
             public int SerialFirstNumber { get; set; }
             public int SerialLastNumber { get; set; }
 
-            public DataTable ProductDataTable { get; } = new();
-            public DataTable SubstrateDataTable { get; } = new();
-            public DataTable ProductUseSubstrate { get; } = new();
-
-            public int SerialDigit => SerialType switch {
-                3 or 101 or 102 => 3,
-                4 => 4,
-                _ => 0
-            };
+            public void Reset() {
+                RowID = 0;
+                ProductID = 0;
+                ProductNumber = string.Empty;
+                OrderNumber = string.Empty;
+                SerialFirst = string.Empty;
+                SerialLast = string.Empty;
+                Quantity = 0;
+                RegDate = string.Empty;
+                Person = string.Empty;
+                Revision = string.Empty;
+                Comment = string.Empty;
+                SerialFirstNumber = 0;
+                SerialLastNumber = 0;
+            }
         }
+
+        public class SubstrateMaster {
+            public int SubstrateID { get; set; }
+            public string CategoryName { get; set; } = string.Empty;
+            public string ProductName { get; set; } = string.Empty;
+            public string SubstrateName { get; set; } = string.Empty;
+            public string SubstrateModel { get; set; } = string.Empty;
+            public int CheckBin { get; set; }
+
+            private int _regType;
+            public int RegType {
+                get => _regType;
+                set {
+                    _regType = value;
+                    UpdatePrintFlags();
+                }
+            }
+
+            private int _serialPrintType;
+            public int SerialPrintType {
+                get => _serialPrintType;
+                set {
+                    _serialPrintType = value;
+                    UpdatePrintFlags();
+                }
+            }
+
+            // ===== 結果フラグ =====
+
+            public bool IsLabelPrint { get; private set; }
+
+            public bool IsSerialGeneration { get; private set; }
+
+            // ===== 内部更新処理 =====
+
+            private void UpdatePrintFlags() {
+                UpdateRegTypeFlags();
+                UpdateSerialPrintTypeFlags();
+            }
+
+            private void UpdateRegTypeFlags() {
+                IsSerialGeneration = RegType is 1 or 2 or 3 or 9;
+            }
+
+            private void UpdateSerialPrintTypeFlags() {
+                var flags = (SerialPrintTypeFlags)_serialPrintType;
+
+                IsLabelPrint = flags.HasFlag(SerialPrintTypeFlags.Label);
+            }
+
+            public void Reset() {
+                SubstrateID = 0;
+                CategoryName = string.Empty;
+                ProductName = string.Empty;
+                SubstrateName = string.Empty;
+                SubstrateModel = string.Empty;
+                RegType = 0;
+                CheckBin = 0;
+                RegType = 0;
+                SerialPrintType = 0;
+            }
+        }
+        public class SubstrateRegisterWork {
+            public int SubstrateID { get; set; }
+
+            public string ProductNumber { get; set; } = string.Empty;
+            public string OrderNumber { get; set; } = string.Empty;
+            public int AddQuantity { get; set; }
+            public int DefectQuantity { get; set; }
+            public int UseQuantity { get; set; }
+
+            public string Person { get; set; } = string.Empty;
+            public string RegDate { get; set; } = string.Empty;
+            public string Comment { get; set; } = string.Empty;
+
+            public void Reset() {
+                SubstrateID = 0;
+                ProductNumber = string.Empty;
+                OrderNumber = string.Empty;
+                AddQuantity = 0;
+                DefectQuantity = 0;
+                UseQuantity = 0;
+                Person = string.Empty;
+                RegDate = string.Empty;
+                Comment = string.Empty;
+            }
+        }
+
+        public class QrSettings {
+            public List<string> CategoryItemNumber { get; set; } = [];
+            public List<string> CategoryProductName { get; set; } = [];
+            public List<string> CategorySubstrateName { get; set; } = [];
+            public List<string> CategoryProductType { get; set; } = [];
+            public List<string> CategoryType { get; set; } = [];
+        }
+
+        public class AppSettings {
+            public List<string> PersonList { get; set; } = [];
+            public string FontName { get; set; } = "Meiryo UI";
+            public float FontSize { get; set; } = 9;
+        }
+
         public class Config {
             public string BackupFolderPath { get; set; } = string.Empty;
             public string[] Administrators { get; set; } = [];
@@ -161,10 +332,27 @@ namespace ProductDatabase {
             public static bool IsAuthorizedUser { get; set; } = false;
         }
 
-        public ProductInformation ProductInfo { get; set; } = new();
+        private readonly ProductRepository _productRepository;
+
+        private readonly ProductMaster _productMaster;
+        private readonly ProductRegisterWork _productRegisterWork;
+
+        private readonly SubstrateMaster _substrateMaster;
+        private readonly SubstrateRegisterWork _substrateRegisterWork;
+
+        private readonly QrSettings _qrSettings;
+        private readonly AppSettings _appSettings;
 
         public MainWindow() {
             InitializeComponent();
+
+            _productRepository = new ProductRepository();
+            _productMaster = new ProductMaster();
+            _productRegisterWork = new ProductRegisterWork();
+            _substrateMaster = new SubstrateMaster();
+            _substrateRegisterWork = new SubstrateRegisterWork();
+            _qrSettings = new QrSettings();
+            _appSettings = new AppSettings();
         }
 
         public static string GetConnectionRegistration() {
@@ -193,7 +381,6 @@ namespace ProductDatabase {
                 CategoryListBox1.Items.Clear();
                 CategoryListBox2.Items.Clear();
                 CategoryListBox3.Items.Clear();
-                MainDataTable.Clear();
 
                 // 設定ファイル読み込み
                 if (!File.Exists(_jsonFilePath)) {
@@ -208,26 +395,10 @@ namespace ProductDatabase {
                 // バックアップ作成
                 CreateDailyBackup();
 
-                // 製品・基板データ取得
-                using SqliteConnection con = new(GetConnectionRegistration());
-                con.Open();
-                using (var cmd = new SqliteCommand("SELECT * FROM M_ProductDef;", con)) {
-                    using var reader = cmd.ExecuteReader();
-                    ProductInfo.ProductDataTable.Load(reader);
-                }
-                using (var cmd = new SqliteCommand("SELECT * FROM M_SubstrateDef;", con)) {
-                    using var reader = cmd.ExecuteReader();
-                    ProductInfo.SubstrateDataTable.Load(reader);
-                }
-                using (var cmd = new SqliteCommand("SELECT * FROM T_ProductUseSubstrate;", con)) {
-                    using var reader = cmd.ExecuteReader();
-                    ProductInfo.ProductUseSubstrate.Load(reader);
-                }
-
                 // 担当者取得
-                ProductInfo.PersonList.Clear();
+                _appSettings.PersonList.Clear();
                 foreach (var person in jsonObj["Persons"]!) {
-                    ProductInfo.PersonList.Add(person.ToString()!);
+                    _appSettings.PersonList.Add(person.ToString()!);
                 }
 
                 // 認証ユーザー名を取得
@@ -244,6 +415,7 @@ namespace ProductDatabase {
                     .ToHashSet(StringComparer.OrdinalIgnoreCase);
                 Config.IsAdministrator = adminSet?.Contains(Environment.UserName) ?? false;
 
+                _productRepository.LoadAll();
 
                 this.Activate();
                 QRCodePanel.Enabled = Config.IsAuthorizedUser;
@@ -285,32 +457,15 @@ namespace ProductDatabase {
             }
         }
         private void ResetFields() {
-            ProductInfo = new ProductInformation();
+            _productMaster.Reset();
+            _productRegisterWork.Reset();
+            _productRepository.Clear();
+            _substrateMaster.Reset();
+            _substrateRegisterWork.Reset();
 
-            using var con = new SqliteConnection(GetConnectionRegistration());
-            con.Open();
-            using (var cmd = new SqliteCommand("SELECT * FROM M_ProductDef;", con)) {
-                using var reader = cmd.ExecuteReader();
-                ProductInfo.ProductDataTable.Load(reader);
-            }
-            using (var cmd = new SqliteCommand("SELECT * FROM M_SubstrateDef;", con)) {
-                using var reader = cmd.ExecuteReader();
-                ProductInfo.SubstrateDataTable.Load(reader);
-            }
-            using (var cmd = new SqliteCommand("SELECT * FROM T_ProductUseSubstrate;", con)) {
-                using var reader = cmd.ExecuteReader();
-                ProductInfo.ProductUseSubstrate.Load(reader);
-            }
+            _productRepository.LoadAll();
 
-            // 担当者取得
-            ProductInfo.PersonList.Clear();
-            var jsonText = File.ReadAllText(_jsonFilePath);
-            var jsonObj = JObject.Parse(jsonText);
-            foreach (var person in jsonObj["Persons"]!) {
-                ProductInfo.PersonList.Add(person.ToString()!);
-            }
-
-            ProductInfo.FontSize = _fontSize;
+            _appSettings.FontSize = _fontSize;
         }
         private static void LockSelf() {
             try {
@@ -322,126 +477,132 @@ namespace ProductDatabase {
         }
         // 登録ボタン処理
         private void Registration() {
-            try {
-                ResetFields();
+            ResetFields();
 
-                if (CategoryListBox3.SelectedIndex == -1) { return; }
-                switch (RadioButtonNumber) {
-                    case 1:
-                        HandleSubstrateRegistration();
-                        break;
-                    case 2:
-                        HandleProductRegistration1();
-                        break;
-                    case 3:
-                        HandleRePrint();
-                        break;
-                    case 4:
-                        HandleSubstrateChange1();
-                        break;
-                    default:
-                        break;
-                }
-
-                QRCodeTextBox.Text = string.Empty;
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (CategoryListBox3.SelectedIndex == -1) { return; }
+            switch (RadioButtonNumber) {
+                case 1:
+                    HandleSubstrateRegistration();
+                    break;
+                case 2:
+                    HandleProductRegistration1();
+                    break;
+                case 3:
+                    HandleRePrint();
+                    break;
+                case 4:
+                    HandleSubstrateChange1();
+                    break;
+                default:
+                    break;
             }
+
+            QRCodeTextBox.Text = string.Empty;
         }
         private void HandleSubstrateRegistration() {
-            var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND SubstrateName = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = _productRepository.SubstrateDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND SubstrateName = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
-                ProductInfo.SubstrateID = Convert.ToInt64(selectedRows[0]["SubstrateID"]);
-                ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
-                ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
-                ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
-                ProductInfo.SubstrateName = selectedRows[0]["SubstrateName"].ToString() ?? string.Empty;
-                ProductInfo.SubstrateModel = selectedRows[0]["SubstrateModel"].ToString() ?? string.Empty;
-                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
-                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-                ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
-                using SubstrateRegistrationWindow window = new(ProductInfo);
+                _substrateMaster.SubstrateID = Convert.ToInt32(selectedRows[0]["SubstrateID"]);
+                _substrateMaster.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
+                _substrateMaster.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
+                _substrateMaster.SubstrateName = selectedRows[0]["SubstrateName"].ToString() ?? string.Empty;
+                _substrateMaster.SubstrateModel = selectedRows[0]["SubstrateModel"].ToString() ?? string.Empty;
+                _substrateMaster.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
+                _substrateMaster.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
+                _substrateMaster.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+                using SubstrateRegistrationWindow window = new(_substrateMaster, _substrateRegisterWork, _appSettings);
                 window.ShowDialog(this);
             }
         }
         private void HandleProductRegistration1() {
-            var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = _productRepository.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
-                ProductInfo.ProductID = Convert.ToInt64(selectedRows[0]["ProductID"]);
-                ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
-                ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
-                ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
-                ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
-                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
-                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-                ProductInfo.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
-                ProductInfo.SerialType = Convert.ToInt32(selectedRows[0]["SerialType"] ?? throw new Exception("SerialType is null"));
-                ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
-                ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
-                ProductInfo.Initial = selectedRows[0]["Initial"].ToString() ?? string.Empty;
-                ProductInfo.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
-                ProductInfo.UseSubstrate = GetUseSubstrate(ProductInfo.ProductID);
-                using ProductRegistration1Window window = new(ProductInfo);
+                _productMaster.ProductID = Convert.ToInt32(selectedRows[0]["ProductID"]);
+                _productMaster.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
+                _productMaster.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
+                _productMaster.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
+                _productMaster.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
+                _productMaster.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+                _productMaster.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
+                _productMaster.SerialDigitType = Convert.ToInt32(selectedRows[0]["SerialType"] ?? throw new Exception("SerialType is null"));
+                _productMaster.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
+                _productMaster.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
+                _productMaster.Initial = selectedRows[0]["Initial"].ToString() ?? string.Empty;
+                _productMaster.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
+                _productMaster.UseSubstrates = GetUseSubstrate(_productMaster.ProductID);
+                using ProductRegistration1Window window = new(_productMaster, _productRegisterWork, _appSettings);
                 window.ShowDialog(this);
             }
         }
         private void HandleRePrint() {
-            var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = _productRepository.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
-                ProductInfo.ProductID = Convert.ToInt64(selectedRows[0]["ProductID"]);
-                ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
-                ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
-                ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
-                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
-                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-                ProductInfo.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
-                ProductInfo.SerialType = Convert.ToInt32(selectedRows[0]["SerialType"] ?? throw new Exception("SerialType is null"));
-                ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
-                ProductInfo.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
-                ProductInfo.Initial = selectedRows[0]["Initial"].ToString() ?? string.Empty;
-                ProductInfo.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
-                using RePrintWindow window = new(ProductInfo);
+                _productMaster.ProductID = Convert.ToInt32(selectedRows[0]["ProductID"]);
+                _productMaster.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
+                _productMaster.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
+                _productMaster.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
+                _productMaster.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
+                _productMaster.SerialDigitType = Convert.ToInt32(selectedRows[0]["SerialType"] ?? throw new Exception("SerialType is null"));
+                _productMaster.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
+                _productMaster.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
+                _productMaster.Initial = selectedRows[0]["Initial"].ToString() ?? string.Empty;
+                _productMaster.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
+                _productMaster.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+                _productMaster.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
+                using RePrintWindow window = new(_productMaster, _productRegisterWork, _appSettings);
                 window.ShowDialog(this);
             }
         }
         private void HandleSubstrateChange1() {
-            var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
+            var selectedRows = _productRepository.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
-                ProductInfo.ProductID = Convert.ToInt64(selectedRows[0]["ProductID"]);
-                ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
-                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-                ProductInfo.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
-                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
-                ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
-                ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
-                ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
-                ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
-                ProductInfo.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
-                ProductInfo.UseSubstrate = GetUseSubstrate(ProductInfo.ProductID);
-                using SubstrateChange1 window = new(ProductInfo);
+                _productMaster.ProductID = Convert.ToInt32(selectedRows[0]["ProductID"]);
+                _productMaster.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
+                _productMaster.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+                _productMaster.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
+                _productMaster.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
+                _productMaster.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
+                _productMaster.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
+                _productMaster.UseSubstrates = GetUseSubstrate(_productMaster.ProductID);
+                _productMaster.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
+                _productMaster.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
+                using SubstrateChange1 window = new(_productMaster, _productRegisterWork, _appSettings);
                 window.ShowDialog(this);
             }
         }
-        private List<string> GetUseSubstrate(long productId) {
-            // 使用基板リスト化+名前順にソート
-            var useSubstrate = new List<string>();
-            var useSubstrateRows = ProductInfo.ProductUseSubstrate.Select($"ProductID = '{productId}'");
+        private List<SubstrateInfo> GetUseSubstrate(int productId) {
+            var useSubstrate = new List<SubstrateInfo>();
+
+            var useSubstrateRows =
+                _productRepository.ProductUseSubstrate
+                .Select($"PKey = {productId}");
 
             foreach (var row in useSubstrateRows) {
-                var substrateId = row["SubstrateID"];
+                var substrateId = Convert.ToInt32(row["SKey"]);
 
-                var substrateRows = ProductInfo.SubstrateDataTable
+                var substrateRows =
+                    _productRepository.SubstrateDataTable
                     .Select($"SubstrateID = {substrateId}");
 
-                if (substrateRows.Length > 0) {
-                    useSubstrate.Add(substrateRows[0]["SubstrateModel"].ToString() ?? string.Empty);
-                }
+                if (substrateRows.Length == 0)
+                    continue;
+
+                var substrateRow = substrateRows[0];
+
+                useSubstrate.Add(new SubstrateInfo {
+                    SubstrateID = substrateId,
+                    SubstrateName = substrateRow["SubstrateName"]?.ToString() ?? string.Empty,
+                    SubstrateModel = substrateRow["SubstrateModel"]?.ToString() ?? string.Empty
+                });
             }
-            useSubstrate.Sort();
+
+            useSubstrate.Sort((a, b) =>
+                string.Compare(a.SubstrateModel, b.SubstrateModel, StringComparison.Ordinal));
+
             return useSubstrate;
         }
         // 履歴ボタン処理
@@ -457,47 +618,48 @@ namespace ProductDatabase {
                     2 or 3 or 4 => CategoryListBox3.SelectedIndex == -1 ? string.Empty : $"AND ProductType = '{CategoryListBox3.SelectedItem}'",
                     _ => string.Empty
                 };
-                selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' {listBox2} {listBox3}");
+                selectedRows = RadioButtonNumber switch {
+                    1 => _productRepository.SubstrateDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' {listBox2} {listBox3}"),
+                    2 or 3 or 4 => _productRepository.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' {listBox2} {listBox3}"),
+                    _ => null
+                };
 
                 if (selectedRows is not null && selectedRows.Length > 0) {
                     switch (RadioButtonNumber) {
                         case 1:
-                            ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
+                            _substrateMaster.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
 
                             if (!string.IsNullOrEmpty(listBox2)) {
-                                ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
-                                ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
+                                _substrateMaster.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
                             }
 
                             if (!string.IsNullOrEmpty(listBox3)) {
-                                ProductInfo.SubstrateID = Convert.ToInt64(selectedRows[0]["SubstrateID"]);
-                                ProductInfo.SubstrateName = selectedRows[0]["SubstrateName"].ToString() ?? string.Empty;
-                                ProductInfo.SubstrateModel = selectedRows[0]["SubstrateModel"].ToString() ?? string.Empty;
-                                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-                                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
+                                _substrateMaster.SubstrateID = Convert.ToInt32(selectedRows[0]["SubstrateID"]);
+                                _substrateMaster.SubstrateName = selectedRows[0]["SubstrateName"].ToString() ?? string.Empty;
+                                _substrateMaster.SubstrateModel = selectedRows[0]["SubstrateModel"].ToString() ?? string.Empty;
+                                _substrateMaster.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
                             }
                             break;
                         case 2:
                         case 3:
-                            ProductInfo.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
+                            _productMaster.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
 
                             if (!string.IsNullOrEmpty(listBox2)) {
-                                ProductInfo.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
-                                ProductInfo.StockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
+                                _productMaster.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
                             }
 
                             if (!string.IsNullOrEmpty(listBox3)) {
-                                ProductInfo.ProductID = Convert.ToInt64(selectedRows[0]["ProductID"]);
-                                ProductInfo.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
-                                ProductInfo.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
-                                ProductInfo.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-                                ProductInfo.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
-                                ProductInfo.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
+                                _productMaster.ProductID = Convert.ToInt32(selectedRows[0]["ProductID"]);
+                                _productMaster.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
+                                _productMaster.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
+                                _productMaster.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
+                                _productMaster.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+                                _productMaster.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
                             }
                             break;
                     }
 
-                    using HistoryWindow window = new(ProductInfo, RadioButtonNumber);
+                    using HistoryWindow window = new(_productMaster, _productRegisterWork, _substrateMaster, _substrateRegisterWork, RadioButtonNumber, _appSettings);
                     window.ShowDialog(this);
                 }
             } catch (Exception ex) {
@@ -506,68 +668,84 @@ namespace ProductDatabase {
         }
         // 処理カテゴリセレクト
         private void CategorySelect(object sender) {
-            // Tagプロパティを使用してラジオボタンの識別子を取得
-            Dictionary<string, (int Number, string Sql)> radioButtonMap = new() {
-                ["1"] = (1, "SELECT * FROM M_SubstrateDef WHERE Visible = 1 ORDER BY SortNumber ASC;"),
-                ["2"] = (2, "SELECT * FROM M_ProductDef WHERE Visible = 1 ORDER BY SortNumber ASC;"),
-                ["3"] = (3, "SELECT * FROM M_ProductDef WHERE Visible = 1 AND SerialPrintType != 0 ORDER BY SortNumber ASC;"),
-                ["4"] = (4, "SELECT * FROM M_ProductDef WHERE Visible = 1 AND (SheetPrintType = 2 OR SheetPrintType = 3) ORDER BY SortNumber ASC;")
-            };
 
-            try {
-                RegisterButton.Enabled = false;
-                HistoryButton.Enabled = false;
-                CategoryListBox1.Items.Clear();
-                CategoryListBox2.Items.Clear();
-                CategoryListBox3.Items.Clear();
-                MainDataTable.Clear();
+            RegisterButton.Enabled = false;
+            HistoryButton.Enabled = false;
+            CategoryListBox1.Items.Clear();
+            CategoryListBox2.Items.Clear();
+            CategoryListBox3.Items.Clear();
 
-                if (sender is RadioButton selectedRadioButton && radioButtonMap.TryGetValue(selectedRadioButton.Tag?.ToString() ?? "", out var map)) {
-                    RadioButtonNumber = map.Number;
-                    using var con = new SqliteConnection(GetConnectionRegistration());
-                    con.Open();
-
-                    using var cmd = new SqliteCommand(map.Sql, con);
-                    using var reader = cmd.ExecuteReader();
-                    MainDataTable.Load(reader);
-                }
-
-                // CategoryName 列の重複を削除し、ソートする
-                var categoryNames = MainDataTable.AsEnumerable()
-                    .Select(row => row.Field<string?>("CategoryName") ?? string.Empty)
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Distinct()
-                    .ToList();
-
-                // リストボックスにアイテムを追加する
-                CategoryListBox1.Items.AddRange([.. categoryNames]);
-
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (sender is not RadioButton rb || !int.TryParse(rb.Tag?.ToString(), out int number)) {
+                return;
             }
+
+            RadioButtonNumber = number;
+
+            IEnumerable<DataRow> targetRows = [];
+
+            switch (RadioButtonNumber) {
+                case 1:
+                    // M_SubstrateDef
+                    targetRows = _productRepository.SubstrateDataTable.AsEnumerable()
+                        .Where(r => r.Field<long>("Visible") == 1);
+                    break;
+
+                case 2:
+                    // M_ProductDef
+                    targetRows = _productRepository.ProductDataTable.AsEnumerable()
+                        .Where(r => r.Field<long>("Visible") == 1);
+                    break;
+
+                case 3:
+                    // 再印刷用
+                    targetRows = _productRepository.ProductDataTable.AsEnumerable()
+                        .Where(r =>
+                            r.Field<long>("Visible") == 1 &&
+                            r.Field<long>("SerialPrintType") != 0);
+                    break;
+
+                case 4:
+                    // 基板変更用
+                    targetRows = _productRepository.ProductDataTable.AsEnumerable()
+                        .Where(r =>
+                            r.Field<long>("Visible") == 1 &&
+                            (r.Field<long>("SheetPrintType") == 2 ||
+                             r.Field<long>("SheetPrintType") == 3));
+                    break;
+            }
+
+            // CategoryName 列の重複除外＋ソート
+            var categoryNames = targetRows
+                .Where(row => row["CategoryName"] != DBNull.Value && row["SortNumber"] != DBNull.Value)
+                .OrderBy(row => Convert.ToInt32(row["SortNumber"]))
+                .Select(row => row["CategoryName"]!.ToString()!)
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Distinct()
+                .ToList();
+
+            CategoryListBox1.Items.AddRange([.. categoryNames]);
         }
         // 製品カテゴリセレクト
         private void CategoryListBox1Select() {
-            try {
-                RegisterButton.Enabled = false;
-                HistoryButton.Enabled = RadioButtonNumber != 4;
-                CategoryListBox2.Items.Clear();
-                CategoryListBox3.Items.Clear();
+            RegisterButton.Enabled = false;
+            HistoryButton.Enabled = RadioButtonNumber != 4;
+            CategoryListBox2.Items.Clear();
+            CategoryListBox3.Items.Clear();
 
-                HashSet<string> productNames = [];
+            var selectedRows = RadioButtonNumber switch {
+                1 => _productRepository.SubstrateDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}'", "SubstrateName ASC"),
+                2 or 3 or 4 => _productRepository.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}'", "ProductType ASC"),
+                _ => []
+            };
 
-                var selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}'", "ProductName ASC");
+            var productNames = selectedRows
+                .Select(r => r["ProductName"]?.ToString())
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Distinct()
+                .OrderBy(name => name)
+                .ToList();
 
-                foreach (var row in selectedRows) {
-                    var productName = row["ProductName"].ToString() ?? throw new Exception("ProductName is null");
-                    productNames.Add(productName);
-                }
-
-                CategoryListBox2.Items.AddRange([.. productNames]);
-
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            CategoryListBox2.Items.AddRange([.. productNames!]);
         }
         private void CategoryListBox2Select() {
             try {
@@ -579,7 +757,7 @@ namespace ProductDatabase {
 
                 switch (RadioButtonNumber) {
                     case 1:
-                        selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "SubstrateName ASC");
+                        selectedRows = _productRepository.SubstrateDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "SubstrateName ASC");
                         HashSet<string> substrateNames = [.. selectedRows.AsEnumerable()
                             .Select(x => x.Field<string>("SubstrateName"))
                             .Where(x => x is not null)
@@ -591,7 +769,7 @@ namespace ProductDatabase {
                     case 2:
                     case 3:
                     case 4:
-                        selectedRows = MainDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductType ASC");
+                        selectedRows = _productRepository.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductType ASC");
                         HashSet<string> productTypes = [.. selectedRows.AsEnumerable()
                             .Select(x => x.Field<string>("ProductType"))
                             .Where(x => x is not null)
@@ -615,16 +793,16 @@ namespace ProductDatabase {
 
                 switch (RadioButtonNumber) {
                     case 1:
-                        ProductInfo.SubstrateName = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
+                        _substrateMaster.SubstrateName = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
                         break;
 
                     case 2:
                     case 3:
-                        ProductInfo.ProductType = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
+                        _productMaster.ProductType = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
                         break;
 
                     case 4:
-                        ProductInfo.ProductType = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
+                        _productMaster.ProductType = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
                         HistoryButton.Enabled = false;
                         break;
                 }
@@ -632,6 +810,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         // QRコード読み取り
         private void CodeScan() {
             try {
@@ -650,7 +829,7 @@ namespace ProductDatabase {
                 FetchDataFromSQLite();
 
                 var listIndex = 0;
-                if (ProductInfo.CategoryItemNumber.Count >= 2) {
+                if (_qrSettings.CategoryItemNumber.Count >= 2) {
                     listIndex = ShowDialogWindowForMultipleItems();
                 }
 
@@ -668,10 +847,10 @@ namespace ProductDatabase {
             CategoryListBox1.Items.Clear();
             CategoryListBox2.Items.Clear();
             CategoryListBox3.Items.Clear();
-            ProductInfo.CategoryItemNumber.Clear();
-            ProductInfo.CategoryProductType.Clear();
-            ProductInfo.CategoryProductName.Clear();
-            ProductInfo.CategoryType.Clear();
+            _qrSettings.CategoryItemNumber.Clear();
+            _qrSettings.CategoryProductType.Clear();
+            _qrSettings.CategoryProductName.Clear();
+            _qrSettings.CategoryType.Clear();
             ResetFields();
             Enabled = false;
         }
@@ -680,14 +859,14 @@ namespace ProductDatabase {
                 string[] separator = ["//"];
                 var arr = QRCodeTextBox.Text.Split(separator, StringSplitOptions.None);
                 if (arr.Length == 1) {
-                    ProductInfo.Proness2 = QRCodeTextBox.Text;
+                    _productMaster.ProductModel = QRCodeTextBox.Text;
                     return;
                 }
                 if (arr.Length != 4) { throw new Exception("QRコードが正しくありません。"); }
-                ProductInfo.Proness1 = arr[0];
-                ProductInfo.Proness2 = arr[1];
-                ProductInfo.Proness4 = int.TryParse(arr[2], out var result) ? result : throw new Exception("数量に数値以外が入力されています。");
-                ProductInfo.Proness5 = arr[3];
+                _productRegisterWork.ProductNumber = arr[0];
+                _productMaster.ProductModel = arr[1];
+                _productRegisterWork.Quantity = int.TryParse(arr[2], out var result) ? result : throw new Exception("数量に数値以外が入力されています。");
+                _productRegisterWork.OrderNumber = arr[3];
             } catch (Exception ex) {
                 throw new Exception($"{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}");
             }
@@ -698,19 +877,19 @@ namespace ProductDatabase {
                 using OdbcCommand cmd = new($"SELECT * FROM V_宮崎手配情報 WHERE 手配管理番号 = '{QRCodeTextBox.Text}';", con);
                 using var dr = cmd.ExecuteReader();
                 while (dr.Read()) {
-                    ProductInfo.Proness1 = dr["手配製番"].ToString() ?? string.Empty;
-                    ProductInfo.Proness2 = dr["品目番号"].ToString() ?? string.Empty;
-                    ProductInfo.Proness3 = dr["品目名称"].ToString() ?? string.Empty;
-                    ProductInfo.Proness4 = Convert.ToInt32(dr["手配数"] ?? throw new Exception("手配数 is null"));
-                    ProductInfo.Proness5 = dr["請求先注番"].ToString() ?? string.Empty;
+                    _productRegisterWork.ProductNumber = dr["手配製番"].ToString() ?? string.Empty;
+                    _productMaster.ProductModel = dr["品目番号"].ToString() ?? string.Empty;
+                    _productMaster.ProductName = dr["品目名称"].ToString() ?? string.Empty;
+                    _productRegisterWork.Quantity = Convert.ToInt32(dr["手配数"] ?? throw new Exception("手配数 is null"));
+                    _productRegisterWork.OrderNumber = dr["請求先注番"].ToString() ?? string.Empty;
                 }
             }
-            if (string.IsNullOrEmpty(ProductInfo.Proness1)) { throw new Exception($"一致する情報がありません。{Environment.NewLine}手配管理番号:{QRCodeTextBox.Text}"); }
+            if (string.IsNullOrEmpty(_productRegisterWork.ProductNumber)) { throw new Exception($"一致する情報がありません。{Environment.NewLine}手配管理番号:{QRCodeTextBox.Text}"); }
         }
         private void ProcessCategoryItemData() {
             var pattern = @"-(?:SMT|H|GH).*";
-            var result = Regex.Replace(ProductInfo.Proness2, pattern, "");
-            ProductInfo.Proness2 = result
+            var result = Regex.Replace(_productMaster.ProductModel, pattern, "");
+            _productMaster.ProductModel = result
                 .Replace("-ACGH", "-AC")
                 .Replace("-DCGH", "-DC");
         }
@@ -740,9 +919,9 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            cmd.Parameters.Add("@StrProness2", SqliteType.Text).Value = ProductInfo.Proness2;
+            cmd.Parameters.Add("@StrProness2", SqliteType.Text).Value = _productMaster.ProductModel;
             using var dr = cmd.ExecuteReader();
-            if (!dr.HasRows) { throw new Exception($"品目番号が見つかりません。\n品目番号:[{ProductInfo.Proness2}]"); }
+            if (!dr.HasRows) { throw new Exception($"品目番号が見つかりません。\n品目番号:[{_productMaster.ProductModel}]"); }
             while (dr.Read()) {
                 var colSubItemNumber = dr["SubItemNumber"].ToString() ?? string.Empty;
                 var colProItemNumber = dr["ProItemNumber"].ToString() ?? string.Empty;
@@ -761,22 +940,22 @@ namespace ProductDatabase {
             }
         }
         private void AddToLists(string itemNumber, string productName, string productType, string substrateName, string type) {
-            ProductInfo.CategoryItemNumber.Add(itemNumber);
-            ProductInfo.CategoryProductName.Add(productName);
-            ProductInfo.CategoryProductType.Add(productType);
-            ProductInfo.CategorySubstrateName.Add(substrateName);
-            ProductInfo.CategoryType.Add(type);
+            _qrSettings.CategoryItemNumber.Add(itemNumber);
+            _qrSettings.CategoryProductName.Add(productName);
+            _qrSettings.CategoryProductType.Add(productType);
+            _qrSettings.CategorySubstrateName.Add(substrateName);
+            _qrSettings.CategoryType.Add(type);
         }
         private int ShowDialogWindowForMultipleItems() {
-            using SeveralDialogWindow window = new(ProductInfo);
+            using SeveralDialogWindow window = new(_qrSettings, _appSettings);
             window.ShowDialog(this);
             return window.SelectedIndex;
         }
         private void HandleSelectedItem(int listIndex) {
-            var productName = ProductInfo.CategoryProductName[listIndex];
-            var productType = ProductInfo.CategoryProductType[listIndex];
-            var substrateName = ProductInfo.CategorySubstrateName[listIndex];
-            var type = ProductInfo.CategoryType[listIndex];
+            var productName = _qrSettings.CategoryProductName[listIndex];
+            var productType = _qrSettings.CategoryProductType[listIndex];
+            var substrateName = _qrSettings.CategorySubstrateName[listIndex];
+            var type = _qrSettings.CategoryType[listIndex];
 
             switch (type) {
                 case "1":
@@ -786,64 +965,51 @@ namespace ProductDatabase {
                     HandleProductSelection(productName, productType);
                     break;
                 default:
-                    throw new Exception($"一致する情報がありません。{Environment.NewLine}品目番号:{ProductInfo.Proness2}{Environment.NewLine}");
+                    throw new Exception($"一致する情報がありません。{Environment.NewLine}品目番号:{_productMaster.ProductModel}{Environment.NewLine}");
             }
         }
         private void HandleSubstrateSelection(string productName, string substrateName) {
-            using SqliteConnection con = new(GetConnectionRegistration());
-            con.Open();
-            using (var cmd = new SqliteCommand("SELECT * FROM M_SubstrateDef;", con)) {
-                using var reader = cmd.ExecuteReader();
-                MainDataTable.Load(reader);
-            }
-
-            var substrateRet = MainDataTable.Select($"ProductName = '{productName}' AND SubstrateName = '{substrateName}'");
+            var substrateRet = _productRepository.SubstrateDataTable.Select($"ProductName = '{productName}' AND SubstrateName = '{substrateName}'");
             OpenSubstrateRegistrationWindow(substrateRet);
         }
         private void OpenSubstrateRegistrationWindow(DataRow[] substrateRet) {
-            ProductInfo.CategoryName = substrateRet[0]["CategoryName"].ToString() ?? string.Empty;
-            ProductInfo.ProductName = substrateRet[0]["ProductName"].ToString() ?? string.Empty;
-            ProductInfo.StockName = substrateRet[0]["StockName"].ToString() ?? string.Empty;
-            ProductInfo.SubstrateName = substrateRet[0]["SubstrateName"].ToString() ?? string.Empty;
-            ProductInfo.SubstrateModel = substrateRet[0]["SubstrateModel"].ToString() ?? string.Empty;
-            ProductInfo.Initial = string.Empty;
-            ProductInfo.RegType = Convert.ToInt32(substrateRet[0]["RegType"] ?? throw new Exception("RegType is null"));
-            ProductInfo.SerialPrintType = Convert.ToInt32(substrateRet[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-            ProductInfo.CheckBin = Convert.ToInt32(substrateRet[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
-            using SubstrateRegistrationWindow window = new(ProductInfo);
+            _substrateMaster.CategoryName = substrateRet[0]["CategoryName"].ToString() ?? string.Empty;
+            _substrateMaster.ProductName = substrateRet[0]["ProductName"].ToString() ?? string.Empty;
+            _substrateMaster.SubstrateName = substrateRet[0]["SubstrateName"].ToString() ?? string.Empty;
+            _substrateMaster.SubstrateModel = substrateRet[0]["SubstrateModel"].ToString() ?? string.Empty;
+            _substrateMaster.RegType = Convert.ToInt32(substrateRet[0]["RegType"] ?? throw new Exception("RegType is null"));
+            _substrateMaster.CheckBin = Convert.ToInt32(substrateRet[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
+            _substrateMaster.SerialPrintType = Convert.ToInt32(substrateRet[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+            _substrateRegisterWork.ProductNumber = _productRegisterWork.ProductNumber;
+            _substrateRegisterWork.OrderNumber = _productRegisterWork.OrderNumber;
+            _substrateRegisterWork.AddQuantity = _productRegisterWork.Quantity;
+            using SubstrateRegistrationWindow window = new(_substrateMaster, _substrateRegisterWork, _appSettings);
             window.ShowDialog(this);
         }
         private void HandleProductSelection(string productName, string productType) {
-            using SqliteConnection con = new(GetConnectionRegistration());
-            con.Open();
-            using (var cmd = new SqliteCommand("SELECT * FROM M_ProductDef;", con)) {
-                using var reader = cmd.ExecuteReader();
-                MainDataTable.Load(reader);
-            }
-
-            var productRet = MainDataTable.Select($"ProductName = '{productName}' AND ProductType = '{productType}'");
+            var productRet = _productRepository.ProductDataTable.Select($"ProductName = '{productName}' AND ProductType = '{productType}'");
             OpenProductRegistrationWindow(productRet);
         }
         private void OpenProductRegistrationWindow(DataRow[] productRet) {
-            ProductInfo.CategoryName = productRet[0]["CategoryName"].ToString() ?? string.Empty;
-            ProductInfo.ProductName = productRet[0]["ProductName"].ToString() ?? string.Empty;
-            ProductInfo.StockName = productRet[0]["StockName"].ToString() ?? string.Empty;
-            ProductInfo.ProductType = productRet[0]["ProductType"].ToString() ?? string.Empty;
-            ProductInfo.ProductModel = productRet[0]["ProductModel"].ToString() ?? string.Empty;
-            ProductInfo.Initial = productRet[0]["Initial"].ToString() ?? string.Empty;
-            ProductInfo.RevisionGroup = Convert.ToInt32(productRet[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
-            ProductInfo.RegType = Convert.ToInt32(productRet[0]["RegType"] ?? throw new Exception("RegType is null"));
-            ProductInfo.SerialPrintType = Convert.ToInt32(productRet[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-            ProductInfo.SheetPrintType = Convert.ToInt32(productRet[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
-            ProductInfo.CheckBin = Convert.ToInt32(productRet[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
-            ProductInfo.SerialType = Convert.ToInt32(productRet[0]["SerialType"] ?? throw new Exception("SerialType is null"));
-            using ProductRegistration1Window window = new(ProductInfo);
+            _productMaster.CategoryName = productRet[0]["CategoryName"].ToString() ?? string.Empty;
+            _productMaster.ProductName = productRet[0]["ProductName"].ToString() ?? string.Empty;
+            _productMaster.ProductType = productRet[0]["ProductType"].ToString() ?? string.Empty;
+            _productMaster.ProductModel = productRet[0]["ProductModel"].ToString() ?? string.Empty;
+            _productMaster.Initial = productRet[0]["Initial"].ToString() ?? string.Empty;
+            _productMaster.RevisionGroup = Convert.ToInt32(productRet[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
+            _productMaster.RegType = Convert.ToInt32(productRet[0]["RegType"] ?? throw new Exception("RegType is null"));
+            _productMaster.CheckBin = Convert.ToInt32(productRet[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
+            _productMaster.SerialDigitType = Convert.ToInt32(productRet[0]["SerialType"] ?? throw new Exception("SerialType is null"));
+            _productMaster.SerialPrintType = Convert.ToInt32(productRet[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+            _productMaster.SheetPrintType = Convert.ToInt32(productRet[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
+            using ProductRegistration1Window window = new(_productMaster, _productRegisterWork, _appSettings);
             window.ShowDialog(this);
         }
         private void CleanupAfterScan() {
             Enabled = true;
             QRCodeTextBox.Focus();
         }
+
         // フォント変更
         private void FontChange(object sender) {
             var radioButton = (RadioButton)sender;
@@ -855,8 +1021,8 @@ namespace ProductDatabase {
                 _ => _fontSize
             };
 
-            ProductInfo.FontSize = _fontSize;
-            Font = new System.Drawing.Font(ProductInfo.FontName, ProductInfo.FontSize);
+            _appSettings.FontSize = _fontSize;
+            Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
         }
         // excel
         private static void OpenExcel(string filePath) {

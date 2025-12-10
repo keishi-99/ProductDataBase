@@ -32,11 +32,11 @@ namespace ProductDatabase.ExcelService {
             }
 
             // レポートを生成するメインメソッド
-            public static void GenerateReport(ProductInformation productInfo) {
+            public static void GenerateReport(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
                 try {
                     // 1. 設定ファイルを読み込み、レポート設定を取得
                     var configWorkbook = LoadConfigWorkbook();
-                    var reportConfig = GetReportConfig(configWorkbook, productInfo.ProductModel);
+                    var reportConfig = GetReportConfig(configWorkbook, productMaster.ProductModel);
 
                     // 2. レポートテンプレートを読み込み
                     var filePath = reportConfig.FilePath;
@@ -48,19 +48,19 @@ namespace ProductDatabase.ExcelService {
                     var reportWorkbook = new XLWorkbook(fs);
 
                     // 3. レポートシートにデータを挿入
-                    PopulateReportSheet(reportWorkbook, productInfo, reportConfig);
+                    PopulateReportSheet(reportWorkbook, productMaster, productRegisterWork, reportConfig);
 
                     // 基板情報の入力がある場合のみ処理を実行
                     if (reportConfig.HasSubstrateInput) {
                         // 4. データベースから使用済み基板情報を取得
-                        var usedSubstrate = GetUsedSubstrateData(productInfo);
+                        var usedSubstrate = GetUsedSubstrateData(productRegisterWork);
 
                         // 5. 基板情報のExcelへの書き込み
                         UpdateSubstrateDetailsInExcel(reportWorkbook, reportConfig, usedSubstrate);
                     }
 
                     // 6. レポートを保存
-                    SaveReport(reportWorkbook, productInfo, reportConfig);
+                    SaveReport(reportWorkbook, productRegisterWork, reportConfig);
 
                     MessageBox.Show("成績書が正常に生成されました。", "完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 } catch (Exception ex) {
@@ -197,17 +197,17 @@ namespace ProductDatabase.ExcelService {
             }
 
             // レポートシートに製品情報を挿入する
-            private static void PopulateReportSheet(XLWorkbook reportWorkbook, ProductInformation productInfo, ReportConfigClosedXml config) {
+            private static void PopulateReportSheet(XLWorkbook reportWorkbook, ProductMaster productMaster, ProductRegisterWork productRegisterWork, ReportConfigClosedXml config) {
                 var workSheetTemp = reportWorkbook.Worksheet(config.SheetName)
                     ?? throw new Exception($"シート '{config.SheetName}' が見つかりません。");
 
-                var productNumber = productInfo.ProductNumber.Split('-')[0] ?? string.Empty;
+                var productNumber = productRegisterWork.ProductNumber.Split('-')[0] ?? string.Empty;
                 SetValue(config.ProductNumberRange, productNumber);
-                SetValue(config.OrderNumberRange, productInfo.OrderNumber);
-                SetValue(config.QuantityRange, productInfo.Quantity.ToString());
-                SetValue(config.SerialFirstRange, productInfo.SerialFirst);
-                SetValue(config.SerialLastRange, productInfo.SerialLast);
-                SetValue(config.ProductModelRange, productInfo.ProductModel);
+                SetValue(config.OrderNumberRange, productRegisterWork.OrderNumber);
+                SetValue(config.QuantityRange, productRegisterWork.Quantity.ToString());
+                SetValue(config.SerialFirstRange, productRegisterWork.SerialFirst);
+                SetValue(config.SerialLastRange, productRegisterWork.SerialLast);
+                SetValue(config.ProductModelRange, productMaster.ProductModel);
 
                 void SetValue(string? range, string? value) {
                     if (string.IsNullOrEmpty(range) || string.IsNullOrEmpty(value)) { return; }
@@ -216,7 +216,7 @@ namespace ProductDatabase.ExcelService {
             }
 
             // データベースから使用済み基板情報を取得するメソッド
-            private static List<(string SubstrateModel, List<string> SubstrateNumbers)> GetUsedSubstrateData(ProductInformation productInfo) {
+            private static List<(string SubstrateModel, List<string> SubstrateNumbers)> GetUsedSubstrateData(ProductRegisterWork productRegisterWork) {
                 List<(string, List<string>)> usedSubstrate = [];
 
                 using SqliteConnection con = new(GetConnectionRegistration());
@@ -237,7 +237,7 @@ namespace ProductDatabase.ExcelService {
                         SubstrateModel ASC
                     ;
                     """;
-                cmd.Parameters.Add("@ID", SqliteType.Text).Value = productInfo.ID;
+                cmd.Parameters.Add("@ID", SqliteType.Text).Value = productRegisterWork.RowID;
                 using var dr = cmd.ExecuteReader();
 
                 while (dr.Read()) {
@@ -289,7 +289,7 @@ namespace ProductDatabase.ExcelService {
             }
 
             // 変更されたレポートをファイルに保存する
-            private static void SaveReport(XLWorkbook reportWorkbook, ProductInformation productInfo, ReportConfigClosedXml config) {
+            private static void SaveReport(XLWorkbook reportWorkbook, ProductRegisterWork productRegisterWork, ReportConfigClosedXml config) {
                 var fileName = config.FileName;
                 var fileExtension = config.FileExtension;
                 var initialDirectory = config.SaveDirectory;
@@ -300,7 +300,7 @@ namespace ProductDatabase.ExcelService {
 
                 using SaveFileDialog saveFileDialog = new() {
                     Filter = $"Excel Files (*{fileExtension})|*{fileExtension}|All Files (*.*)|*.*",
-                    FileName = $"{fileName} のコピー{productInfo.ProductNumber}{fileExtension}",
+                    FileName = $"{fileName} のコピー{productRegisterWork.ProductNumber}{fileExtension}",
                     Title = "保存先を選択してください",
                     InitialDirectory = string.IsNullOrWhiteSpace(initialDirectory)
                         ? Environment.CurrentDirectory  // Nullの場合はデフォルトディレクトリを使用
@@ -336,7 +336,7 @@ namespace ProductDatabase.ExcelService {
                 public bool HasSubstrateInput { get; set; }
             }
             // リストを生成するメインメソッド
-            public static void GenerateList(ProductInformation productInfo) {
+            public static void GenerateList(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
                 try {
                     // 1. Excel設定の読み込みとワークブックの準備
                     var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsm");
@@ -349,22 +349,22 @@ namespace ProductDatabase.ExcelService {
 
                     // FileStreamからXLWorkbookを読み込む
                     using var workBook = new XLWorkbook(fs);
-                    var (targetSheetName, productName, resultRow, configSheet) = LoadExcelConfiguration(workBook, productInfo.ProductModel);
+                    var (targetSheetName, productName, resultRow, configSheet) = LoadExcelConfiguration(workBook, productMaster.ProductModel);
 
                     // 2. 製品情報の設定とExcelへの書き込み
                     var productCellRanges = GetProductCellRanges(configSheet, resultRow);
                     var targetSheet = workBook.Worksheet(targetSheetName) ?? throw new Exception($"テンプレートシート:[{targetSheetName}]が見つかりません。");
-                    PopulateProductDetails(targetSheet, productInfo, productCellRanges, productName);
+                    PopulateProductDetails(targetSheet, productMaster, productRegisterWork, productCellRanges, productName);
 
                     // 3. データベースから使用済み基板情報を取得
-                    var usedSubstrate = GetUsedSubstrateData(productInfo);
+                    var usedSubstrate = GetUsedSubstrateData(productRegisterWork);
 
                     // 4. 基板情報のExcelへの書き込み
                     UpdateSubstrateDetailsInExcel(configSheet, targetSheet, resultRow, usedSubstrate);
 
                     // 5. QRコードの生成と埋め込み
                     if (!string.IsNullOrEmpty(productCellRanges.QrCodeRange)) {
-                        GenerateAndEmbedQrCode(targetSheet, productInfo, productCellRanges.QrCodeRange);
+                        GenerateAndEmbedQrCode(targetSheet, productMaster, productRegisterWork, productCellRanges.QrCodeRange);
                     }
 
                     // 6. Excelファイルの保存と印刷
@@ -419,17 +419,17 @@ namespace ProductDatabase.ExcelService {
             }
 
             // 製品情報をExcelシートに書き込むメソッド
-            private static void PopulateProductDetails(IXLWorksheet targetSheet, ProductInformation productInfo, ProductCellRanges ranges, string productName) {
+            private static void PopulateProductDetails(IXLWorksheet targetSheet, ProductMaster productMaster, ProductRegisterWork productRegisterWork, ProductCellRanges ranges, string productName) {
 
                 SetValue(ranges.ProductNameRange, productName);
-                SetValue(ranges.ProductNumberRange, productInfo.ProductNumber);
-                SetValue(ranges.OrderNumberRange, productInfo.OrderNumber);
-                SetValue(ranges.RegDateRange, productInfo.RegDate);
-                SetValue(ranges.ProductModelRange, productInfo.ProductModel);
-                SetValue(ranges.QuantityRange, productInfo.Quantity.ToString());
-                SetValue(ranges.SerialFirstRange, productInfo.SerialFirst);
-                SetValue(ranges.SerialLastRange, productInfo.SerialLast);
-                SetValue(ranges.CommentRange, productInfo.Comment);
+                SetValue(ranges.ProductNumberRange, productRegisterWork.ProductNumber);
+                SetValue(ranges.OrderNumberRange, productRegisterWork.OrderNumber);
+                SetValue(ranges.RegDateRange, productRegisterWork.RegDate);
+                SetValue(ranges.ProductModelRange, productMaster.ProductModel);
+                SetValue(ranges.QuantityRange, productRegisterWork.Quantity.ToString());
+                SetValue(ranges.SerialFirstRange, productRegisterWork.SerialFirst);
+                SetValue(ranges.SerialLastRange, productRegisterWork.SerialLast);
+                SetValue(ranges.CommentRange, productRegisterWork.Comment);
 
                 void SetValue(string? range, string? value) {
                     if (string.IsNullOrEmpty(range) || string.IsNullOrEmpty(value)) { return; }
@@ -438,7 +438,7 @@ namespace ProductDatabase.ExcelService {
             }
 
             // データベースから使用済み基板情報を取得するメソッド
-            private static List<(string SubstrateModel, List<string> SubstrateNumbers, List<int> Decreases)> GetUsedSubstrateData(ProductInformation productInfo) {
+            private static List<(string SubstrateModel, List<string> SubstrateNumbers, List<int> Decreases)> GetUsedSubstrateData(ProductRegisterWork productRegisterWork) {
                 List<(string, List<string>, List<int>)> usedSubstrate = [];
 
                 using SqliteConnection con = new(GetConnectionRegistration());
@@ -459,7 +459,7 @@ namespace ProductDatabase.ExcelService {
                         SubstrateModel ASC
                     ;
                     """;
-                cmd.Parameters.Add("@ID", SqliteType.Text).Value = productInfo.ID;
+                cmd.Parameters.Add("@ID", SqliteType.Text).Value = productRegisterWork.RowID;
                 using var dr = cmd.ExecuteReader();
 
                 while (dr.Read()) {
@@ -510,7 +510,7 @@ namespace ProductDatabase.ExcelService {
             }
 
             // QRコードを生成し、Excelシートに埋め込むメソッド
-            private static void GenerateAndEmbedQrCode(IXLWorksheet targetSheet, ProductInformation productInfo, string qrCodeRange) {
+            private static void GenerateAndEmbedQrCode(IXLWorksheet targetSheet, ProductMaster productMaster, ProductRegisterWork productRegisterWork, string qrCodeRange) {
                 BarcodeWriter<Bitmap> qr = new() {
                     Format = BarcodeFormat.QR_CODE,
                     Options = new QrCodeEncodingOptions {
@@ -526,7 +526,7 @@ namespace ProductDatabase.ExcelService {
                 };
 
                 // QRコードのデータ文字列を構築
-                var qrData = $"{productInfo.OrderNumber};{productInfo.ProductNumber};{productInfo.ProductModel};{productInfo.Quantity};{productInfo.SerialFirst};{productInfo.SerialLast}";
+                var qrData = $"{productRegisterWork.OrderNumber};{productRegisterWork.ProductNumber};{productMaster.ProductModel};{productRegisterWork.Quantity};{productRegisterWork.SerialFirst};{productRegisterWork.SerialLast}";
                 var qrBitmap = qr.Write(qrData);
 
                 // Excelに画像を埋め込む
@@ -608,7 +608,7 @@ namespace ProductDatabase.ExcelService {
             }
 
             // Excelチェックシートを生成し、データを書き込み、印刷します。
-            public static void GenerateCheckSheet(ProductInformation productInfo) {
+            public static void GenerateCheckSheet(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
                 // 設定ファイルのパスを構築
                 var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
                 var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsm");
@@ -624,13 +624,13 @@ namespace ProductDatabase.ExcelService {
                 try {
 
                     // 1. 設定ファイルの読み込みとメインシートの取得
-                    var (configBook, excelData) = LoadAndExtractConfig(workBook, productInfo);
+                    var (configBook, excelData) = LoadAndExtractConfig(workBook, productMaster);
 
                     // 2. 温度・湿度入力ダイアログの表示と値の取得
                     (string temperature, string humidity) = GetTemperatureAndHumidity(excelData);
 
                     // 3. 日付のフォーマット
-                    var formattedDate = FormatDate(productInfo.RegDate, excelData.DateFormat);
+                    var formattedDate = FormatDate(productRegisterWork.RegDate, excelData.DateFormat);
 
                     // 4. EPPlusでExcelファイルを編集
 
@@ -648,7 +648,7 @@ namespace ProductDatabase.ExcelService {
 
                     try {
                         // 各シートに対して値を書き込む
-                        PopulateExcelSheets(targetBook, productInfo, temperature, humidity, formattedDate, excelData);
+                        PopulateExcelSheets(targetBook, productMaster, productRegisterWork, temperature, humidity, formattedDate, excelData);
 
                         // 不要なシートを非表示にする
                         HideSheets(targetBook, excelData.SheetNames);
@@ -676,9 +676,9 @@ namespace ProductDatabase.ExcelService {
             }
 
             // Excel設定ファイルを読み込み、メインシートから設定データを抽出します。
-            private static (XLWorkbook workBook, CheckSheetConfigData excelData) LoadAndExtractConfig(XLWorkbook workBook, ProductInformation productInfo) {
+            private static (XLWorkbook workBook, CheckSheetConfigData excelData) LoadAndExtractConfig(XLWorkbook workBook, ProductMaster productMaster) {
 
-                var productModel = productInfo.ProductModel;
+                var productModel = productMaster.ProductModel;
 
                 // 既存ワークシートを取得
                 var configSheetName = "Sheet1";
@@ -754,18 +754,18 @@ namespace ProductDatabase.ExcelService {
             }
 
             // 指定されたワークブックの各シートに製品情報を書き込みます。
-            private static void PopulateExcelSheets(XLWorkbook targetBook, ProductInformation productInfo, string temperature, string humidity, string formattedDate, CheckSheetConfigData excelData) {
+            private static void PopulateExcelSheets(XLWorkbook targetBook, ProductMaster productMaster, ProductRegisterWork productRegisterWork, string temperature, string humidity, string formattedDate, CheckSheetConfigData excelData) {
                 var sheetNames = excelData.SheetNames;
                 foreach (var sheetName in sheetNames) {
                     var targetSheet = targetBook.Worksheet(sheetName) ?? throw new Exception($"シート[{sheetName}]が見つかりません。");
 
                     // 各セルに値を書き込む
-                    WriteCellValue(targetSheet, excelData.ProductModelRange, productInfo.ProductModel);
-                    WriteCellValue(targetSheet, excelData.ProductNumberRange, productInfo.ProductNumber);
-                    WriteCellValue(targetSheet, excelData.OrderNumberRange, productInfo.OrderNumber);
-                    WriteCellValue(targetSheet, excelData.QuantityRange, productInfo.Quantity.ToString());
-                    WriteCellValue(targetSheet, excelData.SerialFirstRange, productInfo.SerialFirst);
-                    WriteCellValue(targetSheet, excelData.SerialLastRange, productInfo.SerialLast);
+                    WriteCellValue(targetSheet, excelData.ProductModelRange, productMaster.ProductModel);
+                    WriteCellValue(targetSheet, excelData.ProductNumberRange, productRegisterWork.ProductNumber);
+                    WriteCellValue(targetSheet, excelData.OrderNumberRange, productRegisterWork.OrderNumber);
+                    WriteCellValue(targetSheet, excelData.QuantityRange, productRegisterWork.Quantity.ToString());
+                    WriteCellValue(targetSheet, excelData.SerialFirstRange, productRegisterWork.SerialFirst);
+                    WriteCellValue(targetSheet, excelData.SerialLastRange, productRegisterWork.SerialLast);
                     WriteCellValue(targetSheet, excelData.RegDateRange, formattedDate);
                     WriteCellValue(targetSheet, excelData.RegTemperatureRange, temperature);
                     WriteCellValue(targetSheet, excelData.RegHumidityRange, humidity);
@@ -851,11 +851,11 @@ namespace ProductDatabase.ExcelService {
         // 基板設定を開く
         public static class SubstrateInformationClosedXml {
             // 基板設定ファイルを開くメソッド
-            public static void OpenSubstrateInformationClosedXml(ProductInformation productInfo) {
+            public static void OpenSubstrateInformationClosedXml(SubstrateMaster substrateMaster) {
                 try {
                     // 1. 設定ファイルを読み込み、レポート設定を取得
                     var configBook = LoadConfigWorkbook();
-                    var (filePath, fileName) = GetSubstrateConfig(configBook, productInfo.SubstrateModel);
+                    var (filePath, fileName) = GetSubstrateConfig(configBook, substrateMaster.SubstrateModel);
 
                     OpenExcel(filePath, fileName);
 

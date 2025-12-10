@@ -14,7 +14,9 @@ namespace ProductDatabase {
 
         public string printSettingPath = string.Empty;
 
-        public ProductInformation ProductInfo { get; }
+        private readonly ProductMaster _productMaster;
+        private readonly ProductRegisterWork _productRegisterWork;
+        private readonly AppSettings _appSettings;
 
         private string _serialType = string.Empty;
         private string _serialFirstNumber = string.Empty;
@@ -25,21 +27,24 @@ namespace ProductDatabase {
                     "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
                     "PersonCheckBox", "CommentCheckBox" ];
 
-        public RePrintWindow(ProductInformation productInfo) {
+        public RePrintWindow(ProductMaster productMaster, ProductRegisterWork productRegisterWork, AppSettings appSettings) {
             InitializeComponent();
-            ProductInfo = productInfo;
+
+            _productMaster = productMaster;
+            _productRegisterWork = productRegisterWork;
+            _appSettings = appSettings;
         }
 
         // ロードイベント
         private void LoadEvents() {
             try {
-                Font = new System.Drawing.Font(ProductInfo.FontName, ProductInfo.FontSize);
+                Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
 
-                ProductNameLabel2.Text = ProductInfo.ProductName;
-                SubstrateModelLabel2.Text = $"{ProductInfo.ProductName} - {ProductInfo.ProductModel}";
+                ProductNameLabel2.Text = _productMaster.ProductName;
+                SubstrateModelLabel2.Text = $"{_productMaster.ProductName} - {_productMaster.ProductModel}";
 
-                FirstSerialNumberTextBox.MaxLength = ProductInfo.SerialDigit;
-                FirstSerialNumberTextBox.Text = ProductInfo.SerialDigit switch {
+                FirstSerialNumberTextBox.MaxLength = _productMaster.SerialDigit;
+                FirstSerialNumberTextBox.Text = _productMaster.SerialDigit switch {
                     3 => "000",
                     4 => "0000",
                     _ => string.Empty
@@ -49,12 +54,12 @@ namespace ProductDatabase {
                 for (var i = 0; i < _checkBoxNames.Count; i++) {
                     if (Controls[_checkBoxNames[i]] is CheckBox checkBox) {
                         // i番目のビットが1かどうかをチェック
-                        checkBox.Checked = (ProductInfo.CheckBin & (1 << i)) != 0;
+                        checkBox.Checked = (_productMaster.CheckBin & (1 << i)) != 0;
                     }
                 }
 
                 // ComboBoxへ担当者を追加
-                PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
+                PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
 
                 // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
                 using (SqliteConnection con = new(GetConnectionRegistration())) {
@@ -62,8 +67,8 @@ namespace ProductDatabase {
                     using var cmd = con.CreateCommand();
                     // テーブル検索SQL - [ProductName]テーブルの[SubstrateModel]列の[Revision]を取得
                     cmd.CommandText = $"SELECT Revision FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
-                    cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = ProductInfo.ProductName;
-                    cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = ProductInfo.RevisionGroup;
+                    cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = _productMaster.ProductName;
+                    cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = _productMaster.RevisionGroup;
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
                 }
@@ -77,22 +82,22 @@ namespace ProductDatabase {
         // 印刷UI設定
         private void ConfigurePrintSettings() {
             FirstSerialNumberCheckBox.Checked = true;
-            LabelPrintButton.Enabled = ProductInfo.IsLabelPrint;
-            BarcodePrintButton.Enabled = ProductInfo.IsBarcodePrint;
-            NameplatePrintButton.Enabled = ProductInfo.IsNameplatePrint;
+            LabelPrintButton.Enabled = _productMaster.IsLabelPrint;
+            BarcodePrintButton.Enabled = _productMaster.IsBarcodePrint;
+            NameplatePrintButton.Enabled = _productMaster.IsNameplatePrint;
 
-            シリアルラベル印刷プレビューToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;
-            シリアルラベル印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;
-            バーコード印刷プレビューToolStripMenuItem.Enabled = ProductInfo.IsBarcodePrint;
-            バーコード印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsBarcodePrint;
-            銘版印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsNameplatePrint;
+            シリアルラベル印刷プレビューToolStripMenuItem.Enabled = _productMaster.IsLabelPrint;
+            シリアルラベル印刷設定ToolStripMenuItem.Enabled = _productMaster.IsLabelPrint;
+            バーコード印刷プレビューToolStripMenuItem.Enabled = _productMaster.IsBarcodePrint;
+            バーコード印刷設定ToolStripMenuItem.Enabled = _productMaster.IsBarcodePrint;
+            銘版印刷設定ToolStripMenuItem.Enabled = _productMaster.IsNameplatePrint;
 
             LoadSettings();
         }
         private void LoadSettings() {
             try {
                 ProductPrintSettings = new DocumentPrintSettings();
-                printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", ProductInfo.CategoryName, ProductInfo.ProductName, $"PrintConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.json");
+                printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", _productMaster.CategoryName, _productMaster.ProductName, $"PrintConfig_{_productMaster.ProductName}_{_productMaster.ProductModel}.json");
                 if (!File.Exists(printSettingPath)) { throw new DirectoryNotFoundException($"ラベル印刷用設定ファイルがありません。"); }
                 var jsonString = File.ReadAllText(printSettingPath);
                 ProductPrintSettings = System.Text.Json.JsonSerializer.Deserialize<DocumentPrintSettings>(jsonString) ?? new DocumentPrintSettings();
@@ -114,7 +119,7 @@ namespace ProductDatabase {
                     result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                     if (result == DialogResult.Cancel) { return; }
 
-                    ProductInfo.Person = PersonComboBox.Text;
+                    _productRegisterWork.Person = PersonComboBox.Text;
                     if (!Registration()) { throw new Exception("登録できませんでした。"); }
                 }
 
@@ -150,18 +155,18 @@ namespace ProductDatabase {
 
                 // チェックボックスにチェックがない場合はNullを
                 cmd.Parameters.Add("@SerialPrintType", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_serialType) ? DBNull.Value : _serialType;
-                cmd.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.OrderNumber) ? DBNull.Value : ProductInfo.OrderNumber;
-                cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductName) ? DBNull.Value : ProductInfo.ProductName;
-                cmd.Parameters.Add("@ProductNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductNumber) ? DBNull.Value : ProductInfo.ProductNumber;
-                cmd.Parameters.Add("@ProductType", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductType) ? DBNull.Value : ProductInfo.ProductType;
-                cmd.Parameters.Add("@ProductModel", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.ProductModel) ? DBNull.Value : ProductInfo.ProductModel;
-                cmd.Parameters.Add("@Quantity", SqliteType.Text).Value = ProductInfo.Quantity;
-                cmd.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Person) ? DBNull.Value : ProductInfo.Person;
-                cmd.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.RegDate) ? DBNull.Value : ProductInfo.RegDate;
-                cmd.Parameters.Add("@Revision", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Revision) ? DBNull.Value : ProductInfo.Revision;
+                cmd.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.OrderNumber) ? DBNull.Value : _productRegisterWork.OrderNumber;
+                cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productMaster.ProductName) ? DBNull.Value : _productMaster.ProductName;
+                cmd.Parameters.Add("@ProductNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.ProductNumber) ? DBNull.Value : _productRegisterWork.ProductNumber;
+                cmd.Parameters.Add("@ProductType", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productMaster.ProductType) ? DBNull.Value : _productMaster.ProductType;
+                cmd.Parameters.Add("@ProductModel", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productMaster.ProductModel) ? DBNull.Value : _productMaster.ProductModel;
+                cmd.Parameters.Add("@Quantity", SqliteType.Text).Value = _productRegisterWork.Quantity;
+                cmd.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Person) ? DBNull.Value : _productRegisterWork.Person;
+                cmd.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.RegDate) ? DBNull.Value : _productRegisterWork.RegDate;
+                cmd.Parameters.Add("@Revision", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Revision) ? DBNull.Value : _productRegisterWork.Revision;
                 cmd.Parameters.Add("@SerialFirst", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_serialFirstNumber) ? DBNull.Value : _serialFirstNumber;
                 cmd.Parameters.Add("@SerialLast", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_serialLastNumber) ? DBNull.Value : _serialLastNumber;
-                cmd.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(ProductInfo.Comment) ? DBNull.Value : ProductInfo.Comment;
+                cmd.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Comment) ? DBNull.Value : _productRegisterWork.Comment;
 
                 cmd.ExecuteNonQuery();
 
@@ -170,20 +175,20 @@ namespace ProductDatabase {
                 // ログ出力
                 string[] logMessageArray = [
                     $"[再印刷]",
-                    $"[{ProductInfo.CategoryName}]",
+                    $"[{_productMaster.CategoryName}]",
                     $"[]",
-                    $"注文番号[{ProductInfo.OrderNumber}]",
-                    $"製造番号[{ProductInfo.ProductNumber}]",
-                    $"製品名[{ProductInfo.ProductName}]",
-                    $"タイプ[{ProductInfo.ProductType}]",
-                    $"型式[{ProductInfo.ProductModel}]",
-                    $"数量[{ProductInfo.Quantity}]",
+                    $"注文番号[{_productRegisterWork.OrderNumber}]",
+                    $"製造番号[{_productRegisterWork.ProductNumber}]",
+                    $"製品名[{_productMaster.ProductName}]",
+                    $"タイプ[{_productMaster.ProductType}]",
+                    $"型式[{_productMaster.ProductModel}]",
+                    $"数量[{_productRegisterWork.Quantity}]",
                     $"シリアル先頭[{_serialFirstNumber}]",
                     $"シリアル末尾[{_serialLastNumber}]",
-                    $"Revision[{ProductInfo.Revision}]",
-                    $"登録日[{ProductInfo.RegDate}]",
-                    $"担当者[{ProductInfo.Person}]",
-                    $"コメント[{ProductInfo.Comment}]"
+                    $"Revision[{_productRegisterWork.Revision}]",
+                    $"登録日[{_productRegisterWork.RegDate}]",
+                    $"担当者[{_productRegisterWork.Person}]",
+                    $"コメント[{_productRegisterWork.Comment}]"
                 ];
                 CommonUtils.Logger.AppendLog(logMessageArray);
 
@@ -266,7 +271,7 @@ namespace ProductDatabase {
             var calculatedLastSerial = quantity + firstSerial - 1; // 数量と開始番号から最終シリアルを算出
 
             // シリアル番号の桁数に応じて、閾値とリセット値を設定
-            (var minNumber, var maxNumber, var digit) = ProductInfo.SerialType switch {
+            (var minNumber, var maxNumber, var digit) = _productMaster.SerialDigitType switch {
                 3 => (1, 999, 3),
                 4 => (1, 9999, 4),
                 101 => (1, 899, 3),
@@ -279,25 +284,25 @@ namespace ProductDatabase {
                 FirstSerialNumberTextBox.Text = minNumber.ToString();
             }
 
-            ProductInfo.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
-            ProductInfo.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
-            ProductInfo.Quantity = quantity;
-            ProductInfo.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
-            ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
-            ProductInfo.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
-            ProductInfo.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
+            _productRegisterWork.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
+            _productRegisterWork.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
+            _productRegisterWork.Quantity = quantity;
+            _productRegisterWork.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
+            _productRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
+            _productRegisterWork.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
+            _productRegisterWork.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
 
-            ProductInfo.SerialFirstNumber = firstSerial;
-            ProductInfo.SerialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
+            _productRegisterWork.SerialFirstNumber = firstSerial;
+            _productRegisterWork.SerialLastNumber = _productRegisterWork.SerialFirstNumber + _productRegisterWork.Quantity - 1;
 
             _serialList.Clear();
 
             for (var i = 0; i < quantity; i++) {
-                _serialList.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
+                _serialList.Add(GenerateCode(_productRegisterWork.SerialFirstNumber + i));
             }
 
-            _serialFirstNumber = GenerateCode(ProductInfo.SerialFirstNumber);
-            _serialLastNumber = GenerateCode(ProductInfo.SerialLastNumber);
+            _serialFirstNumber = GenerateCode(_productRegisterWork.SerialFirstNumber);
+            _serialLastNumber = GenerateCode(_productRegisterWork.SerialLastNumber);
             return true;
         }
 
@@ -312,7 +317,7 @@ namespace ProductDatabase {
                 var startLine = (int)PrintPositionNumericUpDown.Value - 1;
 
                 pd.BeginPrint += (sender, e) => {
-                    PrintManager.Initialize(ProductInfo, ProductPrintSettings, _serialList);
+                    PrintManager.ProductInitialize(_productMaster, _productRegisterWork, ProductPrintSettings, _serialList);
                 };
                 pd.PrintPage += (sender, e) => {
                     bool hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, serialType);
@@ -367,7 +372,7 @@ namespace ProductDatabase {
             }
         }
         private string GenerateCode(int serialCode) {
-            var monthCode = DateTime.Parse(ProductInfo.RegDate).ToString("MM");
+            var monthCode = DateTime.Parse(_productRegisterWork.RegDate).ToString("MM");
 
             monthCode = monthCode switch {
                 "10" => "X",
@@ -383,15 +388,15 @@ namespace ProductDatabase {
                 _ => string.Empty
             };
 
-            var regDate = DateTime.Parse(ProductInfo.RegDate);
+            var regDate = DateTime.Parse(_productRegisterWork.RegDate);
 
             var map = new Dictionary<string, string> {
-                ["{T}"] = ProductInfo.Initial,
+                ["{T}"] = _productMaster.Initial,
                 ["{Y}"] = regDate.ToString("yy"),
                 ["{MM}"] = regDate.ToString("MM"),
-                ["{R}"] = ProductInfo.Revision,
+                ["{R}"] = _productRegisterWork.Revision,
                 ["{M}"] = monthCode[^1..],
-                ["{S}"] = Convert.ToInt32(serialCode).ToString($"D{ProductInfo.SerialDigit}")
+                ["{S}"] = Convert.ToInt32(serialCode).ToString($"D{_productMaster.SerialDigit}")
             };
 
             foreach (var kv in map) {
@@ -465,14 +470,10 @@ namespace ProductDatabase {
                     return;
                 }
                 if (arr is not null) {
-                    ProductInfo.Proness1 = arr[0];
-                    ProductInfo.Proness2 = arr[1];
-                    ProductInfo.Proness4 = Convert.ToInt32(arr[2] ?? throw new Exception());
-                    ProductInfo.Proness5 = arr[3];
+                    ManufacturingNumberMaskedTextBox.Text = arr[0];
+                    QuantityTextBox.Text = arr[2];
+                    OrderNumberTextBox.Text = arr[3];
                 }
-                OrderNumberTextBox.Text = ProductInfo.Proness5;
-                ManufacturingNumberMaskedTextBox.Text = ProductInfo.Proness1;
-                QuantityTextBox.Text = ProductInfo.Proness4.ToString();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -481,22 +482,22 @@ namespace ProductDatabase {
         private void ShowInfo() {
             var items = new Dictionary<string, string>
                 {
-                    {"ProductName", $"{ProductInfo.ProductName}"},
-                    {"ProductModel", $"{ProductInfo.ProductModel}"},
-                    {"ProductType", $"{ProductInfo.ProductType}"},
-                    {"OrderNumber", $"{ProductInfo.OrderNumber}"},
-                    {"ProductNumber", $"{ProductInfo.ProductNumber}"},
-                    {"Revision", $"{ProductInfo.Revision}"},
-                    {"RegType", $"{ProductInfo.RegType}"},
-                    {"RegDate", $"{ProductInfo.RegDate}"},
-                    {"Person", $"{ProductInfo.Person}"},
-                    {"Quantity", $"{ProductInfo.Quantity}"},
-                    {"SerialFirstNumber", $"{ProductInfo.SerialFirstNumber}"},
-                    {"SerialLastNumber", $"{ProductInfo.SerialLastNumber}"},
-                    {"Initial", $"{ProductInfo.Initial}"},
-                    {"SerialPrintType", $"{ProductInfo.SerialPrintType}"},
-                    {"SheetPrintType", $"{ProductInfo.SheetPrintType}"},
-                    {"SerialDigit", $"{ProductInfo.SerialDigit}"}
+                    {"ProductName", $"{_productMaster.ProductName}"},
+                    {"ProductModel", $"{_productMaster.ProductModel}"},
+                    {"ProductType", $"{_productMaster.ProductType}"},
+                    {"OrderNumber", $"{_productRegisterWork.OrderNumber}"},
+                    {"ProductNumber", $"{_productRegisterWork.ProductNumber}"},
+                    {"Revision", $"{_productRegisterWork.Revision}"},
+                    {"RegType", $"{_productMaster.RegType}"},
+                    {"RegDate", $"{_productRegisterWork.RegDate}"},
+                    {"Person", $"{_productRegisterWork.Person}"},
+                    {"Quantity", $"{_productRegisterWork.Quantity}"},
+                    {"SerialFirstNumber", $"{_productRegisterWork.SerialFirstNumber}"},
+                    {"SerialLastNumber", $"{_productRegisterWork.SerialLastNumber}"},
+                    {"Initial", $"{_productMaster.Initial}"},
+                    {"SerialPrintType", $"{_productMaster.SerialPrintType}"},
+                    {"SheetPrintType", $"{_productMaster.SheetPrintType}"},
+                    {"SerialDigit", $"{_productMaster.SerialDigit}"}
                 };
 
             var form = new Form {
@@ -517,7 +518,7 @@ namespace ProductDatabase {
                 View = View.Details,
                 FullRowSelect = true,
                 GridLines = true,
-                Font = new Font("PlemolJP", ProductInfo.FontSize),
+                Font = new Font("PlemolJP", _appSettings.FontSize),
             };
 
             // 列の追加
@@ -566,7 +567,7 @@ namespace ProductDatabase {
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             PrintSettingsWindow ls = new() {
-                ProductInfo = ProductInfo,
+                ProductMaster = _productMaster,
                 serialType = "Label"
             };
             ls.ShowDialog(this);
@@ -574,7 +575,7 @@ namespace ProductDatabase {
         }
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             PrintSettingsWindow ls = new() {
-                ProductInfo = ProductInfo,
+                ProductMaster = _productMaster,
                 serialType = "Barcode"
             };
             ls.ShowDialog(this);
@@ -582,7 +583,7 @@ namespace ProductDatabase {
         }
         private void 銘版印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             PrintSettingsWindow ls = new() {
-                ProductInfo = ProductInfo,
+                ProductMaster = _productMaster,
                 serialType = "Nameplate"
             };
             ls.ShowDialog(this);
