@@ -35,8 +35,8 @@ namespace ProductDatabase.Print {
 
         private static List<string> s_serialList = [];
 
-        public static bool IsUnderlinePrint => ProductMaster.IsUnderlinePrint;
-        public static bool IsLast4Digits => ProductMaster.IsLast4Digits;
+        private static bool s_isUnderlinePrint;
+        private static bool s_isLast4Digits;
 
         // 4桁以上の型式番号の下4桁を取得するプロパティ
         public static string Last4ProductModel =>
@@ -53,6 +53,9 @@ namespace ProductDatabase.Print {
             PageCount = 1;
             PrintCount = 0;
             SerialPrintType = productMaster.SerialPrintType;
+
+            s_isUnderlinePrint = ProductMaster.IsUnderlinePrint;
+            s_isLast4Digits = ProductMaster.IsLast4Digits;
         }
         public static void SubstrateInitialize(SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork, DocumentPrintSettings documentPrintSettings, List<string> serialList) {
             SubstrateMaster = substrateMaster;
@@ -97,7 +100,7 @@ namespace ProductDatabase.Print {
                 var intervalYPx = ConvertMmToPixel(printSettings.IntervalY, dpiY);
                 var headerPositionXPx = ConvertMmToPixel(printSettings.HeaderPositionX, dpiX);
                 var headerPositionYPx = ConvertMmToPixel(printSettings.HeaderPositionY, dpiY);
-                var headerString = ConvertHeaderString(printSettings.HeaderTextFormat);
+                var headerString = ConvertHeaderString(serialType, printSettings.HeaderTextFormat);
                 var headerFont = printSettings.HeaderFont;
 
                 var copiesPerLabel = printSettings.CopiesPerLabel;
@@ -126,9 +129,9 @@ namespace ProductDatabase.Print {
                         var isLastCopy = CopiesRemainingPerSerial == 1;
 
                         // タイプ4で残り1の場合、最後のラベルに下線をつける
-                        var fontUnderline = IsUnderlinePrint && isLastCopy;
+                        var fontUnderline = s_isUnderlinePrint && isLastCopy;
 
-                        var printText = IsLast4Digits && isLastCopy
+                        var printText = s_isLast4Digits && isLastCopy
                             ? Last4ProductModel
                             : s_serialList[PrintCount];
 
@@ -286,10 +289,32 @@ namespace ProductDatabase.Print {
             // g.DrawImageでミリメートル単位の座標とサイズを指定して描画
             g.DrawImage(barcodeBitmap, layoutRectBarcode);
         }
-        private static string ConvertHeaderString(string s) {
-            if (ProductMaster is null) { throw new Exception("ProductMaster nullです。"); }
+        private static string ConvertHeaderString(string serialType, string s) {
 
-            var map = new Dictionary<string, string> {
+            var map = serialType switch {
+                "Label" => CreateProductMap(),
+                "Barcode" => CreateProductMap(),
+                "Substrate" => CreateSubstrateMap(),
+                _ => throw new Exception($"不明な SerialType: {serialType}")
+            };
+
+            foreach (var kv in map) {
+                s = s.Replace(kv.Key, kv.Value);
+            }
+
+            return s;
+        }
+        private static Dictionary<string, string> CreateProductMap() {
+
+            if (ProductMaster is null) {
+                throw new Exception("ProductMaster nullです。");
+            }
+
+            if (ProductRegisterWork is null) {
+                throw new Exception("ProductRegisterWork nullです。");
+            }
+
+            return new Dictionary<string, string> {
                 ["{P}"] = ProductMaster.ProductName,
                 ["{T}"] = ProductMaster.ProductModel,
                 ["{D}"] = DateTime.Today.ToShortDateString(),
@@ -298,12 +323,29 @@ namespace ProductDatabase.Print {
                 ["{N}"] = ProductRegisterWork.Quantity.ToString(),
                 ["{U}"] = ProductRegisterWork.Person,
             };
-
-            foreach (var kv in map) {
-                s = s.Replace(kv.Key, kv.Value);
-            }
-            return s;
         }
+        private static Dictionary<string, string> CreateSubstrateMap() {
+
+            if (SubstrateMaster is null) {
+                throw new Exception("SubstrateMaster nullです。");
+            }
+
+            if (SubstrateRegisterWork is null) {
+                throw new Exception("SubstrateRegisterWork nullです。");
+            }
+
+            return new Dictionary<string, string> {
+                ["{P}"] = SubstrateMaster.SubstrateName,
+                ["{T}"] = SubstrateMaster.SubstrateModel,
+                ["{D}"] = DateTime.Today.ToShortDateString(),
+                ["{M}"] = SubstrateRegisterWork.ProductNumber,
+                ["{O}"] = SubstrateRegisterWork.OrderNumber,
+                ["{N}"] = SubstrateRegisterWork.AddQuantity.ToString(),
+                ["{U}"] = SubstrateRegisterWork.Person,
+            };
+        }
+
+
         private static void DrawFinalRowMark(Graphics graphics, int rowNumber, float posX, float posY, float width, float height, Font font) {
             var sf = new StringFormat {
                 Alignment = StringAlignment.Near,
