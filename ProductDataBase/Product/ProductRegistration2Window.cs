@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using DocumentFormat.OpenXml.Drawing.Spreadsheet;
+using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
@@ -17,7 +18,9 @@ namespace ProductDatabase {
 
         public string printSettingPath = string.Empty;
 
-        public ProductInformation ProductInfo { get; set; } = new ProductInformation();
+        private readonly ProductMaster _productMaster;
+        private readonly ProductRegisterWork _productRegisterWork;
+        private readonly AppSettings _appSettings;
 
         private int _serialLastNumber;
 
@@ -39,8 +42,11 @@ namespace ProductDatabase {
         private SqliteConnection? _sqliteConnection; // 編集モード用の接続
         private SqliteTransaction? _sqliteTransaction; // 編集モード用のトランザクション
 
-        public ProductRegistration2Window() {
+        public ProductRegistration2Window(ProductMaster productMaster, ProductRegisterWork productRegisterWork, AppSettings appSettings) {
             InitializeComponent();
+            _productMaster = productMaster;
+            _productRegisterWork = productRegisterWork;
+            _appSettings = appSettings;
         }
 
         private void LoadEvents() {
@@ -52,17 +58,17 @@ namespace ProductDatabase {
                 SetFont();
                 InitializeUIControls();
 
-                if (ProductInfo.IsSerialGeneration) {
+                if (_productMaster.IsSerialGeneration) {
                     SetSerialNumbers();
                 }
 
-                switch (ProductInfo.RegType) {
+                switch (_productMaster.RegType) {
                     case 2:
                     case 4:
                     case 3:
                     case 9:
-                        if (ProductInfo.RegType == 9) {
-                            using ServiceForm window = new(_productMaster, _productRegisterWork, _appSettings);
+                        if (_productMaster.RegType == 9) {
+                            using ServiceForm window = new(ServiceInfo);
                             if (window.ShowDialog(this) != DialogResult.OK) {
                                 Close();
                             }
@@ -96,7 +102,7 @@ namespace ProductDatabase {
             }
         }
         private void SetFont() {
-            Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
+            Font = new Font(_appSettings.FontName, _appSettings.FontSize);
         }
         private void InitializeUIControls() {
             GenerateReportButton.Enabled = false;
@@ -114,30 +120,28 @@ namespace ProductDatabase {
             }
         }
         private void SetSerialNumbers() {
-            _serialLastNumber = ProductInfo.SerialFirstNumber + ProductInfo.Quantity - 1;
+            _serialLastNumber = _productRegisterWork.SerialFirstNumber + _productRegisterWork.Quantity - 1;
         }
         private void LoadSubstrateData(SqliteConnection connection) {
             // サービス向け登録の場合は、サービス情報を使用する
-            var isServiceRegistration = ProductInfo.RegType == 9;
-            var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : ProductInfo.UseSubstrate)
+            var isServiceRegistration = _productMaster.RegType == 9;
+            var useSubstrates = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrates : _productMaster.UseSubstrates)
                 ?? throw new Exception("ArrUseSubstrateが nullです。");
 
             var shortageSubstrateName = string.Empty;
 
-            for (var i = 0; i < useSubstrate.Count; i++) {
+            for (var i = 0; i < useSubstrates.Count; i++) {
                 var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
                 var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
 
-                var selectedRows = ProductInfo.SubstrateDataTable.Select($"SubstrateModel = '{useSubstrate[i]}'");
-                var substrateName = string.Empty;
-                foreach (var row in selectedRows) {
-                    substrateName = row["SubstrateName"].ToString() ?? string.Empty;
-                }
+                var substrateID = useSubstrates[i].SubstrateID;
+                var substrateName = useSubstrates[i].SubstrateName;
+                var substrateModel = useSubstrates[i].SubstrateModel;
 
-                SetupCheckBox(objCbx, i, substrateName, useSubstrate);
+                SetupCheckBox(objCbx, substrateName, substrateModel);
                 SetupDataGridView(objDgv);
 
-                if (FetchAndDisplaySubstrateData(connection, objDgv, i)) {
+                if (FetchAndDisplaySubstrateData(connection, objDgv, substrateID, substrateModel)) {
                     shortageSubstrateName += $"[{substrateName}]{Environment.NewLine}";
                 }
             }
@@ -147,12 +151,12 @@ namespace ProductDatabase {
                 MessageBox.Show($"在庫が足りません。{Environment.NewLine}{shortageSubstrateName}", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
-        private static void SetupCheckBox(CheckBox? objCbx, int index, string substrateName, List<string> useSubstrate) {
+        private static void SetupCheckBox(CheckBox? objCbx, string substrateName, string substrateModel) {
             if (objCbx is not null) {
                 objCbx.Enabled = true;
                 objCbx.Checked = true;
                 var splitSubstrateName = substrateName.Split(':');
-                objCbx.Text = $"{splitSubstrateName.Last()} - {useSubstrate[index]}";
+                objCbx.Text = $"{splitSubstrateName.Last()} - {substrateModel}";
             }
         }
         private void SetupDataGridView(DataGridView? objDgv) {
@@ -188,15 +192,8 @@ namespace ProductDatabase {
                     break;
             }
         }
-        private bool FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, int index) {
-            // サービス向け登録の場合は、サービス情報を使用する
-            var isServiceRegistration = ProductInfo.RegType == 9;
-            var stockName = (isServiceRegistration ? ServiceInfo.ServiceStockName : ProductInfo.StockName)
-                ?? throw new Exception("StockNameが nullです。");
-            var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : ProductInfo.UseSubstrate)
-                ?? throw new Exception("ArrUseSubstrateが nullです。");
-
-            var intQuantity = ProductInfo.Quantity;
+        private bool FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, int substrateID, string substrateModel) {
+            var intQuantity = _productRegisterWork.Quantity;
 
             var commandText =
                 $"""
@@ -207,7 +204,7 @@ namespace ProductDatabase {
                 FROM
                     {Constants.VSubstrateTableName}
                 WHERE
-                    StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber NOTNULL
+                    SubstrateID = @SubstrateID AND SubstrateModel = @SubstrateModel AND SubstrateNumber NOTNULL
                 GROUP BY
                     SubstrateName, SubstrateModel, SubstrateNumber
                 HAVING
@@ -217,13 +214,11 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            using var dr = ExecuteReader(connection, commandText, ("@StockName", stockName), ("@SubstrateModel", useSubstrate[index]));
+            using var dr = ExecuteReader(connection, commandText, ("@SubstrateID", substrateID), ("@SubstrateModel", substrateModel));
 
             while (dr.Read()) {
                 var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
                 var intStock = Convert.ToInt32(dr["Stock"]);
-                var substrateName = useSubstrate[index];
-                substrateName = $"{dr["SubstrateName"]}";
 
                 objDgv?.Rows.Add(strSubstrateNumber, intStock);
 
@@ -250,30 +245,30 @@ namespace ProductDatabase {
 
         // 印刷UI設定
         private void ConfigurePrintSettings() {
-            SubstrateListPrintButton.Visible = ProductInfo.IsListPrint;
-            CheckSheetPrintButton.Visible = ProductInfo.IsCheckSheetPrint;
-            NameplatePrintButton.Visible = ProductInfo.IsNameplatePrint;
+            SubstrateListPrintButton.Visible = _productMaster.IsListPrint;
+            CheckSheetPrintButton.Visible = _productMaster.IsCheckSheetPrint;
+            NameplatePrintButton.Visible = _productMaster.IsNameplatePrint;
 
-            SerialPrintPositionLabel.Visible = ProductInfo.IsLabelPrint;
-            SerialPrintPositionNumericUpDown.Visible = ProductInfo.IsLabelPrint;
+            SerialPrintPositionLabel.Visible = _productMaster.IsLabelPrint;
+            SerialPrintPositionNumericUpDown.Visible = _productMaster.IsLabelPrint;
 
-            BarcodePrintPositionLabel.Visible = ProductInfo.IsBarcodePrint;
-            BarcodePrintPositionNumericUpDown.Visible = ProductInfo.IsBarcodePrint;
+            BarcodePrintPositionLabel.Visible = _productMaster.IsBarcodePrint;
+            BarcodePrintPositionNumericUpDown.Visible = _productMaster.IsBarcodePrint;
 
-            シリアルラベル印刷プレビューToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;
-            シリアルラベル印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsLabelPrint;
-            バーコード印刷プレビューToolStripMenuItem.Enabled = ProductInfo.IsBarcodePrint;
-            バーコード印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsBarcodePrint;
-            銘版印刷設定ToolStripMenuItem.Enabled = ProductInfo.IsNameplatePrint;
+            シリアルラベル印刷プレビューToolStripMenuItem.Enabled = _productMaster.IsLabelPrint;
+            シリアルラベル印刷設定ToolStripMenuItem.Enabled = _productMaster.IsLabelPrint;
+            バーコード印刷プレビューToolStripMenuItem.Enabled = _productMaster.IsBarcodePrint;
+            バーコード印刷設定ToolStripMenuItem.Enabled = _productMaster.IsBarcodePrint;
+            銘版印刷設定ToolStripMenuItem.Enabled = _productMaster.IsNameplatePrint;
 
-            if (ProductInfo.IsSerialGeneration) {
+            if (_productMaster.IsSerialGeneration) {
                 LoadSettings();
             }
         }
         private void LoadSettings() {
             try {
                 ProductPrintSettings = new DocumentPrintSettings();
-                printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", ProductInfo.CategoryName, ProductInfo.ProductName, $"PrintConfig_{ProductInfo.ProductName}_{ProductInfo.ProductModel}.json");
+                printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", _productMaster.CategoryName, _productMaster.ProductName, $"PrintConfig_{_productMaster.ProductName}_{_productMaster.ProductModel}.json");
                 if (!File.Exists(printSettingPath)) {
                     throw new DirectoryNotFoundException($"印刷用設定ファイルがありません。");
                 }
@@ -295,7 +290,7 @@ namespace ProductDatabase {
                 if (!NumberCheck(_sqliteConnection) || !QuantityCheck()) {
                     return;
                 }
-                if (ProductInfo.IsSerialGeneration) {
+                if (_productMaster.IsSerialGeneration) {
                     SerialCheck(_sqliteConnection);
                     GenerateSerialCodes();
                 }
@@ -304,7 +299,7 @@ namespace ProductDatabase {
 
                 Registration(_sqliteConnection, _sqliteTransaction);
 
-                LogRegistration(ProductInfo);
+                LogRegistration(_productMaster, _productRegisterWork);
                 BackupManager.CreateBackup();
 
                 // 登録チェック
@@ -328,16 +323,16 @@ namespace ProductDatabase {
             try {
                 InsertProduct(connection);
 
-                if (ProductInfo.RegType == 9) {
+                if (_productMaster.RegType == 9) {
                     using var command = new SqliteCommand("SELECT last_insert_rowid();", connection);
                     _lastInsertRowid = ExecuteScalar(connection, $"SELECT last_insert_rowid();").ToString() ?? string.Empty;
                 }
 
-                switch (ProductInfo.RegType) {
+                switch (_productMaster.RegType) {
                     case 0:
                         break;
                     case 1:
-                        if (ProductInfo.IsSerialGeneration) {
+                        if (_productMaster.IsSerialGeneration) {
                             InsertSerial(connection);
                         }
                         break;
@@ -345,7 +340,7 @@ namespace ProductDatabase {
                     case 3:
                     case 4:
                     case 9:
-                        if (ProductInfo.IsSerialGeneration) {
+                        if (_productMaster.IsSerialGeneration) {
                             InsertSerial(connection);
                         }
                         RegisterSubstrate(connection);
@@ -379,27 +374,27 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            var comment = ProductInfo.RegType switch {
-                9 => $"製品型式[{ServiceInfo.ServiceProductModel}]\n{ProductInfo.Comment}",
-                _ => ProductInfo.Comment,
+            var comment = _productMaster.RegType switch {
+                9 => $"製品型式[{ServiceInfo.ServiceProductModel}]\n{_productRegisterWork.Comment}",
+                _ => _productRegisterWork.Comment,
             };
 
             ExecuteNonQuery(connection, commandText,
-                ("@ProductID", ProductInfo.ProductID),
-                ("@OrderNumber", ProductInfo.OrderNumber),
-                ("@ProductNumber", ProductInfo.ProductNumber),
-                ("@Quantity", ProductInfo.Quantity),
-                ("@Person", ProductInfo.Person),
-                ("@RegDate", ProductInfo.RegDate),
-                ("@Revision", ProductInfo.Revision),
-                ("@RevisionGroup", ProductInfo.RevisionGroup),
-                ("@SerialFirst", ProductInfo.SerialFirst),
-                ("@SerialLast", ProductInfo.SerialLast),
-                ("@SerialLastNumber", ProductInfo.IsSerialGeneration ? _serialLastNumber : DBNull.Value),
+                ("@ProductID", _productMaster.ProductID),
+                ("@OrderNumber", _productRegisterWork.OrderNumber),
+                ("@ProductNumber", _productRegisterWork.ProductNumber),
+                ("@Quantity", _productRegisterWork.Quantity),
+                ("@Person", _productRegisterWork.Person),
+                ("@RegDate", _productRegisterWork.RegDate),
+                ("@Revision", _productRegisterWork.Revision),
+                ("@RevisionGroup", _productMaster.RevisionGroup),
+                ("@SerialFirst", _productRegisterWork.SerialFirst),
+                ("@SerialLast", _productRegisterWork.SerialLast),
+                ("@SerialLastNumber", _productMaster.IsSerialGeneration ? _serialLastNumber : DBNull.Value),
                 ("@Comment", comment)
                 );
 
-            ProductInfo.ID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {Constants.VProductTableName};"));
+            _productRegisterWork.RowID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {Constants.VProductTableName};"));
         }
         private void InsertSerial(SqliteConnection connection) {
             var serialTableName = $"[T_Serial]";
@@ -417,21 +412,19 @@ namespace ProductDatabase {
             foreach (var serial in _serialList) {
                 ExecuteNonQuery(connection, commandText,
                     ("@Serial", serial),
-                    ("@productRowId", ProductInfo.ID),
-                    ("@ProductName", ProductInfo.ProductName)
+                    ("@productRowId", _productRegisterWork.RowID),
+                    ("@ProductName", _productMaster.ProductName)
                 );
             }
         }
         private void RegisterSubstrate(SqliteConnection connection) {
             // サービス向け登録の場合は、サービス情報を使用する
-            var isServiceRegistration = ProductInfo.RegType == 9;
-            var stockName = (isServiceRegistration ? ServiceInfo.ServiceStockName : ProductInfo.StockName)
-                ?? throw new Exception("StockNameが nullです。");
-            var useSubstrate = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrate : ProductInfo.UseSubstrate)
+            var isServiceRegistration = _productMaster.RegType == 9;
+            var useSubstrates = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrates : _productMaster.UseSubstrates)
                 ?? throw new Exception("ArrUseSubstrateが nullです。");
-            int? useID = isServiceRegistration ? null : ProductInfo.ID;
+            long? useID = isServiceRegistration ? null : _productRegisterWork.RowID;
 
-            for (var i = 0; i < useSubstrate.Count; i++) {
+            for (var i = 0; i < useSubstrates.Count; i++) {
                 if (!(MainPanel.Controls[_checkBoxNames[i]] as CheckBox)?.Checked ?? true) {
                     continue;
                 }
@@ -440,6 +433,9 @@ namespace ProductDatabase {
                     throw new Exception("DataGridViewが nullです。");
                 }
 
+                var substrateID = useSubstrates[i].SubstrateID;
+                var substrateModel = useSubstrates[i].SubstrateModel;
+
                 foreach (DataGridViewRow row in objDgv.Rows) {
                     if (row.Cells[3].Value is not bool isChecked || !isChecked) {
                         continue;
@@ -447,12 +443,12 @@ namespace ProductDatabase {
 
                     var substrateNumber = row.Cells[0].Value.ToString() ?? string.Empty;
                     var useValue = Convert.ToInt32(row.Cells[2].Value);
-                    var (substrateID, orderNumber) = GetSubstrateInfo(connection, i, stockName, substrateNumber, useSubstrate);
+                    var orderNumber = GetSubstrateInfo(connection, substrateID, substrateNumber, substrateModel);
                     InsertSubstrate(connection, substrateID, substrateNumber, orderNumber, useValue, useID);
                 }
             }
         }
-        private static (string substrateID, string orderNumber) GetSubstrateInfo(SqliteConnection connection, int index, string stockName, string substrateNumber, List<string> useSubstrate) {
+        private static string GetSubstrateInfo(SqliteConnection connection, int substrateID, string substrateNumber, string substrateModel) {
             var commandText =
                 $"""
                 SELECT
@@ -460,7 +456,7 @@ namespace ProductDatabase {
                 FROM
                     {Constants.VSubstrateTableName}
                 WHERE
-                    StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                    SubstrateID = @SubstrateID AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                 GROUP BY
                     OrderNumber
                 ORDER
@@ -469,16 +465,16 @@ namespace ProductDatabase {
                 """;
 
             using var dr = ExecuteReader(connection, commandText,
-                ("@StockName", stockName),
-                ("@SubstrateModel", useSubstrate[index]),
+                ("@SubstrateID", substrateID),
+                ("@SubstrateModel", substrateModel),
                 ("@SubstrateNumber", substrateNumber)
             );
 
             return dr.Read()
-                ? ($"{dr["SubstrateID"]}", $"{dr["OrderNumber"]}")
-                : (string.Empty, string.Empty);
+                ? $"{dr["OrderNumber"]}"
+                : string.Empty;
         }
-        private void InsertSubstrate(SqliteConnection connection, string substrateID, string substrateNumber, string orderNumber, int useValue, int? useID) {
+        private void InsertSubstrate(SqliteConnection connection, int substrateID, string substrateNumber, string orderNumber, long useValue, long? useID) {
             var commandText =
                 $"""
                 INSERT INTO {Constants.TSubstrateTableName} (
@@ -492,17 +488,17 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            var comment = ProductInfo.RegType switch {
-                9 => $"サービスID[{_lastInsertRowid}]\n{ProductInfo.Comment}",
-                _ => ProductInfo.Comment,
+            var comment = _productMaster.RegType switch {
+                9 => $"サービスID[{_lastInsertRowid}]\n{_productRegisterWork.Comment}",
+                _ => _productRegisterWork.Comment,
             };
             ExecuteNonQuery(connection, commandText,
                 ("@SubstrateID", substrateID),
                 ("@SubstrateNumber", substrateNumber),
                 ("@OrderNumber", orderNumber),
                 ("@Decrease", 0 - useValue),
-                ("@Person", ProductInfo.Person),
-                ("@RegDate", ProductInfo.RegDate),
+                ("@Person", _productRegisterWork.Person),
+                ("@RegDate", _productRegisterWork.RegDate),
                 ("@Comment", comment),
                 ("@UseID", useID)
                 );
@@ -543,7 +539,7 @@ namespace ProductDatabase {
 
             var commandText = $@"SELECT * FROM {Constants.VProductTableName} WHERE Id = @Id;";
 
-            using var dr = ExecuteReader(connection, commandText, ("@Id", ProductInfo.ID));
+            using var dr = ExecuteReader(connection, commandText, ("@Id", _productRegisterWork.RowID));
 
             if (dr.HasRows && dr.Read()) {
                 // 1行のデータが存在する場合の処理
@@ -561,23 +557,23 @@ namespace ProductDatabase {
             }
         }
         // ログ出力
-        private static void LogRegistration(ProductInformation productInfo) {
+        private static void LogRegistration(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
             string[] logMessageArray = [
                 $"[製品登録]",
-                $"[{productInfo.CategoryName}]",
-                $"ID[{productInfo.ID}]",
-                $"注文番号[{productInfo.OrderNumber}]",
-                $"製造番号[{productInfo.ProductNumber}]",
-                $"製品名[{productInfo.ProductName}]",
-                $"タイプ[{productInfo.ProductType}]",
-                $"型式[{productInfo.ProductModel}]",
-                $"数量[{productInfo.Quantity}]",
-                $"シリアル先頭[{productInfo.SerialFirst}]",
-                $"シリアル末尾[{productInfo.SerialLast}]",
-                $"Revision[{productInfo.Revision}]",
-                $"登録日[{productInfo.RegDate}]",
-                $"担当者[{productInfo.Person}]",
-                $"コメント[{productInfo.Comment}]"
+                $"[{productMaster.CategoryName}]",
+                $"ID[{productRegisterWork.RowID}]",
+                $"注文番号[{productRegisterWork.OrderNumber}]",
+                $"製造番号[{productRegisterWork.ProductNumber}]",
+                $"製品名[{productMaster.ProductName}]",
+                $"タイプ[{productMaster.ProductType}]",
+                $"型式[{productMaster.ProductModel}]",
+                $"数量[{productRegisterWork.Quantity}]",
+                $"シリアル先頭[{productRegisterWork.SerialFirst}]",
+                $"シリアル末尾[{productRegisterWork.SerialLast}]",
+                $"Revision[{productRegisterWork.Revision}]",
+                $"登録日[{productRegisterWork.RegDate}]",
+                $"担当者[{productRegisterWork.Person}]",
+                $"コメント[{productRegisterWork.Comment}]"
             ];
             CommonUtils.Logger.AppendLog(logMessageArray);
         }
@@ -585,7 +581,7 @@ namespace ProductDatabase {
         private bool NumberCheck(SqliteConnection connection) {
             var productModel = string.Empty;
 
-            if (!string.IsNullOrEmpty(ProductInfo.ProductNumber)) {
+            if (!string.IsNullOrEmpty(_productRegisterWork.ProductNumber)) {
                 // 製番が新規かチェック
                 var commandText =
                     $"""
@@ -601,24 +597,24 @@ namespace ProductDatabase {
 
 
                 using var dr = ExecuteReader(connection, commandText,
-                    ("@ProductName", ProductInfo.ProductName),
-                    ("@ProductNumber", ProductInfo.ProductNumber)
+                    ("@ProductName", _productMaster.ProductName),
+                    ("@ProductNumber", _productRegisterWork.ProductNumber)
                     );
                 while (dr.Read()) {
                     productModel = $"{dr["ProductModel"]}";
                 }
 
                 if (productModel != string.Empty) {
-                    if (productModel == ProductInfo.ProductModel) {
+                    if (productModel == _productMaster.ProductModel) {
                         Activate();
-                        var result = MessageBox.Show($"製番[{ProductInfo.ProductNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
+                        var result = MessageBox.Show($"製番[{_productRegisterWork.ProductNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
                         if (result == DialogResult.No) {
                             return false;
                         }
                     }
                     else {
                         Activate();
-                        MessageBox.Show($"[{ProductInfo.ProductNumber}]は[{productModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"[{_productRegisterWork.ProductNumber}]は[{productModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return false;
                     }
                 }
@@ -626,7 +622,7 @@ namespace ProductDatabase {
 
             productModel = string.Empty;
 
-            if (!string.IsNullOrEmpty(ProductInfo.OrderNumber)) {
+            if (!string.IsNullOrEmpty(_productRegisterWork.OrderNumber)) {
                 // 注文番号が新規かチェック
                 var commandText =
                     $"""
@@ -642,24 +638,24 @@ namespace ProductDatabase {
                     """;
 
                 using var dr = ExecuteReader(connection, commandText,
-                    ("@ProductName", ProductInfo.ProductName),
-                    ("@OrderNumber", ProductInfo.OrderNumber)
+                    ("@ProductName", _productMaster.ProductName),
+                    ("@OrderNumber", _productRegisterWork.OrderNumber)
                     );
                 while (dr.Read()) {
                     productModel = $"{dr["ProductModel"]}";
                 }
 
                 if (productModel != string.Empty) {
-                    if (productModel == ProductInfo.ProductModel) {
+                    if (productModel == _productMaster.ProductModel) {
                         Activate();
-                        var result = MessageBox.Show($"注文番号[{ProductInfo.OrderNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
+                        var result = MessageBox.Show($"注文番号[{_productRegisterWork.OrderNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
                         if (result == DialogResult.No) {
                             return false;
                         }
                     }
                     else {
                         Activate();
-                        var result = MessageBox.Show($"[{ProductInfo.OrderNumber}]は[{productModel}]として登録があります。登録しますか？", "", MessageBoxButtons.YesNo);
+                        var result = MessageBox.Show($"[{_productRegisterWork.OrderNumber}]は[{productModel}]として登録があります。登録しますか？", "", MessageBoxButtons.YesNo);
                         if (result == DialogResult.No) {
                             return false;
                         }
@@ -671,7 +667,7 @@ namespace ProductDatabase {
         }
         private bool QuantityCheck() {
             try {
-                switch (ProductInfo.RegType) {
+                switch (_productMaster.RegType) {
                     case 0:
                     case 1:
                         break;
@@ -679,10 +675,10 @@ namespace ProductDatabase {
                     case 3:
                     case 4:
                     case 9:
-                        if (ProductInfo.UseSubstrate is null) {
-                            throw new Exception("ArrUseSubstrateが空です");
+                        if (_productMaster.UseSubstrates is null) {
+                            throw new Exception("UseSubstrateが空です");
                         }
-                        for (var i = 0; i <= ProductInfo.UseSubstrate.Count - 1; i++) {
+                        for (var i = 0; i <= _productMaster.UseSubstrates.Count - 1; i++) {
 
                             var objCbx = MainPanel.Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxが nullです。");
 
@@ -691,7 +687,7 @@ namespace ProductDatabase {
                             objDgv.Columns[3].ReadOnly = false;
 
                             if (objCbx.Checked) {
-                                var intQuantityCheck = ProductInfo.Quantity;
+                                var intQuantityCheck = _productRegisterWork.Quantity;
                                 var dgvRowCnt = objDgv.Rows.Count;
 
                                 for (var j = 0; j < dgvRowCnt; j++) {
@@ -730,10 +726,10 @@ namespace ProductDatabase {
         }
         private void SerialCheck(SqliteConnection connection, bool print = true) {
 
-            _serialType = ProductInfo.IsBarcodePrint ? "Barcode" : "Label";
+            _serialType = _productMaster.IsBarcodePrint ? "Barcode" : "Label";
 
-            for (var i = 0; i < ProductInfo.Quantity; i++) {
-                _serialList.Add(GenerateCode(ProductInfo.SerialFirstNumber + i));
+            for (var i = 0; i < _productRegisterWork.Quantity; i++) {
+                _serialList.Add(GenerateCode(_productRegisterWork.SerialFirstNumber + i));
             }
 
             if (!print) {
@@ -767,7 +763,7 @@ namespace ProductDatabase {
                     s.Serial IN ({string.Join(",", _serialList.Select((_, i) => $"@Serial{i}"))})
                 ;
                 """;
-            cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = ProductInfo.ProductName;
+            cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = _productMaster.ProductName;
             _serialList
                 .Select((serial, i) => new { ParamName = $"@Serial{i}", Value = serial.Trim() })
                 .ToList()
@@ -784,7 +780,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleLabelPrinting() {
-            if (ProductInfo.IsLabelPrint) {
+            if (_productMaster.IsLabelPrint) {
                 MessageBox.Show("シリアルラベルを印刷します。");
                 _serialType = "Label";
 
@@ -794,7 +790,7 @@ namespace ProductDatabase {
             }
         }
         private void HandleBarcodePrinting() {
-            if (ProductInfo.IsBarcodePrint) {
+            if (_productMaster.IsBarcodePrint) {
                 MessageBox.Show("バーコードラベルを印刷します。");
                 _serialType = "Barcode";
 
@@ -809,9 +805,9 @@ namespace ProductDatabase {
             BarcodePrintPositionNumericUpDown.Enabled = false;
         }
         private void GenerateSerialCodes() {
-            _serialType = ProductInfo.IsBarcodePrint ? "Barcode" : "Label";
-            ProductInfo.SerialFirst = GenerateCode(ProductInfo.SerialFirstNumber);
-            ProductInfo.SerialLast = GenerateCode(_serialLastNumber);
+            _serialType = _productMaster.IsBarcodePrint ? "Barcode" : "Label";
+            _productRegisterWork.SerialFirst = GenerateCode(_productRegisterWork.SerialFirstNumber);
+            _productRegisterWork.SerialLast = GenerateCode(_serialLastNumber);
         }
         private void HandlePostRegistration() {
             foreach (Control control in MainPanel.Controls) {
@@ -824,9 +820,9 @@ namespace ProductDatabase {
                         break;
                 }
             }
-            SubstrateListPrintButton.Enabled = ProductInfo.IsListPrint;
-            CheckSheetPrintButton.Enabled = ProductInfo.IsCheckSheetPrint;
-            NameplatePrintButton.Enabled = ProductInfo.IsNameplatePrint;
+            SubstrateListPrintButton.Enabled = _productMaster.IsListPrint;
+            CheckSheetPrintButton.Enabled = _productMaster.IsCheckSheetPrint;
+            NameplatePrintButton.Enabled = _productMaster.IsNameplatePrint;
         }
 
         // サービス向け用処理
@@ -835,10 +831,9 @@ namespace ProductDatabase {
             public long ServiceProductID { get; set; }
             public string ServiceCategoryName { get; set; } = string.Empty;
             public string ServiceProductName { get; set; } = string.Empty;
-            public string ServiceStockName { get; set; } = string.Empty;
             public string ServiceProductType { get; set; } = string.Empty;
             public string ServiceProductModel { get; set; } = string.Empty;
-            public List<string> ServiceUseSubstrate { get; set; } = [];
+            public List<SubstrateInfo> ServiceUseSubstrates { get; set; } = [];
         }
         public ServiceInformation ServiceInfo { get; set; } = new();
 
@@ -857,7 +852,7 @@ namespace ProductDatabase {
                 };
 
                 pd.BeginPrint += (sender, e) => {
-                    PrintManager.Initialize(ProductInfo, ProductPrintSettings, _serialList);
+                    PrintManager.ProductInitialize(_productMaster, _productRegisterWork, ProductPrintSettings, _serialList);
                 };
                 pd.PrintPage += (sender, e) => {
                     var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, serialType);
@@ -912,7 +907,7 @@ namespace ProductDatabase {
             }
         }
         private string GenerateCode(int serialCode) {
-            var monthCode = DateTime.Parse(ProductInfo.RegDate).ToString("MM");
+            var monthCode = DateTime.Parse(_productRegisterWork.RegDate).ToString("MM");
 
             monthCode = monthCode switch {
                 "10" => "X",
@@ -928,15 +923,15 @@ namespace ProductDatabase {
                 _ => string.Empty
             };
 
-            var regDate = DateTime.Parse(ProductInfo.RegDate);
+            var regDate = DateTime.Parse(_productRegisterWork.RegDate);
 
             var map = new Dictionary<string, string> {
-                ["{T}"] = ProductInfo.Initial,
+                ["{T}"] = _productMaster.Initial,
                 ["{Y}"] = regDate.ToString("yy"),
                 ["{MM}"] = regDate.ToString("MM"),
-                ["{R}"] = ProductInfo.Revision,
+                ["{R}"] = _productRegisterWork.Revision,
                 ["{M}"] = monthCode[^1..],
-                ["{S}"] = Convert.ToInt32(serialCode).ToString($"D{ProductInfo.SerialDigit}")
+                ["{S}"] = Convert.ToInt32(serialCode).ToString($"D{_productMaster.SerialDigit}")
             };
 
             foreach (var kv in map) {
@@ -1004,7 +999,7 @@ namespace ProductDatabase {
             dataGridView.Visible = checkBox.Checked;
             checkBox.ForeColor = checkBox.Checked ? Color.Black : Color.Red;
 
-            if (!checkBox.Checked && !ProductInfo.IsRegType9) {
+            if (!checkBox.Checked && !_productMaster.IsRegType9) {
                 MessageBox.Show("チェックがない場合在庫から引き落とされなくなります。", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
@@ -1014,7 +1009,7 @@ namespace ProductDatabase {
                 // --- 処理中カーソルに変更 ---
                 Cursor.Current = Cursors.WaitCursor;
 
-                ExcelServiceClosedXml.ReportGeneratorClosedXml.GenerateReport(ProductInfo);
+                ExcelServiceClosedXml.ReportGeneratorClosedXml.GenerateReport(_productMaster, _productRegisterWork);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
@@ -1028,7 +1023,7 @@ namespace ProductDatabase {
                 // --- 処理中カーソルに変更 ---
                 Cursor.Current = Cursors.WaitCursor;
 
-                ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(ProductInfo);
+                ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(_productMaster, _productRegisterWork);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
@@ -1042,7 +1037,7 @@ namespace ProductDatabase {
                 // --- 処理中カーソルに変更 ---
                 Cursor.Current = Cursors.WaitCursor;
 
-                ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.GenerateCheckSheet(ProductInfo);
+                ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.GenerateCheckSheet(_productMaster, _productRegisterWork);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -1054,23 +1049,23 @@ namespace ProductDatabase {
         private void ShowInfo() {
             var items = new Dictionary<string, string>
                 {
-                    {"ProductName", $"{ProductInfo.ProductName}"},
-                    {"ProductModel", $"{ProductInfo.ProductModel}"},
-                    {"StockName", $"{ProductInfo.StockName}"},
-                    {"ProductType", $"{ProductInfo.ProductType}"},
-                    {"OrderNumber", $"{ProductInfo.OrderNumber}"},
-                    {"ProductNumber", $"{ProductInfo.ProductNumber}"},
-                    {"Revision", $"{ProductInfo.Revision}"},
-                    {"RegDate", $"{ProductInfo.RegDate}"},
-                    {"Person", $"{ProductInfo.Person}"},
-                    {"Quantity", $"{ProductInfo.Quantity}"},
-                    {"SerialFirstNumber", $"{ProductInfo.SerialFirstNumber}"},
+                    {"ProductID", $"{_productMaster.ProductID}"},
+                    {"ProductName", $"{_productMaster.ProductName}"},
+                    {"ProductModel", $"{_productMaster.ProductModel}"},
+                    {"ProductType", $"{_productMaster.ProductType}"},
+                    {"OrderNumber", $"{_productRegisterWork.OrderNumber}"},
+                    {"ProductNumber", $"{_productRegisterWork.ProductNumber}"},
+                    {"Revision", $"{_productRegisterWork.Revision}"},
+                    {"RegDate", $"{_productRegisterWork.RegDate}"},
+                    {"Person", $"{_productRegisterWork.Person}"},
+                    {"Quantity", $"{_productRegisterWork.Quantity}"},
+                    {"SerialFirstNumber", $"{_productRegisterWork.SerialFirstNumber}"},
                     {"SerialLastNumber", $"{_serialLastNumber}"},
-                    {"Initial", $"{ProductInfo.Initial}"},
-                    {"RegType", $"{ProductInfo.RegType}"},
-                    {"SerialPrintType", $"{ProductInfo.SerialPrintType}"},
-                    {"SheetPrintType", $"{ProductInfo.SheetPrintType}"},
-                    {"SerialDigit", $"{ProductInfo.SerialDigit}"}
+                    {"Initial", $"{_productMaster.Initial}"},
+                    {"RegType", $"{_productMaster.RegType}"},
+                    {"SerialPrintType", $"{_productMaster.SerialPrintType}"},
+                    {"SheetPrintType", $"{_productMaster.SheetPrintType}"},
+                    {"SerialDigit", $"{_productMaster.SerialDigit}"}
                 };
 
             var form = new Form {
@@ -1091,7 +1086,7 @@ namespace ProductDatabase {
                 View = View.Details,
                 FullRowSelect = true,
                 GridLines = true,
-                Font = new Font("PlemolJP", ProductInfo.FontSize),
+                Font = new Font("PlemolJP", _appSettings.FontSize),
             };
 
             // 列の追加
@@ -1145,7 +1140,7 @@ namespace ProductDatabase {
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             PrintSettingsWindow ls = new() {
-                ProductInfo = ProductInfo,
+                ProductMaster = _productMaster,
                 serialType = "Label"
             };
             ls.ShowDialog(this);
@@ -1153,7 +1148,7 @@ namespace ProductDatabase {
         }
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             PrintSettingsWindow ls = new() {
-                ProductInfo = ProductInfo,
+                ProductMaster = _productMaster,
                 serialType = "Barcode"
             };
             ls.ShowDialog(this);
@@ -1161,7 +1156,7 @@ namespace ProductDatabase {
         }
         private void 銘版印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             PrintSettingsWindow ls = new() {
-                ProductInfo = ProductInfo,
+                ProductMaster = _productMaster,
                 serialType = "Nameplate"
             };
             ls.ShowDialog(this);

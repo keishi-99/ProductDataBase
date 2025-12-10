@@ -6,13 +6,12 @@ using static ProductDatabase.ProductRegistration2Window;
 namespace ProductDatabase.Other {
     public partial class ServiceForm : Form {
 
-        public ProductInformation ProductInfo { get; }
         public ServiceInformation ServiceInfo { get; }
 
-        public ServiceForm(ProductInformation productInfo, ServiceInformation serviceInfo) {
+        public ServiceForm(ServiceInformation serviceInfo) {
             InitializeComponent();
+
             ServiceInfo = serviceInfo;
-            ProductInfo = productInfo;
         }
 
         private void LoadEvents() {
@@ -93,10 +92,9 @@ namespace ProductDatabase.Other {
                 ServiceInfo.ServiceProductID = Convert.ToInt64(selectedRows[0]["ProductID"]);
                 ServiceInfo.ServiceCategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
                 ServiceInfo.ServiceProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
-                ServiceInfo.ServiceStockName = selectedRows[0]["StockName"].ToString() ?? string.Empty;
                 ServiceInfo.ServiceProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
                 ServiceInfo.ServiceProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
-                ServiceInfo.ServiceUseSubstrate = GetUseSubstrate(ServiceInfo.ServiceProductID);
+                ServiceInfo.ServiceUseSubstrates = GetUseSubstrate(ServiceInfo.ServiceProductID);
                 DialogResult = DialogResult.OK;
             }
             else { DialogResult = DialogResult.Cancel; }
@@ -104,24 +102,25 @@ namespace ProductDatabase.Other {
             Close();
             return DialogResult.OK;
         }
-        private List<string> GetUseSubstrate(long productId) {
-            // 使用基板リスト化+名前順にソート
-            var useSubstrate = new List<string>();
+        private static List<SubstrateInfo> GetUseSubstrate(long productId) {
 
-            var useSubstrateRows = ProductInfo.ProductUseSubstrate.Select($"ProductID = '{productId}'");
+            var productUseSubstrate = new DataTable();
 
-            foreach (var row in useSubstrateRows) {
-                var substrateId = row["SubstrateID"];
+            using var con = new SqliteConnection(GetConnectionRegistration());
+            con.Open();
 
-                var substrateRows = ProductInfo.SubstrateDataTable
-                    .Select($"SubstrateID = {substrateId}");
-
-                if (substrateRows.Length > 0) {
-                    useSubstrate.Add(substrateRows[0]["SubstrateModel"].ToString() ?? string.Empty);
-                }
+            using (var cmd = new SqliteCommand("SELECT * FROM V_ProductUseSubstrate;", con))
+            using (var reader = cmd.ExecuteReader()) {
+                productUseSubstrate.Load(reader);
             }
-            useSubstrate.Sort();
-            return useSubstrate;
+
+            return [.. productUseSubstrate.AsEnumerable()
+                    .Where(r => Convert.ToInt32(r["PKey"]) == productId)
+                    .Select(r => new SubstrateInfo {
+                        SubstrateID = Convert.ToInt32(r["SKey"]),
+                        SubstrateName = r["SubstrateName"]?.ToString() ?? "",
+                        SubstrateModel = r["SubstrateModel"]?.ToString() ?? ""
+                    })];
         }
 
         private void ServiceForm_Load(object sender, EventArgs e) { LoadEvents(); }

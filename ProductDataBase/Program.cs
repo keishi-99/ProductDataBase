@@ -24,6 +24,18 @@ namespace ProductDatabase {
             // アプリケーションを実行
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            // UIスレッド例外
+            Application.ThreadException += (s, e) => {
+                MessageBox.Show(e.Exception.ToString(), "UI例外");
+            };
+
+            // 非UIスレッド例外
+            AppDomain.CurrentDomain.UnhandledException += (s, e) => {
+                if (e.ExceptionObject is Exception ex)
+                    MessageBox.Show(ex.ToString(), "非UI例外");
+            };
+
             Application.Run(new MainWindow());
 
             // アプリケーション終了時にミューテックスを解放

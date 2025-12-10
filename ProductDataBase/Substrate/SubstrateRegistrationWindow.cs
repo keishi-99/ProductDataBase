@@ -8,7 +8,9 @@ using static ProductDatabase.Print.PrintOptions;
 namespace ProductDatabase {
     public partial class SubstrateRegistrationWindow : Form {
 
-        public ProductInformation ProductInfo { get; }
+        private readonly SubstrateMaster _substrateMaster;
+        private readonly SubstrateRegisterWork _substrateRegisterWork;
+        private readonly AppSettings _appSettings;
 
         public DocumentPrintSettings SubstratePrintSettings { get; set; } = new DocumentPrintSettings();
         public LabelPrintSettings LabelPrintSettings => SubstratePrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
@@ -22,29 +24,32 @@ namespace ProductDatabase {
         ];
 
         // プロパティ設定
-        private bool IsLabelPrint => ProductInfo.SerialPrintType is 1;
-        private bool IsRegistration => ProductInfo.RegType is 0 or 1;
+        private bool IsRegistration => _substrateMaster.RegType is 0 or 1;
+        private bool IsLabelPrint => _substrateMaster.SerialPrintType is 1;
 
-        public SubstrateRegistrationWindow(ProductInformation productInfo) {
+        public SubstrateRegistrationWindow(SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork, AppSettings appSettings) {
             InitializeComponent();
-            ProductInfo = productInfo;
+
+            _substrateMaster = substrateMaster;
+            _substrateRegisterWork = substrateRegisterWork;
+            _appSettings = appSettings;
         }
 
         // ロードイベント
         private void LoadEvents() {
             try {
-                Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
+                Font = new Font(_appSettings.FontName, _appSettings.FontSize);
 
-                ProductNameLabel2.Text = ProductInfo.ProductName;
+                ProductNameLabel2.Text = _substrateMaster.ProductName;
 
-                SubstrateModelLabel2.Text = $"{ProductInfo.SubstrateName} - {ProductInfo.SubstrateModel}";
+                SubstrateModelLabel2.Text = $"{_substrateMaster.SubstrateName} - {_substrateMaster.SubstrateModel}";
 
                 var stockQuantity = GetStockQuantity();
                 StockLabel2.Text = stockQuantity;
 
-                OrderNumberTextBox.Text = ProductInfo.Proness5;
-                ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(ProductInfo.Proness1) ? ProductInfo.Proness1 : ManufacturingNumberMaskedTextBox.Text;
-                QuantityTextBox.Text = (ProductInfo.Proness4 != 0) ? ProductInfo.Proness4.ToString() : string.Empty;
+                OrderNumberTextBox.Text = _substrateRegisterWork.OrderNumber;
+                ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(_substrateRegisterWork.ProductNumber) ? _substrateRegisterWork.ProductNumber : ManufacturingNumberMaskedTextBox.Text;
+                QuantityTextBox.Text = (_substrateRegisterWork.AddQuantity != 0) ? _substrateRegisterWork.AddQuantity.ToString() : string.Empty;
 
                 RegisterButton.Enabled = true;
 
@@ -54,12 +59,12 @@ namespace ProductDatabase {
                 for (var i = 0; i < _checkBoxNames.Count; i++) {
                     if (Controls[_checkBoxNames[i]] is CheckBox checkBox) {
                         // i番目のビットが1かどうかをチェック
-                        checkBox.Checked = (ProductInfo.CheckBin & (1 << i)) != 0;
+                        checkBox.Checked = (_substrateMaster.CheckBin & (1 << i)) != 0;
                     }
                 }
 
                 // ComboBoxへ担当者を追加
-                PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
+                PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
 
                 // 印刷しない場合は関連コントロール非表示に
                 if (IsLabelPrint == false) {
@@ -129,13 +134,13 @@ namespace ProductDatabase {
 
             using var transaction = con.BeginTransaction();
             try {
-                var orderNumber = ProductInfo.OrderNumber;
-                var substrateNumber = ProductInfo.ProductNumber;
-                var quantity = ProductInfo.Quantity;
+                var orderNumber = _substrateRegisterWork.OrderNumber;
+                var substrateNumber = _substrateRegisterWork.ProductNumber;
+                var quantity = _substrateRegisterWork.AddQuantity;
                 var defectQuantity = string.IsNullOrWhiteSpace(DefectQuantityTextBox.Text) ? 0 : Convert.ToInt32(DefectQuantityTextBox.Text);
-                var registrationDate = ProductInfo.RegDate;
-                var person = ProductInfo.Person;
-                var comment = ProductInfo.Comment;
+                var registrationDate = _substrateRegisterWork.RegDate;
+                var person = _substrateRegisterWork.Person;
+                var comment = _substrateRegisterWork.Comment;
                 var rowId = string.Empty;
                 var commandText = string.Empty;
 
@@ -145,21 +150,21 @@ namespace ProductDatabase {
                     commandText =
                         $"""
                         SELECT
-                            StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                            SubstrateID,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                         FROM
                             {Constants.VSubstrateTableName}
                         WHERE
-                            StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                            SubstrateID = @SubstrateID AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                         GROUP BY
-                            StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                            SubstrateID, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                         ORDER BY
                             MIN(ID)
                         LIMIT 1
                         ;
                         """;
                     using var dr = ExecuteReader(con, commandText,
-                        ("@StockName", ProductInfo.StockName),
-                        ("@SubstrateModel", ProductInfo.SubstrateModel),
+                        ("@SubstrateID", _substrateMaster.SubstrateID),
+                        ("@SubstrateModel", _substrateMaster.SubstrateModel),
                         ("@SubstrateNumber", substrateNumber)
                     );
                     while (dr.Read()) {
@@ -167,7 +172,7 @@ namespace ProductDatabase {
                     }
 
                     if (substrateName != string.Empty) {
-                        if (ProductInfo.SubstrateName == substrateName) {
+                        if (_substrateMaster.SubstrateName == substrateName) {
                             if (QuantityCheckBox.Checked && !DefectQuantityCheckBox.Checked) {
                                 var result = MessageBox.Show($"[{substrateNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
                                 if (result == DialogResult.No) { return false; }
@@ -181,21 +186,21 @@ namespace ProductDatabase {
                     commandText =
                         $"""
                         SELECT
-                            StockName,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                            SubstrateID,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                         FROM
                             {Constants.VSubstrateTableName}
                         WHERE
-                            StockName = @StockName AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                            SubstrateID = @SubstrateID AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                         GROUP BY
-                            StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                            StockNSubstrateIDame, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                         ORDER BY
                             MIN(ID)
                         LIMIT 1
                         ;
                         """;
                     using var dr = ExecuteReader(con, commandText,
-                        ("@StockName", ProductInfo.StockName),
-                        ("@SubstrateModel", ProductInfo.SubstrateModel),
+                        ("@SubstrateID", _substrateMaster.SubstrateID),
+                        ("@SubstrateModel", _substrateMaster.SubstrateModel),
                         ("@SubstrateNumber", substrateNumber)
                     );
                     if (dr.Read()) {
@@ -221,7 +226,7 @@ namespace ProductDatabase {
                     ;
                     """;
                 ExecuteNonQuery(con, commandText,
-                    ("@SubstrateID", ProductInfo.SubstrateID),
+                    ("@SubstrateID", _substrateMaster.SubstrateID),
                     ("@SubstrateNumber", string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber),
                     ("@OrderNumber", string.IsNullOrWhiteSpace(orderNumber) ? DBNull.Value : orderNumber),
                     ("@Increase", QuantityCheckBox.Checked ? quantity : DBNull.Value),
@@ -239,13 +244,13 @@ namespace ProductDatabase {
 
                 string[] logMessageArray = [
                     $"[基板登録]",
-                    $"[{ProductInfo.CategoryName}]",
+                    $"[{_substrateMaster.CategoryName}]",
                     $"ID[{rowId}]",
                     $"注文番号[{orderNumber}]",
                     $"製造番号[{substrateNumber}]",
-                    $"製品名[{ProductInfo.ProductName}]",
-                    $"基板名[{ProductInfo.SubstrateName}]",
-                    $"型式[{ProductInfo.SubstrateModel}]",
+                    $"製品名[{_substrateMaster.ProductName}]",
+                    $"基板名[{_substrateMaster.SubstrateName}]",
+                    $"型式[{_substrateMaster.SubstrateModel}]",
                     $"追加数[{logQuantity}]",
                     $"使用数[]",
                     $"減少数[{logDefectQuantity}]",
@@ -304,6 +309,7 @@ namespace ProductDatabase {
         private bool DataCheck() {
 
             var quantity = 0;
+            var defectQuantity = 0;
 
             if (QuantityCheckBox.Checked) {
                 if (!int.TryParse(QuantityTextBox.Text, out quantity) || quantity <= 0) {
@@ -313,24 +319,25 @@ namespace ProductDatabase {
                 }
             }
             if (DefectQuantityCheckBox.Checked) {
-                if (!int.TryParse(DefectQuantityTextBox.Text, out var defectQuantity) || defectQuantity <= 0) {
+                if (!int.TryParse(DefectQuantityTextBox.Text, out defectQuantity) || defectQuantity <= 0) {
                     MessageBox.Show("数量は1以上の有効な数値を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     DefectQuantityTextBox.Focus();
                     return false;
                 }
             }
 
-            ProductInfo.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
-            ProductInfo.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
-            ProductInfo.Quantity = quantity;
-            ProductInfo.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
-            ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
-            ProductInfo.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
+            _substrateRegisterWork.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
+            _substrateRegisterWork.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
+            _substrateRegisterWork.AddQuantity = quantity;
+            _substrateRegisterWork.DefectQuantity = defectQuantity;
+            _substrateRegisterWork.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
+            _substrateRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
+            _substrateRegisterWork.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
 
             _serialList.Clear();
             var substrateNumber = ManufacturingNumberMaskedTextBox.Text.Substring(5, 5);
 
-            var monthCode = DateTime.Parse(ProductInfo.RegDate).ToString("MM");
+            var monthCode = DateTime.Parse(_substrateRegisterWork.RegDate).ToString("MM");
 
             monthCode = monthCode switch {
                 "10" => "X",
@@ -338,12 +345,10 @@ namespace ProductDatabase {
                 "12" => "Z",
                 _ => monthCode
             };
-            var regDate = DateTime.Parse(ProductInfo.RegDate);
+            var regDate = DateTime.Parse(_substrateRegisterWork.RegDate);
             var map = new Dictionary<string, string> {
-                ["{T}"] = ProductInfo.Initial,
                 ["{Y}"] = regDate.ToString("yy"),
                 ["{MM}"] = regDate.ToString("MM"),
-                ["{R}"] = ProductInfo.Revision,
                 ["{M}"] = monthCode[^1..],
                 ["{S}"] = substrateNumber
             };
@@ -400,15 +405,15 @@ namespace ProductDatabase {
                 var serialType = "Substrate";
 
                 pd.BeginPrint += (sender, e) => {
-                    PrintManager.Initialize(ProductInfo, SubstratePrintSettings, _serialList);
+                    PrintManager.SubstrateInitialize(_substrateMaster, _substrateRegisterWork, SubstratePrintSettings, _serialList);
                 };
                 pd.PrintPage += (sender, e) => {
                     var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, serialType);
                     e.HasMorePages = hasMore;
                 };
 
-                ProductInfo.Quantity = int.TryParse(QuantityTextBox.Text, out var quantity) ? quantity : 0;
-                if (ProductInfo.Quantity == 0) {
+                _substrateRegisterWork.AddQuantity = int.TryParse(QuantityTextBox.Text, out var quantity) ? quantity : 0;
+                if (_substrateRegisterWork.AddQuantity == 0) {
                     throw new Exception("数量が入力されていません。");
                 }
 
@@ -436,7 +441,7 @@ namespace ProductDatabase {
                         }
                         break;
                     case false:
-                        ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
+                        _substrateRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
                         // PrintPreviewDialogオブジェクトの作成
                         var ppd = new PrintPreviewDialog();
                         ppd.Shown += (sender, e) => {
@@ -467,18 +472,18 @@ namespace ProductDatabase {
             var commandText =
                 $"""
                 SELECT
-                    StockName,SubstrateName,SubstrateModel,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                    SubstrateID,SubstrateName,SubstrateModel,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                 FROM
                     {Constants.VSubstrateTableName}
                 WHERE
-                    StockName = @StockName AND SubstrateModel = @SubstrateModel
+                    SubstrateID = @SubstrateID AND SubstrateModel = @SubstrateModel
                 GROUP BY
-                    StockName, SubstrateName, SubstrateModel
+                    SubstrateID, SubstrateName, SubstrateModel
                 ;
                 """;
             using var dr = ExecuteReader(con, commandText,
-                ("@StockName", ProductInfo.StockName),
-                ("@SubstrateModel", ProductInfo.SubstrateModel)
+                ("@SubstrateID", _substrateMaster.SubstrateID),
+                ("@SubstrateModel", _substrateMaster.SubstrateModel)
             );
 
             transaction.Commit();
@@ -569,14 +574,10 @@ namespace ProductDatabase {
                     return;
                 }
                 if (arr is not null) {
-                    ProductInfo.Proness1 = arr[0];
-                    ProductInfo.Proness2 = arr[1];
-                    ProductInfo.Proness4 = Convert.ToInt32(arr[2] ?? throw new Exception());
-                    ProductInfo.Proness5 = arr[3];
+                    ManufacturingNumberMaskedTextBox.Text = arr[0];
+                    QuantityTextBox.Text = arr[2];
+                    OrderNumberTextBox.Text = arr[3];
                 }
-                OrderNumberTextBox.Text = ProductInfo.Proness5;
-                ManufacturingNumberMaskedTextBox.Text = ProductInfo.Proness1;
-                QuantityTextBox.Text = ProductInfo.Proness4.ToString();
             } catch (Exception ex) {
                 throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}");
             }
@@ -585,19 +586,13 @@ namespace ProductDatabase {
         private void ShowInfo() {
             var items = new Dictionary<string, string>
                 {
-                    {"Proness1", $"{ProductInfo.Proness1}"},
-                    {"Proness2", $"{ProductInfo.Proness2}"},
-                    {"Proness3", $"{ProductInfo.Proness3}"},
-                    {"Proness4", $"{ProductInfo.Proness4}"},
-                    {"Proness5", $"{ProductInfo.Proness5}"},
-                    {"ProductName", $"{ProductInfo.ProductName}"},
-                    {"StockName", $"{ProductInfo.StockName}"},
-                    {"SubstrateName", $"{ProductInfo.SubstrateName}"},
-                    {"SubstrateModel", $"{ProductInfo.SubstrateModel}"},
-                    {"ProductNumber", $"{ProductInfo.ProductNumber}"},
-                    {"Initial", $"{ProductInfo.Initial}"},
-                    {"RegType", $"{ProductInfo.RegType}"},
-                    {"SerialPrintType", $"{ProductInfo.SerialPrintType}"},
+                    {"SubstrateID", $"{_substrateMaster.SubstrateID}"},
+                    {"ProductName", $"{_substrateMaster.ProductName}"},
+                    {"SubstrateName", $"{_substrateMaster.SubstrateName}"},
+                    {"SubstrateModel", $"{_substrateMaster.SubstrateModel}"},
+                    {"ProductNumber", $"{_substrateRegisterWork.ProductNumber}"},
+                    {"RegType", $"{_substrateMaster.RegType}"},
+                    {"SerialPrintType", $"{_substrateMaster.SerialPrintType}"},
                 };
 
             var form = new Form {
@@ -618,7 +613,7 @@ namespace ProductDatabase {
                 View = View.Details,
                 FullRowSelect = true,
                 GridLines = true,
-                Font = new Font("PlemolJP", ProductInfo.FontSize), // 等幅フォント
+                Font = new Font("PlemolJP", _appSettings.FontSize), // 等幅フォント
             };
 
             // 列の追加
@@ -644,7 +639,7 @@ namespace ProductDatabase {
         // 基板設定を開く
         private void OpenSubstrateInformation() {
             try {
-                ExcelServiceClosedXml.SubstrateInformationClosedXml.OpenSubstrateInformationClosedXml(ProductInfo);
+                ExcelServiceClosedXml.SubstrateInformationClosedXml.OpenSubstrateInformationClosedXml(_substrateMaster);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -662,7 +657,7 @@ namespace ProductDatabase {
         private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { RegisterCheck(false); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             PrintSettingsWindow ls = new() {
-                ProductInfo = ProductInfo,
+                SubstrateMaster = _substrateMaster,
                 serialType = "Substrate"
             };
             ls.ShowDialog(this);

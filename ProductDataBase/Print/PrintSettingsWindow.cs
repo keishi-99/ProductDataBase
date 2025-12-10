@@ -12,23 +12,30 @@ namespace ProductDatabase {
         private string _documentPrintSettingFilePath = string.Empty;
         private JsonSerializerOptions? _jsonSerializerOptions;
 
-        public ProductInformation ProductInfo { get; set; } = new ProductInformation();
+        public ProductMaster ProductMaster { get; set; } = new ProductMaster();
+        public SubstrateMaster SubstrateMaster { get; set; } = new SubstrateMaster();
+        public AppSettings AppSettings { get; set; } = new AppSettings();
 
         public string serialType = string.Empty;
+        private bool _isLabelPrint;
+        private bool _isBarcodePrint;
+        private bool _isNameplatePrint;
 
         public PrintSettingsWindow() {
             InitializeComponent();
         }
 
         private void LoadSettings() {
-            Font = new System.Drawing.Font(ProductInfo.FontName, ProductInfo.FontSize);
+            Font = new System.Drawing.Font(AppSettings.FontName, AppSettings.FontSize);
             switch (Owner) {
                 case ProductRegistration2Window productWindow:
-                    ProductInfo = productWindow.ProductInfo;
+                    _isLabelPrint = ProductMaster.IsLabelPrint;
+                    _isBarcodePrint = ProductMaster.IsBarcodePrint;
+                    _isNameplatePrint = ProductMaster.IsNameplatePrint;
                     LoadSettingsFromWindow(productWindow.ProductPrintSettings, productWindow.printSettingPath);
                     break;
                 case SubstrateRegistrationWindow substrateWindow:
-                    ProductInfo = substrateWindow.ProductInfo;
+                    _isLabelPrint = SubstrateMaster.IsLabelPrint;
                     LoadSettingsFromWindow(substrateWindow.SubstratePrintSettings, substrateWindow.printSettingPath);
                     break;
                 case RePrintWindow rePrintWindow:
@@ -54,7 +61,7 @@ namespace ProductDatabase {
         }
         private void SaveProductPrintSettings() {
             try {
-                DocumentPrintSettings.SetSettingsType(ProductInfo.IsLabelPrint, ProductInfo.IsBarcodePrint, ProductInfo.IsNameplatePrint);
+                DocumentPrintSettings.SetSettingsType(_isLabelPrint, _isBarcodePrint, _isNameplatePrint);
                 // JsonSerializerOptions のインスタンスをキャッシュ
                 _jsonSerializerOptions ??= new JsonSerializerOptions {
                     WriteIndented = true,

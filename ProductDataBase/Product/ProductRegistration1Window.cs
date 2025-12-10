@@ -7,7 +7,9 @@ using static ProductDatabase.MainWindow;
 namespace ProductDatabase {
     public partial class ProductRegistration1Window : Form {
 
-        public ProductInformation ProductInfo { get; }
+        private readonly ProductMaster _productMaster;
+        private readonly ProductRegisterWork _productRegisterWork;
+        private readonly AppSettings _appSettings;
 
         readonly string _messageFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config", "Product", "ProductMessages.json");
         private readonly List<string> _checkBoxNames = [
@@ -15,25 +17,28 @@ namespace ProductDatabase {
                     "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
                     "PersonCheckBox", "CommentCheckBox" ];
 
-        public ProductRegistration1Window(ProductInformation productInfo) {
+        public ProductRegistration1Window(ProductMaster productMaster, ProductRegisterWork productRegisterWork, AppSettings appSettings) {
             InitializeComponent();
-            ProductInfo = productInfo;
+
+            _productMaster = productMaster;
+            _productRegisterWork = productRegisterWork;
+            _appSettings = appSettings;
         }
 
         // ロードイベント
         private void LoadEvents() {
             try {
-                Font = new Font(ProductInfo.FontName, ProductInfo.FontSize);
+                Font = new Font(_appSettings.FontName, _appSettings.FontSize);
 
-                ProductNameLabel2.Text = ProductInfo.ProductName;
-                SubstrateModelLabel2.Text = $"{ProductInfo.ProductName} - {ProductInfo.ProductModel}";
-                ProductTypeLabel2.Text = ProductInfo.ProductType;
+                ProductNameLabel2.Text = _productMaster.ProductName;
+                SubstrateModelLabel2.Text = $"{_productMaster.ProductName} - {_productMaster.ProductModel}";
+                ProductTypeLabel2.Text = _productMaster.ProductType;
 
-                OrderNumberTextBox.Text = ProductInfo.Proness5;
-                ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(ProductInfo.Proness1) ? ProductInfo.Proness1 : ManufacturingNumberMaskedTextBox.Text;
-                QuantityTextBox.Text = (ProductInfo.Proness4 != 0) ? ProductInfo.Proness4.ToString() : string.Empty;
+                OrderNumberTextBox.Text = _productRegisterWork.OrderNumber;
+                ManufacturingNumberMaskedTextBox.Text = !string.IsNullOrEmpty(_productRegisterWork.ProductNumber) ? _productRegisterWork.ProductNumber : ManufacturingNumberMaskedTextBox.Text;
+                QuantityTextBox.Text = (_productRegisterWork.Quantity != 0) ? _productRegisterWork.Quantity.ToString() : string.Empty;
 
-                FirstSerialNumberTextBox.MaxLength = ProductInfo.SerialDigit;
+                FirstSerialNumberTextBox.MaxLength = _productMaster.SerialDigit;
 
                 RegisterButton.Enabled = true;
 
@@ -43,12 +48,12 @@ namespace ProductDatabase {
                 for (var i = 0; i < _checkBoxNames.Count; i++) {
                     if (Controls[_checkBoxNames[i]] is CheckBox checkBox) {
                         // i番目のビットが1かどうかをチェック
-                        checkBox.Checked = (ProductInfo.CheckBin & (1 << i)) != 0;
+                        checkBox.Checked = (_productMaster.CheckBin & (1 << i)) != 0;
                     }
                 }
 
                 // ComboBoxへ担当者を追加
-                PersonComboBox.Items.AddRange([.. ProductInfo.PersonList]);
+                PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
 
                 // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
                 using SqliteConnection con = new(GetConnectionRegistration());
@@ -56,15 +61,15 @@ namespace ProductDatabase {
                 using var cmd = con.CreateCommand();
 
                 // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
-                cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = ProductInfo.ProductName;
-                cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = ProductInfo.RevisionGroup;
+                cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = _productMaster.ProductName;
+                cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = _productMaster.RevisionGroup;
                 cmd.CommandText = $"SELECT Revision FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
                 var revisionResult = cmd.ExecuteScalar();
                 RevisionTextBox.Text = revisionResult?.ToString() ?? "";
 
-                if (ProductInfo.IsSerialGeneration) {
+                if (_productMaster.IsSerialGeneration) {
                     cmd.Parameters.Clear();
-                    cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = ProductInfo.ProductName;
+                    cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = _productMaster.ProductName;
                     cmd.CommandText = $"SELECT SerialLastNumber FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;";
                     var serialResult = cmd.ExecuteScalar();
                     if (!int.TryParse(serialResult?.ToString(), out var serialLastNum)) { throw new Exception("シリアル番号の取得に失敗しました。"); }
@@ -72,7 +77,7 @@ namespace ProductDatabase {
                     var nextSerialNumber = serialLastNum + 1;
 
                     // シリアル番号の桁数に応じて、閾値とリセット値を設定
-                    (var minNumber, var maxNumber, var digit) = ProductInfo.SerialType switch {
+                    (var minNumber, var maxNumber, var digit) = _productMaster.SerialDigitType switch {
                         3 => (1, 999, 3),
                         4 => (1, 9999, 4),
                         101 => (1, 899, 3),
@@ -93,7 +98,7 @@ namespace ProductDatabase {
                 if (!File.Exists(_messageFilePath)) {
                     File.WriteAllText(_messageFilePath, "{}");
                 }
-                var productMessage = GetProductMessage(_messageFilePath, ProductInfo.ProductName);
+                var productMessage = GetProductMessage(_messageFilePath, _productMaster.ProductName);
                 if (!string.IsNullOrEmpty(productMessage)) {
                     MessageBox.Show(productMessage, "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     MessageTextBox.Text = productMessage;
@@ -170,7 +175,7 @@ namespace ProductDatabase {
                 }
 
                 var firstSerial = -1;
-                if (ProductInfo.IsSerialGeneration) {
+                if (_productMaster.IsSerialGeneration) {
 
                     if (string.IsNullOrWhiteSpace(FirstSerialNumberTextBox.Text)) {
                         MessageBox.Show("シリアル開始番号を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -192,7 +197,7 @@ namespace ProductDatabase {
                     var calculatedLastSerial = quantity + firstSerial - 1; // 数量と開始番号から最終シリアルを算出
 
                     // シリアル番号の桁数に応じて、閾値とリセット値を設定
-                    (var minNumber, var maxNumber, var digit) = ProductInfo.SerialType switch {
+                    (var minNumber, var maxNumber, var digit) = _productMaster.SerialDigitType switch {
                         3 => (1, 999, 3),
                         4 => (1, 9999, 4),
                         101 => (1, 899, 3),
@@ -209,16 +214,16 @@ namespace ProductDatabase {
 
                 RegisterButton.Enabled = false;
 
-                ProductInfo.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
-                ProductInfo.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
-                ProductInfo.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
-                ProductInfo.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
-                ProductInfo.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
-                ProductInfo.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
-                ProductInfo.Quantity = quantity;
-                ProductInfo.SerialFirstNumber = ProductInfo.IsSerialGeneration ? firstSerial : -1;
-                using ProductRegistration2Window window = new();
-                window.ProductInfo = ProductInfo;
+                _productRegisterWork.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
+                _productRegisterWork.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
+                _productRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
+                _productRegisterWork.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
+                _productRegisterWork.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
+                _productRegisterWork.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
+                _productRegisterWork.Quantity = quantity;
+                _productRegisterWork.SerialFirstNumber = _productMaster.IsSerialGeneration ? firstSerial : -1;
+
+                using ProductRegistration2Window window = new(_productMaster, _productRegisterWork, _appSettings);
                 window.Closed += (s, e) => this.Close();
                 window.ShowDialog(this);
 
@@ -249,9 +254,9 @@ namespace ProductDatabase {
                 return;
             }
 
-            ProductInfo.Revision = revision;
-            ProductInfo.RegDate = RegistrationDateTimePicker.Value.ToShortDateString();
-            ProductInfo.Comment = CommentTextBox.Text.Trim();
+            _productRegisterWork.Revision = revision;
+            _productRegisterWork.RegDate = RegistrationDateTimePicker.Value.ToShortDateString();
+            _productRegisterWork.Comment = CommentTextBox.Text.Trim();
 
             using var connection = new SqliteConnection(GetConnectionRegistration());
             connection.Open();
@@ -267,22 +272,22 @@ namespace ProductDatabase {
                 );
                 """;
 
-                var serialLastNum = ExecuteScalar(connection, $"SELECT SerialLastNumber FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;", ("@ProductName", ProductInfo.ProductName));
+                var serialLastNum = ExecuteScalar(connection, $"SELECT SerialLastNumber FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;", ("@ProductName", _productMaster.ProductName));
 
                 ExecuteNonQuery(connection, commandText,
-                    ("@ProductID", ProductInfo.ProductID),
-                    ("@Revision", ProductInfo.Revision),
-                    ("@RegDate", ProductInfo.RegDate),
-                    ("@RevisionGroup", ProductInfo.RevisionGroup),
+                    ("@ProductID", _productMaster.ProductID),
+                    ("@Revision", _productRegisterWork.Revision),
+                    ("@RegDate", _productRegisterWork.RegDate),
+                    ("@RevisionGroup", _productMaster.RevisionGroup),
                     ("@SerialLastNumber", Convert.ToInt32(serialLastNum)),
-                    ("@Comment", ProductInfo.Comment)
+                    ("@Comment", _productRegisterWork.Comment)
                 );
 
-                ProductInfo.ID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {Constants.VProductTableName};"));
+                var id = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {Constants.VProductTableName};"));
 
                 transaction.Commit();
 
-                LogRegistration(ProductInfo);
+                LogRegistration(_productMaster, _productRegisterWork, id);
 
                 MessageBox.Show("Revision変更完了", "Revision変更", MessageBoxButtons.OK, MessageBoxIcon.Information);
             } catch (Exception ex) {
@@ -396,36 +401,32 @@ namespace ProductDatabase {
                     return;
                 }
                 if (arr is not null) {
-                    ProductInfo.Proness1 = arr[0];
-                    ProductInfo.Proness2 = arr[1];
-                    ProductInfo.Proness4 = Convert.ToInt32(arr[2] ?? throw new Exception());
-                    ProductInfo.Proness5 = arr[3];
+                    ManufacturingNumberMaskedTextBox.Text = arr[0];
+                    QuantityTextBox.Text = arr[2];
+                    OrderNumberTextBox.Text = arr[3];
                 }
-                OrderNumberTextBox.Text = ProductInfo.Proness5;
-                ManufacturingNumberMaskedTextBox.Text = ProductInfo.Proness1;
-                QuantityTextBox.Text = ProductInfo.Proness4.ToString();
             } catch (Exception ex) {
                 throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}");
             }
         }
         // ログ出力
-        private static void LogRegistration(ProductInformation productInfo) {
+        private static void LogRegistration(ProductMaster productMaster, ProductRegisterWork productRegisterWork, long id) {
             string[] logMessageArray = [
                 $"[Rev変更]",
-                $"[{productInfo.CategoryName}]",
-                $"ID{productInfo.ID}]",
+                $"[{productMaster.CategoryName}]",
+                $"ID{id}]",
                 $"[]",
                 $"[]",
-                $"製品名[{productInfo.ProductName}]",
-                $"タイプ[{productInfo.ProductType}]",
-                $"型式[{productInfo.ProductModel}]",
+                $"製品名[{productMaster.ProductName}]",
+                $"タイプ[{productMaster.ProductType}]",
+                $"型式[{productMaster.ProductModel}]",
                 $"[]",
                 $"[]",
                 $"[]",
-                $"Revision[{productInfo.Revision}]",
-                $"登録日[{productInfo.RegDate}]",
+                $"Revision[{productRegisterWork.Revision}]",
+                $"登録日[{productRegisterWork.RegDate}]",
                 $"[]",
-                $"コメント[{productInfo.Comment}]"
+                $"コメント[{productRegisterWork.Comment}]"
             ];
             CommonUtils.Logger.AppendLog(logMessageArray);
         }
@@ -433,20 +434,15 @@ namespace ProductDatabase {
         private void ShowInfo() {
             var items = new Dictionary<string, string>
                 {
-                    {"Proness1", $"{ProductInfo.Proness1}" },
-                    {"Proness2", $"{ProductInfo.Proness2}"},
-                    {"Proness3", $"{ProductInfo.Proness3}"},
-                    {"Proness4", $"{ProductInfo.Proness4}"},
-                    {"Proness5", $"{ProductInfo.Proness5}"},
-                    {"ProductName", $"{ProductInfo.ProductName}"},
-                    {"StockName", $"{ProductInfo.StockName}"},
-                    {"ProductModel", $"{ProductInfo.ProductModel}"},
-                    {"RevisionGroup", $"{ProductInfo.RevisionGroup}"},
-                    {"Initial", $"{ProductInfo.Initial}"},
-                    {"RegType", $"{ProductInfo.RegType}"},
-                    {"SerialPrintType", $"{ProductInfo.SerialPrintType}"},
-                    {"SheetPrintType", $"{ProductInfo.SheetPrintType}"},
-                    {"SerialDigit", $"{ProductInfo.SerialDigit}"}
+                    {"ProductID", $"{_productMaster.ProductID}"},
+                    {"ProductName", $"{_productMaster.ProductName}"},
+                    {"ProductModel", $"{_productMaster.ProductModel}"},
+                    {"RevisionGroup", $"{_productMaster.RevisionGroup}"},
+                    {"Initial", $"{_productMaster.Initial}"},
+                    {"RegType", $"{_productMaster.RegType}"},
+                    {"SerialPrintType", $"{_productMaster.SerialPrintType}"},
+                    {"SheetPrintType", $"{_productMaster.SheetPrintType}"},
+                    {"SerialDigit", $"{_productMaster.SerialDigit}"}
                 };
 
             var form = new Form {
@@ -467,7 +463,7 @@ namespace ProductDatabase {
                 View = View.Details,
                 FullRowSelect = true,
                 GridLines = true,
-                Font = new Font("PlemolJP", ProductInfo.FontSize),
+                Font = new Font("PlemolJP", _appSettings.FontSize),
             };
 
             // 列の追加
@@ -510,8 +506,8 @@ namespace ProductDatabase {
                 var json = JObject.Parse(File.ReadAllText(_messageFilePath));
 
                 // 既存メッセージ取得（無ければ空）
-                string currentMessage = json.ContainsKey(ProductInfo.ProductName)
-                    ? json[ProductInfo.ProductName]!.ToString()
+                string currentMessage = json.ContainsKey(_productMaster.ProductName)
+                    ? json[_productMaster.ProductName]!.ToString()
                     : "";
 
                 // ダイアログを表示（既存メッセージを初期値にする）
@@ -521,7 +517,7 @@ namespace ProductDatabase {
                     string newMessage = dialog.InputText;
 
                     // JSON に保存（追加 OR 上書き）
-                    json[ProductInfo.ProductName] = newMessage;
+                    json[_productMaster.ProductName] = newMessage;
 
                     File.WriteAllText(_messageFilePath, json.ToString());
                 }

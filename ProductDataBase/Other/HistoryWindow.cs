@@ -6,7 +6,12 @@ using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
     public partial class HistoryWindow : Form {
-        public ProductInformation ProductInfo { get; }
+
+        private readonly ProductMaster _productMaster;
+        private readonly ProductRegisterWork _productRegisterWork;
+        private readonly SubstrateMaster _substrateMaster;
+        private readonly SubstrateRegisterWork _substrateRegisterWork;
+        private readonly AppSettings _appSettings;
 
         private readonly int _radioButtonNumber = 0;
 
@@ -15,10 +20,15 @@ namespace ProductDatabase {
         private readonly List<string> _listColFilter = [];
         private string _tableName = string.Empty;
 
-        public HistoryWindow(ProductInformation productInfo, int radioButtonNumber) {
+        public HistoryWindow(ProductMaster productMaster, ProductRegisterWork productRegisterWork, SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork, int radioButtonNumber, AppSettings appSettings) {
             InitializeComponent();
-            ProductInfo = productInfo;
+
+            _productMaster = productMaster;
+            _productRegisterWork = productRegisterWork;
+            _substrateMaster = substrateMaster;
+            _substrateRegisterWork = substrateRegisterWork;
             _radioButtonNumber = radioButtonNumber;
+            _appSettings = appSettings;
             // 最大サイズをディスプレイサイズに合わせる
             if (Screen.PrimaryScreen is not null) {
                 var h = Screen.PrimaryScreen.Bounds.Height;
@@ -39,7 +49,7 @@ namespace ProductDatabase {
 
         private void LoadEvents() {
             try {
-                Font = new System.Drawing.Font(ProductInfo.FontName, ProductInfo.FontSize);
+                Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
 
                 CategoryRadioButton1.Checked = true;
                 CategoryComboBox.SelectedIndex = 0;
@@ -55,9 +65,9 @@ namespace ProductDatabase {
                         GroupModelCheckBox.Visible = false;
                         ShowUsedSubstrateButton.Visible = false;
                         GenerateReportButton.Visible = false;
-                        GenerateListButton.Visible = ProductInfo.IsListPrint;
-                        GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
-                        if (string.IsNullOrEmpty(ProductInfo.SubstrateModel)) { AllSubstrateCheckBox.Checked = true; }
+                        GenerateListButton.Visible = _productMaster.IsListPrint;
+                        GenerateCheckSheetButton.Visible = _productMaster.IsCheckSheetPrint;
+                        if (string.IsNullOrEmpty(_substrateMaster.SubstrateModel)) { AllSubstrateCheckBox.Checked = true; }
                         break;
                     case 2:
                         CategoryRadioButton2.Text = "全てのタイプ";
@@ -112,7 +122,7 @@ namespace ProductDatabase {
                     {
                         { "ID", "ID" },
                         { "SubstrateID", "基板ID" },
-                        { "StockName", "在庫名" },
+                        { "ProductName", "製品名" },
                         { "SubstrateName", "基板名" },
                         { "SubstrateModel", "基板型式" },
                         { "SubstrateNumber", "製造番号" },
@@ -132,7 +142,7 @@ namespace ProductDatabase {
                 {
                     "SubstrateStock", new Dictionary<string, string>
                     {
-                        { "StockName", "在庫名" },
+                        { "ProductName", "製品名" },
                         { "SubstrateID", "基板ID" },
                         { "SubstrateName", "基板名" },
                         { "SubstrateModel", "基板型式" },
@@ -222,14 +232,14 @@ namespace ProductDatabase {
                 AllSubstrateCheckBox.Visible = true;
                 GroupModelCheckBox.Visible = false;
 
-                var substrateCategoryFilter = !string.IsNullOrEmpty(ProductInfo.CategoryName) ? " AND s.CategoryName = @CategoryName" : string.Empty;
-                var stockFilter = !string.IsNullOrEmpty(ProductInfo.StockName) ? " AND s.StockName = @StockName" : string.Empty;
+                var substrateCategoryFilter = !string.IsNullOrEmpty(_substrateMaster.CategoryName) ? " AND s.CategoryName = @CategoryName" : string.Empty;
+                var stockFilter = !string.IsNullOrEmpty(_substrateMaster.ProductName) ? " AND s.ProductName = @ProductName" : string.Empty;
                 var substrateFilter = !AllSubstrateCheckBox.Checked ? " AND s.SubstrateModel = @SubstrateModel" : string.Empty;
 
                 var query =
                     $"""
                     SELECT
-                        s.ID, s.SubstrateID, s.stockName, s.SubstrateName, s.SubstrateModel, s.SubstrateNumber, s.OrderNumber,s.Increase, s.Decrease, s.Defect, p.ProductType, p.ProductNumber, p.OrderNumber, s.Person, s.RegDate, s.Comment, s.UseID
+                        s.ID, s.SubstrateID, s.ProductName, s.SubstrateName, s.SubstrateModel, s.OrderNumber, s.SubstrateNumber,s.Increase, s.Decrease, s.Defect, p.ProductType, p.ProductNumber, p.OrderNumber, s.Person, s.RegDate, s.Comment, s.UseID
                     FROM
                         {Constants.VSubstrateTableName} AS s
                     LEFT JOIN
@@ -243,7 +253,7 @@ namespace ProductDatabase {
                     ;
                     """;
 
-                LoadDataAndDisplay("Substrate", query, ("@CategoryName", ProductInfo.CategoryName), ("@StockName", ProductInfo.StockName), ("@SubstrateModel", ProductInfo.SubstrateModel));
+                LoadDataAndDisplay("Substrate", query, ("@CategoryName", _substrateMaster.CategoryName), ("@ProductName", _substrateMaster.ProductName), ("@SubstrateModel", _substrateMaster.SubstrateModel));
             }
             if (CategoryRadioButton2.Checked) {
                 _tableName = string.Empty;
@@ -252,14 +262,14 @@ namespace ProductDatabase {
                 AllSubstrateCheckBox.Visible = true;
                 GroupModelCheckBox.Visible = true;
 
-                var substrateCategoryFilter = !string.IsNullOrEmpty(ProductInfo.CategoryName) ? " AND CategoryName = @CategoryName" : string.Empty;
-                var stockFilter = !string.IsNullOrEmpty(ProductInfo.StockName) ? " AND StockName = @StockName" : string.Empty;
+                var substrateCategoryFilter = !string.IsNullOrEmpty(_substrateMaster.CategoryName) ? " AND CategoryName = @CategoryName" : string.Empty;
+                var stockFilter = !string.IsNullOrEmpty(_substrateMaster.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
                 var substrateFilter = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
                 var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
 
                 var selectClause = GroupModelCheckBox.Checked
-                    ? "SubstrateID, StockName, SubstrateName, SubstrateModel, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock"
-                    : "SubstrateID, StockName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock";
+                    ? "SubstrateID, ProductName, SubstrateName, SubstrateModel, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock"
+                    : "SubstrateID, ProductName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock";
 
                 var groupByClause = GroupModelCheckBox.Checked
                     ? "SubstrateName, SubstrateModel"
@@ -286,7 +296,7 @@ namespace ProductDatabase {
                     ;
                     """;
 
-                LoadDataAndDisplay("SubstrateStock", query, ("@CategoryName", ProductInfo.CategoryName), ("@StockName", ProductInfo.StockName), ("@SubstrateModel", ProductInfo.SubstrateModel));
+                LoadDataAndDisplay("SubstrateStock", query, ("@CategoryName", _substrateMaster.CategoryName), ("@ProductName", _substrateMaster.ProductName), ("@SubstrateModel", _substrateMaster.SubstrateModel));
             }
         }
 
@@ -295,20 +305,20 @@ namespace ProductDatabase {
             編集モードToolStripMenuItem.Enabled = Config.IsAdministrator;
             GenerateReportButton.Visible = true;
             ShowUsedSubstrateButton.Visible = true;
-            if (string.IsNullOrEmpty(ProductInfo.ProductModel)) {
+            if (string.IsNullOrEmpty(_productMaster.ProductModel)) {
                 GenerateListButton.Visible = true;
                 GenerateCheckSheetButton.Visible = true;
                 CategoryRadioButton1.Visible = false;
                 CategoryRadioButton2.Checked = true;
             }
             else {
-                GenerateListButton.Visible = ProductInfo.IsListPrint;
-                GenerateCheckSheetButton.Visible = ProductInfo.IsCheckSheetPrint;
+                GenerateListButton.Visible = _productMaster.IsListPrint;
+                GenerateCheckSheetButton.Visible = _productMaster.IsCheckSheetPrint;
             }
 
-            var productCategoryFilter = !string.IsNullOrEmpty(ProductInfo.CategoryName) ? " AND CategoryName = @CategoryName" : string.Empty;
-            var productNameFilter = !string.IsNullOrEmpty(ProductInfo.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
-            var productModel = CategoryRadioButton1.Checked ? ProductInfo.ProductModel : string.Empty;
+            var productCategoryFilter = !string.IsNullOrEmpty(_productMaster.CategoryName) ? " AND CategoryName = @CategoryName" : string.Empty;
+            var productNameFilter = !string.IsNullOrEmpty(_productMaster.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
+            var productModel = CategoryRadioButton1.Checked ? _productMaster.ProductModel : string.Empty;
             var productModelFilter = !string.IsNullOrEmpty(productModel) ? " AND ProductModel = @ProductModel" : string.Empty;
 
             var query =
@@ -319,7 +329,7 @@ namespace ProductDatabase {
                 ORDER BY ID DESC;
                 """;
 
-            LoadDataAndDisplay("Product", query, ("@CategoryName", ProductInfo.CategoryName), ("@ProductName", ProductInfo.ProductName), ("@ProductModel", ProductInfo.ProductModel));
+            LoadDataAndDisplay("Product", query, ("@CategoryName", _productMaster.CategoryName), ("@ProductName", _productMaster.ProductName), ("@ProductModel", _productMaster.ProductModel));
         }
         private void ViewSerialLog() {
             _tableName = "Serial";
@@ -330,8 +340,8 @@ namespace ProductDatabase {
             GenerateCheckSheetButton.Visible = false;
 
             var serialTableName = $"[T_Serial]";
-            var substrateCategoryFilter = !string.IsNullOrEmpty(ProductInfo.CategoryName) ? " AND p.CategoryName = @CategoryName" : string.Empty;
-            var productNameFilter = !string.IsNullOrEmpty(ProductInfo.ProductName) ? " AND s.ProductName = @ProductName" : string.Empty;
+            var substrateCategoryFilter = !string.IsNullOrEmpty(_productMaster.CategoryName) ? " AND p.CategoryName = @CategoryName" : string.Empty;
+            var productNameFilter = !string.IsNullOrEmpty(_productMaster.ProductName) ? " AND s.ProductName = @ProductName" : string.Empty;
 
             var query =
                 $"""
@@ -358,13 +368,13 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            LoadDataAndDisplay("Serial", query, ("@CategoryName", ProductInfo.CategoryName), ("@ProductName", ProductInfo.ProductName));
+            LoadDataAndDisplay("Serial", query, ("@CategoryName", _productMaster.CategoryName), ("@ProductName", _productMaster.ProductName));
         }
 
         private void ViewReprintLog() {
             編集モードToolStripMenuItem.Enabled = false;
 
-            var productModelFilter = !string.IsNullOrEmpty(ProductInfo.ProductModel) ? " AND ProductModel = @ProductModel" : string.Empty;
+            var productModelFilter = !string.IsNullOrEmpty(_productMaster.ProductModel) ? " AND ProductModel = @ProductModel" : string.Empty;
 
             var query =
                 $"""
@@ -379,7 +389,7 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            LoadDataAndDisplay("Reprint", query, ("@ProductModel", ProductInfo.ProductModel));
+            LoadDataAndDisplay("Reprint", query, ("@ProductModel", _productMaster.ProductModel));
         }
 
         private SqliteConnection? _editModeConnection; // 編集モード用の接続
@@ -410,7 +420,7 @@ namespace ProductDatabase {
             switch (_tableName) {
                 case "Substrate":
                     DataBaseDataGridView.Columns["ID"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["StockName"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["ProductName"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SubstrateName"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SubstrateModel"].ReadOnly = true;
                     DataBaseDataGridView.Columns["Decrease"].ReadOnly = true;
@@ -419,7 +429,7 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["OrderNumber"].ReadOnly = true;
                     DataBaseDataGridView.Columns["UseID"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ID"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["StockName"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["ProductName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SubstrateName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SubstrateModel"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["Decrease"].DefaultCellStyle.ForeColor = Color.Red;
@@ -522,11 +532,11 @@ namespace ProductDatabase {
                                 // ログ出力
                                 string[] logMessageArray = [
                                     $"[基板履歴編集:前]",
-                                    $"[{ProductInfo.CategoryName}]",
+                                    $"[{_substrateMaster.CategoryName}]",
                                     $"ID[{row["ID", DataRowVersion.Original]}]",
                                     $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
                                     $"製造番号[{row["SubstrateNumber", DataRowVersion.Original]}]",
-                                    $"ストック名[{row["StockName", DataRowVersion.Original]}]",
+                                    $"製品名[{row["ProductName", DataRowVersion.Original]}]",
                                     $"基板名[{row["SubstrateName", DataRowVersion.Original]}]",
                                     $"型式[{row["SubstrateModel", DataRowVersion.Original]}]",
                                     $"追加数[{row["Increase", DataRowVersion.Original]}]",
@@ -541,11 +551,11 @@ namespace ProductDatabase {
 
                                 logMessageArray = [
                                     $"[基板履歴編集:後]",
-                                    $"[{ProductInfo.CategoryName}]",
+                                    $"[{_substrateMaster.CategoryName}]",
                                     $"ID[{row["ID"]}]",
                                     $"注文番号[{row["OrderNumber"]}]",
                                     $"製造番号[{row["SubstrateNumber"]}]",
-                                    $"ストック名[{row["StockName"]}]",
+                                    $"製品名[{row["ProductName"]}]",
                                     $"基板名[{row["SubstrateName"]}]",
                                     $"型式[{row["SubstrateModel"]}]",
                                     $"追加数[{row["Increase"]}]",
@@ -580,7 +590,7 @@ namespace ProductDatabase {
                                 // ログ出力
                                 string[] logMessageArray = [
                                     $"[基板履歴削除]",
-                                    $"[{ProductInfo.CategoryName}]",
+                                    $"[{_substrateMaster.CategoryName}]",
                                     $"ID[{row["ID", DataRowVersion.Original]}]",
                                     $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
                                     $"製造番号[{row["SubstrateNumber", DataRowVersion.Original]}]",
@@ -590,7 +600,7 @@ namespace ProductDatabase {
                                     $"[]",
                                     $"登録日[{row["RegDate", DataRowVersion.Original]}]",
                                     $"担当者[{row["Person", DataRowVersion.Original]}]",
-                                    $"UseID[{ProductInfo.CategoryName}_{row["UseID", DataRowVersion.Original]}]",
+                                    $"UseID[{_substrateMaster.CategoryName}_{row["UseID", DataRowVersion.Original]}]",
                                 ];
                                 CommonUtils.Logger.AppendLog(logMessageArray);
                             }
@@ -633,7 +643,7 @@ namespace ProductDatabase {
                                 // ログ出力
                                 string[] logMessageArray = [
                                     $"[製品履歴編集:前]",
-                                    $"[{ProductInfo.CategoryName}]",
+                                    $"[{_productMaster.CategoryName}]",
                                     $"ID[{row["ID", DataRowVersion.Original]}]",
                                     $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
                                     $"製造番号[{row["ProductNumber", DataRowVersion.Original]}]",
@@ -652,7 +662,7 @@ namespace ProductDatabase {
 
                                 logMessageArray = [
                                     $"[製品履歴編集:後]",
-                                    $"[{ProductInfo.CategoryName}]",
+                                    $"[{_productMaster.CategoryName}]",
                                     $"ID[{row["ID"]}]",
                                     $"注文番号[{row["OrderNumber"]}]",
                                     $"製造番号[{row["ProductNumber"]}]",
@@ -690,7 +700,7 @@ namespace ProductDatabase {
                                 // ログ出力
                                 string[] logMessageArray = [
                                     $"[製品履歴削除]",
-                                    $"[{ProductInfo.CategoryName}]",
+                                    $"[{_productMaster.CategoryName}]",
                                     $"ID[{row["ID", DataRowVersion.Original]}]",
                                     $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
                                     $"製造番号[{row["ProductNumber", DataRowVersion.Original]}]",
@@ -731,7 +741,7 @@ namespace ProductDatabase {
                                 // ログ出力
                                 string[] logMessageArray = [
                                     $"[シリアル履歴削除]",
-                                    $"[{ProductInfo.CategoryName}]",
+                                    $"[{_productMaster.CategoryName}]",
                                     $"ID[{row["rowid", DataRowVersion.Original]}]",
                                     $"製品名[{row["ProductName", DataRowVersion.Original]}]",
                                     $"Serial[{row["Serial", DataRowVersion.Original]}]",
@@ -874,13 +884,8 @@ namespace ProductDatabase {
                     ;
                     """;
 
-                // Sotck名とIDで特定
-                //WHERE
-                //    StockName = @StockName AND UseID = @ID
-
                 var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 var id = Convert.ToInt32(DataBaseDataGridView.Rows[i].Cells["ID"].Value);
-                //cmd.Parameters.Add("@StockName", SqliteType.Text).Value = ProductInfo.StockName;
                 cmd.Parameters.Add("@ID", SqliteType.Integer).Value = id;
 
                 using var reader = cmd.ExecuteReader();
@@ -903,16 +908,16 @@ namespace ProductDatabase {
                 // 選択されたセルがない場合は処理を終了
                 if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
-                ProductInfo.ID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
-                ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
-                ProductInfo.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
-                ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
-                ProductInfo.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
-                ProductInfo.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
-                ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
-                ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.RowID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
+                _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
+                _productMaster.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
+                _productRegisterWork.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
 
-                ExcelServiceClosedXml.ReportGeneratorClosedXml.GenerateReport(ProductInfo);
+                ExcelServiceClosedXml.ReportGeneratorClosedXml.GenerateReport(_productMaster, _productRegisterWork);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -930,17 +935,17 @@ namespace ProductDatabase {
                 // 選択されたセルがない場合は処理を終了
                 if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
-                ProductInfo.ID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
-                ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
-                ProductInfo.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
-                ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
-                ProductInfo.Quantity = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value);
-                ProductInfo.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
-                ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
-                ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
-                ProductInfo.Comment = DataBaseDataGridView.Rows[selectRow].Cells["Comment"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.RowID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
+                _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
+                _productMaster.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.Quantity = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value);
+                _productRegisterWork.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.Comment = DataBaseDataGridView.Rows[selectRow].Cells["Comment"].Value.ToString() ?? string.Empty;
 
-                ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(ProductInfo);
+                ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(_productMaster, _productRegisterWork);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -958,15 +963,15 @@ namespace ProductDatabase {
                 // 選択されたセルがない場合は処理を終了
                 if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
-                ProductInfo.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
-                ProductInfo.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
-                ProductInfo.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
-                ProductInfo.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
-                ProductInfo.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
-                ProductInfo.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
-                ProductInfo.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
+                _productMaster.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
+                _productRegisterWork.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
+                _productRegisterWork.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
 
-                ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.GenerateCheckSheet(ProductInfo);
+                ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.GenerateCheckSheet(_productMaster, _productRegisterWork);
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
