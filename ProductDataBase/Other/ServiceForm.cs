@@ -94,7 +94,7 @@ namespace ProductDatabase.Other {
                 ServiceInfo.ServiceProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
                 ServiceInfo.ServiceProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
                 ServiceInfo.ServiceProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
-                ServiceInfo.ServiceUseSubstrates = GetUseSubstrate(ServiceInfo.ServiceProductID);
+                ServiceInfo.ServiceUseSubstrates = GetUseSubstrates(ServiceInfo.ServiceProductID);
                 DialogResult = DialogResult.OK;
             }
             else { DialogResult = DialogResult.Cancel; }
@@ -102,7 +102,7 @@ namespace ProductDatabase.Other {
             Close();
             return DialogResult.OK;
         }
-        private static List<SubstrateInfo> GetUseSubstrate(long productId) {
+        private static List<SubstrateInfo> GetUseSubstrates(long productId) {
 
             var productUseSubstrate = new DataTable();
 

@@ -66,9 +66,9 @@ namespace ProductDatabase {
             public List<SubstrateInfo> GetUseSubstrates(int productKey) {
 
                 return [.. ProductUseSubstrate.AsEnumerable()
-                    .Where(r => Convert.ToInt32(r["ProductKey"]) == productKey)
+                    .Where(r => Convert.ToInt32(r["PKey"]) == productKey)
                     .Select(r => new SubstrateInfo {
-                        SubstrateID = Convert.ToInt32(r["SubstrateKey"]),
+                        SubstrateID = Convert.ToInt32(r["SKey"]),
                         SubstrateName = r["SubstrateName"]?.ToString() ?? "",
                         SubstrateModel = r["SubstrateModel"]?.ToString() ?? ""
                     })];
@@ -531,7 +531,7 @@ namespace ProductDatabase {
                 _productMaster.CheckBin = Convert.ToInt32(selectedRows[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
                 _productMaster.Initial = selectedRows[0]["Initial"].ToString() ?? string.Empty;
                 _productMaster.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
-                _productMaster.UseSubstrates = GetUseSubstrate(_productMaster.ProductID);
+                _productMaster.UseSubstrates = _productRepository.GetUseSubstrates(_productMaster.ProductID);
                 using ProductRegistration1Window window = new(_productMaster, _productRegisterWork, _appSettings);
                 window.ShowDialog(this);
             }
@@ -567,43 +567,12 @@ namespace ProductDatabase {
                 _productMaster.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
                 _productMaster.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
                 _productMaster.RevisionGroup = Convert.ToInt32(selectedRows[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
-                _productMaster.UseSubstrates = GetUseSubstrate(_productMaster.ProductID);
+                _productMaster.UseSubstrates = _productRepository.GetUseSubstrates(_productMaster.ProductID);
                 _productMaster.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
                 _productMaster.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
                 using SubstrateChange1 window = new(_productMaster, _productRegisterWork, _appSettings);
                 window.ShowDialog(this);
             }
-        }
-        private List<SubstrateInfo> GetUseSubstrate(int productId) {
-            var useSubstrate = new List<SubstrateInfo>();
-
-            var useSubstrateRows =
-                _productRepository.ProductUseSubstrate
-                .Select($"PKey = {productId}");
-
-            foreach (var row in useSubstrateRows) {
-                var substrateId = Convert.ToInt32(row["SKey"]);
-
-                var substrateRows =
-                    _productRepository.SubstrateDataTable
-                    .Select($"SubstrateID = {substrateId}");
-
-                if (substrateRows.Length == 0)
-                    continue;
-
-                var substrateRow = substrateRows[0];
-
-                useSubstrate.Add(new SubstrateInfo {
-                    SubstrateID = substrateId,
-                    SubstrateName = substrateRow["SubstrateName"]?.ToString() ?? string.Empty,
-                    SubstrateModel = substrateRow["SubstrateModel"]?.ToString() ?? string.Empty
-                });
-            }
-
-            useSubstrate.Sort((a, b) =>
-                string.Compare(a.SubstrateModel, b.SubstrateModel, StringComparison.Ordinal));
-
-            return useSubstrate;
         }
         // 履歴ボタン処理
         private void History() {
