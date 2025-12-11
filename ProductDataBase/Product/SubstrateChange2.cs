@@ -1,8 +1,6 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
-using System.Data;
 using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {

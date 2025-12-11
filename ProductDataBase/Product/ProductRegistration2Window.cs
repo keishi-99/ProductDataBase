@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Drawing.Spreadsheet;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
