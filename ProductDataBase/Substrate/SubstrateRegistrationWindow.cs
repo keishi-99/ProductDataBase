@@ -192,7 +192,7 @@ namespace ProductDatabase {
                         WHERE
                             SubstrateID = @SubstrateID AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
                         GROUP BY
-                            StockNSubstrateIDame, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                            SubstrateID, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
                         ORDER BY
                             MIN(ID)
                         LIMIT 1
