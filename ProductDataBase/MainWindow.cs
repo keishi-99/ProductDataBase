@@ -590,64 +590,46 @@ namespace ProductDatabase {
         }
         // 履歴ボタン処理
         private void History() {
+
             ResetFields();
-            try {
-                DataRow[]? selectedRows = null;
 
-                var listBox2 = CategoryListBox2.SelectedIndex == -1 ? string.Empty : $"AND ProductName = '{CategoryListBox2.SelectedItem}'";
-
-                var listBox3 = RadioButtonNumber switch {
-                    1 => CategoryListBox3.SelectedIndex == -1 ? string.Empty : $"AND SubstrateName = '{CategoryListBox3.SelectedItem}'",
-                    2 or 3 or 4 => CategoryListBox3.SelectedIndex == -1 ? string.Empty : $"AND ProductType = '{CategoryListBox3.SelectedItem}'",
-                    _ => string.Empty
-                };
-                selectedRows = RadioButtonNumber switch {
-                    1 => _productRepository.SubstrateDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' {listBox2} {listBox3}"),
-                    2 or 3 or 4 => _productRepository.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' {listBox2} {listBox3}"),
-                    _ => null
-                };
-
-                if (selectedRows is not null && selectedRows.Length > 0) {
-                    switch (RadioButtonNumber) {
-                        case 1:
-                            _substrateMaster.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
-
-                            if (!string.IsNullOrEmpty(listBox2)) {
-                                _substrateMaster.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
-                            }
-
-                            if (!string.IsNullOrEmpty(listBox3)) {
-                                _substrateMaster.SubstrateID = Convert.ToInt32(selectedRows[0]["SubstrateID"]);
-                                _substrateMaster.SubstrateName = selectedRows[0]["SubstrateName"].ToString() ?? string.Empty;
-                                _substrateMaster.SubstrateModel = selectedRows[0]["SubstrateModel"].ToString() ?? string.Empty;
-                                _substrateMaster.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
-                            }
-                            break;
-                        case 2:
-                        case 3:
-                            _productMaster.CategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
-
-                            if (!string.IsNullOrEmpty(listBox2)) {
-                                _productMaster.ProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
-                            }
-
-                            if (!string.IsNullOrEmpty(listBox3)) {
-                                _productMaster.ProductID = Convert.ToInt32(selectedRows[0]["ProductID"]);
-                                _productMaster.ProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
-                                _productMaster.ProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
-                                _productMaster.RegType = Convert.ToInt32(selectedRows[0]["RegType"] ?? throw new Exception("RegType is null"));
-                                _productMaster.SerialPrintType = Convert.ToInt32(selectedRows[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-                                _productMaster.SheetPrintType = Convert.ToInt32(selectedRows[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
-                            }
-                            break;
-                    }
-
-                    using HistoryWindow window = new(_productMaster, _productRegisterWork, _substrateMaster, _substrateRegisterWork, RadioButtonNumber, _appSettings);
-                    window.ShowDialog(this);
+            if (CategoryListBox3.SelectedItem is not ListItem<int> item) {
+                switch (RadioButtonNumber) {
+                    case 1:
+                        _substrateMaster.CategoryName = CategoryListBox1.SelectedItem?.ToString() ?? string.Empty;
+                        _substrateMaster.ProductName = CategoryListBox2.SelectedItem?.ToString() ?? string.Empty;
+                        break;
+                    case 2 or 3 or 4:
+                        _productMaster.CategoryName = CategoryListBox1.SelectedItem?.ToString() ?? string.Empty;
+                        _productMaster.ProductName = CategoryListBox2.SelectedItem?.ToString() ?? string.Empty;
+                        break;
                 }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            else {
+                DataRow row = RadioButtonNumber switch {
+                    1 => _productRepository.GetSubstrateById(item.Id),
+                    2 or 3 or 4 => _productRepository.GetProductById(item.Id),
+                    _ => throw new InvalidOperationException("不正なモードです")
+                };
+
+                if (RadioButtonNumber == 1) {
+                    _substrateMaster.LoadFrom(row);
+                }
+                else {
+                    _productMaster.LoadFrom(row);
+                }
+            }
+
+
+            using var window = new HistoryWindow(
+                _productMaster,
+                _productRegisterWork,
+                _substrateMaster,
+                _substrateRegisterWork,
+                RadioButtonNumber,
+                _appSettings);
+
+            window.ShowDialog(this);
         }
 
         private record CategoryConfig(string OrderKey, string IdKey, string NameKey);
@@ -717,7 +699,6 @@ namespace ProductDatabase {
         }
         // 製品カテゴリセレクト
         private void CategoryListBox1Select() {
-
             RegisterButton.Enabled = false;
             HistoryButton.Enabled = RadioButtonNumber != 4;
             CategoryListBox2.Items.Clear();
@@ -970,6 +951,7 @@ namespace ProductDatabase {
             _productMaster.SerialDigitType = Convert.ToInt32(productRet[0]["SerialType"] ?? throw new Exception("SerialType is null"));
             _productMaster.SerialPrintType = Convert.ToInt32(productRet[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
             _productMaster.SheetPrintType = Convert.ToInt32(productRet[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
+            _productMaster.UseSubstrates = _productRepository.GetUseSubstrates(_productMaster.ProductID);
             using ProductRegistration1Window window = new(_productMaster, _productRegisterWork, _appSettings);
             window.ShowDialog(this);
         }
