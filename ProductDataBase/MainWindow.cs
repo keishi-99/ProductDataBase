@@ -11,6 +11,7 @@ namespace ProductDatabase {
 
         public int RadioButtonNumber { get; set; }
         private float _fontSize = SystemFonts.DefaultFont.Size;
+        private IEnumerable<DataRow> _currentTargetRows = Enumerable.Empty<DataRow>();
 
         readonly string _jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "General", "appsettings.json");
 
@@ -521,73 +522,71 @@ namespace ProductDatabase {
             }
         }
         // 登録ボタン処理
+        public enum ProductOperationMode {
+            Register,
+            RePrint,
+            SubstrateChange
+        }
         private void Registration() {
             ResetFields();
 
-            if (CategoryListBox3.SelectedIndex == -1) { return; }
+            if (CategoryListBox3.SelectedItem is not ListItem<int> item) { return; }
+
             switch (RadioButtonNumber) {
                 case 1:
-                    HandleSubstrateRegistration();
+                    HandleSubstrateRegistration(item.Id);
                     break;
+
                 case 2:
-                    HandleProductRegistration1();
+                    HandleProductRegistration(item.Id, ProductOperationMode.Register);
                     break;
+
                 case 3:
-                    HandleRePrint();
+                    HandleProductRegistration(item.Id, ProductOperationMode.RePrint);
                     break;
+
                 case 4:
-                    HandleSubstrateChange1();
-                    break;
-                default:
+                    HandleProductRegistration(item.Id, ProductOperationMode.SubstrateChange);
                     break;
             }
 
             QRCodeTextBox.Text = string.Empty;
         }
-        private void HandleSubstrateRegistration() {
-            if (CategoryListBox3.SelectedItem is not ListItem<int> item) { return; }
+        private void HandleSubstrateRegistration(int substrateId) {
 
-            var row = _productRepository.GetSubstrateById(item.Id);
+            var row = _productRepository.GetSubstrateById(substrateId);
 
             _substrateMaster.LoadFrom(row);
 
             using SubstrateRegistrationWindow window = new(_substrateMaster, _substrateRegisterWork, _appSettings);
             window.ShowDialog(this);
         }
-        private void HandleProductRegistration1() {
-            if (CategoryListBox3.SelectedItem is not ListItem<int> item) { return; }
+        private void HandleProductRegistration(int productId, ProductOperationMode mode) {
 
-            var row = _productRepository.GetProductById(item.Id);
-
-            _productMaster.LoadFrom(row);
-            _productMaster.UseSubstrates = _productRepository.GetUseSubstrates(_productMaster.ProductID);
-
-            using ProductRegistration1Window window = new(_productMaster, _productRegisterWork, _appSettings);
-            window.ShowDialog(this);
-        }
-        private void HandleRePrint() {
-            if (CategoryListBox3.SelectedItem is not ListItem<int> item) { return; }
-
-            var row = _productRepository.GetProductById(item.Id);
+            var row = _productRepository.GetProductById(productId);
 
             _productMaster.LoadFrom(row);
             _productMaster.UseSubstrates = _productRepository.GetUseSubstrates(_productMaster.ProductID);
 
-            using RePrintWindow window = new(_productMaster, _productRegisterWork, _appSettings);
-            window.ShowDialog(this);
+            switch (mode) {
+                case ProductOperationMode.Register:
+                    using (var window = new ProductRegistration1Window(_productMaster, _productRegisterWork, _appSettings)) {
+                        window.ShowDialog(this);
+                    }
+                    break;
 
-        }
-        private void HandleSubstrateChange1() {
-            if (CategoryListBox3.SelectedItem is not ListItem<int> item) { return; }
+                case ProductOperationMode.RePrint:
+                    using (var window = new RePrintWindow(_productMaster, _productRegisterWork, _appSettings)) {
+                        window.ShowDialog(this);
+                    }
+                    break;
 
-            var row = _productRepository.GetProductById(item.Id);
-
-            _productMaster.LoadFrom(row);
-            _productMaster.UseSubstrates = _productRepository.GetUseSubstrates(_productMaster.ProductID);
-
-            using SubstrateChange1 window = new(_productMaster, _productRegisterWork, _appSettings);
-            window.ShowDialog(this);
-
+                case ProductOperationMode.SubstrateChange:
+                    using (var window = new SubstrateChange1(_productMaster, _productRegisterWork, _appSettings)) {
+                        window.ShowDialog(this);
+                    }
+                    break;
+            }
         }
         // 履歴ボタン処理
         private void History() {
@@ -650,6 +649,14 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private record CategoryConfig(string OrderKey, string IdKey, string NameKey);
+        private readonly Dictionary<int, CategoryConfig> _categoryConfigs = new() {
+            { 1, new CategoryConfig("SubstrateName", "SubstrateID", "SubstrateName") }, // 基板登録
+            { 2, new CategoryConfig("ProductType",   "ProductID",   "ProductType")   }, // 製品登録
+            { 3, new CategoryConfig("ProductType",   "ProductID",   "ProductType")   }, // 再印刷
+            { 4, new CategoryConfig("ProductType",   "ProductID",   "ProductType")   }  // 基板変更
+        };
         // 処理カテゴリセレクト
         private void CategorySelect(object sender) {
 
@@ -659,50 +666,49 @@ namespace ProductDatabase {
             CategoryListBox2.Items.Clear();
             CategoryListBox3.Items.Clear();
 
-            if (sender is not RadioButton rb || !int.TryParse(rb.Tag?.ToString(), out int number)) {
+            // RadioButton の Tag 取得
+            if (sender is not RadioButton rb ||
+                !int.TryParse(rb.Tag?.ToString(), out int number)) {
                 return;
             }
 
             RadioButtonNumber = number;
 
-            IEnumerable<DataRow> targetRows = [];
-
-            switch (RadioButtonNumber) {
-                case 1:
-                    // 基板登録
-                    targetRows = _productRepository.SubstrateDataTable.AsEnumerable()
-                        .Where(r => Convert.ToInt32(r["Visible"]) == 1);
-                    break;
-
-                case 2:
-                    // 製品登録
-                    targetRows = _productRepository.ProductDataTable.AsEnumerable()
-                        .Where(r => Convert.ToInt32(r["Visible"]) == 1);
-                    break;
-
-                case 3:
-                    // 再印刷
-                    targetRows = _productRepository.ProductDataTable.AsEnumerable()
-                        .Where(r =>
-                            Convert.ToInt32(r["Visible"]) == 1 &&
-                            Convert.ToInt32(r["SerialPrintType"]) != 0);
-                    break;
-
-                case 4:
-                    // 基板変更
-                    targetRows = _productRepository.ProductDataTable.AsEnumerable()
-                        .Where(r =>
-                            Convert.ToInt32(r["Visible"]) == 1 &&
-                            (Convert.ToInt32(r["SheetPrintType"]) == 2 ||
-                             Convert.ToInt32(r["SheetPrintType"]) == 3));
-                    break;
+            // 未定義モード防止
+            if (!_categoryConfigs.ContainsKey(RadioButtonNumber)) {
+                _currentTargetRows = [];
+                return;
             }
 
-            // CategoryName 列の重複除外＋ソート
-            var categoryNames = targetRows
-                .Where(row => row["CategoryName"] != DBNull.Value && row["SortNumber"] != DBNull.Value)
-                .OrderBy(row => Convert.ToInt32(row["SortNumber"]))
-                .Select(row => row["CategoryName"]!.ToString()!)
+            // データソース切替
+            bool isSubstrateMode = RadioButtonNumber == 1;
+
+            var sourceTable = isSubstrateMode
+                ? _productRepository.SubstrateDataTable
+                : _productRepository.ProductDataTable;
+
+            // フィルタ済み行を保持
+            _currentTargetRows = sourceTable
+                .AsEnumerable()
+                .Where(r => r["Visible"] != DBNull.Value &&
+                            Convert.ToInt32(r["Visible"]) == 1)
+                .Where(r => RadioButtonNumber switch {
+                    1 => true,
+                    2 => true,
+                    3 => r["SerialPrintType"] != DBNull.Value &&
+                         Convert.ToInt32(r["SerialPrintType"]) != 0,
+                    4 => r["SheetPrintType"] != DBNull.Value &&
+                        (Convert.ToInt32(r["SheetPrintType"]) == 2 ||
+                         Convert.ToInt32(r["SheetPrintType"]) == 3),
+                    _ => false
+                });
+
+            // CategoryName 列の重複除外＋SortNumber 昇順
+            var categoryNames = _currentTargetRows
+                .Where(r => r["CategoryName"] != DBNull.Value &&
+                            r["SortNumber"] != DBNull.Value)
+                .OrderBy(r => Convert.ToInt32(r["SortNumber"]))
+                .Select(r => r["CategoryName"]!.ToString()!)
                 .Where(name => !string.IsNullOrWhiteSpace(name))
                 .Distinct()
                 .ToList();
@@ -711,98 +717,66 @@ namespace ProductDatabase {
         }
         // 製品カテゴリセレクト
         private void CategoryListBox1Select() {
+
             RegisterButton.Enabled = false;
             HistoryButton.Enabled = RadioButtonNumber != 4;
             CategoryListBox2.Items.Clear();
             CategoryListBox3.Items.Clear();
 
-            var selectedRows = RadioButtonNumber switch {
-                1 => _productRepository.SubstrateDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}'", "SubstrateName ASC"),
-                2 or 3 or 4 => _productRepository.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}'", "ProductType ASC"),
-                _ => []
-            };
+            if (CategoryListBox1.SelectedItem is null) {
+                return;
+            }
 
-            var productNames = selectedRows
-                .Select(r => r["ProductName"]?.ToString())
+            string selectedCategory = CategoryListBox1.SelectedItem.ToString()!;
+
+            // _currentTargetRows から ProductName を取得
+            var productNames = _currentTargetRows
+                .Where(r =>
+                    r["CategoryName"]?.ToString() == selectedCategory &&
+                    r["ProductName"] != DBNull.Value)
+                .Select(r => r["ProductName"]!.ToString()!)
                 .Where(name => !string.IsNullOrWhiteSpace(name))
                 .Distinct()
                 .OrderBy(name => name)
                 .ToList();
 
-            CategoryListBox2.Items.AddRange([.. productNames!]);
+            CategoryListBox2.Items.AddRange([.. productNames]);
         }
         private void CategoryListBox2Select() {
-            try {
-                RegisterButton.Enabled = false;
-                HistoryButton.Enabled = RadioButtonNumber != 4;
-                CategoryListBox3.Items.Clear();
+            RegisterButton.Enabled = false;
+            HistoryButton.Enabled = RadioButtonNumber != 4;
+            CategoryListBox3.Items.Clear();
 
-                DataRow[] selectedRows;
-
-                switch (RadioButtonNumber) {
-                    case 1:
-                        selectedRows = _productRepository.SubstrateDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "SubstrateName ASC");
-                        var substrateItems = selectedRows
-                            .Select(r => new ListItem<int> {
-                                Id = Convert.ToInt32(r["SubstrateID"]),
-                                Name = r.Field<string>("SubstrateName") ?? string.Empty
-                            })
-                            .GroupBy(x => x.Id)
-                            .Select(g => g.First())
-                            .OrderBy(x => x.Name)
-                            .ToList();
-
-                        CategoryListBox3.Items.AddRange([.. substrateItems.Cast<object>()]);
-                        break;
-
-                    case 2:
-                    case 3:
-                    case 4:
-                        selectedRows = _productRepository.ProductDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductType ASC");
-                        var productTypes = selectedRows
-                            .Select(r => new ListItem<int> {
-                                Id = Convert.ToInt32(r["ProductID"]),
-                                Name = r.Field<string>("ProductType") ?? string.Empty
-                            })
-                            .GroupBy(x => x.Id)
-                            .Select(g => g.First())
-                            .OrderBy(x => x.Name)
-                            .ToList();
-
-                        CategoryListBox3.Items.AddRange([.. productTypes.Cast<object>()]);
-                        break;
-
-                    default:
-                        break;
-                }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (CategoryListBox1.SelectedItem is null ||
+                CategoryListBox2.SelectedItem is null) {
+                return;
             }
+
+            if (!_categoryConfigs.TryGetValue(RadioButtonNumber, out var config)) {
+                return;
+            }
+
+            var selectedRows = _currentTargetRows
+                .Where(r =>
+                    r["CategoryName"]?.ToString() == CategoryListBox1.SelectedItem?.ToString() &&
+                    r["ProductName"]?.ToString() == CategoryListBox2.SelectedItem?.ToString())
+                .OrderBy(r => r[config.OrderKey]?.ToString())
+                .ToArray();
+
+            var items = selectedRows
+                .Select(r => new ListItem<int> {
+                    Id = Convert.ToInt32(r[config.IdKey]),
+                    Name = r[config.NameKey]?.ToString() ?? string.Empty
+                })
+                .GroupBy(x => x.Id)
+                .Select(g => g.First())
+                .OrderBy(x => x.Name)
+                .ToList();
+
+            CategoryListBox3.Items.AddRange([.. items.Cast<object>()]);
         }
         private void CategoryListBox3Select() {
-            try {
-                if (CategoryListBox3.SelectedIndex == -1) { return; }
-                RegisterButton.Enabled = Config.IsAuthorizedUser;
-                HistoryButton.Enabled = true;
-
-                switch (RadioButtonNumber) {
-                    case 1:
-                        _substrateMaster.SubstrateName = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
-                        break;
-
-                    case 2:
-                    case 3:
-                        _productMaster.ProductType = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
-                        break;
-
-                    case 4:
-                        _productMaster.ProductType = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
-                        HistoryButton.Enabled = false;
-                        break;
-                }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            RegisterButton.Enabled = true;
         }
 
         // QRコード読み取り
