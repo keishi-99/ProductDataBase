@@ -356,26 +356,17 @@ namespace ProductDatabase {
             public List<string> CategoryProductType { get; set; } = [];
             public List<string> CategoryType { get; set; } = [];
         }
-
         public class AppSettings {
             public List<string> PersonList { get; set; } = [];
             public string FontName { get; set; } = "Meiryo UI";
             public float FontSize { get; set; } = 9;
         }
-
         public class Config {
             public string BackupFolderPath { get; set; } = string.Empty;
             public string[] Administrators { get; set; } = [];
             public string[] AuthorizedUsers { get; set; } = [];
             public static bool IsAdministrator { get; set; } = false;
             public static bool IsAuthorizedUser { get; set; } = false;
-        }
-
-        public class ListItem<T> {
-            public T Id { get; set; } = default!;
-            public string Name { get; set; } = string.Empty;
-
-            public override string ToString() => Name;
         }
 
         private readonly ProductRepository _productRepository;
@@ -522,6 +513,12 @@ namespace ProductDatabase {
             }
         }
         // 登録ボタン処理
+        public class ListItem<T> {
+            public T Id { get; set; } = default!;
+            public string Name { get; set; } = string.Empty;
+
+            public override string ToString() => Name;
+        }
         public enum ProductOperationMode {
             Register,
             RePrint,
