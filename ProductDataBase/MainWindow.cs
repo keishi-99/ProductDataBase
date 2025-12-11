@@ -11,7 +11,7 @@ namespace ProductDatabase {
 
         public int RadioButtonNumber { get; set; }
         private float _fontSize = SystemFonts.DefaultFont.Size;
-        private IEnumerable<DataRow> _currentTargetRows = Enumerable.Empty<DataRow>();
+        private IEnumerable<DataRow> _currentTargetRows = [];
 
         readonly string _jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "General", "appsettings.json");
 

@@ -397,10 +397,9 @@ namespace ProductDatabase {
             _productRegisterWork.RowID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {Constants.VProductTableName};"));
         }
         private void InsertSerial(SqliteConnection connection) {
-            var serialTableName = $"[T_Serial]";
             var commandText =
                 $"""
-                INSERT INTO {serialTableName} (
+                INSERT INTO {Constants.TSerialTableName} (
                     Serial, UsedID, ProductName
                     )
                 VALUES (
@@ -739,7 +738,6 @@ namespace ProductDatabase {
             List<string> strSerialDuplication = [];
 
             using var cmd = connection.CreateCommand();
-            var serialTableName = $"[T_Serial]";
             cmd.CommandText =
                 $"""
                 SELECT
@@ -752,7 +750,7 @@ namespace ProductDatabase {
                     p.RegDate,
                     s.usedID
                 FROM
-                    {serialTableName} AS s
+                    {Constants.TSerialTableName} AS s
                 LEFT JOIN
                     {Constants.VProductTableName} AS p
                 ON
