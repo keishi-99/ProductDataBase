@@ -4,6 +4,7 @@
         public const string SubstrateTableName = "M_SubstrateDef";
         public const string TProductTableName = "T_Product";
         public const string TSubstrateTableName = "T_Substrate";
+        public const string TSerialTableName = "T_Serial";
         public const string VProductTableName = "V_Product";
         public const string VSubstrateTableName = "V_Substrate";
     }
