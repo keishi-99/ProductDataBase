@@ -79,9 +79,9 @@ namespace ProductDatabase {
             public List<SubstrateInfo> GetUseSubstrates(int productKey) {
 
                 return [.. ProductUseSubstrate.AsEnumerable()
-                    .Where(r => Convert.ToInt32(r["PKey"]) == productKey)
+                    .Where(r => Convert.ToInt32(r["P_ProductID"]) == productKey)
                     .Select(r => new SubstrateInfo {
-                        SubstrateID = Convert.ToInt32(r["SKey"]),
+                        SubstrateID = Convert.ToInt32(r["S_SubstrateID"]),
                         SubstrateName = r["SubstrateName"]?.ToString() ?? string.Empty,
                         SubstrateModel = r["SubstrateModel"]?.ToString() ?? string.Empty
                     })];
