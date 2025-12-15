@@ -20,6 +20,101 @@ namespace ProductDatabase {
         private readonly List<string> _listColFilter = [];
         private string _tableName = string.Empty;
 
+        private readonly Dictionary<string, Dictionary<string, string>> _headerTextMap = new() {
+                {
+                    "Substrate", new Dictionary<string, string>
+                    {
+                        { "ID", "ID" },
+                        { "SubstrateID", "基板ID" },
+                        { "ProductName", "製品名" },
+                        { "SubstrateName", "基板名" },
+                        { "SubstrateModel", "基板型式" },
+                        { "SubstrateNumber", "製造番号" },
+                        { "OrderNumber", "注文番号" },
+                        { "Increase", "追加数" },
+                        { "Decrease", "使用数" },
+                        { "Defect", "減少数" },
+                        { "ProductType", "使用製品名" },
+                        { "ProductNumber", "使用製番" },
+                        { "OrderNumber1", "使用注番" },
+                        { "Person", "担当者" },
+                        { "RegDate", "登録日" },
+                        { "Comment", "コメント" },
+                        { "usedID", "UsedID" },
+                        { "CreatedAt", "作成日" },
+                    }
+                },
+                {
+                    "SubstrateStock", new Dictionary<string, string>
+                    {
+                        { "ProductName", "製品名" },
+                        { "SubstrateID", "基板ID" },
+                        { "SubstrateName", "基板名" },
+                        { "SubstrateModel", "基板型式" },
+                        { "SubstrateNumber", "製造番号" },
+                        { "OrderNumber", "注文番号" },
+                        { "Stock", "残数" }
+                    }
+                },
+                {
+                    "Product", new Dictionary<string, string>
+                    {
+                        { "ID", "ID" },
+                        { "ProductID", "製品ID" },
+                        { "CategoryName", "カテゴリ" },
+                        { "OrderNumber", "注文番号" },
+                        { "ProductNumber", "製造番号" },
+                        { "ProductName", "製品名" },
+                        { "ProductType", "タイプ" },
+                        { "ProductModel", "製品型式" },
+                        { "Quantity", "数量" },
+                        { "Person", "担当者" },
+                        { "RegDate", "登録日" },
+                        { "Revision", "Rev" },
+                        { "RevisionGroup", "Group" },
+                        { "SerialFirst", "シリアル先頭" },
+                        { "SerialLast", "シリアル末尾" },
+                        { "SerialLastNumber", "末番" },
+                        { "Comment", "コメント" },
+                        { "CreatedAt", "作成日" },
+                    }
+                },
+                {
+                    "Serial", new Dictionary<string, string>
+                    {
+                        { "ID", "ID" },
+                        { "Serial", "シリアル" },
+                        { "OrderNumber", "注文番号" },
+                        { "ProductNumber", "製造番号" },
+                        { "ProductName", "製品名" },
+                        { "ProductType", "タイプ" },
+                        { "ProductModel", "製品型式" },
+                        { "RegDate", "登録日" },
+                        { "usedID", "UsedID" }
+                    }
+                },
+                {
+                    "Reprint", new Dictionary<string, string>
+                    {
+                        { "ID", "ID" },
+                        { "SerialPrintType", "印刷対象" },
+                        { "ProductName", "製品名" },
+                        { "OrderNumber", "注文番号" },
+                        { "ProductNumber", "製造番号" },
+                        { "ProductType", "タイプ" },
+                        { "ProductModel", "製品型式" },
+                        { "Quantity", "数量" },
+                        { "Person", "担当者" },
+                        { "RegDate", "登録日" },
+                        { "Revision", "Rev" },
+                        { "SerialFirst", "シリアル先頭" },
+                        { "SerialLast", "シリアル末尾" },
+                        { "Comment", "コメント" },
+                        { "CreatedAt", "作成日" },
+                    }
+                }
+            };
+
         public HistoryWindow(ProductMaster productMaster, ProductRegisterWork productRegisterWork, SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork, int radioButtonNumber, AppSettings appSettings) {
             InitializeComponent();
 
@@ -115,100 +210,8 @@ namespace ProductDatabase {
             for (var i = 0; i < DataBaseDataGridView.ColumnCount; i++) {
                 _listColFilter.Add(DataBaseDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty);
             }
-            var headerTextMap = new Dictionary<string, Dictionary<string, string>>
-            {
-                {
-                    "Substrate", new Dictionary<string, string>
-                    {
-                        { "ID", "ID" },
-                        { "SubstrateID", "基板ID" },
-                        { "ProductName", "製品名" },
-                        { "SubstrateName", "基板名" },
-                        { "SubstrateModel", "基板型式" },
-                        { "SubstrateNumber", "製造番号" },
-                        { "OrderNumber", "注文番号" },
-                        { "Increase", "追加数" },
-                        { "Decrease", "使用数" },
-                        { "Defect", "減少数" },
-                        { "ProductType", "使用製品名" },
-                        { "ProductNumber", "使用製番" },
-                        { "OrderNumber1", "使用注番" },
-                        { "Person", "担当者" },
-                        { "RegDate", "登録日" },
-                        { "Comment", "コメント" },
-                        { "usedID", "UsedID" }
-                    }
-                },
-                {
-                    "SubstrateStock", new Dictionary<string, string>
-                    {
-                        { "ProductName", "製品名" },
-                        { "SubstrateID", "基板ID" },
-                        { "SubstrateName", "基板名" },
-                        { "SubstrateModel", "基板型式" },
-                        { "SubstrateNumber", "製造番号" },
-                        { "OrderNumber", "注文番号" },
-                        { "Stock", "残数" }
-                    }
-                },
-                {
-                    "Product", new Dictionary<string, string>
-                    {
-                        { "ID", "ID" },
-                        { "ProductID", "製品ID" },
-                        { "CategoryName", "カテゴリ" },
-                        { "OrderNumber", "注文番号" },
-                        { "ProductNumber", "製造番号" },
-                        { "ProductName", "製品名" },
-                        { "ProductType", "タイプ" },
-                        { "ProductModel", "製品型式" },
-                        { "Quantity", "数量" },
-                        { "Person", "担当者" },
-                        { "RegDate", "登録日" },
-                        { "Revision", "Rev" },
-                        { "RevisionGroup", "Group" },
-                        { "SerialFirst", "シリアル先頭" },
-                        { "SerialLast", "シリアル末尾" },
-                        { "SerialLastNumber", "末番" },
-                        { "Comment", "コメント" }
-                    }
-                },
-                {
-                    "Serial", new Dictionary<string, string>
-                    {
-                        { "ID", "ID" },
-                        { "Serial", "シリアル" },
-                        { "OrderNumber", "注文番号" },
-                        { "ProductNumber", "製造番号" },
-                        { "ProductName", "製品名" },
-                        { "ProductType", "タイプ" },
-                        { "ProductModel", "製品型式" },
-                        { "RegDate", "登録日" },
-                        { "usedID", "UsedID" }
-                    }
-                },
-                {
-                    "Reprint", new Dictionary<string, string>
-                    {
-                        { "ID", "ID" },
-                        { "SerialPrintType", "印刷対象" },
-                        { "ProductName", "製品名" },
-                        { "OrderNumber", "注文番号" },
-                        { "ProductNumber", "製造番号" },
-                        { "ProductType", "タイプ" },
-                        { "ProductModel", "製品型式" },
-                        { "Quantity", "数量" },
-                        { "Person", "担当者" },
-                        { "RegDate", "登録日" },
-                        { "Revision", "Rev" },
-                        { "SerialFirst", "シリアル先頭" },
-                        { "SerialLast", "シリアル末尾" },
-                        { "Comment", "コメント" }
-                    }
-                }
-            };
 
-            if (headerTextMap.TryGetValue(categoryName, out var columnHeaders)) {
+            if (_headerTextMap.TryGetValue(categoryName, out var columnHeaders)) {
                 foreach (var column in DataBaseDataGridView.Columns.Cast<DataGridViewColumn>()) {
                     if (columnHeaders.TryGetValue(column.Name, out var headerText)) {
                         column.HeaderCell.Value = headerText;
@@ -239,7 +242,24 @@ namespace ProductDatabase {
                 var query =
                     $"""
                     SELECT
-                        s.ID, s.SubstrateID, s.ProductName, s.SubstrateName, s.SubstrateModel, s.OrderNumber, s.SubstrateNumber,s.Increase, s.Decrease, s.Defect, p.ProductType, p.ProductNumber, p.OrderNumber, s.Person, s.RegDate, s.Comment, s.UseID
+                        s.ID,
+                        s.SubstrateID,
+                        s.ProductName,
+                        s.SubstrateName,
+                        s.SubstrateModel,
+                        s.OrderNumber,
+                        s.SubstrateNumber,
+                        s.Increase,
+                        s.Decrease,
+                        s.Defect,
+                        p.ProductType,
+                        p.ProductNumber,
+                        p.OrderNumber,
+                        s.Person,
+                        s.RegDate,
+                        s.Comment,
+                        s.UseID,
+                        s.CreatedAt
                     FROM
                         {Constants.VSubstrateTableName} AS s
                     LEFT JOIN
@@ -323,10 +343,34 @@ namespace ProductDatabase {
 
             var query =
                 $"""
-                SELECT *
-                FROM {Constants.VProductTableName}
-                WHERE 1=1{productCategoryFilter}{productNameFilter}{productModelFilter}
-                ORDER BY ID DESC;
+                SELECT 
+                    ID,
+                    ProductID,
+                    CategoryName,
+                    ProductName,
+                    ProductType,
+                    ProductModel,
+                    OrderNumber,
+                    ProductNumber,
+                    Quantity,
+                    SerialFirst,
+                    SerialLast,
+                    Revision,
+                    RevisionGroup,
+                    SerialLastNumber,
+                    Person,
+                    RegDate,
+                    Comment,
+                    CreatedAt
+                FROM 
+                    {Constants.VProductTableName}
+                WHERE 
+                    1=1
+                    {productCategoryFilter}
+                    {productNameFilter}
+                    {productModelFilter}
+                ORDER BY 
+                    ID DESC;
                 """;
 
             LoadDataAndDisplay("Product", query, ("@CategoryName", _productMaster.CategoryName), ("@ProductName", _productMaster.ProductName), ("@ProductModel", _productMaster.ProductModel));
@@ -379,11 +423,26 @@ namespace ProductDatabase {
             var query =
                 $"""
                 SELECT
-                    *
+                    ID,
+                    SerialPrintType,
+                    ProductName,
+                    OrderNumber,
+                    ProductNumber,
+                    ProductType,
+                    ProductModel,
+                    Quantity,
+                    Person,
+                    RegDate,
+                    Revision,
+                    SerialFirst,
+                    SerialLast,
+                    Comment,
+                    CreatedAt
                 FROM
                     T_Reprint
                 WHERE
-                    1=1{productModelFilter}
+                    1=1
+                    {productModelFilter}
                 ORDER BY
                     ID DESC
                 ;
