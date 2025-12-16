@@ -237,7 +237,7 @@ namespace ProductDatabase {
 
                 var substrateCategoryFilter = !string.IsNullOrEmpty(_substrateMaster.CategoryName) ? " AND s.CategoryName = @CategoryName" : string.Empty;
                 var stockFilter = !string.IsNullOrEmpty(_substrateMaster.ProductName) ? " AND s.ProductName = @ProductName" : string.Empty;
-                var substrateFilter = !AllSubstrateCheckBox.Checked ? " AND s.SubstrateModel = @SubstrateModel" : string.Empty;
+                var substrateIdFilter = !AllSubstrateCheckBox.Checked ? " AND s.SubstrateID = @SubstrateID" : string.Empty;
 
                 var query =
                     $"""
@@ -267,13 +267,16 @@ namespace ProductDatabase {
                     ON
                         s.UseID = p.ID
                     WHERE
-                        1=1{substrateCategoryFilter}{stockFilter}{substrateFilter}
+                        1=1
+                        {substrateCategoryFilter}
+                        {stockFilter}
+                        {substrateIdFilter}
                     ORDER BY
                         s.ID DESC
                     ;
                     """;
 
-                LoadDataAndDisplay("Substrate", query, ("@CategoryName", _substrateMaster.CategoryName), ("@ProductName", _substrateMaster.ProductName), ("@SubstrateModel", _substrateMaster.SubstrateModel));
+                LoadDataAndDisplay("Substrate", query, ("@CategoryName", _substrateMaster.CategoryName), ("@ProductName", _substrateMaster.ProductName), ("@SubstrateID", _substrateMaster.SubstrateID));
             }
             if (CategoryRadioButton2.Checked) {
                 _tableName = string.Empty;
@@ -284,7 +287,8 @@ namespace ProductDatabase {
 
                 var substrateCategoryFilter = !string.IsNullOrEmpty(_substrateMaster.CategoryName) ? " AND CategoryName = @CategoryName" : string.Empty;
                 var stockFilter = !string.IsNullOrEmpty(_substrateMaster.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
-                var substrateFilter = !AllSubstrateCheckBox.Checked ? " AND SubstrateModel = @SubstrateModel" : string.Empty;
+                var substrateId = !AllSubstrateCheckBox.Checked ? _substrateMaster.SubstrateID : 0;
+                var substrateIdFilter = (substrateId != 0) ? " AND SubstrateID = @SubstrateID" : string.Empty;
                 var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
 
                 var selectClause = GroupModelCheckBox.Checked
@@ -292,8 +296,8 @@ namespace ProductDatabase {
                     : "SubstrateID, ProductName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock";
 
                 var groupByClause = GroupModelCheckBox.Checked
-                    ? "SubstrateName, SubstrateModel"
-                    : "SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber";
+                    ? "SubstrateName, SubstrateID"
+                    : "SubstrateName, SubstrateID, SubstrateNumber, OrderNumber";
 
                 var orderByClause = GroupModelCheckBox.Checked
                     ? "SubstrateModel"
@@ -306,7 +310,10 @@ namespace ProductDatabase {
                     FROM
                         {Constants.VSubstrateTableName}
                     WHERE
-                        1=1{substrateCategoryFilter}{stockFilter}{substrateFilter}
+                        1=1
+                        {substrateCategoryFilter}
+                        {stockFilter}
+                        {substrateIdFilter}
                     GROUP BY
                         {groupByClause}
                     HAVING
@@ -316,7 +323,7 @@ namespace ProductDatabase {
                     ;
                     """;
 
-                LoadDataAndDisplay("SubstrateStock", query, ("@CategoryName", _substrateMaster.CategoryName), ("@ProductName", _substrateMaster.ProductName), ("@SubstrateModel", _substrateMaster.SubstrateModel));
+                LoadDataAndDisplay("SubstrateStock", query, ("@CategoryName", _substrateMaster.CategoryName), ("@ProductName", _substrateMaster.ProductName), ("@SubstrateID", _substrateMaster.SubstrateID));
             }
         }
 
@@ -338,8 +345,8 @@ namespace ProductDatabase {
 
             var productCategoryFilter = !string.IsNullOrEmpty(_productMaster.CategoryName) ? " AND CategoryName = @CategoryName" : string.Empty;
             var productNameFilter = !string.IsNullOrEmpty(_productMaster.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
-            var productModel = CategoryRadioButton1.Checked ? _productMaster.ProductModel : string.Empty;
-            var productModelFilter = !string.IsNullOrEmpty(productModel) ? " AND ProductModel = @ProductModel" : string.Empty;
+            var productId = CategoryRadioButton1.Checked ? _productMaster.ProductID : 0;
+            var productIdFilter = (productId != 0) ? " AND ProductID = @ProductID" : string.Empty;
 
             var query =
                 $"""
@@ -368,12 +375,12 @@ namespace ProductDatabase {
                     1=1
                     {productCategoryFilter}
                     {productNameFilter}
-                    {productModelFilter}
+                    {productIdFilter}
                 ORDER BY 
                     ID DESC;
                 """;
 
-            LoadDataAndDisplay("Product", query, ("@CategoryName", _productMaster.CategoryName), ("@ProductName", _productMaster.ProductName), ("@ProductModel", _productMaster.ProductModel));
+            LoadDataAndDisplay("Product", query, ("@CategoryName", _productMaster.CategoryName), ("@ProductName", _productMaster.ProductName), ("@ProductID", _productMaster.ProductID));
         }
         private void ViewSerialLog() {
             _tableName = "Serial";
