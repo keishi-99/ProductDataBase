@@ -665,10 +665,10 @@ namespace ProductDatabase {
                     case 3:
                     case 4:
                     case 9:
-                        if (_productMaster.UseSubstrates is null) {
-                            throw new Exception("UseSubstrateが空です");
-                        }
-                        for (var i = 0; i <= _productMaster.UseSubstrates.Count - 1; i++) {
+                        var useSubstrate = _productMaster.RegType != 9
+                            ? _productMaster.UseSubstrates
+                            : ServiceInfo.ServiceUseSubstrates;
+                        for (var i = 0; i <= useSubstrate.Count - 1; i++) {
 
                             var objCbx = MainPanel.Controls[_checkBoxNames[i]] as System.Windows.Forms.CheckBox ?? throw new Exception("objCbxが nullです。");
 
@@ -699,8 +699,21 @@ namespace ProductDatabase {
                                     }
                                 }
 
-                                if (intQuantityCheck != 0 && _productMaster.RegType != 9) {
-                                    throw new Exception("入力された数量の合計が必要数と一致しません。");
+                                if (intQuantityCheck != 0) {
+                                    if (_productMaster.RegType != 9) {
+                                        throw new Exception("入力された数量の合計が必要数と一致しません。");
+                                    }
+                                    else {
+                                        DialogResult result = MessageBox.Show(
+                                            "使用数量の合計が製品数と一致しませんがよろしいですか？",
+                                            "",
+                                            MessageBoxButtons.YesNo,
+                                            MessageBoxIcon.Exclamation,
+                                            MessageBoxDefaultButton.Button2);
+                                        if (result == DialogResult.No) {
+                                            return false;
+                                        }
+                                    }
                                 }
                             }
                         }
