@@ -374,7 +374,7 @@ namespace ProductDatabase {
                 """;
 
             var comment = _productMaster.RegType switch {
-                9 => $"製品型式[{ServiceInfo.ServiceProductModel}]\n{_productRegisterWork.Comment}",
+                9 => $"製品ID[{ServiceInfo.ServiceProductID}],製品名[{ServiceInfo.ServiceProductName}],製品型式[{ServiceInfo.ServiceProductModel}]\n{_productRegisterWork.Comment}",
                 _ => _productRegisterWork.Comment,
             };
 
@@ -420,7 +420,7 @@ namespace ProductDatabase {
             var isServiceRegistration = _productMaster.RegType == 9;
             var useSubstrates = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrates : _productMaster.UseSubstrates)
                 ?? throw new Exception("ArrUseSubstrateが nullです。");
-            long? useID = isServiceRegistration ? null : _productRegisterWork.RowID;
+            long? useID = _productRegisterWork.RowID;
 
             for (var i = 0; i < useSubstrates.Count; i++) {
                 if (!(MainPanel.Controls[_checkBoxNames[i]] as CheckBox)?.Checked ?? true) {
@@ -486,10 +486,8 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            var comment = _productMaster.RegType switch {
-                9 => $"サービスID[{_lastInsertRowid}]\n{_productRegisterWork.Comment}",
-                _ => _productRegisterWork.Comment,
-            };
+            var comment = _productRegisterWork.Comment;
+
             ExecuteNonQuery(connection, commandText,
                 ("@SubstrateID", substrateID),
                 ("@SubstrateNumber", substrateNumber),
