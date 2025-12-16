@@ -23,7 +23,6 @@ namespace ProductDatabase {
 
         private int _serialLastNumber;
 
-        private string _lastInsertRowid = string.Empty;
         private string _serialType = string.Empty;
 
         private readonly List<string> _serialList = [];
@@ -321,11 +320,6 @@ namespace ProductDatabase {
         private void Registration(SqliteConnection connection, SqliteTransaction transaction) {
             try {
                 InsertProduct(connection);
-
-                if (_productMaster.RegType == 9) {
-                    using var command = new SqliteCommand("SELECT last_insert_rowid();", connection);
-                    _lastInsertRowid = ExecuteScalar(connection, $"SELECT last_insert_rowid();").ToString() ?? string.Empty;
-                }
 
                 switch (_productMaster.RegType) {
                     case 0:
@@ -705,7 +699,7 @@ namespace ProductDatabase {
                                     }
                                 }
 
-                                if (intQuantityCheck != 0) {
+                                if (intQuantityCheck != 0 && _productMaster.RegType != 9) {
                                     throw new Exception("入力された数量の合計が必要数と一致しません。");
                                 }
                             }
