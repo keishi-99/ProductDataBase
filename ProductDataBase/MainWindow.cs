@@ -693,6 +693,7 @@ namespace ProductDatabase {
                 .ToList();
 
             CategoryListBox1.Items.AddRange([.. categoryNames]);
+            HistoryButton.Enabled = RadioButtonNumber != 4;
         }
         // 製品カテゴリセレクト
         private void CategoryListBox1Select() {
