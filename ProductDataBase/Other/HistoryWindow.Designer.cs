@@ -40,6 +40,8 @@
             this.編集終了ToolStripMenuItem = new ToolStripMenuItem();
             this.GroupModelCheckBox = new CheckBox();
             this.ShowUsedSubstrateButton = new Button();
+            this.オプションToolStripMenuItem = new ToolStripMenuItem();
+            this.在庫調整ToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -178,7 +180,7 @@
             // 
             // menuStrip1
             // 
-            this.menuStrip1.Items.AddRange(new ToolStripItem[] { this.ファイルToolStripMenuItem });
+            this.menuStrip1.Items.AddRange(new ToolStripItem[] { this.ファイルToolStripMenuItem, this.オプションToolStripMenuItem });
             this.menuStrip1.Location = new Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new Size(1184, 24);
@@ -196,7 +198,7 @@
             // 
             this.編集モードToolStripMenuItem.Enabled = false;
             this.編集モードToolStripMenuItem.Name = "編集モードToolStripMenuItem";
-            this.編集モードToolStripMenuItem.Size = new Size(125, 22);
+            this.編集モードToolStripMenuItem.Size = new Size(180, 22);
             this.編集モードToolStripMenuItem.Text = "編集モード";
             this.編集モードToolStripMenuItem.Click += this.編集ToolStripMenuItem_Click;
             // 
@@ -204,7 +206,7 @@
             // 
             this.編集終了ToolStripMenuItem.Enabled = false;
             this.編集終了ToolStripMenuItem.Name = "編集終了ToolStripMenuItem";
-            this.編集終了ToolStripMenuItem.Size = new Size(125, 22);
+            this.編集終了ToolStripMenuItem.Size = new Size(180, 22);
             this.編集終了ToolStripMenuItem.Text = "編集終了";
             this.編集終了ToolStripMenuItem.Click += this.編集終了ToolStripMenuItem_Click;
             // 
@@ -230,6 +232,21 @@
             this.ShowUsedSubstrateButton.Text = "使用基板";
             this.ShowUsedSubstrateButton.UseVisualStyleBackColor = true;
             this.ShowUsedSubstrateButton.Click += this.ShowUsedSubstrateButton_Click;
+            // 
+            // オプションToolStripMenuItem
+            // 
+            this.オプションToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.在庫調整ToolStripMenuItem });
+            this.オプションToolStripMenuItem.Name = "オプションToolStripMenuItem";
+            this.オプションToolStripMenuItem.Size = new Size(62, 20);
+            this.オプションToolStripMenuItem.Text = "オプション";
+            // 
+            // 在庫調整ToolStripMenuItem
+            // 
+            this.在庫調整ToolStripMenuItem.Enabled = false;
+            this.在庫調整ToolStripMenuItem.Name = "在庫調整ToolStripMenuItem";
+            this.在庫調整ToolStripMenuItem.Size = new Size(180, 22);
+            this.在庫調整ToolStripMenuItem.Text = "在庫調整";
+            this.在庫調整ToolStripMenuItem.Click += this.在庫調整ToolStripMenuItem_Click;
             // 
             // HistoryWindow
             // 
@@ -286,5 +303,7 @@
         private ToolStripMenuItem 編集終了ToolStripMenuItem;
         private CheckBox GroupModelCheckBox;
         private Button ShowUsedSubstrateButton;
+        private ToolStripMenuItem オプションToolStripMenuItem;
+        private ToolStripMenuItem 在庫調整ToolStripMenuItem;
     }
 }

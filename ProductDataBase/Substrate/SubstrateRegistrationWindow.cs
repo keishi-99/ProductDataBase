@@ -476,14 +476,13 @@ namespace ProductDatabase {
                 FROM
                     {Constants.VSubstrateTableName}
                 WHERE
-                    SubstrateID = @SubstrateID AND SubstrateModel = @SubstrateModel
+                    SubstrateID = @SubstrateID
                 GROUP BY
                     SubstrateID, SubstrateName, SubstrateModel
                 ;
                 """;
             using var dr = ExecuteReader(con, commandText,
-                ("@SubstrateID", _substrateMaster.SubstrateID),
-                ("@SubstrateModel", _substrateMaster.SubstrateModel)
+                ("@SubstrateID", _substrateMaster.SubstrateID)
             );
 
             transaction.Commit();
