@@ -5,7 +5,6 @@ using ProductDatabase.Other;
 using System.Data;
 using System.Data.Odbc;
 using System.Text.RegularExpressions;
-using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
