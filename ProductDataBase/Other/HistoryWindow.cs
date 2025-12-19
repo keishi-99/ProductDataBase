@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using System.Data;
@@ -281,6 +282,7 @@ namespace ProductDatabase {
             if (CategoryRadioButton2.Checked) {
                 _tableName = string.Empty;
                 編集モードToolStripMenuItem.Enabled = false;
+                在庫調整ToolStripMenuItem.Enabled = true;
                 StockCheckBox.Visible = true;
                 AllSubstrateCheckBox.Visible = true;
                 GroupModelCheckBox.Visible = true;
@@ -904,6 +906,53 @@ namespace ProductDatabase {
             }
         }
 
+        private void InventoryAdjustment() {
+            var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
+            _substrateMaster.SubstrateID = Convert.ToInt32(DataBaseDataGridView.Rows[i].Cells["SubstrateID"].Value);
+            _substrateRegisterWork.OrderNumber = DataBaseDataGridView.Rows[i].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
+            _substrateRegisterWork.ProductNumber = DataBaseDataGridView.Rows[i].Cells["SubstrateNumber"].Value.ToString() ?? string.Empty;
+
+            using SqliteConnection con = new(GetConnectionRegistration());
+            {
+                con.Open();
+                using var cmd = con.CreateCommand();
+
+                cmd.CommandText =
+                    $"""
+                    SELECT
+                        SubstrateID,
+                        SubstrateName,
+                        SubstrateModel,
+                        ProductName,
+                        RegType,
+                        CheckBox,
+                        SerialPrintType
+                    FROM
+                        {Constants.SubstrateTableName}
+                    WHERE
+                        SubstrateID = @SubstrateID
+                    ;
+                    """;
+
+                cmd.Parameters.Add("@SubstrateID", SqliteType.Integer).Value = _substrateMaster.SubstrateID;
+
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read()) {
+                    _substrateMaster.SubstrateName = reader["SubstrateName"].ToString() ?? string.Empty;
+                    _substrateMaster.SubstrateModel = reader["SubstrateModel"].ToString() ?? string.Empty;
+                    _substrateMaster.ProductName = reader["ProductName"].ToString() ?? string.Empty;
+                    _substrateMaster.RegType = Convert.ToInt32(reader["RegType"]);
+                    _substrateMaster.CheckBin = Convert.ToInt32(reader["Checkbox"].ToString(), 2);
+                    _substrateMaster.SerialPrintType = Convert.ToInt32(reader["SerialPrintType"]);
+                }
+
+                using SubstrateRegistrationWindow window = new(_substrateMaster, _substrateRegisterWork, _appSettings);
+                window.ShowDialog(this);
+
+                LoadEvents();
+            }
+        }
+
         // 使用基板表示
         private void ShowDataForm() {
 
@@ -1064,6 +1113,7 @@ namespace ProductDatabase {
         private void HistoryWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void 編集ToolStripMenuItem_Click(object sender, EventArgs e) { EditMode(); }
         private void 編集終了ToolStripMenuItem_Click(object sender, EventArgs e) { SaveRegistrationLog(); }
+        private void 在庫調整ToolStripMenuItem_Click(object sender, EventArgs e) { InventoryAdjustment(); }
         private void ShowUsedSubstrateButton_Click(object sender, EventArgs e) { ShowDataForm(); }
         private void GenerateReportButton_Click(object sender, EventArgs e) { GenerateReport(); }
         private void GenerateListButton_Click(object sender, EventArgs e) { GenerateList(); }
