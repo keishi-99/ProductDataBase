@@ -5,6 +5,7 @@ using ProductDatabase.Other;
 using System.Data;
 using System.Data.Odbc;
 using System.Text.RegularExpressions;
+using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
@@ -920,6 +921,7 @@ namespace ProductDatabase {
             OpenSubstrateRegistrationWindow(substrateRet);
         }
         private void OpenSubstrateRegistrationWindow(DataRow[] substrateRet) {
+            _substrateMaster.SubstrateID = Convert.ToInt32(substrateRet[0]["SubstrateID"] ?? throw new Exception("RegType is null"));
             _substrateMaster.CategoryName = substrateRet[0]["CategoryName"].ToString() ?? string.Empty;
             _substrateMaster.ProductName = substrateRet[0]["ProductName"].ToString() ?? string.Empty;
             _substrateMaster.SubstrateName = substrateRet[0]["SubstrateName"].ToString() ?? string.Empty;
@@ -938,6 +940,7 @@ namespace ProductDatabase {
             OpenProductRegistrationWindow(productRet);
         }
         private void OpenProductRegistrationWindow(DataRow[] productRet) {
+            _productMaster.ProductID = Convert.ToInt32(productRet[0]["ProductID"] ?? throw new Exception("RegType is null"));
             _productMaster.CategoryName = productRet[0]["CategoryName"].ToString() ?? string.Empty;
             _productMaster.ProductName = productRet[0]["ProductName"].ToString() ?? string.Empty;
             _productMaster.ProductType = productRet[0]["ProductType"].ToString() ?? string.Empty;
