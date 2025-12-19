@@ -51,7 +51,7 @@ namespace ProductDatabase {
             try {
                 _sqliteConnection = new SqliteConnection(GetConnectionRegistration());
                 _sqliteConnection.Open();
-                _sqliteTransaction = _sqliteConnection.BeginTransaction(); // トランザクション開始（ロック）
+                _sqliteTransaction = _sqliteConnection.BeginTransaction();
 
                 SetFont();
                 InitializeUIControls();
@@ -71,6 +71,9 @@ namespace ProductDatabase {
                                 Close();
                             }
                             ServiceInfo = window.ServiceInfo;
+                        }
+                        if (_productMaster.SheetPrintType == 3) {
+                            break;
                         }
                         LoadSubstrateData(_sqliteConnection);
                         break;
