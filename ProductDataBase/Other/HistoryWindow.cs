@@ -755,8 +755,18 @@ namespace ProductDatabase {
                                     UPDATE
                                         {Constants.TProductTableName}
                                     SET
-                                        ProductID = NULL, OrderNumber = NULL, ProductNumber = NULL, Quantity = NULL, Person = NULL, RegDate = NULL,
-                                        Revision = NULL, RevisionGroup = NULL, SerialFirst = NULL, SerialLast = NULL, SerialLastNumber = NULL, Comment = NULL
+                                        ProductID = NULL,
+                                        OrderNumber = NULL,
+                                        ProductNumber = NULL,
+                                        Quantity = NULL,
+                                        Person = NULL,
+                                        RegDate = NULL,
+                                        Revision = NULL,
+                                        RevisionGroup = NULL,
+                                        SerialFirst = NULL,
+                                        SerialLast = NULL,
+                                        SerialLastNumber = NULL,
+                                        Comment = NULL
                                     WHERE
                                         ID = @ID
                                     ;
@@ -989,7 +999,11 @@ namespace ProductDatabase {
                 cmd.CommandText =
                     $"""
                     SELECT
-                        ID, SubstrateName, SubstrateModel, SubstrateNumber, Decrease
+                        ID,
+                        SubstrateName,
+                        SubstrateModel,
+                        SubstrateNumber,
+                        Decrease
                     FROM
                         {Constants.VSubstrateTableName}
                     WHERE

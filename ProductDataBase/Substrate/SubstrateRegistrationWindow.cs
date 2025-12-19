@@ -150,13 +150,23 @@ namespace ProductDatabase {
                     commandText =
                         $"""
                         SELECT
-                            SubstrateID,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                            SubstrateID,
+                            SubstrateName,
+                            SubstrateModel,
+                            SubstrateNumber,
+                            OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                         FROM
                             {Constants.VSubstrateTableName}
                         WHERE
-                            SubstrateID = @SubstrateID AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                            SubstrateID = @SubstrateID
+                            AND SubstrateModel = @SubstrateModel
+                            AND SubstrateNumber = @SubstrateNumber
                         GROUP BY
-                            SubstrateID, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                            SubstrateID, 
+                            SubstrateName,
+                            SubstrateModel,
+                            SubstrateNumber,
+                            OrderNumber
                         ORDER BY
                             MIN(ID)
                         LIMIT 1
@@ -186,13 +196,23 @@ namespace ProductDatabase {
                     commandText =
                         $"""
                         SELECT
-                            SubstrateID,SubstrateName,SubstrateModel,SubstrateNumber,OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                            SubstrateID,
+                            SubstrateName,
+                            SubstrateModel,
+                            SubstrateNumber,
+                            OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                         FROM
                             {Constants.VSubstrateTableName}
                         WHERE
-                            SubstrateID = @SubstrateID AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                            SubstrateID = @SubstrateID 
+                            AND SubstrateModel = @SubstrateModel 
+                            AND SubstrateNumber = @SubstrateNumber
                         GROUP BY
-                            SubstrateID, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber
+                            SubstrateID, 
+                            SubstrateName, 
+                            SubstrateModel,
+                            SubstrateNumber,
+                            OrderNumber
                         ORDER BY
                             MIN(ID)
                         LIMIT 1
@@ -217,12 +237,28 @@ namespace ProductDatabase {
                 // 基板登録テーブルへ追加
                 commandText =
                     $"""
-                    INSERT INTO {Constants.TSubstrateTableName} (
-                        SubstrateID,SubstrateNumber,OrderNumber,Increase,Defect,Person,RegDate,Comment
-                        )
-                    VALUES (
-                        @SubstrateID,@SubstrateNumber,@OrderNumber,@Increase,@Defect,@Person,@RegDate,@Comment
-                        )
+                    INSERT INTO {Constants.TSubstrateTableName}
+                    (
+                        SubstrateID,
+                        SubstrateNumber,
+                        OrderNumber,
+                        Increase,
+                        Defect,
+                        Person,
+                        RegDate,
+                        Comment
+                    )
+                    VALUES 
+                    (
+                        @SubstrateID,
+                        @SubstrateNumber,
+                        @OrderNumber,
+                        @Increase,
+                        @Defect,
+                        @Person,
+                        @RegDate,
+                        @Comment
+                    )
                     ;
                     """;
                 ExecuteNonQuery(con, commandText,
@@ -472,13 +508,18 @@ namespace ProductDatabase {
             var commandText =
                 $"""
                 SELECT
-                    SubstrateID,SubstrateName,SubstrateModel,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                    SubstrateID,
+                    SubstrateName,
+                    SubstrateModel,
+                    SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                 FROM
                     {Constants.VSubstrateTableName}
                 WHERE
                     SubstrateID = @SubstrateID
                 GROUP BY
-                    SubstrateID, SubstrateName, SubstrateModel
+                    SubstrateID, 
+                    SubstrateName, 
+                    SubstrateModel
                 ;
                 """;
             using var dr = ExecuteReader(con, commandText,
