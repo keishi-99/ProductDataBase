@@ -354,16 +354,36 @@ namespace ProductDatabase {
         private void InsertProduct(SqliteConnection connection) {
             var commandText =
                 $"""
-                INSERT INTO {Constants.TProductTableName} (
-                    ProductID, OrderNumber, ProductNumber,
-                    Quantity, Person, RegDate, Revision, RevisionGroup,
-                    SerialFirst, SerialLast, SerialLastNumber, Comment
-                    )
-                VALUES (
-                    @ProductID, @OrderNumber, @ProductNumber,
-                    @Quantity, @Person, @RegDate, @Revision, @RevisionGroup,
-                    @SerialFirst, @SerialLast, @SerialLastNumber, @Comment
-                    )
+                INSERT INTO {Constants.TProductTableName} 
+                (
+                    ProductID,
+                    OrderNumber,
+                    ProductNumber,
+                    Quantity,
+                    Person, 
+                    RegDate,
+                    Revision, 
+                    RevisionGroup,
+                    SerialFirst,
+                    SerialLast, 
+                    SerialLastNumber, 
+                    Comment
+                )
+                VALUES 
+                (
+                    @ProductID,
+                    @OrderNumber,
+                    @ProductNumber,
+                    @Quantity, 
+                    @Person,
+                    @RegDate,
+                    @Revision,
+                    @RevisionGroup,
+                    @SerialFirst, 
+                    @SerialLast, 
+                    @SerialLastNumber, 
+                    @Comment
+                )
                 ;
                 """;
 
@@ -392,12 +412,18 @@ namespace ProductDatabase {
         private void InsertSerial(SqliteConnection connection) {
             var commandText =
                 $"""
-                INSERT INTO {Constants.TSerialTableName} (
-                    Serial, UsedID, ProductName
-                    )
-                VALUES (
-                    @Serial, @productRowId, @ProductName
-                    )
+                INSERT INTO {Constants.TSerialTableName} 
+                (
+                    Serial,
+                    UsedID,
+                    ProductName
+                )
+                VALUES 
+                (
+                    @Serial, 
+                    @productRowId, 
+                    @ProductName
+                )
                 ;
                 """;
 
@@ -444,11 +470,18 @@ namespace ProductDatabase {
             var commandText =
                 $"""
                 SELECT
-                    SubstrateID, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                    SubstrateID,
+                    SubstrateName,
+                    SubstrateModel,
+                    SubstrateNumber, 
+                    OrderNumber, 
+                    SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
                 FROM
                     {Constants.VSubstrateTableName}
                 WHERE
-                    SubstrateID = @SubstrateID AND SubstrateModel = @SubstrateModel AND SubstrateNumber = @SubstrateNumber
+                    SubstrateID = @SubstrateID 
+                    AND SubstrateModel = @SubstrateModel 
+                    AND SubstrateNumber = @SubstrateNumber
                 GROUP BY
                     OrderNumber
                 ORDER
@@ -469,14 +502,28 @@ namespace ProductDatabase {
         private void InsertSubstrate(SqliteConnection connection, int substrateID, string substrateNumber, string orderNumber, long useValue, long? useID) {
             var commandText =
                 $"""
-                INSERT INTO {Constants.TSubstrateTableName} (
-                    SubstrateID, SubstrateNumber, OrderNumber,
-                    Decrease, Person, RegDate, Comment, UseID
-                    )
-                VALUES (
-                    @SubstrateID, @SubstrateNumber, @OrderNumber,
-                    @Decrease, @Person, @RegDate, @Comment, @UseID
-                    )
+                INSERT INTO {Constants.TSubstrateTableName}
+                (
+                    SubstrateID,
+                    SubstrateNumber,
+                    OrderNumber,
+                    Decrease, 
+                    Person, 
+                    RegDate,
+                    Comment, 
+                    UseID
+                )
+                VALUES
+                (
+                    @SubstrateID,
+                    @SubstrateNumber,
+                    @OrderNumber,
+                    @Decrease,
+                    @Person, 
+                    @RegDate, 
+                    @Comment, 
+                    @UseID
+                )
                 ;
                 """;
 
@@ -580,7 +627,8 @@ namespace ProductDatabase {
                     FROM
                         {Constants.VProductTableName}
                     WHERE
-                        ProductName = @ProductName AND ProductNumber = @ProductNumber
+                        ProductName = @ProductName 
+                        AND ProductNumber = @ProductNumber
                     ORDER BY
                         ID ASC LIMIT 1;
                     """;
@@ -621,7 +669,8 @@ namespace ProductDatabase {
                     FROM
                         {Constants.VProductTableName}
                     WHERE
-                        ProductName = @ProductName AND OrderNumber = @OrderNumber
+                        ProductName = @ProductName 
+                        AND OrderNumber = @OrderNumber
                     ORDER BY
                         ID ASC LIMIT 1
                     ;

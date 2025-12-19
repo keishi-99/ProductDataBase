@@ -264,11 +264,23 @@ namespace ProductDatabase {
             try {
                 var commandText =
                 $"""
-                INSERT INTO {Constants.TProductTableName} (
-                    ProductID, RegDate, Revision, RevisionGroup, SerialLastNumber, Comment
+                INSERT INTO {Constants.TProductTableName} 
+                (
+                    ProductID,
+                    RegDate,
+                    Revision,
+                    RevisionGroup,
+                    SerialLastNumber,
+                    Comment
                 )
-                VALUES (
-                    @ProductID, @RegDate, @Revision, @RevisionGroup, @SerialLastNumber, @Comment
+                VALUES 
+                (
+                    @ProductID, 
+                    @RegDate,
+                    @Revision,
+                    @RevisionGroup,
+                    @SerialLastNumber,
+                    @Comment
                 );
                 """;
 

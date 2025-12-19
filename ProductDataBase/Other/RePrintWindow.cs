@@ -144,12 +144,38 @@ namespace ProductDatabase {
                 using var cmd = con.CreateCommand();
                 cmd.CommandText =
                     $"""
-                    INSERT INTO T_Reprint (
-                        SerialPrintType, OrderNumber, ProductName, ProductNumber, ProductType, ProductModel, Quantity, Person, RegDate, Revision, SerialFirst, SerialLast, Comment
-                        )
-                    VALUES (
-                        @SerialPrintType, @OrderNumber, @ProductName, @ProductNumber, @ProductType, @ProductModel, @Quantity, @Person, @RegDate, @Revision, @SerialFirst, @SerialLast, @Comment
-                        )
+                    INSERT INTO T_Reprint 
+                    (
+                        SerialPrintType, 
+                        OrderNumber, 
+                        ProductName, 
+                        ProductNumber,
+                        ProductType, 
+                        ProductModel, 
+                        Quantity,
+                        Person,
+                        RegDate, 
+                        Revision, 
+                        SerialFirst, 
+                        SerialLast, 
+                        Comment
+                    )
+                    VALUES
+                    (
+                        @SerialPrintType,
+                        @OrderNumber, 
+                        @ProductName, 
+                        @ProductNumber,
+                        @ProductType, 
+                        @ProductModel, 
+                        @Quantity, 
+                        @Person,
+                        @RegDate,
+                        @Revision,
+                        @SerialFirst, 
+                        @SerialLast, 
+                        @Comment
+                    )
                     ;
                     """;
 
