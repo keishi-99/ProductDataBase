@@ -393,7 +393,7 @@ namespace ProductDatabase {
             GenerateCheckSheetButton.Visible = false;
 
             var serialTableName = $"[T_Serial]";
-            var substrateCategoryFilter = !string.IsNullOrEmpty(_productMaster.CategoryName) ? " AND p.CategoryName = @CategoryName" : string.Empty;
+            var substrateCategoryFilter = !string.IsNullOrEmpty(_productMaster.CategoryName) ? " AND p.CategoryName = @CategoryName OR p.CategoryName IS NULL" : string.Empty;
             var productNameFilter = !string.IsNullOrEmpty(_productMaster.ProductName) ? " AND s.ProductName = @ProductName" : string.Empty;
 
             var query =
@@ -415,7 +415,9 @@ namespace ProductDatabase {
                 ON
                     s.UsedID = p.ID
                 WHERE
-                    1=1{substrateCategoryFilter}{productNameFilter}
+                    1=1
+                    {substrateCategoryFilter}
+                    {productNameFilter}
                 ORDER BY
                     s.rowid DESC
                 ;
