@@ -404,9 +404,10 @@ namespace ProductDatabase {
             GenerateListButton.Visible = false;
             GenerateCheckSheetButton.Visible = false;
 
-            var serialTableName = $"[T_Serial]";
-            var substrateCategoryFilter = !string.IsNullOrEmpty(_productMaster.CategoryName) ? " AND p.CategoryName = @CategoryName OR p.CategoryName IS NULL" : string.Empty;
+            var substrateCategoryFilter = !string.IsNullOrEmpty(_productMaster.CategoryName) ? " AND (p.CategoryName = @CategoryName OR p.CategoryName IS NULL)" : string.Empty;
             var productNameFilter = !string.IsNullOrEmpty(_productMaster.ProductName) ? " AND s.ProductName = @ProductName" : string.Empty;
+            var productId = CategoryRadioButton1.Checked ? _productMaster.ProductID : 0;
+            var productIdFilter = (productId != 0) ? " AND ProductID = @ProductID" : string.Empty;
 
             var query =
                 $"""
@@ -421,7 +422,7 @@ namespace ProductDatabase {
                     p.RegDate,
                     s.usedID
                 FROM
-                    {serialTableName} AS s
+                    {Constants.TSerialTableName} AS s
                 LEFT JOIN
                     {Constants.VProductTableName} AS p
                 ON
@@ -430,6 +431,7 @@ namespace ProductDatabase {
                     1=1
                     {substrateCategoryFilter}
                     {productNameFilter}
+                    {productIdFilter}
                 ORDER BY
                     s.rowid DESC
                 ;
@@ -438,7 +440,8 @@ namespace ProductDatabase {
             LoadDataAndDisplay("Serial",
                 query,
                 ("@CategoryName", _productMaster.CategoryName),
-                ("@ProductName", _productMaster.ProductName)
+                ("@ProductName", _productMaster.ProductName),
+                ("@ProductID", _productMaster.ProductID)
             );
         }
 
