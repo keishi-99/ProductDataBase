@@ -62,7 +62,6 @@ namespace ProductDatabase {
         private void SaveProductPrintSettings() {
             try {
                 DocumentPrintSettings.SetSettingsType(_isLabelPrint, _isBarcodePrint, _isNameplatePrint);
-                // JsonSerializerOptions のインスタンスをキャッシュ
                 _jsonSerializerOptions ??= new JsonSerializerOptions {
                     WriteIndented = true,
                     PropertyNamingPolicy = null,
