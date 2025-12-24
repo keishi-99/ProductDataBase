@@ -10,6 +10,10 @@
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="ExcelService\ExcelServiceEPPlus.cs" />
+    <Compile Remove="ExcelService\ExcelServiceNPOI.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <COMReference Include="bpac">
       <WrapperTool>tlbimp</WrapperTool>
       <VersionMinor>3</VersionMinor>
