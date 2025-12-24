@@ -22,9 +22,9 @@ namespace ProductDatabase.Other {
                     return;
                 } catch (IOException) {
                     if (attempt == retryCount) {
-                        throw new Exception("バックアップファイルがコピーできません。"); // 最後の試行で失敗したら例外を投げる
+                        throw new Exception("バックアップファイルがコピーできません。");
                     }
-                    Thread.Sleep(delayMilliseconds); // 一定時間待機してリトライ
+                    Thread.Sleep(delayMilliseconds);
                 }
             }
         }
@@ -40,15 +40,15 @@ namespace ProductDatabase.Other {
                     return;
                 } catch (IOException) {
                     if (attempt == retryCount) {
-                        throw new Exception("バックアップファイルが削除できません。"); // 最後の試行で失敗したら例外を投げる
+                        throw new Exception("バックアップファイルが削除できません。");
                     }
-                    Thread.Sleep(delayMilliseconds); // 一定時間待機してリトライ
+                    Thread.Sleep(delayMilliseconds);
                 }
             }
         }
         // ログ作成
         public static class Logger {
-            private static readonly string s_logDirectory = Path.Combine(Environment.CurrentDirectory, "db", "logs"); // ログを保存するディレクトリ
+            private static readonly string s_logDirectory = Path.Combine(Environment.CurrentDirectory, "db", "logs");
             private static readonly object s_lockObject = new();
 
             /// <summary>
@@ -58,18 +58,15 @@ namespace ProductDatabase.Other {
             public static void AppendLog(string[] message) {
                 try {
                     lock (s_lockObject) {
-                        // ディレクトリが存在しない場合は作成
                         if (!Directory.Exists(s_logDirectory)) {
                             Directory.CreateDirectory(s_logDirectory);
                         }
 
-                        //// 年と月を含むログファイル名を生成
                         var logFileName = $"log_{DateTime.Now:yyyyMM}.csv";
                         var logFilePath = Path.Combine(s_logDirectory, logFileName);
 
-                        // CSV形式でログ内容をファイルの末尾に追記
                         var logEntry = $"\"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\",{string.Join(",", message.Select(m => $"\"{m.Replace("\"", "\"\"").Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ")}\""))}";
-                        // ログ内容をファイルの末尾に追記
+
                         File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
 
                         if (!string.IsNullOrEmpty(s_backupPath)) {
@@ -86,9 +83,9 @@ namespace ProductDatabase.Other {
         }
         // バックアップ作成
         public static class BackupManager {
-            private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup"); // バックアップを保存するディレクトリ
-            private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db"); // 元ファイルパス
-            private static readonly int s_maxBackupFiles = 20; // 最大バックアップファイル数
+            private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup");
+            private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
+            private static readonly int s_maxBackupFiles = 20;
             private static readonly object s_lockObject = new();
 
             /// <summary>
@@ -97,22 +94,17 @@ namespace ProductDatabase.Other {
             public static void CreateBackup() {
                 try {
                     lock (s_lockObject) {
-                        // バックアップ用ディレクトリが存在しない場合は作成
                         if (!Directory.Exists(s_backupDirectory)) {
                             Directory.CreateDirectory(s_backupDirectory);
                         }
 
-                        // 日付と時間をファイル名に付加
                         var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                         var backupFileName = $"ProductRegistry_{timestamp}.db";
                         var backupFilePath = Path.Combine(s_backupDirectory, backupFileName);
 
-                        // 元ファイルをバックアップにコピー
                         CopyWithRetry(s_originalFilePath, backupFilePath, true);
-                        // バックアップファイルを管理
                         ManageBackupFiles();
 
-                        // ネットワークにバックアップ
                         if (!string.IsNullOrEmpty(s_backupPath)) {
                             var backupPath = Path.Combine(s_backupPath, "db", "ProductRegistry.db");
                             if (Environment.CurrentDirectory != s_backupPath) {
@@ -132,7 +124,7 @@ namespace ProductDatabase.Other {
             private static void ManageBackupFiles() {
                 try {
                     var backupFiles = Directory.GetFiles(s_backupDirectory, "ProductRegistry_*.db")
-                        .OrderBy(File.GetCreationTime) // 作成日時順に並べる
+                        .OrderBy(File.GetCreationTime)
                         .ToList();
 
                     while (backupFiles.Count > s_maxBackupFiles) {
