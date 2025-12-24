@@ -125,7 +125,7 @@ namespace ProductDatabase {
             _substrateRegisterWork = substrateRegisterWork;
             _radioButtonNumber = radioButtonNumber;
             _appSettings = appSettings;
-            // 最大サイズをディスプレイサイズに合わせる
+
             if (Screen.PrimaryScreen is not null) {
                 var h = Screen.PrimaryScreen.Bounds.Height;
                 var w = Screen.PrimaryScreen.Bounds.Width;
@@ -144,49 +144,45 @@ namespace ProductDatabase {
         }
 
         private void LoadEvents() {
-            try {
-                Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
+            Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
 
-                CategoryRadioButton1.Checked = true;
-                CategoryComboBox.SelectedIndex = 0;
+            CategoryRadioButton1.Checked = true;
+            CategoryComboBox.SelectedIndex = 0;
 
-                編集モードToolStripMenuItem.Enabled = Config.IsAdministrator;
+            編集モードToolStripMenuItem.Enabled = Config.IsAdministrator;
 
-                switch (_radioButtonNumber) {
-                    case 1:
-                        CategoryRadioButton2.Text = "在庫";
-                        CategoryRadioButton3.Visible = false;
-                        StockCheckBox.Visible = false;
-                        AllSubstrateCheckBox.Visible = true;
-                        GroupModelCheckBox.Visible = false;
-                        ShowUsedSubstrateButton.Visible = false;
-                        GenerateReportButton.Visible = false;
-                        GenerateListButton.Visible = _productMaster.IsListPrint;
-                        GenerateCheckSheetButton.Visible = _productMaster.IsCheckSheetPrint;
-                        if (string.IsNullOrEmpty(_substrateMaster.SubstrateModel)) { AllSubstrateCheckBox.Checked = true; }
-                        break;
-                    case 2:
-                        CategoryRadioButton2.Text = "全てのタイプ";
-                        CategoryRadioButton3.Text = "シリアル";
-                        StockCheckBox.Visible = false;
-                        AllSubstrateCheckBox.Visible = false;
-                        GroupModelCheckBox.Visible = false;
-                        break;
-                    case 3:
-                        CategoryRadioButton1.Visible = false;
-                        CategoryRadioButton2.Visible = false;
-                        CategoryRadioButton3.Visible = false;
-                        StockCheckBox.Visible = false;
-                        AllSubstrateCheckBox.Visible = false;
-                        GroupModelCheckBox.Visible = false;
-                        ShowUsedSubstrateButton.Visible = false;
-                        GenerateReportButton.Visible = false;
-                        GenerateListButton.Visible = false;
-                        GenerateCheckSheetButton.Visible = false;
-                        break;
-                }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            switch (_radioButtonNumber) {
+                case 1:
+                    CategoryRadioButton2.Text = "在庫";
+                    CategoryRadioButton3.Visible = false;
+                    StockCheckBox.Visible = false;
+                    AllSubstrateCheckBox.Visible = true;
+                    GroupModelCheckBox.Visible = false;
+                    ShowUsedSubstrateButton.Visible = false;
+                    GenerateReportButton.Visible = false;
+                    GenerateListButton.Visible = _productMaster.IsListPrint;
+                    GenerateCheckSheetButton.Visible = _productMaster.IsCheckSheetPrint;
+                    if (string.IsNullOrEmpty(_substrateMaster.SubstrateModel)) { AllSubstrateCheckBox.Checked = true; }
+                    break;
+                case 2:
+                    CategoryRadioButton2.Text = "全てのタイプ";
+                    CategoryRadioButton3.Text = "シリアル";
+                    StockCheckBox.Visible = false;
+                    AllSubstrateCheckBox.Visible = false;
+                    GroupModelCheckBox.Visible = false;
+                    break;
+                case 3:
+                    CategoryRadioButton1.Visible = false;
+                    CategoryRadioButton2.Visible = false;
+                    CategoryRadioButton3.Visible = false;
+                    StockCheckBox.Visible = false;
+                    AllSubstrateCheckBox.Visible = false;
+                    GroupModelCheckBox.Visible = false;
+                    ShowUsedSubstrateButton.Visible = false;
+                    GenerateReportButton.Visible = false;
+                    GenerateListButton.Visible = false;
+                    GenerateCheckSheetButton.Visible = false;
+                    break;
             }
         }
 
@@ -277,7 +273,12 @@ namespace ProductDatabase {
                     ;
                     """;
 
-                LoadDataAndDisplay("Substrate", query, ("@CategoryName", _substrateMaster.CategoryName), ("@ProductName", _substrateMaster.ProductName), ("@SubstrateID", _substrateMaster.SubstrateID));
+                LoadDataAndDisplay("Substrate",
+                    query, ("@CategoryName",
+                    _substrateMaster.CategoryName),
+                    ("@ProductName", _substrateMaster.ProductName),
+                    ("@SubstrateID", _substrateMaster.SubstrateID)
+                );
             }
             if (CategoryRadioButton2.Checked) {
                 _tableName = string.Empty;
@@ -325,7 +326,13 @@ namespace ProductDatabase {
                     ;
                     """;
 
-                LoadDataAndDisplay("SubstrateStock", query, ("@CategoryName", _substrateMaster.CategoryName), ("@ProductName", _substrateMaster.ProductName), ("@SubstrateID", _substrateMaster.SubstrateID));
+                LoadDataAndDisplay("SubstrateStock",
+                    query, ("@CategoryName",
+                    _substrateMaster.CategoryName),
+                    ("@ProductName",
+                    _substrateMaster.ProductName),
+                    ("@SubstrateID", _substrateMaster.SubstrateID)
+                );
             }
         }
 
@@ -382,7 +389,12 @@ namespace ProductDatabase {
                     ID DESC;
                 """;
 
-            LoadDataAndDisplay("Product", query, ("@CategoryName", _productMaster.CategoryName), ("@ProductName", _productMaster.ProductName), ("@ProductID", _productMaster.ProductID));
+            LoadDataAndDisplay("Product",
+                query, ("@CategoryName",
+                _productMaster.CategoryName),
+                ("@ProductName", _productMaster.ProductName),
+                ("@ProductID", _productMaster.ProductID)
+            );
         }
         private void ViewSerialLog() {
             _tableName = "Serial";
@@ -423,7 +435,11 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            LoadDataAndDisplay("Serial", query, ("@CategoryName", _productMaster.CategoryName), ("@ProductName", _productMaster.ProductName));
+            LoadDataAndDisplay("Serial",
+                query,
+                ("@CategoryName", _productMaster.CategoryName),
+                ("@ProductName", _productMaster.ProductName)
+            );
         }
 
         private void ViewReprintLog() {
@@ -459,17 +475,19 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            LoadDataAndDisplay("Reprint", query, ("@ProductModel", _productMaster.ProductModel));
+            LoadDataAndDisplay("Reprint",
+                query, ("@ProductModel",
+                _productMaster.ProductModel)
+            );
         }
 
-        private SqliteConnection? _editModeConnection; // 編集モード用の接続
-        private SqliteTransaction? _editModeTransaction; // 編集モード用のトランザクション
+        private SqliteConnection? _editModeConnection;
+        private SqliteTransaction? _editModeTransaction;
         private void EditMode() {
-            // 編集モード用の接続とトランザクションを開始
             try {
                 _editModeConnection = new SqliteConnection(GetConnectionRegistration());
                 _editModeConnection.Open();
-                _editModeTransaction = _editModeConnection.BeginTransaction(); // トランザクション開始（ロック）
+                _editModeTransaction = _editModeConnection.BeginTransaction();
             } catch (SqliteException ex) {
                 MessageBox.Show($"データベースがロックされています。: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -490,45 +508,65 @@ namespace ProductDatabase {
             switch (_tableName) {
                 case "Substrate":
                     DataBaseDataGridView.Columns["ID"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["SubstrateID"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ProductName"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SubstrateName"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SubstrateModel"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["SubstrateNumber"].ReadOnly = true;
                     DataBaseDataGridView.Columns["Decrease"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ProductType"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ProductNumber"].ReadOnly = true;
                     DataBaseDataGridView.Columns["OrderNumber"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["Person"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["RegDate"].ReadOnly = true;
                     DataBaseDataGridView.Columns["UseID"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["CreatedAt"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ID"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["SubstrateID"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SubstrateName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SubstrateModel"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["SubstrateNumber"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["Decrease"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductType"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductNumber"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["OrderNumber"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["Person"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["RegDate"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["UseID"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["CreatedAt"].DefaultCellStyle.ForeColor = Color.Red;
                     break;
                 case "Product":
                     DataBaseDataGridView.Columns["ID"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["ProductID"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["CategoryName"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ProductName"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ProductType"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ProductModel"].ReadOnly = true;
                     DataBaseDataGridView.Columns["Quantity"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["Person"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["RegDate"].ReadOnly = true;
                     DataBaseDataGridView.Columns["Revision"].ReadOnly = true;
                     DataBaseDataGridView.Columns["RevisionGroup"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SerialFirst"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SerialLast"].ReadOnly = true;
                     DataBaseDataGridView.Columns["SerialLastNumber"].ReadOnly = true;
+                    DataBaseDataGridView.Columns["CreatedAt"].ReadOnly = true;
                     DataBaseDataGridView.Columns["ID"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["ProductID"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["CategoryName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductName"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductType"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["ProductModel"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["Quantity"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["Person"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["RegDate"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["Revision"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["RevisionGroup"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SerialFirst"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SerialLast"].DefaultCellStyle.ForeColor = Color.Red;
                     DataBaseDataGridView.Columns["SerialLastNumber"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.Columns["CreatedAt"].DefaultCellStyle.ForeColor = Color.Red;
                     break;
                 case "Serial":
                     DataBaseDataGridView.Columns["rowid"].ReadOnly = true;
@@ -554,19 +592,17 @@ namespace ProductDatabase {
         }
         private void SaveRegistrationLog() {
             try {
-                // 編集モードで使用している接続を使用
                 if (_editModeConnection is null) {
                     MessageBox.Show("編集モードが開始されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                var command = _editModeConnection.CreateCommand(); // 編集モードの接続を使用
+                var command = _editModeConnection.CreateCommand();
 
                 switch (_tableName) {
                     case "Substrate":
                         foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
                             if (row.RowState == DataRowState.Modified) {
-                                // UPDATE文の設定
                                 command.CommandText =
                                     $"""
                                     UPDATE
@@ -586,7 +622,7 @@ namespace ProductDatabase {
                                     ;
                                     """;
 
-                                command.Parameters.Clear(); // パラメータをクリア
+                                command.Parameters.Clear();
                                 command.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = row["SubstrateNumber"];
                                 command.Parameters.Add("@OrderNumber", SqliteType.Text).Value = row["OrderNumber"];
                                 command.Parameters.Add("@Increase", SqliteType.Integer).Value = row["Increase"];
@@ -638,26 +674,31 @@ namespace ProductDatabase {
                                 ];
                                 CommonUtils.Logger.AppendLog(logMessageArray);
                             }
-                            else if (row.RowState == DataRowState.Deleted) // 削除行の処理
-                            {
-                                // DELETE文の設定
-
+                            else if (row.RowState == DataRowState.Deleted) {
                                 command.CommandText =
                                     $"""
                                     UPDATE
                                         {Constants.TSubstrateTableName}
                                     SET
-                                        SubstrateID = NULL, SubstrateNumber = NULL, OrderNumber = NULL, Increase = NULL, Decrease = NULL, Defect = NULL,
-                                        Person = NULL, RegDate = NULL, Comment = NULL, UseID = NULL
+                                        SubstrateID = NULL,
+                                        SubstrateNumber = NULL,
+                                        OrderNumber = NULL,
+                                        Increase = NULL, 
+                                        Decrease = NULL,
+                                        Defect = NULL,
+                                        Person = NULL,
+                                        RegDate = NULL,
+                                        Comment = NULL,
+                                        UseID = NULL
                                     WHERE
                                         ID = @ID
                                     ;
                                     """;
-                                command.Parameters.Clear(); // パラメータをクリア
+                                command.Parameters.Clear();
                                 command.Parameters.Add("@ID", SqliteType.Integer).Value = row["ID", DataRowVersion.Original];
 
                                 command.ExecuteNonQuery();
-                                // ログ出力
+
                                 string[] logMessageArray = [
                                     $"[基板履歴削除]",
                                     $"[{_substrateMaster.CategoryName}]",
@@ -679,7 +720,6 @@ namespace ProductDatabase {
                     case "Product":
                         foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
                             if (row.RowState == DataRowState.Modified) {
-                                // UPDATE文の設定
                                 command.CommandText =
                                     $"""
                                     UPDATE
@@ -699,7 +739,7 @@ namespace ProductDatabase {
                                     ;
                                     """;
 
-                                command.Parameters.Clear(); // パラメータをクリア
+                                command.Parameters.Clear();
                                 command.Parameters.Add("@ID", SqliteType.Integer).Value = row["ID"];
                                 command.Parameters.Add("@OrderNumber", SqliteType.Text).Value = row["OrderNumber"];
                                 command.Parameters.Add("@ProductNumber", SqliteType.Text).Value = row["ProductNumber"];
@@ -710,7 +750,7 @@ namespace ProductDatabase {
                                 command.Parameters.Add("@Comment", SqliteType.Text).Value = row["Comment"];
 
                                 command.ExecuteNonQuery();
-                                // ログ出力
+
                                 string[] logMessageArray = [
                                     $"[製品履歴編集:前]",
                                     $"[{_productMaster.CategoryName}]",
@@ -749,9 +789,7 @@ namespace ProductDatabase {
                                 ];
                                 CommonUtils.Logger.AppendLog(logMessageArray);
                             }
-                            else if (row.RowState == DataRowState.Deleted) // 削除行の処理
-                            {
-                                // DELETE文の設定
+                            else if (row.RowState == DataRowState.Deleted) {
                                 command.CommandText =
                                     $"""
                                     UPDATE
@@ -773,11 +811,11 @@ namespace ProductDatabase {
                                         ID = @ID
                                     ;
                                     """;
-                                command.Parameters.Clear(); // パラメータをクリア
+                                command.Parameters.Clear();
                                 command.Parameters.Add("@ID", SqliteType.Integer).Value = row["ID", DataRowVersion.Original];
 
                                 command.ExecuteNonQuery();
-                                // ログ出力
+
                                 string[] logMessageArray = [
                                     $"[製品履歴削除]",
                                     $"[{_productMaster.CategoryName}]",
@@ -802,9 +840,7 @@ namespace ProductDatabase {
                         foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
                             if (row.RowState == DataRowState.Modified) {
                             }
-                            else if (row.RowState == DataRowState.Deleted) // 削除行の処理
-                            {
-                                // DELETE文の設定
+                            else if (row.RowState == DataRowState.Deleted) {
                                 var serialTableName = $"[T_Serial]";
                                 command.CommandText =
                                     $"""
@@ -814,11 +850,11 @@ namespace ProductDatabase {
                                         rowid = @rowid
                                     ;
                                     """;
-                                command.Parameters.Clear(); // パラメータをクリア
+                                command.Parameters.Clear();
                                 command.Parameters.Add("@rowid", SqliteType.Integer).Value = row["rowid", DataRowVersion.Original];
 
                                 command.ExecuteNonQuery();
-                                // ログ出力
+
                                 string[] logMessageArray = [
                                     $"[シリアル履歴削除]",
                                     $"[{_productMaster.CategoryName}]",
@@ -844,7 +880,6 @@ namespace ProductDatabase {
                 // バックアップ作成
                 CommonUtils.BackupManager.CreateBackup();
 
-                // 編集モードのトランザクションをコミットしてロック解除
                 if (_editModeTransaction is not null) {
                     _editModeTransaction.Commit();
                     _editModeTransaction.Dispose();
@@ -859,7 +894,7 @@ namespace ProductDatabase {
                 Close();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                // エラー発生時のロールバック（トランザクションが存在する場合）
+
                 if (_editModeTransaction is not null) {
                     _editModeTransaction.Rollback();
                     _editModeTransaction.Dispose();
@@ -878,7 +913,6 @@ namespace ProductDatabase {
             if (!selectedRadioButton.Checked) { return; }
             var tag = selectedRadioButton.Tag?.ToString() ?? string.Empty;
 
-            // 動作マッピング用の辞書を定義
             var actionMap = new Dictionary<(int, string), System.Action>
             {
                 { (1, "1"), ViewSubstrateRegistrationLog },
@@ -889,7 +923,6 @@ namespace ProductDatabase {
                 { (3, "1"), ViewReprintLog }
             };
 
-            // Tag と RadioButtonFlg の組み合わせに応じた動作を実行
             if (actionMap.TryGetValue((_radioButtonNumber, tag), out var action)) {
                 action();
             }
@@ -898,23 +931,18 @@ namespace ProductDatabase {
             }
         }
         private void HistoryTableFilter() {
-            try {
-                // DataGridView のデータソースから取得
-                if (DataBaseDataGridView.DataSource is not System.Data.DataTable historyTable) {
-                    return;
-                }
+            if (DataBaseDataGridView.DataSource is not System.Data.DataTable historyTable) {
+                return;
+            }
 
-                if (string.IsNullOrEmpty(FilterStringTextBox.Text) || CategoryComboBox.SelectedIndex == -1) {
-                    historyTable.DefaultView.RowFilter = null;
-                }
-                else if (historyTable.Columns[_listColFilter[CategoryComboBox.SelectedIndex]]?.DataType == typeof(long)) {
-                    historyTable.DefaultView.RowFilter = $"CONVERT({_listColFilter[CategoryComboBox.SelectedIndex]}, 'System.String') LIKE '%{FilterStringTextBox.Text}%'";
-                }
-                else if (CategoryComboBox.Text != "") {
-                    historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} LIKE '*{FilterStringTextBox.Text}*'";
-                }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (string.IsNullOrEmpty(FilterStringTextBox.Text) || CategoryComboBox.SelectedIndex == -1) {
+                historyTable.DefaultView.RowFilter = null;
+            }
+            else if (historyTable.Columns[_listColFilter[CategoryComboBox.SelectedIndex]]?.DataType == typeof(long)) {
+                historyTable.DefaultView.RowFilter = $"CONVERT({_listColFilter[CategoryComboBox.SelectedIndex]}, 'System.String') LIKE '%{FilterStringTextBox.Text}%'";
+            }
+            else if (CategoryComboBox.Text != "") {
+                historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} LIKE '*{FilterStringTextBox.Text}*'";
             }
         }
 
@@ -968,31 +996,27 @@ namespace ProductDatabase {
         // 使用基板表示
         private void ShowDataForm() {
 
-            // 選択されたセルがない場合は処理を終了
             if (DataBaseDataGridView.CurrentCell is null) { return; }
 
-            // 新しいフォームクラスを作成
             var dataForm = new Form {
                 Text = "使用基板",
-                ShowIcon = false, // アイコンを非表示
+                ShowIcon = false,
                 Width = 800,
                 Height = 400,
-                MaximizeBox = false, // 最大化ボタンを非表示
-                MinimizeBox = false, // 最小化ボタンを非表示
-                StartPosition = FormStartPosition.CenterScreen // 画面中央に表示
+                MaximizeBox = false,
+                MinimizeBox = false,
+                StartPosition = FormStartPosition.CenterScreen
             };
 
-            // DataGridViewをフォームに追加
             var dataGridView = new DataGridView {
                 Dock = DockStyle.Fill,
-                AllowUserToAddRows = false, // 行の追加を禁止
-                AllowUserToDeleteRows = false, // 行の削除を禁止
-                ReadOnly = true, // 編集を禁止
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells // 列幅を自動設定
+                AllowUserToAddRows = false,
+                AllowUserToDeleteRows = false,
+                ReadOnly = true,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells
             };
             dataForm.Controls.Add(dataGridView);
 
-            // データベース接続とSQLクエリの実行
             using SqliteConnection con = new(GetConnectionRegistration());
             {
                 con.Open();
@@ -1023,20 +1047,16 @@ namespace ProductDatabase {
                 var dt = new DataTable();
 
                 dt.Load(reader);
-                // DataGridViewにデータを表示
                 dataGridView.DataSource = dt;
             }
-            // 新しいウィンドウを表示
             dataForm.ShowDialog();
         }
 
         // 成績書作成
         private void GenerateReport() {
             try {
-                // --- 処理中カーソルに変更 ---
                 Cursor.Current = Cursors.WaitCursor;
 
-                // 選択されたセルがない場合は処理を終了
                 if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 _productRegisterWork.RowID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
@@ -1053,17 +1073,14 @@ namespace ProductDatabase {
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
-                // --- 通常カーソルに戻す ---
                 Cursor.Current = Cursors.Default;
             }
         }
         // リスト作成
         private void GenerateList() {
             try {
-                // --- 処理中カーソルに変更 ---
                 Cursor.Current = Cursors.WaitCursor;
 
-                // 選択されたセルがない場合は処理を終了
                 if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 _productRegisterWork.RowID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
@@ -1081,17 +1098,14 @@ namespace ProductDatabase {
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
-                // --- 通常カーソルに戻す ---
                 Cursor.Current = Cursors.Default;
             }
         }
         // チェックシート作成
         private void GenerateCheckSheet() {
             try {
-                // --- 処理中カーソルに変更 ---
                 Cursor.Current = Cursors.WaitCursor;
 
-                // 選択されたセルがない場合は処理を終了
                 if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
@@ -1107,13 +1121,11 @@ namespace ProductDatabase {
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
-                // --- 通常カーソルに戻す ---
                 Cursor.Current = Cursors.Default;
             }
         }
 
         private void ClosedEvents() {
-            // 編集モードのトランザクションをコミットしてロック解除
             if (_editModeTransaction is not null) {
                 _editModeTransaction.Commit();
                 _editModeTransaction.Dispose();
