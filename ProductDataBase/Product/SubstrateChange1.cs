@@ -26,81 +26,91 @@ namespace ProductDatabase {
 
         // ロードイベント
         private void LoadEvents() {
-            try {
-                Font = new Font(_appSettings.FontName, _appSettings.FontSize);
+            Font = new Font(_appSettings.FontName, _appSettings.FontSize);
 
-                using SqliteConnection con = new(GetConnectionRegistration());
-                con.Open();
-                HistoryTable.Clear();
+            using SqliteConnection con = new(GetConnectionRegistration());
+            con.Open();
+            HistoryTable.Clear();
 
-                using var cmd = con.CreateCommand();
-                cmd.CommandText =
-                    $"""
+            using var cmd = con.CreateCommand();
+            cmd.CommandText =
+                $"""
                     SELECT
-                        *
+                        ID,
+                        ProductName,
+                        ProductType,
+                        ProductModel,
+                        OrderNumber,
+                        ProductNumber,
+                        Quantity,
+                        SerialFirst,
+                        SerialLast,
+                        SerialLastNumber,
+                        Revision,
+                        RevisionGroup,
+                        Person,
+                        RegDate,    
+                        Comment,
+                        CreatedAt
                     FROM
                         {Constants.VProductTableName}
                     WHERE
-                        ProductModel = @ProductModel AND Quantity > 1
+                        ProductID = @ProductID 
+                        AND Quantity > 1
                     ORDER BY
                         ID DESC
                     ;
                     """;
 
-                cmd.Parameters.Add("@ProductModel", SqliteType.Text).Value = _productMaster.ProductModel;
+            cmd.Parameters.Add("@ProductID", SqliteType.Text).Value = _productMaster.ProductID;
 
-                using (var reader = cmd.ExecuteReader()) {
-                    HistoryTable.Load(reader);
-                }
-
-                SubstrateChangeDataGridView.DataSource = HistoryTable;
-
-                _colFilter.Add("");
-                for (var i = 0; i < SubstrateChangeDataGridView.ColumnCount; i++) {
-                    var headerValue = SubstrateChangeDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
-                    if (headerValue is not null) { _colFilter.Add(headerValue); }
-                }
-
-                // 最大サイズをディスプレイサイズに合わせる
-                if (Screen.PrimaryScreen is not null) {
-                    var h = Screen.PrimaryScreen.Bounds.Height;
-                    var w = Screen.PrimaryScreen.Bounds.Width;
-                    SubstrateChangeDataGridView.MaximumSize = new Size(w, h);
-                }
-                SubstrateChangeDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(SubstrateChangeDataGridView.Font, FontStyle.Bold);
-                SubstrateChangeDataGridView.RowHeadersVisible = true;
-                SubstrateChangeDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
-                // ヘッダーとすべてのセルの内容に合わせて、行の高さを自動調整する
-                SubstrateChangeDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-                SubstrateChangeDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-
-                SubstrateChangeDataGridView.Columns["ID"].HeaderCell.Value = "ID";
-                SubstrateChangeDataGridView.Columns["ID"].Width = 40;
-                SubstrateChangeDataGridView.Columns["ProductName"].HeaderCell.Value = "製品名";
-                SubstrateChangeDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
-                SubstrateChangeDataGridView.Columns["ProductNumber"].HeaderCell.Value = "製造番号";
-                SubstrateChangeDataGridView.Columns["ProductNumber"].Width = 130;
-                SubstrateChangeDataGridView.Columns["ProductType"].HeaderCell.Value = "製品名";
-                SubstrateChangeDataGridView.Columns["ProductModel"].HeaderCell.Value = "製品型式";
-                SubstrateChangeDataGridView.Columns["Quantity"].HeaderCell.Value = "数量";
-                SubstrateChangeDataGridView.Columns["Quantity"].Width = 40;
-                SubstrateChangeDataGridView.Columns["Person"].HeaderCell.Value = "担当者";
-                SubstrateChangeDataGridView.Columns["Person"].Width = 70;
-                SubstrateChangeDataGridView.Columns["RegDate"].HeaderCell.Value = "登録日";
-                SubstrateChangeDataGridView.Columns["RegDate"].Width = 80;
-                SubstrateChangeDataGridView.Columns["Revision"].HeaderCell.Value = "Rev";
-                SubstrateChangeDataGridView.Columns["Revision"].Width = 40;
-                SubstrateChangeDataGridView.Columns["RevisionGroup"].HeaderCell.Value = "RevGroup";
-                SubstrateChangeDataGridView.Columns["SerialFirst"].HeaderCell.Value = "シリアル先頭";
-                SubstrateChangeDataGridView.Columns["SerialLast"].HeaderCell.Value = "シリアル末尾";
-                SubstrateChangeDataGridView.Columns["SerialLastNumber"].HeaderCell.Value = "末番";
-                SubstrateChangeDataGridView.Columns["SerialLastNumber"].Width = 40;
-                SubstrateChangeDataGridView.Columns["Comment"].HeaderCell.Value = "コメント";
-
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } finally {
+            using (var reader = cmd.ExecuteReader()) {
+                HistoryTable.Load(reader);
             }
+
+            SubstrateChangeDataGridView.DataSource = HistoryTable;
+
+            _colFilter.Add("");
+            for (var i = 0; i < SubstrateChangeDataGridView.ColumnCount; i++) {
+                var headerValue = SubstrateChangeDataGridView.Columns[i].HeaderCell.Value?.ToString() ?? string.Empty;
+                if (headerValue is not null) { _colFilter.Add(headerValue); }
+            }
+
+            if (Screen.PrimaryScreen is not null) {
+                var h = Screen.PrimaryScreen.Bounds.Height;
+                var w = Screen.PrimaryScreen.Bounds.Width;
+                SubstrateChangeDataGridView.MaximumSize = new Size(w, h);
+            }
+            SubstrateChangeDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(SubstrateChangeDataGridView.Font, FontStyle.Bold);
+            SubstrateChangeDataGridView.RowHeadersVisible = true;
+            SubstrateChangeDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
+
+            SubstrateChangeDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            SubstrateChangeDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+
+            SubstrateChangeDataGridView.Columns["ID"].HeaderCell.Value = "ID";
+            SubstrateChangeDataGridView.Columns["ID"].Width = 40;
+            SubstrateChangeDataGridView.Columns["ProductName"].HeaderCell.Value = "製品名";
+            SubstrateChangeDataGridView.Columns["OrderNumber"].HeaderCell.Value = "注文番号";
+            SubstrateChangeDataGridView.Columns["ProductNumber"].HeaderCell.Value = "製造番号";
+            SubstrateChangeDataGridView.Columns["ProductNumber"].Width = 130;
+            SubstrateChangeDataGridView.Columns["ProductType"].HeaderCell.Value = "製品名";
+            SubstrateChangeDataGridView.Columns["ProductModel"].HeaderCell.Value = "製品型式";
+            SubstrateChangeDataGridView.Columns["Quantity"].HeaderCell.Value = "数量";
+            SubstrateChangeDataGridView.Columns["Quantity"].Width = 40;
+            SubstrateChangeDataGridView.Columns["Person"].HeaderCell.Value = "担当者";
+            SubstrateChangeDataGridView.Columns["Person"].Width = 70;
+            SubstrateChangeDataGridView.Columns["RegDate"].HeaderCell.Value = "登録日";
+            SubstrateChangeDataGridView.Columns["RegDate"].Width = 80;
+            SubstrateChangeDataGridView.Columns["Revision"].HeaderCell.Value = "Rev";
+            SubstrateChangeDataGridView.Columns["Revision"].Width = 40;
+            SubstrateChangeDataGridView.Columns["RevisionGroup"].HeaderCell.Value = "RevGroup";
+            SubstrateChangeDataGridView.Columns["SerialFirst"].HeaderCell.Value = "シリアル先頭";
+            SubstrateChangeDataGridView.Columns["SerialLast"].HeaderCell.Value = "シリアル末尾";
+            SubstrateChangeDataGridView.Columns["SerialLastNumber"].HeaderCell.Value = "シリアル末番";
+            SubstrateChangeDataGridView.Columns["SerialLastNumber"].Width = 40;
+            SubstrateChangeDataGridView.Columns["Comment"].HeaderCell.Value = "コメント";
+
         }
 
         // 基板変更フォームを開く
