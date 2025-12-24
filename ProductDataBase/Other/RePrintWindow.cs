@@ -61,18 +61,16 @@ namespace ProductDatabase {
                 // ComboBoxへ担当者を追加
                 PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
 
-                // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
+                // DB2へ接続し対象製品テーブルの最新のシリアル,リビジョン取得
                 using (SqliteConnection con = new(GetConnectionRegistration())) {
                     con.Open();
                     using var cmd = con.CreateCommand();
-                    // テーブル検索SQL - [ProductName]テーブルの[SubstrateModel]列の[Revision]を取得
                     cmd.CommandText = $"SELECT Revision FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
                     cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = _productMaster.ProductName;
                     cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = _productMaster.RevisionGroup;
                     var result = cmd.ExecuteScalar();
                     RevisionTextBox.Text = result?.ToString() ?? "";
                 }
-                // 印刷UI設定
                 ConfigurePrintSettings();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -107,38 +105,32 @@ namespace ProductDatabase {
         }
         // 登録処理
         private void RegisterCheck(bool isPrint) {
-            try {
-                FormCheck();
-                if (!DataCheck()) { return; }
+            FormCheck();
+            if (!DataCheck()) { return; }
 
-                if (isPrint) {
-                    DialogResult result;
-                    result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                    if (result == DialogResult.Cancel) { return; }
+            if (isPrint) {
+                DialogResult result;
+                result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                if (result == DialogResult.Cancel) { return; }
 
-                    result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                    if (result == DialogResult.Cancel) { return; }
+                result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                if (result == DialogResult.Cancel) { return; }
 
-                    _productRegisterWork.Person = PersonComboBox.Text;
-                    if (!Registration()) { throw new Exception("登録できませんでした。"); }
-                }
+                _productRegisterWork.Person = PersonComboBox.Text;
+                if (!Registration()) { throw new Exception("登録できませんでした。"); }
+            }
 
-                switch (_serialType) {
-                    case "Nameplate":
-                        PrintManager.PrintUsingBPac(NameplatePrintSettings, _serialList);
-                        break;
-                    default:
-                        if (!Print(isPrint)) { throw new Exception("キャンセルしました。"); }
-                        break;
-                }
-
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            switch (_serialType) {
+                case "Nameplate":
+                    PrintManager.PrintUsingBPac(NameplatePrintSettings, _serialList);
+                    break;
+                default:
+                    if (!Print(isPrint)) { throw new Exception("キャンセルしました。"); }
+                    break;
             }
         }
         private bool Registration() {
             try {
-                // 再印刷登録テーブルへ追加
                 using SqliteConnection con = new(GetConnectionRegistration());
                 con.Open();
                 using var cmd = con.CreateCommand();
@@ -179,7 +171,6 @@ namespace ProductDatabase {
                     ;
                     """;
 
-                // チェックボックスにチェックがない場合はNullを
                 cmd.Parameters.Add("@SerialPrintType", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_serialType) ? DBNull.Value : _serialType;
                 cmd.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.OrderNumber) ? DBNull.Value : _productRegisterWork.OrderNumber;
                 cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productMaster.ProductName) ? DBNull.Value : _productMaster.ProductName;
@@ -225,7 +216,6 @@ namespace ProductDatabase {
             }
         }
         private bool FormCheck() {
-            // 入力フォームのチェック
             var anyTextBoxEnabled = false;
             var allTextBoxesFilled = true;
 
@@ -244,16 +234,14 @@ namespace ProductDatabase {
                 : !allTextBoxesFilled
                 ? throw new Exception("空欄があります。")
                 : ManufacturingNumberCheckBox.Checked &&
-                  !manufacturingNumber.StartsWith("R", StringComparison.OrdinalIgnoreCase) &&
-                  manufacturingNumber.Length != 15
+                    !manufacturingNumber.StartsWith("R", StringComparison.OrdinalIgnoreCase) &&
+                    manufacturingNumber.Length != 15
                 ? throw new Exception("製番を10桁+4桁で入力して下さい。")
                 : true;
         }
         private bool DataCheck() {
             var revision = RevisionTextBox.Text.Trim();
             if (RevisionCheckBox.Checked) {
-                // revision.Any(...) は、revision 内のいずれかの文字が条件を満たす場合に true を返します。
-                // char.ToUpperInvariant(c) は、文字を大文字に変換し、比較を行います。
                 if (revision.Any(c => "IO".Contains(char.ToUpperInvariant(c)))) {
                     MessageBox.Show("Revisionに I, O は使用できません。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     RevisionTextBox.Focus();
@@ -293,19 +281,17 @@ namespace ProductDatabase {
                 return false;
             }
 
-            // 最終シリアル番号計算
-            var calculatedLastSerial = quantity + firstSerial - 1; // 数量と開始番号から最終シリアルを算出
+            var calculatedLastSerial = quantity + firstSerial - 1;
 
-            // シリアル番号の桁数に応じて、閾値とリセット値を設定
             (var minNumber, var maxNumber, var digit) = _productMaster.SerialDigitType switch {
                 3 => (1, 999, 3),
                 4 => (1, 9999, 4),
                 101 => (1, 899, 3),
                 102 => (901, 999, 3),
-                _ => throw new InvalidOperationException("不明なシリアル桁数です。") // より具体的な例外
+                _ => throw new InvalidOperationException("不明なシリアル桁数です。")
             };
 
-            if (calculatedLastSerial > maxNumber || firstSerial < minNumber) {// あるいは firstSerialが minNumber未満の場合も対象に
+            if (calculatedLastSerial > maxNumber || firstSerial < minNumber) {
                 MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 FirstSerialNumberTextBox.Text = minNumber.ToString();
             }
@@ -335,7 +321,6 @@ namespace ProductDatabase {
         // 印刷処理
         private bool Print(bool isPrint) {
             try {
-                // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
                 var isPreview = !isPrint;
                 var serialType = _serialType;
@@ -352,24 +337,19 @@ namespace ProductDatabase {
 
                 switch (isPrint) {
                     case true:
-                        // PrintDialogクラスの作成
                         var pdlg = new PrintDialog {
                             Document = pd
                         };
                         if (pdlg.ShowDialog() == DialogResult.OK) {
-                            // ローディング画面の表示
                             using var loadingForm = new LoadingForm();
-                            // 別スレッドで印刷処理を実行
                             Task.Run(() => {
                                 try {
                                     pd.Print();
                                 } finally {
-                                    // 印刷が終了したらローディング画面を閉じる
                                     loadingForm.Invoke(new System.Action(() => loadingForm.Close()));
                                 }
                             });
 
-                            // ローディング画面をモーダルとして表示
                             loadingForm.ShowDialog();
                         }
                         else {
@@ -377,7 +357,6 @@ namespace ProductDatabase {
                         }
                         return true;
                     case false:
-                        // PrintPreviewDialogオブジェクトの作成
                         var ppd = new PrintPreviewDialog();
                         ppd.Shown += (sender, e) => {
                             var tool = (ToolStrip)ppd.Controls[1];
@@ -538,7 +517,6 @@ namespace ProductDatabase {
                 MinimizeBox = false
             };
 
-            // ListView作成
             var listView = new ListView {
                 Dock = DockStyle.Fill,
                 View = View.Details,
@@ -547,21 +525,18 @@ namespace ProductDatabase {
                 Font = new Font("PlemolJP", _appSettings.FontSize),
             };
 
-            // 列の追加
-            listView.Columns.Add("", 0);   // 値列の幅（調整可）
-            listView.Columns.Add("項目", 200, HorizontalAlignment.Right);  // 項目列の幅
-            listView.Columns.Add("値", 360);   // 値列の幅（調整可）
+            listView.Columns.Add("", 0);
+            listView.Columns.Add("項目", 200, HorizontalAlignment.Right);
+            listView.Columns.Add("値", 360);
 
-            // データを追加
             foreach (var kvp in items) {
-                var item = new ListViewItem("");  // ダミー1列目
+                var item = new ListViewItem("");
                 item.SubItems.Add(kvp.Key);
                 item.SubItems.Add(kvp.Value);
                 listView.Items.Add(item);
             }
             form.Controls.Add(listView);
 
-            // フォームのイベントハンドラ
             form.Shown += (_, _) => {
                 listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             };
