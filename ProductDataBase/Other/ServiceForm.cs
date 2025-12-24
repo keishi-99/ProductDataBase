@@ -24,66 +24,50 @@ namespace ProductDatabase.Other {
                 ServiceInfo.ServiceDataTable.Load(reader);
             }
 
-            // CategoryName 列の重複を削除し、ソートする
             var categoryNames = ServiceInfo.ServiceDataTable.AsEnumerable()
                 .Select(row => row.Field<string?>("CategoryName") ?? string.Empty)
                 .Distinct()
                 .ToList();
 
-            // リストボックスにアイテムを追加する
             CategoryListBox1.Items.AddRange([.. categoryNames]);
 
             RegisterButton.Enabled = false;
         }
 
         private void CategoryListBox1Select() {
-            try {
-                RegisterButton.Enabled = false;
-                CategoryListBox2.Items.Clear();
-                CategoryListBox3.Items.Clear();
+            RegisterButton.Enabled = false;
+            CategoryListBox2.Items.Clear();
+            CategoryListBox3.Items.Clear();
 
-                HashSet<string> productNames = [];
+            HashSet<string> productNames = [];
 
-                var selectedRows = ServiceInfo.ServiceDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductModel <> 'SERVICE'", "ProductName ASC");
+            var selectedRows = ServiceInfo.ServiceDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductModel <> 'SERVICE'", "ProductName ASC");
 
-                foreach (var row in selectedRows) {
-                    var productName = row["ProductName"].ToString() ?? throw new Exception("ProductName is null");
-                    productNames.Add(productName);
-                }
-
-                CategoryListBox2.Items.AddRange([.. productNames]);
-
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            foreach (var row in selectedRows) {
+                var productName = row["ProductName"].ToString() ?? throw new Exception("ProductName is null");
+                productNames.Add(productName);
             }
+
+            CategoryListBox2.Items.AddRange([.. productNames]);
         }
         private void CategoryListBox2Select() {
-            try {
-                RegisterButton.Enabled = false;
-                CategoryListBox3.Items.Clear();
+            RegisterButton.Enabled = false;
+            CategoryListBox3.Items.Clear();
 
-                DataRow[] selectedRows;
+            DataRow[] selectedRows;
 
-                selectedRows = ServiceInfo.ServiceDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductType ASC");
-                HashSet<string> productTypes = [.. selectedRows.AsEnumerable()
+            selectedRows = ServiceInfo.ServiceDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}'", "ProductType ASC");
+            HashSet<string> productTypes = [.. selectedRows.AsEnumerable()
                     .Select(x => x.Field<string>("ProductType"))
                     .Where(x => x is not null)
                     .Select(x => x!)];
 
-                CategoryListBox3.Items.AddRange([.. productTypes]);
-
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            CategoryListBox3.Items.AddRange([.. productTypes]);
         }
         private void CategoryListBox3Select() {
-            try {
-                if (CategoryListBox3.SelectedIndex == -1) { return; ; }
-                RegisterButton.Enabled = true;
-                ServiceInfo.ServiceProductType = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            if (CategoryListBox3.SelectedIndex == -1) { return; ; }
+            RegisterButton.Enabled = true;
+            ServiceInfo.ServiceProductType = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
         }
         private DialogResult Registration() {
             var selectedRows = ServiceInfo.ServiceDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
