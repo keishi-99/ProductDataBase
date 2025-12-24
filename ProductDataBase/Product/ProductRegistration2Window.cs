@@ -64,16 +64,17 @@ namespace ProductDatabase {
                     case 2:
                     case 4:
                     case 3:
+                        if (_productMaster.SheetPrintType == 3) {
+                            break;
+                        }
+                        LoadSubstrateData(_sqliteConnection);
+                        break;
                     case 9:
-                        if (_productMaster.RegType == 9) {
-                            using ServiceForm window = new(ServiceInfo);
+                        using (ServiceForm window = new(ServiceInfo)) {
                             if (window.ShowDialog(this) != DialogResult.OK) {
                                 Close();
                             }
                             ServiceInfo = window.ServiceInfo;
-                        }
-                        if (_productMaster.SheetPrintType == 3) {
-                            break;
                         }
                         LoadSubstrateData(_sqliteConnection);
                         break;
@@ -126,8 +127,7 @@ namespace ProductDatabase {
         private void LoadSubstrateData(SqliteConnection connection) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = _productMaster.RegType == 9;
-            var useSubstrates = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrates : _productMaster.UseSubstrates)
-                ?? throw new Exception("ArrUseSubstrateが nullです。");
+            var useSubstrates = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrates : _productMaster.UseSubstrates);
 
             var shortageSubstrateName = string.Empty;
 
@@ -205,9 +205,12 @@ namespace ProductDatabase {
                 FROM
                     {Constants.VSubstrateTableName}
                 WHERE
-                    SubstrateID = @SubstrateID AND SubstrateModel = @SubstrateModel AND SubstrateNumber NOTNULL
+                    SubstrateID = @SubstrateID 
+                    AND SubstrateNumber NOTNULL
                 GROUP BY
-                    SubstrateName, SubstrateModel, SubstrateNumber
+                    SubstrateName,
+                    SubstrateModel,
+                    SubstrateNumber
                 HAVING
                     Stock > 0
                 ORDER BY
@@ -215,7 +218,7 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            using var dr = ExecuteReader(connection, commandText, ("@SubstrateID", substrateID), ("@SubstrateModel", substrateModel));
+            using var dr = ExecuteReader(connection, commandText, ("@SubstrateID", substrateID));
 
             while (dr.Read()) {
                 var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
@@ -347,7 +350,6 @@ namespace ProductDatabase {
                 transaction.Commit();
 
             } catch (Exception) {
-                // エラーが発生した場合はトランザクションをロールバック
                 transaction.Rollback();
                 MessageBox.Show("登録に失敗しました。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 throw;
@@ -408,7 +410,7 @@ namespace ProductDatabase {
                 ("@SerialLast", _productRegisterWork.SerialLast),
                 ("@SerialLastNumber", _productMaster.IsSerialGeneration ? _serialLastNumber : DBNull.Value),
                 ("@Comment", comment)
-                );
+            );
 
             _productRegisterWork.RowID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {Constants.VProductTableName};"));
         }
@@ -441,8 +443,7 @@ namespace ProductDatabase {
         private void RegisterSubstrate(SqliteConnection connection) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = _productMaster.RegType == 9;
-            var useSubstrates = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrates : _productMaster.UseSubstrates)
-                ?? throw new Exception("ArrUseSubstrateが nullです。");
+            var useSubstrates = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrates : _productMaster.UseSubstrates);
             long? useID = _productRegisterWork.RowID;
 
             for (var i = 0; i < useSubstrates.Count; i++) {
@@ -482,8 +483,7 @@ namespace ProductDatabase {
                 FROM
                     {Constants.VSubstrateTableName}
                 WHERE
-                    SubstrateID = @SubstrateID 
-                    AND SubstrateModel = @SubstrateModel 
+                    SubstrateID = @SubstrateID
                     AND SubstrateNumber = @SubstrateNumber
                 GROUP BY
                     OrderNumber
@@ -494,7 +494,6 @@ namespace ProductDatabase {
 
             using var dr = ExecuteReader(connection, commandText,
                 ("@SubstrateID", substrateID),
-                ("@SubstrateModel", substrateModel),
                 ("@SubstrateNumber", substrateNumber)
             );
 
@@ -541,7 +540,7 @@ namespace ProductDatabase {
                 ("@RegDate", _productRegisterWork.RegDate),
                 ("@Comment", comment),
                 ("@UseID", useID)
-                );
+            );
         }
 
         private static void ExecuteNonQuery(SqliteConnection connection, string commandText, params (string, object?)[] parameters) {
@@ -915,24 +914,19 @@ namespace ProductDatabase {
 
                 switch (isPreview) {
                     case false:
-                        // PrintDialogクラスの作成
                         var pdlg = new PrintDialog {
                             Document = pd
                         };
                         if (pdlg.ShowDialog() == DialogResult.OK) {
-                            // ローディング画面の表示
                             using var loadingForm = new LoadingForm();
-                            // 別スレッドで印刷処理を実行
                             Task.Run(() => {
                                 try {
                                     pd.Print();
                                 } finally {
-                                    // 印刷が終了したらローディング画面を閉じる
                                     loadingForm.Invoke(new System.Action(() => loadingForm.Close()));
                                 }
                             });
 
-                            // ローディング画面をモーダルとして表示
                             loadingForm.ShowDialog();
                         }
                         else {
@@ -940,7 +934,6 @@ namespace ProductDatabase {
                         }
                         return true;
                     case true:
-                        // PrintPreviewDialogオブジェクトの作成
                         var ppd = new PrintPreviewDialog();
                         ppd.Shown += (sender, e) => {
                             var tool = (ToolStrip)ppd.Controls[1];
@@ -1060,42 +1053,36 @@ namespace ProductDatabase {
         // 成績書作成
         private void GenerateReport() {
             try {
-                // --- 処理中カーソルに変更 ---
                 Cursor.Current = Cursors.WaitCursor;
 
                 ExcelServiceClosedXml.ReportGeneratorClosedXml.GenerateReport(_productMaster, _productRegisterWork);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
-                // --- 通常カーソルに戻す ---
                 Cursor.Current = Cursors.Default;
             }
         }
         // リスト作成
         private void GenerateList() {
             try {
-                // --- 処理中カーソルに変更 ---
                 Cursor.Current = Cursors.WaitCursor;
 
                 ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(_productMaster, _productRegisterWork);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
-                // --- 通常カーソルに戻す ---
                 Cursor.Current = Cursors.Default;
             }
         }
         // チェックシート作成
         private void GenerateCheckSheet() {
             try {
-                // --- 処理中カーソルに変更 ---
                 Cursor.Current = Cursors.WaitCursor;
 
                 ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.GenerateCheckSheet(_productMaster, _productRegisterWork);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            // --- 処理中カーソルに変更 ---
             Cursor.Current = Cursors.WaitCursor;
         }
 
@@ -1134,7 +1121,6 @@ namespace ProductDatabase {
                 MinimizeBox = false
             };
 
-            // ListView作成
             var listView = new ListView {
                 Dock = DockStyle.Fill,
                 View = View.Details,
@@ -1143,12 +1129,10 @@ namespace ProductDatabase {
                 Font = new Font("PlemolJP", _appSettings.FontSize),
             };
 
-            // 列の追加
             listView.Columns.Add("", 0);   // 値列の幅（調整可）
             listView.Columns.Add("項目", 200, HorizontalAlignment.Right);  // 項目列の幅
             listView.Columns.Add("値", 360);   // 値列の幅（調整可）
 
-            // データを追加
             foreach (var kvp in items) {
                 var item = new ListViewItem("");  // ダミー1列目
                 item.SubItems.Add(kvp.Key);
@@ -1157,7 +1141,6 @@ namespace ProductDatabase {
             }
             form.Controls.Add(listView);
 
-            // フォームのイベントハンドラ
             form.Shown += (_, _) => {
                 listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             };
