@@ -101,7 +101,6 @@ namespace ProductDatabase {
 
                 RegisterButton.Enabled = false;
 
-                // 印刷のみにチェックがある場合登録処理をしない
                 if (!PrintOnlyCheckBox.Checked) {
                     if (isPrint && !Registration()) {
                         return;
@@ -159,7 +158,6 @@ namespace ProductDatabase {
                             {Constants.VSubstrateTableName}
                         WHERE
                             SubstrateID = @SubstrateID
-                            AND SubstrateModel = @SubstrateModel
                             AND SubstrateNumber = @SubstrateNumber
                         GROUP BY
                             SubstrateID, 
@@ -174,7 +172,6 @@ namespace ProductDatabase {
                         """;
                     using var dr = ExecuteReader(con, commandText,
                         ("@SubstrateID", _substrateMaster.SubstrateID),
-                        ("@SubstrateModel", _substrateMaster.SubstrateModel),
                         ("@SubstrateNumber", substrateNumber)
                     );
                     while (dr.Read()) {
@@ -337,8 +334,8 @@ namespace ProductDatabase {
                 : !allTextBoxesFilled
                 ? throw new Exception("空欄があります。")
                 : ManufacturingNumberCheckBox.Checked &&
-                  !manufacturingNumber.StartsWith("R", StringComparison.OrdinalIgnoreCase) &&
-                  manufacturingNumber.Length != 15
+                    !manufacturingNumber.StartsWith("R", StringComparison.OrdinalIgnoreCase) &&
+                    manufacturingNumber.Length != 15
                 ? throw new Exception("製番を10桁+4桁で入力して下さい。")
                 : true;
         }
@@ -433,7 +430,6 @@ namespace ProductDatabase {
         // 印刷処理
         private void PrintStart(bool isPrint) {
             try {
-                // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
 
                 var isPreview = !isPrint;
@@ -455,30 +451,24 @@ namespace ProductDatabase {
 
                 switch (isPrint) {
                     case true:
-                        // PrintDialogクラスの作成
                         var pdlg = new PrintDialog {
                             Document = pd
                         };
                         if (pdlg.ShowDialog() == DialogResult.OK) {
-                            // ローディング画面の表示
                             using var loadingForm = new LoadingForm();
-                            // 別スレッドで印刷処理を実行
                             Task.Run(() => {
                                 try {
                                     pd.Print();
                                 } finally {
-                                    // 印刷が終了したらローディング画面を閉じる
                                     loadingForm.Invoke(new System.Action(() => loadingForm.Close()));
                                 }
                             });
 
-                            // ローディング画面をモーダルとして表示
                             loadingForm.ShowDialog();
                         }
                         break;
                     case false:
                         _substrateRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
-                        // PrintPreviewDialogオブジェクトの作成
                         var ppd = new PrintPreviewDialog();
                         ppd.Shown += (sender, e) => {
                             var tool = (ToolStrip)ppd.Controls[1];
@@ -647,7 +637,6 @@ namespace ProductDatabase {
                 MinimizeBox = false
             };
 
-            // ListView作成
             var listView = new ListView {
                 Dock = DockStyle.Fill,
                 View = View.Details,
@@ -656,12 +645,10 @@ namespace ProductDatabase {
                 Font = new Font("PlemolJP", _appSettings.FontSize), // 等幅フォント
             };
 
-            // 列の追加
             listView.Columns.Add("", 0);   // 値列の幅（調整可）
             listView.Columns.Add("項目", 200, HorizontalAlignment.Right);  // 項目列の幅
             listView.Columns.Add("値", 360);   // 値列の幅（調整可）
 
-            // データを追加
             foreach (var kvp in items) {
                 var item = new ListViewItem("");  // ダミー1列目
                 item.SubItems.Add(kvp.Key);
@@ -670,7 +657,6 @@ namespace ProductDatabase {
             }
             form.Controls.Add(listView);
 
-            // フォームのイベントハンドラ
             form.Shown += (_, _) => {
                 listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             };
