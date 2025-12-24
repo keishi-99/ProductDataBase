@@ -112,7 +112,6 @@ namespace ProductDatabase {
         // 登録チェック
         private void RegisterCheck() {
             try {
-                // 入力フォームのチェック
                 var anyTextBoxEnabled = false;
                 var allTextBoxesFilled = true;
 
@@ -135,8 +134,6 @@ namespace ProductDatabase {
 
                 var revision = RevisionTextBox.Text.Trim();
                 if (RevisionCheckBox.Checked) {
-                    // revision.Any(...) は、revision 内のいずれかの文字が条件を満たす場合に true を返します。
-                    // char.ToUpperInvariant(c) は、文字を大文字に変換し、比較を行います。
                     if (revision.Any(c => "IO".Contains(char.ToUpperInvariant(c)))) {
                         MessageBox.Show("Revisionに I, O は使用できません。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         RevisionTextBox.Focus();
@@ -147,7 +144,6 @@ namespace ProductDatabase {
                 if (ManufacturingNumberCheckBox.Checked) {
                     string text = ManufacturingNumberMaskedTextBox.Text.Trim();
 
-                    // 先頭が "R" の場合はスキップ
                     if (!text.StartsWith("R", StringComparison.OrdinalIgnoreCase) && text.Length != 15) {
                         throw new Exception("製番を10桁+4桁で入力して下さい。");
                     }
@@ -193,19 +189,17 @@ namespace ProductDatabase {
                         return;
                     }
 
-                    // 最終シリアル番号計算
-                    var calculatedLastSerial = quantity + firstSerial - 1; // 数量と開始番号から最終シリアルを算出
+                    var calculatedLastSerial = quantity + firstSerial - 1;
 
-                    // シリアル番号の桁数に応じて、閾値とリセット値を設定
                     (var minNumber, var maxNumber, var digit) = _productMaster.SerialDigitType switch {
                         3 => (1, 999, 3),
                         4 => (1, 9999, 4),
                         101 => (1, 899, 3),
                         102 => (901, 999, 3),
-                        _ => throw new InvalidOperationException("不明なシリアル桁数です。") // より具体的な例外
+                        _ => throw new InvalidOperationException("不明なシリアル桁数です。")
                     };
 
-                    if (calculatedLastSerial > maxNumber || firstSerial < minNumber) {// あるいは firstSerialが minNumber未満の場合も対象に
+                    if (calculatedLastSerial > maxNumber || firstSerial < minNumber) {
                         MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         FirstSerialNumberTextBox.Text = minNumber.ToString();
                         firstSerial = minNumber;
@@ -246,8 +240,6 @@ namespace ProductDatabase {
             }
 
             var revision = RevisionTextBox.Text.Trim();
-            // revision.Any(...) は、revision 内のいずれかの文字が条件を満たす場合に true を返します。
-            // char.ToUpperInvariant(c) は、文字を大文字に変換し、比較を行います。
             if (revision.Any(c => "IO".Contains(char.ToUpperInvariant(c)))) {
                 MessageBox.Show("Revisionに I, O は使用できません。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 RevisionTextBox.Focus();
@@ -284,7 +276,19 @@ namespace ProductDatabase {
                 );
                 """;
 
-                var serialLastNum = ExecuteScalar(connection, $"SELECT SerialLastNumber FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;", ("@ProductName", _productMaster.ProductName));
+                var serialLastNum = ExecuteScalar(connection,
+                    $"""
+                    SELECT 
+                        SerialLastNumber
+                    FROM 
+                        {Constants.VProductTableName} 
+                    WHERE 
+                        ProductName = @ProductName 
+                        AND SerialLastNumber NOT NULL 
+                    ORDER BY 
+                        ID DESC
+                    ;
+                    """, ("@ProductName", _productMaster.ProductName));
 
                 ExecuteNonQuery(connection, commandText,
                     ("@ProductID", _productMaster.ProductID),
@@ -303,7 +307,7 @@ namespace ProductDatabase {
 
                 MessageBox.Show("Revision変更完了", "Revision変更", MessageBoxButtons.OK, MessageBoxIcon.Information);
             } catch (Exception ex) {
-                if (transaction.Connection is not null) { // 接続が開いているか確認する。
+                if (transaction.Connection is not null) {
                     transaction.Rollback();
                 }
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -403,22 +407,18 @@ namespace ProductDatabase {
         }
         // QR入力処理
         private void QrInput() {
-            try {
-                if (string.IsNullOrWhiteSpace(QrCodeTextBox.Text)) { return; }
-                string[] separator = ["//"];
-                var code = textToUpperCheckBox.Checked ? QrCodeTextBox.Text.ToUpper() : QrCodeTextBox.Text;
-                var arr = code.Split(separator, StringSplitOptions.None);
-                if (arr.Length != 4) {
-                    MessageBox.Show("QRコードが正しくありません。");
-                    return;
-                }
-                if (arr is not null) {
-                    ManufacturingNumberMaskedTextBox.Text = arr[0];
-                    QuantityTextBox.Text = arr[2];
-                    OrderNumberTextBox.Text = arr[3];
-                }
-            } catch (Exception ex) {
-                throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}");
+            if (string.IsNullOrWhiteSpace(QrCodeTextBox.Text)) { return; }
+            string[] separator = ["//"];
+            var code = textToUpperCheckBox.Checked ? QrCodeTextBox.Text.ToUpper() : QrCodeTextBox.Text;
+            var arr = code.Split(separator, StringSplitOptions.None);
+            if (arr.Length != 4) {
+                MessageBox.Show("QRコードが正しくありません。");
+                return;
+            }
+            if (arr is not null) {
+                ManufacturingNumberMaskedTextBox.Text = arr[0];
+                QuantityTextBox.Text = arr[2];
+                OrderNumberTextBox.Text = arr[3];
             }
         }
         // ログ出力
@@ -469,7 +469,6 @@ namespace ProductDatabase {
                 MinimizeBox = false
             };
 
-            // ListView作成
             var listView = new ListView {
                 Dock = DockStyle.Fill,
                 View = View.Details,
@@ -478,21 +477,18 @@ namespace ProductDatabase {
                 Font = new Font("PlemolJP", _appSettings.FontSize),
             };
 
-            // 列の追加
-            listView.Columns.Add("", 0);   // 値列の幅（調整可）
-            listView.Columns.Add("項目", 200, HorizontalAlignment.Right);  // 項目列の幅
-            listView.Columns.Add("値", 360);   // 値列の幅（調整可）
+            listView.Columns.Add("", 0);
+            listView.Columns.Add("項目", 200, HorizontalAlignment.Right);
+            listView.Columns.Add("値", 360);
 
-            // データを追加
             foreach (var kvp in items) {
-                var item = new ListViewItem("");  // ダミー1列目
+                var item = new ListViewItem("");
                 item.SubItems.Add(kvp.Key);
                 item.SubItems.Add(kvp.Value);
                 listView.Items.Add(item);
             }
             form.Controls.Add(listView);
 
-            // フォームのイベントハンドラ
             form.Shown += (_, _) => {
                 listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             };
@@ -501,40 +497,31 @@ namespace ProductDatabase {
 
         // JSON から機種別注意メッセージ取得
         public static string? GetProductMessage(string filePath, string productName) {
-            // JSON 読み込み
             var jsonText = File.ReadAllText(filePath);
             var jsonObj = JObject.Parse(jsonText);
-            // 機種名（キー）に対応するメッセージを取得
+
             return jsonObj[productName]?.ToString();
         }
         // 注意メッセージ更新
         private void ProductMessageChange() {
-            try {
-                if (!File.Exists(_messageFilePath)) {
-                    throw new FileNotFoundException($"{_messageFilePath}\nが見つかりません。");
-                }
+            if (!File.Exists(_messageFilePath)) {
+                throw new FileNotFoundException($"{_messageFilePath}\nが見つかりません。");
+            }
 
-                // JSON 読み込み
-                var json = JObject.Parse(File.ReadAllText(_messageFilePath));
+            var json = JObject.Parse(File.ReadAllText(_messageFilePath));
 
-                // 既存メッセージ取得（無ければ空）
-                string currentMessage = json.ContainsKey(_productMaster.ProductName)
-                    ? json[_productMaster.ProductName]!.ToString()
-                    : "";
+            string currentMessage = json.ContainsKey(_productMaster.ProductName)
+                ? json[_productMaster.ProductName]!.ToString()
+                : "";
 
-                // ダイアログを表示（既存メッセージを初期値にする）
-                using var dialog = new InputDialog("メッセージ編集", "メッセージを入力してください", currentMessage);
+            using var dialog = new InputDialog("メッセージ編集", "メッセージを入力してください", currentMessage);
 
-                if (dialog.ShowDialog() == DialogResult.OK) {
-                    string newMessage = dialog.InputText;
+            if (dialog.ShowDialog() == DialogResult.OK) {
+                string newMessage = dialog.InputText;
 
-                    // JSON に保存（追加 OR 上書き）
-                    json[_productMaster.ProductName] = newMessage;
+                json[_productMaster.ProductName] = newMessage;
 
-                    File.WriteAllText(_messageFilePath, json.ToString());
-                }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                File.WriteAllText(_messageFilePath, json.ToString());
             }
         }
         public class InputDialog : Form {
@@ -562,7 +549,7 @@ namespace ProductDatabase {
                     Top = 50,
                     Width = 340,
                     MaxLength = 80,
-                    Text = defaultText   // ← 初期値をセット
+                    Text = defaultText
                 };
 
                 Button ok = new Button() {
