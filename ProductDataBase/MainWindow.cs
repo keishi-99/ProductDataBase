@@ -221,8 +221,9 @@ namespace ProductDatabase {
         public class ProductRegisterWork {
             public int RowID { get; set; }
             public int ProductID { get; set; }
-            public string ProductNumber { get; set; } = string.Empty;
             public string OrderNumber { get; set; } = string.Empty;
+            public string ProductNumber { get; set; } = string.Empty;
+            public string OLesNumber { get; set; } = string.Empty;
             public string SerialFirst { get; set; } = string.Empty;
             public string SerialLast { get; set; } = string.Empty;
             public int Quantity { get; set; }
