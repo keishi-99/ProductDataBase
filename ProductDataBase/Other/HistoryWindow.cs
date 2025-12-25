@@ -65,6 +65,7 @@ namespace ProductDatabase {
                         { "CategoryName", "カテゴリ" },
                         { "OrderNumber", "注文番号" },
                         { "ProductNumber", "製造番号" },
+                        { "OLesNumber", "OLes番号" },
                         { "ProductName", "製品名" },
                         { "ProductType", "タイプ" },
                         { "ProductModel", "製品型式" },
@@ -368,6 +369,7 @@ namespace ProductDatabase {
                     ProductModel,
                     OrderNumber,
                     ProductNumber,
+                    OLesNumber,
                     Quantity,
                     SerialFirst,
                     SerialLast,
@@ -731,6 +733,7 @@ namespace ProductDatabase {
                                         ID = @ID,
                                         OrderNumber = @OrderNumber,
                                         ProductNumber = @ProductNumber,
+                                        OLesNumber = @OLesNumber,
                                         Person = @Person,
                                         RegDate = @RegDate,
                                         Revision = @Revision,
@@ -746,6 +749,7 @@ namespace ProductDatabase {
                                 command.Parameters.Add("@ID", SqliteType.Integer).Value = row["ID"];
                                 command.Parameters.Add("@OrderNumber", SqliteType.Text).Value = row["OrderNumber"];
                                 command.Parameters.Add("@ProductNumber", SqliteType.Text).Value = row["ProductNumber"];
+                                command.Parameters.Add("@OLesNumber", SqliteType.Text).Value = row["OLesNumber"];
                                 command.Parameters.Add("@Person", SqliteType.Text).Value = row["Person"];
                                 command.Parameters.Add("@RegDate", SqliteType.Text).Value = row["RegDate"];
                                 command.Parameters.Add("@Revision", SqliteType.Text).Value = row["Revision"];
@@ -760,6 +764,7 @@ namespace ProductDatabase {
                                     $"ID[{row["ID", DataRowVersion.Original]}]",
                                     $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
                                     $"製造番号[{row["ProductNumber", DataRowVersion.Original]}]",
+                                    $"OLes番号[{row["OLesNumber", DataRowVersion.Original]}]",
                                     $"製品名[{row["ProductName", DataRowVersion.Original]}]",
                                     $"タイプ[{row["ProductType", DataRowVersion.Original]}]",
                                     $"型式[{row["ProductModel", DataRowVersion.Original]}]",
@@ -779,6 +784,7 @@ namespace ProductDatabase {
                                     $"ID[{row["ID"]}]",
                                     $"注文番号[{row["OrderNumber"]}]",
                                     $"製造番号[{row["ProductNumber"]}]",
+                                    $"OLes番号[{row["OLesNumber"]}]",
                                     $"製品名[{row["ProductName"]}]",
                                     $"タイプ[{row["ProductType"]}]",
                                     $"型式[{row["ProductModel"]}]",
@@ -801,6 +807,7 @@ namespace ProductDatabase {
                                         ProductID = NULL,
                                         OrderNumber = NULL,
                                         ProductNumber = NULL,
+                                        OLesNumber = NULL,
                                         Quantity = NULL,
                                         Person = NULL,
                                         RegDate = NULL,
@@ -825,6 +832,7 @@ namespace ProductDatabase {
                                     $"ID[{row["ID", DataRowVersion.Original]}]",
                                     $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
                                     $"製造番号[{row["ProductNumber", DataRowVersion.Original]}]",
+                                    $"OLes番号[{row["OLesNumber", DataRowVersion.Original]}]",
                                     $"製品名[{row["ProductName", DataRowVersion.Original]}]",
                                     $"[]",
                                     $"[]",

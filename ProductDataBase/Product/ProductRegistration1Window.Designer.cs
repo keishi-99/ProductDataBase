@@ -35,8 +35,8 @@
             this.FirstSerialNumberCheckBox = new CheckBox();
             this.ExtraTextBox3 = new TextBox();
             this.ExtraCheckBox3 = new CheckBox();
-            this.ExtraTextBox2 = new TextBox();
-            this.ExtraCheckBox2 = new CheckBox();
+            this.OLesNumberTextBox = new TextBox();
+            this.OLesNumberCheckBox = new CheckBox();
             this.RevisionTextBox = new TextBox();
             this.RevisionCheckBox = new CheckBox();
             this.ExtraTextBox1 = new TextBox();
@@ -210,28 +210,28 @@
             this.ExtraCheckBox3.UseVisualStyleBackColor = true;
             this.ExtraCheckBox3.CheckedChanged += this.CheckBoxChecked;
             // 
-            // ExtraTextBox2
+            // OLesNumberTextBox
             // 
-            this.ExtraTextBox2.Enabled = false;
-            this.ExtraTextBox2.Location = new Point(166, 191);
-            this.ExtraTextBox2.Margin = new Padding(0);
-            this.ExtraTextBox2.MaxLength = 20;
-            this.ExtraTextBox2.Name = "ExtraTextBox2";
-            this.ExtraTextBox2.Size = new Size(120, 23);
-            this.ExtraTextBox2.TabIndex = 60;
-            this.ExtraTextBox2.TextAlign = HorizontalAlignment.Right;
+            this.OLesNumberTextBox.Enabled = false;
+            this.OLesNumberTextBox.Location = new Point(166, 191);
+            this.OLesNumberTextBox.Margin = new Padding(0);
+            this.OLesNumberTextBox.MaxLength = 20;
+            this.OLesNumberTextBox.Name = "OLesNumberTextBox";
+            this.OLesNumberTextBox.Size = new Size(120, 23);
+            this.OLesNumberTextBox.TabIndex = 60;
+            this.OLesNumberTextBox.TextAlign = HorizontalAlignment.Right;
             // 
-            // ExtraCheckBox2
+            // OLesNumberCheckBox
             // 
-            this.ExtraCheckBox2.Location = new Point(166, 168);
-            this.ExtraCheckBox2.Margin = new Padding(0);
-            this.ExtraCheckBox2.Name = "ExtraCheckBox2";
-            this.ExtraCheckBox2.Size = new Size(50, 19);
-            this.ExtraCheckBox2.TabIndex = 59;
-            this.ExtraCheckBox2.TabStop = false;
-            this.ExtraCheckBox2.Text = "予備";
-            this.ExtraCheckBox2.UseVisualStyleBackColor = true;
-            this.ExtraCheckBox2.CheckedChanged += this.CheckBoxChecked;
+            this.OLesNumberCheckBox.Location = new Point(166, 168);
+            this.OLesNumberCheckBox.Margin = new Padding(0);
+            this.OLesNumberCheckBox.Name = "OLesNumberCheckBox";
+            this.OLesNumberCheckBox.Size = new Size(79, 19);
+            this.OLesNumberCheckBox.TabIndex = 59;
+            this.OLesNumberCheckBox.TabStop = false;
+            this.OLesNumberCheckBox.Text = "OLes番号";
+            this.OLesNumberCheckBox.UseVisualStyleBackColor = true;
+            this.OLesNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // RevisionTextBox
             // 
@@ -588,8 +588,8 @@
             this.Controls.Add(this.FirstSerialNumberCheckBox);
             this.Controls.Add(this.ExtraTextBox3);
             this.Controls.Add(this.ExtraCheckBox3);
-            this.Controls.Add(this.ExtraTextBox2);
-            this.Controls.Add(this.ExtraCheckBox2);
+            this.Controls.Add(this.OLesNumberTextBox);
+            this.Controls.Add(this.OLesNumberCheckBox);
             this.Controls.Add(this.RevisionTextBox);
             this.Controls.Add(this.RevisionCheckBox);
             this.Controls.Add(this.ExtraTextBox1);
@@ -639,8 +639,8 @@
         private CheckBox FirstSerialNumberCheckBox;
         private TextBox ExtraTextBox3;
         private CheckBox ExtraCheckBox3;
-        private TextBox ExtraTextBox2;
-        private CheckBox ExtraCheckBox2;
+        private TextBox OLesNumberTextBox;
+        private CheckBox OLesNumberCheckBox;
         private TextBox RevisionTextBox;
         private CheckBox RevisionCheckBox;
         private TextBox ExtraTextBox1;

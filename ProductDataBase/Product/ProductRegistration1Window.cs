@@ -14,7 +14,7 @@ namespace ProductDatabase {
         readonly string _messageFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config", "Product", "ProductMessages.json");
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox", "FirstSerialNumberCheckBox",
-                    "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
+                    "RevisionCheckBox", "ExtraCheckBox1", "OLesNumberCheckBox", "ExtraCheckBox3", "RegistrationDateCheckBox",
                     "PersonCheckBox", "CommentCheckBox" ];
 
         public ProductRegistration1Window(ProductMaster productMaster, ProductRegisterWork productRegisterWork, AppSettings appSettings) {
@@ -210,6 +210,7 @@ namespace ProductDatabase {
 
                 _productRegisterWork.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
                 _productRegisterWork.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
+                _productRegisterWork.OLesNumber = OLesNumberCheckBox.Checked ? OLesNumberTextBox.Text : string.Empty;
                 _productRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
                 _productRegisterWork.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
                 _productRegisterWork.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
@@ -374,8 +375,8 @@ namespace ProductDatabase {
                 case "ExtraCheckBox1":
                     ExtraTextBox1.Enabled = checkBox.Checked;
                     break;
-                case "ExtraCheckBox2":
-                    ExtraTextBox2.Enabled = checkBox.Checked;
+                case "OLesNumberCheckBox":
+                    OLesNumberTextBox.Enabled = checkBox.Checked;
                     break;
                 case "ExtraCheckBox3":
                     ExtraTextBox3.Enabled = checkBox.Checked;
