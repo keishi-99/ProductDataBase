@@ -785,6 +785,7 @@ namespace ProductDatabase {
         private void SerialCheck(SqliteConnection connection, bool print = true) {
 
             _serialType = _productMaster.IsBarcodePrint ? "Barcode" : "Label";
+            _serialType = _productMaster.IsNameplatePrint ? "Nameplate" : _serialType;
 
             for (var i = 0; i < _productRegisterWork.Quantity; i++) {
                 _serialList.Add(GenerateCode(_productRegisterWork.SerialFirstNumber + i));
@@ -863,6 +864,7 @@ namespace ProductDatabase {
         }
         private void GenerateSerialCodes() {
             _serialType = _productMaster.IsBarcodePrint ? "Barcode" : "Label";
+            _serialType = _productMaster.IsNameplatePrint ? "Nameplate" : _serialType;
             _productRegisterWork.SerialFirst = GenerateCode(_productRegisterWork.SerialFirstNumber);
             _productRegisterWork.SerialLast = GenerateCode(_serialLastNumber);
         }
