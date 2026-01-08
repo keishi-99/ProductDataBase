@@ -39,6 +39,9 @@ namespace ProductDatabase {
                     LoadSettingsFromWindow(substrateWindow.SubstratePrintSettings, substrateWindow.printSettingPath);
                     break;
                 case RePrintWindow rePrintWindow:
+                    _isLabelPrint = ProductMaster.IsLabelPrint;
+                    _isBarcodePrint = ProductMaster.IsBarcodePrint;
+                    _isNameplatePrint = ProductMaster.IsNameplatePrint;
                     LoadSettingsFromWindow(rePrintWindow.ProductPrintSettings, rePrintWindow.printSettingPath);
                     break;
                 default:
