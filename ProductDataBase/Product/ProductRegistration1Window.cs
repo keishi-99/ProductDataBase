@@ -430,6 +430,7 @@ namespace ProductDatabase {
                 $"ID{id}]",
                 $"[]",
                 $"[]",
+                $"[]",
                 $"製品名[{productMaster.ProductName}]",
                 $"タイプ[{productMaster.ProductType}]",
                 $"型式[{productMaster.ProductModel}]",

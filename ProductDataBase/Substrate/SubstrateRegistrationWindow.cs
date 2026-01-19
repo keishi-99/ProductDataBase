@@ -281,6 +281,7 @@ namespace ProductDatabase {
                     $"ID[{rowId}]",
                     $"注文番号[{orderNumber}]",
                     $"製造番号[{substrateNumber}]",
+                    $"[]",
                     $"製品名[{_substrateMaster.ProductName}]",
                     $"基板名[{_substrateMaster.SubstrateName}]",
                     $"型式[{_substrateMaster.SubstrateModel}]",
