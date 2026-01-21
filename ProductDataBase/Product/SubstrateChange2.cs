@@ -49,8 +49,6 @@ namespace ProductDatabase {
             // ComboBoxへ担当者を追加
             PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
 
-            var strQuantity = string.Empty;
-
             switch (_productMaster.RegType) {
                 case 2:
                 case 3:

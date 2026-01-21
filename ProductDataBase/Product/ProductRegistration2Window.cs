@@ -142,7 +142,7 @@ namespace ProductDatabase {
                 SetupCheckBox(objCbx, substrateName, substrateModel);
                 SetupDataGridView(objDgv);
 
-                if (FetchAndDisplaySubstrateData(connection, objDgv, substrateID, substrateModel)) {
+                if (FetchAndDisplaySubstrateData(connection, objDgv, substrateID)) {
                     shortageSubstrateName += $"[{substrateName}]{Environment.NewLine}";
                 }
             }
@@ -193,7 +193,7 @@ namespace ProductDatabase {
                     break;
             }
         }
-        private bool FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, int substrateID, string substrateModel) {
+        private bool FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, int substrateID) {
             var intQuantity = _productRegisterWork.Quantity;
 
             var commandText =
@@ -459,7 +459,6 @@ namespace ProductDatabase {
                 }
 
                 var substrateID = useSubstrates[i].SubstrateID;
-                var substrateModel = useSubstrates[i].SubstrateModel;
 
                 foreach (DataGridViewRow row in objDgv.Rows) {
                     if (row.Cells[3].Value is not bool isChecked || !isChecked) {
@@ -468,12 +467,12 @@ namespace ProductDatabase {
 
                     var substrateNumber = row.Cells[0].Value.ToString() ?? string.Empty;
                     var useValue = Convert.ToInt32(row.Cells[2].Value);
-                    var orderNumber = GetSubstrateInfo(connection, substrateID, substrateNumber, substrateModel);
+                    var orderNumber = GetSubstrateInfo(connection, substrateID, substrateNumber);
                     InsertSubstrate(connection, substrateID, substrateNumber, orderNumber, useValue, useID);
                 }
             }
         }
-        private static string GetSubstrateInfo(SqliteConnection connection, int substrateID, string substrateNumber, string substrateModel) {
+        private static string GetSubstrateInfo(SqliteConnection connection, int substrateID, string substrateNumber) {
             var commandText =
                 $"""
                 SELECT
