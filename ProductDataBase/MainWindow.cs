@@ -13,6 +13,10 @@ namespace ProductDatabase {
         private float _fontSize = SystemFonts.DefaultFont.Size;
         private IEnumerable<DataRow> _currentTargetRows = [];
 
+        private string _dsn = string.Empty;
+        private string _uid = string.Empty;
+        private string _pwd = string.Empty;
+
         readonly string _jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "General", "appsettings.json");
 
         [Flags]
@@ -453,6 +457,10 @@ namespace ProductDatabase {
                     .ToHashSet(StringComparer.OrdinalIgnoreCase);
                 Config.IsAdministrator = adminSet?.Contains(Environment.UserName) ?? false;
 
+                _dsn = jsonObj["DSN"]?.ToString() ?? string.Empty;
+                _uid = jsonObj["UID"]?.ToString() ?? string.Empty;
+                _pwd = jsonObj["PWD"]?.ToString() ?? string.Empty;
+
                 _productRepository.LoadAll();
 
                 this.Activate();
@@ -820,7 +828,7 @@ namespace ProductDatabase {
             }
         }
         private void BarcodeInput() {
-            using (OdbcConnection con = new("DSN=DrSum_PRONES_YD; UID=YD00; PWD=YD00")) {
+            using (OdbcConnection con = new($"DSN={_dsn}; UID={_uid}; PWD={_pwd}")) {
                 con.Open();
                 using OdbcCommand cmd = new($"SELECT * FROM V_宮崎手配情報 WHERE 手配管理番号 = '{QRCodeTextBox.Text}';", con);
                 using var dr = cmd.ExecuteReader();
