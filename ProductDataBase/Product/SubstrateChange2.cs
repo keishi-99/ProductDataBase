@@ -508,6 +508,7 @@ namespace ProductDatabase {
                     $"ID[{_productRegisterWork.RowID}]",
                     $"注文番号[{_productRegisterWork.OrderNumber}]",
                     $"製造番号[{_productRegisterWork.ProductNumber}]",
+                    $"[]",
                     $"製品名[{_productMaster.ProductName}]",
                     $"タイプ[{_productMaster.ProductType}]",
                     $"型式[{_productMaster.ProductModel}]",
