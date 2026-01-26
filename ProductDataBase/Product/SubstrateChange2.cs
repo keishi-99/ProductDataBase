@@ -36,74 +36,78 @@ namespace ProductDatabase {
 
         // ロードイベント
         private void LoadEvents() {
-            Font = new Font(_appSettings.FontName, _appSettings.FontSize);
-            CloseButton.Enabled = true;
+            try {
+                Font = new Font(_appSettings.FontName, _appSettings.FontSize);
+                CloseButton.Enabled = true;
 
-            // テキストボックスに入力
-            OrderNumberTextBox.Text = _productRegisterWork.OrderNumber;
-            ManufacturingNumberTextBox.Text = _productRegisterWork.ProductNumber;
-            QuantityTextBox.Text = _productRegisterWork.Quantity.ToString();
-            RevisionTextBox.Text = _productRegisterWork.Revision;
-            CommentTextBox.Text = _productRegisterWork.Comment;
+                // テキストボックスに入力
+                OrderNumberTextBox.Text = _productRegisterWork.OrderNumber;
+                ManufacturingNumberTextBox.Text = _productRegisterWork.ProductNumber;
+                QuantityTextBox.Text = _productRegisterWork.Quantity.ToString();
+                RevisionTextBox.Text = _productRegisterWork.Revision;
+                CommentTextBox.Text = _productRegisterWork.Comment;
 
-            // ComboBoxへ担当者を追加
-            PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
+                // ComboBoxへ担当者を追加
+                PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
 
-            switch (_productMaster.RegType) {
-                case 2:
-                case 3:
-                    for (var i = 0; i <= _productMaster.UseSubstrates.Count - 1; i++) {
-                        var substrateName = _productMaster.UseSubstrates[i].SubstrateName;
-                        var substrateModel = _productMaster.UseSubstrates[i].SubstrateModel;
-                        var substrateId = _productMaster.UseSubstrates[i].SubstrateID;
+                var strQuantity = string.Empty;
 
-                        _objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
-                        if (_objCbx is not null) {
-                            _objCbx.Enabled = true;
-                            _objCbx.Checked = true;
-                        }
+                switch (_productMaster.RegType) {
+                    case 2:
+                    case 3:
+                        for (var i = 0; i <= _productMaster.UseSubstrates.Count - 1; i++) {
+                            var substrateName = _productMaster.UseSubstrates[i].SubstrateName;
+                            var substrateModel = _productMaster.UseSubstrates[i].SubstrateModel;
+                            var quantity = _productRegisterWork.Quantity;
 
-                        _objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
-                        if (_objDgv is not null) {
-                            _objDgv.Columns[1].DefaultCellStyle.BackColor = Color.LightGray;
-                            _objDgv.Columns[2].DefaultCellStyle.BackColor = Color.LightGray;
-                            _objDgv.Columns[2].ReadOnly = true;
-                            _objDgv.Columns[3].ReadOnly = false;
-                            _objDgv.Columns[4].ReadOnly = false;
-                            switch (Font.Size) {
-                                case 9:
-                                    _objDgv.RowTemplate.Height = 24;
-                                    _objDgv.Columns[0].Width = 130;
-                                    _objDgv.Columns[1].Width = 30;
-                                    _objDgv.Columns[2].Width = 30;
-                                    _objDgv.Columns[3].Width = 30;
-                                    _objDgv.Columns[4].Width = 24;
-                                    break;
-                                case 12:
-                                    _objDgv.RowTemplate.Height = 24;
-                                    _objDgv.Columns[0].Width = 220;
-                                    _objDgv.Columns[1].Width = 40;
-                                    _objDgv.Columns[2].Width = 40;
-                                    _objDgv.Columns[3].Width = 40;
-                                    _objDgv.Columns[4].Width = 24;
-                                    break;
-                                case 14:
-                                    _objDgv.RowTemplate.Height = 25;
-                                    _objDgv.Columns[0].Width = 230;
-                                    _objDgv.Columns[1].Width = 60;
-                                    _objDgv.Columns[2].Width = 60;
-                                    _objDgv.Columns[3].Width = 60;
-                                    _objDgv.Columns[4].Width = 25;
-                                    break;
+                            // チェックボックスとDgvを有効に
+                            _objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
+                            if (_objCbx is not null) {
+                                _objCbx.Enabled = true;
+                                _objCbx.Checked = true;
                             }
-                        }
 
-                        using SqliteConnection con = new(GetConnectionRegistration());
-                        con.Open();
-                        using var cmd = con.CreateCommand();
+                            _objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
+                            if (_objDgv is not null) {
+                                _objDgv.Columns[1].DefaultCellStyle.BackColor = Color.LightGray;
+                                _objDgv.Columns[2].DefaultCellStyle.BackColor = Color.LightGray;
+                                _objDgv.Columns[2].ReadOnly = true;
+                                _objDgv.Columns[3].ReadOnly = false;
+                                _objDgv.Columns[4].ReadOnly = false;
+                                switch (Font.Size) {
+                                    case 9:
+                                        _objDgv.RowTemplate.Height = 24;
+                                        _objDgv.Columns[0].Width = 130;
+                                        _objDgv.Columns[1].Width = 30;
+                                        _objDgv.Columns[2].Width = 30;
+                                        _objDgv.Columns[3].Width = 30;
+                                        _objDgv.Columns[4].Width = 24;
+                                        break;
+                                    case 12:
+                                        _objDgv.RowTemplate.Height = 24;
+                                        _objDgv.Columns[0].Width = 220;
+                                        _objDgv.Columns[1].Width = 40;
+                                        _objDgv.Columns[2].Width = 40;
+                                        _objDgv.Columns[3].Width = 40;
+                                        _objDgv.Columns[4].Width = 24;
+                                        break;
+                                    case 14:
+                                        _objDgv.RowTemplate.Height = 25;
+                                        _objDgv.Columns[0].Width = 230;
+                                        _objDgv.Columns[1].Width = 60;
+                                        _objDgv.Columns[2].Width = 60;
+                                        _objDgv.Columns[3].Width = 60;
+                                        _objDgv.Columns[4].Width = 25;
+                                        break;
+                                }
+                            }
 
-                        cmd.CommandText =
-                            $"""
+                            using SqliteConnection con = new(GetConnectionRegistration());
+                            con.Open();
+                            using var cmd = con.CreateCommand();
+
+                            cmd.CommandText =
+                                $"""
                                 -- 使用履歴のある SubstrateNumber ごとの合計を別テーブルで集計
                                 WITH Used AS 
                                 (
@@ -113,7 +117,7 @@ namespace ProductDatabase {
                                     FROM
                                         {Constants.VSubstrateTableName}
                                     WHERE
-                                        SubstrateID = @SubstrateID
+                                        SubstrateModel = @SubstrateModel
                                         AND UseID = @ID
                                         AND SubstrateNumber NOTNULL
                                     GROUP BY
@@ -130,7 +134,7 @@ namespace ProductDatabase {
                                     FROM
                                         {Constants.VSubstrateTableName}
                                     WHERE
-                                        SubstrateID = @SubstrateID
+                                        SubstrateModel = @SubstrateModel
                                         AND SubstrateNumber NOTNULL
                                     GROUP BY
                                         SubstrateName,
@@ -156,63 +160,75 @@ namespace ProductDatabase {
                                     s.SubstrateNumber;
                                 """;
 
-                        cmd.Parameters.Clear();
-                        cmd.Parameters.Add("@ID", SqliteType.Integer).Value = _productRegisterWork.RowID;
-                        cmd.Parameters.Add("@SubstrateID", SqliteType.Text).Value = substrateId;
+                            cmd.Parameters.Clear();
+                            cmd.Parameters.Add("@ID", SqliteType.Integer).Value = _productRegisterWork.RowID;
+                            cmd.Parameters.Add("@SubstrateModel", SqliteType.Text).Value = substrateModel;
 
-                        using var dr = cmd.ExecuteReader();
-                        var j = 0;
+                            using var dr = cmd.ExecuteReader();
+                            var j = 0;
 
-                        if (_objCbx is not null) {
-                            var splitSubstrateName = substrateName.Split(':');
-                            _objCbx.Text = $"{splitSubstrateName.Last()} - {substrateModel}";
-                        }
-                        while (dr.Read()) {
-                            var strSubstrateNum = dr["SubstrateNumber"].ToString() ?? string.Empty;
-                            var intStock = Convert.ToInt32(dr["Stock"]);
-                            var intUsedQuantity = Convert.ToInt32(dr["UsedDecrease"]); ;
-
-                            if (_objDgv is null) {
-                                break;
+                            if (_objCbx is not null) {
+                                var splitSubstrateName = substrateName.Split(':');
+                                _objCbx.Text = $"{splitSubstrateName.Last()} - {substrateModel}";
                             }
+                            while (dr.Read()) {
+                                var strSubstrateNum = dr["SubstrateNumber"].ToString() ?? string.Empty;
+                                var intStock = Convert.ToInt32(dr["Stock"]);
+                                var intUsedQuantity = Convert.ToInt32(dr["UsedDecrease"]); ;
 
-                            _objDgv.Rows.Add();
-                            _objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
-                            _objDgv.Rows[j].Cells[1].Value = intStock;
-                            _objDgv.Rows[j].Cells[2].Value = intUsedQuantity;
-                            _objDgv.Rows[j].Cells[3].Value = intUsedQuantity;
-                            _objDgv.Rows[j].Cells[4].Value = intUsedQuantity != 0;
-                            j++;
+                                if (_objDgv is null) {
+                                    break;
+                                }
+
+                                _objDgv.Rows.Add();
+                                _objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
+                                _objDgv.Rows[j].Cells[1].Value = intStock;
+                                _objDgv.Rows[j].Cells[2].Value = intUsedQuantity;
+                                _objDgv.Rows[j].Cells[3].Value = intUsedQuantity;
+                                _objDgv.Rows[j].Cells[4].Value = intUsedQuantity != 0;
+                                j++;
+                            }
                         }
-                    }
-                    break;
-            }
+                        break;
+                }
 
-            RegisterButton.Enabled = true;
+                RegisterButton.Enabled = true;
+
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            } finally {
+            }
         }
         // 変更登録
         private void ChangeRegistration() {
-            if (!QuantityCheck()) { return; }
+            try {
+                if (!QuantityCheck()) { return; }
 
-            Registration();
+                Registration();
 
-            MessageBox.Show("登録完了");
+                MessageBox.Show("登録完了");
 
-            RegistrationDateTimePicker.Enabled = false;
-            PersonComboBox.Enabled = false;
-            RegisterButton.Enabled = false;
-            for (var i = 0; i <= 9; i++) {
-                _objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
-                if (_objCbx is not null) {
-                    _objCbx.Enabled = false;
+                // フォームを編集不可にする
+                RegistrationDateTimePicker.Enabled = false;
+                PersonComboBox.Enabled = false;
+                RegisterButton.Enabled = false;
+                for (var i = 0; i <= 9; i++) {
+                    _objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
+                    if (_objCbx is not null) {
+                        _objCbx.Enabled = false;
+                    }
+
+                    _objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
+                    if (_objDgv is not null) {
+                        _objDgv.Enabled = false;
+                    }
                 }
+                // リスト印刷ボタンを有効に
+                if (_productMaster.IsListPrint) { SubstrateListPrintButton.Enabled = true; }
 
-                _objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
-                if (_objDgv is not null) {
-                    _objDgv.Enabled = false;
-                }
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            if (_productMaster.IsListPrint) { SubstrateListPrintButton.Enabled = true; }
         }
         private bool QuantityCheck() {
             try {
@@ -240,9 +256,15 @@ namespace ProductDatabase {
                                         var usedValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value.ToString());
                                         var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[3].Value.ToString());
 
-                                        if (useValue <= 0) {
+                                        if (useValue < 0) {
                                             throw new Exception("使用数が0以下になっています。");
                                         }
+
+                                        // 使用数がマイナスの場合は確認ダイアログを表示
+                                        if (useValue < 0) {
+                                            throw new Exception("使用数が0未満になっています。");
+                                        }
+
                                         if (stockValue + usedValue < useValue) {
                                             throw new Exception("在庫より多い数量が入力されています。");
                                         }
@@ -251,7 +273,15 @@ namespace ProductDatabase {
                                 }
 
                                 if (intQuantityCheck != 0) {
-                                    throw new Exception("入力された数量の合計が必要数と一致しません。");
+                                    var dlg = MessageBox.Show(
+                                        $"[{_productMaster.UseSubstrates[i].SubstrateName}]の合計が必要数と一致しませんがよろしいですか？",
+                                        "確認",
+                                        MessageBoxButtons.YesNo,
+                                        MessageBoxIcon.Question
+                                    );
+                                    if (dlg == DialogResult.No) {
+                                        return false;
+                                    }
                                 }
                             }
                         }
@@ -301,28 +331,28 @@ namespace ProductDatabase {
                                             using (var cmd = con.CreateCommand()) {
                                                 cmd.CommandText =
                                                     $"""
-                                                    SELECT
-                                                        SubstrateName,
-                                                        SubstrateModel,
-                                                        SubstrateNumber,
-                                                        OrderNumber,
-                                                        SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock,
-                                                        SubstrateID
-                                                    FROM
-                                                        {Constants.VSubstrateTableName}
-                                                    WHERE
-                                                        SubstrateID = @SubstrateID
-                                                        AND SubstrateNumber = @SubstrateNumber
-                                                    GROUP BY
-                                                        SubstrateName,
-                                                        SubstrateModel,
-                                                        SubstrateNumber,
-                                                        OrderNumber
-                                                    ORDER BY
-                                                        MIN(ID)
-                                                    ;
-                                                    """;
-                                                cmd.Parameters.Add("@SubstrateID", SqliteType.Text).Value = _productMaster.UseSubstrates[i].SubstrateID;
+                                                        SELECT
+                                                            SubstrateName,
+                                                            SubstrateModel,
+                                                            SubstrateNumber,
+                                                            OrderNumber,
+                                                            SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock,
+                                                            SubstrateID
+                                                        FROM
+                                                            {Constants.VSubstrateTableName}
+                                                        WHERE
+                                                            SubstrateModel = @SubstrateModel 
+                                                            AND SubstrateNumber = @SubstrateNumber
+                                                        GROUP BY
+                                                            SubstrateName,
+                                                            SubstrateModel,
+                                                            SubstrateNumber,
+                                                            OrderNumber
+                                                        ORDER BY
+                                                            MIN(ID)
+                                                        ;
+                                                        """;
+                                                cmd.Parameters.Add("@SubstrateModel", SqliteType.Text).Value = _productMaster.UseSubstrates[i].SubstrateModel;
                                                 cmd.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = substrateNum;
                                                 using var dr = cmd.ExecuteReader();
                                                 while (dr.Read()) {
@@ -332,20 +362,21 @@ namespace ProductDatabase {
                                             }
                                             // 基板テーブルを更新、できない場合は挿入
                                             using (var cmdUpdate = con.CreateCommand()) {
+                                                // 更新
                                                 cmdUpdate.CommandText =
                                                     $"""
-                                                    UPDATE
-                                                        {Constants.TSubstrateTableName}
-                                                    SET
-                                                        Decrease = @Decrease,
-                                                        Person = @Person,
-                                                        RegDate = @RegDate,
-                                                        Comment = @Comment
-                                                    WHERE
-                                                        SubstrateNumber = @SubstrateNumber
-                                                        AND UseID = @UseID
-                                                    ;
-                                                    """;
+                                                        UPDATE
+                                                            {Constants.TSubstrateTableName}
+                                                        SET
+                                                            Decrease = @Decrease,
+                                                            Person = @Person,
+                                                            RegDate = @RegDate,
+                                                            Comment = @Comment
+                                                        WHERE
+                                                            SubstrateNumber = @SubstrateNumber
+                                                            AND UseID = @UseID
+                                                        ;
+                                                        """;
 
                                                 cmdUpdate.Parameters.Add("@Decrease", SqliteType.Integer).Value = 0 - useValue;
                                                 cmdUpdate.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Person) ? DBNull.Value : _productRegisterWork.Person;
@@ -357,33 +388,34 @@ namespace ProductDatabase {
                                                 var affectedRows = cmdUpdate.ExecuteNonQuery();
 
                                                 if (affectedRows == 0) {
+                                                    // 挿入
                                                     using var cmdInsert = con.CreateCommand();
                                                     cmdInsert.CommandText =
                                                         $"""
-                                                        INSERT INTO {Constants.TSubstrateTableName}
-                                                            (
-                                                                SubstrateID,
-                                                                SubstrateNumber,
-                                                                OrderNumber,
-                                                                Decrease,
-                                                                Person,
-                                                                RegDate,
-                                                                Comment,
-                                                                UseID
-                                                            )
-                                                        VALUES
-                                                            (
-                                                                @SubstrateID,
-                                                                @SubstrateNumber,
-                                                                @OrderNumber,
-                                                                @Decrease,
-                                                                @Person,
-                                                                @RegDate,
-                                                                @Comment,
-                                                            @UseID
-                                                            )
-                                                        ;
-                                                        """;
+                                                            INSERT INTO {Constants.TSubstrateTableName}
+                                                                (
+                                                                    SubstrateID,
+                                                                    SubstrateNumber,
+                                                                    OrderNumber,
+                                                                    Decrease,
+                                                                    Person,
+                                                                    RegDate,
+                                                                    Comment,
+                                                                    UseID
+                                                                )
+                                                            VALUES
+                                                                (
+                                                                    @SubstrateID,
+                                                                    @SubstrateNumber,
+                                                                    @OrderNumber,
+                                                                    @Decrease,
+                                                                    @Person,
+                                                                    @RegDate,
+                                                                    @Comment,
+                                                                @UseID
+                                                                )
+                                                            ;
+                                                            """;
 
                                                     cmdInsert.Parameters.Add("@SubstrateID", SqliteType.Text).Value = string.IsNullOrWhiteSpace(substrateID) ? DBNull.Value : substrateID;
                                                     cmdInsert.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
@@ -417,7 +449,7 @@ namespace ProductDatabase {
                                                     AND UseID = @ID
                                                 ;
                                                 """;
-                                            cmdDelete.Parameters.Clear();
+                                            cmdDelete.Parameters.Clear(); // パラメータをクリア
                                             cmdDelete.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
                                             cmdDelete.Parameters.Add("@ID", SqliteType.Integer).Value = _productRegisterWork.RowID;
 
@@ -476,7 +508,6 @@ namespace ProductDatabase {
                     $"ID[{_productRegisterWork.RowID}]",
                     $"注文番号[{_productRegisterWork.OrderNumber}]",
                     $"製造番号[{_productRegisterWork.ProductNumber}]",
-                    $"[]",
                     $"製品名[{_productMaster.ProductName}]",
                     $"タイプ[{_productMaster.ProductType}]",
                     $"型式[{_productMaster.ProductModel}]",
@@ -497,12 +528,14 @@ namespace ProductDatabase {
         // リスト印刷
         private void GenerateList() {
             try {
+                // --- 処理中カーソルに変更 ---
                 Cursor.Current = Cursors.WaitCursor;
 
                 ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(_productMaster, _productRegisterWork);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } finally {
+                // --- 通常カーソルに戻す ---
                 Cursor.Current = Cursors.Default;
             }
         }
