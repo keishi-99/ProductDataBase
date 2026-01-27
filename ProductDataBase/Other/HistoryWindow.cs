@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using System.Data;
@@ -265,7 +264,7 @@ namespace ProductDatabase {
                     ON
                         s.UseID = p.ID
                     WHERE
-                        1=1
+                        s.IsDeleted = 0
                         {substrateCategoryFilter}
                         {stockFilter}
                         {substrateIdFilter}
@@ -314,7 +313,7 @@ namespace ProductDatabase {
                     FROM
                         {Constants.VSubstrateTableName}
                     WHERE
-                        1=1
+                        IsDeleted = 0
                         {substrateCategoryFilter}
                         {stockFilter}
                         {substrateIdFilter}
@@ -383,7 +382,7 @@ namespace ProductDatabase {
                 FROM 
                     {Constants.VProductTableName}
                 WHERE 
-                    1=1
+                    IsDeleted = 0
                     {productCategoryFilter}
                     {productNameFilter}
                     {productIdFilter}
@@ -512,34 +511,8 @@ namespace ProductDatabase {
             GenerateReportButton.Enabled = false;
             switch (_tableName) {
                 case "Substrate":
-                    DataBaseDataGridView.Columns["ID"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["SubstrateID"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["ProductName"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["SubstrateName"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["SubstrateModel"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["SubstrateNumber"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["Decrease"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["ProductType"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["ProductNumber"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["OrderNumber"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["Person"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["RegDate"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["UseID"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["CreatedAt"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["ID"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["SubstrateID"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["ProductName"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["SubstrateName"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["SubstrateModel"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["SubstrateNumber"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["Decrease"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["ProductType"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["ProductNumber"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["OrderNumber"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["Person"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["RegDate"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["UseID"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["CreatedAt"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.ReadOnly = true;
+                    DataBaseDataGridView.DefaultCellStyle.ForeColor = Color.Red;
                     break;
                 case "Product":
                     DataBaseDataGridView.Columns["ID"].ReadOnly = true;
@@ -574,24 +547,8 @@ namespace ProductDatabase {
                     DataBaseDataGridView.Columns["CreatedAt"].DefaultCellStyle.ForeColor = Color.Red;
                     break;
                 case "Serial":
-                    DataBaseDataGridView.Columns["rowid"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["Serial"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["OrderNumber"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["ProductNumber"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["ProductName"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["ProductType"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["ProductModel"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["RegDate"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["UsedID"].ReadOnly = true;
-                    DataBaseDataGridView.Columns["rowid"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["Serial"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["OrderNumber"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["ProductNumber"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["ProductName"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["ProductType"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["ProductModel"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["RegDate"].DefaultCellStyle.ForeColor = Color.Red;
-                    DataBaseDataGridView.Columns["UsedID"].DefaultCellStyle.ForeColor = Color.Red;
+                    DataBaseDataGridView.ReadOnly = true;
+                    DataBaseDataGridView.DefaultCellStyle.ForeColor = Color.Red;
                     break;
             }
         }
@@ -682,49 +639,7 @@ namespace ProductDatabase {
                                 CommonUtils.Logger.AppendLog(logMessageArray);
                             }
                             else if (row.RowState == DataRowState.Deleted) {
-                                command.CommandText =
-                                    $"""
-                                    UPDATE
-                                        {Constants.TSubstrateTableName}
-                                    SET
-                                        SubstrateID = NULL,
-                                        SubstrateNumber = NULL,
-                                        OrderNumber = NULL,
-                                        Increase = NULL, 
-                                        Decrease = NULL,
-                                        Defect = NULL,
-                                        Person = NULL,
-                                        RegDate = NULL,
-                                        Comment = NULL,
-                                        UseID = NULL
-                                    WHERE
-                                        ID = @ID
-                                    ;
-                                    """;
-                                command.Parameters.Clear();
-                                command.Parameters.Add("@ID", SqliteType.Integer).Value = row["ID", DataRowVersion.Original];
-
-                                command.ExecuteNonQuery();
-
-                                string[] logMessageArray = [
-                                    $"[基板履歴削除]",
-                                    $"[{_substrateMaster.CategoryName}]",
-                                    $"ID[{row["ID", DataRowVersion.Original]}]",
-                                    $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
-                                    $"製造番号[{row["SubstrateNumber", DataRowVersion.Original]}]",
-                                    $"[]",
-                                    $"製品名[{row["ProductName", DataRowVersion.Original]}]",
-                                    $"基板名[{row["SubstrateName", DataRowVersion.Original]}]",
-                                    $"型式[{row["SubstrateModel", DataRowVersion.Original]}]",
-                                    $"追加数[{row["Increase", DataRowVersion.Original]}]",
-                                    $"使用数[{row["Decrease", DataRowVersion.Original]}]",
-                                    $"減少数[{row["Defect", DataRowVersion.Original]}]",
-                                    $"登録日[{row["RegDate", DataRowVersion.Original]}]",
-                                    $"担当者[{row["Person", DataRowVersion.Original]}]",
-                                    $"コメント[{row["Comment", DataRowVersion.Original]}]",
-                                    $"UseID[{_substrateMaster.CategoryName}_{row["UseID", DataRowVersion.Original]}]",
-                                ];
-                                CommonUtils.Logger.AppendLog(logMessageArray);
+                                DeleteSubstrate(_editModeConnection, Convert.ToInt32(row["ID", DataRowVersion.Original]));
                             }
                         }
                         break;
@@ -805,94 +720,18 @@ namespace ProductDatabase {
                                 CommonUtils.Logger.AppendLog(logMessageArray);
                             }
                             else if (row.RowState == DataRowState.Deleted) {
-                                command.CommandText =
-                                    $"""
-                                    UPDATE
-                                        {Constants.TProductTableName}
-                                    SET
-                                        ProductID = NULL,
-                                        OrderNumber = NULL,
-                                        ProductNumber = NULL,
-                                        OLesNumber = NULL,
-                                        Quantity = NULL,
-                                        Person = NULL,
-                                        RegDate = NULL,
-                                        Revision = NULL,
-                                        RevisionGroup = NULL,
-                                        SerialFirst = NULL,
-                                        SerialLast = NULL,
-                                        SerialLastNumber = NULL,
-                                        Comment = NULL
-                                    WHERE
-                                        ID = @ID
-                                    ;
-                                    """;
-                                command.Parameters.Clear();
-                                command.Parameters.Add("@ID", SqliteType.Integer).Value = row["ID", DataRowVersion.Original];
-
-                                command.ExecuteNonQuery();
-
-                                string[] logMessageArray = [
-                                    $"[製品履歴削除]",
-                                    $"[{_productMaster.CategoryName}]",
-                                    $"ID[{row["ID", DataRowVersion.Original]}]",
-                                    $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
-                                    $"製造番号[{row["ProductNumber", DataRowVersion.Original]}]",
-                                    $"OLes番号[{row["OLesNumber", DataRowVersion.Original]}]",
-                                    $"製品名[{row["ProductName", DataRowVersion.Original]}]",
-                                    $"タイプ[{row["ProductType", DataRowVersion.Original]}]",
-                                    $"型式[{row["ProductModel", DataRowVersion.Original]}]",
-                                    $"数量[{row["Quantity", DataRowVersion.Original]}]",
-                                    $"シリアル先頭[{row["SerialFirst", DataRowVersion.Original]}]",
-                                    $"シリアル末尾[{row["SerialLast", DataRowVersion.Original]}]",
-                                    $"Revision[{row["Revision", DataRowVersion.Original]}]",
-                                    $"登録日[{row["RegDate", DataRowVersion.Original]}]",
-                                    $"担当者[{row["Person", DataRowVersion.Original]}]",
-                                    $"コメント[{row["Comment", DataRowVersion.Original]}]"
-                                ];
-                                CommonUtils.Logger.AppendLog(logMessageArray);
+                                DeleteProduct(_editModeConnection, Convert.ToInt32(row["ID", DataRowVersion.Original]));
+                                DeleteSerial(_editModeConnection, Convert.ToInt32(row["ID", DataRowVersion.Original]));
+                                DeleteSubstrate(_editModeConnection, Convert.ToInt32(row["ID", DataRowVersion.Original]));
                             }
                         }
-
                         break;
                     case "Serial":
                         foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
                             if (row.RowState == DataRowState.Modified) {
                             }
                             else if (row.RowState == DataRowState.Deleted) {
-                                var serialTableName = $"[T_Serial]";
-                                command.CommandText =
-                                    $"""
-                                    DELETE FROM
-                                        {serialTableName}
-                                    WHERE
-                                        rowid = @rowid
-                                    ;
-                                    """;
-                                command.Parameters.Clear();
-                                command.Parameters.Add("@rowid", SqliteType.Integer).Value = row["rowid", DataRowVersion.Original];
-
-                                command.ExecuteNonQuery();
-
-                                string[] logMessageArray = [
-                                    $"[シリアル履歴削除]",
-                                    $"[{_productMaster.CategoryName}]",
-                                    $"ID[{row["rowid", DataRowVersion.Original]}]",
-                                    $"製品名[{row["ProductName", DataRowVersion.Original]}]",
-                                    $"Serial[{row["Serial", DataRowVersion.Original]}]",
-                                    $"UsedID[{row["UsedID", DataRowVersion.Original]}]",
-                                    $"[]",
-                                    $"[]",
-                                    $"[]",
-                                    $"[]",
-                                    $"[]",
-                                    $"[]",
-                                    $"[]",
-                                    $"[]",
-                                    $"[]",
-                                    $"[]",
-                                ];
-                                CommonUtils.Logger.AppendLog(logMessageArray);
+                                DeleteSerial(_editModeConnection, Convert.ToInt32(row["usedID", DataRowVersion.Original]));
                             }
                         }
                         break;
@@ -926,6 +765,182 @@ namespace ProductDatabase {
                     _editModeConnection = null;
                 }
             }
+        }
+        private void DeleteSubstrate(SqliteConnection connection, int rowId) {
+            var commandText = $"""
+                SELECT
+                    ID,
+                    OrderNumber,
+                    SubstrateNumber,
+                    ProductName,
+                    SubstrateName,
+                    SubstrateModel,
+                    Increase,
+                    Decrease,
+                    Defect,
+                    RegDate,
+                    Person,
+                    Comment,
+                    UseID
+                FROM {Constants.VSubstrateTableName}
+                WHERE 
+                    UseID = @rowId
+                ;
+                """;
+
+            using var dr = ExecuteReader(connection, commandText, ("@rowId", rowId));
+
+            while (dr.Read()) {
+                string[] logMessageArray = [
+                    $"[基板履歴削除]",
+                    $"[{_substrateMaster.CategoryName}]",
+                    $"ID[{dr["ID"]}]",
+                    $"注文番号[{dr["OrderNumber"]}]",
+                    $"製造番号[{dr["SubstrateNumber"]}]",
+                    $"[]",
+                    $"製品名[{dr["ProductName"]}]",
+                    $"基板名[{dr["SubstrateName"]}]",
+                    $"型式[{dr["SubstrateModel"]}]",
+                    $"追加数[{dr["Increase"]}]",
+                    $"使用数[{dr["Decrease"]}]",
+                    $"減少数[{dr["Defect"]}]",
+                    $"登録日[{dr["RegDate"]}]",
+                    $"担当者[{dr["Person"]}]",
+                    $"コメント[{dr["Comment"]}]",
+                    $"UseID[{dr["UseID"]}]",
+                ];
+                CommonUtils.Logger.AppendLog(logMessageArray);
+            }
+
+            var command = connection.CreateCommand();
+            command.CommandText = $@"
+                UPDATE {Constants.TSubstrateTableName}
+                SET
+                    IsDeleted = 1,
+                    DeletedAt = datetime('now', 'localtime')
+                WHERE UseID = @UseID;
+            ";
+            command.Parameters.Add("@UseID", SqliteType.Integer).Value = rowId;
+            command.ExecuteNonQuery();
+        }
+        private void DeleteProduct(SqliteConnection connection, int rowId) {
+            var commandText = $"""                
+                SELECT
+                    ID,
+                    OrderNumber,
+                    ProductNumber,
+                    OLesNumber,
+                    ProductName,
+                    ProductType,
+                    ProductModel,
+                    Quantity,
+                    SerialFirst,
+                    SerialLast,
+                    Revision,
+                    RegDate,
+                    Person,
+                    Comment
+                FROM {Constants.VProductTableName}
+                WHERE 
+                    ID = @rowId
+                ;                
+                """;
+
+            using var dr = ExecuteReader(connection, commandText, ("@rowId", rowId));
+
+            while (dr.Read()) {
+                string[] logMessageArray = [
+                    $"[製品履歴削除]",
+                    $"[{_productMaster.CategoryName}]",
+                    $"ID[{dr["ID"]}]",
+                    $"注文番号[{dr["OrderNumber"]}]",
+                    $"製造番号[{dr["ProductNumber"]}]",
+                    $"OLes番号[{dr["OLesNumber"]}]",
+                    $"製品名[{dr["ProductName"]}]",
+                    $"タイプ[{dr["ProductType"]}]",
+                    $"型式[{dr["ProductModel"]}]",
+                    $"数量[{dr["Quantity"]}]",
+                    $"シリアル先頭[{dr["SerialFirst"]}]",
+                    $"シリアル末尾[{dr["SerialLast"]}]",
+                    $"Revision[{dr["Revision"]}]",
+                    $"登録日[{dr["RegDate"]}]",
+                    $"担当者[{dr["Person"]}]",
+                    $"コメント[{dr["Comment"]}]"
+                ];
+                CommonUtils.Logger.AppendLog(logMessageArray);
+            }
+
+            var command = connection.CreateCommand();
+
+            command.CommandText = $"""
+                UPDATE {Constants.TProductTableName}
+                SET
+                    IsDeleted = 1,
+                    DeletedAt = datetime('now', 'localtime')
+                WHERE ID = @ID;
+                """;
+            command.Parameters.Add("@ID", SqliteType.Integer).Value = rowId;
+            command.ExecuteNonQuery();
+        }
+        private void DeleteSerial(SqliteConnection connection, int rowId) {
+            var commandText = $"""                
+                SELECT
+                    rowid,
+                    ProductName,
+                    Serial,
+                    UsedID
+                FROM {Constants.TSerialTableName}
+                WHERE 
+                    UsedID = @rowId
+                ;                
+                """;
+
+            using var dr = ExecuteReader(connection, commandText, ("@rowId", rowId));
+
+            while (dr.Read()) {
+                string[] logMessageArray = [
+                    $"[シリアル履歴削除]",
+                    $"[{_productMaster.CategoryName}]",
+                    $"ID[{dr["rowid"]}]",
+                    $"製品名[{dr["ProductName"]}]",
+                    $"Serial[{dr["Serial"]}]",
+                    $"UsedID[{dr["UsedID"]}]",
+                    $"[]",
+                    $"[]",
+                    $"[]",
+                    $"[]",
+                    $"[]",
+                    $"[]",
+                    $"[]",
+                    $"[]",
+                    $"[]",
+                    $"[]",
+                ];
+                CommonUtils.Logger.AppendLog(logMessageArray);
+            }
+
+            var command = connection.CreateCommand();
+
+            command.CommandText =
+                $"""
+                DELETE FROM
+                    {Constants.TSerialTableName}
+                WHERE
+                    UsedID = @rowid
+                ;
+                """;
+            command.Parameters.Add("@rowid", SqliteType.Integer).Value = rowId;
+            command.ExecuteNonQuery();
+        }
+
+        private static SqliteDataReader ExecuteReader(SqliteConnection connection, string commandText, params (string, object)[] parameters) {
+            var command = connection.CreateCommand();
+            command.CommandText = commandText;
+            foreach (var (name, value) in parameters) {
+                command.Parameters.Add(name, SqliteType.Text).Value = value ?? DBNull.Value;
+            }
+
+            return command.ExecuteReader();
         }
 
         private void CategorySelect(object sender) {

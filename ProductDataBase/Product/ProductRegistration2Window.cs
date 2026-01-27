@@ -207,9 +207,9 @@ namespace ProductDatabase {
                 WHERE
                     SubstrateID = @SubstrateID 
                     AND SubstrateNumber NOTNULL
+                    AND IsDeleted = 0
                 GROUP BY
-                    SubstrateName,
-                    SubstrateModel,
+                    SubstrateID,
                     SubstrateNumber
                 HAVING
                     Stock > 0
@@ -487,6 +487,7 @@ namespace ProductDatabase {
                 WHERE
                     SubstrateID = @SubstrateID
                     AND SubstrateNumber = @SubstrateNumber
+                    AND IsDeleted = 0
                 GROUP BY
                     OrderNumber
                 ORDER
@@ -634,6 +635,7 @@ namespace ProductDatabase {
                     WHERE
                         ProductName = @ProductName 
                         AND ProductNumber = @ProductNumber
+                        AND IsDeleted = 0
                     ORDER BY
                         ID ASC LIMIT 1;
                     """;
@@ -676,6 +678,7 @@ namespace ProductDatabase {
                     WHERE
                         ProductName = @ProductName 
                         AND OrderNumber = @OrderNumber
+                        AND IsDeleted = 0
                     ORDER BY
                         ID ASC LIMIT 1
                     ;
