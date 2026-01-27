@@ -63,14 +63,14 @@ namespace ProductDatabase {
                 // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
                 cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = _productMaster.ProductName;
                 cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = _productMaster.RevisionGroup;
-                cmd.CommandText = $"SELECT Revision FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
+                cmd.CommandText = $"SELECT Revision FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup AND IsDeleted = 0 ORDER BY ID DESC;";
                 var revisionResult = cmd.ExecuteScalar();
                 RevisionTextBox.Text = revisionResult?.ToString() ?? "";
 
                 if (_productMaster.IsSerialGeneration) {
                     cmd.Parameters.Clear();
                     cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = _productMaster.ProductName;
-                    cmd.CommandText = $"SELECT SerialLastNumber FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND SerialLastNumber NOT NULL ORDER BY ID DESC;";
+                    cmd.CommandText = $"SELECT SerialLastNumber FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND IsDeleted = 0 AND SerialLastNumber NOT NULL ORDER BY ID DESC;";
                     var serialResult = cmd.ExecuteScalar();
                     if (!int.TryParse(serialResult?.ToString(), out var serialLastNum)) { throw new Exception("シリアル番号の取得に失敗しました。"); }
 
@@ -285,6 +285,7 @@ namespace ProductDatabase {
                         {Constants.VProductTableName} 
                     WHERE 
                         ProductName = @ProductName 
+                        AND IsDeleted = 0
                         AND SerialLastNumber NOT NULL 
                     ORDER BY 
                         ID DESC

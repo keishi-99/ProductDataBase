@@ -120,6 +120,7 @@ namespace ProductDatabase {
                                         SubstrateModel = @SubstrateModel
                                         AND UseID = @ID
                                         AND SubstrateNumber NOTNULL
+                                        AND IsDeleted = 0
                                     GROUP BY
                                         SubstrateNumber
                                 ),
@@ -136,6 +137,7 @@ namespace ProductDatabase {
                                     WHERE
                                         SubstrateModel = @SubstrateModel
                                         AND SubstrateNumber NOTNULL
+                                        AND IsDeleted = 0
                                     GROUP BY
                                         SubstrateName,
                                         SubstrateModel,
@@ -155,6 +157,7 @@ namespace ProductDatabase {
                                 WHERE
                                     s.Stock > 0 
                                     OR u.UsedDecrease IS NOT NULL
+                                    AND IsDeleted = 0
                                 ORDER BY
                                     CASE WHEN COALESCE(u.UsedDecrease, 0) = 0 THEN 1 ELSE 0 END,
                                     s.SubstrateNumber;
@@ -341,11 +344,11 @@ namespace ProductDatabase {
                                                         FROM
                                                             {Constants.VSubstrateTableName}
                                                         WHERE
-                                                            SubstrateModel = @SubstrateModel 
+                                                            SubstrateID = @SubstrateID 
                                                             AND SubstrateNumber = @SubstrateNumber
+                                                            AND IsDeleted = 0
                                                         GROUP BY
-                                                            SubstrateName,
-                                                            SubstrateModel,
+                                                            SubstrateID,
                                                             SubstrateNumber,
                                                             OrderNumber
                                                         ORDER BY
@@ -374,6 +377,7 @@ namespace ProductDatabase {
                                                             Comment = @Comment
                                                         WHERE
                                                             SubstrateNumber = @SubstrateNumber
+                                                            AND IsDeleted = 0
                                                             AND UseID = @UseID
                                                         ;
                                                         """;
@@ -446,6 +450,7 @@ namespace ProductDatabase {
                                                     {Constants.TSubstrateTableName}
                                                 WHERE
                                                     SubstrateNumber = @SubstrateNumber
+                                                    AND IsDeleted = 0
                                                     AND UseID = @ID
                                                 ;
                                                 """;
@@ -478,6 +483,7 @@ namespace ProductDatabase {
                                     WHERE
                                         ProductNumber = @ProductNumber
                                         AND SerialFirst = @SerialFirst
+                                        AND IsDeleted = 0
                                     ;
                                     """;
                                 cmd.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.OrderNumber) ? DBNull.Value : _productRegisterWork.OrderNumber;
