@@ -343,7 +343,7 @@ namespace ProductDatabase {
                                                         FROM
                                                             {Constants.VSubstrateTableName}
                                                         WHERE
-                                                            SubstrateID = @SubstrateID 
+                                                            SubstrateModel = @SubstrateModel 
                                                             AND SubstrateNumber = @SubstrateNumber
                                                             AND IsDeleted = 0
                                                         GROUP BY
@@ -415,7 +415,7 @@ namespace ProductDatabase {
                                                                     @Person,
                                                                     @RegDate,
                                                                     @Comment,
-                                                                @UseID
+                                                                    @UseID
                                                                 )
                                                             ;
                                                             """;
