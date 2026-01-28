@@ -552,222 +552,297 @@ namespace ProductDatabase {
                     break;
             }
         }
+
         private void SaveRegistrationLog() {
+            List<string[]> pendingLogs = [];
+
             try {
-                if (_editModeConnection is null) {
+                if (_editModeConnection is null || _editModeTransaction is null) {
                     MessageBox.Show("編集モードが開始されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                var command = _editModeConnection.CreateCommand();
+                using var command = _editModeConnection.CreateCommand();
+                command.Transaction = _editModeTransaction;
+
+                var changes = _historyTable.GetChanges();
+                if (changes == null) {
+                    MessageBox.Show("変更がありません。", "情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    CleanupEditMode();
+                    Close();
+                    return;
+                }
 
                 switch (_tableName) {
                     case "Substrate":
-                        foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
-                            if (row.RowState == DataRowState.Modified) {
-                                command.CommandText =
-                                    $"""
-                                    UPDATE
-                                        {Constants.TSubstrateTableName}
-                                    SET
-                                        SubstrateNumber = @SubstrateNumber,
-                                        OrderNumber = @OrderNumber,
-                                        Increase = @Increase,
-                                        Decrease = @Decrease,
-                                        Defect = @Defect,
-                                        Person = @Person,
-                                        RegDate = @RegDate,
-                                        Comment = @Comment,
-                                        UseId = @UseId
-                                    WHERE
-                                        ID = @ID
-                                    ;
-                                    """;
-
-                                command.Parameters.Clear();
-                                command.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = row["SubstrateNumber"];
-                                command.Parameters.Add("@OrderNumber", SqliteType.Text).Value = row["OrderNumber"];
-                                command.Parameters.Add("@Increase", SqliteType.Integer).Value = row["Increase"];
-                                command.Parameters.Add("@Decrease", SqliteType.Integer).Value = row["Decrease"];
-                                command.Parameters.Add("@Defect", SqliteType.Integer).Value = row["Defect"];
-                                command.Parameters.Add("@RegDate", SqliteType.Text).Value = row["RegDate"];
-                                command.Parameters.Add("@Person", SqliteType.Text).Value = row["Person"];
-                                command.Parameters.Add("@Comment", SqliteType.Text).Value = row["Comment"];
-                                command.Parameters.Add("@UseId", SqliteType.Integer).Value = row["UseId"];
-                                command.Parameters.Add("@ID", SqliteType.Integer).Value = row["ID"];
-
-                                command.ExecuteNonQuery();
-                                // ログ出力
-                                string[] logMessageArray = [
-                                    $"[基板履歴編集:前]",
-                                    $"[{_substrateMaster.CategoryName}]",
-                                    $"ID[{row["ID", DataRowVersion.Original]}]",
-                                    $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
-                                    $"製造番号[{row["SubstrateNumber", DataRowVersion.Original]}]",
-                                    $"[]",
-                                    $"製品名[{row["ProductName", DataRowVersion.Original]}]",
-                                    $"基板名[{row["SubstrateName", DataRowVersion.Original]}]",
-                                    $"型式[{row["SubstrateModel", DataRowVersion.Original]}]",
-                                    $"追加数[{row["Increase", DataRowVersion.Original]}]",
-                                    $"使用数[{row["Decrease", DataRowVersion.Original]}]",
-                                    $"減少数[{row["Defect", DataRowVersion.Original]}]",
-                                    $"[]",
-                                    $"登録日[{row["RegDate", DataRowVersion.Original]}]",
-                                    $"担当者[{row["Person", DataRowVersion.Original]}]",
-                                    $"コメント[{row["Comment", DataRowVersion.Original]}]"
-                                ];
-                                CommonUtils.Logger.AppendLog(logMessageArray);
-
-                                logMessageArray = [
-                                    $"[基板履歴編集:後]",
-                                    $"[{_substrateMaster.CategoryName}]",
-                                    $"ID[{row["ID"]}]",
-                                    $"注文番号[{row["OrderNumber"]}]",
-                                    $"製造番号[{row["SubstrateNumber"]}]",
-                                    $"[]",
-                                    $"製品名[{row["ProductName"]}]",
-                                    $"基板名[{row["SubstrateName"]}]",
-                                    $"型式[{row["SubstrateModel"]}]",
-                                    $"追加数[{row["Increase"]}]",
-                                    $"使用数[{row["Decrease"]}]",
-                                    $"減少数[{row["Defect"]}]",
-                                    $"[]",
-                                    $"登録日[{row["RegDate"]}]",
-                                    $"担当者[{row["Person"]}]",
-                                    $"コメント[{row["Comment"]}]"
-                                ];
-                                CommonUtils.Logger.AppendLog(logMessageArray);
-                            }
-                            else if (row.RowState == DataRowState.Deleted) {
-                                DeleteSubstrate(_editModeConnection, Convert.ToInt32(row["ID", DataRowVersion.Original]));
-                            }
-                        }
+                        ProcessSubstrateChanges(command, changes, pendingLogs);
                         break;
                     case "Product":
-                        foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
-                            if (row.RowState == DataRowState.Modified) {
-                                command.CommandText =
-                                    $"""
-                                    UPDATE
-                                        {Constants.TProductTableName}
-                                    SET
-                                        ID = @ID,
-                                        OrderNumber = @OrderNumber,
-                                        ProductNumber = @ProductNumber,
-                                        OLesNumber = @OLesNumber,
-                                        Person = @Person,
-                                        RegDate = @RegDate,
-                                        Revision = @Revision,
-                                        RevisionGroup = @RevisionGroup,
-                                        RegDate = @RegDate,
-                                        Comment = @Comment
-                                    WHERE
-                                        ID = @ID
-                                    ;
-                                    """;
-
-                                command.Parameters.Clear();
-                                command.Parameters.Add("@ID", SqliteType.Integer).Value = row["ID"];
-                                command.Parameters.Add("@OrderNumber", SqliteType.Text).Value = row["OrderNumber"];
-                                command.Parameters.Add("@ProductNumber", SqliteType.Text).Value = row["ProductNumber"];
-                                command.Parameters.Add("@OLesNumber", SqliteType.Text).Value = row["OLesNumber"];
-                                command.Parameters.Add("@Person", SqliteType.Text).Value = row["Person"];
-                                command.Parameters.Add("@RegDate", SqliteType.Text).Value = row["RegDate"];
-                                command.Parameters.Add("@Revision", SqliteType.Text).Value = row["Revision"];
-                                command.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = row["RevisionGroup"];
-                                command.Parameters.Add("@Comment", SqliteType.Text).Value = row["Comment"];
-
-                                command.ExecuteNonQuery();
-
-                                string[] logMessageArray = [
-                                    $"[製品履歴編集:前]",
-                                    $"[{_productMaster.CategoryName}]",
-                                    $"ID[{row["ID", DataRowVersion.Original]}]",
-                                    $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
-                                    $"製造番号[{row["ProductNumber", DataRowVersion.Original]}]",
-                                    $"OLes番号[{row["OLesNumber", DataRowVersion.Original]}]",
-                                    $"製品名[{row["ProductName", DataRowVersion.Original]}]",
-                                    $"タイプ[{row["ProductType", DataRowVersion.Original]}]",
-                                    $"型式[{row["ProductModel", DataRowVersion.Original]}]",
-                                    $"数量[{row["Quantity", DataRowVersion.Original]}]",
-                                    $"シリアル先頭[{row["SerialFirst", DataRowVersion.Original]}]",
-                                    $"シリアル末尾[{row["SerialLast", DataRowVersion.Original]}]",
-                                    $"Revision[{row["Revision", DataRowVersion.Original]}]",
-                                    $"登録日[{row["RegDate", DataRowVersion.Original]}]",
-                                    $"担当者[{row["Person", DataRowVersion.Original]}]",
-                                    $"コメント[{row["Comment", DataRowVersion.Original]}]"
-                                ];
-                                CommonUtils.Logger.AppendLog(logMessageArray);
-
-                                logMessageArray = [
-                                    $"[製品履歴編集:後]",
-                                    $"[{_productMaster.CategoryName}]",
-                                    $"ID[{row["ID"]}]",
-                                    $"注文番号[{row["OrderNumber"]}]",
-                                    $"製造番号[{row["ProductNumber"]}]",
-                                    $"OLes番号[{row["OLesNumber"]}]",
-                                    $"製品名[{row["ProductName"]}]",
-                                    $"タイプ[{row["ProductType"]}]",
-                                    $"型式[{row["ProductModel"]}]",
-                                    $"数量[{row["Quantity"]}]",
-                                    $"シリアル先頭[{row["SerialFirst"]}]",
-                                    $"シリアル末尾[{row["SerialLast"]}]",
-                                    $"Revision[{row["Revision"]}]",
-                                    $"登録日[{row["RegDate"]}]",
-                                    $"担当者[{row["Person"]}]",
-                                    $"コメント[{row["Comment"]}]"
-                                ];
-                                CommonUtils.Logger.AppendLog(logMessageArray);
-                            }
-                            else if (row.RowState == DataRowState.Deleted) {
-                                DeleteProduct(_editModeConnection, Convert.ToInt32(row["ID", DataRowVersion.Original]));
-                                DeleteSerial(_editModeConnection, Convert.ToInt32(row["ID", DataRowVersion.Original]));
-                                DeleteSubstrate(_editModeConnection, Convert.ToInt32(row["ID", DataRowVersion.Original]));
-                            }
-                        }
+                        ProcessProductChanges(command, changes, pendingLogs);
                         break;
                     case "Serial":
-                        foreach (var row in _historyTable.GetChanges()?.Rows.OfType<DataRow>() ?? []) {
-                            if (row.RowState == DataRowState.Modified) {
-                            }
-                            else if (row.RowState == DataRowState.Deleted) {
-                                DeleteSerial(_editModeConnection, Convert.ToInt32(row["usedID", DataRowVersion.Original]));
-                            }
-                        }
+                        ProcessSerialChanges(command, changes, pendingLogs);
                         break;
                 }
+
                 // バックアップ作成
                 CommonUtils.BackupManager.CreateBackup();
 
-                if (_editModeTransaction is not null) {
-                    _editModeTransaction.Commit();
-                    _editModeTransaction.Dispose();
-                    _editModeTransaction = null;
-                }
-                if (_editModeConnection is not null) {
-                    _editModeConnection.Close();
-                    _editModeConnection.Dispose();
-                    _editModeConnection = null;
+                _editModeTransaction.Commit();
+
+                foreach (var log in pendingLogs) {
+                    CommonUtils.Logger.AppendLog(log);
                 }
 
+                CleanupEditMode();
                 Close();
+
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                if (_editModeTransaction is not null) {
-                    _editModeTransaction.Rollback();
-                    _editModeTransaction.Dispose();
-                    _editModeTransaction = null;
+                try {
+                    _editModeTransaction?.Rollback();
+                } catch (Exception rollbackEx) {
+                    MessageBox.Show($"ロールバックに失敗しました: {rollbackEx.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-                if (_editModeConnection is not null) {
-                    _editModeConnection.Close();
-                    _editModeConnection.Dispose();
-                    _editModeConnection = null;
+
+                CleanupEditMode();
+            }
+        }
+
+        private void CleanupEditMode() {
+            _editModeTransaction?.Dispose();
+            _editModeTransaction = null;
+            _editModeConnection?.Close();
+            _editModeConnection?.Dispose();
+            _editModeConnection = null;
+        }
+
+        private void ProcessSubstrateChanges(SqliteCommand command, DataTable changes, List<string[]> pendingLogs) {
+            foreach (var row in changes.Rows.OfType<DataRow>()) {
+                if (row.RowState == DataRowState.Modified) {
+                    LogSubstrateEdit(row, pendingLogs);
+                    UpdateSubstrateRow(command, row);
+                }
+                else if (row.RowState == DataRowState.Deleted) {
+                    LogSubstrateDelete(row, pendingLogs);
+                    DeleteSubstrateRow(command, row);
                 }
             }
         }
-        private void DeleteSubstrate(SqliteConnection connection, int rowId) {
-            var commandText = $"""
+        private void LogSubstrateEdit(DataRow row, List<string[]> pendingLogs) {
+            pendingLogs.Add([
+                "[基板履歴編集:前]",
+                $"[{_substrateMaster.CategoryName}]",
+                $"ID[{GetValue(row, "ID", DataRowVersion.Original)}]",
+                $"注文番号[{GetValue(row, "OrderNumber", DataRowVersion.Original)}]",
+                $"製造番号[{GetValue(row, "SubstrateNumber", DataRowVersion.Original)}]",
+                $"[]",
+                $"製品名[{GetValue(row,"ProductName", DataRowVersion.Original)}]",
+                $"基板名[{GetValue(row,"SubstrateName", DataRowVersion.Original)}]",
+                $"型式[{GetValue(row, "SubstrateModel", DataRowVersion.Original)}]",
+                $"追加数[{GetValue(row, "Increase", DataRowVersion.Original)}]",
+                $"使用数[{GetValue(row, "Decrease", DataRowVersion.Original)}]",
+                $"減少数[{GetValue(row, "Defect", DataRowVersion.Original)}]",
+                $"[]",
+                $"登録日[{GetValue(row, "RegDate", DataRowVersion.Original)}]",
+                $"担当者[{GetValue(row, "Person", DataRowVersion.Original)}]",
+                $"コメント[{GetValue(row, "Comment", DataRowVersion.Original)}]"
+            ]);
+
+            pendingLogs.Add([
+                "[基板履歴編集:後]",
+                $"[{_substrateMaster.CategoryName}]",
+                $"ID[{GetValue(row, "ID")}]",
+                $"注文番号[{GetValue(row,"OrderNumber")}]",
+                $"製造番号[{GetValue(row,"SubstrateNumber")}]",
+                $"[]",
+                $"製品名[{GetValue(row, "ProductName")}]",
+                $"基板名[{GetValue(row, "SubstrateName")}]",
+                $"型式[{GetValue(row, "SubstrateModel")}]",
+                $"追加数[{GetValue(row, "Increase")}]",
+                $"使用数[{GetValue(row, "Decrease")}]",
+                $"減少数[{GetValue(row, "Defect")}]",
+                $"[]",
+                $"登録日[{GetValue(row, "RegDate")}]",
+                $"担当者[{GetValue(row, "Person")}]",
+                $"コメント[{GetValue(row, "Comment")}]"
+            ]);
+        }
+        private static void UpdateSubstrateRow(SqliteCommand command, DataRow row) {
+            command.CommandText =
+                $"""
+                UPDATE {Constants.TSubstrateTableName}
+                SET
+                    SubstrateNumber = @SubstrateNumber,
+                    OrderNumber = @OrderNumber,
+                    Increase = @Increase,
+                    Decrease = @Decrease,
+                    Defect = @Defect,
+                    Person = @Person,
+                    RegDate = @RegDate,
+                    Comment = @Comment,
+                    UseId = @UseId
+                WHERE ID = @ID;
+                """;
+
+            command.Parameters.Clear();
+            AddParameter(command, "@SubstrateNumber", row["SubstrateNumber"]);
+            AddParameter(command, "@OrderNumber", row["OrderNumber"]);
+            AddParameter(command, "@Increase", row["Increase"]);
+            AddParameter(command, "@Decrease", row["Decrease"]);
+            AddParameter(command, "@Defect", row["Defect"]);
+            AddParameter(command, "@RegDate", row["RegDate"]);
+            AddParameter(command, "@Person", row["Person"]);
+            AddParameter(command, "@Comment", row["Comment"]);
+            AddParameter(command, "@UseId", row["UseId"]);
+            AddParameter(command, "@ID", row["ID"]);
+
+            command.ExecuteNonQuery();
+        }
+        private void LogSubstrateDelete(DataRow row, List<string[]> pendingLogs) {
+            pendingLogs.Add([
+                "[基板履歴削除]",
+                $"[{_substrateMaster.CategoryName}]",
+                $"ID[{GetValue(row, "ID", DataRowVersion.Original)}]",
+                $"注文番号[{GetValue(row, "OrderNumber", DataRowVersion.Original)}]",
+                $"製造番号[{GetValue(row, "SubstrateNumber", DataRowVersion.Original)}]",
+                $"[]",
+                $"製品名[{GetValue(row,"ProductName", DataRowVersion.Original)}]",
+                $"基板名[{GetValue(row,"SubstrateName", DataRowVersion.Original)}]",
+                $"型式[{GetValue(row, "SubstrateModel", DataRowVersion.Original)}]",
+                $"追加数[{GetValue(row, "Increase", DataRowVersion.Original)}]",
+                $"使用数[{GetValue(row, "Decrease", DataRowVersion.Original)}]",
+                $"減少数[{GetValue(row, "Defect", DataRowVersion.Original)}]",
+                $"[]",
+                $"登録日[{GetValue(row, "RegDate", DataRowVersion.Original)}]",
+                $"担当者[{GetValue(row, "Person", DataRowVersion.Original)}]",
+                $"コメント[{GetValue(row, "Comment", DataRowVersion.Original)}]"
+            ]);
+        }
+        private static void DeleteSubstrateRow(SqliteCommand command, DataRow row) {
+            command.CommandText = $@"
+                    UPDATE {Constants.TSubstrateTableName}
+                    SET
+                        IsDeleted = 1,
+                        DeletedAt = datetime('now', 'localtime')
+                    WHERE ID = @ID;
+                ";
+            AddParameter(command, "@ID", row["ID", DataRowVersion.Original]);
+            command.ExecuteNonQuery();
+        }
+
+        private void ProcessProductChanges(SqliteCommand command, DataTable changes, List<string[]> pendingLogs) {
+            foreach (var row in changes.Rows.OfType<DataRow>()) {
+                if (row.RowState == DataRowState.Modified) {
+                    LogProductEdit(row, pendingLogs);
+                    UpdateProductRow(command, row);
+                }
+                else if (row.RowState == DataRowState.Deleted) {
+                    LogProductDelete(row, pendingLogs);
+                    LogProductSubstrateDelete(command, row, pendingLogs);
+                    LogProductSerialDelete(command, row, pendingLogs);
+
+                    DeleteProductRow(command, row);
+                    DeleteProductSubstrateRow(command, row);
+                    DeleteProductSerialRow(command, row);
+                }
+            }
+        }
+        private static void UpdateProductRow(SqliteCommand command, DataRow row) {
+            command.CommandText =
+                $"""
+                UPDATE
+                    {Constants.TProductTableName}
+                SET
+                    OrderNumber = @OrderNumber,
+                    ProductNumber = @ProductNumber,
+                    OLesNumber = @OLesNumber,
+                    Person = @Person,
+                    RegDate = @RegDate,
+                    Revision = @Revision,
+                    RevisionGroup = @RevisionGroup,
+                    Comment = @Comment
+                WHERE
+                    ID = @ID
+                ;
+                """;
+
+            command.Parameters.Clear();
+            AddParameter(command, "@ID", row["ID"]);
+            AddParameter(command, "@OrderNumber", row["OrderNumber"]);
+            AddParameter(command, "@ProductNumber", row["ProductNumber"]);
+            AddParameter(command, "@OLesNumber", row["OLesNumber"]);
+            AddParameter(command, "@Person", row["Person"]);
+            AddParameter(command, "@RegDate", row["RegDate"]);
+            AddParameter(command, "@Revision", row["Revision"]);
+            AddParameter(command, "@RevisionGroup", row["RevisionGroup"]);
+            AddParameter(command, "@Comment", row["Comment"]);
+
+            command.ExecuteNonQuery();
+        }
+        private void LogProductEdit(DataRow row, List<string[]> pendingLogs) {
+            pendingLogs.Add([
+                $"[製品履歴編集:前]",
+                $"[{_productMaster.CategoryName}]",
+                $"ID[{row["ID", DataRowVersion.Original]}]",
+                $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
+                $"製造番号[{row["ProductNumber", DataRowVersion.Original]}]",
+                $"OLes番号[{row["OLesNumber", DataRowVersion.Original]}]",
+                $"製品名[{row["ProductName", DataRowVersion.Original]}]",
+                $"タイプ[{row["ProductType", DataRowVersion.Original]}]",
+                $"型式[{row["ProductModel", DataRowVersion.Original]}]",
+                $"数量[{row["Quantity", DataRowVersion.Original]}]",
+                $"シリアル先頭[{row["SerialFirst", DataRowVersion.Original]}]",
+                $"シリアル末尾[{row["SerialLast", DataRowVersion.Original]}]",
+                $"Revision[{row["Revision", DataRowVersion.Original]}]",
+                $"登録日[{row["RegDate", DataRowVersion.Original]}]",
+                $"担当者[{row["Person", DataRowVersion.Original]}]",
+                $"コメント[{row["Comment", DataRowVersion.Original]}]"
+            ]);
+
+            pendingLogs.Add([
+                $"[製品履歴編集:後]",
+                $"[{_productMaster.CategoryName}]",
+                $"ID[{GetValue(row,"ID")}]",
+                $"注文番号[{GetValue(row,"OrderNumber")}]",
+                $"製造番号[{GetValue(row,"ProductNumber")}]",
+                $"OLes番号[{GetValue(row,"OLesNumber")}]",
+                $"製品名[{GetValue(row, "ProductName")}]",
+                $"タイプ[{GetValue(row, "ProductType")}]",
+                $"型式[{GetValue(row, "ProductModel")}]",
+                $"数量[{GetValue(row, "Quantity")}]",
+                $"シリアル先頭[{GetValue(row, "SerialFirst")}]",
+                $"シリアル末尾[{GetValue(row, "SerialLast")}]",
+                $"Revision[{GetValue(row, "Revision")}]",
+                $"登録日[{GetValue(row, "RegDate")}]",
+                $"担当者[{GetValue(row, "Person")}]",
+                $"コメント[{GetValue(row, "Comment")}]"
+            ]);
+        }
+        private void LogProductDelete(DataRow row, List<string[]> pendingLogs) {
+            pendingLogs.Add([
+                "[製品履歴削除]",
+                $"[{_productMaster.CategoryName}]",
+                $"ID[{GetValue(row, "ID", DataRowVersion.Original)}]",
+                $"注文番号[{GetValue(row, "OrderNumber", DataRowVersion.Original)}]",
+                $"製造番号[{GetValue(row, "ProductNumber", DataRowVersion.Original)}]",
+                $"OLes番号[{GetValue(row, "OLesNumber", DataRowVersion.Original)}]",
+                $"製品名[{GetValue(row,"ProductName", DataRowVersion.Original)}]",
+                $"タイプ[{GetValue(row,"ProductType", DataRowVersion.Original)}]",
+                $"型式[{GetValue(row, "ProductModel", DataRowVersion.Original)}]",
+                $"数量[{GetValue(row, "Quantity", DataRowVersion.Original)}]",
+                $"シリアル先頭[{GetValue(row, "SerialFirst", DataRowVersion.Original)}]",
+                $"シリアル末尾[{GetValue(row, "SerialLast", DataRowVersion.Original)}]",
+                $"Revision[{GetValue(row, "Revision", DataRowVersion.Original)}]",
+                $"登録日[{GetValue(row, "RegDate", DataRowVersion.Original)}]",
+                $"担当者[{GetValue(row, "Person", DataRowVersion.Original)}]",
+                $"コメント[{GetValue(row, "Comment", DataRowVersion.Original)}]"
+            ]);
+        }
+        private void LogProductSubstrateDelete(SqliteCommand command, DataRow row, List<string[]> pendingLogs) {
+            command.CommandText =
+                $"""
                 SELECT
                     ID,
                     OrderNumber,
@@ -784,106 +859,37 @@ namespace ProductDatabase {
                     UseID
                 FROM {Constants.VSubstrateTableName}
                 WHERE 
-                    UseID = @rowId
+                    UseID = @ID
                 ;
                 """;
 
-            using var dr = ExecuteReader(connection, commandText, ("@rowId", rowId));
+            command.Parameters.Clear();
+            using var reader = ExecuteReader(command, ("@ID", row["ID", DataRowVersion.Original]));
 
-            while (dr.Read()) {
-                string[] logMessageArray = [
-                    $"[基板履歴削除]",
+            while (reader.Read()) {
+                pendingLogs.Add([
+                    $"[製品削除に伴う基板削除]",
                     $"[{_substrateMaster.CategoryName}]",
-                    $"ID[{dr["ID"]}]",
-                    $"注文番号[{dr["OrderNumber"]}]",
-                    $"製造番号[{dr["SubstrateNumber"]}]",
+                    $"ID[{GetReaderValue(reader,"ID")}]",
+                    $"注文番号[{GetReaderValue(reader,"OrderNumber")}]",
+                    $"製造番号[{GetReaderValue(reader, "SubstrateNumber")}]",
                     $"[]",
-                    $"製品名[{dr["ProductName"]}]",
-                    $"基板名[{dr["SubstrateName"]}]",
-                    $"型式[{dr["SubstrateModel"]}]",
-                    $"追加数[{dr["Increase"]}]",
-                    $"使用数[{dr["Decrease"]}]",
-                    $"減少数[{dr["Defect"]}]",
-                    $"登録日[{dr["RegDate"]}]",
-                    $"担当者[{dr["Person"]}]",
-                    $"コメント[{dr["Comment"]}]",
-                    $"UseID[{dr["UseID"]}]",
-                ];
-                CommonUtils.Logger.AppendLog(logMessageArray);
+                    $"製品名[{GetReaderValue(reader, "ProductName")}]",
+                    $"基板名[{GetReaderValue(reader, "SubstrateName")}]",
+                    $"型式[{GetReaderValue(reader, "SubstrateModel")}]",
+                    $"追加数[{GetReaderValue(reader, "Increase")}]",
+                    $"使用数[{GetReaderValue(reader, "Decrease")}]",
+                    $"減少数[{GetReaderValue(reader, "Defect")}]",
+                    $"登録日[{GetReaderValue(reader, "RegDate")}]",
+                    $"担当者[{GetReaderValue(reader, "Person")}]",
+                    $"コメント[{GetReaderValue(reader, "Comment")}]",
+                    $"UseID[{GetReaderValue(reader, "UseID")}]",
+                ]);
             }
-
-            var command = connection.CreateCommand();
-            command.CommandText = $@"
-                UPDATE {Constants.TSubstrateTableName}
-                SET
-                    IsDeleted = 1,
-                    DeletedAt = datetime('now', 'localtime')
-                WHERE UseID = @UseID;
-            ";
-            command.Parameters.Add("@UseID", SqliteType.Integer).Value = rowId;
-            command.ExecuteNonQuery();
         }
-        private void DeleteProduct(SqliteConnection connection, int rowId) {
-            var commandText = $"""                
-                SELECT
-                    ID,
-                    OrderNumber,
-                    ProductNumber,
-                    OLesNumber,
-                    ProductName,
-                    ProductType,
-                    ProductModel,
-                    Quantity,
-                    SerialFirst,
-                    SerialLast,
-                    Revision,
-                    RegDate,
-                    Person,
-                    Comment
-                FROM {Constants.VProductTableName}
-                WHERE 
-                    ID = @rowId
-                ;                
-                """;
-
-            using var dr = ExecuteReader(connection, commandText, ("@rowId", rowId));
-
-            while (dr.Read()) {
-                string[] logMessageArray = [
-                    $"[製品履歴削除]",
-                    $"[{_productMaster.CategoryName}]",
-                    $"ID[{dr["ID"]}]",
-                    $"注文番号[{dr["OrderNumber"]}]",
-                    $"製造番号[{dr["ProductNumber"]}]",
-                    $"OLes番号[{dr["OLesNumber"]}]",
-                    $"製品名[{dr["ProductName"]}]",
-                    $"タイプ[{dr["ProductType"]}]",
-                    $"型式[{dr["ProductModel"]}]",
-                    $"数量[{dr["Quantity"]}]",
-                    $"シリアル先頭[{dr["SerialFirst"]}]",
-                    $"シリアル末尾[{dr["SerialLast"]}]",
-                    $"Revision[{dr["Revision"]}]",
-                    $"登録日[{dr["RegDate"]}]",
-                    $"担当者[{dr["Person"]}]",
-                    $"コメント[{dr["Comment"]}]"
-                ];
-                CommonUtils.Logger.AppendLog(logMessageArray);
-            }
-
-            var command = connection.CreateCommand();
-
-            command.CommandText = $"""
-                UPDATE {Constants.TProductTableName}
-                SET
-                    IsDeleted = 1,
-                    DeletedAt = datetime('now', 'localtime')
-                WHERE ID = @ID;
-                """;
-            command.Parameters.Add("@ID", SqliteType.Integer).Value = rowId;
-            command.ExecuteNonQuery();
-        }
-        private void DeleteSerial(SqliteConnection connection, int rowId) {
-            var commandText = $"""                
+        private void LogProductSerialDelete(SqliteCommand command, DataRow row, List<string[]> pendingLogs) {
+            command.CommandText =
+                $"""                
                 SELECT
                     rowid,
                     ProductName,
@@ -891,20 +897,21 @@ namespace ProductDatabase {
                     UsedID
                 FROM {Constants.TSerialTableName}
                 WHERE 
-                    UsedID = @rowId
+                    UsedID = @ID
                 ;                
                 """;
 
-            using var dr = ExecuteReader(connection, commandText, ("@rowId", rowId));
+            command.Parameters.Clear();
+            using var reader = ExecuteReader(command, ("@ID", row["ID", DataRowVersion.Original]));
 
-            while (dr.Read()) {
-                string[] logMessageArray = [
-                    $"[シリアル履歴削除]",
+            while (reader.Read()) {
+                pendingLogs.Add([
+                    $"[製品削除に伴うシリアル削除]",
                     $"[{_productMaster.CategoryName}]",
-                    $"ID[{dr["rowid"]}]",
-                    $"製品名[{dr["ProductName"]}]",
-                    $"Serial[{dr["Serial"]}]",
-                    $"UsedID[{dr["UsedID"]}]",
+                    $"ID[{GetReaderValue(reader, "rowid")}]",
+                    $"製品名[{GetReaderValue(reader, "ProductName")}]",
+                    $"Serial[{GetReaderValue(reader, "Serial")}]",
+                    $"UsedID[{GetReaderValue(reader, "UsedID")}]",
                     $"[]",
                     $"[]",
                     $"[]",
@@ -915,29 +922,123 @@ namespace ProductDatabase {
                     $"[]",
                     $"[]",
                     $"[]",
-                ];
-                CommonUtils.Logger.AppendLog(logMessageArray);
+                ]);
             }
+        }
+        private static void DeleteProductRow(SqliteCommand command, DataRow row) {
+            command.CommandText =
+                $"""
+                UPDATE {Constants.TProductTableName}
+                SET
+                    IsDeleted = 1,
+                    DeletedAt = datetime('now', 'localtime')
+                WHERE ID = @ID;
+                """;
 
-            var command = connection.CreateCommand();
+            command.Parameters.Clear();
+            AddParameter(command, "@ID", row["ID", DataRowVersion.Original]);
+            command.ExecuteNonQuery();
+        }
+        private static void DeleteProductSubstrateRow(SqliteCommand command, DataRow row) {
+            command.CommandText = $@"
+                UPDATE {Constants.TSubstrateTableName}
+                SET
+                    IsDeleted = 1,
+                    DeletedAt = datetime('now', 'localtime')
+                WHERE UseID = @ID;
+            ";
 
+            command.Parameters.Clear();
+            AddParameter(command, "@ID", row["ID", DataRowVersion.Original]);
+            command.ExecuteNonQuery();
+        }
+        private static void DeleteProductSerialRow(SqliteCommand command, DataRow row) {
             command.CommandText =
                 $"""
                 DELETE FROM
                     {Constants.TSerialTableName}
                 WHERE
-                    UsedID = @rowid
+                    UsedID = @ID
                 ;
                 """;
-            command.Parameters.Add("@rowid", SqliteType.Integer).Value = rowId;
+
+            command.Parameters.Clear();
+            AddParameter(command, "@ID", row["ID", DataRowVersion.Original]);
             command.ExecuteNonQuery();
         }
 
-        private static SqliteDataReader ExecuteReader(SqliteConnection connection, string commandText, params (string, object)[] parameters) {
-            var command = connection.CreateCommand();
-            command.CommandText = commandText;
+        private void ProcessSerialChanges(SqliteCommand command, DataTable changes, List<string[]> pendingLogs) {
+            foreach (var row in changes.Rows.OfType<DataRow>()) {
+                if (row.RowState == DataRowState.Modified) {
+                }
+                else if (row.RowState == DataRowState.Deleted) {
+                    LogSerialDelete(row, pendingLogs);
+                    DeleteSerialRow(command, row);
+                }
+            }
+        }
+        private void LogSerialDelete(DataRow row, List<string[]> pendingLogs) {
+            pendingLogs.Add([
+            $"[シリアル履歴削除]",
+                $"[{_productMaster.CategoryName}]",
+                $"ID[{GetValue(row, "rowid", DataRowVersion.Original)}]",
+                $"製品名[{GetValue(row, "ProductName", DataRowVersion.Original)}]",
+                $"Serial[{GetValue(row, "Serial", DataRowVersion.Original)}]",
+                $"UsedID[{GetValue(row, "UsedID", DataRowVersion.Original)}]",
+                $"[]",
+                $"[]",
+                $"[]",
+                $"[]",
+                $"[]",
+                $"[]",
+                $"[]",
+                $"[]",
+                $"[]",
+                $"[]",
+            ]);
+        }
+        private static void DeleteSerialRow(SqliteCommand command, DataRow row) {
+            command.CommandText =
+                $"""
+                    DELETE FROM
+                        {Constants.TSerialTableName}
+                    WHERE
+                        rowid = @rowid
+                    ;
+                    """;
+            command.Parameters.Clear();
+            AddParameter(command, "@rowid", row["rowid", DataRowVersion.Original]);
+            command.ExecuteNonQuery();
+        }
+
+        private static string GetReaderValue(SqliteDataReader reader, string columnName) {
+            var ordinal = reader.GetOrdinal(columnName);
+            if (reader.IsDBNull(ordinal)) {
+                return "";
+            }
+            return reader.GetValue(ordinal)?.ToString() ?? "";
+        }
+        private static void AddParameter(SqliteCommand command, string name, object value) {
+            command.Parameters.AddWithValue(name, value == DBNull.Value ? null : value);
+        }
+        private static string GetValue(DataRow row, string columnName, DataRowVersion version = DataRowVersion.Current) {
+            var value = row[columnName, version];
+            return value == DBNull.Value ? "" : value.ToString() ?? "";
+        }
+        private static SqliteDataReader ExecuteReader(SqliteCommand command, params (string name, object value)[] parameters) {
             foreach (var (name, value) in parameters) {
-                command.Parameters.Add(name, SqliteType.Text).Value = value ?? DBNull.Value;
+                if (value == null || value == DBNull.Value) {
+                    command.Parameters.Add(name, SqliteType.Text).Value = DBNull.Value;
+                }
+                else if (value is int or long) {
+                    command.Parameters.Add(name, SqliteType.Integer).Value = value;
+                }
+                else if (value is double or float or decimal) {
+                    command.Parameters.Add(name, SqliteType.Real).Value = value;
+                }
+                else {
+                    command.Parameters.Add(name, SqliteType.Text).Value = value;
+                }
             }
 
             return command.ExecuteReader();
