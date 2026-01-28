@@ -157,7 +157,6 @@ namespace ProductDatabase {
                                 WHERE
                                     s.Stock > 0 
                                     OR u.UsedDecrease IS NOT NULL
-                                    AND IsDeleted = 0
                                 ORDER BY
                                     CASE WHEN COALESCE(u.UsedDecrease, 0) = 0 THEN 1 ELSE 0 END,
                                     s.SubstrateNumber;
