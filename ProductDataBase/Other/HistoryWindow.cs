@@ -1132,7 +1132,7 @@ namespace ProductDatabase {
         // 使用基板表示
         private void ShowDataForm() {
 
-            if (DataBaseDataGridView.CurrentCell is null) { return; }
+            if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
 
             var dataForm = new Form {
                 Text = "使用基板",
@@ -1193,7 +1193,7 @@ namespace ProductDatabase {
             try {
                 Cursor.Current = Cursors.WaitCursor;
 
-                if (DataBaseDataGridView.CurrentCell is null) { return; }
+                if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 _productRegisterWork.RowID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
                 _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
@@ -1217,7 +1217,7 @@ namespace ProductDatabase {
             try {
                 Cursor.Current = Cursors.WaitCursor;
 
-                if (DataBaseDataGridView.CurrentCell is null) { return; }
+                if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 _productRegisterWork.RowID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
                 _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
@@ -1242,7 +1242,7 @@ namespace ProductDatabase {
             try {
                 Cursor.Current = Cursors.WaitCursor;
 
-                if (DataBaseDataGridView.CurrentCell is null) { return; }
+                if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
                 var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
                 _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
                 _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
