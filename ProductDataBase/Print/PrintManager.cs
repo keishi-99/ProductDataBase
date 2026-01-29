@@ -21,9 +21,9 @@ namespace ProductDatabase.Print {
         public static DocumentPrintSettings DocumentPrintSettings { get; private set; } = new();
 
         // 各種設定へのアクセスプロパティ
-        public static LabelPrintSettings LabelPrintSettings => DocumentPrintSettings.LabelPrintSettings ?? throw new InvalidOperationException("LabelPageSettings が null です。");
-        public static BarcodePrintSettings BarcodePrintSettings => DocumentPrintSettings.BarcodePrintSettings ?? throw new InvalidOperationException("BarcodePageSettings が null です。");
-        private static DocumentPrintSettings PrintSettings => DocumentPrintSettings ?? throw new InvalidOperationException("ProductPrintSettings が null です。");
+        public static LabelPrintSettings LabelPrintSettings => DocumentPrintSettings.LabelPrintSettings ?? throw new InvalidOperationException("LabelPrintSettings が null です。");
+        public static BarcodePrintSettings BarcodePrintSettings => DocumentPrintSettings.BarcodePrintSettings ?? throw new InvalidOperationException("BarcodePrintSettings が null です。");
+        private static DocumentPrintSettings PrintSettings => DocumentPrintSettings ?? throw new InvalidOperationException("DocumentPrintSettings が null です。");
 
         // 印刷状態を保持するプロパティ
         public static int PrintCount { get; private set; }
@@ -324,7 +324,7 @@ namespace ProductDatabase.Print {
 
 
         private static void DrawFinalRowMark(Graphics graphics, int rowNumber, float posX, float posY, float width, float height, Font font) {
-            var sf = new StringFormat {
+            using var sf = new StringFormat {
                 Alignment = StringAlignment.Near,
                 LineAlignment = StringAlignment.Center
             };
@@ -338,8 +338,13 @@ namespace ProductDatabase.Print {
             int copiesPerLabel = nameplatePrintSettings.CopiesPerLabel;
             var templatePath = nameplatePrintSettings.TemplatePath;
 
-            var doc = new Document();
-            if (doc.Open(templatePath) != false) {
+            Document? doc = null;
+            try {
+                doc = new Document();
+                if (!doc.Open(templatePath)) {
+                    throw new Exception("テンプレートファイルが開けませんでした。");
+                }
+
                 doc.StartPrint("", PrintOptionConstants.bpoDefault);
 
                 foreach (var serialNumber in serialList) {
@@ -348,10 +353,11 @@ namespace ProductDatabase.Print {
                 }
 
                 doc.EndPrint();
-                doc.Close();
-            }
-            else {
-                throw new Exception("テンプレートファイルが開けませんでした。");
+            } finally {
+                if (doc != null) {
+                    doc.Close();
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(doc);
+                }
             }
         }
     }
