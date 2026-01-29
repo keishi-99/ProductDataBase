@@ -399,7 +399,7 @@ namespace ProductDatabase {
         }
         private void ViewSerialLog() {
             _tableName = "Serial";
-            編集モードToolStripMenuItem.Enabled = Config.IsAdministrator; ;
+            編集モードToolStripMenuItem.Enabled = Config.IsAdministrator;
             GenerateReportButton.Visible = false;
             ShowUsedSubstrateButton.Visible = false;
             GenerateListButton.Visible = false;
