@@ -22,6 +22,7 @@ namespace ProductDatabase {
         private readonly AppSettings _appSettings;
 
         private int _serialLastNumber;
+        private bool _isTransactionCommitted = false;
 
         private string _serialType = string.Empty;
         private const string SerialTypeLabel = "Label";
@@ -55,6 +56,7 @@ namespace ProductDatabase {
                 _sqliteConnection = new SqliteConnection(GetConnectionRegistration());
                 _sqliteConnection.Open();
                 _sqliteTransaction = _sqliteConnection.BeginTransaction();
+                _isTransactionCommitted = false;
 
                 SetFont();
                 InitializeUIControls();
@@ -99,13 +101,14 @@ namespace ProductDatabase {
         }
         private void ClosingEvents(bool shouldCommit = true) {
             try {
-                if (_sqliteTransaction is not null) {
+                if (_sqliteTransaction is not null && !_isTransactionCommitted) {
                     if (shouldCommit) {
                         _sqliteTransaction.Commit();
                     }
                     else {
                         _sqliteTransaction.Rollback();
                     }
+                    _isTransactionCommitted = true;
                 }
             } finally {
                 _sqliteTransaction?.Dispose();
@@ -113,6 +116,7 @@ namespace ProductDatabase {
                 _sqliteConnection?.Close();
                 _sqliteConnection?.Dispose();
                 _sqliteConnection = null;
+                _isTransactionCommitted = false;
             }
         }
         private void SetFont() {
@@ -218,7 +222,7 @@ namespace ProductDatabase {
                     {Constants.VSubstrateTableName}
                 WHERE
                     SubstrateID = @SubstrateID 
-                    AND SubstrateNumber NOTNULL
+                    AND SubstrateNumber IS NOT NULL
                     AND IsDeleted = 0
                 GROUP BY
                     SubstrateID,
@@ -360,9 +364,11 @@ namespace ProductDatabase {
                         throw new Exception("RegType unknown");
                 }
                 transaction.Commit();
+                _isTransactionCommitted = true;
 
             } catch (Exception) {
                 transaction.Rollback();
+                _isTransactionCommitted = true;
                 MessageBox.Show("登録に失敗しました。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 throw;
             }
