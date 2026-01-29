@@ -331,7 +331,7 @@ namespace ProductDatabase {
                                                         FROM
                                                             {Constants.VSubstrateTableName}
                                                         WHERE
-                                                            SubstrateModel = @SubstrateModel 
+                                                            SubstrateID = @SubstrateID 
                                                             AND SubstrateNumber = @SubstrateNumber
                                                             AND IsDeleted = 0
                                                         GROUP BY
@@ -342,7 +342,7 @@ namespace ProductDatabase {
                                                             MIN(ID)
                                                         ;
                                                         """;
-                                                cmd.Parameters.Add("@SubstrateModel", SqliteType.Text).Value = _productMaster.UseSubstrates[i].SubstrateModel;
+                                                cmd.Parameters.Add("@SubstrateID", SqliteType.Text).Value = _productMaster.UseSubstrates[i].SubstrateID;
                                                 cmd.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = substrateNum;
                                                 using var dr = cmd.ExecuteReader();
                                                 while (dr.Read()) {
