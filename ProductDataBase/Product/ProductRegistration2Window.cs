@@ -15,7 +15,7 @@ namespace ProductDatabase {
         public BarcodePrintSettings BarcodePrintSettings => ProductPrintSettings.BarcodePrintSettings ?? new BarcodePrintSettings();
         public NameplatePrintSettings NameplatePrintSettings => ProductPrintSettings.NameplatePrintSettings ?? new NameplatePrintSettings();
 
-        public string printSettingPath = string.Empty;
+        public string PrintSettingPath { get; set; } = string.Empty;
 
         private readonly ProductMaster _productMaster;
         private readonly ProductRegisterWork _productRegisterWork;
@@ -24,6 +24,9 @@ namespace ProductDatabase {
         private int _serialLastNumber;
 
         private string _serialType = string.Empty;
+        private const string SerialTypeLabel = "Label";
+        private const string SerialTypeBarcode = "Barcode";
+        private const string SerialTypeNameplate = "Nameplate";
 
         private readonly List<string> _serialList = [];
         private readonly List<string> _checkBoxNames = [
@@ -90,16 +93,25 @@ namespace ProductDatabase {
                 Close();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ClosingEvents(shouldCommit: false);
                 Close();
             }
         }
-        private void ClosingEvents() {
-            // 編集モードのトランザクションをコミットしてロック解除
-            _sqliteTransaction?.Dispose();
-            _sqliteTransaction = null;
-            if (_sqliteConnection is not null) {
-                _sqliteConnection.Close();
-                _sqliteConnection.Dispose();
+        private void ClosingEvents(bool shouldCommit = true) {
+            try {
+                if (_sqliteTransaction is not null) {
+                    if (shouldCommit) {
+                        _sqliteTransaction.Commit();
+                    }
+                    else {
+                        _sqliteTransaction.Rollback();
+                    }
+                }
+            } finally {
+                _sqliteTransaction?.Dispose();
+                _sqliteTransaction = null;
+                _sqliteConnection?.Close();
+                _sqliteConnection?.Dispose();
                 _sqliteConnection = null;
             }
         }
@@ -272,11 +284,11 @@ namespace ProductDatabase {
         private void LoadSettings() {
             try {
                 ProductPrintSettings = new DocumentPrintSettings();
-                printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", _productMaster.CategoryName, _productMaster.ProductName, $"PrintConfig_{_productMaster.ProductName}_{_productMaster.ProductModel}.json");
-                if (!File.Exists(printSettingPath)) {
+                PrintSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", _productMaster.CategoryName, _productMaster.ProductName, $"PrintConfig_{_productMaster.ProductName}_{_productMaster.ProductModel}.json");
+                if (!File.Exists(PrintSettingPath)) {
                     throw new DirectoryNotFoundException($"印刷用設定ファイルがありません。");
                 }
-                var jsonString = File.ReadAllText(printSettingPath);
+                var jsonString = File.ReadAllText(PrintSettingPath);
                 ProductPrintSettings = System.Text.Json.JsonSerializer.Deserialize<DocumentPrintSettings>(jsonString) ?? new DocumentPrintSettings();
             } catch (Exception ex) {
                 MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -786,8 +798,8 @@ namespace ProductDatabase {
         }
         private void SerialCheck(SqliteConnection connection, bool print = true) {
 
-            _serialType = _productMaster.IsBarcodePrint ? "Barcode" : "Label";
-            _serialType = _productMaster.IsNameplatePrint ? "Nameplate" : _serialType;
+            _serialType = _productMaster.IsBarcodePrint ? SerialTypeBarcode : SerialTypeLabel;
+            _serialType = _productMaster.IsNameplatePrint ? SerialTypeNameplate : _serialType;
 
             for (var i = 0; i < _productRegisterWork.Quantity; i++) {
                 _serialList.Add(GenerateCode(_productRegisterWork.SerialFirstNumber + i));
@@ -842,7 +854,7 @@ namespace ProductDatabase {
         private void HandleLabelPrinting() {
             if (_productMaster.IsLabelPrint) {
                 MessageBox.Show("シリアルラベルを印刷します。");
-                _serialType = "Label";
+                _serialType = SerialTypeLabel;
 
                 if (!Print(true)) {
                     throw new OperationCanceledException("キャンセルしました。");
@@ -852,7 +864,7 @@ namespace ProductDatabase {
         private void HandleBarcodePrinting() {
             if (_productMaster.IsBarcodePrint) {
                 MessageBox.Show("バーコードラベルを印刷します。");
-                _serialType = "Barcode";
+                _serialType = SerialTypeBarcode;
 
                 if (!Print(true)) {
                     throw new OperationCanceledException("キャンセルしました。");
@@ -865,8 +877,8 @@ namespace ProductDatabase {
             BarcodePrintPositionNumericUpDown.Enabled = false;
         }
         private void GenerateSerialCodes() {
-            _serialType = _productMaster.IsBarcodePrint ? "Barcode" : "Label";
-            _serialType = _productMaster.IsNameplatePrint ? "Nameplate" : _serialType;
+            _serialType = _productMaster.IsBarcodePrint ? SerialTypeBarcode : SerialTypeLabel;
+            _serialType = _productMaster.IsNameplatePrint ? SerialTypeNameplate : _serialType;
             _productRegisterWork.SerialFirst = GenerateCode(_productRegisterWork.SerialFirstNumber);
             _productRegisterWork.SerialLast = GenerateCode(_serialLastNumber);
         }
@@ -907,8 +919,8 @@ namespace ProductDatabase {
                 var serialType = _serialType;
 
                 var startLine = serialType switch {
-                    "Label" => (int)SerialPrintPositionNumericUpDown.Value - 1,
-                    "Barcode" => (int)BarcodePrintPositionNumericUpDown.Value - 1,
+                    SerialTypeLabel => (int)SerialPrintPositionNumericUpDown.Value - 1,
+                    SerialTypeNameplate => (int)BarcodePrintPositionNumericUpDown.Value - 1,
                     _ => throw new Exception("SerialPrintType unknown")
                 };
 
@@ -972,9 +984,9 @@ namespace ProductDatabase {
             };
 
             var outputCode = _serialType switch {
-                "Label" => LabelPrintSettings.TextFormat ?? string.Empty,
-                "Barcode" => BarcodePrintSettings.TextFormat ?? string.Empty,
-                "Nameplate" => NameplatePrintSettings.TextFormat ?? string.Empty,
+                SerialTypeLabel => LabelPrintSettings.TextFormat ?? string.Empty,
+                SerialTypeBarcode => BarcodePrintSettings.TextFormat ?? string.Empty,
+                SerialTypeNameplate => NameplatePrintSettings.TextFormat ?? string.Empty,
                 _ => string.Empty
             };
 
@@ -1090,8 +1102,9 @@ namespace ProductDatabase {
                 ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.GenerateCheckSheet(_productMaster, _productRegisterWork);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            } finally {
+                Cursor.Current = Cursors.WaitCursor;
             }
-            Cursor.Current = Cursors.WaitCursor;
         }
 
         // 取得情報表示
@@ -1175,35 +1188,43 @@ namespace ProductDatabase {
             Close();
         }
         private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            _serialType = "Label";
-            SerialCheck(_sqliteConnection ?? throw new Exception("_sqliteConnectionがnullです。"), false);
+            _serialType = SerialTypeLabel;
+            if (_sqliteConnection is null) {
+                MessageBox.Show("データベース接続が確立されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            SerialCheck(_sqliteConnection, false);
             Print(false);
         }
         private void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            _serialType = "Barcode";
-            SerialCheck(_sqliteConnection ?? throw new Exception("_sqliteConnectionがnullです。"), false);
+            _serialType = SerialTypeBarcode;
+            if (_sqliteConnection is null) {
+                MessageBox.Show("データベース接続が確立されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            SerialCheck(_sqliteConnection, false);
             Print(false);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            PrintSettingsWindow ls = new() {
+            using PrintSettingsWindow ls = new() {
                 ProductMaster = _productMaster,
-                serialType = "Label"
+                serialType = SerialTypeLabel
             };
             ls.ShowDialog(this);
             LoadSettings();
         }
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            PrintSettingsWindow ls = new() {
+            using PrintSettingsWindow ls = new() {
                 ProductMaster = _productMaster,
-                serialType = "Barcode"
+                serialType = SerialTypeBarcode
             };
             ls.ShowDialog(this);
             LoadSettings();
         }
         private void 銘版印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            PrintSettingsWindow ls = new() {
+            using PrintSettingsWindow ls = new() {
                 ProductMaster = _productMaster,
-                serialType = "Nameplate"
+                serialType = SerialTypeNameplate
             };
             ls.ShowDialog(this);
             LoadSettings();
