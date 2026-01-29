@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using DocumentFormat.OpenXml.Office.Word;
+using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using static ProductDatabase.MainWindow;
@@ -321,27 +322,27 @@ namespace ProductDatabase {
                                             using (var cmd = con.CreateCommand()) {
                                                 cmd.CommandText =
                                                     $"""
-                                                        SELECT
-                                                            SubstrateName,
-                                                            SubstrateModel,
-                                                            SubstrateNumber,
-                                                            OrderNumber,
-                                                            SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock,
-                                                            SubstrateID
-                                                        FROM
-                                                            {Constants.VSubstrateTableName}
-                                                        WHERE
-                                                            SubstrateID = @SubstrateID 
-                                                            AND SubstrateNumber = @SubstrateNumber
-                                                            AND IsDeleted = 0
-                                                        GROUP BY
-                                                            SubstrateID,
-                                                            SubstrateNumber,
-                                                            OrderNumber
-                                                        ORDER BY
-                                                            MIN(ID)
-                                                        ;
-                                                        """;
+                                                    SELECT
+                                                        SubstrateName,
+                                                        SubstrateModel,
+                                                        SubstrateNumber,
+                                                        OrderNumber,
+                                                        SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock,
+                                                        SubstrateID
+                                                    FROM
+                                                        {Constants.VSubstrateTableName}
+                                                    WHERE
+                                                        SubstrateID = @SubstrateID 
+                                                        AND SubstrateNumber = @SubstrateNumber
+                                                        AND IsDeleted = 0
+                                                    GROUP BY
+                                                        SubstrateID,
+                                                        SubstrateNumber,
+                                                        OrderNumber
+                                                    ORDER BY
+                                                        MIN(ID)
+                                                    ;
+                                                    """;
                                                 cmd.Parameters.Add("@SubstrateID", SqliteType.Text).Value = _productMaster.UseSubstrates[i].SubstrateID;
                                                 cmd.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = substrateNum;
                                                 using var dr = cmd.ExecuteReader();
@@ -355,20 +356,21 @@ namespace ProductDatabase {
                                                 // 更新
                                                 cmdUpdate.CommandText =
                                                     $"""
-                                                        UPDATE
-                                                            {Constants.TSubstrateTableName}
-                                                        SET
-                                                            Decrease = @Decrease,
-                                                            Person = @Person,
-                                                            RegDate = @RegDate,
-                                                            Comment = @Comment
-                                                        WHERE
-                                                            SubstrateNumber = @SubstrateNumber
-                                                            AND IsDeleted = 0
-                                                            AND UseID = @UseID
-                                                        ;
-                                                        """;
+                                                    UPDATE
+                                                        {Constants.TSubstrateTableName}
+                                                    SET
+                                                        Decrease = @Decrease,
+                                                        Person = @Person,
+                                                        RegDate = @RegDate,
+                                                        Comment = @Comment
+                                                    WHERE
+                                                        SubstrateNumber = @SubstrateNumber
+                                                        AND IsDeleted = 0
+                                                        AND UseID = @UseID
+                                                    ;
+                                                    """;
 
+                                                cmdUpdate.Parameters.Clear();
                                                 cmdUpdate.Parameters.Add("@Decrease", SqliteType.Integer).Value = 0 - useValue;
                                                 cmdUpdate.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Person) ? DBNull.Value : _productRegisterWork.Person;
                                                 cmdUpdate.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.RegDate) ? DBNull.Value : _productRegisterWork.RegDate;
@@ -383,30 +385,30 @@ namespace ProductDatabase {
                                                     using var cmdInsert = con.CreateCommand();
                                                     cmdInsert.CommandText =
                                                         $"""
-                                                            INSERT INTO {Constants.TSubstrateTableName}
-                                                                (
-                                                                    SubstrateID,
-                                                                    SubstrateNumber,
-                                                                    OrderNumber,
-                                                                    Decrease,
-                                                                    Person,
-                                                                    RegDate,
-                                                                    Comment,
-                                                                    UseID
-                                                                )
-                                                            VALUES
-                                                                (
-                                                                    @SubstrateID,
-                                                                    @SubstrateNumber,
-                                                                    @OrderNumber,
-                                                                    @Decrease,
-                                                                    @Person,
-                                                                    @RegDate,
-                                                                    @Comment,
-                                                                    @UseID
-                                                                )
-                                                            ;
-                                                            """;
+                                                        INSERT INTO {Constants.TSubstrateTableName}
+                                                            (
+                                                                SubstrateID,
+                                                                SubstrateNumber,
+                                                                OrderNumber,
+                                                                Decrease,
+                                                                Person,
+                                                                RegDate,
+                                                                Comment,
+                                                                UseID
+                                                            )
+                                                        VALUES
+                                                            (
+                                                                @SubstrateID,
+                                                                @SubstrateNumber,
+                                                                @OrderNumber,
+                                                                @Decrease,
+                                                                @Person,
+                                                                @RegDate,
+                                                                @Comment,
+                                                                @UseID
+                                                            )
+                                                        ;
+                                                        """;
 
                                                     cmdInsert.Parameters.Add("@SubstrateID", SqliteType.Text).Value = string.IsNullOrWhiteSpace(substrateID) ? DBNull.Value : substrateID;
                                                     cmdInsert.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
@@ -427,23 +429,27 @@ namespace ProductDatabase {
                                                 _listUsedQuantity.Add(useValue);
                                             }
                                         }
-                                        // 使用数が0になった場合、基板テーブルから削除
                                         else if (usedValue != useValue && useValue == 0) {
                                             using var cmdDelete = con.CreateCommand();
+
                                             cmdDelete.CommandText =
                                                 $"""
-                                                DELETE
-                                                FROM
+                                                UPDATE
                                                     {Constants.TSubstrateTableName}
+                                                SET
+                                                    Decrease = @Decrease
                                                 WHERE
-                                                    SubstrateNumber = @SubstrateNumber
+                                                    SubstrateID = @SubstrateID
+                                                    AND SubstrateNumber = @SubstrateNumber
                                                     AND IsDeleted = 0
-                                                    AND UseID = @ID
+                                                    AND UseID = @UseID
                                                 ;
                                                 """;
-                                            cmdDelete.Parameters.Clear(); // パラメータをクリア
+                                            cmdDelete.Parameters.Clear();
+                                            cmdDelete.Parameters.Add("@Decrease", SqliteType.Integer).Value = 0;
+                                            cmdDelete.Parameters.Add("@SubstrateID", SqliteType.Integer).Value = _productMaster.UseSubstrates[i].SubstrateID;
                                             cmdDelete.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
-                                            cmdDelete.Parameters.Add("@ID", SqliteType.Integer).Value = _productRegisterWork.RowID;
+                                            cmdDelete.Parameters.Add("@UseID", SqliteType.Integer).Value = _productRegisterWork.RowID;
 
                                             cmdDelete.Connection = con;
                                             cmdDelete.ExecuteNonQuery();

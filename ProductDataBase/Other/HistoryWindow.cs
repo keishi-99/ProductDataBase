@@ -1000,12 +1000,12 @@ namespace ProductDatabase {
         private static void DeleteSerialRow(SqliteCommand command, DataRow row) {
             command.CommandText =
                 $"""
-                    DELETE FROM
-                        {Constants.TSerialTableName}
-                    WHERE
-                        rowid = @rowid
-                    ;
-                    """;
+                DELETE FROM
+                    {Constants.TSerialTableName}
+                WHERE
+                    rowid = @rowid
+                ;
+                """;
             command.Parameters.Clear();
             AddParameter(command, "@rowid", row["rowid", DataRowVersion.Original]);
             command.ExecuteNonQuery();
