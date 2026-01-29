@@ -1130,7 +1130,7 @@ namespace ProductDatabase {
         }
 
         // 使用基板表示
-        private void ShowDataForm() {
+        private void ShowUsedSubstrateDetails() {
 
             if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
 
@@ -1278,7 +1278,7 @@ namespace ProductDatabase {
         private void 編集ToolStripMenuItem_Click(object sender, EventArgs e) { EditMode(); }
         private void 編集終了ToolStripMenuItem_Click(object sender, EventArgs e) { SaveRegistrationLog(); }
         private void 在庫調整ToolStripMenuItem_Click(object sender, EventArgs e) { InventoryAdjustment(); }
-        private void ShowUsedSubstrateButton_Click(object sender, EventArgs e) { ShowDataForm(); }
+        private void ShowUsedSubstrateButton_Click(object sender, EventArgs e) { ShowUsedSubstrateDetails(); }
         private void GenerateReportButton_Click(object sender, EventArgs e) { GenerateReport(); }
         private void GenerateListButton_Click(object sender, EventArgs e) { GenerateList(); }
         private void GenerateCheckSheetButton_Click(object sender, EventArgs e) { GenerateCheckSheet(); }
