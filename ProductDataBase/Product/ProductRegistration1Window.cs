@@ -63,14 +63,32 @@ namespace ProductDatabase {
                 // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
                 cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = _productMaster.ProductName;
                 cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = _productMaster.RevisionGroup;
-                cmd.CommandText = $"SELECT Revision FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup AND IsDeleted = 0 ORDER BY ID DESC;";
+                cmd.CommandText =
+                    $"""
+                    SELECT Revision 
+                    FROM {Constants.VProductTableName} 
+                    WHERE 
+                        ProductName = @ProductName 
+                        AND RevisionGroup = @RevisionGroup 
+                        AND IsDeleted = 0 
+                    ORDER BY ID DESC;
+                    """;
                 var revisionResult = cmd.ExecuteScalar();
                 RevisionTextBox.Text = revisionResult?.ToString() ?? "";
 
                 if (_productMaster.IsSerialGeneration) {
                     cmd.Parameters.Clear();
                     cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = _productMaster.ProductName;
-                    cmd.CommandText = $"SELECT SerialLastNumber FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND IsDeleted = 0 AND SerialLastNumber NOT NULL ORDER BY ID DESC;";
+                    cmd.CommandText =
+                        $"""
+                        SELECT SerialLastNumber 
+                        FROM {Constants.VProductTableName} 
+                        WHERE 
+                            ProductName = @ProductName 
+                            AND IsDeleted = 0 
+                            AND SerialLastNumber IS NOT NULL 
+                        ORDER BY ID DESC;
+                        """;
                     var serialResult = cmd.ExecuteScalar();
                     if (!int.TryParse(serialResult?.ToString(), out var serialLastNum)) { throw new Exception("シリアル番号の取得に失敗しました。"); }
 
@@ -87,11 +105,10 @@ namespace ProductDatabase {
 
                     if (nextSerialNumber > maxNumber || nextSerialNumber < minNumber) {// あるいは firstSerialが minNumber未満の場合も対象に
                         MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        FirstSerialNumberTextBox.Text = minNumber.ToString();
                         nextSerialNumber = minNumber;
                     }
 
-                    FirstSerialNumberTextBox.Text = (nextSerialNumber).ToString();
+                    FirstSerialNumberTextBox.Text = nextSerialNumber.ToString();
                 }
 
                 // 機種別注意メッセージ表示
@@ -106,7 +123,6 @@ namespace ProductDatabase {
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } finally {
             }
         }
         // 登録チェック
@@ -126,7 +142,9 @@ namespace ProductDatabase {
                 }
 
                 if (PersonComboBox.SelectedIndex == -1 && PersonComboBox.Enabled) {
-                    throw new Exception("担当者が選択されていません。");
+                    MessageBox.Show("担当者が選択されていません。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    PersonComboBox.Focus();
+                    return;
                 }
 
                 if (!anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
@@ -143,9 +161,13 @@ namespace ProductDatabase {
 
                 if (ManufacturingNumberCheckBox.Checked) {
                     string text = ManufacturingNumberMaskedTextBox.Text.Trim();
+                    bool startsWithR = text.StartsWith("R", StringComparison.OrdinalIgnoreCase);
+                    bool hasCorrectLength = text.Length == 15;
 
-                    if (!text.StartsWith("R", StringComparison.OrdinalIgnoreCase) && text.Length != 15) {
-                        throw new Exception("製番を10桁+4桁で入力して下さい。");
+                    if (!startsWithR && !hasCorrectLength) {
+                        MessageBox.Show("製番を10桁+4桁で入力して下さい。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        ManufacturingNumberMaskedTextBox.Focus();
+                        return;
                     }
                 }
 
@@ -506,25 +528,28 @@ namespace ProductDatabase {
             return jsonObj[productName]?.ToString();
         }
         // 注意メッセージ更新
+        private static readonly object s_fileLock = new();
         private void ProductMessageChange() {
-            if (!File.Exists(_messageFilePath)) {
-                throw new FileNotFoundException($"{_messageFilePath}\nが見つかりません。");
-            }
+            lock (s_fileLock) {
+                if (!File.Exists(_messageFilePath)) {
+                    throw new FileNotFoundException($"{_messageFilePath}\nが見つかりません。");
+                }
 
-            var json = JObject.Parse(File.ReadAllText(_messageFilePath));
+                var json = JObject.Parse(File.ReadAllText(_messageFilePath));
 
-            string currentMessage = json.ContainsKey(_productMaster.ProductName)
-                ? json[_productMaster.ProductName]!.ToString()
-                : "";
+                string currentMessage = json.ContainsKey(_productMaster.ProductName)
+                    ? json[_productMaster.ProductName]!.ToString()
+                    : "";
 
-            using var dialog = new InputDialog("メッセージ編集", "メッセージを入力してください", currentMessage);
+                using var dialog = new InputDialog("メッセージ編集", "メッセージを入力してください", currentMessage);
 
-            if (dialog.ShowDialog() == DialogResult.OK) {
-                string newMessage = dialog.InputText;
+                if (dialog.ShowDialog() == DialogResult.OK) {
+                    string newMessage = dialog.InputText;
 
-                json[_productMaster.ProductName] = newMessage;
+                    json[_productMaster.ProductName] = newMessage;
 
-                File.WriteAllText(_messageFilePath, json.ToString());
+                    File.WriteAllText(_messageFilePath, json.ToString());
+                }
             }
         }
         public class InputDialog : Form {
