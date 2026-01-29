@@ -36,7 +36,7 @@ namespace ProductDatabase {
                     break;
                 case SubstrateRegistrationWindow substrateWindow:
                     _isLabelPrint = SubstrateMaster.IsLabelPrint;
-                    LoadSettingsFromWindow(substrateWindow.SubstratePrintSettings, substrateWindow.printSettingPath);
+                    LoadSettingsFromWindow(substrateWindow.SubstratePrintSettings, substrateWindow.PrintSettingPath);
                     break;
                 case RePrintWindow rePrintWindow:
                     _isLabelPrint = ProductMaster.IsLabelPrint;
