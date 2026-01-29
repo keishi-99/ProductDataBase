@@ -23,8 +23,6 @@ namespace ProductDatabase {
                         "Substrate6DataGridView", "Substrate7DataGridView", "Substrate8DataGridView", "Substrate9DataGridView","Substrate10DataGridView",
                         "Substrate11DataGridView", "Substrate12DataGridView", "Substrate13DataGridView", "Substrate14DataGridView","Substrate15DataGridView"
                         ];
-        private CheckBox? _objCbx;
-        private DataGridView? _objDgv;
 
         public SubstrateChange2(ProductMaster productMaster, ProductRegisterWork productRegisterWork, AppSettings appSettings) {
             InitializeComponent();
@@ -50,8 +48,6 @@ namespace ProductDatabase {
                 // ComboBoxへ担当者を追加
                 PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
 
-                var strQuantity = string.Empty;
-
                 switch (_productMaster.RegType) {
                     case 2:
                     case 3:
@@ -59,46 +55,28 @@ namespace ProductDatabase {
                             var substrateName = _productMaster.UseSubstrates[i].SubstrateName;
                             var substrateModel = _productMaster.UseSubstrates[i].SubstrateModel;
                             var quantity = _productRegisterWork.Quantity;
+                            var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
+                            var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
 
                             // チェックボックスとDgvを有効に
-                            _objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
-                            if (_objCbx is not null) {
-                                _objCbx.Enabled = true;
-                                _objCbx.Checked = true;
+                            objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
+                            if (objCbx is not null) {
+                                objCbx.Enabled = true;
+                                objCbx.Checked = true;
                             }
 
-                            _objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
-                            if (_objDgv is not null) {
-                                _objDgv.Columns[1].DefaultCellStyle.BackColor = Color.LightGray;
-                                _objDgv.Columns[2].DefaultCellStyle.BackColor = Color.LightGray;
-                                _objDgv.Columns[2].ReadOnly = true;
-                                _objDgv.Columns[3].ReadOnly = false;
-                                _objDgv.Columns[4].ReadOnly = false;
-                                switch (Font.Size) {
-                                    case 9:
-                                        _objDgv.RowTemplate.Height = 24;
-                                        _objDgv.Columns[0].Width = 130;
-                                        _objDgv.Columns[1].Width = 30;
-                                        _objDgv.Columns[2].Width = 30;
-                                        _objDgv.Columns[3].Width = 30;
-                                        _objDgv.Columns[4].Width = 24;
-                                        break;
-                                    case 12:
-                                        _objDgv.RowTemplate.Height = 24;
-                                        _objDgv.Columns[0].Width = 220;
-                                        _objDgv.Columns[1].Width = 40;
-                                        _objDgv.Columns[2].Width = 40;
-                                        _objDgv.Columns[3].Width = 40;
-                                        _objDgv.Columns[4].Width = 24;
-                                        break;
-                                    case 14:
-                                        _objDgv.RowTemplate.Height = 25;
-                                        _objDgv.Columns[0].Width = 230;
-                                        _objDgv.Columns[1].Width = 60;
-                                        _objDgv.Columns[2].Width = 60;
-                                        _objDgv.Columns[3].Width = 60;
-                                        _objDgv.Columns[4].Width = 25;
-                                        break;
+                            objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
+                            if (objDgv is not null) {
+                                objDgv.Columns[1].DefaultCellStyle.BackColor = Color.LightGray;
+                                objDgv.Columns[2].DefaultCellStyle.BackColor = Color.LightGray;
+                                objDgv.Columns[2].ReadOnly = true;
+                                objDgv.Columns[3].ReadOnly = false;
+                                objDgv.Columns[4].ReadOnly = false;
+                                if (s_layoutSettings.TryGetValue(Font.Size, out var layout)) {
+                                    objDgv.RowTemplate.Height = layout.RowHeight;
+                                    for (int z = 0; z < layout.ColumnWidths.Length; z++) {
+                                        objDgv.Columns[z].Width = layout.ColumnWidths[z];
+                                    }
                                 }
                             }
 
@@ -119,7 +97,7 @@ namespace ProductDatabase {
                                     WHERE
                                         SubstrateModel = @SubstrateModel
                                         AND UseID = @ID
-                                        AND SubstrateNumber NOTNULL
+                                        AND SubstrateNumber IS NOT NULL
                                         AND IsDeleted = 0
                                     GROUP BY
                                         SubstrateNumber
@@ -136,7 +114,7 @@ namespace ProductDatabase {
                                         {Constants.VSubstrateTableName}
                                     WHERE
                                         SubstrateModel = @SubstrateModel
-                                        AND SubstrateNumber NOTNULL
+                                        AND SubstrateNumber IS NOT NULL
                                         AND IsDeleted = 0
                                     GROUP BY
                                         SubstrateName,
@@ -169,25 +147,25 @@ namespace ProductDatabase {
                             using var dr = cmd.ExecuteReader();
                             var j = 0;
 
-                            if (_objCbx is not null) {
+                            if (objCbx is not null) {
                                 var splitSubstrateName = substrateName.Split(':');
-                                _objCbx.Text = $"{splitSubstrateName.Last()} - {substrateModel}";
+                                objCbx.Text = $"{splitSubstrateName.Last()} - {substrateModel}";
                             }
                             while (dr.Read()) {
                                 var strSubstrateNum = dr["SubstrateNumber"].ToString() ?? string.Empty;
                                 var intStock = Convert.ToInt32(dr["Stock"]);
                                 var intUsedQuantity = Convert.ToInt32(dr["UsedDecrease"]); ;
 
-                                if (_objDgv is null) {
+                                if (objDgv is null) {
                                     break;
                                 }
 
-                                _objDgv.Rows.Add();
-                                _objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
-                                _objDgv.Rows[j].Cells[1].Value = intStock;
-                                _objDgv.Rows[j].Cells[2].Value = intUsedQuantity;
-                                _objDgv.Rows[j].Cells[3].Value = intUsedQuantity;
-                                _objDgv.Rows[j].Cells[4].Value = intUsedQuantity != 0;
+                                objDgv.Rows.Add();
+                                objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
+                                objDgv.Rows[j].Cells[1].Value = intStock;
+                                objDgv.Rows[j].Cells[2].Value = intUsedQuantity;
+                                objDgv.Rows[j].Cells[3].Value = intUsedQuantity;
+                                objDgv.Rows[j].Cells[4].Value = intUsedQuantity != 0;
                                 j++;
                             }
                         }
@@ -201,6 +179,16 @@ namespace ProductDatabase {
             } finally {
             }
         }
+        private class DataGridViewLayoutSettings {
+            public int RowHeight { get; init; }
+            public int[] ColumnWidths { get; init; } = [];
+        }
+
+        private static readonly Dictionary<float, DataGridViewLayoutSettings> s_layoutSettings = new() {
+            [9f] = new() { RowHeight = 24, ColumnWidths = [130, 30, 30, 30, 24] },
+            [12f] = new() { RowHeight = 24, ColumnWidths = [220, 40, 40, 40, 24] },
+            [14f] = new() { RowHeight = 25, ColumnWidths = [230, 60, 60, 60, 25] }
+        };
         // 変更登録
         private void ChangeRegistration() {
             try {
@@ -215,14 +203,14 @@ namespace ProductDatabase {
                 PersonComboBox.Enabled = false;
                 RegisterButton.Enabled = false;
                 for (var i = 0; i <= 9; i++) {
-                    _objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
-                    if (_objCbx is not null) {
-                        _objCbx.Enabled = false;
+                    var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
+                    if (objCbx is not null) {
+                        objCbx.Enabled = false;
                     }
 
-                    _objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
-                    if (_objDgv is not null) {
-                        _objDgv.Enabled = false;
+                    var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
+                    if (objDgv is not null) {
+                        objDgv.Enabled = false;
                     }
                 }
                 // リスト印刷ボタンを有効に
@@ -485,17 +473,17 @@ namespace ProductDatabase {
                                         AND IsDeleted = 0
                                     ;
                                     """;
-                                cmd.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.OrderNumber) ? DBNull.Value : _productRegisterWork.OrderNumber;
-                                cmd.Parameters.Add("@ProductNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.ProductNumber) ? DBNull.Value : _productRegisterWork.ProductNumber;
+                                cmd.Parameters.Add("@OrderNumber", SqliteType.Text).Value = ToDbValue(_productRegisterWork.OrderNumber);
+                                cmd.Parameters.Add("@ProductNumber", SqliteType.Text).Value = ToDbValue(_productRegisterWork.ProductNumber);
                                 cmd.Parameters.Add("@Quantity", SqliteType.Text).Value = _productRegisterWork.Quantity;
-                                cmd.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Person) ? DBNull.Value : _productRegisterWork.Person;
-                                cmd.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.RegDate) ? DBNull.Value : _productRegisterWork.RegDate;
-                                cmd.Parameters.Add("@Revision", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Revision) ? DBNull.Value : _productRegisterWork.Revision;
+                                cmd.Parameters.Add("@Person", SqliteType.Text).Value = ToDbValue(_productRegisterWork.Person);
+                                cmd.Parameters.Add("@RegDate", SqliteType.Text).Value = ToDbValue(_productRegisterWork.RegDate);
+                                cmd.Parameters.Add("@Revision", SqliteType.Text).Value = ToDbValue(_productRegisterWork.Revision);
                                 cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = _productMaster.RevisionGroup;
-                                cmd.Parameters.Add("@SerialFirst", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.SerialFirst) ? DBNull.Value : _productRegisterWork.SerialFirst;
-                                cmd.Parameters.Add("@SerialLast", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.SerialLast) ? DBNull.Value : _productRegisterWork.SerialLast;
+                                cmd.Parameters.Add("@SerialFirst", SqliteType.Text).Value = ToDbValue(_productRegisterWork.SerialFirst);
+                                cmd.Parameters.Add("@SerialLast", SqliteType.Text).Value = ToDbValue(_productRegisterWork.SerialLast);
                                 cmd.Parameters.Add("@SerialLastNumber", SqliteType.Text).Value = _productRegisterWork.SerialLastNumber;
-                                cmd.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Comment) ? DBNull.Value : _productRegisterWork.Comment;
+                                cmd.Parameters.Add("@Comment", SqliteType.Text).Value = ToDbValue(_productRegisterWork.Comment);
 
                                 cmd.ExecuteNonQuery();
                                 transaction.Commit();
@@ -530,7 +518,9 @@ namespace ProductDatabase {
                 throw;
             }
         }
-
+        private static object ToDbValue(string? value) {
+            return string.IsNullOrWhiteSpace(value) ? DBNull.Value : value;
+        }
         // リスト印刷
         private void GenerateList() {
             try {
@@ -549,65 +539,39 @@ namespace ProductDatabase {
         // チェックボックスイベント
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
             var checkBox = (CheckBox)sender;
-            DataGridView dataGridView = new();
+            var dataGridView = GetDataGridViewForCheckBox(checkBox.Name);
 
-            switch (checkBox.Name) {
-                case "Substrate1CheckBox":
-                    dataGridView = Substrate1DataGridView;
-                    break;
-                case "Substrate2CheckBox":
-                    dataGridView = Substrate2DataGridView;
-                    break;
-                case "Substrate3CheckBox":
-                    dataGridView = Substrate3DataGridView;
-                    break;
-                case "Substrate4CheckBox":
-                    dataGridView = Substrate4DataGridView;
-                    break;
-                case "Substrate5CheckBox":
-                    dataGridView = Substrate5DataGridView;
-                    break;
-                case "Substrate6CheckBox":
-                    dataGridView = Substrate6DataGridView;
-                    break;
-                case "Substrate7CheckBox":
-                    dataGridView = Substrate7DataGridView;
-                    break;
-                case "Substrate8CheckBox":
-                    dataGridView = Substrate8DataGridView;
-                    break;
-                case "Substrate9CheckBox":
-                    dataGridView = Substrate9DataGridView;
-                    break;
-                case "Substrate10CheckBox":
-                    dataGridView = Substrate10DataGridView;
-                    break;
-                case "Substrate11CheckBox":
-                    dataGridView = Substrate11DataGridView;
-                    break;
-                case "Substrate12CheckBox":
-                    dataGridView = Substrate12DataGridView;
-                    break;
-                case "Substrate13CheckBox":
-                    dataGridView = Substrate13DataGridView;
-                    break;
-                case "Substrate14CheckBox":
-                    dataGridView = Substrate14DataGridView;
-                    break;
-                case "Substrate15CheckBox":
-                    dataGridView = Substrate15DataGridView;
-                    break;
-                default:
-                    break;
-            }
+            if (dataGridView is null) return;
 
             dataGridView.Enabled = checkBox.Checked;
             dataGridView.Visible = checkBox.Checked;
             checkBox.ForeColor = checkBox.Checked ? Color.Black : Color.Red;
 
             if (!checkBox.Checked) {
-                MessageBox.Show("チェックがない場合在庫から引き落とされなくなります。", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("チェックがない場合在庫から引き落とされなくなります。", "",
+                               MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
+        }
+
+        private DataGridView? GetDataGridViewForCheckBox(string checkBoxName) {
+            return checkBoxName switch {
+                "Substrate1CheckBox" => Substrate1DataGridView,
+                "Substrate2CheckBox" => Substrate2DataGridView,
+                "Substrate3CheckBox" => Substrate3DataGridView,
+                "Substrate4CheckBox" => Substrate4DataGridView,
+                "Substrate5CheckBox" => Substrate5DataGridView,
+                "Substrate6CheckBox" => Substrate6DataGridView,
+                "Substrate7CheckBox" => Substrate7DataGridView,
+                "Substrate8CheckBox" => Substrate8DataGridView,
+                "Substrate9CheckBox" => Substrate9DataGridView,
+                "Substrate10CheckBox" => Substrate10DataGridView,
+                "Substrate11CheckBox" => Substrate11DataGridView,
+                "Substrate12CheckBox" => Substrate12DataGridView,
+                "Substrate13CheckBox" => Substrate13DataGridView,
+                "Substrate14CheckBox" => Substrate14DataGridView,
+                "Substrate15CheckBox" => Substrate15DataGridView,
+                _ => null
+            };
         }
 
         private void SubstrateChange2_Load(object sender, EventArgs e) { LoadEvents(); }
