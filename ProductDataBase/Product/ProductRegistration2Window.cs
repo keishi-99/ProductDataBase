@@ -920,7 +920,7 @@ namespace ProductDatabase {
 
                 var startLine = serialType switch {
                     SerialTypeLabel => (int)SerialPrintPositionNumericUpDown.Value - 1,
-                    SerialTypeNameplate => (int)BarcodePrintPositionNumericUpDown.Value - 1,
+                    SerialTypeBarcode => (int)BarcodePrintPositionNumericUpDown.Value - 1,
                     _ => throw new Exception("SerialPrintType unknown")
                 };
 
