@@ -21,7 +21,17 @@ namespace ProductDatabase {
             _productRegisterWork = productRegisterWork;
             _appSettings = appSettings;
 
+            SubstrateChangeDataGridView.AllowUserToAddRows = true;
+            SubstrateChangeDataGridView.AllowUserToDeleteRows = true;
+            SubstrateChangeDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Lavender;
+            SubstrateChangeDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            SubstrateChangeDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(SubstrateChangeDataGridView.Font, FontStyle.Bold);
+            SubstrateChangeDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            SubstrateChangeDataGridView.ReadOnly = true;
+            SubstrateChangeDataGridView.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             SubstrateChangeDataGridView.RowTemplate.DefaultCellStyle.Padding = new Padding(5);
+            SubstrateChangeDataGridView.RowTemplate.Height += 10;
+
         }
 
         // ロードイベント
@@ -35,32 +45,32 @@ namespace ProductDatabase {
             using var cmd = con.CreateCommand();
             cmd.CommandText =
                 $"""
-                    SELECT
-                        ID,
-                        ProductName,
-                        ProductType,
-                        ProductModel,
-                        OrderNumber,
-                        ProductNumber,
-                        Quantity,
-                        SerialFirst,
-                        SerialLast,
-                        SerialLastNumber,
-                        Revision,
-                        RevisionGroup,
-                        Person,
-                        RegDate,    
-                        Comment,
-                        CreatedAt
-                    FROM
-                        {Constants.VProductTableName}
-                    WHERE
-                        ProductID = @ProductID 
-                        AND Quantity > 1
-                    ORDER BY
-                        ID DESC
-                    ;
-                    """;
+                SELECT
+                    ID,
+                    ProductName,
+                    ProductType,
+                    ProductModel,
+                    OrderNumber,
+                    ProductNumber,
+                    Quantity,
+                    SerialFirst,
+                    SerialLast,
+                    SerialLastNumber,
+                    Revision,
+                    RevisionGroup,
+                    Person,
+                    RegDate,    
+                    Comment,
+                    CreatedAt
+                FROM
+                    {Constants.VProductTableName}
+                WHERE
+                    ProductID = @ProductID 
+                    AND Quantity > 1
+                ORDER BY
+                    ID DESC
+                ;
+                """;
 
             cmd.Parameters.Add("@ProductID", SqliteType.Text).Value = _productMaster.ProductID;
 
@@ -81,12 +91,6 @@ namespace ProductDatabase {
                 var w = Screen.PrimaryScreen.Bounds.Width;
                 SubstrateChangeDataGridView.MaximumSize = new Size(w, h);
             }
-            SubstrateChangeDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(SubstrateChangeDataGridView.Font, FontStyle.Bold);
-            SubstrateChangeDataGridView.RowHeadersVisible = true;
-            SubstrateChangeDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;
-
-            SubstrateChangeDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-            SubstrateChangeDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
             SubstrateChangeDataGridView.Columns["ID"].HeaderCell.Value = "ID";
             SubstrateChangeDataGridView.Columns["ID"].Width = 40;

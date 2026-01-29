@@ -32,17 +32,11 @@
             // 
             // SubstrateChangeDataGridView
             // 
-            this.SubstrateChangeDataGridView.AllowUserToAddRows = false;
-            this.SubstrateChangeDataGridView.AllowUserToDeleteRows = false;
-            this.SubstrateChangeDataGridView.AllowUserToResizeRows = false;
             this.SubstrateChangeDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            this.SubstrateChangeDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.SubstrateChangeDataGridView.Location = new Point(0, 0);
             this.SubstrateChangeDataGridView.MultiSelect = false;
             this.SubstrateChangeDataGridView.Name = "SubstrateChangeDataGridView";
             this.SubstrateChangeDataGridView.ReadOnly = true;
-            this.SubstrateChangeDataGridView.RowHeadersVisible = false;
-            this.SubstrateChangeDataGridView.RowTemplate.Height = 21;
             this.SubstrateChangeDataGridView.Size = new Size(1184, 300);
             this.SubstrateChangeDataGridView.TabIndex = 1;
             // 
