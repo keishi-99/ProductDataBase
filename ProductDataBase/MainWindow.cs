@@ -4,6 +4,8 @@ using Newtonsoft.Json.Linq;
 using ProductDatabase.Other;
 using System.Data;
 using System.Data.Odbc;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace ProductDatabase {
@@ -925,11 +927,15 @@ namespace ProductDatabase {
             }
         }
         private void HandleSubstrateSelection(string productName, string substrateName) {
-            var substrateRet = _productRepository.SubstrateDataTable.Select($"ProductName = '{productName}' AND SubstrateName = '{substrateName}'");
+            var substrateRet = _productRepository.SubstrateDataTable
+                .AsEnumerable()
+                .Where(r => r["ProductName"]?.ToString() == productName &&
+                            r["SubstrateName"]?.ToString() == substrateName)
+                .ToArray();
             OpenSubstrateRegistrationWindow(substrateRet);
         }
         private void OpenSubstrateRegistrationWindow(DataRow[] substrateRet) {
-            _substrateMaster.SubstrateID = Convert.ToInt32(substrateRet[0]["SubstrateID"] ?? throw new Exception("RegType is null"));
+            _substrateMaster.SubstrateID = Convert.ToInt32(substrateRet[0]["SubstrateID"] ?? throw new Exception("SubstrateID is null"));
             _substrateMaster.CategoryName = substrateRet[0]["CategoryName"].ToString() ?? string.Empty;
             _substrateMaster.ProductName = substrateRet[0]["ProductName"].ToString() ?? string.Empty;
             _substrateMaster.SubstrateName = substrateRet[0]["SubstrateName"].ToString() ?? string.Empty;
@@ -944,11 +950,15 @@ namespace ProductDatabase {
             window.ShowDialog(this);
         }
         private void HandleProductSelection(string productName, string productType) {
-            var productRet = _productRepository.ProductDataTable.Select($"ProductName = '{productName}' AND ProductType = '{productType}'");
+            var productRet = _productRepository.SubstrateDataTable
+                .AsEnumerable()
+                .Where(r => r["ProductName"]?.ToString() == productName &&
+                            r["ProductType"]?.ToString() == productType)
+                .ToArray();
             OpenProductRegistrationWindow(productRet);
         }
         private void OpenProductRegistrationWindow(DataRow[] productRet) {
-            _productMaster.ProductID = Convert.ToInt32(productRet[0]["ProductID"] ?? throw new Exception("RegType is null"));
+            _productMaster.ProductID = Convert.ToInt32(productRet[0]["ProductID"] ?? throw new Exception("ProductID is null"));
             _productMaster.CategoryName = productRet[0]["CategoryName"].ToString() ?? string.Empty;
             _productMaster.ProductName = productRet[0]["ProductName"].ToString() ?? string.Empty;
             _productMaster.ProductType = productRet[0]["ProductType"].ToString() ?? string.Empty;
@@ -985,13 +995,24 @@ namespace ProductDatabase {
         }
         // excel
         private static void OpenExcel(string filePath) {
-            // Excel実行ファイルの場所を取得
-            var xlApp = new Microsoft.Office.Interop.Excel.Application();
-            var excelFullPath = System.IO.Path.Combine(xlApp.Path, "EXCEL.EXE");
-            xlApp.Quit();
-            System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
-            // ファイルを実行
-            System.Diagnostics.Process.Start(excelFullPath, filePath);
+            Microsoft.Office.Interop.Excel.Application? xlApp = null;
+            try {
+                xlApp = new Microsoft.Office.Interop.Excel.Application();
+                var excelFullPath = Path.Combine(xlApp.Path, "EXCEL.EXE");
+                xlApp.Quit();
+
+                using var process = Process.Start(new ProcessStartInfo {
+                    FileName = excelFullPath,
+                    Arguments = $"\"{filePath}\"",
+                    UseShellExecute = true
+                });
+            } finally {
+                if (xlApp != null) {
+                    Marshal.ReleaseComObject(xlApp);
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                }
+            }
         }
 
         private void MainWindow_Load(object sender, EventArgs e) { LoadEvents(); }
