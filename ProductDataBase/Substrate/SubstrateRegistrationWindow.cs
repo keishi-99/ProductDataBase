@@ -14,7 +14,7 @@ namespace ProductDatabase {
 
         public DocumentPrintSettings SubstratePrintSettings { get; set; } = new DocumentPrintSettings();
         public LabelPrintSettings LabelPrintSettings => SubstratePrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
-        public readonly string printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
+        public string PrintSettingPath { get; } = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
 
         private readonly List<string> _serialList = [];
         private readonly List<string> _checkBoxNames = [
@@ -67,20 +67,18 @@ namespace ProductDatabase {
                 PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
 
                 // 印刷しない場合は関連コントロール非表示に
-                if (IsLabelPrint == false) {
+                if (!IsLabelPrint) {
                     PrintRowLabel.Visible = false;
                     PrintPositionNumericUpDown.Visible = false;
                     PrintOnlyCheckBox.Visible = false;
                     PrintButton.Visible = false;
                 }
 
-                if (File.Exists(printSettingPath) == false) { throw new Exception("印刷設定ファイルが見つかりませんでした"); }
-                SubstratePrintSettings = new DocumentPrintSettings();
-                LoadSettings(printSettingPath);
+                if (!File.Exists(PrintSettingPath)) { throw new Exception("印刷設定ファイルが見つかりませんでした"); }
+                LoadSettings(PrintSettingPath);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
-            } finally {
             }
         }
         private void LoadSettings(string settingFilePath) {
@@ -89,36 +87,39 @@ namespace ProductDatabase {
                 SubstratePrintSettings = System.Text.Json.JsonSerializer.Deserialize<DocumentPrintSettings>(jsonString) ?? new DocumentPrintSettings();
             } catch (Exception ex) {
                 MessageBox.Show($"設定ファイルの読み込みに失敗しました。{Environment.NewLine}{ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } finally {
             }
         }
         // 登録処理
-        private void RegisterCheck(bool isPrint) {
+        private void ProcessRegistration(bool isPrint) {
             try {
 
-                FormCheck();
-                if (!DataCheck()) { return; }
+                ValidateForm();
+                if (!ValidateData()) { return; }
 
                 RegisterButton.Enabled = false;
 
-                if (!PrintOnlyCheckBox.Checked) {
-                    if (isPrint && !Registration()) {
+                if (!PrintOnlyCheckBox.Checked && isPrint) {
+                    if (!Registration()) {
                         return;
                     }
                 }
 
-                if (IsLabelPrint) {
-                    if (QuantityCheckBox.Checked) {
-                        if (isPrint) { MessageBox.Show("登録完了 続けて印刷します。"); }
-                        PrintStart(isPrint);
-                    }
-                    if (DefectQuantityCheckBox.Checked) {
-                        MessageBox.Show("登録完了");
-                    }
+                if (!IsLabelPrint) {
+                    MessageBox.Show("登録完了");
+                    Close();
+                    return;
                 }
-                else {
+
+                if (QuantityCheckBox.Checked) {
+                    if (isPrint) {
+                        MessageBox.Show("登録完了 続けて印刷します。");
+                    }
+                    PrintStart(isPrint);
+                }
+                else if (DefectQuantityCheckBox.Checked) {
                     MessageBox.Show("登録完了");
                 }
+
                 Close();
 
             } catch (Exception ex) {
@@ -310,7 +311,7 @@ namespace ProductDatabase {
             }
 
         }
-        private bool FormCheck() {
+        private bool ValidateForm() {
             // 入力フォームのチェック
             var anyTextBoxEnabled = false;
             var allTextBoxesFilled = true;
@@ -340,7 +341,7 @@ namespace ProductDatabase {
                 ? throw new Exception("製番を10桁+4桁で入力して下さい。")
                 : true;
         }
-        private bool DataCheck() {
+        private bool ValidateData() {
 
             var quantity = 0;
             var defectQuantity = 0;
@@ -604,13 +605,11 @@ namespace ProductDatabase {
                     MessageBox.Show("QRコードが正しくありません。");
                     return;
                 }
-                if (arr is not null) {
-                    ManufacturingNumberMaskedTextBox.Text = arr[0];
-                    QuantityTextBox.Text = arr[2];
-                    OrderNumberTextBox.Text = arr[3];
-                }
+                ManufacturingNumberMaskedTextBox.Text = arr[0];
+                QuantityTextBox.Text = arr[2];
+                OrderNumberTextBox.Text = arr[3];
             } catch (Exception ex) {
-                throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}");
+                throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", ex);
             }
         }
         // 取得情報表示
@@ -674,21 +673,22 @@ namespace ProductDatabase {
 
         private void SubstrateRegistrationWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
-        private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(true); }
-        private void PrintButton_Click(object sender, EventArgs e) { RegisterCheck(true); }
+        private void RegisterButton_Click(object sender, EventArgs e) { ProcessRegistration(true); }
+        private void PrintButton_Click(object sender, EventArgs e) { ProcessRegistration(true); }
         private void OpenSubstrateInformationButton_Click(object sender, EventArgs e) { OpenSubstrateInformation(); }
         private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
         private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void DefectQuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
-        private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { RegisterCheck(false); }
+        private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { ProcessRegistration(false); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            PrintSettingsWindow ls = new() {
+            using (var ls = new PrintSettingsWindow {
                 SubstrateMaster = _substrateMaster,
                 serialType = "Substrate"
-            };
-            ls.ShowDialog(this);
-            LoadSettings(printSettingPath);
+            }) {
+                ls.ShowDialog(this);
+            }
+            LoadSettings(PrintSettingPath);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
         private void QrCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
