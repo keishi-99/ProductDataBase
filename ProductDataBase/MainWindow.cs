@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Dapper;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using ProductDatabase.Other;
@@ -53,18 +54,15 @@ namespace ProductDatabase {
                 using var con = new SqliteConnection(GetConnectionRegistration());
                 con.Open();
 
-                using (var cmd = new SqliteCommand("SELECT * FROM M_ProductDef;", con))
-                using (var reader = cmd.ExecuteReader()) {
+                using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.ProductTableName};")) {
                     ProductDataTable.Load(reader);
                 }
 
-                using (var cmd = new SqliteCommand("SELECT * FROM M_SubstrateDef;", con))
-                using (var reader = cmd.ExecuteReader()) {
+                using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.SubstrateTableName};")) {
                     SubstrateDataTable.Load(reader);
                 }
 
-                using (var cmd = new SqliteCommand("SELECT * FROM V_ProductUseSubstrate;", con))
-                using (var reader = cmd.ExecuteReader()) {
+                using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.VProductUseSubstrate};")) {
                     ProductUseSubstrate.Load(reader);
                 }
             }
@@ -82,15 +80,21 @@ namespace ProductDatabase {
             }
 
             // 製品IDから使用基板リストを取得
-            public List<SubstrateInfo> GetUseSubstrates(int productKey) {
+            public static List<SubstrateInfo> GetUseSubstrates(int productKey) {
+                using var con = new SqliteConnection(GetConnectionRegistration());
 
-                return [.. ProductUseSubstrate.AsEnumerable()
-                    .Where(r => Convert.ToInt32(r["P_ProductID"]) == productKey)
-                    .Select(r => new SubstrateInfo {
-                        SubstrateID = Convert.ToInt32(r["S_SubstrateID"]),
-                        SubstrateName = r["SubstrateName"]?.ToString() ?? string.Empty,
-                        SubstrateModel = r["SubstrateModel"]?.ToString() ?? string.Empty
-                    })];
+                var sql =
+                    $"""
+                    SELECT 
+                        S_SubstrateID as SubstrateID,
+                        SubstrateName,
+                        SubstrateModel
+                    FROM {Constants.VProductUseSubstrate}
+                    WHERE P_ProductID = @ProductKey
+                    """
+                    ;
+
+                return [.. con.Query<SubstrateInfo>(sql, new { ProductKey = productKey })];
             }
 
             public void Clear() {
@@ -574,7 +578,7 @@ namespace ProductDatabase {
             var row = _productRepository.GetProductById(productId);
 
             _productMaster.LoadFrom(row);
-            _productMaster.UseSubstrates = _productRepository.GetUseSubstrates(_productMaster.ProductID);
+            _productMaster.UseSubstrates = ProductRepository.GetUseSubstrates(_productMaster.ProductID);
 
             switch (mode) {
                 case ProductOperationMode.Register:
@@ -830,19 +834,30 @@ namespace ProductDatabase {
             }
         }
         private void BarcodeInput() {
-            using (OdbcConnection con = new($"DSN={_dsn}; UID={_uid}; PWD={_pwd}")) {
-                con.Open();
-                using OdbcCommand cmd = new($"SELECT * FROM V_宮崎手配情報 WHERE 手配管理番号 = '{QRCodeTextBox.Text}';", con);
-                using var dr = cmd.ExecuteReader();
-                while (dr.Read()) {
-                    _productRegisterWork.ProductNumber = dr["手配製番"].ToString() ?? string.Empty;
-                    _productMaster.ProductModel = dr["品目番号"].ToString() ?? string.Empty;
-                    _productMaster.ProductName = dr["品目名称"].ToString() ?? string.Empty;
-                    _productRegisterWork.Quantity = Convert.ToInt32(dr["手配数"] ?? throw new Exception("手配数 is null"));
-                    _productRegisterWork.OrderNumber = dr["請求先注番"].ToString() ?? string.Empty;
-                }
-            }
-            if (string.IsNullOrEmpty(_productRegisterWork.ProductNumber)) { throw new Exception($"一致する情報がありません。{Environment.NewLine}手配管理番号:{QRCodeTextBox.Text}"); }
+            using var con = new OdbcConnection($"DSN={_dsn}; UID={_uid}; PWD={_pwd}");
+            con.Open();
+
+            var result = con.QueryFirstOrDefault<OrderDto>(
+                @"""
+                SELECT *
+                FROM V_宮崎手配情報
+                WHERE 手配管理番号 = ?;
+                """,
+                new { 手配管理番号 = QRCodeTextBox.Text })
+                ?? throw new Exception($"一致する情報がありません。{Environment.NewLine}手配管理番号:{QRCodeTextBox.Text}");
+
+            _productRegisterWork.ProductNumber = result.手配製番 ?? string.Empty;
+            _productMaster.ProductModel = result.品目番号 ?? string.Empty;
+            _productMaster.ProductName = result.品目名称 ?? string.Empty;
+            _productRegisterWork.Quantity = result.手配数;
+            _productRegisterWork.OrderNumber = result.請求先注番 ?? string.Empty;
+        }
+        private sealed class OrderDto {
+            public string 手配製番 { get; set; } = string.Empty;
+            public string 品目番号 { get; set; } = string.Empty;
+            public string 品目名称 { get; set; } = string.Empty;
+            public int 手配数 { get; set; }
+            public string 請求先注番 { get; set; } = string.Empty;
         }
         private void ProcessCategoryItemData() {
             var pattern = @"-(?:SMT|H|GH).*";
@@ -853,9 +868,8 @@ namespace ProductDatabase {
         }
         private void FetchDataFromSQLite() {
             using var con = new SqliteConnection(GetConnectionRegistration());
-            con.Open();
-            using var cmd = con.CreateCommand();
-            cmd.CommandText =
+
+            var sql =
                 $"""
                 SELECT
                     s.SubItemNumber,
@@ -865,34 +879,36 @@ namespace ProductDatabase {
                     p.ProductType,
                     p.ProItemNumber
                 FROM
-                    M_SubstrateDef AS s
+                    {Constants.ProductTableName} AS s
                 FULL JOIN
-                    M_ProductDef AS p
+                    {Constants.SubstrateTableName} AS p
                 ON
                     s.SubItemNumber = p.ProItemNumber
                 WHERE
-                    s.SubItemNumber LIKE '%'|| @StrProness2 ||'%'
+                    s.SubItemNumber LIKE '%' || @ProductModel || '%'
                 OR
-                    p.ProItemNumber LIKE '%'|| @StrProness2 ||'%'
-                ;
+                    p.ProItemNumber LIKE '%' || @ProductModel || '%'
                 """;
 
-            cmd.Parameters.Add("@StrProness2", SqliteType.Text).Value = _productMaster.ProductModel;
-            using var dr = cmd.ExecuteReader();
-            if (!dr.HasRows) { throw new Exception($"品目番号が見つかりません。\n品目番号:[{_productMaster.ProductModel}]"); }
-            while (dr.Read()) {
-                var colSubItemNumber = dr["SubItemNumber"].ToString() ?? string.Empty;
-                var colProItemNumber = dr["ProItemNumber"].ToString() ?? string.Empty;
+            var results = con.Query(sql, new { _productMaster.ProductModel });
+
+            if (!results.Any()) {
+                throw new Exception($"品目番号が見つかりません。\n品目番号:[{_productMaster.ProductModel}]");
+            }
+
+            foreach (var row in results) {
+                var colSubItemNumber = row.SubItemNumber?.ToString() ?? string.Empty;
+                var colProItemNumber = row.ProItemNumber?.ToString() ?? string.Empty;
 
                 if (!string.IsNullOrWhiteSpace(colSubItemNumber)) {
-                    var productName = dr["sName"]?.ToString() ?? string.Empty;
-                    var substrateName = dr["SubstrateName"]?.ToString() ?? string.Empty;
+                    var productName = row.sName?.ToString() ?? string.Empty;
+                    var substrateName = row.SubstrateName?.ToString() ?? string.Empty;
                     AddToLists(colSubItemNumber, productName, string.Empty, substrateName, "1");
                 }
 
                 if (!string.IsNullOrWhiteSpace(colProItemNumber)) {
-                    var productName = dr["pName"]?.ToString() ?? string.Empty;
-                    var productType = dr["ProductType"]?.ToString() ?? string.Empty;
+                    var productName = row.pName?.ToString() ?? string.Empty;
+                    var productType = row.ProductType?.ToString() ?? string.Empty;
                     AddToLists(colProItemNumber, productName, productType, string.Empty, "2");
                 }
             }
@@ -970,7 +986,7 @@ namespace ProductDatabase {
             _productMaster.SerialDigitType = Convert.ToInt32(productRet[0]["SerialType"] ?? throw new Exception("SerialType is null"));
             _productMaster.SerialPrintType = Convert.ToInt32(productRet[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
             _productMaster.SheetPrintType = Convert.ToInt32(productRet[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
-            _productMaster.UseSubstrates = _productRepository.GetUseSubstrates(_productMaster.ProductID);
+            _productMaster.UseSubstrates = ProductRepository.GetUseSubstrates(_productMaster.ProductID);
             using ProductRegistration1Window window = new(_productMaster, _productRegisterWork, _appSettings);
             window.ShowDialog(this);
         }

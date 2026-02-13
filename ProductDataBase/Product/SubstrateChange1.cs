@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Dapper;
+using Microsoft.Data.Sqlite;
 using ProductDatabase.Other;
 using System.Data;
 using static ProductDatabase.MainWindow;
@@ -23,9 +24,9 @@ namespace ProductDatabase {
 
             SubstrateChangeDataGridView.AllowUserToAddRows = true;
             SubstrateChangeDataGridView.AllowUserToDeleteRows = true;
-            SubstrateChangeDataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.Lavender;
+            SubstrateChangeDataGridView.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.Color.Lavender;
             SubstrateChangeDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-            SubstrateChangeDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(SubstrateChangeDataGridView.Font, FontStyle.Bold);
+            SubstrateChangeDataGridView.ColumnHeadersDefaultCellStyle.Font = new System.Drawing.Font(SubstrateChangeDataGridView.Font, FontStyle.Bold);
             SubstrateChangeDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             SubstrateChangeDataGridView.ReadOnly = true;
             SubstrateChangeDataGridView.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
@@ -36,14 +37,13 @@ namespace ProductDatabase {
 
         // ロードイベント
         private void LoadEvents() {
-            Font = new Font(_appSettings.FontName, _appSettings.FontSize);
+            Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
 
-            using SqliteConnection con = new(GetConnectionRegistration());
-            con.Open();
             HistoryTable.Clear();
 
-            using var cmd = con.CreateCommand();
-            cmd.CommandText =
+            using SqliteConnection con = new(GetConnectionRegistration());
+
+            var sql =
                 $"""
                 SELECT
                     ID,
@@ -72,11 +72,8 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            cmd.Parameters.Add("@ProductID", SqliteType.Text).Value = _productMaster.ProductID;
-
-            using (var reader = cmd.ExecuteReader()) {
-                HistoryTable.Load(reader);
-            }
+            var result = con.ExecuteReader(sql, new { _productMaster.ProductID });
+            HistoryTable.Load(result);
 
             SubstrateChangeDataGridView.DataSource = HistoryTable;
 
