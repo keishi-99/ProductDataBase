@@ -179,7 +179,7 @@ namespace ProductDatabase {
         private void InsertProduct(SqliteConnection connection) {
             var commandText =
                 $"""
-                INSERT INTO {Constants.TProductTableName} 
+                INSERT INTO {Constants.TRePrintTableName} 
                 (
                     ProductID,
                     OrderNumber,
@@ -228,7 +228,7 @@ namespace ProductDatabase {
                 _productRegisterWork.Comment
             });
 
-            _productRegisterWork.RowID = connection.ExecuteScalar<int>($"SELECT MAX(ID) FROM {Constants.TProductTableName};");
+            _productRegisterWork.RowID = connection.ExecuteScalar<int>("SELECT last_insert_rowid();");
         }
 
         private bool FormCheck() {
