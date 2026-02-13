@@ -1,5 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
-using Newtonsoft.Json;
+﻿using Dapper;
+using Microsoft.Data.Sqlite;
 using Newtonsoft.Json.Linq;
 using ProductDatabase.Other;
 using static ProductDatabase.MainWindow;
@@ -57,41 +57,43 @@ namespace ProductDatabase {
 
                 // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
                 using SqliteConnection con = new(GetConnectionRegistration());
-                con.Open();
-                using var cmd = con.CreateCommand();
 
                 // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
-                cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = _productMaster.ProductName;
-                cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = _productMaster.RevisionGroup;
-                cmd.CommandText =
+                var revisionSql =
                     $"""
                     SELECT Revision 
-                    FROM {Constants.VProductTableName} 
-                    WHERE 
-                        ProductName = @ProductName 
-                        AND RevisionGroup = @RevisionGroup 
-                        AND IsDeleted = 0 
-                    ORDER BY ID DESC;
+                    FROM {Constants.VProductTableName}
+                    WHERE ProductName = @ProductName 
+                      AND RevisionGroup = @RevisionGroup 
+                      AND IsDeleted = 0 
+                    ORDER BY ID DESC
+                    LIMIT 1
                     """;
-                var revisionResult = cmd.ExecuteScalar();
-                RevisionTextBox.Text = revisionResult?.ToString() ?? "";
+
+                var revisionResult = con.ExecuteScalar<string>(
+                    revisionSql,
+                    new {
+                        _productMaster.ProductName,
+                        _productMaster.RevisionGroup
+                    });
+
+                RevisionTextBox.Text = revisionResult ?? "";
 
                 if (_productMaster.IsSerialGeneration) {
-                    cmd.Parameters.Clear();
-                    cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = _productMaster.ProductName;
-                    cmd.CommandText =
+                    var serialSql =
                         $"""
                         SELECT SerialLastNumber 
                         FROM {Constants.VProductTableName} 
-                        WHERE 
-                            ProductName = @ProductName 
-                            AND IsDeleted = 0 
-                            AND SerialLastNumber IS NOT NULL 
-                        ORDER BY ID DESC;
+                        WHERE ProductName = @ProductName 
+                          AND IsDeleted = 0 
+                          AND SerialLastNumber IS NOT NULL 
+                        ORDER BY ID DESC
+                        LIMIT 1
                         """;
-                    var serialResult = cmd.ExecuteScalar();
-                    if (!int.TryParse(serialResult?.ToString(), out var serialLastNum)) { throw new Exception("シリアル番号の取得に失敗しました。"); }
 
+                    var serialResult = con.ExecuteScalar<int?>(serialSql, new { _productMaster.ProductName })
+                        ?? throw new Exception("シリアル番号の取得に失敗しました。");
+                    var serialLastNum = serialResult;
                     var nextSerialNumber = serialLastNum + 1;
 
                     // シリアル番号の桁数に応じて、閾値とリセット値を設定
@@ -299,31 +301,29 @@ namespace ProductDatabase {
                 );
                 """;
 
-                var serialLastNum = ExecuteScalar(connection,
+                var serialLastNum = connection.ExecuteScalar<int>(
                     $"""
-                    SELECT 
-                        SerialLastNumber
-                    FROM 
-                        {Constants.VProductTableName} 
-                    WHERE 
-                        ProductName = @ProductName 
-                        AND IsDeleted = 0
-                        AND SerialLastNumber NOT NULL 
-                    ORDER BY 
-                        ID DESC
-                    ;
-                    """, ("@ProductName", _productMaster.ProductName));
+                    SELECT SerialLastNumber
+                    FROM {Constants.VProductTableName} 
+                    WHERE ProductName = @ProductName 
+                    AND IsDeleted = 0
+                    AND SerialLastNumber IS NOT NULL 
+                    ORDER BY ID DESC
+                    LIMIT 1
+                    """,
+                    new { _productMaster.ProductName },
+                    transaction: transaction);
 
-                ExecuteNonQuery(connection, commandText,
-                    ("@ProductID", _productMaster.ProductID),
-                    ("@Revision", _productRegisterWork.Revision),
-                    ("@RegDate", _productRegisterWork.RegDate),
-                    ("@RevisionGroup", _productMaster.RevisionGroup),
-                    ("@SerialLastNumber", Convert.ToInt32(serialLastNum)),
-                    ("@Comment", _productRegisterWork.Comment)
-                );
+                connection.Execute(commandText, new {
+                    _productMaster.ProductID,
+                    _productRegisterWork.Revision,
+                    _productRegisterWork.RegDate,
+                    _productMaster.RevisionGroup,
+                    SerialLastNumber = serialLastNum,
+                    _productRegisterWork.Comment
+                }, transaction: transaction);
 
-                var id = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {Constants.VProductTableName};"));
+                var id = connection.ExecuteScalar<int>($"SELECT MAX(ID) FROM {Constants.VProductTableName};", transaction: transaction);
 
                 transaction.Commit();
 
@@ -336,26 +336,6 @@ namespace ProductDatabase {
                 }
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-        private static void ExecuteNonQuery(SqliteConnection connection, string commandText, params (string, object?)[] parameters) {
-            using var command = connection.CreateCommand();
-            command.CommandText = commandText;
-            foreach (var (name, value) in parameters) {
-                // 空の文字列の場合にNULLを設定
-                var sqlValue = value is string strValue && string.IsNullOrEmpty(strValue) ? DBNull.Value : value ?? DBNull.Value;
-                command.Parameters.Add(name, SqliteType.Text).Value = sqlValue;
-            }
-
-            command.ExecuteNonQuery();
-        }
-        private static object ExecuteScalar(SqliteConnection connection, string commandText, params (string, object)[] parameters) {
-            using var command = connection.CreateCommand();
-            command.CommandText = commandText;
-            foreach (var (name, value) in parameters) {
-                command.Parameters.Add(name, SqliteType.Text).Value = value ?? DBNull.Value;
-            }
-
-            return command.ExecuteScalar() ?? 0;
         }
         // コメント用テンプレート
         private void TemplateComment() {

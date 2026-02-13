@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Dapper;
+using Microsoft.Data.Sqlite;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
 using static ProductDatabase.MainWindow;
@@ -19,8 +20,8 @@ namespace ProductDatabase {
         private readonly AppSettings _appSettings;
 
         private string _serialType = string.Empty;
-        private string _serialFirstNumber = string.Empty;
-        private string _serialLastNumber = string.Empty;
+        private string _serialFirst = string.Empty;
+        private string _serialLast = string.Empty;
         private readonly List<string> _serialList = [];
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox",  "FirstSerialNumberCheckBox",
@@ -62,15 +63,27 @@ namespace ProductDatabase {
                 PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
 
                 // DB2へ接続し対象製品テーブルの最新のシリアル,リビジョン取得
-                using (SqliteConnection con = new(GetConnectionRegistration())) {
-                    con.Open();
-                    using var cmd = con.CreateCommand();
-                    cmd.CommandText = $"SELECT Revision FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND RevisionGroup = @RevisionGroup ORDER BY ID DESC;";
-                    cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = _productMaster.ProductName;
-                    cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = _productMaster.RevisionGroup;
-                    var result = cmd.ExecuteScalar();
-                    RevisionTextBox.Text = result?.ToString() ?? "";
-                }
+                using SqliteConnection con = new(GetConnectionRegistration());
+                var revisionSql =
+                    $"""
+                    SELECT Revision 
+                    FROM {Constants.VProductTableName}
+                    WHERE ProductName = @ProductName 
+                        AND RevisionGroup = @RevisionGroup 
+                        AND IsDeleted = 0 
+                    ORDER BY ID DESC
+                    LIMIT 1
+                    """;
+
+                var revisionResult = con.ExecuteScalar<string>(
+                    revisionSql,
+                    new {
+                        _productMaster.ProductName,
+                        _productMaster.RevisionGroup
+                    });
+
+                RevisionTextBox.Text = revisionResult ?? "";
+
                 ConfigurePrintSettings();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -132,60 +145,7 @@ namespace ProductDatabase {
         private bool Registration() {
             try {
                 using SqliteConnection con = new(GetConnectionRegistration());
-                con.Open();
-                using var cmd = con.CreateCommand();
-                cmd.CommandText =
-                    $"""
-                    INSERT INTO T_Reprint 
-                    (
-                        SerialPrintType, 
-                        OrderNumber, 
-                        ProductName, 
-                        ProductNumber,
-                        ProductType, 
-                        ProductModel, 
-                        Quantity,
-                        Person,
-                        RegDate, 
-                        Revision, 
-                        SerialFirst, 
-                        SerialLast, 
-                        Comment
-                    )
-                    VALUES
-                    (
-                        @SerialPrintType,
-                        @OrderNumber, 
-                        @ProductName, 
-                        @ProductNumber,
-                        @ProductType, 
-                        @ProductModel, 
-                        @Quantity, 
-                        @Person,
-                        @RegDate,
-                        @Revision,
-                        @SerialFirst, 
-                        @SerialLast, 
-                        @Comment
-                    )
-                    ;
-                    """;
-
-                cmd.Parameters.Add("@SerialPrintType", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_serialType) ? DBNull.Value : _serialType;
-                cmd.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.OrderNumber) ? DBNull.Value : _productRegisterWork.OrderNumber;
-                cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productMaster.ProductName) ? DBNull.Value : _productMaster.ProductName;
-                cmd.Parameters.Add("@ProductNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.ProductNumber) ? DBNull.Value : _productRegisterWork.ProductNumber;
-                cmd.Parameters.Add("@ProductType", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productMaster.ProductType) ? DBNull.Value : _productMaster.ProductType;
-                cmd.Parameters.Add("@ProductModel", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productMaster.ProductModel) ? DBNull.Value : _productMaster.ProductModel;
-                cmd.Parameters.Add("@Quantity", SqliteType.Text).Value = _productRegisterWork.Quantity;
-                cmd.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Person) ? DBNull.Value : _productRegisterWork.Person;
-                cmd.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.RegDate) ? DBNull.Value : _productRegisterWork.RegDate;
-                cmd.Parameters.Add("@Revision", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Revision) ? DBNull.Value : _productRegisterWork.Revision;
-                cmd.Parameters.Add("@SerialFirst", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_serialFirstNumber) ? DBNull.Value : _serialFirstNumber;
-                cmd.Parameters.Add("@SerialLast", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_serialLastNumber) ? DBNull.Value : _serialLastNumber;
-                cmd.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Comment) ? DBNull.Value : _productRegisterWork.Comment;
-
-                cmd.ExecuteNonQuery();
+                InsertProduct(con);
 
                 // バックアップ作成
                 CommonUtils.BackupManager.CreateBackup();
@@ -201,8 +161,8 @@ namespace ProductDatabase {
                     $"タイプ[{_productMaster.ProductType}]",
                     $"型式[{_productMaster.ProductModel}]",
                     $"数量[{_productRegisterWork.Quantity}]",
-                    $"シリアル先頭[{_serialFirstNumber}]",
-                    $"シリアル末尾[{_serialLastNumber}]",
+                    $"シリアル先頭[{_serialFirst}]",
+                    $"シリアル末尾[{_serialLast}]",
                     $"Revision[{_productRegisterWork.Revision}]",
                     $"登録日[{_productRegisterWork.RegDate}]",
                     $"担当者[{_productRegisterWork.Person}]",
@@ -216,6 +176,61 @@ namespace ProductDatabase {
                 return false;
             }
         }
+        private void InsertProduct(SqliteConnection connection) {
+            var commandText =
+                $"""
+                INSERT INTO {Constants.TProductTableName} 
+                (
+                    ProductID,
+                    OrderNumber,
+                    ProductNumber,
+                    OLesNumber,
+                    Quantity,
+                    Person,
+                    RegDate,
+                    Revision,
+                    RevisionGroup,
+                    SerialFirst,
+                    SerialLast,
+                    SerialLastNumber,
+                    Comment
+                )
+                VALUES 
+                (
+                    @ProductID,
+                    @OrderNumber,
+                    @ProductNumber,
+                    @OLesNumber,
+                    @Quantity,
+                    @Person,
+                    @RegDate,
+                    @Revision,
+                    @RevisionGroup,
+                    @SerialFirst,
+                    @SerialLast,
+                    @Comment
+                )
+                ;
+                """;
+
+            connection.Execute(commandText, new {
+                _productMaster.ProductID,
+                OrderNumber = _productRegisterWork.OrderNumber.NullIfWhiteSpace(),
+                ProductNumber = _productRegisterWork.ProductNumber.NullIfWhiteSpace(),
+                OLesNumber = _productRegisterWork.OLesNumber.NullIfWhiteSpace(),
+                _productRegisterWork.Quantity,
+                Person = _productRegisterWork.Person.NullIfWhiteSpace(),
+                RegDate = _productRegisterWork.RegDate.NullIfWhiteSpace(),
+                Revision = _productRegisterWork.Revision.NullIfWhiteSpace(),
+                _productMaster.RevisionGroup,
+                SerialFirst = _productRegisterWork.SerialFirst.NullIfWhiteSpace(),
+                SerialLast = _productRegisterWork.SerialLast.NullIfWhiteSpace(),
+                _productRegisterWork.Comment
+            });
+
+            _productRegisterWork.RowID = connection.ExecuteScalar<int>($"SELECT MAX(ID) FROM {Constants.TProductTableName};");
+        }
+
         private bool FormCheck() {
             var anyTextBoxEnabled = false;
             var allTextBoxesFilled = true;
@@ -314,8 +329,8 @@ namespace ProductDatabase {
                 _serialList.Add(GenerateCode(_productRegisterWork.SerialFirstNumber + i));
             }
 
-            _serialFirstNumber = GenerateCode(_productRegisterWork.SerialFirstNumber);
-            _serialLastNumber = GenerateCode(_productRegisterWork.SerialLastNumber);
+            _serialFirst = GenerateCode(_productRegisterWork.SerialFirstNumber);
+            _serialLast = GenerateCode(_productRegisterWork.SerialLastNumber);
             return true;
         }
 
