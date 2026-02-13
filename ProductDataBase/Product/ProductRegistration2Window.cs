@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Dapper;
+using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
@@ -8,6 +9,7 @@ using static ProductDatabase.Other.CommonUtils;
 using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase {
+
     public partial class ProductRegistration2Window : Form {
 
         public DocumentPrintSettings ProductPrintSettings { get; set; } = new DocumentPrintSettings();
@@ -234,11 +236,11 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            using var dr = ExecuteReader(connection, commandText, ("@SubstrateID", substrateID));
+            var results = connection.Query(commandText, new { SubstrateID = substrateID }, transaction: _sqliteTransaction);
 
-            while (dr.Read()) {
-                var strSubstrateNumber = $"{dr["SubstrateNumber"]}";
-                var intStock = Convert.ToInt32(dr["Stock"]);
+            foreach (var row in results) {
+                var strSubstrateNumber = $"{row.SubstrateNumber}";
+                var intStock = Convert.ToInt32(row.Stock);
 
                 objDgv?.Rows.Add(strSubstrateNumber, intStock);
 
@@ -417,23 +419,23 @@ namespace ProductDatabase {
                 _ => _productRegisterWork.Comment,
             };
 
-            ExecuteNonQuery(connection, commandText,
-                ("@ProductID", _productMaster.ProductID),
-                ("@OrderNumber", _productRegisterWork.OrderNumber),
-                ("@ProductNumber", _productRegisterWork.ProductNumber),
-                ("@OLesNumber", _productRegisterWork.OLesNumber),
-                ("@Quantity", _productRegisterWork.Quantity),
-                ("@Person", _productRegisterWork.Person),
-                ("@RegDate", _productRegisterWork.RegDate),
-                ("@Revision", _productRegisterWork.Revision),
-                ("@RevisionGroup", _productMaster.RevisionGroup),
-                ("@SerialFirst", _productRegisterWork.SerialFirst),
-                ("@SerialLast", _productRegisterWork.SerialLast),
-                ("@SerialLastNumber", _productMaster.IsSerialGeneration ? _serialLastNumber : DBNull.Value),
-                ("@Comment", comment)
-            );
+            connection.Execute(commandText, new {
+                _productMaster.ProductID,
+                OrderNumber = _productRegisterWork.OrderNumber.NullIfWhiteSpace(),
+                ProductNumber = _productRegisterWork.ProductNumber.NullIfWhiteSpace(),
+                OLesNumber = _productRegisterWork.OLesNumber.NullIfWhiteSpace(),
+                _productRegisterWork.Quantity,
+                Person = _productRegisterWork.Person.NullIfWhiteSpace(),
+                RegDate = _productRegisterWork.RegDate.NullIfWhiteSpace(),
+                Revision = _productRegisterWork.Revision.NullIfWhiteSpace(),
+                _productMaster.RevisionGroup,
+                SerialFirst = _productRegisterWork.SerialFirst.NullIfWhiteSpace(),
+                SerialLast = _productRegisterWork.SerialLast.NullIfWhiteSpace(),
+                SerialLastNumber = _productMaster.IsSerialGeneration ? (int?)_serialLastNumber : null,
+                Comment = comment
+            }, transaction: _sqliteTransaction);
 
-            _productRegisterWork.RowID = Convert.ToInt32(ExecuteScalar(connection, $"SELECT MAX(ID) FROM {Constants.VProductTableName};"));
+            _productRegisterWork.RowID = connection.ExecuteScalar<int>($"SELECT MAX(ID) FROM {Constants.TProductTableName};", transaction: _sqliteTransaction);
         }
         private void InsertSerial(SqliteConnection connection) {
             var commandText =
@@ -453,13 +455,13 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            foreach (var serial in _serialList) {
-                ExecuteNonQuery(connection, commandText,
-                    ("@Serial", serial),
-                    ("@productRowId", _productRegisterWork.RowID),
-                    ("@ProductName", _productMaster.ProductName)
-                );
-            }
+            var serialData = _serialList.Select(serial => new {
+                Serial = serial,
+                productRowId = _productRegisterWork.RowID,
+                _productMaster.ProductName
+            }).ToList();
+
+            connection.Execute(commandText, serialData, transaction: _sqliteTransaction);
         }
         private void RegisterSubstrate(SqliteConnection connection) {
             // サービス向け登録の場合は、サービス情報を使用する
@@ -490,7 +492,7 @@ namespace ProductDatabase {
                 }
             }
         }
-        private static string GetSubstrateInfo(SqliteConnection connection, int substrateID, string substrateNumber) {
+        private string GetSubstrateInfo(SqliteConnection connection, int substrateID, string substrateNumber) {
             var commandText =
                 $"""
                 SELECT
@@ -513,14 +515,22 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            using var dr = ExecuteReader(connection, commandText,
-                ("@SubstrateID", substrateID),
-                ("@SubstrateNumber", substrateNumber)
-            );
+            var result = connection.QueryFirstOrDefault<SubstrateStockInfo>(
+                commandText,
+                new { SubstrateID = substrateID, SubstrateNumber = substrateNumber },
+                transaction: _sqliteTransaction);
 
-            return dr.Read()
-                ? $"{dr["OrderNumber"]}"
-                : string.Empty;
+            return result
+                ?.OrderNumber
+                ?? string.Empty;
+        }
+        private class SubstrateStockInfo {
+            public int SubstrateID { get; set; }
+            public string SubstrateName { get; set; } = string.Empty;
+            public string SubstrateModel { get; set; } = string.Empty;
+            public string SubstrateNumber { get; set; } = string.Empty;
+            public string OrderNumber { get; set; } = string.Empty;
+            public int Stock { get; set; }
         }
         private void InsertSubstrate(SqliteConnection connection, int substrateID, string substrateNumber, string orderNumber, long useValue, long? useID) {
             var commandText =
@@ -552,67 +562,25 @@ namespace ProductDatabase {
 
             var comment = _productRegisterWork.Comment;
 
-            ExecuteNonQuery(connection, commandText,
-                ("@SubstrateID", substrateID),
-                ("@SubstrateNumber", substrateNumber),
-                ("@OrderNumber", orderNumber),
-                ("@Decrease", 0 - useValue),
-                ("@Person", _productRegisterWork.Person),
-                ("@RegDate", _productRegisterWork.RegDate),
-                ("@Comment", comment),
-                ("@UseID", useID)
-            );
-        }
-
-        private static void ExecuteNonQuery(SqliteConnection connection, string commandText, params (string, object?)[] parameters) {
-            var command = connection.CreateCommand();
-            command.CommandText = commandText;
-            foreach (var (name, value) in parameters) {
-                // 空の文字列の場合にNULLを設定
-                var sqlValue = value is string strValue && string.IsNullOrEmpty(strValue) ? DBNull.Value : value ?? DBNull.Value;
-                command.Parameters.Add(name, SqliteType.Text).Value = sqlValue;
-            }
-
-            command.ExecuteNonQuery();
-        }
-        private static object ExecuteScalar(SqliteConnection connection, string commandText, params (string, object)[] parameters) {
-            var command = connection.CreateCommand();
-            command.CommandText = commandText;
-            foreach (var (name, value) in parameters) {
-                command.Parameters.Add(name, SqliteType.Text).Value = value ?? DBNull.Value;
-            }
-
-            return command.ExecuteScalar() ?? 0;
-        }
-        private static SqliteDataReader ExecuteReader(SqliteConnection connection, string commandText, params (string, object)[] parameters) {
-            var command = connection.CreateCommand();
-            command.CommandText = commandText;
-            foreach (var (name, value) in parameters) {
-                command.Parameters.Add(name, SqliteType.Text).Value = value ?? DBNull.Value;
-            }
-
-            return command.ExecuteReader();
+            connection.Execute(commandText, new {
+                SubstrateID = substrateID,
+                SubstrateNumber = substrateNumber.NullIfWhiteSpace(),
+                OrderNumber = orderNumber.NullIfWhiteSpace(),
+                Decrease = 0 - useValue,
+                Person = _productRegisterWork.Person.NullIfWhiteSpace(),
+                RegDate = _productRegisterWork.RegDate.NullIfWhiteSpace(),
+                Comment = comment.NullIfWhiteSpace(),
+                UseID = useID
+            }, transaction: _sqliteTransaction);
         }
 
         // 登録チェック
         private void RegistrationCheck(SqliteConnection connection) {
+            var exists = connection.ExecuteScalar<bool>(
+                $@"SELECT EXISTS(SELECT 1 FROM {Constants.VProductTableName} WHERE Id = @Id);",
+                new { Id = _productRegisterWork.RowID });
 
-            var commandText = $@"SELECT * FROM {Constants.VProductTableName} WHERE Id = @Id;";
-
-            using var dr = ExecuteReader(connection, commandText, ("@Id", _productRegisterWork.RowID));
-
-            if (dr.HasRows && dr.Read()) {
-                // 1行のデータが存在する場合の処理
-                if (dr.Read()) {
-                    // 2行以上データが存在する場合の処理
-                    throw new Exception("登録IDが複数存在します。");
-                }
-                else {
-                    // 1行のみデータが存在する場合の処理
-                }
-            }
-            else {
-                // データが存在しない場合の処理
+            if (!exists) {
                 throw new Exception("登録に失敗しました。IDが見つかりません。");
             }
         }
@@ -640,35 +608,15 @@ namespace ProductDatabase {
         }
 
         private bool NumberCheck(SqliteConnection connection) {
-            var productModel = string.Empty;
 
             if (!string.IsNullOrEmpty(_productRegisterWork.ProductNumber)) {
                 // 製番が新規かチェック
-                var commandText =
-                    $"""
-                    SELECT
-                        *
-                    FROM
-                        {Constants.VProductTableName}
-                    WHERE
-                        ProductName = @ProductName 
-                        AND ProductNumber = @ProductNumber
-                        AND IsDeleted = 0
-                    ORDER BY
-                        ID ASC LIMIT 1;
-                    """;
-
-
-                using var dr = ExecuteReader(connection, commandText,
-                    ("@ProductName", _productMaster.ProductName),
-                    ("@ProductNumber", _productRegisterWork.ProductNumber)
-                    );
-                while (dr.Read()) {
-                    productModel = $"{dr["ProductModel"]}";
-                }
-
-                if (productModel != string.Empty) {
-                    if (productModel == _productMaster.ProductModel) {
+                var productNumberQuery = $@"SELECT ProductModel FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND ProductNumber = @ProductNumber AND IsDeleted = 0 LIMIT 1";
+                var existingModel = connection.QueryFirstOrDefault<string>(
+                    productNumberQuery,
+                    new { _productMaster.ProductName, _productRegisterWork.ProductNumber },
+                    transaction: _sqliteTransaction); if (existingModel != null) {
+                    if (existingModel == _productMaster.ProductModel) {
                         Activate();
                         var result = MessageBox.Show($"製番[{_productRegisterWork.ProductNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
                         if (result == DialogResult.No) {
@@ -677,41 +625,20 @@ namespace ProductDatabase {
                     }
                     else {
                         Activate();
-                        MessageBox.Show($"[{_productRegisterWork.ProductNumber}]は[{productModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"[{_productRegisterWork.ProductNumber}]は[{existingModel}]として登録があります。確認してください。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return false;
                     }
                 }
             }
 
-            productModel = string.Empty;
-
             if (!string.IsNullOrEmpty(_productRegisterWork.OrderNumber)) {
                 // 注文番号が新規かチェック
-                var commandText =
-                    $"""
-                    SELECT
-                        *
-                    FROM
-                        {Constants.VProductTableName}
-                    WHERE
-                        ProductName = @ProductName 
-                        AND OrderNumber = @OrderNumber
-                        AND IsDeleted = 0
-                    ORDER BY
-                        ID ASC LIMIT 1
-                    ;
-                    """;
-
-                using var dr = ExecuteReader(connection, commandText,
-                    ("@ProductName", _productMaster.ProductName),
-                    ("@OrderNumber", _productRegisterWork.OrderNumber)
-                    );
-                while (dr.Read()) {
-                    productModel = $"{dr["ProductModel"]}";
-                }
-
-                if (productModel != string.Empty) {
-                    if (productModel == _productMaster.ProductModel) {
+                var orderNumberQuery = $@"SELECT ProductModel FROM {Constants.VProductTableName} WHERE ProductName = @ProductName AND OrderNumber = @OrderNumber AND IsDeleted = 0 LIMIT 1";
+                var existingModel = connection.QueryFirstOrDefault<string>(
+                    orderNumberQuery,
+                    new { _productMaster.ProductName, _productRegisterWork.OrderNumber },
+                    transaction: _sqliteTransaction); if (existingModel != null) {
+                    if (existingModel == _productMaster.ProductModel) {
                         Activate();
                         var result = MessageBox.Show($"注文番号[{_productRegisterWork.OrderNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
                         if (result == DialogResult.No) {
@@ -720,7 +647,7 @@ namespace ProductDatabase {
                     }
                     else {
                         Activate();
-                        var result = MessageBox.Show($"[{_productRegisterWork.OrderNumber}]は[{productModel}]として登録があります。登録しますか？", "", MessageBoxButtons.YesNo);
+                        var result = MessageBox.Show($"[{_productRegisterWork.OrderNumber}]は[{existingModel}]として登録があります。登録しますか？", "", MessageBoxButtons.YesNo);
                         if (result == DialogResult.No) {
                             return false;
                         }
@@ -817,18 +744,10 @@ namespace ProductDatabase {
 
             List<string> strSerialDuplication = [];
 
-            using var cmd = connection.CreateCommand();
-            cmd.CommandText =
+            var sql =
                 $"""
                 SELECT
-                    s.rowid,
-                    s.Serial,
-                    p.OrderNumber,
-                    p.ProductNumber,
-                    p.ProductType,
-                    p.ProductModel,
-                    p.RegDate,
-                    s.usedID
+                    s.Serial
                 FROM
                     {Constants.TSerialTableName} AS s
                 LEFT JOIN
@@ -838,23 +757,22 @@ namespace ProductDatabase {
                 WHERE
                     s.ProductName = @ProductName
                 AND
-                    s.Serial IN ({string.Join(",", _serialList.Select((_, i) => $"@Serial{i}"))})
+                    s.Serial IN @SerialList
                 ;
                 """;
-            cmd.Parameters.Add("@ProductName", SqliteType.Text).Value = _productMaster.ProductName;
-            _serialList
-                .Select((serial, i) => new { ParamName = $"@Serial{i}", Value = serial.Trim() })
-                .ToList()
-                .ForEach(p => cmd.Parameters.Add(p.ParamName, SqliteType.Text).Value = p.Value);
 
-            using var dr = cmd.ExecuteReader();
-            while (dr.Read()) {
-                strSerialDuplication.Add($"{dr["Serial"]}");
-            }
+            var duplicatedSerials = connection.Query<string>(
+                sql,
+                new {
+                    _productMaster.ProductName,
+                    SerialList = _serialList.Select(x => x.Trim()).ToList()
+                });
 
-            if (strSerialDuplication.Count > 0) {
-                var strSQLDuplication = string.Join($"{Environment.NewLine}", strSerialDuplication);
-                throw new Exception($"{strSQLDuplication}{Environment.NewLine}は既に使用されているシリアルです。");
+            var list = duplicatedSerials.ToList();
+
+            if (list.Count > 0) {
+                var message = string.Join(Environment.NewLine, list);
+                throw new Exception($"{message}{Environment.NewLine}は既に使用されているシリアルです。");
             }
         }
         private void HandleLabelPrinting() {
@@ -1241,5 +1159,10 @@ namespace ProductDatabase {
         private void SubstrateListPrintButton_Click(object sender, EventArgs e) { GenerateList(); }
         private void CheckSheetPrintButton_Click(object sender, EventArgs e) { GenerateCheckSheet(); }
 
+    }
+    public static class StringExtensions {
+        public static string? NullIfWhiteSpace(this string? value) {
+            return string.IsNullOrWhiteSpace(value) ? null : value;
+        }
     }
 }

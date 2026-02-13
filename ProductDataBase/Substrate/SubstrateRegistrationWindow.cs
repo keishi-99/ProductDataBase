@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Dapper;
+using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
@@ -15,6 +16,15 @@ namespace ProductDatabase {
         public DocumentPrintSettings SubstratePrintSettings { get; set; } = new DocumentPrintSettings();
         public LabelPrintSettings LabelPrintSettings => SubstratePrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
         public string PrintSettingPath { get; } = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
+
+        private class SubstrateStockDto {
+            public int SubstrateID { get; set; }
+            public string SubstrateName { get; set; } = string.Empty;
+            public string SubstrateModel { get; set; } = string.Empty;
+            public string SubstrateNumber { get; set; } = string.Empty;
+            public string OrderNumber { get; set; } = string.Empty;
+            public int Stock { get; set; }
+        }
 
         private readonly List<string> _serialList = [];
         private readonly List<string> _checkBoxNames = [
@@ -146,7 +156,6 @@ namespace ProductDatabase {
 
                 // 製番が新規かチェック
                 if (IsRegistration) {
-                    var substrateName = string.Empty;
                     commandText =
                         $"""
                         SELECT
@@ -171,19 +180,21 @@ namespace ProductDatabase {
                         LIMIT 1
                         ;
                         """;
-                    using var dr = ExecuteReader(con, commandText,
-                        ("@SubstrateID", _substrateMaster.SubstrateID),
-                        ("@SubstrateNumber", substrateNumber)
-                    );
-                    while (dr.Read()) {
-                        substrateName = $"{dr["SubstrateName"]}";
-                    }
+                    var result = con.QueryFirstOrDefault<SubstrateStockDto>(
+                        commandText,
+                        new {
+                            _substrateMaster.SubstrateID,
+                            SubstrateNumber = substrateNumber
+                        },
+                        transaction: transaction);
+
+                    var substrateName = result?.SubstrateName ?? string.Empty;
 
                     if (substrateName != string.Empty) {
                         if (_substrateMaster.SubstrateName == substrateName) {
                             if (QuantityCheckBox.Checked && !DefectQuantityCheckBox.Checked) {
-                                var result = MessageBox.Show($"[{substrateNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
-                                if (result == DialogResult.No) { return false; }
+                                var dialogResult = MessageBox.Show($"[{substrateNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
+                                if (dialogResult == DialogResult.No) { return false; }
                             }
                         }
                     }
@@ -216,19 +227,18 @@ namespace ProductDatabase {
                         LIMIT 1
                         ;
                         """;
-                    using var dr = ExecuteReader(con, commandText,
-                        ("@SubstrateID", _substrateMaster.SubstrateID),
-                        ("@SubstrateModel", _substrateMaster.SubstrateModel),
-                        ("@SubstrateNumber", substrateNumber)
-                    );
-                    if (dr.Read()) {
-                        if (Convert.ToInt32(dr["Stock"]) < defectQuantity) {
-                            throw new Exception($"[{substrateNumber}]は在庫が[{dr["Stock"]}]です。");
-                        }
-                    }
-                    else {
-                        // データが見つからなかった場合の処理
-                        throw new Exception($"[{substrateNumber}]は登録がありません。");
+                    var stockResult = con.QueryFirstOrDefault<SubstrateStockDto>(
+                        commandText,
+                        new {
+                            _substrateMaster.SubstrateID,
+                            _substrateMaster.SubstrateModel,
+                            SubstrateNumber = substrateNumber
+                        },
+                        transaction: transaction)
+                        ?? throw new Exception($"[{substrateNumber}]は登録がありません。");
+
+                    if (stockResult.Stock < defectQuantity) {
+                        throw new Exception($"[{substrateNumber}]は在庫が[{stockResult.Stock}]です。");
                     }
                 }
 
@@ -259,18 +269,19 @@ namespace ProductDatabase {
                     )
                     ;
                     """;
-                ExecuteNonQuery(con, commandText,
-                    ("@SubstrateID", _substrateMaster.SubstrateID),
-                    ("@SubstrateNumber", string.IsNullOrWhiteSpace(substrateNumber) ? DBNull.Value : substrateNumber),
-                    ("@OrderNumber", string.IsNullOrWhiteSpace(orderNumber) ? DBNull.Value : orderNumber),
-                    ("@Increase", QuantityCheckBox.Checked ? quantity : DBNull.Value),
-                    ("@Defect", DefectQuantityCheckBox.Checked ? $"-{defectQuantity}" : DBNull.Value),
-                    ("@RegDate", string.IsNullOrWhiteSpace(registrationDate) ? DBNull.Value : registrationDate),
-                    ("@Person", string.IsNullOrWhiteSpace(person) ? DBNull.Value : person),
-                    ("@Comment", string.IsNullOrWhiteSpace(comment) ? DBNull.Value : comment)
-                    );
-                commandText = $@"SELECT MAX(ID) FROM {Constants.VSubstrateTableName};";
-                rowId = ExecuteScalar(con, commandText).ToString() ?? string.Empty;
+
+                con.Execute(commandText, new {
+                    _substrateMaster.SubstrateID,
+                    SubstrateNumber = string.IsNullOrWhiteSpace(substrateNumber) ? (object)DBNull.Value : substrateNumber,
+                    OrderNumber = string.IsNullOrWhiteSpace(orderNumber) ? (object)DBNull.Value : orderNumber,
+                    Increase = QuantityCheckBox.Checked ? (object)quantity : DBNull.Value,
+                    Defect = DefectQuantityCheckBox.Checked ? (object)$"-{defectQuantity}" : DBNull.Value,
+                    RegDate = string.IsNullOrWhiteSpace(registrationDate) ? (object)DBNull.Value : registrationDate,
+                    Person = string.IsNullOrWhiteSpace(person) ? (object)DBNull.Value : person,
+                    Comment = string.IsNullOrWhiteSpace(comment) ? (object)DBNull.Value : comment
+                }, transaction: transaction);
+
+                rowId = con.ExecuteScalar<string>($"SELECT MAX(ID) FROM {Constants.VSubstrateTableName};", transaction: transaction);
 
                 // ログ出力
                 var logQuantity = QuantityCheckBox.Checked ? quantity.ToString() : string.Empty;
@@ -400,35 +411,6 @@ namespace ProductDatabase {
             return true;
         }
 
-        private static void ExecuteNonQuery(SqliteConnection con, string commandText, params (string, object?)[] parameters) {
-            var command = con.CreateCommand();
-            command.CommandText = commandText;
-            foreach (var (name, value) in parameters) {
-                // 空の文字列の場合にNULLを設定
-                var sqlValue = value is string strValue && string.IsNullOrEmpty(strValue) ? DBNull.Value : value ?? DBNull.Value;
-                command.Parameters.Add(name, SqliteType.Text).Value = sqlValue;
-            }
-
-            command.ExecuteNonQuery();
-        }
-        private static object ExecuteScalar(SqliteConnection con, string commandText, params (string, object)[] parameters) {
-            var command = con.CreateCommand();
-            command.CommandText = commandText;
-            foreach (var (name, value) in parameters) {
-                command.Parameters.Add(name, SqliteType.Text).Value = value ?? DBNull.Value;
-            }
-
-            return command.ExecuteScalar() ?? 0;
-        }
-        private static SqliteDataReader ExecuteReader(SqliteConnection con, string commandText, params (string, object)[] parameters) {
-            var command = con.CreateCommand();
-            command.CommandText = commandText;
-            foreach (var (name, value) in parameters) {
-                command.Parameters.Add(name, SqliteType.Text).Value = value ?? DBNull.Value;
-            }
-
-            return command.ExecuteReader();
-        }
         // 印刷処理
         private void PrintStart(bool isPrint) {
             try {
@@ -491,11 +473,7 @@ namespace ProductDatabase {
 
         // 在庫数取得
         private string GetStockQuantity() {
-
             using var con = new SqliteConnection(GetConnectionRegistration());
-            con.Open();
-
-            using var transaction = con.BeginTransaction();
 
             var commandText =
                 $"""
@@ -504,28 +482,16 @@ namespace ProductDatabase {
                     SubstrateName,
                     SubstrateModel,
                     SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                FROM
-                    {Constants.VSubstrateTableName}
-                WHERE
-                    SubstrateID = @SubstrateID
-                GROUP BY
-                    SubstrateID, 
-                    SubstrateName, 
-                    SubstrateModel
-                ;
+                FROM {Constants.VSubstrateTableName}
+                WHERE SubstrateID = @SubstrateID
+                GROUP BY SubstrateID, SubstrateName, SubstrateModel
                 """;
-            using var dr = ExecuteReader(con, commandText,
-                ("@SubstrateID", _substrateMaster.SubstrateID)
-            );
 
-            transaction.Commit();
+            var stock = con.ExecuteScalar<int?>(
+                commandText,
+                new { _substrateMaster.SubstrateID });
 
-            if (dr.Read()) {
-                return dr["Stock"].ToString() ?? "0";
-            }
-            else {
-                return "0";
-            }
+            return stock?.ToString() ?? "0";
         }
 
         // コメント用テンプレート

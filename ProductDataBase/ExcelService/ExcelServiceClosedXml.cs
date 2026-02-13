@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using Dapper;
 using Microsoft.Data.Sqlite;
 using ProductDatabase.Other;
 using ZXing;
@@ -217,13 +218,9 @@ namespace ProductDatabase.ExcelService {
 
             // データベースから使用済み基板情報を取得するメソッド
             private static List<(string SubstrateModel, List<string> SubstrateNumbers)> GetUsedSubstrateData(ProductRegisterWork productRegisterWork) {
-                List<(string, List<string>)> usedSubstrate = [];
+                using var con = new SqliteConnection(GetConnectionRegistration());
 
-                using SqliteConnection con = new(GetConnectionRegistration());
-                con.Open();
-                using var cmd = con.CreateCommand();
-
-                cmd.CommandText =
+                var sql =
                     $"""
                     SELECT
                         SubstrateModel,
@@ -235,26 +232,26 @@ namespace ProductDatabase.ExcelService {
                         UseID = @ID
                     ORDER BY
                         SubstrateModel ASC
-                    ;
                     """;
-                cmd.Parameters.Add("@ID", SqliteType.Text).Value = productRegisterWork.RowID;
-                using var dr = cmd.ExecuteReader();
 
-                while (dr.Read()) {
-                    var substrateModel = dr.GetString(0);
-                    var substrateNumber = dr.GetString(1);
+                var results = con.Query<(string SubstrateModel, string SubstrateNumber, int Decrease)>(
+                    sql,
+                    new { ID = productRegisterWork.RowID }
+                );
 
-                    // 既存の substrateModel を検索し、見つかればリストに追加、なければ新しいエントリを作成
+                var usedSubstrate = new List<(string, List<string>)>();
+
+                foreach (var (substrateModel, substrateNumber, decrease) in results) {
                     var existingSubstrateIndex = usedSubstrate.FindIndex(x => x.Item1 == substrateModel);
 
                     if (existingSubstrateIndex != -1) {
                         usedSubstrate[existingSubstrateIndex].Item2.Add(substrateNumber);
                     }
                     else {
-                        List<string> substrateNumbers = [substrateNumber];
-                        usedSubstrate.Add((substrateModel, substrateNumbers));
+                        usedSubstrate.Add((substrateModel, new List<string> { substrateNumber }));
                     }
                 }
+
                 return usedSubstrate;
             }
 
@@ -439,13 +436,9 @@ namespace ProductDatabase.ExcelService {
 
             // データベースから使用済み基板情報を取得するメソッド
             private static List<(string SubstrateModel, List<string> SubstrateNumbers, List<int> Decreases)> GetUsedSubstrateData(ProductRegisterWork productRegisterWork) {
-                List<(string, List<string>, List<int>)> usedSubstrate = [];
+                using var con = new SqliteConnection(GetConnectionRegistration());
 
-                using SqliteConnection con = new(GetConnectionRegistration());
-                con.Open();
-                using var cmd = con.CreateCommand();
-
-                cmd.CommandText =
+                var sql =
                     $"""
                     SELECT
                         SubstrateModel,
@@ -457,29 +450,27 @@ namespace ProductDatabase.ExcelService {
                         UseID = @ID
                     ORDER BY
                         SubstrateModel ASC
-                    ;
                     """;
-                cmd.Parameters.Add("@ID", SqliteType.Text).Value = productRegisterWork.RowID;
-                using var dr = cmd.ExecuteReader();
 
-                while (dr.Read()) {
-                    var substrateModel = dr.GetString(0);
-                    var substrateNumber = dr.GetString(1);
-                    var decrease = -1 * dr.GetInt32(2);
+                var results = con.Query<(string SubstrateModel, string SubstrateNumber, int Decrease)>(
+                    sql,
+                    new { ID = productRegisterWork.RowID }
+                );
 
-                    // 既存の substrateModel を検索し、見つかればリストに追加、なければ新しいエントリを作成
+                var usedSubstrate = new List<(string, List<string>, List<int>)>();
+
+                foreach (var (substrateModel, substrateNumber, decrease) in results) {
                     var existingSubstrateIndex = usedSubstrate.FindIndex(x => x.Item1 == substrateModel);
 
                     if (existingSubstrateIndex != -1) {
                         usedSubstrate[existingSubstrateIndex].Item2.Add(substrateNumber);
-                        usedSubstrate[existingSubstrateIndex].Item3.Add(decrease);
+                        usedSubstrate[existingSubstrateIndex].Item3.Add(-decrease);
                     }
                     else {
-                        List<string> substrateNumbers = [substrateNumber];
-                        List<int> decreases = [decrease];
-                        usedSubstrate.Add((substrateModel, substrateNumbers, decreases));
+                        usedSubstrate.Add((substrateModel, new List<string> { substrateNumber }, new List<int> { decrease }));
                     }
                 }
+
                 return usedSubstrate;
             }
 
