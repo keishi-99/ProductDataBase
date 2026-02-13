@@ -467,7 +467,7 @@ namespace ProductDatabase.ExcelService {
                         usedSubstrate[existingSubstrateIndex].Item3.Add(-decrease);
                     }
                     else {
-                        usedSubstrate.Add((substrateModel, new List<string> { substrateNumber }, new List<int> { decrease }));
+                        usedSubstrate.Add((substrateModel, new List<string> { substrateNumber }, new List<int> { -decrease }));
                     }
                 }
 

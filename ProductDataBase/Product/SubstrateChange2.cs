@@ -65,7 +65,7 @@ namespace ProductDatabase {
                 switch (_productMaster.RegType) {
                     case 2:
                     case 3:
-                        for (var i = 0; i <= _productMaster.UseSubstrates.Count - 1; i++) {
+                        for (var i = 0; i < _productMaster.UseSubstrates.Count; i++) {
                             var substrateName = _productMaster.UseSubstrates[i].SubstrateName;
                             var substrateModel = _productMaster.UseSubstrates[i].SubstrateModel;
                             var quantity = _productRegisterWork.Quantity;
@@ -234,7 +234,7 @@ namespace ProductDatabase {
                     case 2:
                     case 3:
                         if (_productMaster.UseSubstrates is null) { throw new Exception("ArrUseSubstrateが空です"); }
-                        for (var i = 0; i <= _productMaster.UseSubstrates.Count - 1; i++) {
+                        for (var i = 0; i < _productMaster.UseSubstrates.Count; i++) {
 
                             var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
                             objCbx.Enabled = true;
@@ -308,7 +308,7 @@ namespace ProductDatabase {
                             using var transaction = con.BeginTransaction();
 
                             if (_productMaster.UseSubstrates is null) { throw new Exception("ArrUseSubstrateが nullです。"); }
-                            for (var i = 0; i <= _productMaster.UseSubstrates.Count - 1; i++) {
+                            for (var i = 0; i < _productMaster.UseSubstrates.Count; i++) {
 
                                 var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
 

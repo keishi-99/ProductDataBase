@@ -281,7 +281,7 @@ namespace ProductDatabase {
                     Comment = string.IsNullOrWhiteSpace(comment) ? (object)DBNull.Value : comment
                 }, transaction: transaction);
 
-                rowId = con.ExecuteScalar<string>($"SELECT MAX(ID) FROM {Constants.VSubstrateTableName};", transaction: transaction);
+                rowId = con.ExecuteScalar<string>("SELECT last_insert_rowid();", transaction: transaction);
 
                 // ログ出力
                 var logQuantity = QuantityCheckBox.Checked ? quantity.ToString() : string.Empty;

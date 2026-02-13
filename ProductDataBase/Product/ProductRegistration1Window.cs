@@ -323,7 +323,7 @@ namespace ProductDatabase {
                     _productRegisterWork.Comment
                 }, transaction: transaction);
 
-                var id = connection.ExecuteScalar<int>($"SELECT MAX(ID) FROM {Constants.VProductTableName};", transaction: transaction);
+                var id = connection.ExecuteScalar<int>("SELECT last_insert_rowid();", transaction: transaction);
 
                 transaction.Commit();
 
