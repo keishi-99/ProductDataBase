@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office.Word;
+﻿using Dapper;
 using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
@@ -10,6 +10,19 @@ namespace ProductDatabase {
         private readonly ProductMaster _productMaster;
         private readonly ProductRegisterWork _productRegisterWork;
         private readonly AppSettings _appSettings;
+
+        private sealed class SubstrateStockDto {
+            public string SubstrateName { get; init; } = string.Empty;
+            public string SubstrateModel { get; init; } = string.Empty;
+            public string SubstrateNumber { get; init; } = string.Empty;
+            public int Stock { get; init; }
+            public int UsedDecrease { get; init; }
+        }
+
+        private sealed class SubstrateInfoDto {
+            public string SubstrateID { get; init; } = string.Empty;
+            public string OrderNumber { get; init; } = string.Empty;
+        }
 
         private readonly List<string> _listUsedSubstrate = [];
         private readonly List<string> _listUsedProductNumber = [];
@@ -80,14 +93,10 @@ namespace ProductDatabase {
                                     }
                                 }
                             }
-
                             using SqliteConnection con = new(GetConnectionRegistration());
-                            con.Open();
-                            using var cmd = con.CreateCommand();
 
-                            cmd.CommandText =
+                            var sql =
                                 $"""
-                                -- 使用履歴のある SubstrateNumber ごとの合計を別テーブルで集計
                                 WITH Used AS 
                                 (
                                     SELECT
@@ -123,7 +132,6 @@ namespace ProductDatabase {
                                         SubstrateNumber
                                 )
 
-                                -- 最終結合（在庫がある or 使用済み）を条件に絞る
                                 SELECT
                                     s.SubstrateName,
                                     s.SubstrateModel,
@@ -141,32 +149,31 @@ namespace ProductDatabase {
                                     s.SubstrateNumber;
                                 """;
 
-                            cmd.Parameters.Clear();
-                            cmd.Parameters.Add("@ID", SqliteType.Integer).Value = _productRegisterWork.RowID;
-                            cmd.Parameters.Add("@SubstrateModel", SqliteType.Text).Value = substrateModel;
+                            var list = con.Query<SubstrateStockDto>(sql,
+                                new {
+                                    ID = _productRegisterWork.RowID,
+                                    SubstrateModel = substrateModel
+                                });
 
-                            using var dr = cmd.ExecuteReader();
                             var j = 0;
 
-                            if (objCbx is not null) {
-                                var splitSubstrateName = substrateName.Split(':');
-                                objCbx.Text = $"{splitSubstrateName.Last()} - {substrateModel}";
-                            }
-                            while (dr.Read()) {
-                                var strSubstrateNum = dr["SubstrateNumber"].ToString() ?? string.Empty;
-                                var intStock = Convert.ToInt32(dr["Stock"]);
-                                var intUsedQuantity = Convert.ToInt32(dr["UsedDecrease"]); ;
+                            foreach (var row in list) {
 
-                                if (objDgv is null) {
-                                    break;
+                                if (objCbx is not null) {
+                                    var splitSubstrateName = substrateName.Split(':');
+                                    objCbx.Text = $"{splitSubstrateName.Last()} - {substrateModel}";
                                 }
 
+                                if (objDgv is null) break;
+
                                 objDgv.Rows.Add();
-                                objDgv.Rows[j].Cells[0].Value = strSubstrateNum;
-                                objDgv.Rows[j].Cells[1].Value = intStock;
-                                objDgv.Rows[j].Cells[2].Value = intUsedQuantity;
-                                objDgv.Rows[j].Cells[3].Value = intUsedQuantity;
-                                objDgv.Rows[j].Cells[4].Value = intUsedQuantity != 0;
+
+                                objDgv.Rows[j].Cells[0].Value = row.SubstrateNumber;
+                                objDgv.Rows[j].Cells[1].Value = row.Stock;
+                                objDgv.Rows[j].Cells[2].Value = row.UsedDecrease;
+                                objDgv.Rows[j].Cells[3].Value = row.UsedDecrease;
+                                objDgv.Rows[j].Cells[4].Value = row.UsedDecrease != 0;
+
                                 j++;
                             }
                         }
@@ -301,7 +308,7 @@ namespace ProductDatabase {
                             using var transaction = con.BeginTransaction();
 
                             if (_productMaster.UseSubstrates is null) { throw new Exception("ArrUseSubstrateが nullです。"); }
-                            for (var i = 0; i <= _productMaster.UseSubstrates.Count; i++) {
+                            for (var i = 0; i <= _productMaster.UseSubstrates.Count - 1; i++) {
 
                                 var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
 
@@ -314,113 +321,109 @@ namespace ProductDatabase {
                                         var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[4].Value);
                                         var useValue = boolCbx ? Convert.ToInt32(objDgv.Rows[j].Cells[3].Value) : 0;
                                         if (boolCbx) {
-                                            var substrateID = string.Empty;
-                                            var orderNum = string.Empty;
                                             var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
                                             var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
 
-                                            using (var cmd = con.CreateCommand()) {
-                                                cmd.CommandText =
+                                            var sql =
+                                                $"""
+                                                SELECT
+                                                    SubstrateID,
+                                                    OrderNumber
+                                                FROM
+                                                    {Constants.VSubstrateTableName}
+                                                WHERE
+                                                    SubstrateID = @SubstrateID
+                                                    AND SubstrateNumber = @SubstrateNumber
+                                                    AND IsDeleted = 0
+                                                GROUP BY
+                                                    SubstrateID,
+                                                    SubstrateNumber,
+                                                    OrderNumber
+                                                ORDER BY
+                                                    MIN(ID)
+                                                LIMIT 1
+                                                """;
+
+                                            var info = con.QueryFirstOrDefault<SubstrateInfoDto>(sql,
+                                                new {
+                                                    _productMaster.UseSubstrates[i].SubstrateID,
+                                                    SubstrateNumber = substrateNum
+                                                },
+                                                transaction
+                                            );
+
+                                            var substrateID = info?.SubstrateID ?? "";
+                                            var orderNum = info?.OrderNumber ?? "";
+
+                                            // 基板テーブルを更新
+                                            var updateSql =
+                                                $"""
+                                                UPDATE
+                                                    {Constants.TSubstrateTableName}
+                                                SET
+                                                    Decrease = @Decrease,
+                                                    Person = @Person,
+                                                    RegDate = @RegDate,
+                                                    Comment = @Comment
+                                                WHERE
+                                                    SubstrateNumber = @SubstrateNumber
+                                                    AND IsDeleted = 0
+                                                    AND UseID = @UseID
+                                                """;
+
+                                            var affectedRows = con.Execute(updateSql,
+                                                new {
+                                                    Decrease = 0 - useValue,
+                                                    Person = ToDbValue(_productRegisterWork.Person),
+                                                    RegDate = ToDbValue(_productRegisterWork.RegDate),
+                                                    Comment = ToDbValue(_productRegisterWork.Comment),
+                                                    SubstrateNumber = objDgv.Rows[j].Cells[0].Value,
+                                                    UseID = _productRegisterWork.RowID
+                                                },
+                                                transaction
+                                            );
+
+                                            // 更新できない場合は挿入
+                                            if (affectedRows == 0) {
+                                                var insertSql =
                                                     $"""
-                                                    SELECT
-                                                        SubstrateName,
-                                                        SubstrateModel,
-                                                        SubstrateNumber,
-                                                        OrderNumber,
-                                                        SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock,
-                                                        SubstrateID
-                                                    FROM
-                                                        {Constants.VSubstrateTableName}
-                                                    WHERE
-                                                        SubstrateID = @SubstrateID 
-                                                        AND SubstrateNumber = @SubstrateNumber
-                                                        AND IsDeleted = 0
-                                                    GROUP BY
-                                                        SubstrateID,
-                                                        SubstrateNumber,
-                                                        OrderNumber
-                                                    ORDER BY
-                                                        MIN(ID)
-                                                    ;
-                                                    """;
-                                                cmd.Parameters.Add("@SubstrateID", SqliteType.Text).Value = _productMaster.UseSubstrates[i].SubstrateID;
-                                                cmd.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = substrateNum;
-                                                using var dr = cmd.ExecuteReader();
-                                                while (dr.Read()) {
-                                                    substrateID = $"{dr["SubstrateID"]}";
-                                                    orderNum = $"{dr["OrderNumber"]}";
-                                                }
-                                            }
-                                            // 基板テーブルを更新、できない場合は挿入
-                                            using (var cmdUpdate = con.CreateCommand()) {
-                                                // 更新
-                                                cmdUpdate.CommandText =
-                                                    $"""
-                                                    UPDATE
-                                                        {Constants.TSubstrateTableName}
-                                                    SET
-                                                        Decrease = @Decrease,
-                                                        Person = @Person,
-                                                        RegDate = @RegDate,
-                                                        Comment = @Comment
-                                                    WHERE
-                                                        SubstrateNumber = @SubstrateNumber
-                                                        AND IsDeleted = 0
-                                                        AND UseID = @UseID
-                                                    ;
+                                                    INSERT INTO {Constants.TSubstrateTableName}
+                                                        (
+                                                            SubstrateID,
+                                                            SubstrateNumber,
+                                                            OrderNumber,
+                                                            Decrease,
+                                                            Person,
+                                                            RegDate,
+                                                            Comment,
+                                                            UseID
+                                                        )
+                                                    VALUES
+                                                        (
+                                                            @SubstrateID,
+                                                            @SubstrateNumber,
+                                                            @OrderNumber,
+                                                            @Decrease,
+                                                            @Person,
+                                                            @RegDate,
+                                                            @Comment,
+                                                            @UseID
+                                                        )
                                                     """;
 
-                                                cmdUpdate.Parameters.Clear();
-                                                cmdUpdate.Parameters.Add("@Decrease", SqliteType.Integer).Value = 0 - useValue;
-                                                cmdUpdate.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Person) ? DBNull.Value : _productRegisterWork.Person;
-                                                cmdUpdate.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.RegDate) ? DBNull.Value : _productRegisterWork.RegDate;
-                                                cmdUpdate.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Comment) ? DBNull.Value : _productRegisterWork.Comment;
-                                                cmdUpdate.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
-                                                cmdUpdate.Parameters.Add("@UseID", SqliteType.Text).Value = _productRegisterWork.RowID;
-
-                                                var affectedRows = cmdUpdate.ExecuteNonQuery();
-
-                                                if (affectedRows == 0) {
-                                                    // 挿入
-                                                    using var cmdInsert = con.CreateCommand();
-                                                    cmdInsert.CommandText =
-                                                        $"""
-                                                        INSERT INTO {Constants.TSubstrateTableName}
-                                                            (
-                                                                SubstrateID,
-                                                                SubstrateNumber,
-                                                                OrderNumber,
-                                                                Decrease,
-                                                                Person,
-                                                                RegDate,
-                                                                Comment,
-                                                                UseID
-                                                            )
-                                                        VALUES
-                                                            (
-                                                                @SubstrateID,
-                                                                @SubstrateNumber,
-                                                                @OrderNumber,
-                                                                @Decrease,
-                                                                @Person,
-                                                                @RegDate,
-                                                                @Comment,
-                                                                @UseID
-                                                            )
-                                                        ;
-                                                        """;
-
-                                                    cmdInsert.Parameters.Add("@SubstrateID", SqliteType.Text).Value = string.IsNullOrWhiteSpace(substrateID) ? DBNull.Value : substrateID;
-                                                    cmdInsert.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
-                                                    cmdInsert.Parameters.Add("@OrderNumber", SqliteType.Text).Value = string.IsNullOrWhiteSpace(orderNum) ? DBNull.Value : orderNum;
-                                                    cmdInsert.Parameters.Add("@Decrease", SqliteType.Integer).Value = 0 - useValue;
-                                                    cmdInsert.Parameters.Add("@Person", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Person) ? DBNull.Value : _productRegisterWork.Person;
-                                                    cmdInsert.Parameters.Add("@RegDate", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.RegDate) ? DBNull.Value : _productRegisterWork.RegDate;
-                                                    cmdInsert.Parameters.Add("@Comment", SqliteType.Text).Value = string.IsNullOrWhiteSpace(_productRegisterWork.Comment) ? DBNull.Value : _productRegisterWork.Comment;
-                                                    cmdInsert.Parameters.Add("@UseID", SqliteType.Text).Value = _productRegisterWork.RowID;
-
-                                                    cmdInsert.ExecuteNonQuery();
-                                                }
+                                                con.Execute(insertSql,
+                                                    new {
+                                                        SubstrateID = ToDbValue(substrateID),
+                                                        SubstrateNumber = objDgv.Rows[j].Cells[0].Value,
+                                                        OrderNumber = ToDbValue(orderNum),
+                                                        Decrease = 0 - useValue,
+                                                        Person = ToDbValue(_productRegisterWork.Person),
+                                                        RegDate = ToDbValue(_productRegisterWork.RegDate),
+                                                        Comment = ToDbValue(_productRegisterWork.Comment),
+                                                        UseID = _productRegisterWork.RowID
+                                                    },
+                                                    transaction
+                                                );
                                             }
 
                                             if (_productMaster.IsListPrint) {
@@ -430,9 +433,7 @@ namespace ProductDatabase {
                                             }
                                         }
                                         else if (usedValue != useValue && useValue == 0) {
-                                            using var cmdDelete = con.CreateCommand();
-
-                                            cmdDelete.CommandText =
+                                            var deleteSql =
                                                 $"""
                                                 UPDATE
                                                     {Constants.TSubstrateTableName}
@@ -443,57 +444,60 @@ namespace ProductDatabase {
                                                     AND SubstrateNumber = @SubstrateNumber
                                                     AND IsDeleted = 0
                                                     AND UseID = @UseID
-                                                ;
                                                 """;
-                                            cmdDelete.Parameters.Clear();
-                                            cmdDelete.Parameters.Add("@Decrease", SqliteType.Integer).Value = 0;
-                                            cmdDelete.Parameters.Add("@SubstrateID", SqliteType.Integer).Value = _productMaster.UseSubstrates[i].SubstrateID;
-                                            cmdDelete.Parameters.Add("@SubstrateNumber", SqliteType.Text).Value = objDgv.Rows[j].Cells[0].Value;
-                                            cmdDelete.Parameters.Add("@UseID", SqliteType.Integer).Value = _productRegisterWork.RowID;
 
-                                            cmdDelete.Connection = con;
-                                            cmdDelete.ExecuteNonQuery();
+                                            con.Execute(deleteSql,
+                                                new {
+                                                    Decrease = 0,
+                                                    _productMaster.UseSubstrates[i].SubstrateID,
+                                                    SubstrateNumber = objDgv.Rows[j].Cells[0].Value,
+                                                    UseID = _productRegisterWork.RowID
+                                                },
+                                                transaction
+                                            );
                                         }
                                     }
                                 }
                             }
 
                             // 製品テーブル更新
-                            using (var cmd = con.CreateCommand()) {
-                                cmd.CommandText =
-                                    $"""
-                                    UPDATE
-                                        {Constants.TProductTableName}
-                                    SET
-                                        Quantity = @Quantity,
-                                        Person = @Person,
-                                        RegDate = @RegDate,
-                                        Revision = @Revision,
-                                        RevisionGroup = @RevisionGroup,
-                                        SerialLast = @SerialLast,
-                                        SerialLastNumber = @SerialLastNumber,
-                                        Comment = @Comment
-                                    WHERE
-                                        ProductNumber = @ProductNumber
-                                        AND SerialFirst = @SerialFirst
-                                        AND IsDeleted = 0
-                                    ;
-                                    """;
-                                cmd.Parameters.Add("@OrderNumber", SqliteType.Text).Value = ToDbValue(_productRegisterWork.OrderNumber);
-                                cmd.Parameters.Add("@ProductNumber", SqliteType.Text).Value = ToDbValue(_productRegisterWork.ProductNumber);
-                                cmd.Parameters.Add("@Quantity", SqliteType.Text).Value = _productRegisterWork.Quantity;
-                                cmd.Parameters.Add("@Person", SqliteType.Text).Value = ToDbValue(_productRegisterWork.Person);
-                                cmd.Parameters.Add("@RegDate", SqliteType.Text).Value = ToDbValue(_productRegisterWork.RegDate);
-                                cmd.Parameters.Add("@Revision", SqliteType.Text).Value = ToDbValue(_productRegisterWork.Revision);
-                                cmd.Parameters.Add("@RevisionGroup", SqliteType.Text).Value = _productMaster.RevisionGroup;
-                                cmd.Parameters.Add("@SerialFirst", SqliteType.Text).Value = ToDbValue(_productRegisterWork.SerialFirst);
-                                cmd.Parameters.Add("@SerialLast", SqliteType.Text).Value = ToDbValue(_productRegisterWork.SerialLast);
-                                cmd.Parameters.Add("@SerialLastNumber", SqliteType.Text).Value = _productRegisterWork.SerialLastNumber;
-                                cmd.Parameters.Add("@Comment", SqliteType.Text).Value = ToDbValue(_productRegisterWork.Comment);
+                            var updateProductSql =
+                                $"""
+                                UPDATE
+                                    {Constants.TProductTableName}
+                                SET
+                                    Quantity = @Quantity,
+                                    Person = @Person,
+                                    RegDate = @RegDate,
+                                    Revision = @Revision,
+                                    RevisionGroup = @RevisionGroup,
+                                    SerialLast = @SerialLast,
+                                    SerialLastNumber = @SerialLastNumber,
+                                    Comment = @Comment
+                                WHERE
+                                    ProductNumber = @ProductNumber
+                                    AND SerialFirst = @SerialFirst
+                                    AND IsDeleted = 0
+                                """;
 
-                                cmd.ExecuteNonQuery();
-                                transaction.Commit();
-                            }
+                            con.Execute(updateProductSql,
+                                new {
+                                    OrderNumber = ToDbValue(_productRegisterWork.OrderNumber),
+                                    ProductNumber = ToDbValue(_productRegisterWork.ProductNumber),
+                                    _productRegisterWork.Quantity,
+                                    Person = ToDbValue(_productRegisterWork.Person),
+                                    RegDate = ToDbValue(_productRegisterWork.RegDate),
+                                    Revision = ToDbValue(_productRegisterWork.Revision),
+                                    _productMaster.RevisionGroup,
+                                    SerialFirst = ToDbValue(_productRegisterWork.SerialFirst),
+                                    SerialLast = ToDbValue(_productRegisterWork.SerialLast),
+                                    _productRegisterWork.SerialLastNumber,
+                                    Comment = ToDbValue(_productRegisterWork.Comment)
+                                },
+                                transaction
+                            );
+
+                            transaction.Commit();
                         }
                         break;
                 }
@@ -524,6 +528,7 @@ namespace ProductDatabase {
                 throw;
             }
         }
+
         private static object ToDbValue(string? value) {
             return string.IsNullOrWhiteSpace(value) ? DBNull.Value : value;
         }

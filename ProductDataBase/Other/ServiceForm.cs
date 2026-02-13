@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Dapper;
+using Microsoft.Data.Sqlite;
 using System.Data;
 using static ProductDatabase.MainWindow;
 using static ProductDatabase.ProductRegistration2Window;
@@ -19,8 +20,7 @@ namespace ProductDatabase.Other {
 
             using SqliteConnection con = new(GetConnectionRegistration());
             con.Open();
-            using (var cmd = new SqliteCommand(strSqlQuery, con))
-            using (var reader = cmd.ExecuteReader()) {
+            using (var reader = con.ExecuteReader(strSqlQuery)) {
                 ServiceInfo.ServiceDataTable.Load(reader);
             }
 
@@ -93,8 +93,7 @@ namespace ProductDatabase.Other {
             using var con = new SqliteConnection(GetConnectionRegistration());
             con.Open();
 
-            using (var cmd = new SqliteCommand("SELECT * FROM V_ProductUseSubstrate;", con))
-            using (var reader = cmd.ExecuteReader()) {
+            using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.VProductUseSubstrate};")) {
                 productUseSubstrate.Load(reader);
             }
 

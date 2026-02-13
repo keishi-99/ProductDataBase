@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Dapper;
+using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using System.Data;
@@ -188,18 +189,21 @@ namespace ProductDatabase {
 
         private void LoadDataAndDisplay(string categoryName, string query, params (string name, object value)[] parameters) {
             using SqliteConnection con = new(GetConnectionRegistration());
-            con.Open();
 
-            using SqliteCommand cmd = new(query, con);
-            cmd.Parameters.AddRange([.. parameters.Select(p => new SqliteParameter(p.name, p.value))]);
-            using (var reader = cmd.ExecuteReader()) {
-
-                _historyTable = new DataTable();
-                _historyTable.Load(reader);
-
-                DataBaseDataGridView.Columns.Clear();
-                DataBaseDataGridView.DataSource = _historyTable;
+            var dynamicParams = new DynamicParameters();
+            foreach (var (name, value) in parameters) {
+                dynamicParams.Add(name, value);
             }
+
+            using var reader = con.ExecuteReader(query, dynamicParams);
+
+            // DataTableに読み込み
+            _historyTable = new DataTable();
+            _historyTable.Load(reader);
+
+            // DataGridViewにバインド
+            DataBaseDataGridView.Columns.Clear();
+            DataBaseDataGridView.DataSource = _historyTable;
 
             _listColFilter.Clear();
             _listColFilter.Add("");
@@ -575,13 +579,13 @@ namespace ProductDatabase {
 
                 switch (_tableName) {
                     case "Substrate":
-                        ProcessSubstrateChanges(command, changes, pendingLogs);
+                        ProcessSubstrateChanges(changes, pendingLogs);
                         break;
                     case "Product":
-                        ProcessProductChanges(command, changes, pendingLogs);
+                        ProcessProductChanges(changes, pendingLogs);
                         break;
                     case "Serial":
-                        ProcessSerialChanges(command, changes, pendingLogs);
+                        ProcessSerialChanges(changes, pendingLogs);
                         break;
                 }
 
@@ -618,18 +622,19 @@ namespace ProductDatabase {
             _editModeConnection = null;
         }
 
-        private void ProcessSubstrateChanges(SqliteCommand command, DataTable changes, List<string[]> pendingLogs) {
+        private void ProcessSubstrateChanges(DataTable changes, List<string[]> pendingLogs) {
             foreach (var row in changes.Rows.OfType<DataRow>()) {
                 if (row.RowState == DataRowState.Modified) {
                     LogSubstrateEdit(row, pendingLogs);
-                    UpdateSubstrateRow(command, row);
+                    UpdateSubstrateRow(_editModeConnection!, row);
                 }
                 else if (row.RowState == DataRowState.Deleted) {
                     LogSubstrateDelete(row, pendingLogs);
-                    DeleteSubstrateRow(command, row);
+                    DeleteSubstrateRow(_editModeConnection!, row);
                 }
             }
         }
+
         private void LogSubstrateEdit(DataRow row, List<string[]> pendingLogs) {
             pendingLogs.Add([
                 "[基板履歴編集:前]",
@@ -669,8 +674,8 @@ namespace ProductDatabase {
                 $"コメント[{GetValue(row, "Comment")}]"
             ]);
         }
-        private static void UpdateSubstrateRow(SqliteCommand command, DataRow row) {
-            command.CommandText =
+        private void UpdateSubstrateRow(IDbConnection connection, DataRow row) {
+            var sql =
                 $"""
                 UPDATE {Constants.TSubstrateTableName}
                 SET
@@ -686,20 +691,20 @@ namespace ProductDatabase {
                 WHERE ID = @ID;
                 """;
 
-            command.Parameters.Clear();
-            AddParameter(command, "@SubstrateNumber", row["SubstrateNumber"]);
-            AddParameter(command, "@OrderNumber", row["OrderNumber"]);
-            AddParameter(command, "@Increase", row["Increase"]);
-            AddParameter(command, "@Decrease", row["Decrease"]);
-            AddParameter(command, "@Defect", row["Defect"]);
-            AddParameter(command, "@RegDate", row["RegDate"]);
-            AddParameter(command, "@Person", row["Person"]);
-            AddParameter(command, "@Comment", row["Comment"]);
-            AddParameter(command, "@UseId", row["UseId"]);
-            AddParameter(command, "@ID", row["ID"]);
-
-            command.ExecuteNonQuery();
+            connection.Execute(sql, new {
+                SubstrateNumber = row["SubstrateNumber"],
+                OrderNumber = row["OrderNumber"],
+                Increase = row["Increase"],
+                Decrease = row["Decrease"],
+                Defect = row["Defect"],
+                RegDate = row["RegDate"],
+                Person = row["Person"],
+                Comment = row["Comment"],
+                UseId = row["UseId"],
+                ID = row["ID"]
+            }, _editModeTransaction);
         }
+
         private void LogSubstrateDelete(DataRow row, List<string[]> pendingLogs) {
             pendingLogs.Add([
                 "[基板履歴削除]",
@@ -720,40 +725,41 @@ namespace ProductDatabase {
                 $"コメント[{GetValue(row, "Comment", DataRowVersion.Original)}]"
             ]);
         }
-        private static void DeleteSubstrateRow(SqliteCommand command, DataRow row) {
-            command.CommandText = $@"
-                    UPDATE {Constants.TSubstrateTableName}
-                    SET
-                        IsDeleted = 1,
-                        DeletedAt = datetime('now', 'localtime')
-                    WHERE ID = @ID;
-                ";
-            AddParameter(command, "@ID", row["ID", DataRowVersion.Original]);
-            command.ExecuteNonQuery();
+        private void DeleteSubstrateRow(IDbConnection connection, DataRow row) {
+            var sql =
+                $"""
+                UPDATE {Constants.TSubstrateTableName}
+                SET
+                    IsDeleted = 1,
+                    DeletedAt = datetime('now', 'localtime')
+                WHERE ID = @ID;
+                """;
+
+            connection.Execute(sql, new {
+                ID = row["ID", DataRowVersion.Original]
+            }, _editModeTransaction);
         }
 
-        private void ProcessProductChanges(SqliteCommand command, DataTable changes, List<string[]> pendingLogs) {
+        private void ProcessProductChanges(DataTable changes, List<string[]> pendingLogs) {
             foreach (var row in changes.Rows.OfType<DataRow>()) {
                 if (row.RowState == DataRowState.Modified) {
                     LogProductEdit(row, pendingLogs);
-                    UpdateProductRow(command, row);
+                    UpdateProductRow(_editModeConnection!, row);
                 }
                 else if (row.RowState == DataRowState.Deleted) {
                     LogProductDelete(row, pendingLogs);
-                    LogProductSubstrateDelete(command, row, pendingLogs);
-                    LogProductSerialDelete(command, row, pendingLogs);
-
-                    DeleteProductRow(command, row);
-                    DeleteProductSubstrateRow(command, row);
-                    DeleteProductSerialRow(command, row);
+                    LogProductSubstrateDelete(_editModeConnection!, row, pendingLogs);
+                    LogProductSerialDelete(_editModeConnection!, row, pendingLogs);
+                    DeleteProductRow(_editModeConnection!, row);
+                    DeleteProductSubstrateRow(_editModeConnection!, row);
+                    DeleteProductSerialRow(_editModeConnection!, row);
                 }
             }
         }
-        private static void UpdateProductRow(SqliteCommand command, DataRow row) {
-            command.CommandText =
+        private void UpdateProductRow(IDbConnection connection, DataRow row) {
+            var sql =
                 $"""
-                UPDATE
-                    {Constants.TProductTableName}
+                UPDATE {Constants.TProductTableName}
                 SET
                     OrderNumber = @OrderNumber,
                     ProductNumber = @ProductNumber,
@@ -763,24 +769,22 @@ namespace ProductDatabase {
                     Revision = @Revision,
                     RevisionGroup = @RevisionGroup,
                     Comment = @Comment
-                WHERE
-                    ID = @ID
-                ;
+                WHERE ID = @ID;
                 """;
 
-            command.Parameters.Clear();
-            AddParameter(command, "@ID", row["ID"]);
-            AddParameter(command, "@OrderNumber", row["OrderNumber"]);
-            AddParameter(command, "@ProductNumber", row["ProductNumber"]);
-            AddParameter(command, "@OLesNumber", row["OLesNumber"]);
-            AddParameter(command, "@Person", row["Person"]);
-            AddParameter(command, "@RegDate", row["RegDate"]);
-            AddParameter(command, "@Revision", row["Revision"]);
-            AddParameter(command, "@RevisionGroup", row["RevisionGroup"]);
-            AddParameter(command, "@Comment", row["Comment"]);
-
-            command.ExecuteNonQuery();
+            connection.Execute(sql, new {
+                ID = row["ID"],
+                OrderNumber = row["OrderNumber"],
+                ProductNumber = row["ProductNumber"],
+                OLesNumber = row["OLesNumber"],
+                Person = row["Person"],
+                RegDate = row["RegDate"],
+                Revision = row["Revision"],
+                RevisionGroup = row["RevisionGroup"],
+                Comment = row["Comment"]
+            }, _editModeTransaction);
         }
+
         private void LogProductEdit(DataRow row, List<string[]> pendingLogs) {
             pendingLogs.Add([
                 $"[製品履歴編集:前]",
@@ -840,8 +844,8 @@ namespace ProductDatabase {
                 $"コメント[{GetValue(row, "Comment", DataRowVersion.Original)}]"
             ]);
         }
-        private void LogProductSubstrateDelete(SqliteCommand command, DataRow row, List<string[]> pendingLogs) {
-            command.CommandText =
+        private void LogProductSubstrateDelete(IDbConnection connection, DataRow row, List<string[]> pendingLogs) {
+            var sql =
                 $"""
                 SELECT
                     ID,
@@ -858,75 +862,67 @@ namespace ProductDatabase {
                     Comment,
                     UseID
                 FROM {Constants.VSubstrateTableName}
-                WHERE 
-                    UseID = @ID
-                ;
+                WHERE UseID = @ID;
                 """;
 
-            command.Parameters.Clear();
-            using var reader = ExecuteReader(command, ("@ID", row["ID", DataRowVersion.Original]));
+            var results = connection.Query(sql, new {
+                ID = row["ID", DataRowVersion.Original]
+            }, _editModeTransaction);
 
-            while (reader.Read()) {
+            foreach (var item in results) {
                 pendingLogs.Add([
                     $"[製品削除に伴う基板削除]",
                     $"[{_substrateMaster.CategoryName}]",
-                    $"ID[{GetReaderValue(reader,"ID")}]",
-                    $"注文番号[{GetReaderValue(reader,"OrderNumber")}]",
-                    $"製造番号[{GetReaderValue(reader, "SubstrateNumber")}]",
+                    $"ID[{item.ID}]",
+                    $"注文番号[{item.OrderNumber}]",
+                    $"製造番号[{item.SubstrateNumber}]",
                     $"[]",
-                    $"製品名[{GetReaderValue(reader, "ProductName")}]",
-                    $"基板名[{GetReaderValue(reader, "SubstrateName")}]",
-                    $"型式[{GetReaderValue(reader, "SubstrateModel")}]",
-                    $"追加数[{GetReaderValue(reader, "Increase")}]",
-                    $"使用数[{GetReaderValue(reader, "Decrease")}]",
-                    $"減少数[{GetReaderValue(reader, "Defect")}]",
-                    $"登録日[{GetReaderValue(reader, "RegDate")}]",
-                    $"担当者[{GetReaderValue(reader, "Person")}]",
-                    $"コメント[{GetReaderValue(reader, "Comment")}]",
-                    $"UseID[{GetReaderValue(reader, "UseID")}]",
+                    $"製品名[{item.ProductName}]",
+                    $"基板名[{item.SubstrateName}]",
+                    $"型式[{item.SubstrateModel}]",
+                    $"追加数[{item.Increase}]",
+                    $"使用数[{item.Decrease}]",
+                    $"減少数[{item.Defect}]",
+                    $"登録日[{item.RegDate}]",
+                    $"担当者[{item.Person}]",
+                    $"コメント[{item.Comment}]",
+                    $"UseID[{item.UseID}]",
                 ]);
             }
         }
-        private void LogProductSerialDelete(SqliteCommand command, DataRow row, List<string[]> pendingLogs) {
-            command.CommandText =
-                $"""                
+        private void LogProductSerialDelete(IDbConnection connection, DataRow row, List<string[]> pendingLogs) {
+            var sql =
+                $"""
                 SELECT
                     rowid,
                     ProductName,
                     Serial,
                     UsedID
                 FROM {Constants.TSerialTableName}
-                WHERE 
-                    UsedID = @ID
-                ;                
+                WHERE UsedID = @ID;
                 """;
 
-            command.Parameters.Clear();
-            using var reader = ExecuteReader(command, ("@ID", row["ID", DataRowVersion.Original]));
+            var results = connection.Query(sql, new {
+                ID = row["ID", DataRowVersion.Original]
+            }, _editModeTransaction);
 
-            while (reader.Read()) {
+            foreach (var item in results) {
                 pendingLogs.Add([
                     $"[製品削除に伴うシリアル削除]",
                     $"[{_productMaster.CategoryName}]",
-                    $"ID[{GetReaderValue(reader, "rowid")}]",
-                    $"製品名[{GetReaderValue(reader, "ProductName")}]",
-                    $"Serial[{GetReaderValue(reader, "Serial")}]",
-                    $"UsedID[{GetReaderValue(reader, "UsedID")}]",
-                    $"[]",
-                    $"[]",
-                    $"[]",
-                    $"[]",
-                    $"[]",
-                    $"[]",
-                    $"[]",
-                    $"[]",
-                    $"[]",
-                    $"[]",
+                    $"ID[{item.rowid}]",
+                    $"製品名[{item.ProductName}]",
+                    $"Serial[{item.Serial}]",
+                    $"UsedID[{item.UsedID}]",
+                    $"[]", $"[]", $"[]", $"[]",
+                    $"[]", $"[]", $"[]", $"[]",
+                    $"[]", $"[]",
                 ]);
             }
         }
-        private static void DeleteProductRow(SqliteCommand command, DataRow row) {
-            command.CommandText =
+
+        private void DeleteProductRow(IDbConnection connection, DataRow row) {
+            var sql =
                 $"""
                 UPDATE {Constants.TProductTableName}
                 SET
@@ -935,45 +931,40 @@ namespace ProductDatabase {
                 WHERE ID = @ID;
                 """;
 
-            command.Parameters.Clear();
-            AddParameter(command, "@ID", row["ID", DataRowVersion.Original]);
-            command.ExecuteNonQuery();
+            connection.Execute(sql, new {
+                ID = row["ID", DataRowVersion.Original]
+            }, _editModeTransaction);
         }
-        private static void DeleteProductSubstrateRow(SqliteCommand command, DataRow row) {
-            command.CommandText = $@"
-                UPDATE {Constants.TSubstrateTableName}
-                SET
-                    IsDeleted = 1,
-                    DeletedAt = datetime('now', 'localtime')
-                WHERE UseID = @ID;
-            ";
+        private void DeleteProductSubstrateRow(IDbConnection connection, DataRow row) {
+            var sql = $"""
+        UPDATE {Constants.TSubstrateTableName}
+        SET
+            IsDeleted = 1,
+            DeletedAt = datetime('now', 'localtime')
+        WHERE UseID = @ID;
+        """;
 
-            command.Parameters.Clear();
-            AddParameter(command, "@ID", row["ID", DataRowVersion.Original]);
-            command.ExecuteNonQuery();
+            connection.Execute(sql, new {
+                ID = row["ID", DataRowVersion.Original]
+            }, _editModeTransaction);
         }
-        private static void DeleteProductSerialRow(SqliteCommand command, DataRow row) {
-            command.CommandText =
+        private void DeleteProductSerialRow(IDbConnection connection, DataRow row) {
+            var sql =
                 $"""
-                DELETE FROM
-                    {Constants.TSerialTableName}
-                WHERE
-                    UsedID = @ID
-                ;
+                DELETE FROM {Constants.TSerialTableName}
+                WHERE UsedID = @ID;
                 """;
 
-            command.Parameters.Clear();
-            AddParameter(command, "@ID", row["ID", DataRowVersion.Original]);
-            command.ExecuteNonQuery();
+            connection.Execute(sql, new {
+                ID = row["ID", DataRowVersion.Original]
+            }, _editModeTransaction);
         }
 
-        private void ProcessSerialChanges(SqliteCommand command, DataTable changes, List<string[]> pendingLogs) {
+        private void ProcessSerialChanges(DataTable changes, List<string[]> pendingLogs) {
             foreach (var row in changes.Rows.OfType<DataRow>()) {
-                if (row.RowState == DataRowState.Modified) {
-                }
-                else if (row.RowState == DataRowState.Deleted) {
+                if (row.RowState == DataRowState.Deleted) {
                     LogSerialDelete(row, pendingLogs);
-                    DeleteSerialRow(command, row);
+                    DeleteSerialRow(_editModeConnection!, row);
                 }
             }
         }
@@ -997,51 +988,21 @@ namespace ProductDatabase {
                 $"[]",
             ]);
         }
-        private static void DeleteSerialRow(SqliteCommand command, DataRow row) {
-            command.CommandText =
+        private void DeleteSerialRow(IDbConnection connection, DataRow row) {
+            var sql =
                 $"""
-                DELETE FROM
-                    {Constants.TSerialTableName}
-                WHERE
-                    rowid = @rowid
-                ;
+                DELETE FROM {Constants.TSerialTableName}
+                WHERE rowid = @rowid;
                 """;
-            command.Parameters.Clear();
-            AddParameter(command, "@rowid", row["rowid", DataRowVersion.Original]);
-            command.ExecuteNonQuery();
+
+            connection.Execute(sql, new {
+                rowid = row["rowid", DataRowVersion.Original]
+            }, _editModeTransaction);
         }
 
-        private static string GetReaderValue(SqliteDataReader reader, string columnName) {
-            var ordinal = reader.GetOrdinal(columnName);
-            if (reader.IsDBNull(ordinal)) {
-                return "";
-            }
-            return reader.GetValue(ordinal)?.ToString() ?? "";
-        }
-        private static void AddParameter(SqliteCommand command, string name, object value) {
-            command.Parameters.AddWithValue(name, value == DBNull.Value ? null : value);
-        }
         private static string GetValue(DataRow row, string columnName, DataRowVersion version = DataRowVersion.Current) {
             var value = row[columnName, version];
             return value == DBNull.Value ? "" : value.ToString() ?? "";
-        }
-        private static SqliteDataReader ExecuteReader(SqliteCommand command, params (string name, object value)[] parameters) {
-            foreach (var (name, value) in parameters) {
-                if (value == null || value == DBNull.Value) {
-                    command.Parameters.Add(name, SqliteType.Text).Value = DBNull.Value;
-                }
-                else if (value is int or long) {
-                    command.Parameters.Add(name, SqliteType.Integer).Value = value;
-                }
-                else if (value is double or float or decimal) {
-                    command.Parameters.Add(name, SqliteType.Real).Value = value;
-                }
-                else {
-                    command.Parameters.Add(name, SqliteType.Text).Value = value;
-                }
-            }
-
-            return command.ExecuteReader();
         }
 
         private void CategorySelect(object sender) {
@@ -1081,7 +1042,6 @@ namespace ProductDatabase {
                 historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} LIKE '*{FilterStringTextBox.Text}*'";
             }
         }
-
         private void InventoryAdjustment() {
             var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
             _substrateMaster.SubstrateID = Convert.ToInt32(DataBaseDataGridView.Rows[i].Cells["SubstrateID"].Value);
@@ -1089,49 +1049,36 @@ namespace ProductDatabase {
             _substrateRegisterWork.ProductNumber = DataBaseDataGridView.Rows[i].Cells["SubstrateNumber"].Value.ToString() ?? string.Empty;
 
             using SqliteConnection con = new(GetConnectionRegistration());
-            {
-                con.Open();
-                using var cmd = con.CreateCommand();
+            var sql =
+                $"""
+                SELECT
+                    SubstrateID,
+                    SubstrateName,
+                    SubstrateModel,
+                    ProductName,
+                    RegType,
+                    CheckBox,
+                    SerialPrintType
+                FROM {Constants.SubstrateTableName}
+                WHERE SubstrateID = @SubstrateID;
+                """;
 
-                cmd.CommandText =
-                    $"""
-                    SELECT
-                        SubstrateID,
-                        SubstrateName,
-                        SubstrateModel,
-                        ProductName,
-                        RegType,
-                        CheckBox,
-                        SerialPrintType
-                    FROM
-                        {Constants.SubstrateTableName}
-                    WHERE
-                        SubstrateID = @SubstrateID
-                    ;
-                    """;
+            var result = con.QueryFirstOrDefault(sql, new { _substrateMaster.SubstrateID });
 
-                cmd.Parameters.Add("@SubstrateID", SqliteType.Integer).Value = _substrateMaster.SubstrateID;
-
-                using var reader = cmd.ExecuteReader();
-                while (reader.Read()) {
-                    _substrateMaster.SubstrateName = reader["SubstrateName"].ToString() ?? string.Empty;
-                    _substrateMaster.SubstrateModel = reader["SubstrateModel"].ToString() ?? string.Empty;
-                    _substrateMaster.ProductName = reader["ProductName"].ToString() ?? string.Empty;
-                    _substrateMaster.RegType = Convert.ToInt32(reader["RegType"]);
-                    _substrateMaster.CheckBin = Convert.ToInt32(reader["Checkbox"].ToString(), 2);
-                    _substrateMaster.SerialPrintType = Convert.ToInt32(reader["SerialPrintType"]);
-                }
-
-                using SubstrateRegistrationWindow window = new(_substrateMaster, _substrateRegisterWork, _appSettings);
-                window.ShowDialog(this);
-
-                LoadEvents();
+            if (result != null) {
+                _substrateMaster.SubstrateName = result.SubstrateName ?? string.Empty;
+                _substrateMaster.SubstrateModel = result.SubstrateModel ?? string.Empty;
+                _substrateMaster.ProductName = result.ProductName ?? string.Empty;
+                _substrateMaster.RegType = Convert.ToInt32(result.RegType);
+                _substrateMaster.CheckBin = Convert.ToInt32(result.CheckBox?.ToString() ?? "0", 2);
+                _substrateMaster.SerialPrintType = Convert.ToInt32(result.SerialPrintType);
             }
+
+            using SubstrateRegistrationWindow window = new(_substrateMaster, _substrateRegisterWork, _appSettings);
+            window.ShowDialog(this);
+            LoadEvents();
         }
-
-        // 使用基板表示
         private void ShowUsedSubstrateDetails() {
-
             if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
 
             var dataForm = new Form {
@@ -1151,44 +1098,45 @@ namespace ProductDatabase {
                 ReadOnly = true,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells
             };
+
             dataForm.Controls.Add(dataGridView);
 
             using SqliteConnection con = new(GetConnectionRegistration());
-            {
-                con.Open();
-                using var cmd = con.CreateCommand();
+            var sql =
+                $"""
+                SELECT
+                    ID,
+                    SubstrateName,
+                    SubstrateModel,
+                    SubstrateNumber,
+                    Decrease
+                FROM {Constants.VSubstrateTableName}
+                WHERE UseID = @ID
+                ORDER BY SubstrateModel ASC;
+                """;
 
-                cmd.CommandText =
-                    $"""
-                    SELECT
-                        ID,
-                        SubstrateName,
-                        SubstrateModel,
-                        SubstrateNumber,
-                        Decrease
-                    FROM
-                        {Constants.VSubstrateTableName}
-                    WHERE
-                        UseID = @ID
-                    ORDER BY
-                        SubstrateModel ASC
-                    ;
-                    """;
+            var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
+            var id = Convert.ToInt32(DataBaseDataGridView.Rows[i].Cells["ID"].Value);
 
-                var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
-                var id = Convert.ToInt32(DataBaseDataGridView.Rows[i].Cells["ID"].Value);
-                cmd.Parameters.Add("@ID", SqliteType.Integer).Value = id;
+            var results = con.Query(sql, new { ID = id }).ToList();
+            var dt = new DataTable();
 
-                using var reader = cmd.ExecuteReader();
-                var dt = new DataTable();
+            if (results.Count != 0) {
+                // 動的オブジェクトからDataTableを作成
+                var firstRow = results.First() as IDictionary<string, object>;
+                foreach (var key in firstRow!.Keys) {
+                    dt.Columns.Add(key);
+                }
 
-                dt.Load(reader);
-                dataGridView.DataSource = dt;
+                foreach (var row in results) {
+                    var dict = row as IDictionary<string, object>;
+                    dt.Rows.Add([.. dict!.Values]);
+                }
             }
+
+            dataGridView.DataSource = dt;
             dataForm.ShowDialog();
         }
-
-        // 成績書作成
         private void GenerateReport() {
             try {
                 Cursor.Current = Cursors.WaitCursor;

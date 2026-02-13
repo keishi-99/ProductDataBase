@@ -7,5 +7,6 @@
         public const string TSerialTableName = "T_Serial";
         public const string VProductTableName = "V_Product";
         public const string VSubstrateTableName = "V_Substrate";
+        public const string VProductUseSubstrate = "V_ProductUseSubstrate";
     }
 }
