@@ -1127,7 +1127,6 @@ namespace ProductDatabase {
                 foreach (var key in firstRow!.Keys) {
                     dt.Columns.Add(key);
                 }
-
                 foreach (var row in results) {
                     var dict = row as IDictionary<string, object>;
                     dt.Rows.Add([.. dict!.Values]);

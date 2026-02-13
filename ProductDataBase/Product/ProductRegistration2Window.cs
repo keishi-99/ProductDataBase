@@ -435,7 +435,7 @@ namespace ProductDatabase {
                 Comment = comment
             }, transaction: _sqliteTransaction);
 
-            _productRegisterWork.RowID = connection.ExecuteScalar<int>($"SELECT MAX(ID) FROM {Constants.TProductTableName};", transaction: _sqliteTransaction);
+            _productRegisterWork.RowID = connection.ExecuteScalar<int>("SELECT last_insert_rowid();", transaction: _sqliteTransaction);
         }
         private void InsertSerial(SqliteConnection connection) {
             var commandText =
