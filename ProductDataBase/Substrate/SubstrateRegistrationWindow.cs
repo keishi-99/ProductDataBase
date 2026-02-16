@@ -342,15 +342,23 @@ namespace ProductDatabase {
             }
 
             string manufacturingNumber = ManufacturingNumberMaskedTextBox.Text.Trim();
-            return !anyTextBoxEnabled
-                ? throw new Exception("何も入力されていません")
-                : !allTextBoxesFilled
-                ? throw new Exception("空欄があります。")
-                : ManufacturingNumberCheckBox.Checked &&
-                    !manufacturingNumber.StartsWith("R", StringComparison.OrdinalIgnoreCase) &&
-                    manufacturingNumber.Length != 15
-                ? throw new Exception("製番を10桁+4桁で入力して下さい。")
-                : true;
+            // 未入力チェック
+            if (!anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
+
+            // 空欄チェック
+            if (!allTextBoxesFilled) { throw new Exception("空欄があります。"); }
+
+            // 3. 製番フォーマットチェック
+            if (ManufacturingNumberCheckBox.Checked) {
+                bool isValid = manufacturingNumber.Length == 15;
+                if (otherNumberCheckBox.Checked) {
+                }
+                else if (!isValid) {
+                    throw new Exception("製番を10桁+4桁で入力して下さい。");
+                }
+            }
+
+            return true;
         }
         private bool ValidateData() {
 
@@ -381,7 +389,12 @@ namespace ProductDatabase {
             _substrateRegisterWork.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
 
             _serialList.Clear();
-            var substrateNumber = ManufacturingNumberMaskedTextBox.Text.Substring(5, 5);
+
+            string text = ManufacturingNumberMaskedTextBox.Text.Trim();
+
+            var substrateNumber = otherNumberCheckBox.Checked
+                ? text[^6..]
+                : text.Substring(5, 5);
 
             var monthCode = DateTime.Parse(_substrateRegisterWork.RegDate).ToString("MM");
 
@@ -512,6 +525,11 @@ namespace ProductDatabase {
                     break;
                 case "ManufacturingNumberCheckBox":
                     ManufacturingNumberMaskedTextBox.Enabled = checkBox.Checked;
+                    otherNumberCheckBox.Enabled = checkBox.Checked;
+                    break;
+                case "otherNumberCheckBox":
+                    ManufacturingNumberMaskedTextBox.Mask = checkBox.Checked ? "AAAAAAAAAAAAAA" : ">LA00A00000-0000";
+                    ManufacturingNumberMaskedTextBox.Text = string.Empty;
                     break;
                 case "QuantityCheckBox":
                     QuantityTextBox.Enabled = checkBox.Checked;
