@@ -138,7 +138,10 @@ namespace ProductDatabase {
                     PrintManager.PrintUsingBPac(NameplatePrintSettings, _serialList);
                     break;
                 default:
-                    if (!Print(isPrint)) { throw new Exception("キャンセルしました。"); }
+                    if (!Print(isPrint)) {
+                        MessageBox.Show("キャンセルしました。");
+                        return;
+                    }
                     break;
             }
         }
@@ -192,7 +195,6 @@ namespace ProductDatabase {
                     RevisionGroup,
                     SerialFirst,
                     SerialLast,
-                    SerialLastNumber,
                     Comment
                 )
                 VALUES 
