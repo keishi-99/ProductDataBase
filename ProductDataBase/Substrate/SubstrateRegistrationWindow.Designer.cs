@@ -72,6 +72,7 @@
             this.OpenSubstrateInformationButton = new Button();
             this.StockLabel1 = new Label();
             this.StockLabel2 = new Label();
+            this.otherNumberCheckBox = new CheckBox();
             this.SubstrateRegistrationMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPositionNumericUpDown).BeginInit();
             this.panelCommentTexrBox.SuspendLayout();
@@ -601,11 +602,24 @@
             this.StockLabel2.Text = "---";
             this.StockLabel2.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // otherNumberCheckBox
+            // 
+            this.otherNumberCheckBox.Location = new Point(93, 168);
+            this.otherNumberCheckBox.Margin = new Padding(0);
+            this.otherNumberCheckBox.Name = "otherNumberCheckBox";
+            this.otherNumberCheckBox.Size = new Size(38, 19);
+            this.otherNumberCheckBox.TabIndex = 614;
+            this.otherNumberCheckBox.TabStop = false;
+            this.otherNumberCheckBox.Text = "他";
+            this.otherNumberCheckBox.UseVisualStyleBackColor = true;
+            this.otherNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
+            // 
             // SubstrateRegistrationWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.otherNumberCheckBox);
             this.Controls.Add(this.StockLabel2);
             this.Controls.Add(this.StockLabel1);
             this.Controls.Add(this.OpenSubstrateInformationButton);
@@ -718,5 +732,6 @@
         private Button OpenSubstrateInformationButton;
         private Label StockLabel1;
         private Label StockLabel2;
+        private CheckBox otherNumberCheckBox;
     }
 }
