@@ -50,6 +50,15 @@ namespace ProductDatabase {
             try {
                 Font = new Font(_appSettings.FontName, _appSettings.FontSize);
 
+                var inputControls = new Control[] {
+                    OrderNumberTextBox, ManufacturingNumberMaskedTextBox, QuantityTextBox, DefectQuantityTextBox, PersonComboBox, CommentTextBox
+                };
+                foreach (var ctrl in inputControls) {
+                    ctrl.TextChanged += InputControls_TextChanged;
+                }
+
+                ValidateAllInputs();
+
                 ProductNameLabel2.Text = _substrateMaster.ProductName;
 
                 SubstrateModelLabel2.Text = $"{_substrateMaster.SubstrateName} - {_substrateMaster.SubstrateModel}";
@@ -103,7 +112,6 @@ namespace ProductDatabase {
         private void ProcessRegistration(bool isPrint) {
             try {
 
-                ValidateForm();
                 if (!ValidateData()) { return; }
 
                 RegisterButton.Enabled = false;
@@ -322,44 +330,6 @@ namespace ProductDatabase {
             }
 
         }
-        private bool ValidateForm() {
-            // 入力フォームのチェック
-            var anyTextBoxEnabled = false;
-            var allTextBoxesFilled = true;
-
-            foreach (Control control in Controls) {
-                if (control is TextBoxBase textBox && textBox.Enabled) {
-                    anyTextBoxEnabled = true;
-                    if (string.IsNullOrWhiteSpace(textBox.Text) && textBox.Name != "QrCodeTextBox") {
-                        allTextBoxesFilled = false;
-                        break;
-                    }
-                }
-            }
-
-            if (PersonComboBox.SelectedIndex == -1 && PersonComboBox.Enabled) {
-                throw new Exception("担当者が選択されていません。");
-            }
-
-            string manufacturingNumber = ManufacturingNumberMaskedTextBox.Text.Trim();
-            // 未入力チェック
-            if (!anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
-
-            // 空欄チェック
-            if (!allTextBoxesFilled) { throw new Exception("空欄があります。"); }
-
-            // 3. 製番フォーマットチェック
-            if (ManufacturingNumberCheckBox.Checked) {
-                bool isValid = manufacturingNumber.Length == 15;
-                if (otherNumberCheckBox.Checked) {
-                }
-                else if (!isValid) {
-                    throw new Exception("製番を10桁+4桁で入力して下さい。");
-                }
-            }
-
-            return true;
-        }
         private bool ValidateData() {
 
             var quantity = 0;
@@ -570,6 +540,7 @@ namespace ProductDatabase {
                 default:
                     break;
             }
+            ValidateAllInputs();
         }
         // 入力数値のみ
         private void NumericOnly(object sender, KeyPressEventArgs e) {
@@ -655,6 +626,73 @@ namespace ProductDatabase {
             }
         }
 
+        private void ValidateAllInputs() {
+            ErrorMessageLabel.Text = "";
+            RegisterButton.Enabled = true;
+
+            var anyTextBoxEnabled = false;
+            var allTextBoxesFilled = true;
+
+            foreach (Control control in Controls) {
+                if (control is TextBoxBase textBox && textBox.Enabled) {
+                    anyTextBoxEnabled = true;
+                    if (string.IsNullOrWhiteSpace(textBox.Text)) {
+                        allTextBoxesFilled = false;
+                        break;
+                    }
+                }
+            }
+
+            // 未入力チェック
+            if (!anyTextBoxEnabled) {
+                ShowError("何も入力されていません");
+                return;
+            }
+
+            // 空欄チェック
+            if (!allTextBoxesFilled) {
+                ShowError("空欄があります。");
+                return;
+            }
+
+            string manufacturingNumber = ManufacturingNumberMaskedTextBox.Text.Trim();
+            if (ManufacturingNumberCheckBox.Checked) {
+                bool isValid = manufacturingNumber.Length == 15;
+                if (otherNumberCheckBox.Checked) {
+                }
+                else if (!isValid) {
+                    ShowError("製番を10桁+4桁で入力して下さい。");
+                    return;
+                }
+            }
+
+            if (QuantityCheckBox.Checked) {
+                if (string.IsNullOrWhiteSpace(QuantityTextBox.Text)) {
+                    ShowError("数量を入力してください。");
+                    return;
+                }
+                if (!int.TryParse(QuantityTextBox.Text, out var quantity) || quantity <= 0) {
+                    ShowError("数量は1以上の有効な数値を入力してください。");
+                    return;
+                }
+            }
+
+            if (PersonComboBox.SelectedIndex == -1 && PersonComboBox.Enabled) {
+                ShowError("担当者が選択されていません。");
+                return;
+            }
+
+        }
+        private void ShowError(string message) {
+            ErrorMessageLabel.Text = message;
+            ErrorMessageLabel.ForeColor = Color.Red;
+            RegisterButton.Enabled = false;
+        }
+
+        private void InputControls_TextChanged(object? sender, EventArgs e) {
+            ValidateAllInputs();
+        }
+
         private void SubstrateRegistrationWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
         private void RegisterButton_Click(object sender, EventArgs e) { ProcessRegistration(true); }
@@ -676,5 +714,6 @@ namespace ProductDatabase {
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
         private void QrCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
+
     }
 }
