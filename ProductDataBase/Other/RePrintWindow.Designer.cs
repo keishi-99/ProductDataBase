@@ -75,9 +75,12 @@
             this.RegistrationDateTimePicker = new DateTimePicker();
             this.RNumberCheckBox = new CheckBox();
             this.NameplatePrintButton = new Button();
+            this.ErrorMessageLabel = new Label();
+            this.QrCodePanel = new Panel();
             this.RePrintMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPositionNumericUpDown).BeginInit();
             this.panel1.SuspendLayout();
+            this.QrCodePanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // TemplateButton
@@ -527,7 +530,7 @@
             // 
             // QrCodeTextBox
             // 
-            this.QrCodeTextBox.Location = new Point(313, 39);
+            this.QrCodeTextBox.Location = new Point(-3, 0);
             this.QrCodeTextBox.MaxLength = 100;
             this.QrCodeTextBox.Name = "QrCodeTextBox";
             this.QrCodeTextBox.Size = new Size(305, 23);
@@ -619,11 +622,30 @@
             this.NameplatePrintButton.UseVisualStyleBackColor = true;
             this.NameplatePrintButton.Click += this.NamePlatePrintButton_Click;
             // 
+            // ErrorMessageLabel
+            // 
+            this.ErrorMessageLabel.Location = new Point(193, 388);
+            this.ErrorMessageLabel.Name = "ErrorMessageLabel";
+            this.ErrorMessageLabel.Size = new Size(400, 15);
+            this.ErrorMessageLabel.TabIndex = 1001;
+            this.ErrorMessageLabel.Text = "----------";
+            this.ErrorMessageLabel.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // QrCodePanel
+            // 
+            this.QrCodePanel.Controls.Add(this.QrCodeTextBox);
+            this.QrCodePanel.Location = new Point(313, 39);
+            this.QrCodePanel.Name = "QrCodePanel";
+            this.QrCodePanel.Size = new Size(305, 23);
+            this.QrCodePanel.TabIndex = 1002;
+            // 
             // RePrintWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 441);
+            this.Controls.Add(this.QrCodePanel);
+            this.Controls.Add(this.ErrorMessageLabel);
             this.Controls.Add(this.NameplatePrintButton);
             this.Controls.Add(this.RNumberCheckBox);
             this.Controls.Add(this.RegistrationDateTimePicker);
@@ -632,7 +654,6 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.ProductTypeLabel2);
             this.Controls.Add(this.ProductTypeLabel1);
-            this.Controls.Add(this.QrCodeTextBox);
             this.Controls.Add(this.BarcodePrintButton);
             this.Controls.Add(this.LabelPrintButton);
             this.Controls.Add(this.PrintPositionNumericUpDown);
@@ -680,6 +701,8 @@
             ((System.ComponentModel.ISupportInitialize)this.PrintPositionNumericUpDown).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.QrCodePanel.ResumeLayout(false);
+            this.QrCodePanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -738,5 +761,7 @@
         private CheckBox RNumberCheckBox;
         private Button NameplatePrintButton;
         private ToolStripMenuItem 銘版印刷設定ToolStripMenuItem;
+        private Label ErrorMessageLabel;
+        private Panel QrCodePanel;
     }
 }

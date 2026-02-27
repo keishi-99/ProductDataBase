@@ -398,9 +398,9 @@ namespace ProductDatabase.Print {
             public double IntervalX { get; set; }
             [Category("\t用紙設定"), DisplayName("ラベル間隔 縦 (mm)")]
             public double IntervalY { get; set; }
-            [Category("\t用紙設定"), DisplayName("ヘッダー開始位置 上 (mm)")]
-            public double HeaderPositionX { get; set; }
             [Category("\t用紙設定"), DisplayName("ヘッダー開始位置 左 (mm)")]
+            public double HeaderPositionX { get; set; }
+            [Category("\t用紙設定"), DisplayName("ヘッダー開始位置 上 (mm)")]
             public double HeaderPositionY { get; set; }
             [Category("\t用紙設定"), DisplayName("ヘッダー フォーマット"), Description("{D}(印刷日)  {M}(製番)  {O}(注番)  {T}(型式)  {P}(製品名)  {N}(台数)  {U}(担当者)")]
             public string HeaderTextFormat { get; set; } = string.Empty;
