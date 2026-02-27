@@ -41,6 +41,15 @@ namespace ProductDatabase {
             try {
                 Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
 
+                var inputControls = new Control[] {
+                    OrderNumberTextBox, ManufacturingNumberMaskedTextBox, QuantityTextBox, FirstSerialNumberTextBox, RevisionTextBox, PersonComboBox, CommentTextBox
+                };
+                foreach (var ctrl in inputControls) {
+                    ctrl.TextChanged += InputControls_TextChanged;
+                }
+
+                ValidateAllInputs();
+
                 ProductNameLabel2.Text = _productMaster.ProductName;
                 SubstrateModelLabel2.Text = $"{_productMaster.ProductName} - {_productMaster.ProductModel}";
 
@@ -118,7 +127,6 @@ namespace ProductDatabase {
         }
         // 登録処理
         private void RegisterCheck(bool isPrint) {
-            FormCheck();
             if (!DataCheck()) { return; }
 
             if (isPrint) {
@@ -233,30 +241,6 @@ namespace ProductDatabase {
             _productRegisterWork.RowID = connection.ExecuteScalar<int>("SELECT last_insert_rowid();");
         }
 
-        private bool FormCheck() {
-            var anyTextBoxEnabled = false;
-            var allTextBoxesFilled = true;
-
-            foreach (Control control in Controls) {
-                if (control is TextBoxBase textBox && textBox.Enabled) {
-                    anyTextBoxEnabled = true;
-                    if (string.IsNullOrWhiteSpace(textBox.Text) && textBox.Name != "QrCodeTextBox") {
-                        allTextBoxesFilled = false;
-                        break;
-                    }
-                }
-            }
-            string manufacturingNumber = ManufacturingNumberMaskedTextBox.Text.Trim();
-            return !anyTextBoxEnabled
-                ? throw new Exception("何も入力されていません")
-                : !allTextBoxesFilled
-                ? throw new Exception("空欄があります。")
-                : ManufacturingNumberCheckBox.Checked &&
-                    !manufacturingNumber.StartsWith("R", StringComparison.OrdinalIgnoreCase) &&
-                    manufacturingNumber.Length != 15
-                ? throw new Exception("製番を10桁+4桁で入力して下さい。")
-                : true;
-        }
         private bool DataCheck() {
             var revision = RevisionTextBox.Text.Trim();
             if (RevisionCheckBox.Checked) {
@@ -267,11 +251,6 @@ namespace ProductDatabase {
                 }
             }
 
-            if (string.IsNullOrWhiteSpace(QuantityTextBox.Text)) {
-                MessageBox.Show("数量を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                QuantityTextBox.Focus();
-                return false;
-            }
             if (!int.TryParse(QuantityTextBox.Text, out var quantity)) {
                 MessageBox.Show("数量は有効な数値を入力してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 QuantityTextBox.Focus();
@@ -473,6 +452,7 @@ namespace ProductDatabase {
                     TemplateButton.Enabled = checkBox.Checked;
                     break;
             }
+            ValidateAllInputs();
         }
         // 入力数値のみ
         private void NumericOnly(object sender, KeyPressEventArgs e) {
@@ -559,6 +539,97 @@ namespace ProductDatabase {
                 listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             };
             form.ShowDialog();
+        }
+
+        // 入力チェック
+        private void ValidateAllInputs() {
+            ErrorMessageLabel.Text = "";
+
+            LabelPrintButton.Enabled = _productMaster.IsLabelPrint;
+            BarcodePrintButton.Enabled = _productMaster.IsBarcodePrint;
+            NameplatePrintButton.Enabled = _productMaster.IsNameplatePrint;
+
+            var anyTextBoxEnabled = false;
+            var allTextBoxesFilled = true;
+
+            foreach (Control control in Controls) {
+                if (control is TextBoxBase textBox && textBox.Enabled) {
+                    anyTextBoxEnabled = true;
+                    if (string.IsNullOrWhiteSpace(textBox.Text)) {
+                        allTextBoxesFilled = false;
+                        break;
+                    }
+                }
+            }
+
+            // 未入力チェック
+            if (!anyTextBoxEnabled) {
+                ShowError("何も入力されていません");
+                return;
+            }
+
+            // 空欄チェック
+            if (!allTextBoxesFilled) {
+                ShowError("空欄があります。");
+                return;
+            }
+
+            string manufacturingNumber = ManufacturingNumberMaskedTextBox.Text.Trim();
+            if (ManufacturingNumberCheckBox.Checked) {
+                bool isValid = manufacturingNumber.Length == 15;
+                if (RNumberCheckBox.Checked) {
+                }
+                else if (!isValid) {
+                    ShowError("製番を10桁+4桁で入力して下さい。");
+                    return;
+                }
+            }
+
+            if (QuantityCheckBox.Checked) {
+                if (string.IsNullOrWhiteSpace(QuantityTextBox.Text)) {
+                    ShowError("数量を入力してください。");
+                    return;
+                }
+                if (!int.TryParse(QuantityTextBox.Text, out var quantity) || quantity <= 0) {
+                    ShowError("数量は1以上の有効な数値を入力してください。");
+                    return;
+                }
+            }
+
+            if (FirstSerialNumberCheckBox.Checked) {
+                if (string.IsNullOrWhiteSpace(FirstSerialNumberTextBox.Text)) {
+                    ShowError("数量を入力してください。");
+                    return;
+                }
+                if (!int.TryParse(FirstSerialNumberTextBox.Text, out var quantity) || quantity <= 0) {
+                    ShowError("シリアル開始番号は1以上の有効な数値を入力してください。");
+                    return;
+                }
+            }
+
+            var revision = RevisionTextBox.Text.Trim();
+            if (RevisionCheckBox.Checked) {
+                if (revision.Any(c => "IO".Contains(char.ToUpperInvariant(c)))) {
+                    ShowError("Revisionに I, O は使用できません。");
+                }
+            }
+
+            if (PersonComboBox.SelectedIndex == -1 && PersonComboBox.Enabled) {
+                ShowError("担当者が選択されていません。");
+                return;
+            }
+
+        }
+        private void ShowError(string message) {
+            ErrorMessageLabel.Text = message;
+            ErrorMessageLabel.ForeColor = Color.Red;
+            LabelPrintButton.Enabled = false;
+            BarcodePrintButton.Enabled = false;
+            NameplatePrintButton.Enabled = false;
+        }
+
+        private void InputControls_TextChanged(object? sender, EventArgs e) {
+            ValidateAllInputs();
         }
 
         private void RePrintWindow_Load(object sender, EventArgs e) { LoadEvents(); }

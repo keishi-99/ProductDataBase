@@ -30,6 +30,15 @@ namespace ProductDatabase {
             try {
                 Font = new Font(_appSettings.FontName, _appSettings.FontSize);
 
+                var inputControls = new Control[] {
+                    OrderNumberTextBox, ManufacturingNumberMaskedTextBox, QuantityTextBox, FirstSerialNumberTextBox, RevisionTextBox, OLesNumberTextBox, PersonComboBox, CommentTextBox
+                };
+                foreach (var ctrl in inputControls) {
+                    ctrl.TextChanged += InputControls_TextChanged;
+                }
+
+                ValidateAllInputs();
+
                 ProductNameLabel2.Text = _productMaster.ProductName;
                 SubstrateModelLabel2.Text = $"{_productMaster.ProductName} - {_productMaster.ProductModel}";
                 ProductTypeLabel2.Text = _productMaster.ProductType;
@@ -396,6 +405,7 @@ namespace ProductDatabase {
                 default:
                     break;
             }
+            ValidateAllInputs();
         }
         // 入力数値のみ
         private void NumericOnly(object sender, KeyPressEventArgs e) {
@@ -579,6 +589,92 @@ namespace ProductDatabase {
                 AcceptButton = ok;
                 CancelButton = cancel;
             }
+        }
+
+        // 入力チェック
+        private void ValidateAllInputs() {
+            ErrorMessageLabel.Text = "";
+            RegisterButton.Enabled = true;
+
+            var anyTextBoxEnabled = false;
+            var allTextBoxesFilled = true;
+
+            foreach (Control control in Controls) {
+                if (control is TextBoxBase textBox && textBox.Enabled) {
+                    anyTextBoxEnabled = true;
+                    if (string.IsNullOrWhiteSpace(textBox.Text)) {
+                        allTextBoxesFilled = false;
+                        break;
+                    }
+                }
+            }
+
+            // 未入力チェック
+            if (!anyTextBoxEnabled) {
+                ShowError("何も入力されていません");
+                return;
+            }
+
+            // 空欄チェック
+            if (!allTextBoxesFilled) {
+                ShowError("空欄があります。");
+                return;
+            }
+
+            string manufacturingNumber = ManufacturingNumberMaskedTextBox.Text.Trim();
+            if (ManufacturingNumberCheckBox.Checked) {
+                bool isValid = manufacturingNumber.Length == 15;
+                if (RNumberCheckBox.Checked) {
+                }
+                else if (!isValid) {
+                    ShowError("製番を10桁+4桁で入力して下さい。");
+                    return;
+                }
+            }
+
+            if (QuantityCheckBox.Checked) {
+                if (string.IsNullOrWhiteSpace(QuantityTextBox.Text)) {
+                    ShowError("数量を入力してください。");
+                    return;
+                }
+                if (!int.TryParse(QuantityTextBox.Text, out var quantity) || quantity <= 0) {
+                    ShowError("数量は1以上の有効な数値を入力してください。");
+                    return;
+                }
+            }
+
+            if (FirstSerialNumberCheckBox.Checked) {
+                if (string.IsNullOrWhiteSpace(FirstSerialNumberTextBox.Text)) {
+                    ShowError("数量を入力してください。");
+                    return;
+                }
+                if (!int.TryParse(FirstSerialNumberTextBox.Text, out var quantity) || quantity <= 0) {
+                    ShowError("シリアル開始番号は1以上の有効な数値を入力してください。");
+                    return;
+                }
+            }
+
+            var revision = RevisionTextBox.Text.Trim();
+            if (RevisionCheckBox.Checked) {
+                if (revision.Any(c => "IO".Contains(char.ToUpperInvariant(c)))) {
+                    ShowError("Revisionに I, O は使用できません。");
+                }
+            }
+
+            if (PersonComboBox.SelectedIndex == -1 && PersonComboBox.Enabled) {
+                ShowError("担当者が選択されていません。");
+                return;
+            }
+
+        }
+        private void ShowError(string message) {
+            ErrorMessageLabel.Text = message;
+            ErrorMessageLabel.ForeColor = Color.Red;
+            RegisterButton.Enabled = false;
+        }
+
+        private void InputControls_TextChanged(object? sender, EventArgs e) {
+            ValidateAllInputs();
         }
 
         private void ProductRegistration1Window_Load(object sender, EventArgs e) { LoadEvents(); }
