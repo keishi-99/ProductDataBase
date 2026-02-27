@@ -63,7 +63,7 @@
             this.RegisterButton = new Button();
             this.PrintOnlyCheckBox = new CheckBox();
             this.PrintButton = new Button();
-            this.panelCommentTexrBox = new Panel();
+            this.CommentTextBoxPanel = new Panel();
             this.label1 = new Label();
             this.QrCodeButton = new Button();
             this.QrCodeTextBox = new TextBox();
@@ -73,9 +73,12 @@
             this.StockLabel1 = new Label();
             this.StockLabel2 = new Label();
             this.otherNumberCheckBox = new CheckBox();
+            this.ErrorMessageLabel = new Label();
+            this.QrCodePanel = new Panel();
             this.SubstrateRegistrationMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPositionNumericUpDown).BeginInit();
-            this.panelCommentTexrBox.SuspendLayout();
+            this.CommentTextBoxPanel.SuspendLayout();
+            this.QrCodePanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // SubstrateRegistrationMenuStrip
@@ -457,7 +460,7 @@
             // 
             // PrintRowLabel
             // 
-            this.PrintRowLabel.Location = new Point(177, 392);
+            this.PrintRowLabel.Location = new Point(30, 392);
             this.PrintRowLabel.Margin = new Padding(0);
             this.PrintRowLabel.Name = "PrintRowLabel";
             this.PrintRowLabel.Size = new Size(79, 15);
@@ -466,7 +469,7 @@
             // 
             // PrintPositionNumericUpDown
             // 
-            this.PrintPositionNumericUpDown.Location = new Point(166, 410);
+            this.PrintPositionNumericUpDown.Location = new Point(19, 410);
             this.PrintPositionNumericUpDown.Margin = new Padding(0);
             this.PrintPositionNumericUpDown.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
             this.PrintPositionNumericUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
@@ -478,7 +481,7 @@
             // 
             // RegisterButton
             // 
-            this.RegisterButton.Location = new Point(313, 407);
+            this.RegisterButton.Location = new Point(278, 407);
             this.RegisterButton.Margin = new Padding(0);
             this.RegisterButton.Name = "RegisterButton";
             this.RegisterButton.Size = new Size(75, 25);
@@ -510,13 +513,13 @@
             this.PrintButton.UseVisualStyleBackColor = true;
             this.PrintButton.Click += this.PrintButton_Click;
             // 
-            // panelCommentTexrBox
+            // CommentTextBoxPanel
             // 
-            this.panelCommentTexrBox.Controls.Add(this.CommentTextBox);
-            this.panelCommentTexrBox.Location = new Point(313, 141);
-            this.panelCommentTexrBox.Name = "panelCommentTexrBox";
-            this.panelCommentTexrBox.Size = new Size(305, 193);
-            this.panelCommentTexrBox.TabIndex = 22;
+            this.CommentTextBoxPanel.Controls.Add(this.CommentTextBox);
+            this.CommentTextBoxPanel.Location = new Point(313, 141);
+            this.CommentTextBoxPanel.Name = "CommentTextBoxPanel";
+            this.CommentTextBoxPanel.Size = new Size(305, 193);
+            this.CommentTextBoxPanel.TabIndex = 22;
             // 
             // label1
             // 
@@ -539,7 +542,7 @@
             // 
             // QrCodeTextBox
             // 
-            this.QrCodeTextBox.Location = new Point(313, 39);
+            this.QrCodeTextBox.Location = new Point(0, 0);
             this.QrCodeTextBox.MaxLength = 100;
             this.QrCodeTextBox.Name = "QrCodeTextBox";
             this.QrCodeTextBox.Size = new Size(305, 23);
@@ -614,11 +617,29 @@
             this.otherNumberCheckBox.UseVisualStyleBackColor = true;
             this.otherNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
+            // ErrorMessageLabel
+            // 
+            this.ErrorMessageLabel.Location = new Point(115, 432);
+            this.ErrorMessageLabel.Name = "ErrorMessageLabel";
+            this.ErrorMessageLabel.Size = new Size(400, 15);
+            this.ErrorMessageLabel.TabIndex = 1000;
+            this.ErrorMessageLabel.Text = "----------";
+            this.ErrorMessageLabel.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // QrCodePanel
+            // 
+            this.QrCodePanel.Controls.Add(this.QrCodeTextBox);
+            this.QrCodePanel.Location = new Point(313, 39);
+            this.QrCodePanel.Name = "QrCodePanel";
+            this.QrCodePanel.Size = new Size(305, 23);
+            this.QrCodePanel.TabIndex = 1001;
+            // 
             // SubstrateRegistrationWindow
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(630, 441);
+            this.ClientSize = new Size(630, 455);
+            this.Controls.Add(this.ErrorMessageLabel);
             this.Controls.Add(this.otherNumberCheckBox);
             this.Controls.Add(this.StockLabel2);
             this.Controls.Add(this.StockLabel1);
@@ -627,7 +648,6 @@
             this.Controls.Add(this.textToUpperCheckBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.QrCodeButton);
-            this.Controls.Add(this.QrCodeTextBox);
             this.Controls.Add(this.PrintButton);
             this.Controls.Add(this.PrintOnlyCheckBox);
             this.Controls.Add(this.RegisterButton);
@@ -660,7 +680,8 @@
             this.Controls.Add(this.ProductNameLabel2);
             this.Controls.Add(this.ProductNameLabel1);
             this.Controls.Add(this.SubstrateRegistrationMenuStrip);
-            this.Controls.Add(this.panelCommentTexrBox);
+            this.Controls.Add(this.CommentTextBoxPanel);
+            this.Controls.Add(this.QrCodePanel);
             this.Font = new Font("Meiryo UI", 9F);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MainMenuStrip = this.SubstrateRegistrationMenuStrip;
@@ -675,8 +696,10 @@
             this.SubstrateRegistrationMenuStrip.ResumeLayout(false);
             this.SubstrateRegistrationMenuStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)this.PrintPositionNumericUpDown).EndInit();
-            this.panelCommentTexrBox.ResumeLayout(false);
-            this.panelCommentTexrBox.PerformLayout();
+            this.CommentTextBoxPanel.ResumeLayout(false);
+            this.CommentTextBoxPanel.PerformLayout();
+            this.QrCodePanel.ResumeLayout(false);
+            this.QrCodePanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -723,7 +746,7 @@
         private Button RegisterButton;
         private CheckBox PrintOnlyCheckBox;
         private Button PrintButton;
-        private Panel panelCommentTexrBox;
+        private Panel CommentTextBoxPanel;
         private Label label1;
         private Button QrCodeButton;
         private TextBox QrCodeTextBox;
@@ -733,5 +756,7 @@
         private Label StockLabel1;
         private Label StockLabel2;
         private CheckBox otherNumberCheckBox;
+        private Label ErrorMessageLabel;
+        private Panel QrCodePanel;
     }
 }

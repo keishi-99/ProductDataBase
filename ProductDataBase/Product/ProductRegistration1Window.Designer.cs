@@ -68,13 +68,16 @@
             this.RegistrationDateTimePicker = new DateTimePicker();
             this.RNumberCheckBox = new CheckBox();
             this.MessageTextBox = new RichTextBox();
+            this.ErrorMessageLabel = new Label();
+            this.QrCodePanel = new Panel();
             this.ProductRegistration1MenuStrip.SuspendLayout();
             this.panelCommentTextBox.SuspendLayout();
+            this.QrCodePanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // RegisterButton
             // 
-            this.RegisterButton.Location = new Point(313, 407);
+            this.RegisterButton.Location = new Point(278, 407);
             this.RegisterButton.Margin = new Padding(0);
             this.RegisterButton.Name = "RegisterButton";
             this.RegisterButton.Size = new Size(75, 25);
@@ -479,7 +482,7 @@
             // 
             // QrCodeTextBox
             // 
-            this.QrCodeTextBox.Location = new Point(313, 39);
+            this.QrCodeTextBox.Location = new Point(0, 0);
             this.QrCodeTextBox.MaxLength = 100;
             this.QrCodeTextBox.Name = "QrCodeTextBox";
             this.QrCodeTextBox.Size = new Size(305, 23);
@@ -562,11 +565,29 @@
             this.MessageTextBox.Text = "";
             this.MessageTextBox.WordWrap = false;
             // 
+            // ErrorMessageLabel
+            // 
+            this.ErrorMessageLabel.Location = new Point(115, 432);
+            this.ErrorMessageLabel.Name = "ErrorMessageLabel";
+            this.ErrorMessageLabel.Size = new Size(400, 15);
+            this.ErrorMessageLabel.TabIndex = 1001;
+            this.ErrorMessageLabel.Text = "----------";
+            this.ErrorMessageLabel.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // QrCodePanel
+            // 
+            this.QrCodePanel.Controls.Add(this.QrCodeTextBox);
+            this.QrCodePanel.Location = new Point(313, 39);
+            this.QrCodePanel.Name = "QrCodePanel";
+            this.QrCodePanel.Size = new Size(305, 23);
+            this.QrCodePanel.TabIndex = 1002;
+            // 
             // ProductRegistration1Window
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(630, 441);
+            this.ClientSize = new Size(630, 455);
+            this.Controls.Add(this.ErrorMessageLabel);
             this.Controls.Add(this.MessageTextBox);
             this.Controls.Add(this.RNumberCheckBox);
             this.Controls.Add(this.RegistrationDateTimePicker);
@@ -574,7 +595,6 @@
             this.Controls.Add(this.textToUpperCheckBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.QrCodeButton);
-            this.Controls.Add(this.QrCodeTextBox);
             this.Controls.Add(this.ProductTypeLabel2);
             this.Controls.Add(this.ProductTypeLabel1);
             this.Controls.Add(this.RegisterButton);
@@ -606,6 +626,7 @@
             this.Controls.Add(this.ProductNameLabel1);
             this.Controls.Add(this.ProductRegistration1MenuStrip);
             this.Controls.Add(this.panelCommentTextBox);
+            this.Controls.Add(this.QrCodePanel);
             this.Font = new Font("Meiryo UI", 9F);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MainMenuStrip = this.ProductRegistration1MenuStrip;
@@ -621,6 +642,8 @@
             this.ProductRegistration1MenuStrip.PerformLayout();
             this.panelCommentTextBox.ResumeLayout(false);
             this.panelCommentTextBox.PerformLayout();
+            this.QrCodePanel.ResumeLayout(false);
+            this.QrCodePanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -672,5 +695,7 @@
         private CheckBox RNumberCheckBox;
         private ToolStripMenuItem メッセージ設定ToolStripMenuItem;
         private RichTextBox MessageTextBox;
+        private Label ErrorMessageLabel;
+        private Panel QrCodePanel;
     }
 }
