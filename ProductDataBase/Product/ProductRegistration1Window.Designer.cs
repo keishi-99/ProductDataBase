@@ -78,7 +78,7 @@
             this.RegisterButton.Margin = new Padding(0);
             this.RegisterButton.Name = "RegisterButton";
             this.RegisterButton.Size = new Size(75, 25);
-            this.RegisterButton.TabIndex = 81;
+            this.RegisterButton.TabIndex = 25;
             this.RegisterButton.Text = "OK";
             this.RegisterButton.UseVisualStyleBackColor = true;
             this.RegisterButton.Click += this.RegisterButton_Click;
@@ -89,7 +89,7 @@
             this.TemplateButton.Location = new Point(543, 340);
             this.TemplateButton.Name = "TemplateButton";
             this.TemplateButton.Size = new Size(75, 25);
-            this.TemplateButton.TabIndex = 78;
+            this.TemplateButton.TabIndex = 24;
             this.TemplateButton.Text = "定型文";
             this.TemplateButton.UseVisualStyleBackColor = true;
             this.TemplateButton.Click += this.TemplateButton_Click;
@@ -103,7 +103,7 @@
             this.CommentComboBox.Location = new Point(313, 341);
             this.CommentComboBox.Name = "CommentComboBox";
             this.CommentComboBox.Size = new Size(224, 23);
-            this.CommentComboBox.TabIndex = 77;
+            this.CommentComboBox.TabIndex = 23;
             // 
             // CommentTextBox
             // 
@@ -116,7 +116,7 @@
             this.CommentTextBox.Name = "CommentTextBox";
             this.CommentTextBox.ScrollBars = ScrollBars.Vertical;
             this.CommentTextBox.Size = new Size(305, 193);
-            this.CommentTextBox.TabIndex = 76;
+            this.CommentTextBox.TabIndex = 22;
             // 
             // CommentCheckBox
             // 
@@ -124,7 +124,7 @@
             this.CommentCheckBox.Margin = new Padding(0);
             this.CommentCheckBox.Name = "CommentCheckBox";
             this.CommentCheckBox.Size = new Size(59, 19);
-            this.CommentCheckBox.TabIndex = 75;
+            this.CommentCheckBox.TabIndex = 21;
             this.CommentCheckBox.TabStop = false;
             this.CommentCheckBox.Text = "コメント";
             this.CommentCheckBox.UseVisualStyleBackColor = true;
@@ -138,7 +138,7 @@
             this.PersonComboBox.Location = new Point(166, 341);
             this.PersonComboBox.Name = "PersonComboBox";
             this.PersonComboBox.Size = new Size(121, 23);
-            this.PersonComboBox.TabIndex = 68;
+            this.PersonComboBox.TabIndex = 20;
             // 
             // PersonCheckBox
             // 
@@ -146,7 +146,7 @@
             this.PersonCheckBox.Margin = new Padding(0);
             this.PersonCheckBox.Name = "PersonCheckBox";
             this.PersonCheckBox.Size = new Size(62, 19);
-            this.PersonCheckBox.TabIndex = 67;
+            this.PersonCheckBox.TabIndex = 19;
             this.PersonCheckBox.TabStop = false;
             this.PersonCheckBox.Text = "担当者";
             this.PersonCheckBox.UseVisualStyleBackColor = true;
@@ -158,7 +158,7 @@
             this.RegistrationDateCheckBox.Margin = new Padding(0);
             this.RegistrationDateCheckBox.Name = "RegistrationDateCheckBox";
             this.RegistrationDateCheckBox.Size = new Size(62, 19);
-            this.RegistrationDateCheckBox.TabIndex = 65;
+            this.RegistrationDateCheckBox.TabIndex = 17;
             this.RegistrationDateCheckBox.TabStop = false;
             this.RegistrationDateCheckBox.Text = "登録日";
             this.RegistrationDateCheckBox.UseVisualStyleBackColor = true;
@@ -172,7 +172,7 @@
             this.FirstSerialNumberTextBox.MaxLength = 20;
             this.FirstSerialNumberTextBox.Name = "FirstSerialNumberTextBox";
             this.FirstSerialNumberTextBox.Size = new Size(120, 23);
-            this.FirstSerialNumberTextBox.TabIndex = 64;
+            this.FirstSerialNumberTextBox.TabIndex = 8;
             this.FirstSerialNumberTextBox.TextAlign = HorizontalAlignment.Right;
             // 
             // FirstSerialNumberCheckBox
@@ -181,7 +181,7 @@
             this.FirstSerialNumberCheckBox.Margin = new Padding(0);
             this.FirstSerialNumberCheckBox.Name = "FirstSerialNumberCheckBox";
             this.FirstSerialNumberCheckBox.Size = new Size(110, 19);
-            this.FirstSerialNumberCheckBox.TabIndex = 63;
+            this.FirstSerialNumberCheckBox.TabIndex = 7;
             this.FirstSerialNumberCheckBox.TabStop = false;
             this.FirstSerialNumberCheckBox.Text = "先頭シリアル番号";
             this.FirstSerialNumberCheckBox.UseVisualStyleBackColor = true;
@@ -195,7 +195,7 @@
             this.ExtraTextBox3.MaxLength = 20;
             this.ExtraTextBox3.Name = "ExtraTextBox3";
             this.ExtraTextBox3.Size = new Size(120, 23);
-            this.ExtraTextBox3.TabIndex = 62;
+            this.ExtraTextBox3.TabIndex = 16;
             this.ExtraTextBox3.TextAlign = HorizontalAlignment.Right;
             // 
             // ExtraCheckBox3
@@ -204,7 +204,7 @@
             this.ExtraCheckBox3.Margin = new Padding(0);
             this.ExtraCheckBox3.Name = "ExtraCheckBox3";
             this.ExtraCheckBox3.Size = new Size(50, 19);
-            this.ExtraCheckBox3.TabIndex = 61;
+            this.ExtraCheckBox3.TabIndex = 15;
             this.ExtraCheckBox3.TabStop = false;
             this.ExtraCheckBox3.Text = "予備";
             this.ExtraCheckBox3.UseVisualStyleBackColor = true;
@@ -218,7 +218,7 @@
             this.OLesNumberTextBox.MaxLength = 20;
             this.OLesNumberTextBox.Name = "OLesNumberTextBox";
             this.OLesNumberTextBox.Size = new Size(120, 23);
-            this.OLesNumberTextBox.TabIndex = 60;
+            this.OLesNumberTextBox.TabIndex = 14;
             this.OLesNumberTextBox.TextAlign = HorizontalAlignment.Right;
             // 
             // OLesNumberCheckBox
@@ -227,7 +227,7 @@
             this.OLesNumberCheckBox.Margin = new Padding(0);
             this.OLesNumberCheckBox.Name = "OLesNumberCheckBox";
             this.OLesNumberCheckBox.Size = new Size(79, 19);
-            this.OLesNumberCheckBox.TabIndex = 59;
+            this.OLesNumberCheckBox.TabIndex = 13;
             this.OLesNumberCheckBox.TabStop = false;
             this.OLesNumberCheckBox.Text = "OLes番号";
             this.OLesNumberCheckBox.UseVisualStyleBackColor = true;
@@ -241,7 +241,7 @@
             this.RevisionTextBox.MaxLength = 4;
             this.RevisionTextBox.Name = "RevisionTextBox";
             this.RevisionTextBox.Size = new Size(120, 23);
-            this.RevisionTextBox.TabIndex = 58;
+            this.RevisionTextBox.TabIndex = 10;
             this.RevisionTextBox.TextAlign = HorizontalAlignment.Right;
             // 
             // RevisionCheckBox
@@ -250,7 +250,7 @@
             this.RevisionCheckBox.Margin = new Padding(0);
             this.RevisionCheckBox.Name = "RevisionCheckBox";
             this.RevisionCheckBox.Size = new Size(68, 19);
-            this.RevisionCheckBox.TabIndex = 57;
+            this.RevisionCheckBox.TabIndex = 9;
             this.RevisionCheckBox.TabStop = false;
             this.RevisionCheckBox.Text = "レビジョン";
             this.RevisionCheckBox.UseVisualStyleBackColor = true;
@@ -264,7 +264,7 @@
             this.ExtraTextBox1.MaxLength = 4;
             this.ExtraTextBox1.Name = "ExtraTextBox1";
             this.ExtraTextBox1.Size = new Size(120, 23);
-            this.ExtraTextBox1.TabIndex = 56;
+            this.ExtraTextBox1.TabIndex = 12;
             this.ExtraTextBox1.TextAlign = HorizontalAlignment.Right;
             // 
             // ExtraCheckBox1
@@ -273,7 +273,7 @@
             this.ExtraCheckBox1.Margin = new Padding(0);
             this.ExtraCheckBox1.Name = "ExtraCheckBox1";
             this.ExtraCheckBox1.Size = new Size(62, 19);
-            this.ExtraCheckBox1.TabIndex = 55;
+            this.ExtraCheckBox1.TabIndex = 11;
             this.ExtraCheckBox1.TabStop = false;
             this.ExtraCheckBox1.Text = "予備";
             this.ExtraCheckBox1.UseVisualStyleBackColor = true;
@@ -287,7 +287,7 @@
             this.QuantityTextBox.MaxLength = 4;
             this.QuantityTextBox.Name = "QuantityTextBox";
             this.QuantityTextBox.Size = new Size(120, 23);
-            this.QuantityTextBox.TabIndex = 54;
+            this.QuantityTextBox.TabIndex = 6;
             this.QuantityTextBox.TextAlign = HorizontalAlignment.Right;
             this.QuantityTextBox.KeyPress += this.QuantityTextBox_KeyPress;
             // 
@@ -297,7 +297,7 @@
             this.QuantityCheckBox.Margin = new Padding(0);
             this.QuantityCheckBox.Name = "QuantityCheckBox";
             this.QuantityCheckBox.Size = new Size(50, 19);
-            this.QuantityCheckBox.TabIndex = 53;
+            this.QuantityCheckBox.TabIndex = 5;
             this.QuantityCheckBox.TabStop = false;
             this.QuantityCheckBox.Text = "数量";
             this.QuantityCheckBox.UseVisualStyleBackColor = true;
@@ -311,7 +311,7 @@
             this.ManufacturingNumberMaskedTextBox.Name = "ManufacturingNumberMaskedTextBox";
             this.ManufacturingNumberMaskedTextBox.PromptChar = '*';
             this.ManufacturingNumberMaskedTextBox.Size = new Size(120, 23);
-            this.ManufacturingNumberMaskedTextBox.TabIndex = 52;
+            this.ManufacturingNumberMaskedTextBox.TabIndex = 4;
             this.ManufacturingNumberMaskedTextBox.Text = "H";
             this.ManufacturingNumberMaskedTextBox.TextAlign = HorizontalAlignment.Right;
             // 
@@ -321,7 +321,7 @@
             this.ManufacturingNumberCheckBox.Margin = new Padding(0);
             this.ManufacturingNumberCheckBox.Name = "ManufacturingNumberCheckBox";
             this.ManufacturingNumberCheckBox.Size = new Size(74, 19);
-            this.ManufacturingNumberCheckBox.TabIndex = 51;
+            this.ManufacturingNumberCheckBox.TabIndex = 2;
             this.ManufacturingNumberCheckBox.TabStop = false;
             this.ManufacturingNumberCheckBox.Text = "製造番号";
             this.ManufacturingNumberCheckBox.UseVisualStyleBackColor = true;
@@ -335,7 +335,7 @@
             this.OrderNumberTextBox.MaxLength = 20;
             this.OrderNumberTextBox.Name = "OrderNumberTextBox";
             this.OrderNumberTextBox.Size = new Size(120, 23);
-            this.OrderNumberTextBox.TabIndex = 50;
+            this.OrderNumberTextBox.TabIndex = 1;
             this.OrderNumberTextBox.TextAlign = HorizontalAlignment.Right;
             // 
             // OrderNumberCheckBox
@@ -344,7 +344,7 @@
             this.OrderNumberCheckBox.Margin = new Padding(0);
             this.OrderNumberCheckBox.Name = "OrderNumberCheckBox";
             this.OrderNumberCheckBox.Size = new Size(74, 19);
-            this.OrderNumberCheckBox.TabIndex = 49;
+            this.OrderNumberCheckBox.TabIndex = 0;
             this.OrderNumberCheckBox.TabStop = false;
             this.OrderNumberCheckBox.Text = "注文番号";
             this.OrderNumberCheckBox.UseVisualStyleBackColor = true;
@@ -358,7 +358,7 @@
             this.SubstrateModelLabel2.Margin = new Padding(4, 0, 4, 0);
             this.SubstrateModelLabel2.Name = "SubstrateModelLabel2";
             this.SubstrateModelLabel2.Size = new Size(24, 17);
-            this.SubstrateModelLabel2.TabIndex = 46;
+            this.SubstrateModelLabel2.TabIndex = 999;
             this.SubstrateModelLabel2.Text = "---";
             this.SubstrateModelLabel2.TextAlign = ContentAlignment.MiddleLeft;
             // 
@@ -371,7 +371,7 @@
             this.SubstrateModelLabel1.Margin = new Padding(4, 0, 4, 0);
             this.SubstrateModelLabel1.Name = "SubstrateModelLabel1";
             this.SubstrateModelLabel1.Size = new Size(66, 17);
-            this.SubstrateModelLabel1.TabIndex = 45;
+            this.SubstrateModelLabel1.TabIndex = 999;
             this.SubstrateModelLabel1.Text = "製品型式 :";
             this.SubstrateModelLabel1.TextAlign = ContentAlignment.MiddleRight;
             // 
@@ -396,7 +396,7 @@
             this.ProductNameLabel2.Margin = new Padding(4, 0, 4, 0);
             this.ProductNameLabel2.Name = "ProductNameLabel2";
             this.ProductNameLabel2.Size = new Size(24, 17);
-            this.ProductNameLabel2.TabIndex = 44;
+            this.ProductNameLabel2.TabIndex = 999;
             this.ProductNameLabel2.Text = "---";
             this.ProductNameLabel2.TextAlign = ContentAlignment.MiddleLeft;
             // 
@@ -430,7 +430,7 @@
             this.ProductNameLabel1.Margin = new Padding(4, 0, 4, 0);
             this.ProductNameLabel1.Name = "ProductNameLabel1";
             this.ProductNameLabel1.Size = new Size(54, 17);
-            this.ProductNameLabel1.TabIndex = 43;
+            this.ProductNameLabel1.TabIndex = 999;
             this.ProductNameLabel1.Text = "製品名 :";
             this.ProductNameLabel1.TextAlign = ContentAlignment.MiddleRight;
             // 
@@ -441,7 +441,7 @@
             this.ProductRegistration1MenuStrip.Location = new Point(0, 0);
             this.ProductRegistration1MenuStrip.Name = "ProductRegistration1MenuStrip";
             this.ProductRegistration1MenuStrip.Size = new Size(630, 24);
-            this.ProductRegistration1MenuStrip.TabIndex = 42;
+            this.ProductRegistration1MenuStrip.TabIndex = 999;
             this.ProductRegistration1MenuStrip.Text = "menuStrip";
             // 
             // ProductTypeLabel2
@@ -452,7 +452,7 @@
             this.ProductTypeLabel2.Margin = new Padding(4, 0, 4, 0);
             this.ProductTypeLabel2.Name = "ProductTypeLabel2";
             this.ProductTypeLabel2.Size = new Size(24, 17);
-            this.ProductTypeLabel2.TabIndex = 83;
+            this.ProductTypeLabel2.TabIndex = 999;
             this.ProductTypeLabel2.Text = "---";
             this.ProductTypeLabel2.TextAlign = ContentAlignment.MiddleLeft;
             // 
@@ -465,7 +465,7 @@
             this.ProductTypeLabel1.Margin = new Padding(4, 0, 4, 0);
             this.ProductTypeLabel1.Name = "ProductTypeLabel1";
             this.ProductTypeLabel1.Size = new Size(44, 17);
-            this.ProductTypeLabel1.TabIndex = 82;
+            this.ProductTypeLabel1.TabIndex = 999;
             this.ProductTypeLabel1.Text = "タイプ :";
             this.ProductTypeLabel1.TextAlign = ContentAlignment.MiddleRight;
             // 
@@ -475,7 +475,7 @@
             this.panelCommentTextBox.Location = new Point(313, 141);
             this.panelCommentTextBox.Name = "panelCommentTextBox";
             this.panelCommentTextBox.Size = new Size(305, 193);
-            this.panelCommentTextBox.TabIndex = 84;
+            this.panelCommentTextBox.TabIndex = 22;
             // 
             // QrCodeTextBox
             // 
@@ -483,7 +483,7 @@
             this.QrCodeTextBox.MaxLength = 100;
             this.QrCodeTextBox.Name = "QrCodeTextBox";
             this.QrCodeTextBox.Size = new Size(305, 23);
-            this.QrCodeTextBox.TabIndex = 85;
+            this.QrCodeTextBox.TabIndex = 999;
             this.QrCodeTextBox.Enter += this.QrCodeTextBox_Enter;
             // 
             // QrCodeButton
@@ -491,7 +491,7 @@
             this.QrCodeButton.Location = new Point(543, 68);
             this.QrCodeButton.Name = "QrCodeButton";
             this.QrCodeButton.Size = new Size(75, 23);
-            this.QrCodeButton.TabIndex = 86;
+            this.QrCodeButton.TabIndex = 999;
             this.QrCodeButton.Text = "入力";
             this.QrCodeButton.UseVisualStyleBackColor = true;
             this.QrCodeButton.Click += this.QrCodeButton_Click;
@@ -502,7 +502,7 @@
             this.label1.Location = new Point(313, 21);
             this.label1.Name = "label1";
             this.label1.Size = new Size(86, 15);
-            this.label1.TabIndex = 87;
+            this.label1.TabIndex = 999;
             this.label1.Text = "QRコード入力用";
             // 
             // textToUpperCheckBox
@@ -513,7 +513,7 @@
             this.textToUpperCheckBox.Location = new Point(397, 71);
             this.textToUpperCheckBox.Name = "textToUpperCheckBox";
             this.textToUpperCheckBox.Size = new Size(140, 19);
-            this.textToUpperCheckBox.TabIndex = 608;
+            this.textToUpperCheckBox.TabIndex = 999;
             this.textToUpperCheckBox.Text = "小文字を大文字に変換";
             this.textToUpperCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -522,7 +522,7 @@
             this.RevisionChangeButton.Location = new Point(19, 375);
             this.RevisionChangeButton.Name = "RevisionChangeButton";
             this.RevisionChangeButton.Size = new Size(75, 25);
-            this.RevisionChangeButton.TabIndex = 609;
+            this.RevisionChangeButton.TabIndex = 999;
             this.RevisionChangeButton.Text = "Rev変更";
             this.RevisionChangeButton.UseVisualStyleBackColor = true;
             this.RevisionChangeButton.Click += this.RevisionChangeButton_Click;
@@ -533,7 +533,7 @@
             this.RegistrationDateTimePicker.Location = new Point(166, 291);
             this.RegistrationDateTimePicker.Name = "RegistrationDateTimePicker";
             this.RegistrationDateTimePicker.Size = new Size(120, 23);
-            this.RegistrationDateTimePicker.TabIndex = 612;
+            this.RegistrationDateTimePicker.TabIndex = 18;
             // 
             // RNumberCheckBox
             // 
@@ -541,7 +541,7 @@
             this.RNumberCheckBox.Location = new Point(96, 168);
             this.RNumberCheckBox.Name = "RNumberCheckBox";
             this.RNumberCheckBox.Size = new Size(46, 19);
-            this.RNumberCheckBox.TabIndex = 613;
+            this.RNumberCheckBox.TabIndex = 3;
             this.RNumberCheckBox.Text = "R番";
             this.RNumberCheckBox.UseVisualStyleBackColor = true;
             this.RNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
@@ -557,7 +557,7 @@
             this.MessageTextBox.ReadOnly = true;
             this.MessageTextBox.ScrollBars = RichTextBoxScrollBars.None;
             this.MessageTextBox.Size = new Size(450, 25);
-            this.MessageTextBox.TabIndex = 615;
+            this.MessageTextBox.TabIndex = 999;
             this.MessageTextBox.TabStop = false;
             this.MessageTextBox.Text = "";
             this.MessageTextBox.WordWrap = false;

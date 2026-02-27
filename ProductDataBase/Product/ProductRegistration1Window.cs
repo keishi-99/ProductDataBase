@@ -189,11 +189,6 @@ namespace ProductDatabase {
                     return;
                 }
 
-                var result = MessageBox.Show("入力に不備がないか確認して下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                if (result == DialogResult.Cancel) {
-                    return;
-                }
-
                 var firstSerial = -1;
                 if (_productMaster.IsSerialGeneration) {
 
