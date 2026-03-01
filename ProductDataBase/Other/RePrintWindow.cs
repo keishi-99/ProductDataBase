@@ -577,9 +577,7 @@ namespace ProductDatabase {
             string manufacturingNumber = ManufacturingNumberMaskedTextBox.Text.Trim();
             if (ManufacturingNumberCheckBox.Checked) {
                 bool isValid = manufacturingNumber.Length == 15;
-                if (RNumberCheckBox.Checked) {
-                }
-                else if (!isValid) {
+                if (!RNumberCheckBox.Checked && !isValid) {
                     ShowError("製番を10桁+4桁で入力して下さい。");
                     return;
                 }
@@ -598,7 +596,7 @@ namespace ProductDatabase {
 
             if (FirstSerialNumberCheckBox.Checked) {
                 if (string.IsNullOrWhiteSpace(FirstSerialNumberTextBox.Text)) {
-                    ShowError("数量を入力してください。");
+                    ShowError("シリアル開始番号を入力してください。");
                     return;
                 }
                 if (!int.TryParse(FirstSerialNumberTextBox.Text, out var quantity) || quantity <= 0) {
@@ -611,6 +609,7 @@ namespace ProductDatabase {
             if (RevisionCheckBox.Checked) {
                 if (revision.Any(c => "IO".Contains(char.ToUpperInvariant(c)))) {
                     ShowError("Revisionに I, O は使用できません。");
+                    return;
                 }
             }
 
