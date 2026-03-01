@@ -658,9 +658,7 @@ namespace ProductDatabase {
             string manufacturingNumber = ManufacturingNumberMaskedTextBox.Text.Trim();
             if (ManufacturingNumberCheckBox.Checked) {
                 bool isValid = manufacturingNumber.Length == 15;
-                if (otherNumberCheckBox.Checked) {
-                }
-                else if (!isValid) {
+                if (!otherNumberCheckBox.Checked && !isValid) {
                     ShowError("製番を10桁+4桁で入力して下さい。");
                     return;
                 }
