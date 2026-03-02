@@ -67,14 +67,14 @@ namespace ProductDatabase {
                 }
             }
 
-            public DataRow GetSubstrateById(int id) {
+            public DataRow GetSubstrateById(long id) {
                 return SubstrateDataTable
                     .AsEnumerable()
                     .SingleOrDefault(r => r.Field<long>("SubstrateID") == id)
                     ?? throw new InvalidOperationException($"基板ID [{id}] が見つかりません。");
             }
 
-            public DataRow GetProductById(int id) {
+            public DataRow GetProductById(long id) {
                 return ProductDataTable
                     .AsEnumerable()
                     .SingleOrDefault(r => r.Field<long>("ProductID") == id)
