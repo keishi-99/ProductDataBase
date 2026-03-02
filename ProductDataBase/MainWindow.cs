@@ -879,9 +879,9 @@ namespace ProductDatabase {
                     p.ProductType,
                     p.ProItemNumber
                 FROM
-                    {Constants.ProductTableName} AS s
+                    {Constants.ProductTableName} AS p
                 FULL JOIN
-                    {Constants.SubstrateTableName} AS p
+                    {Constants.SubstrateTableName} AS s
                 ON
                     s.SubItemNumber = p.ProItemNumber
                 WHERE
@@ -966,7 +966,7 @@ namespace ProductDatabase {
             window.ShowDialog(this);
         }
         private void HandleProductSelection(string productName, string productType) {
-            var productRet = _productRepository.SubstrateDataTable
+            var productRet = _productRepository.ProductDataTable
                 .AsEnumerable()
                 .Where(r => r["ProductName"]?.ToString() == productName &&
                             r["ProductType"]?.ToString() == productType)
