@@ -10,7 +10,7 @@ using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase.Print {
     // シリアル印刷管理クラス
-    public static class PrintManager {
+    public class PrintManager {
 
         public static ProductMaster ProductMaster { get; private set; } = default!;
         public static ProductRegisterWork ProductRegisterWork { get; private set; } = default!;
@@ -43,6 +43,9 @@ namespace ProductDatabase.Print {
                 ? ProductMaster.ProductModel[^4..]
                 : string.Empty;
 
+        public static SerialType CurrentSerialType { get; set; }
+        public enum SerialType { Label, Barcode, Nameplate, Substrate }
+
         public static void ProductInitialize(ProductMaster productMaster, ProductRegisterWork productRegisterWork, DocumentPrintSettings productPrintSettings, List<string> serialList) {
             ProductMaster = productMaster;
             ProductRegisterWork = productRegisterWork;
@@ -73,7 +76,7 @@ namespace ProductDatabase.Print {
             return (float)(mm / MmPerInch * dpi);
         }
 
-        public static bool PrintSerialCommon(PrintPageEventArgs e, bool isPreview, int startLine, string serialType) {
+        public static bool PrintSerialCommon(PrintPageEventArgs e, bool isPreview, int startLine, SerialType serialType) {
             try {
                 if (e.Graphics is null) { throw new InvalidOperationException("Graphics オブジェクトを取得できません。"); }
 
@@ -83,10 +86,10 @@ namespace ProductDatabase.Print {
                 var dpiY = e.Graphics.DpiY;
 
                 PrintSettingsBase printSettings = serialType switch {
-                    "Label" => PrintSettings.LabelPrintSettings!,
-                    "Barcode" => PrintSettings.BarcodePrintSettings!,
-                    "Substrate" => PrintSettings.LabelPrintSettings!,
-                    _ => throw new ArgumentException($"不明なシリアルタイプ: {serialType}")
+                    SerialType.Label => PrintSettings.LabelPrintSettings!,
+                    SerialType.Barcode => PrintSettings.BarcodePrintSettings!,
+                    SerialType.Substrate => PrintSettings.LabelPrintSettings!,
+                    _ => throw new ArgumentException($"不明なシリアルタイプ: {CurrentSerialType}")
                 };
 
                 var labelCountX = printSettings.LabelsPerColumn;
@@ -99,7 +102,7 @@ namespace ProductDatabase.Print {
                 var intervalYPx = ConvertMmToPixel(printSettings.IntervalY, dpiY);
                 var headerPositionXPx = ConvertMmToPixel(printSettings.HeaderPositionX, dpiX);
                 var headerPositionYPx = ConvertMmToPixel(printSettings.HeaderPositionY, dpiY);
-                var headerString = ConvertHeaderString(serialType, printSettings.HeaderTextFormat);
+                var headerString = ConvertHeaderString(CurrentSerialType, printSettings.HeaderTextFormat);
                 var headerFont = printSettings.HeaderFont;
 
                 var copiesPerLabel = printSettings.CopiesPerLabel;
@@ -134,7 +137,7 @@ namespace ProductDatabase.Print {
                             ? Last4ProductModel
                             : s_serialList[PrintCount];
 
-                        using var labelImage = MakeLabelImage(printText, serialType, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY, isPreview);
+                        using var labelImage = MakeLabelImage(printText, CurrentSerialType, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY, isPreview);
 
                         e.Graphics.DrawImage(labelImage, posX, posY, labelWidthPx, labelHeightPx);
 
@@ -164,7 +167,7 @@ namespace ProductDatabase.Print {
                 return false;
             }
         }
-        private static Bitmap MakeLabelImage(string text, string serialType, bool fontUnderline, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY, bool isPreview) {
+        private static Bitmap MakeLabelImage(string text, SerialType serialType, bool fontUnderline, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY, bool isPreview) {
 
             var widthPx = (int)Math.Round(labelWidthPx);
             var heightPx = (int)Math.Round(labelHeightPx);
@@ -180,13 +183,13 @@ namespace ProductDatabase.Print {
                 g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
 
                 switch (serialType) {
-                    case "Label":
+                    case SerialType.Label:
                         DrawLabel(g, text, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY);
                         break;
-                    case "Barcode":
+                    case SerialType.Barcode:
                         DrawBarcode(g, text, labelWidthPx, labelHeightPx, dpiX, dpiY);
                         break;
-                    case "Substrate":
+                    case SerialType.Substrate:
                         DrawLabel(g, text, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY);
                         break;
                 }
@@ -266,12 +269,12 @@ namespace ProductDatabase.Print {
             var layoutRectBarcode = new RectangleF(barcodePosX, barcodePosY, barcodeWidthPx, barcodeHeightPx);
             g.DrawImage(barcodeBitmap, layoutRectBarcode);
         }
-        private static string ConvertHeaderString(string serialType, string s) {
+        private static string ConvertHeaderString(SerialType serialType, string s) {
 
             var map = serialType switch {
-                "Label" => CreateProductMap(),
-                "Barcode" => CreateProductMap(),
-                "Substrate" => CreateSubstrateMap(),
+                SerialType.Label => CreateProductMap(),
+                SerialType.Barcode => CreateProductMap(),
+                SerialType.Substrate => CreateSubstrateMap(),
                 _ => throw new Exception($"不明な SerialType: {serialType}")
             };
 

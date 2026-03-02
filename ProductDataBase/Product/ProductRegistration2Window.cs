@@ -6,6 +6,7 @@ using ProductDatabase.Print;
 using System.Data;
 using static ProductDatabase.MainWindow;
 using static ProductDatabase.Other.CommonUtils;
+using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase {
@@ -25,11 +26,6 @@ namespace ProductDatabase {
 
         private int _serialLastNumber;
         private bool _isTransactionCommitted = false;
-
-        private string _serialType = string.Empty;
-        private const string SerialTypeLabel = "Label";
-        private const string SerialTypeBarcode = "Barcode";
-        private const string SerialTypeNameplate = "Nameplate";
 
         private readonly List<string> _serialList = [];
         private readonly List<string> _checkBoxNames = [
@@ -731,8 +727,8 @@ namespace ProductDatabase {
         }
         private void SerialCheck(SqliteConnection connection, bool print = true) {
 
-            _serialType = _productMaster.IsBarcodePrint ? SerialTypeBarcode : SerialTypeLabel;
-            _serialType = _productMaster.IsNameplatePrint ? SerialTypeNameplate : _serialType;
+            CurrentSerialType = _productMaster.IsBarcodePrint ? SerialType.Barcode : SerialType.Label;
+            CurrentSerialType = _productMaster.IsNameplatePrint ? SerialType.Nameplate : CurrentSerialType;
 
             for (var i = 0; i < _productRegisterWork.Quantity; i++) {
                 _serialList.Add(GenerateCode(_productRegisterWork.SerialFirstNumber + i));
@@ -778,7 +774,7 @@ namespace ProductDatabase {
         private void HandleLabelPrinting() {
             if (_productMaster.IsLabelPrint) {
                 MessageBox.Show("シリアルラベルを印刷します。");
-                _serialType = SerialTypeLabel;
+                CurrentSerialType = SerialType.Label;
 
                 if (!Print(true)) {
                     throw new OperationCanceledException("キャンセルしました。");
@@ -788,7 +784,7 @@ namespace ProductDatabase {
         private void HandleBarcodePrinting() {
             if (_productMaster.IsBarcodePrint) {
                 MessageBox.Show("バーコードラベルを印刷します。");
-                _serialType = SerialTypeBarcode;
+                CurrentSerialType = SerialType.Barcode;
 
                 if (!Print(true)) {
                     throw new OperationCanceledException("キャンセルしました。");
@@ -801,8 +797,8 @@ namespace ProductDatabase {
             BarcodePrintPositionNumericUpDown.Enabled = false;
         }
         private void GenerateSerialCodes() {
-            _serialType = _productMaster.IsBarcodePrint ? SerialTypeBarcode : SerialTypeLabel;
-            _serialType = _productMaster.IsNameplatePrint ? SerialTypeNameplate : _serialType;
+            CurrentSerialType = _productMaster.IsBarcodePrint ? SerialType.Barcode : SerialType.Label;
+            CurrentSerialType = _productMaster.IsNameplatePrint ? SerialType.Nameplate : CurrentSerialType;
             _productRegisterWork.SerialFirst = GenerateCode(_productRegisterWork.SerialFirstNumber);
             _productRegisterWork.SerialLast = GenerateCode(_serialLastNumber);
         }
@@ -840,11 +836,10 @@ namespace ProductDatabase {
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
                 var isPreview = !isPrint;
-                var serialType = _serialType;
 
-                var startLine = serialType switch {
-                    SerialTypeLabel => (int)SerialPrintPositionNumericUpDown.Value - 1,
-                    SerialTypeBarcode => (int)BarcodePrintPositionNumericUpDown.Value - 1,
+                var startLine = CurrentSerialType switch {
+                    SerialType.Label => (int)SerialPrintPositionNumericUpDown.Value - 1,
+                    SerialType.Barcode => (int)BarcodePrintPositionNumericUpDown.Value - 1,
                     _ => throw new Exception("SerialPrintType unknown")
                 };
 
@@ -852,7 +847,7 @@ namespace ProductDatabase {
                     PrintManager.ProductInitialize(_productMaster, _productRegisterWork, ProductPrintSettings, _serialList);
                 };
                 pd.PrintPage += (sender, e) => {
-                    var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, serialType);
+                    var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, CurrentSerialType);
                     e.HasMorePages = hasMore;
                 };
 
@@ -907,10 +902,10 @@ namespace ProductDatabase {
                 _ => monthCode
             };
 
-            var outputCode = _serialType switch {
-                SerialTypeLabel => LabelPrintSettings.TextFormat ?? string.Empty,
-                SerialTypeBarcode => BarcodePrintSettings.TextFormat ?? string.Empty,
-                SerialTypeNameplate => NameplatePrintSettings.TextFormat ?? string.Empty,
+            var outputCode = CurrentSerialType switch {
+                SerialType.Label => LabelPrintSettings.TextFormat ?? string.Empty,
+                SerialType.Barcode => BarcodePrintSettings.TextFormat ?? string.Empty,
+                SerialType.Nameplate => NameplatePrintSettings.TextFormat ?? string.Empty,
                 _ => string.Empty
             };
 
@@ -1112,7 +1107,7 @@ namespace ProductDatabase {
             Close();
         }
         private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            _serialType = SerialTypeLabel;
+            CurrentSerialType = SerialType.Label;
             if (_sqliteConnection is null) {
                 MessageBox.Show("データベース接続が確立されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -1121,7 +1116,7 @@ namespace ProductDatabase {
             Print(false);
         }
         private void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            _serialType = SerialTypeBarcode;
+            CurrentSerialType = SerialType.Barcode;
             if (_sqliteConnection is null) {
                 MessageBox.Show("データベース接続が確立されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -1130,25 +1125,25 @@ namespace ProductDatabase {
             Print(false);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
+            CurrentSerialType = SerialType.Label;
             using PrintSettingsWindow ls = new() {
-                ProductMaster = _productMaster,
-                serialType = SerialTypeLabel
+                ProductMaster = _productMaster
             };
             ls.ShowDialog(this);
             LoadSettings();
         }
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
+            CurrentSerialType = SerialType.Barcode;
             using PrintSettingsWindow ls = new() {
-                ProductMaster = _productMaster,
-                serialType = SerialTypeBarcode
+                ProductMaster = _productMaster
             };
             ls.ShowDialog(this);
             LoadSettings();
         }
         private void 銘版印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
+            CurrentSerialType = SerialType.Nameplate;
             using PrintSettingsWindow ls = new() {
-                ProductMaster = _productMaster,
-                serialType = SerialTypeNameplate
+                ProductMaster = _productMaster
             };
             ls.ShowDialog(this);
             LoadSettings();
