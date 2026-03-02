@@ -727,8 +727,7 @@ namespace ProductDatabase {
         }
         private void SerialCheck(SqliteConnection connection, bool print = true) {
 
-            CurrentSerialType = _productMaster.IsBarcodePrint ? SerialType.Barcode : SerialType.Label;
-            CurrentSerialType = _productMaster.IsNameplatePrint ? SerialType.Nameplate : CurrentSerialType;
+            CurrentSerialType = GetSerialTypeFromProductMaster();
 
             for (var i = 0; i < _productRegisterWork.Quantity; i++) {
                 _serialList.Add(GenerateCode(_productRegisterWork.SerialFirstNumber + i));
@@ -770,6 +769,11 @@ namespace ProductDatabase {
                 var message = string.Join(Environment.NewLine, list);
                 throw new Exception($"{message}{Environment.NewLine}は既に使用されているシリアルです。");
             }
+        }
+        private SerialType GetSerialTypeFromProductMaster() {
+            if (_productMaster.IsNameplatePrint) { return SerialType.Nameplate; }
+            if (_productMaster.IsBarcodePrint) { return SerialType.Barcode; }
+            return SerialType.Label;
         }
         private void HandleLabelPrinting() {
             if (_productMaster.IsLabelPrint) {

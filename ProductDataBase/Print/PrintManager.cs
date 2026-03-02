@@ -10,7 +10,7 @@ using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase.Print {
     // シリアル印刷管理クラス
-    public class PrintManager {
+    public static class PrintManager {
 
         public static ProductMaster ProductMaster { get; private set; } = default!;
         public static ProductRegisterWork ProductRegisterWork { get; private set; } = default!;
@@ -89,7 +89,7 @@ namespace ProductDatabase.Print {
                     SerialType.Label => PrintSettings.LabelPrintSettings!,
                     SerialType.Barcode => PrintSettings.BarcodePrintSettings!,
                     SerialType.Substrate => PrintSettings.LabelPrintSettings!,
-                    _ => throw new ArgumentException($"不明なシリアルタイプ: {CurrentSerialType}")
+                    _ => throw new ArgumentException($"不明なシリアルタイプ: {serialType}")
                 };
 
                 var labelCountX = printSettings.LabelsPerColumn;
@@ -102,7 +102,7 @@ namespace ProductDatabase.Print {
                 var intervalYPx = ConvertMmToPixel(printSettings.IntervalY, dpiY);
                 var headerPositionXPx = ConvertMmToPixel(printSettings.HeaderPositionX, dpiX);
                 var headerPositionYPx = ConvertMmToPixel(printSettings.HeaderPositionY, dpiY);
-                var headerString = ConvertHeaderString(CurrentSerialType, printSettings.HeaderTextFormat);
+                var headerString = ConvertHeaderString(serialType, printSettings.HeaderTextFormat);
                 var headerFont = printSettings.HeaderFont;
 
                 var copiesPerLabel = printSettings.CopiesPerLabel;
@@ -137,7 +137,7 @@ namespace ProductDatabase.Print {
                             ? Last4ProductModel
                             : s_serialList[PrintCount];
 
-                        using var labelImage = MakeLabelImage(printText, CurrentSerialType, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY, isPreview);
+                        using var labelImage = MakeLabelImage(printText, serialType, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY, isPreview);
 
                         e.Graphics.DrawImage(labelImage, posX, posY, labelWidthPx, labelHeightPx);
 
