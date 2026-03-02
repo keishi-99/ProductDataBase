@@ -3,6 +3,7 @@ using Microsoft.Data.Sqlite;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
 using static ProductDatabase.MainWindow;
+using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase {
@@ -315,7 +316,6 @@ namespace ProductDatabase {
             try {
                 using System.Drawing.Printing.PrintDocument pd = new();
                 var isPreview = !isPrint;
-                var serialType = _serialType;
 
                 var startLine = (int)PrintPositionNumericUpDown.Value - 1;
 
@@ -323,7 +323,7 @@ namespace ProductDatabase {
                     PrintManager.ProductInitialize(_productMaster, _productRegisterWork, ProductPrintSettings, _serialList);
                 };
                 pd.PrintPage += (sender, e) => {
-                    bool hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, serialType);
+                    bool hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, CurrentSerialType);
                     e.HasMorePages = hasMore;
                 };
 
@@ -655,25 +655,25 @@ namespace ProductDatabase {
             RegisterCheck(false);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
+            CurrentSerialType = SerialType.Label;
             PrintSettingsWindow ls = new() {
-                ProductMaster = _productMaster,
-                serialType = "Label"
+                ProductMaster = _productMaster
             };
             ls.ShowDialog(this);
             LoadSettings();
         }
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
+            CurrentSerialType = SerialType.Barcode;
             PrintSettingsWindow ls = new() {
-                ProductMaster = _productMaster,
-                serialType = "Barcode"
+                ProductMaster = _productMaster
             };
             ls.ShowDialog(this);
             LoadSettings();
         }
         private void 銘版印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
+            CurrentSerialType = SerialType.Nameplate;
             PrintSettingsWindow ls = new() {
-                ProductMaster = _productMaster,
-                serialType = "Nameplate"
+                ProductMaster = _productMaster
             };
             ls.ShowDialog(this);
             LoadSettings();

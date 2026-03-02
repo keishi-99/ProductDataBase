@@ -4,6 +4,7 @@ using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
 using static ProductDatabase.MainWindow;
+using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase {
@@ -401,13 +402,13 @@ namespace ProductDatabase {
 
                 var isPreview = !isPrint;
                 var startLine = (int)PrintPositionNumericUpDown.Value - 1;
-                var serialType = "Substrate";
+                CurrentSerialType = SerialType.Substrate;
 
                 pd.BeginPrint += (sender, e) => {
                     PrintManager.SubstrateInitialize(_substrateMaster, _substrateRegisterWork, SubstratePrintSettings, _serialList);
                 };
                 pd.PrintPage += (sender, e) => {
-                    var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, serialType);
+                    var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, CurrentSerialType);
                     e.HasMorePages = hasMore;
                 };
 
@@ -702,9 +703,9 @@ namespace ProductDatabase {
         private void DefectQuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { ProcessRegistration(false); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
+            CurrentSerialType = SerialType.Substrate;
             using (var ls = new PrintSettingsWindow {
-                SubstrateMaster = _substrateMaster,
-                serialType = "Substrate"
+                SubstrateMaster = _substrateMaster
             }) {
                 ls.ShowDialog(this);
             }
