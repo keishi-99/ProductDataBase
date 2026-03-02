@@ -70,15 +70,15 @@ namespace ProductDatabase {
             public DataRow GetSubstrateById(int id) {
                 return SubstrateDataTable
                     .AsEnumerable()
-                    .FirstOrDefault(r => r.Field<int>("SubstrateID") == id)
+                    .SingleOrDefault(r => r.Field<int>("SubstrateID") == id)
                     ?? throw new InvalidOperationException($"基板ID [{id}] が見つかりません。");
             }
 
             public DataRow GetProductById(int id) {
                 return ProductDataTable
                     .AsEnumerable()
-                    .FirstOrDefault(r => r.Field<int>("ProductID") == id)
-                    ?? throw new InvalidOperationException($"製品ID [{id}]が有りません。");
+                    .SingleOrDefault(r => r.Field<int>("ProductID") == id)
+                    ?? throw new InvalidOperationException($"製品ID [{id}] が見つかりません。");
             }
 
             // 製品IDから使用基板リストを取得
