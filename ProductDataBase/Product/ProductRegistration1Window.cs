@@ -31,11 +31,12 @@ namespace ProductDatabase {
                 Font = new Font(_appSettings.FontName, _appSettings.FontSize);
 
                 var inputControls = new Control[] {
-                    OrderNumberTextBox, ManufacturingNumberMaskedTextBox, QuantityTextBox, FirstSerialNumberTextBox, RevisionTextBox, OLesNumberTextBox, PersonComboBox, CommentTextBox
+                    OrderNumberTextBox, ManufacturingNumberMaskedTextBox, QuantityTextBox, FirstSerialNumberTextBox, RevisionTextBox, OLesNumberTextBox, CommentTextBox
                 };
                 foreach (var ctrl in inputControls) {
                     ctrl.TextChanged += InputControls_TextChanged;
                 }
+                PersonComboBox.SelectedIndexChanged += InputControls_TextChanged;
 
                 ValidateAllInputs();
 

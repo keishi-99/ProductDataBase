@@ -147,6 +147,7 @@
             this.Substrate11CheckBox = new CheckBox();
             this.RegistrationDateTimePicker = new DateTimePicker();
             this.MainPanel = new Panel();
+            this.ErrorMessageLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)this.Substrate10DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate9DataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.Substrate8DataGridView).BeginInit();
@@ -169,7 +170,7 @@
             // CloseButton
             // 
             this.CloseButton.Enabled = false;
-            this.CloseButton.Location = new Point(1126, 608);
+            this.CloseButton.Location = new Point(1126, 590);
             this.CloseButton.Name = "CloseButton";
             this.CloseButton.Size = new Size(100, 25);
             this.CloseButton.TabIndex = 57;
@@ -180,7 +181,7 @@
             // RegisterButton
             // 
             this.RegisterButton.Enabled = false;
-            this.RegisterButton.Location = new Point(1020, 608);
+            this.RegisterButton.Location = new Point(1020, 590);
             this.RegisterButton.Name = "RegisterButton";
             this.RegisterButton.Size = new Size(100, 25);
             this.RegisterButton.TabIndex = 56;
@@ -191,7 +192,7 @@
             // SubstrateListPrintButton
             // 
             this.SubstrateListPrintButton.Enabled = false;
-            this.SubstrateListPrintButton.Location = new Point(1126, 577);
+            this.SubstrateListPrintButton.Location = new Point(1126, 559);
             this.SubstrateListPrintButton.Name = "SubstrateListPrintButton";
             this.SubstrateListPrintButton.Size = new Size(100, 25);
             this.SubstrateListPrintButton.TabIndex = 54;
@@ -1448,6 +1449,7 @@
             // MainPanel
             // 
             this.MainPanel.AutoScroll = true;
+            this.MainPanel.Controls.Add(this.ErrorMessageLabel);
             this.MainPanel.Controls.Add(this.Substrate1CheckBox);
             this.MainPanel.Controls.Add(this.RegistrationDateTimePicker);
             this.MainPanel.Controls.Add(this.panelCommentTextBox);
@@ -1500,6 +1502,16 @@
             this.MainPanel.Name = "MainPanel";
             this.MainPanel.Size = new Size(1238, 645);
             this.MainPanel.TabIndex = 614;
+            // 
+            // ErrorMessageLabel
+            // 
+            this.ErrorMessageLabel.ImageAlign = ContentAlignment.MiddleRight;
+            this.ErrorMessageLabel.Location = new Point(1020, 618);
+            this.ErrorMessageLabel.Name = "ErrorMessageLabel";
+            this.ErrorMessageLabel.Size = new Size(206, 15);
+            this.ErrorMessageLabel.TabIndex = 614;
+            this.ErrorMessageLabel.Text = "------";
+            this.ErrorMessageLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // SubstrateChange2
             // 
@@ -1664,5 +1676,6 @@
         private CheckBox Substrate11CheckBox;
         private DateTimePicker RegistrationDateTimePicker;
         private Panel MainPanel;
+        private Label ErrorMessageLabel;
     }
 }
