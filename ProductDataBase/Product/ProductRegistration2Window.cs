@@ -801,8 +801,7 @@ namespace ProductDatabase {
             BarcodePrintPositionNumericUpDown.Enabled = false;
         }
         private void GenerateSerialCodes() {
-            CurrentSerialType = _productMaster.IsBarcodePrint ? SerialType.Barcode : SerialType.Label;
-            CurrentSerialType = _productMaster.IsNameplatePrint ? SerialType.Nameplate : CurrentSerialType;
+            CurrentSerialType = GetSerialTypeFromProductMaster();
             _productRegisterWork.SerialFirst = GenerateCode(_productRegisterWork.SerialFirstNumber);
             _productRegisterWork.SerialLast = GenerateCode(_serialLastNumber);
         }
