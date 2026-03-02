@@ -832,7 +832,7 @@ namespace ProductDatabase {
                 _productRegisterWork.Quantity = int.TryParse(arr[2], out var result) ? result : throw new Exception("数量に数値以外が入力されています。");
                 _productRegisterWork.OrderNumber = arr[3];
             } catch (Exception ex) {
-                throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}");
+                throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}", ex);
             }
         }
         private void BarcodeInput() {
