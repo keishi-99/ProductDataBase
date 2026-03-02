@@ -22,8 +22,6 @@ namespace ProductDatabase {
             _productRegisterWork = productRegisterWork;
             _appSettings = appSettings;
 
-            SubstrateChangeDataGridView.AllowUserToAddRows = false;
-            SubstrateChangeDataGridView.AllowUserToDeleteRows = false;
             SubstrateChangeDataGridView.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.Color.Lavender;
             SubstrateChangeDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             SubstrateChangeDataGridView.ColumnHeadersDefaultCellStyle.Font = new System.Drawing.Font(SubstrateChangeDataGridView.Font, FontStyle.Bold);
