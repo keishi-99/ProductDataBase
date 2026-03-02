@@ -103,9 +103,7 @@ namespace ProductDatabase {
         private void ConfigurePrintSettings() {
             FirstSerialNumberCheckBox.Checked = true;
 
-            シリアルラベル印刷プレビューToolStripMenuItem.Enabled = _productMaster.IsLabelPrint;
             シリアルラベル印刷設定ToolStripMenuItem.Enabled = _productMaster.IsLabelPrint;
-            バーコード印刷プレビューToolStripMenuItem.Enabled = _productMaster.IsBarcodePrint;
             バーコード印刷設定ToolStripMenuItem.Enabled = _productMaster.IsBarcodePrint;
             銘版印刷設定ToolStripMenuItem.Enabled = _productMaster.IsNameplatePrint;
 
@@ -546,6 +544,9 @@ namespace ProductDatabase {
             BarcodePrintButton.Enabled = _productMaster.IsBarcodePrint;
             NameplatePrintButton.Enabled = _productMaster.IsNameplatePrint;
 
+            シリアルラベル印刷プレビューToolStripMenuItem.Enabled = _productMaster.IsLabelPrint;
+            バーコード印刷プレビューToolStripMenuItem.Enabled = _productMaster.IsBarcodePrint;
+
             var anyTextBoxEnabled = false;
             var allTextBoxesFilled = true;
 
@@ -622,6 +623,8 @@ namespace ProductDatabase {
             LabelPrintButton.Enabled = false;
             BarcodePrintButton.Enabled = false;
             NameplatePrintButton.Enabled = false;
+            シリアルラベル印刷プレビューToolStripMenuItem.Enabled = false;
+            バーコード印刷プレビューToolStripMenuItem.Enabled = false;
         }
 
         private void InputControls_TextChanged(object? sender, EventArgs e) {
