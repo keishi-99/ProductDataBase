@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using static ProductDatabase.MainWindow;
+using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase {
@@ -16,7 +17,6 @@ namespace ProductDatabase {
         public SubstrateMaster SubstrateMaster { get; set; } = new SubstrateMaster();
         public AppSettings AppSettings { get; set; } = new AppSettings();
 
-        public string serialType = string.Empty;
         private bool _isLabelPrint;
         private bool _isBarcodePrint;
         private bool _isNameplatePrint;
@@ -54,11 +54,11 @@ namespace ProductDatabase {
             DocumentPrintSettings = settings;
             _documentPrintSettingFilePath = filePath;
 
-            PrintPropertyGrid.SelectedObject = serialType switch {
-                "Label" => DocumentPrintSettings.LabelPrintSettings,
-                "Barcode" => DocumentPrintSettings.BarcodePrintSettings,
-                "Nameplate" => DocumentPrintSettings.NameplatePrintSettings,
-                "Substrate" => DocumentPrintSettings.LabelPrintSettings,
+            PrintPropertyGrid.SelectedObject = CurrentSerialType switch {
+                SerialType.Label => DocumentPrintSettings.LabelPrintSettings,
+                SerialType.Barcode => DocumentPrintSettings.BarcodePrintSettings,
+                SerialType.Nameplate => DocumentPrintSettings.NameplatePrintSettings,
+                SerialType.Substrate => DocumentPrintSettings.LabelPrintSettings,
                 _ => null
             };
         }
