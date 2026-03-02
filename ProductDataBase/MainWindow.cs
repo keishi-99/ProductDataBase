@@ -8,7 +8,6 @@ using System.Data.Odbc;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
@@ -71,13 +70,15 @@ namespace ProductDatabase {
             public DataRow GetSubstrateById(int id) {
                 return SubstrateDataTable
                     .AsEnumerable()
-                    .First(r => Convert.ToInt32(r["SubstrateID"]) == id);
+                    .FirstOrDefault(r => Convert.ToInt32(r["SubstrateID"]) == id)
+                    ?? throw new Exception($"[{id}]が有りません。");
             }
 
             public DataRow GetProductById(int id) {
                 return ProductDataTable
                     .AsEnumerable()
-                    .First(r => Convert.ToInt32(r["ProductID"]) == id);
+                    .FirstOrDefault(r => Convert.ToInt32(r["ProductID"]) == id)
+                    ?? throw new Exception($"[{id}]が有りません。");
             }
 
             // 製品IDから使用基板リストを取得
@@ -331,7 +332,6 @@ namespace ProductDatabase {
                 SubstrateModel = string.Empty;
                 RegType = 0;
                 CheckBin = 0;
-                RegType = 0;
                 SerialPrintType = 0;
             }
         }
@@ -372,13 +372,13 @@ namespace ProductDatabase {
             public List<string> PersonList { get; set; } = [];
             public string FontName { get; set; } = "Meiryo UI";
             public float FontSize { get; set; } = 9;
+            public bool IsAdministrator { get; set; } = false;
+            public bool IsAuthorizedUser { get; set; } = false;
         }
         public class Config {
             public string BackupFolderPath { get; set; } = string.Empty;
             public string[] Administrators { get; set; } = [];
             public string[] AuthorizedUsers { get; set; } = [];
-            public static bool IsAdministrator { get; set; } = false;
-            public static bool IsAuthorizedUser { get; set; } = false;
         }
 
         private readonly ProductRepository _productRepository;
@@ -455,14 +455,14 @@ namespace ProductDatabase {
                     .Select(u => (string)u!)
                     .Where(u => u != null)
                     .ToHashSet(StringComparer.OrdinalIgnoreCase);
-                Config.IsAuthorizedUser = userSet?.Contains(Environment.UserName) ?? false;
+                _appSettings.IsAuthorizedUser = userSet?.Contains(Environment.UserName) ?? false;
 
                 // 管理者ユーザー名を取得
                 var adminSet = (jsonObj["Administrators"] as JArray)?
                     .Select(u => (string)u!)
                     .Where(u => u != null)
                     .ToHashSet(StringComparer.OrdinalIgnoreCase);
-                Config.IsAdministrator = adminSet?.Contains(Environment.UserName) ?? false;
+                _appSettings.IsAdministrator = adminSet?.Contains(Environment.UserName) ?? false;
 
                 _dsn = jsonObj["DSN"]?.ToString() ?? string.Empty;
                 _uid = jsonObj["UID"]?.ToString() ?? string.Empty;
@@ -471,7 +471,7 @@ namespace ProductDatabase {
                 _productRepository.LoadAll();
 
                 this.Activate();
-                QRCodePanel.Enabled = Config.IsAuthorizedUser;
+                QRCodePanel.Enabled = _appSettings.IsAuthorizedUser;
                 QRCodeTextBox.Select();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -607,32 +607,11 @@ namespace ProductDatabase {
             ResetFields();
 
             if (CategoryListBox3.SelectedItem is not ListItem<int> item) {
-                switch (RadioButtonNumber) {
-                    case 1:
-                        _substrateMaster.CategoryName = CategoryListBox1.SelectedItem?.ToString() ?? string.Empty;
-                        _substrateMaster.ProductName = CategoryListBox2.SelectedItem?.ToString() ?? string.Empty;
-                        break;
-                    case 2 or 3 or 4:
-                        _productMaster.CategoryName = CategoryListBox1.SelectedItem?.ToString() ?? string.Empty;
-                        _productMaster.ProductName = CategoryListBox2.SelectedItem?.ToString() ?? string.Empty;
-                        break;
-                }
+                LoadHistoryWithoutSelection();
             }
             else {
-                DataRow row = RadioButtonNumber switch {
-                    1 => _productRepository.GetSubstrateById(item.Id),
-                    2 or 3 or 4 => _productRepository.GetProductById(item.Id),
-                    _ => throw new InvalidOperationException("不正なモードです")
-                };
-
-                if (RadioButtonNumber == 1) {
-                    _substrateMaster.LoadFrom(row);
-                }
-                else {
-                    _productMaster.LoadFrom(row);
-                }
+                LoadHistoryWithSelection(item.Id);
             }
-
 
             using var window = new HistoryWindow(
                 _productMaster,
@@ -643,6 +622,30 @@ namespace ProductDatabase {
                 _appSettings);
 
             window.ShowDialog(this);
+        }
+        private void LoadHistoryWithoutSelection() {
+            switch (RadioButtonNumber) {
+                case 1:
+                    _substrateMaster.CategoryName = CategoryListBox1.SelectedItem?.ToString() ?? string.Empty;
+                    _substrateMaster.ProductName = CategoryListBox2.SelectedItem?.ToString() ?? string.Empty;
+                    break;
+                case 2 or 3 or 4:
+                    _productMaster.CategoryName = CategoryListBox1.SelectedItem?.ToString() ?? string.Empty;
+                    _productMaster.ProductName = CategoryListBox2.SelectedItem?.ToString() ?? string.Empty;
+                    break;
+            }
+        }
+        private void LoadHistoryWithSelection(int itemId) {
+            switch (RadioButtonNumber) {
+                case 1:
+                    _substrateMaster.LoadFrom(_productRepository.GetSubstrateById(itemId));
+                    break;
+                case 2 or 3 or 4:
+                    _productMaster.LoadFrom(_productRepository.GetProductById(itemId));
+                    break;
+                default:
+                    throw new InvalidOperationException("不正なモードです");
+            }
         }
 
         private record CategoryConfig(string OrderKey, string IdKey, string NameKey);
@@ -953,14 +956,7 @@ namespace ProductDatabase {
             OpenSubstrateRegistrationWindow(substrateRet);
         }
         private void OpenSubstrateRegistrationWindow(DataRow[] substrateRet) {
-            _substrateMaster.SubstrateID = Convert.ToInt32(substrateRet[0]["SubstrateID"] ?? throw new Exception("SubstrateID is null"));
-            _substrateMaster.CategoryName = substrateRet[0]["CategoryName"].ToString() ?? string.Empty;
-            _substrateMaster.ProductName = substrateRet[0]["ProductName"].ToString() ?? string.Empty;
-            _substrateMaster.SubstrateName = substrateRet[0]["SubstrateName"].ToString() ?? string.Empty;
-            _substrateMaster.SubstrateModel = substrateRet[0]["SubstrateModel"].ToString() ?? string.Empty;
-            _substrateMaster.RegType = Convert.ToInt32(substrateRet[0]["RegType"] ?? throw new Exception("RegType is null"));
-            _substrateMaster.CheckBin = Convert.ToInt32(substrateRet[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
-            _substrateMaster.SerialPrintType = Convert.ToInt32(substrateRet[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
+            _substrateMaster.LoadFrom(substrateRet[0]);
             _substrateRegisterWork.ProductNumber = _productRegisterWork.ProductNumber;
             _substrateRegisterWork.OrderNumber = _productRegisterWork.OrderNumber;
             _substrateRegisterWork.AddQuantity = _productRegisterWork.Quantity;
@@ -976,18 +972,7 @@ namespace ProductDatabase {
             OpenProductRegistrationWindow(productRet);
         }
         private void OpenProductRegistrationWindow(DataRow[] productRet) {
-            _productMaster.ProductID = Convert.ToInt32(productRet[0]["ProductID"] ?? throw new Exception("ProductID is null"));
-            _productMaster.CategoryName = productRet[0]["CategoryName"].ToString() ?? string.Empty;
-            _productMaster.ProductName = productRet[0]["ProductName"].ToString() ?? string.Empty;
-            _productMaster.ProductType = productRet[0]["ProductType"].ToString() ?? string.Empty;
-            _productMaster.ProductModel = productRet[0]["ProductModel"].ToString() ?? string.Empty;
-            _productMaster.Initial = productRet[0]["Initial"].ToString() ?? string.Empty;
-            _productMaster.RevisionGroup = Convert.ToInt32(productRet[0]["RevisionGroup"] ?? throw new Exception("RevisionGroup is null"));
-            _productMaster.RegType = Convert.ToInt32(productRet[0]["RegType"] ?? throw new Exception("RegType is null"));
-            _productMaster.CheckBin = Convert.ToInt32(productRet[0]["Checkbox"].ToString() ?? throw new Exception("Checkbox is null"), 2);
-            _productMaster.SerialDigitType = Convert.ToInt32(productRet[0]["SerialType"] ?? throw new Exception("SerialType is null"));
-            _productMaster.SerialPrintType = Convert.ToInt32(productRet[0]["SerialPrintType"] ?? throw new Exception("SerialPrintType is null"));
-            _productMaster.SheetPrintType = Convert.ToInt32(productRet[0]["SheetPrintType"] ?? throw new Exception("SheetPrintType is null"));
+            _productMaster.LoadFrom(productRet[0]);
             _productMaster.UseSubstrates = ProductRepository.GetUseSubstrates(_productMaster.ProductID);
             using ProductRegistration1Window window = new(_productMaster, _productRegisterWork, _appSettings);
             window.ShowDialog(this);
