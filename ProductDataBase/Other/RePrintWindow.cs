@@ -102,9 +102,6 @@ namespace ProductDatabase {
         // 印刷UI設定
         private void ConfigurePrintSettings() {
             FirstSerialNumberCheckBox.Checked = true;
-            LabelPrintButton.Enabled = _productMaster.IsLabelPrint;
-            BarcodePrintButton.Enabled = _productMaster.IsBarcodePrint;
-            NameplatePrintButton.Enabled = _productMaster.IsNameplatePrint;
 
             シリアルラベル印刷プレビューToolStripMenuItem.Enabled = _productMaster.IsLabelPrint;
             シリアルラベル印刷設定ToolStripMenuItem.Enabled = _productMaster.IsLabelPrint;
