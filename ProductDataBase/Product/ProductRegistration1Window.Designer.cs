@@ -156,6 +156,7 @@
             // 
             // RegistrationDateCheckBox
             // 
+            this.RegistrationDateCheckBox.AutoCheck = false;
             this.RegistrationDateCheckBox.Location = new Point(166, 268);
             this.RegistrationDateCheckBox.Margin = new Padding(0);
             this.RegistrationDateCheckBox.Name = "RegistrationDateCheckBox";
@@ -179,6 +180,7 @@
             // 
             // FirstSerialNumberCheckBox
             // 
+            this.FirstSerialNumberCheckBox.AutoCheck = false;
             this.FirstSerialNumberCheckBox.Location = new Point(19, 268);
             this.FirstSerialNumberCheckBox.Margin = new Padding(0);
             this.FirstSerialNumberCheckBox.Name = "FirstSerialNumberCheckBox";
@@ -295,6 +297,7 @@
             // 
             // QuantityCheckBox
             // 
+            this.QuantityCheckBox.AutoCheck = false;
             this.QuantityCheckBox.Location = new Point(19, 218);
             this.QuantityCheckBox.Margin = new Padding(0);
             this.QuantityCheckBox.Name = "QuantityCheckBox";
