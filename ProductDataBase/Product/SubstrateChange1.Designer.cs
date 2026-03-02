@@ -32,6 +32,8 @@
             // 
             // SubstrateChangeDataGridView
             // 
+            this.SubstrateChangeDataGridView.AllowUserToAddRows = false;
+            this.SubstrateChangeDataGridView.AllowUserToDeleteRows = false;
             this.SubstrateChangeDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             this.SubstrateChangeDataGridView.Location = new Point(0, 0);
             this.SubstrateChangeDataGridView.MultiSelect = false;
