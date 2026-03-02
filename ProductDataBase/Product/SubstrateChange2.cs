@@ -52,6 +52,9 @@ namespace ProductDatabase {
                 Font = new Font(_appSettings.FontName, _appSettings.FontSize);
                 CloseButton.Enabled = true;
 
+                PersonComboBox.SelectedIndexChanged += InputControls_TextChanged;
+                ValidateAllInputs();
+
                 // テキストボックスに入力
                 OrderNumberTextBox.Text = _productRegisterWork.OrderNumber;
                 ManufacturingNumberTextBox.Text = _productRegisterWork.ProductNumber;
@@ -179,8 +182,6 @@ namespace ProductDatabase {
                         }
                         break;
                 }
-
-                RegisterButton.Enabled = true;
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -562,6 +563,26 @@ namespace ProductDatabase {
                 MessageBox.Show("チェックがない場合在庫から引き落とされなくなります。", "",
                                MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
+        }
+        // 入力チェック
+        private void ValidateAllInputs() {
+            ErrorMessageLabel.Text = "";
+            RegisterButton.Enabled = true;
+
+            if (PersonComboBox.SelectedIndex == -1 && PersonComboBox.Enabled) {
+                ShowError("担当者が選択されていません。");
+                return;
+            }
+
+        }
+        private void ShowError(string message) {
+            ErrorMessageLabel.Text = message;
+            ErrorMessageLabel.ForeColor = Color.Red;
+            RegisterButton.Enabled = false;
+        }
+
+        private void InputControls_TextChanged(object? sender, EventArgs e) {
+            ValidateAllInputs();
         }
 
         private DataGridView? GetDataGridViewForCheckBox(string checkBoxName) {
