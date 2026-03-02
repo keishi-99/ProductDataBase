@@ -8,6 +8,7 @@ using System.Data.Odbc;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using static ProductDatabase.MainWindow;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
@@ -812,6 +813,7 @@ namespace ProductDatabase {
             _qrSettings.CategoryItemNumber.Clear();
             _qrSettings.CategoryProductType.Clear();
             _qrSettings.CategoryProductName.Clear();
+            _qrSettings.CategorySubstrateName.Clear();
             _qrSettings.CategoryType.Clear();
             ResetFields();
             Enabled = false;
@@ -830,7 +832,7 @@ namespace ProductDatabase {
                 _productRegisterWork.Quantity = int.TryParse(arr[2], out var result) ? result : throw new Exception("数量に数値以外が入力されています。");
                 _productRegisterWork.OrderNumber = arr[3];
             } catch (Exception ex) {
-                throw new Exception($"{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}");
+                throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}");
             }
         }
         private void BarcodeInput() {
