@@ -627,9 +627,11 @@ namespace ProductDatabase {
             }
         }
 
+        // 入力チェック
         private void ValidateAllInputs() {
             ErrorMessageLabel.Text = "";
             RegisterButton.Enabled = true;
+            印刷プレビューToolStripMenuItem.Enabled = true;
 
             var anyTextBoxEnabled = false;
             var allTextBoxesFilled = true;
@@ -686,6 +688,7 @@ namespace ProductDatabase {
             ErrorMessageLabel.Text = message;
             ErrorMessageLabel.ForeColor = Color.Red;
             RegisterButton.Enabled = false;
+            印刷プレビューToolStripMenuItem.Enabled = false;
         }
 
         private void InputControls_TextChanged(object? sender, EventArgs e) {
