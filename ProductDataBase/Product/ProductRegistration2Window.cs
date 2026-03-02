@@ -43,8 +43,8 @@ namespace ProductDatabase {
                         "Substrate11DataGridView", "Substrate12DataGridView", "Substrate13DataGridView", "Substrate14DataGridView","Substrate15DataGridView"
                         ];
 
-        private SqliteConnection? _sqliteConnection; // 編集モード用の接続
-        private SqliteTransaction? _sqliteTransaction; // 編集モード用のトランザクション
+        private SqliteConnection? _sqliteConnection;
+        private SqliteTransaction? _sqliteTransaction;
 
         public ProductRegistration2Window(ProductMaster productMaster, ProductRegisterWork productRegisterWork, AppSettings appSettings) {
             InitializeComponent();
