@@ -62,17 +62,16 @@
             this.panelCommentTextBox = new Panel();
             this.QrCodeTextBox = new TextBox();
             this.QrCodeButton = new Button();
-            this.label1 = new Label();
             this.textToUpperCheckBox = new CheckBox();
             this.RevisionChangeButton = new Button();
             this.RegistrationDateTimePicker = new DateTimePicker();
             this.RNumberCheckBox = new CheckBox();
             this.MessageTextBox = new RichTextBox();
             this.ErrorMessageLabel = new Label();
-            this.QrCodePanel = new Panel();
+            this.groupBox1 = new GroupBox();
             this.ProductRegistration1MenuStrip.SuspendLayout();
             this.panelCommentTextBox.SuspendLayout();
-            this.QrCodePanel.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // RegisterButton
@@ -482,7 +481,7 @@
             // 
             // QrCodeTextBox
             // 
-            this.QrCodeTextBox.Location = new Point(0, 0);
+            this.QrCodeTextBox.Location = new Point(9, 22);
             this.QrCodeTextBox.MaxLength = 100;
             this.QrCodeTextBox.Name = "QrCodeTextBox";
             this.QrCodeTextBox.Size = new Size(305, 23);
@@ -491,7 +490,7 @@
             // 
             // QrCodeButton
             // 
-            this.QrCodeButton.Location = new Point(543, 68);
+            this.QrCodeButton.Location = new Point(239, 51);
             this.QrCodeButton.Name = "QrCodeButton";
             this.QrCodeButton.Size = new Size(75, 23);
             this.QrCodeButton.TabIndex = 999;
@@ -499,21 +498,12 @@
             this.QrCodeButton.UseVisualStyleBackColor = true;
             this.QrCodeButton.Click += this.QrCodeButton_Click;
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new Point(313, 21);
-            this.label1.Name = "label1";
-            this.label1.Size = new Size(86, 15);
-            this.label1.TabIndex = 999;
-            this.label1.Text = "QRコード入力用";
-            // 
             // textToUpperCheckBox
             // 
             this.textToUpperCheckBox.AutoSize = true;
             this.textToUpperCheckBox.Checked = true;
             this.textToUpperCheckBox.CheckState = CheckState.Checked;
-            this.textToUpperCheckBox.Location = new Point(397, 71);
+            this.textToUpperCheckBox.Location = new Point(93, 54);
             this.textToUpperCheckBox.Name = "textToUpperCheckBox";
             this.textToUpperCheckBox.Size = new Size(140, 19);
             this.textToUpperCheckBox.TabIndex = 999;
@@ -574,27 +564,29 @@
             this.ErrorMessageLabel.Text = "----------";
             this.ErrorMessageLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // QrCodePanel
+            // groupBox1
             // 
-            this.QrCodePanel.Controls.Add(this.QrCodeTextBox);
-            this.QrCodePanel.Location = new Point(313, 39);
-            this.QrCodePanel.Name = "QrCodePanel";
-            this.QrCodePanel.Size = new Size(305, 23);
-            this.QrCodePanel.TabIndex = 1002;
+            this.groupBox1.Controls.Add(this.QrCodeTextBox);
+            this.groupBox1.Controls.Add(this.QrCodeButton);
+            this.groupBox1.Controls.Add(this.textToUpperCheckBox);
+            this.groupBox1.Location = new Point(298, 27);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new Size(320, 80);
+            this.groupBox1.TabIndex = 1003;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "QRコード入力用";
             // 
             // ProductRegistration1Window
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 455);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.ErrorMessageLabel);
             this.Controls.Add(this.MessageTextBox);
             this.Controls.Add(this.RNumberCheckBox);
             this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.RevisionChangeButton);
-            this.Controls.Add(this.textToUpperCheckBox);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.QrCodeButton);
             this.Controls.Add(this.ProductTypeLabel2);
             this.Controls.Add(this.ProductTypeLabel1);
             this.Controls.Add(this.RegisterButton);
@@ -626,7 +618,6 @@
             this.Controls.Add(this.ProductNameLabel1);
             this.Controls.Add(this.ProductRegistration1MenuStrip);
             this.Controls.Add(this.panelCommentTextBox);
-            this.Controls.Add(this.QrCodePanel);
             this.Font = new Font("Meiryo UI", 9F);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MainMenuStrip = this.ProductRegistration1MenuStrip;
@@ -642,8 +633,8 @@
             this.ProductRegistration1MenuStrip.PerformLayout();
             this.panelCommentTextBox.ResumeLayout(false);
             this.panelCommentTextBox.PerformLayout();
-            this.QrCodePanel.ResumeLayout(false);
-            this.QrCodePanel.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -688,7 +679,6 @@
         private Panel panelCommentTextBox;
         private TextBox QrCodeTextBox;
         private Button QrCodeButton;
-        private Label label1;
         private CheckBox textToUpperCheckBox;
         private Button RevisionChangeButton;
         private DateTimePicker RegistrationDateTimePicker;
@@ -696,6 +686,6 @@
         private ToolStripMenuItem メッセージ設定ToolStripMenuItem;
         private RichTextBox MessageTextBox;
         private Label ErrorMessageLabel;
-        private Panel QrCodePanel;
+        private GroupBox groupBox1;
     }
 }
