@@ -378,7 +378,6 @@
             // 
             // RegistrationDateCheckBox
             // 
-            this.RegistrationDateCheckBox.AutoCheck = false;
             this.RegistrationDateCheckBox.Location = new Point(166, 268);
             this.RegistrationDateCheckBox.Margin = new Padding(0);
             this.RegistrationDateCheckBox.Name = "RegistrationDateCheckBox";
