@@ -371,15 +371,6 @@ namespace ProductDatabase {
                     break;
                 case "QuantityCheckBox":
                     QuantityTextBox.Enabled = checkBox.Checked;
-                    if (checkBox.Checked) {
-                        ExtraCheckBox1.Checked = false;
-                    }
-                    break;
-                case "DefectNumberCheckBox":
-                    ExtraTextBox1.Enabled = checkBox.Checked;
-                    if (checkBox.Checked) {
-                        QuantityCheckBox.Checked = false;
-                    }
                     break;
                 case "RevisionCheckBox":
                     RevisionTextBox.Enabled = checkBox.Checked;
