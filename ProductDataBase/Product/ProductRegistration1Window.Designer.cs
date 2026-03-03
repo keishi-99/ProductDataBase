@@ -164,7 +164,7 @@
             this.RegistrationDateCheckBox.TabStop = false;
             this.RegistrationDateCheckBox.Text = "登録日";
             this.RegistrationDateCheckBox.UseVisualStyleBackColor = true;
-            this.RegistrationDateCheckBox.CheckedChanged += this.NumberCheckBox_CheckedChanged;
+            this.RegistrationDateCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // FirstSerialNumberTextBox
             // 
