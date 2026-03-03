@@ -369,6 +369,18 @@ namespace ProductDatabase {
                 case "RNumberCheckBox":
                     ManufacturingNumberMaskedTextBox.Mask = checkBox.Checked ? "R00000000000000" : ">LA00A00000-0000";
                     break;
+                case "QuantityCheckBox":
+                    QuantityTextBox.Enabled = checkBox.Checked;
+                    if (checkBox.Checked) {
+                        ExtraCheckBox1.Checked = false;
+                    }
+                    break;
+                case "DefectNumberCheckBox":
+                    ExtraTextBox1.Enabled = checkBox.Checked;
+                    if (checkBox.Checked) {
+                        QuantityCheckBox.Checked = false;
+                    }
+                    break;
                 case "RevisionCheckBox":
                     RevisionTextBox.Enabled = checkBox.Checked;
                     break;
@@ -380,6 +392,12 @@ namespace ProductDatabase {
                     break;
                 case "ExtraCheckBox3":
                     ExtraTextBox3.Enabled = checkBox.Checked;
+                    break;
+                case "FirstSerialNumberCheckBox":
+                    FirstSerialNumberTextBox.Enabled = checkBox.Checked;
+                    break;
+                case "RegistrationDateCheckBox":
+                    RegistrationDateTimePicker.Enabled = checkBox.Checked;
                     break;
                 case "PersonCheckBox":
                     PersonComboBox.Enabled = checkBox.Checked;
