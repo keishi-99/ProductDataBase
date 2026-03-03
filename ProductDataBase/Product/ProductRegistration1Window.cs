@@ -677,7 +677,6 @@ namespace ProductDatabase {
         private void RevisionChangeButton_Click(object sender, EventArgs e) { RevisionChange(); }
         private void RegisterButton_Click(object sender, EventArgs e) { RegisterCheck(); }
         private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
-        private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void メッセージ設定ToolStripMenuItem_Click(object sender, EventArgs e) { ProductMessageChange(); }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }

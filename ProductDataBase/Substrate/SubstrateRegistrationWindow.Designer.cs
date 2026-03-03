@@ -198,7 +198,7 @@
             this.OrderNumberCheckBox.TabStop = false;
             this.OrderNumberCheckBox.Text = "注文番号";
             this.OrderNumberCheckBox.UseVisualStyleBackColor = true;
-            this.OrderNumberCheckBox.CheckedChanged += this.NumberCheckBox_CheckedChanged;
+            this.OrderNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // OrderNumberTextBox
             // 

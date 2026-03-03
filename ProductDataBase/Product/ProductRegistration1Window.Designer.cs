@@ -130,7 +130,7 @@
             this.CommentCheckBox.TabStop = false;
             this.CommentCheckBox.Text = "コメント";
             this.CommentCheckBox.UseVisualStyleBackColor = true;
-            this.CommentCheckBox.CheckedChanged += this.NumberCheckBox_CheckedChanged;
+            this.CommentCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // PersonComboBox
             // 
@@ -152,7 +152,7 @@
             this.PersonCheckBox.TabStop = false;
             this.PersonCheckBox.Text = "担当者";
             this.PersonCheckBox.UseVisualStyleBackColor = true;
-            this.PersonCheckBox.CheckedChanged += this.NumberCheckBox_CheckedChanged;
+            this.PersonCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // RegistrationDateCheckBox
             // 
