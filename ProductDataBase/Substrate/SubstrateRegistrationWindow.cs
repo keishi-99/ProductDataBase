@@ -704,7 +704,6 @@ namespace ProductDatabase {
         private void PrintButton_Click(object sender, EventArgs e) { ProcessRegistration(true); }
         private void OpenSubstrateInformationButton_Click(object sender, EventArgs e) { OpenSubstrateInformation(); }
         private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
-        private void NumberCheckBox_CheckedChanged(object sender, EventArgs e) { CheckBoxChecked(sender, e); }
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void DefectQuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { ProcessRegistration(false); }
