@@ -525,9 +525,6 @@ namespace ProductDatabase {
                 case "ExtraCheckBox3":
                     ExtraTextBox3.Enabled = checkBox.Checked;
                     break;
-                case "RegistrationDateCheckBox":
-                    RegistrationDateTimePicker.Enabled = checkBox.Checked;
-                    break;
                 case "PersonCheckBox":
                     PersonComboBox.Enabled = checkBox.Checked;
                     break;
