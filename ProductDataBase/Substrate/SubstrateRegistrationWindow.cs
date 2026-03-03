@@ -41,6 +41,8 @@ namespace ProductDatabase {
         public SubstrateRegistrationWindow(SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork, AppSettings appSettings) {
             InitializeComponent();
 
+            RegistrationDateCheckBox.AutoCheck = false;
+
             _substrateMaster = substrateMaster;
             _substrateRegisterWork = substrateRegisterWork;
             _appSettings = appSettings;

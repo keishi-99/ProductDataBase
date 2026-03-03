@@ -32,6 +32,10 @@ namespace ProductDatabase {
         public RePrintWindow(ProductMaster productMaster, ProductRegisterWork productRegisterWork, AppSettings appSettings) {
             InitializeComponent();
 
+            RegistrationDateCheckBox.AutoCheck = false;
+            FirstSerialNumberCheckBox.AutoCheck = false;
+            QuantityCheckBox.AutoCheck = false;
+
             _productMaster = productMaster;
             _productRegisterWork = productRegisterWork;
             _appSettings = appSettings;
