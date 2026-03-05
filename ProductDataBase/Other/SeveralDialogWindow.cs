@@ -1,4 +1,4 @@
-﻿using static ProductDatabase.MainWindow;
+﻿using static ProductDatabase.ProductRepository;
 
 namespace ProductDatabase {
     public partial class SeveralDialogWindow : Form {

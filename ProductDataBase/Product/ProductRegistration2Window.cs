@@ -4,7 +4,7 @@ using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
 using System.Data;
-using static ProductDatabase.MainWindow;
+using static ProductDatabase.ProductRepository;
 using static ProductDatabase.Other.CommonUtils;
 using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;

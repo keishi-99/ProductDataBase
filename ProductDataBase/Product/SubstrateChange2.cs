@@ -2,7 +2,7 @@
 using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
-using static ProductDatabase.MainWindow;
+using static ProductDatabase.ProductRepository;
 
 namespace ProductDatabase {
     public partial class SubstrateChange2 : Form {

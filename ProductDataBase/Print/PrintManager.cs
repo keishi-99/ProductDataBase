@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using ZXing;
 using ZXing.Windows.Compatibility;
-using static ProductDatabase.MainWindow;
+using static ProductDatabase.ProductRepository;
 using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase.Print {
