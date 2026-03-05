@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.Sqlite;
 using System.Data;
-using static ProductDatabase.MainWindow;
+using static ProductDatabase.ProductRepository;
 using static ProductDatabase.ProductRegistration2Window;
 
 namespace ProductDatabase.Other {

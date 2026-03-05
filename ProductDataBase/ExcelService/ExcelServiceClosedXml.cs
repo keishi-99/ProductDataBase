@@ -6,7 +6,7 @@ using ZXing;
 using ZXing.QrCode;
 using ZXing.QrCode.Internal;
 using ZXing.Windows.Compatibility;
-using static ProductDatabase.MainWindow;
+using static ProductDatabase.ProductRepository;
 
 namespace ProductDatabase.ExcelService {
     internal class ExcelServiceClosedXml {

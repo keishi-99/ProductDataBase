@@ -3,7 +3,7 @@ using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using System.Data;
-using static ProductDatabase.MainWindow;
+using static ProductDatabase.ProductRepository;
 
 namespace ProductDatabase {
     public partial class HistoryWindow : Form {

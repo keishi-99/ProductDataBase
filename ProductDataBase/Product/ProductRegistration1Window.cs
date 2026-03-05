@@ -2,7 +2,7 @@
 using Microsoft.Data.Sqlite;
 using Newtonsoft.Json.Linq;
 using ProductDatabase.Other;
-using static ProductDatabase.MainWindow;
+using static ProductDatabase.ProductRepository;
 
 namespace ProductDatabase {
     public partial class ProductRegistration1Window : Form {
@@ -111,13 +111,7 @@ namespace ProductDatabase {
                     var nextSerialNumber = serialLastNum + 1;
 
                     // シリアル番号の桁数に応じて、閾値とリセット値を設定
-                    (var minNumber, var maxNumber, var digit) = _productMaster.SerialDigitType switch {
-                        3 => (1, 999, 3),
-                        4 => (1, 9999, 4),
-                        101 => (1, 899, 3),
-                        102 => (901, 999, 3),
-                        _ => throw new InvalidOperationException("不明なシリアル桁数です。")
-                    };
+                    (var minNumber, var maxNumber, var digit) = _productMaster.GetSerialRange();
 
                     if (nextSerialNumber > maxNumber || nextSerialNumber < minNumber) {// あるいは firstSerialが minNumber未満の場合も対象に
                         MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -144,27 +138,9 @@ namespace ProductDatabase {
         // 登録チェック
         private void RegisterCheck() {
             try {
-                var anyTextBoxEnabled = false;
-                var allTextBoxesFilled = true;
-
-                foreach (Control control in Controls) {
-                    if (control is TextBoxBase textBox && textBox.Enabled) {
-                        anyTextBoxEnabled = true;
-                        if (string.IsNullOrWhiteSpace(textBox.Text) && textBox.Name != "QrCodeTextBox") {
-                            allTextBoxesFilled = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (PersonComboBox.SelectedIndex == -1 && PersonComboBox.Enabled) {
-                    MessageBox.Show("担当者が選択されていません。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    PersonComboBox.Focus();
-                    return;
-                }
-
-                if (!anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
-                if (!allTextBoxesFilled || (PersonCheckBox.Checked && string.IsNullOrWhiteSpace(PersonComboBox.Text))) { throw new Exception("空欄があります。"); }
+                // ValidateAllInputs が既にリアルタイムでチェック済みのため、エラー状態なら早期リターン
+                ValidateAllInputs();
+                if (!RegisterButton.Enabled) return;
 
                 var revision = RevisionTextBox.Text.Trim();
                 if (RevisionCheckBox.Checked) {
@@ -224,13 +200,7 @@ namespace ProductDatabase {
 
                     var calculatedLastSerial = quantity + firstSerial - 1;
 
-                    (var minNumber, var maxNumber, var digit) = _productMaster.SerialDigitType switch {
-                        3 => (1, 999, 3),
-                        4 => (1, 9999, 4),
-                        101 => (1, 899, 3),
-                        102 => (901, 999, 3),
-                        _ => throw new InvalidOperationException("不明なシリアル桁数です。")
-                    };
+                    (var minNumber, var maxNumber, var digit) = _productMaster.GetSerialRange();
 
                     if (calculatedLastSerial > maxNumber || firstSerial < minNumber) {
                         MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -431,7 +401,7 @@ namespace ProductDatabase {
             string[] logMessageArray = [
                 $"[Rev変更]",
                 $"[{productMaster.CategoryName}]",
-                $"ID{id}]",
+                $"[ID{id}]",
                 $"[]",
                 $"[]",
                 $"[]",
