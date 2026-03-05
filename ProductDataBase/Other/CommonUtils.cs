@@ -137,6 +137,17 @@ namespace ProductDatabase.Other {
                 }
             }
         }
+        /// <summary>
+        /// 月コードを取得します（10月→X, 11月→Y, 12月→Z, それ以外→MM形式）。
+        /// </summary>
+        public static string ToMonthCode(DateTime date) =>
+            date.ToString("MM") switch {
+                "10" => "X",
+                "11" => "Y",
+                "12" => "Z",
+                var m => m
+            };
+
         // CapsLockがオンになっていたらCapsLockを解除する
         public static partial class Keyboard {
             private const byte VK_CAPITAL = 0x14; // CapsLock の仮想キーコード
