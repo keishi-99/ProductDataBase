@@ -1,7 +1,5 @@
 ﻿using Dapper;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
 using ProductDatabase.Other;
 using System.Data;
 using System.Data.Odbc;
@@ -69,38 +67,31 @@ namespace ProductDatabase {
                 if (!File.Exists(_jsonFilePath)) {
                     throw new DirectoryNotFoundException($"'{_jsonFilePath}'\nが見つかりません。");
                 }
-                var jsonText = File.ReadAllText(_jsonFilePath);
-                var jsonObj = JObject.Parse(jsonText);
+                var generalSettings = System.Text.Json.JsonSerializer.Deserialize<GeneralSettings>(
+                    File.ReadAllText(_jsonFilePath),
+                    new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                ) ?? new GeneralSettings();
 
-                // CloneFolderPathを取得
-                CommonUtils.s_backupPath = jsonObj["BackupFolderPath"]?.ToString() ?? string.Empty;
+                // バックアップパス取得
+                CommonUtils.BackupPath = generalSettings.BackupFolderPath;
 
                 // バックアップ作成
                 CreateDailyBackup();
 
                 // 担当者取得
-                _appSettings.PersonList.Clear();
-                foreach (var person in jsonObj["Persons"]!) {
-                    _appSettings.PersonList.Add(person.ToString()!);
-                }
+                _appSettings.PersonList = [.. generalSettings.Persons];
 
                 // 認証ユーザー名を取得
-                var userSet = (jsonObj["AuthorizedUsers"] as JArray)?
-                    .Select(u => (string)u!)
-                    .Where(u => u != null)
-                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
-                _appSettings.IsAuthorizedUser = userSet?.Contains(Environment.UserName) ?? false;
+                _appSettings.IsAuthorizedUser = generalSettings.AuthorizedUsers
+                    .Contains(Environment.UserName, StringComparer.OrdinalIgnoreCase);
 
                 // 管理者ユーザー名を取得
-                var adminSet = (jsonObj["Administrators"] as JArray)?
-                    .Select(u => (string)u!)
-                    .Where(u => u != null)
-                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
-                _appSettings.IsAdministrator = adminSet?.Contains(Environment.UserName) ?? false;
+                _appSettings.IsAdministrator = generalSettings.Administrators
+                    .Contains(Environment.UserName, StringComparer.OrdinalIgnoreCase);
 
-                _dsn = jsonObj["DSN"]?.ToString() ?? string.Empty;
-                _uid = jsonObj["UID"]?.ToString() ?? string.Empty;
-                _pwd = jsonObj["PWD"]?.ToString() ?? string.Empty;
+                _dsn = generalSettings.DSN;
+                _uid = generalSettings.UID;
+                _pwd = generalSettings.PWD;
 
                 _productRepository.LoadAll();
 
@@ -113,15 +104,15 @@ namespace ProductDatabase {
         }
         private static void CreateDailyBackup() {
             // フォルダ未設定
-            if (string.IsNullOrWhiteSpace(CommonUtils.s_backupPath)) {
+            if (string.IsNullOrWhiteSpace(CommonUtils.BackupPath)) {
                 MessageBox.Show("フォルダが設定されていません。バックアップは保存されません。",
                     string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
             // ネットワークフォルダが見つからない
-            if (!Directory.Exists(CommonUtils.s_backupPath)) {
-                MessageBox.Show($"'{CommonUtils.s_backupPath}'\nが見つかりません。バックアップは保存されません。",
+            if (!Directory.Exists(CommonUtils.BackupPath)) {
+                MessageBox.Show($"'{CommonUtils.BackupPath}'\nが見つかりません。バックアップは保存されません。",
                     string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
@@ -133,7 +124,7 @@ namespace ProductDatabase {
             var day = today.Day;
 
             // パス生成
-            string backupFolder = Path.Combine(CommonUtils.s_backupPath, "db", "backup", $"{year}", $"{month:00}");
+            string backupFolder = Path.Combine(CommonUtils.BackupPath, "db", "backup", $"{year}", $"{month:00}");
             string backupFile = Path.Combine(backupFolder, $"_bak_{year}-{month:00}-{day:00}.db");
             string productRegistryFile = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
 
