@@ -20,4 +20,17 @@ namespace ProductDatabase {
         public string[] Administrators { get; set; } = [];
         public string[] AuthorizedUsers { get; set; } = [];
     }
+
+    /// <summary>
+    /// appsettings.json 全体に対応する設定クラス。IConfiguration でバインドして使用します。
+    /// </summary>
+    public class GeneralSettings {
+        public string BackupFolderPath { get; set; } = string.Empty;
+        public List<string> Persons { get; set; } = [];
+        public string[] AuthorizedUsers { get; set; } = [];
+        public string[] Administrators { get; set; } = [];
+        public string DSN { get; set; } = string.Empty;
+        public string UID { get; set; } = string.Empty;
+        public string PWD { get; set; } = string.Empty;
+    }
 }

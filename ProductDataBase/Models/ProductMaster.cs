@@ -1,7 +1,7 @@
 using System.Data;
 
 namespace ProductDatabase {
-    public class ProductMaster {
+    public class ProductMaster : PrintMasterBase {
         public int ProductID { get; set; }
         public string CategoryName { get; set; } = string.Empty;
         public string ProductName { get; set; } = string.Empty;
@@ -18,24 +18,6 @@ namespace ProductDatabase {
         public int CheckBin { get; set; }
         public List<SubstrateInfo> UseSubstrates { get; set; } = [];
 
-        private int _regType;
-        public int RegType {
-            get => _regType;
-            set {
-                _regType = value;
-                UpdatePrintFlags();
-            }
-        }
-
-        private int _serialPrintType;
-        public int SerialPrintType {
-            get => _serialPrintType;
-            set {
-                _serialPrintType = value;
-                UpdatePrintFlags();
-            }
-        }
-
         private int _sheetPrintType;
         public int SheetPrintType {
             get => _sheetPrintType;
@@ -45,9 +27,8 @@ namespace ProductDatabase {
             }
         }
 
-        // ===== 結果フラグ =====
+        // ===== 製品固有フラグ =====
 
-        public bool IsLabelPrint { get; private set; }
         public bool IsBarcodePrint { get; private set; }
         public bool IsNameplatePrint { get; private set; }
         public bool IsLast4Digits { get; private set; }
@@ -56,26 +37,23 @@ namespace ProductDatabase {
         public bool IsCheckSheetPrint { get; private set; }
         public bool IsListPrint { get; private set; }
 
-        public bool IsSerialGeneration { get; private set; }
         public bool IsRegType9 { get; private set; }
 
-        // ===== 内部更新処理 =====
+        // ===== 内部更新処理（基底クラスを拡張）=====
 
-        private void UpdatePrintFlags() {
-            UpdateRegTypeFlags();
-            UpdateSerialPrintTypeFlags();
+        protected override void UpdatePrintFlags() {
+            base.UpdatePrintFlags();
             UpdateSheetPrintTypeFlags();
         }
 
-        private void UpdateRegTypeFlags() {
+        protected override void UpdateRegTypeFlags() {
+            base.UpdateRegTypeFlags();
             IsRegType9 = RegType == 9;
-            IsSerialGeneration = RegType is 1 or 2 or 3 or 9;
         }
 
-        private void UpdateSerialPrintTypeFlags() {
+        protected override void UpdateSerialPrintTypeFlags() {
+            base.UpdateSerialPrintTypeFlags();
             var flags = (SerialPrintTypeFlags)_serialPrintType;
-
-            IsLabelPrint = flags.HasFlag(SerialPrintTypeFlags.Label);
             IsBarcodePrint = flags.HasFlag(SerialPrintTypeFlags.Barcode);
             IsNameplatePrint = flags.HasFlag(SerialPrintTypeFlags.Nameplate);
             IsUnderlinePrint = flags.HasFlag(SerialPrintTypeFlags.Underline);
@@ -84,7 +62,6 @@ namespace ProductDatabase {
 
         private void UpdateSheetPrintTypeFlags() {
             var flags = (SheetPrintTypeFlags)_sheetPrintType;
-
             IsCheckSheetPrint = flags.HasFlag(SheetPrintTypeFlags.CheckSheet);
             IsListPrint = flags.HasFlag(SheetPrintTypeFlags.List);
         }

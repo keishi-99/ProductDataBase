@@ -390,11 +390,9 @@ namespace ProductDatabase {
                 MessageBox.Show("QRコードが正しくありません。");
                 return;
             }
-            if (arr is not null) {
-                ManufacturingNumberMaskedTextBox.Text = arr[0];
-                QuantityTextBox.Text = arr[2];
-                OrderNumberTextBox.Text = arr[3];
-            }
+            ManufacturingNumberMaskedTextBox.Text = arr[0];
+            QuantityTextBox.Text = arr[2];
+            OrderNumberTextBox.Text = arr[3];
         }
         // ログ出力
         private static void LogRegistration(ProductMaster productMaster, ProductRegisterWork productRegisterWork, long id) {
