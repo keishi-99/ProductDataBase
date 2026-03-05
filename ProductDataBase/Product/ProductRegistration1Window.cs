@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Microsoft.Data.Sqlite;
-using Newtonsoft.Json.Linq;
 using ProductDatabase.Other;
 using static ProductDatabase.ProductRepository;
 
@@ -472,9 +471,8 @@ namespace ProductDatabase {
         // JSON から機種別注意メッセージ取得
         public static string? GetProductMessage(string filePath, string productName) {
             var jsonText = File.ReadAllText(filePath);
-            var jsonObj = JObject.Parse(jsonText);
-
-            return jsonObj[productName]?.ToString();
+            var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(jsonText);
+            return dict?.TryGetValue(productName, out var val) == true ? val : null;
         }
         // 注意メッセージ更新
         private static readonly object s_fileLock = new();
@@ -484,20 +482,17 @@ namespace ProductDatabase {
                     throw new FileNotFoundException($"{_messageFilePath}\nが見つかりません。");
                 }
 
-                var json = JObject.Parse(File.ReadAllText(_messageFilePath));
+                var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(
+                    File.ReadAllText(_messageFilePath)) ?? new();
 
-                string currentMessage = json.ContainsKey(_productMaster.ProductName)
-                    ? json[_productMaster.ProductName]!.ToString()
-                    : "";
+                dict.TryGetValue(_productMaster.ProductName, out var currentMessage);
 
-                using var dialog = new InputDialog("メッセージ編集", "メッセージを入力してください", currentMessage);
+                using var dialog = new InputDialog("メッセージ編集", "メッセージを入力してください", currentMessage ?? "");
 
                 if (dialog.ShowDialog() == DialogResult.OK) {
-                    string newMessage = dialog.InputText;
-
-                    json[_productMaster.ProductName] = newMessage;
-
-                    File.WriteAllText(_messageFilePath, json.ToString());
+                    dict[_productMaster.ProductName] = dialog.InputText;
+                    File.WriteAllText(_messageFilePath, System.Text.Json.JsonSerializer.Serialize(
+                        dict, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
                 }
             }
         }

@@ -36,7 +36,6 @@ namespace ProductDatabase {
 
         // プロパティ設定
         private bool IsRegistration => _substrateMaster.RegType is 0 or 1;
-        private bool IsLabelPrint => _substrateMaster.SerialPrintType is 1;
 
         public SubstrateRegistrationWindow(SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork, AppSettings appSettings) {
             InitializeComponent();
@@ -90,7 +89,7 @@ namespace ProductDatabase {
                 PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
 
                 // 印刷しない場合は関連コントロール非表示に
-                if (!IsLabelPrint) {
+                if (!_substrateMaster.IsLabelPrint) {
                     PrintRowLabel.Visible = false;
                     PrintPositionNumericUpDown.Visible = false;
                     PrintOnlyCheckBox.Visible = false;
@@ -126,7 +125,7 @@ namespace ProductDatabase {
                     }
                 }
 
-                if (!IsLabelPrint) {
+                if (!_substrateMaster.IsLabelPrint) {
                     MessageBox.Show("登録完了");
                     Close();
                     return;
@@ -370,15 +369,8 @@ namespace ProductDatabase {
                 ? text[^6..]
                 : text.Substring(5, 5);
 
-            var monthCode = DateTime.Parse(_substrateRegisterWork.RegDate).ToString("MM");
-
-            monthCode = monthCode switch {
-                "10" => "X",
-                "11" => "Y",
-                "12" => "Z",
-                _ => monthCode
-            };
             var regDate = DateTime.Parse(_substrateRegisterWork.RegDate);
+            var monthCode = CommonUtils.ToMonthCode(regDate);
             var map = new Dictionary<string, string> {
                 ["{Y}"] = regDate.ToString("yy"),
                 ["{MM}"] = regDate.ToString("MM"),

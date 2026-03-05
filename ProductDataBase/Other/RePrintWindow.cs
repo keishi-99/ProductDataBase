@@ -281,13 +281,7 @@ namespace ProductDatabase {
 
             var calculatedLastSerial = quantity + firstSerial - 1;
 
-            (var minNumber, var maxNumber, var digit) = _productMaster.SerialDigitType switch {
-                3 => (1, 999, 3),
-                4 => (1, 9999, 4),
-                101 => (1, 899, 3),
-                102 => (901, 999, 3),
-                _ => throw new InvalidOperationException("不明なシリアル桁数です。")
-            };
+            (var minNumber, var maxNumber, var digit) = _productMaster.GetSerialRange();
 
             if (calculatedLastSerial > maxNumber || firstSerial < minNumber) {
                 MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -374,14 +368,8 @@ namespace ProductDatabase {
             }
         }
         private string GenerateCode(int serialCode) {
-            var monthCode = DateTime.Parse(_productRegisterWork.RegDate).ToString("MM");
-
-            monthCode = monthCode switch {
-                "10" => "X",
-                "11" => "Y",
-                "12" => "Z",
-                _ => monthCode
-            };
+            var regDate = DateTime.Parse(_productRegisterWork.RegDate);
+            var monthCode = CommonUtils.ToMonthCode(regDate);
 
             var outputCode = _serialType switch {
                 "Label" => LabelPrintSettings.TextFormat ?? string.Empty,
@@ -389,8 +377,6 @@ namespace ProductDatabase {
                 "Nameplate" => NameplatePrintSettings.TextFormat ?? string.Empty,
                 _ => string.Empty
             };
-
-            var regDate = DateTime.Parse(_productRegisterWork.RegDate);
 
             var map = new Dictionary<string, string> {
                 ["{T}"] = _productMaster.Initial,
