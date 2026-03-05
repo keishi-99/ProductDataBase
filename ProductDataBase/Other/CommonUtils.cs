@@ -141,11 +141,11 @@ namespace ProductDatabase.Other {
         /// 月コードを取得します（10月→X, 11月→Y, 12月→Z, それ以外→MM形式）。
         /// </summary>
         public static string ToMonthCode(DateTime date) =>
-            date.ToString("MM") switch {
-                "10" => "X",
-                "11" => "Y",
-                "12" => "Z",
-                var m => m
+            date.Month switch {
+                10 => "X",
+                11 => "Y",
+                12 => "Z",
+                var m => m.ToString("00")
             };
 
         // CapsLockがオンになっていたらCapsLockを解除する

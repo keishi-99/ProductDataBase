@@ -369,7 +369,9 @@ namespace ProductDatabase {
                 ? text[^6..]
                 : text.Substring(5, 5);
 
-            var regDate = DateTime.Parse(_substrateRegisterWork.RegDate);
+            var regDate = DateTime.TryParse(_substrateRegisterWork.RegDate, out var parsedDate)
+                ? parsedDate
+                : DateTime.Today;
             var monthCode = CommonUtils.ToMonthCode(regDate);
             var map = new Dictionary<string, string> {
                 ["{Y}"] = regDate.ToString("yy"),
