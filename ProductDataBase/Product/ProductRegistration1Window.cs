@@ -3,6 +3,7 @@ using Microsoft.Data.Sqlite;
 using Newtonsoft.Json.Linq;
 using ProductDatabase.Other;
 using static ProductDatabase.MainWindow;
+using static ProductDatabase.Other.DatabaseHelper;
 
 namespace ProductDatabase {
     public partial class ProductRegistration1Window : Form {

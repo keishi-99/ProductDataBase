@@ -5,6 +5,7 @@ using ProductDatabase.Other;
 using ProductDatabase.Print;
 using System.Data;
 using static ProductDatabase.MainWindow;
+using static ProductDatabase.Other.DatabaseHelper;
 using static ProductDatabase.Other.CommonUtils;
 using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;

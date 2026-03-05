@@ -3,6 +3,7 @@ using Microsoft.Data.Sqlite;
 using ProductDatabase.Other;
 using System.Data;
 using static ProductDatabase.MainWindow;
+using static ProductDatabase.Other.DatabaseHelper;
 
 namespace ProductDatabase {
     public partial class SubstrateChange1 : Form {

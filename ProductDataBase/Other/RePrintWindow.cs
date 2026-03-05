@@ -3,6 +3,7 @@ using Microsoft.Data.Sqlite;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
 using static ProductDatabase.MainWindow;
+using static ProductDatabase.Other.DatabaseHelper;
 using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
 

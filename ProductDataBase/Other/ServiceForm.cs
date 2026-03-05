@@ -2,6 +2,7 @@
 using Microsoft.Data.Sqlite;
 using System.Data;
 using static ProductDatabase.MainWindow;
+using static ProductDatabase.Other.DatabaseHelper;
 using static ProductDatabase.ProductRegistration2Window;
 
 namespace ProductDatabase.Other {
