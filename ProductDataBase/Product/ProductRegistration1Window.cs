@@ -472,7 +472,7 @@ namespace ProductDatabase {
         public static string? GetProductMessage(string filePath, string productName) {
             var jsonText = File.ReadAllText(filePath);
             var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(jsonText);
-            return dict?.TryGetValue(productName, out var val) == true ? val : null;
+            return dict?.GetValueOrDefault(productName);
         }
         // 注意メッセージ更新
         private static readonly object s_fileLock = new();

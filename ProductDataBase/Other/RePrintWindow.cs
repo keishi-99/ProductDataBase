@@ -368,7 +368,9 @@ namespace ProductDatabase {
             }
         }
         private string GenerateCode(int serialCode) {
-            var regDate = DateTime.Parse(_productRegisterWork.RegDate);
+            var regDate = DateTime.TryParse(_productRegisterWork.RegDate, out var parsedDate)
+                ? parsedDate
+                : DateTime.Today;
             var monthCode = CommonUtils.ToMonthCode(regDate);
 
             var outputCode = _serialType switch {
