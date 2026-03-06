@@ -11,7 +11,7 @@ namespace ProductDatabase {
         public DataTable ProductUseSubstrate { get; } = new();
 
         public static string GetConnectionRegistration() {
-            var productRegistryPath = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
+            var productRegistryPath = Path.Combine(AppContext.BaseDirectory, "db", "ProductRegistry.db");
             return !File.Exists(productRegistryPath)
                 ? throw new FileNotFoundException("ファイルが見つかりません。", productRegistryPath)
                 : new SqliteConnectionStringBuilder() { DataSource = productRegistryPath, Pooling = false }.ToString();
