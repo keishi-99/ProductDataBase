@@ -15,6 +15,7 @@ namespace ProductDatabase.Other {
             ServiceInfo = serviceInfo;
         }
 
+        // ロード時にM_ProductDefを取得してカテゴリ一覧をListBox1に表示する
         private void LoadEvents() {
             var strSqlQuery = "SELECT * FROM M_ProductDef WHERE Visible = 1 ORDER BY SortNumber ASC;";
 
@@ -34,6 +35,7 @@ namespace ProductDatabase.Other {
             RegisterButton.Enabled = false;
         }
 
+        // カテゴリ選択時に製品名一覧をListBox2に表示する（SERVICE品目を除く）
         private void CategoryListBox1Select() {
             RegisterButton.Enabled = false;
             CategoryListBox2.Items.Clear();
@@ -50,6 +52,7 @@ namespace ProductDatabase.Other {
 
             CategoryListBox2.Items.AddRange([.. productNames]);
         }
+        // 製品名選択時にProductTypeの一覧をListBox3に表示する
         private void CategoryListBox2Select() {
             RegisterButton.Enabled = false;
             CategoryListBox3.Items.Clear();
@@ -64,11 +67,13 @@ namespace ProductDatabase.Other {
 
             CategoryListBox3.Items.AddRange([.. productTypes]);
         }
+        // タイプ選択時に登録ボタンを有効化し選択したServiceProductTypeをセットする
         private void CategoryListBox3Select() {
             if (CategoryListBox3.SelectedIndex == -1) { return; ; }
             RegisterButton.Enabled = true;
             ServiceInfo.ServiceProductType = CategoryListBox3.SelectedItem?.ToString() ?? string.Empty;
         }
+        // 選択行の製品情報をServiceInfoにセットしてダイアログをOKで閉じる
         private DialogResult Registration() {
             var selectedRows = ServiceInfo.ServiceDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
@@ -86,6 +91,7 @@ namespace ProductDatabase.Other {
             Close();
             return DialogResult.OK;
         }
+        // 製品IDに紐づく使用基板情報をV_ProductUseSubstrateから取得してリストで返す
         private static List<SubstrateInfo> GetUseSubstrates(long productId) {
 
             var productUseSubstrate = new DataTable();

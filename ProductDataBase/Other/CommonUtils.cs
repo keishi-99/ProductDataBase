@@ -46,7 +46,7 @@ namespace ProductDatabase.Other {
                 }
             }
         }
-        // ログ作成
+        // 月次CSVログファイルへの追記と共有フォルダへのコピーを管理するクラス
         public static class Logger {
             private static readonly string s_logDirectory = Path.Combine(Environment.CurrentDirectory, "db", "logs");
             private static readonly object s_lockObject = new();
@@ -81,7 +81,7 @@ namespace ProductDatabase.Other {
                 }
             }
         }
-        // バックアップ作成
+        // DBファイルのタイムスタンプ付きバックアップ作成と古いバックアップの自動削除を管理するクラス
         public static class BackupManager {
             private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup");
             private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");

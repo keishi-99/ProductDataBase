@@ -10,6 +10,7 @@ namespace ProductDatabase {
         public DataTable SubstrateDataTable { get; } = new();
         public DataTable ProductUseSubstrate { get; } = new();
 
+        // DBファイルのパスを検証しSQLite接続文字列を返す
         public static string GetConnectionRegistration() {
             var productRegistryPath = Path.Combine(AppContext.BaseDirectory, "db", "ProductRegistry.db");
             return !File.Exists(productRegistryPath)
@@ -17,6 +18,7 @@ namespace ProductDatabase {
                 : new SqliteConnectionStringBuilder() { DataSource = productRegistryPath, Pooling = false }.ToString();
         }
 
+        // 製品・基板・使用基板の全マスターデータをDBから読み込む
         public void LoadAll() {
 
             ProductDataTable.Clear();
@@ -39,6 +41,7 @@ namespace ProductDatabase {
             }
         }
 
+        // 基板IDに一致する行をSubstrateDataTableから取得する
         public DataRow GetSubstrateById(long id) {
             return SubstrateDataTable
                 .AsEnumerable()
@@ -46,6 +49,7 @@ namespace ProductDatabase {
                 ?? throw new InvalidOperationException($"基板ID [{id}] が見つかりません。");
         }
 
+        // 製品IDに一致する行をProductDataTableから取得する
         public DataRow GetProductById(long id) {
             return ProductDataTable
                 .AsEnumerable()
@@ -71,6 +75,7 @@ namespace ProductDatabase {
             return [.. con.Query<SubstrateInfo>(sql, new { ProductKey = productKey })];
         }
 
+        // キャッシュ済みの全DataTableをクリアする
         public void Clear() {
             ProductDataTable.Clear();
             SubstrateDataTable.Clear();

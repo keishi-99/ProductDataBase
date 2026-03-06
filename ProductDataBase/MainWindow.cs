@@ -45,7 +45,7 @@ namespace ProductDatabase {
 
         private static FileStream? s_lockStream;
 
-        // ロードイベント
+        // フォームロード時にファイルロック・設定読み込み・DBデータ取得・日次バックアップ作成を行いUIを初期化する
         private void LoadEvents() {
             try {
                 // ファイルロック
@@ -102,6 +102,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        // 当日分のバックアップが未作成の場合のみDBをバックアップフォルダにコピーする
         private static void CreateDailyBackup() {
             // フォルダ未設定
             if (string.IsNullOrWhiteSpace(CommonUtils.BackupPath)) {
@@ -134,6 +135,7 @@ namespace ProductDatabase {
                 File.Copy(productRegistryFile, backupFile, overwrite: false);
             }
         }
+        // 各マスター・作業データをリセットしDBを再読み込みする
         private void ResetFields() {
             _productMaster.Reset();
             _productRegisterWork.Reset();
@@ -145,6 +147,7 @@ namespace ProductDatabase {
 
             _appSettings.FontSize = _fontSize;
         }
+        // 実行中のEXEファイルをロックして二重起動を防止する
         private static void LockSelf() {
             try {
                 string exePath = Application.ExecutablePath;
@@ -153,7 +156,7 @@ namespace ProductDatabase {
                 // 失敗しても無視
             }
         }
-        // 登録ボタン処理
+        // ラジオボタンのモードに応じて選択品目の基板登録・製品登録・再印刷・基板変更ウィンドウを開く
         private void Registration() {
             ResetFields();
 
@@ -179,6 +182,7 @@ namespace ProductDatabase {
 
             QRCodeTextBox.Text = string.Empty;
         }
+        // 指定基板IDのマスターを読み込み基板登録ウィンドウを開く
         private void HandleSubstrateRegistration(int substrateId) {
 
             var row = _productRepository.GetSubstrateById(substrateId);
@@ -188,6 +192,7 @@ namespace ProductDatabase {
             using SubstrateRegistrationWindow window = new(_substrateMaster, _substrateRegisterWork, _appSettings);
             window.ShowDialog(this);
         }
+        // 指定製品IDのマスターを読み込みモードに応じた製品操作ウィンドウを開く
         private void HandleProductRegistration(int productId, ProductOperationMode mode) {
 
             var row = _productRepository.GetProductById(productId);
@@ -215,7 +220,7 @@ namespace ProductDatabase {
                     break;
             }
         }
-        // 履歴ボタン処理
+        // 品目選択有無に応じてマスターをセットし履歴ウィンドウをダイアログで開く
         private void History() {
 
             ResetFields();
@@ -237,6 +242,7 @@ namespace ProductDatabase {
 
             window.ShowDialog(this);
         }
+        // 品目未選択時にカテゴリ名・製品名のみマスターにセットする
         private void LoadHistoryWithoutSelection() {
             switch (RadioButtonNumber) {
                 case 1:
@@ -249,6 +255,7 @@ namespace ProductDatabase {
                     break;
             }
         }
+        // 品目選択時に該当マスターデータをDBから読み込む
         private void LoadHistoryWithSelection(int itemId) {
             switch (RadioButtonNumber) {
                 case 1:
@@ -269,7 +276,7 @@ namespace ProductDatabase {
             { 3, new CategoryConfig("ProductType",   "ProductID",   "ProductType")   }, // 再印刷
             { 4, new CategoryConfig("ProductType",   "ProductID",   "ProductType")   }  // 基板変更
         };
-        // 処理カテゴリセレクト
+        // ラジオボタン選択時にモードに応じたマスターデータをフィルタしてCategoryListBox1にカテゴリ一覧を表示する
         private void CategorySelect(object sender) {
 
             RegisterButton.Enabled = false;
@@ -328,7 +335,7 @@ namespace ProductDatabase {
             CategoryListBox1.Items.AddRange([.. categoryNames]);
             HistoryButton.Enabled = RadioButtonNumber != 4;
         }
-        // 製品カテゴリセレクト
+        // カテゴリ選択時に一致する製品名またはSubstrateNameの一覧をListBox2に表示する
         private void CategoryListBox1Select() {
             RegisterButton.Enabled = false;
             HistoryButton.Enabled = RadioButtonNumber != 4;
@@ -354,6 +361,7 @@ namespace ProductDatabase {
 
             CategoryListBox2.Items.AddRange([.. productNames]);
         }
+        // 製品名セレクト：カテゴリ・製品名に一致する品目一覧をListBox3に表示する
         private void CategoryListBox2Select() {
             RegisterButton.Enabled = false;
             HistoryButton.Enabled = RadioButtonNumber != 4;
@@ -387,11 +395,12 @@ namespace ProductDatabase {
 
             CategoryListBox3.Items.AddRange([.. items.Cast<object>()]);
         }
+        // 品目セレクト：選択確定時に登録ボタンを有効化する
         private void CategoryListBox3Select() {
             RegisterButton.Enabled = true;
         }
 
-        // QRコード読み取り
+        // QR/バーコード入力を解析してSQLiteを検索し品目候補に応じた登録ウィンドウを開く
         private void CodeScan() {
             try {
                 if (string.IsNullOrWhiteSpace(QRCodeTextBox.Text)) { return; }
@@ -422,6 +431,7 @@ namespace ProductDatabase {
                 CleanupAfterScan();
             }
         }
+        // コードスキャン前にUIと各設定データをリセットしフォームを無効化する
         private void ResetFieldsForCodeScan() {
             CategoryRadioButton1.Checked = CategoryRadioButton2.Checked = CategoryRadioButton3.Checked = CategoryRadioButton4.Checked = false;
             CategoryListBox1.Items.Clear();
@@ -435,6 +445,7 @@ namespace ProductDatabase {
             ResetFields();
             Enabled = false;
         }
+        // QRコードテキストを解析して製番・品目番号・数量・注番を取得する
         private void ParseQRCodeInput() {
             try {
                 string[] separator = ["//"];
@@ -452,6 +463,7 @@ namespace ProductDatabase {
                 throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}", ex);
             }
         }
+        // バーコードの手配管理番号からODBCで手配情報を取得して各フィールドにセットする
         private void BarcodeInput() {
             using var con = new OdbcConnection($"DSN={_dsn}; UID={_uid}; PWD={_pwd}");
             con.Open();
@@ -478,6 +490,7 @@ namespace ProductDatabase {
             public int 手配数 { get; set; }
             public string 請求先注番 { get; set; } = string.Empty;
         }
+        // 品目番号から不要なサフィックスを除去して正規化する
         private void ProcessCategoryItemData() {
             var pattern = @"-(?:SMT|H|GH).*";
             var result = Regex.Replace(_productMaster.ProductModel, pattern, string.Empty);
@@ -485,6 +498,7 @@ namespace ProductDatabase {
                 .Replace("-ACGH", "-AC")
                 .Replace("-DCGH", "-DC");
         }
+        // 品目番号でSQLiteを検索し一致する基板・製品情報をリストに追加する
         private void FetchDataFromSQLite() {
             using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
 
@@ -532,6 +546,7 @@ namespace ProductDatabase {
                 }
             }
         }
+        // 品目情報を各カテゴリリストに追加する
         private void AddToLists(string itemNumber, string productName, string productType, string substrateName, string type) {
             _qrSettings.CategoryItemNumber.Add(itemNumber);
             _qrSettings.CategoryProductName.Add(productName);
@@ -539,11 +554,13 @@ namespace ProductDatabase {
             _qrSettings.CategorySubstrateName.Add(substrateName);
             _qrSettings.CategoryType.Add(type);
         }
+        // 複数候補がある場合に選択ダイアログを表示し選択インデックスを返す
         private int ShowDialogWindowForMultipleItems() {
             using SeveralDialogWindow window = new(_qrSettings, _appSettings);
             window.ShowDialog(this);
             return window.SelectedIndex;
         }
+        // 選択された品目のタイプに応じて基板または製品の登録処理を実行する
         private void HandleSelectedItem(int listIndex) {
             var productName = _qrSettings.CategoryProductName[listIndex];
             var productType = _qrSettings.CategoryProductType[listIndex];
@@ -561,6 +578,7 @@ namespace ProductDatabase {
                     throw new Exception($"一致する情報がありません。{Environment.NewLine}品目番号:{_productMaster.ProductModel}{Environment.NewLine}");
             }
         }
+        // 製品名と基板名で基板マスターを検索し基板登録ウィンドウを開く
         private void HandleSubstrateSelection(string productName, string substrateName) {
             var substrateRet = _productRepository.SubstrateDataTable
                 .AsEnumerable()
@@ -569,6 +587,7 @@ namespace ProductDatabase {
                 .ToArray();
             OpenSubstrateRegistrationWindow(substrateRet);
         }
+        // 基板マスターと作業データをセットして基板登録ウィンドウを表示する
         private void OpenSubstrateRegistrationWindow(DataRow[] substrateRet) {
             _substrateMaster.LoadFrom(substrateRet[0]);
             _substrateRegisterWork.ProductNumber = _productRegisterWork.ProductNumber;
@@ -577,6 +596,7 @@ namespace ProductDatabase {
             using SubstrateRegistrationWindow window = new(_substrateMaster, _substrateRegisterWork, _appSettings);
             window.ShowDialog(this);
         }
+        // 製品名と型式で製品マスターを検索し製品登録ウィンドウを開く
         private void HandleProductSelection(string productName, string productType) {
             var productRet = _productRepository.ProductDataTable
                 .AsEnumerable()
@@ -585,18 +605,20 @@ namespace ProductDatabase {
                 .ToArray();
             OpenProductRegistrationWindow(productRet);
         }
+        // 製品マスターと使用基板情報をセットして製品登録ウィンドウを表示する
         private void OpenProductRegistrationWindow(DataRow[] productRet) {
             _productMaster.LoadFrom(productRet[0]);
             _productMaster.UseSubstrates = ProductRepository.GetUseSubstrates(_productMaster.ProductID);
             using ProductRegistration1Window window = new(_productMaster, _productRegisterWork, _appSettings);
             window.ShowDialog(this);
         }
+        // スキャン後にフォームを再有効化してQRコード入力欄にフォーカスを戻す
         private void CleanupAfterScan() {
             Enabled = true;
             QRCodeTextBox.Focus();
         }
 
-        // フォント変更
+        // ラジオボタン選択に応じてアプリ全体のフォントサイズを変更する
         private void FontChange(object sender) {
             var radioButton = (RadioButton)sender;
 
@@ -610,7 +632,7 @@ namespace ProductDatabase {
             _appSettings.FontSize = _fontSize;
             Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
         }
-        // excel
+        // ExcelのパスをInteropで取得しEXEを直接起動して指定ファイルを開く
         private static void OpenExcel(string filePath) {
             Microsoft.Office.Interop.Excel.Application? xlApp = null;
             try {

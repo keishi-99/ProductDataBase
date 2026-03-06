@@ -9,6 +9,7 @@ namespace ProductDatabase {
         public string SubstrateModel { get; set; } = string.Empty;
         public int CheckBin { get; set; }
 
+        // DataRowから基板マスターの各フィールドを読み込む
         public void LoadFrom(DataRow row) {
             SubstrateID = Convert.ToInt32(row["SubstrateID"]);
             CategoryName = row.Field<string>("CategoryName") ?? string.Empty;
@@ -20,6 +21,7 @@ namespace ProductDatabase {
             SerialPrintType = Convert.ToInt32(row["SerialPrintType"]);
         }
 
+        // 基板マスターデータを初期値にリセットする
         public void Reset() {
             SubstrateID = 0;
             CategoryName = string.Empty;

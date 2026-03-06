@@ -29,15 +29,18 @@ namespace ProductDatabase {
 
         // ===== 内部更新処理 =====
 
+        // RegTypeとSerialPrintTypeの両フラグを更新する
         protected virtual void UpdatePrintFlags() {
             UpdateRegTypeFlags();
             UpdateSerialPrintTypeFlags();
         }
 
+        // RegTypeに基づきシリアル生成フラグを更新する
         protected virtual void UpdateRegTypeFlags() {
             IsSerialGeneration = RegType is 1 or 2 or 3 or 9;
         }
 
+        // SerialPrintTypeのビットフラグをboolプロパティに展開する
         protected virtual void UpdateSerialPrintTypeFlags() {
             var flags = (SerialPrintTypeFlags)_serialPrintType;
             IsLabelPrint = flags.HasFlag(SerialPrintTypeFlags.Label);

@@ -28,7 +28,7 @@ namespace ProductDatabase {
             _appSettings = appSettings;
         }
 
-        // ロードイベント
+        // フォームロード時にUI初期化・DBからのリビジョン/シリアル取得・機種別メッセージ表示を行う
         private void LoadEvents() {
             try {
                 Font = new Font(_appSettings.FontName, _appSettings.FontSize);
@@ -134,7 +134,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        // 登録チェック
+        // 入力値の最終検証を行い問題なければ製品登録2ウィンドウを開く
         private void RegisterCheck() {
             try {
                 // ValidateAllInputs が既にリアルタイムでチェック済みのため、エラー状態なら早期リターン
@@ -230,7 +230,7 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = true;
             }
         }
-        // revisionの変更
+        // 確認ダイアログを経てDBにRevision変更レコードを挿入しログ記録する
         private void RevisionChange() {
             var result = MessageBox.Show("レビジョンを変更しますか？",
                 "確認",
@@ -315,7 +315,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        // コメント用テンプレート
+        // 選択されたテンプレートワードをコメントTextBoxに追記する
         private void TemplateComment() {
             var templateWord = CommentComboBox.SelectedIndex switch {
                 0 => "[Rev.UP]変更点番号:",
@@ -323,7 +323,7 @@ namespace ProductDatabase {
             };
             CommentTextBox.Text = $"{CommentTextBox.Text}{templateWord}";
         }
-        // チェックボックスイベント
+        // チェックボックスのOn/Offに連動して関連する入力コントロールの有効無効を切り替える
         private void CheckBoxChecked(object sender, EventArgs e) {
             var checkBox = (CheckBox)sender;
 
@@ -372,14 +372,14 @@ namespace ProductDatabase {
             }
             ValidateAllInputs();
         }
-        // 入力数値のみ
+        // 数字とバックスペース以外のキー入力を無効化して数値入力専用にする
         private void NumericOnly(object sender, KeyPressEventArgs e) {
             // 0～9と、バックスペース以外の時は、イベントをキャンセルする
             if (e.KeyChar is (< '0' or > '9') and not '\b') {
                 e.Handled = true;
             }
         }
-        // QR入力処理
+        // QRコードテキストを「//」区切りで解析して製番・数量・注番を各入力欄にセットする
         private void QrInput() {
             if (string.IsNullOrWhiteSpace(QrCodeTextBox.Text)) { return; }
             string[] separator = ["//"];
@@ -393,7 +393,7 @@ namespace ProductDatabase {
             QuantityTextBox.Text = arr[2];
             OrderNumberTextBox.Text = arr[3];
         }
-        // ログ出力
+        // Revision変更の操作内容をログファイルに記録する
         private static void LogRegistration(ProductMaster productMaster, ProductRegisterWork productRegisterWork, long id) {
             string[] logMessageArray = [
                 $"[Rev変更]",
@@ -415,7 +415,7 @@ namespace ProductDatabase {
             ];
             CommonUtils.Logger.AppendLog(logMessageArray);
         }
-        // 取得情報表示
+        // 現在の製品マスターのフィールド値をリスト形式のサブウィンドウで確認表示する
         private void ShowInfo() {
             var items = new Dictionary<string, string>
                 {
@@ -468,13 +468,13 @@ namespace ProductDatabase {
             form.ShowDialog();
         }
 
-        // JSON から機種別注意メッセージ取得
+        // JSONファイルから製品名に対応する注意メッセージを取得する
         public static string? GetProductMessage(string filePath, string productName) {
             var jsonText = File.ReadAllText(filePath);
             var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(jsonText);
             return dict?.GetValueOrDefault(productName);
         }
-        // 注意メッセージ更新
+        // 入力ダイアログで編集した注意メッセージをJSONファイルに上書き保存する
         private static readonly object s_fileLock = new();
         private void ProductMessageChange() {
             lock (s_fileLock) {
@@ -550,7 +550,7 @@ namespace ProductDatabase {
             }
         }
 
-        // 入力チェック
+        // 全入力コントロールを検証し問題があればエラー表示して登録ボタンを無効化する
         private void ValidateAllInputs() {
             ErrorMessageLabel.Text = "";
             RegisterButton.Enabled = true;
@@ -625,12 +625,14 @@ namespace ProductDatabase {
             }
 
         }
+        // エラーメッセージを赤字で表示して登録ボタンを無効化する
         private void ShowError(string message) {
             ErrorMessageLabel.Text = message;
             ErrorMessageLabel.ForeColor = Color.Red;
             RegisterButton.Enabled = false;
         }
 
+        // 入力コントロール変更時にすべての入力検証を再実行する
         private void InputControls_TextChanged(object? sender, EventArgs e) {
             ValidateAllInputs();
         }

@@ -49,6 +49,7 @@ namespace ProductDatabase {
             _appSettings = appSettings;
         }
 
+        // フォームロード時にDB接続・トランザクション開始・UIと基板データ初期化・印刷設定読み込みを行う
         private void LoadEvents() {
             try {
                 _sqliteConnection = new SqliteConnection(GetConnectionRegistration());
@@ -97,6 +98,7 @@ namespace ProductDatabase {
                 Close();
             }
         }
+        // フォームクローズ時にトランザクションをコミットまたはロールバックしDB接続を解放する
         private void ClosingEvents(bool shouldCommit = true) {
             try {
                 if (_sqliteTransaction is not null && !_isTransactionCommitted) {
@@ -117,13 +119,16 @@ namespace ProductDatabase {
                 _isTransactionCommitted = false;
             }
         }
+        // 設定フォントをフォームに適用する
         private void SetFont() {
             Font = new Font(_appSettings.FontName, _appSettings.FontSize);
         }
+        // 登録ボタンと成績書ボタンの初期有効状態を設定する
         private void InitializeUIControls() {
             GenerateReportButton.Enabled = false;
             RegisterButton.Enabled = true;
         }
+        // 全ての基板チェックボックスとDataGridViewを非表示にする
         private void HideAllControls() {
             for (var i = 0; i <= 14; i++) {
                 if (MainPanel.Controls[_checkBoxNames[i]] is CheckBox objCbx) {
@@ -135,9 +140,11 @@ namespace ProductDatabase {
                 }
             }
         }
+        // シリアル末尾番号を先頭番号と数量から算出して保持する
         private void SetSerialNumbers() {
             _serialLastNumber = _productRegisterWork.SerialFirstNumber + _productRegisterWork.Quantity - 1;
         }
+        // 使用基板一覧をDBから取得してチェックボックスとDataGridViewに表示し在庫不足を警告する
         private void LoadSubstrateData(SqliteConnection connection) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = _productMaster.RegType == 9;
@@ -166,6 +173,7 @@ namespace ProductDatabase {
                 MessageBox.Show($"在庫が足りません。{Environment.NewLine}{shortageSubstrateName}", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
+        // チェックボックスを有効化してONにし基板名と型式を表示テキストにセットする
         private static void SetupCheckBox(CheckBox? objCbx, string substrateName, string substrateModel) {
             if (objCbx is not null) {
                 objCbx.Enabled = true;
@@ -174,6 +182,7 @@ namespace ProductDatabase {
                 objCbx.Text = $"{splitSubstrateName.Last()} - {substrateModel}";
             }
         }
+        // DataGridViewのセル書式を設定しフォントサイズに合わせた列幅を適用する
         private void SetupDataGridView(DataGridView? objDgv) {
             if (objDgv is not null) {
                 objDgv.Columns[1].DefaultCellStyle.BackColor = Color.LightGray;
@@ -182,6 +191,7 @@ namespace ProductDatabase {
                 SetDataGridViewSize(objDgv);
             }
         }
+        // 現在のフォントサイズに合わせてDataGridViewの行高・列幅を設定する
         private void SetDataGridViewSize(DataGridView objDgv) {
             switch (Font.Size) {
                 case 9:
@@ -207,6 +217,7 @@ namespace ProductDatabase {
                     break;
             }
         }
+        // 基板IDの在庫データをDBから取得してDataGridViewに表示し在庫が0以下ならtrueを返す
         private bool FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, int substrateID) {
             var intQuantity = _productRegisterWork.Quantity;
 
@@ -261,7 +272,7 @@ namespace ProductDatabase {
             return intQuantity > 0;
         }
 
-        // 印刷UI設定
+        // 製品マスターの印刷フラグに応じて印刷ボタン・メニューの表示と有効状態を設定し印刷設定を読み込む
         private void ConfigurePrintSettings() {
             SubstrateListPrintButton.Visible = _productMaster.IsListPrint;
             CheckSheetPrintButton.Visible = _productMaster.IsCheckSheetPrint;
@@ -283,6 +294,7 @@ namespace ProductDatabase {
                 LoadSettings();
             }
         }
+        // 製品・型式に対応するJSON印刷設定ファイルを読み込んでProductPrintSettingsに反映する
         private void LoadSettings() {
             try {
                 ProductPrintSettings = new DocumentPrintSettings();
@@ -296,7 +308,7 @@ namespace ProductDatabase {
                 MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        // 登録処理
+        // 重複チェック・数量検証・シリアル検証を経てDB登録・ログ記録・印刷処理を実行する
         private void RegisterCheck() {
             try {
                 _serialList.Clear();
@@ -337,6 +349,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        // RegTypeに応じて製品・シリアル・基板のINSERT処理を呼び出しトランザクションをコミットする
         private void Registration(SqliteConnection connection, SqliteTransaction transaction) {
             try {
                 InsertProduct(connection);
@@ -372,10 +385,11 @@ namespace ProductDatabase {
             }
         }
 
+        // 製品履歴テーブルにレコードをINSERTして生成されたROWIDを作業データに保存する
         private void InsertProduct(SqliteConnection connection) {
             var commandText =
                 $"""
-                INSERT INTO {Constants.TProductTableName} 
+                INSERT INTO {Constants.TProductTableName}
                 (
                     ProductID,
                     OrderNumber,
@@ -433,6 +447,7 @@ namespace ProductDatabase {
 
             _productRegisterWork.RowID = connection.ExecuteScalar<int>("SELECT last_insert_rowid();", transaction: _sqliteTransaction);
         }
+        // シリアルリストの各シリアルをシリアルテーブルにINSERTする
         private void InsertSerial(SqliteConnection connection) {
             var commandText =
                 $"""
@@ -459,6 +474,7 @@ namespace ProductDatabase {
 
             connection.Execute(commandText, serialData, transaction: _sqliteTransaction);
         }
+        // DataGridViewでチェックされた基板番号・使用数を読み取り基板履歴テーブルにINSERTする
         private void RegisterSubstrate(SqliteConnection connection) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = _productMaster.RegType == 9;
@@ -488,6 +504,7 @@ namespace ProductDatabase {
                 }
             }
         }
+        // 基板IDと製造番号から在庫情報を取得して注文番号を返す
         private string GetSubstrateInfo(SqliteConnection connection, int substrateID, string substrateNumber) {
             var commandText =
                 $"""
@@ -528,6 +545,7 @@ namespace ProductDatabase {
             public string OrderNumber { get; set; } = string.Empty;
             public int Stock { get; set; }
         }
+        // 基板使用履歴テーブルに使用数（Decrease）をINSERTして製品IDと紐づける
         private void InsertSubstrate(SqliteConnection connection, int substrateID, string substrateNumber, string orderNumber, long useValue, long? useID) {
             var commandText =
                 $"""
@@ -570,7 +588,7 @@ namespace ProductDatabase {
             }, transaction: _sqliteTransaction);
         }
 
-        // 登録チェック
+        // 登録したIDがDB上に存在するか確認し見つからない場合は例外をスローする
         private void RegistrationCheck(SqliteConnection connection) {
             var exists = connection.ExecuteScalar<bool>(
                 $@"SELECT EXISTS(SELECT 1 FROM {Constants.VProductTableName} WHERE Id = @Id);",
@@ -580,7 +598,7 @@ namespace ProductDatabase {
                 throw new Exception("登録に失敗しました。IDが見つかりません。");
             }
         }
-        // ログ出力
+        // 製品登録の操作内容をログファイルに記録する
         private static void LogRegistration(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
             string[] logMessageArray = [
                 $"[製品登録]",
@@ -603,6 +621,7 @@ namespace ProductDatabase {
             CommonUtils.Logger.AppendLog(logMessageArray);
         }
 
+        // 製番と注文番号の重複登録をDBで確認しユーザーに続行可否を確認する
         private bool NumberCheck(SqliteConnection connection) {
 
             if (!string.IsNullOrEmpty(_productRegisterWork.ProductNumber)) {
@@ -653,6 +672,7 @@ namespace ProductDatabase {
 
             return true;
         }
+        // RegTypeと選択された基板数量の整合性を検証する
         private bool QuantityCheck() {
             try {
                 switch (_productMaster.RegType) {
@@ -725,6 +745,7 @@ namespace ProductDatabase {
                 return false;
             }
         }
+        // シリアルリストを生成しDBに既存シリアルがないか重複チェックする
         private void SerialCheck(SqliteConnection connection, bool print = true) {
 
             CurrentSerialType = GetSerialTypeFromProductMaster();
@@ -770,11 +791,13 @@ namespace ProductDatabase {
                 throw new Exception($"{message}{Environment.NewLine}は既に使用されているシリアルです。");
             }
         }
+        // 製品マスターの印刷フラグからシリアルタイプ（銘版/バーコード/ラベル）を決定する
         private SerialType GetSerialTypeFromProductMaster() {
             if (_productMaster.IsNameplatePrint) { return SerialType.Nameplate; }
             if (_productMaster.IsBarcodePrint) { return SerialType.Barcode; }
             return SerialType.Label;
         }
+        // IsLabelPrintが有効な場合にシリアルラベルの印刷を実行する
         private void HandleLabelPrinting() {
             if (_productMaster.IsLabelPrint) {
                 MessageBox.Show("シリアルラベルを印刷します。");
@@ -785,6 +808,7 @@ namespace ProductDatabase {
                 }
             }
         }
+        // IsBarcodePrintが有効な場合にバーコードラベルの印刷を実行する
         private void HandleBarcodePrinting() {
             if (_productMaster.IsBarcodePrint) {
                 MessageBox.Show("バーコードラベルを印刷します。");
@@ -795,16 +819,19 @@ namespace ProductDatabase {
                 }
             }
         }
+        // 登録ボタンと印刷位置入力コントロールを無効化して二重登録を防止する
         private void DisableControls() {
             RegisterButton.Enabled = false;
             SerialPrintPositionNumericUpDown.Enabled = false;
             BarcodePrintPositionNumericUpDown.Enabled = false;
         }
+        // シリアルタイプを決定してシリアル先頭・末尾のコード文字列を生成する
         private void GenerateSerialCodes() {
             CurrentSerialType = GetSerialTypeFromProductMaster();
             _productRegisterWork.SerialFirst = GenerateCode(_productRegisterWork.SerialFirstNumber);
             _productRegisterWork.SerialLast = GenerateCode(_serialLastNumber);
         }
+        // 登録完了後に基板コントロールを無効化してリスト・チェックシート・銘版ボタンを有効化する
         private void HandlePostRegistration() {
             foreach (Control control in MainPanel.Controls) {
                 switch (control) {
@@ -833,7 +860,7 @@ namespace ProductDatabase {
         }
         public ServiceInformation ServiceInfo { get; set; } = new();
 
-        // 印刷処理
+        // isPrintがtrueなら印刷ダイアログ経由で印刷しfalseならプレビューを表示する
         private bool Print(bool isPrint) {
             try {
                 // PrintDocumentオブジェクトの作成
@@ -895,6 +922,7 @@ namespace ProductDatabase {
                 return false;
             }
         }
+        // シリアルコードと日付情報からテキストフォーマットに従ってラベル印字コードを生成する
         private string GenerateCode(int serialCode) {
             var monthCode = DateTime.Parse(_productRegisterWork.RegDate).ToString("MM");
 
@@ -929,7 +957,7 @@ namespace ProductDatabase {
 
             return outputCode;
         }
-        // チェックボックスイベント
+        // 基板チェックボックスのOn/Offに連動して対応DataGridViewの表示と有効状態を切り替える
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
             var checkBox = (System.Windows.Forms.CheckBox)sender;
             DataGridView dataGridView = new();
@@ -992,7 +1020,7 @@ namespace ProductDatabase {
                 MessageBox.Show("チェックがない場合在庫から引き落とされなくなります。", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
-        // 成績書作成
+        // 登録済み製品情報をもとにExcel成績書を生成する
         private void GenerateReport() {
             try {
                 Cursor.Current = Cursors.WaitCursor;
@@ -1004,7 +1032,7 @@ namespace ProductDatabase {
                 Cursor.Current = Cursors.Default;
             }
         }
-        // リスト作成
+        // 登録済み製品情報をもとにExcel製品一覧を生成する
         private void GenerateList() {
             try {
                 Cursor.Current = Cursors.WaitCursor;
@@ -1016,7 +1044,7 @@ namespace ProductDatabase {
                 Cursor.Current = Cursors.Default;
             }
         }
-        // チェックシート作成
+        // 登録済み製品情報をもとにExcelチェックシートを生成する
         private void GenerateCheckSheet() {
             try {
                 Cursor.Current = Cursors.WaitCursor;
@@ -1029,7 +1057,7 @@ namespace ProductDatabase {
             }
         }
 
-        // 取得情報表示
+        // 現在の製品・作業データのフィールド値をListViewで確認表示するデバッグ用ダイアログを開く
         private void ShowInfo() {
             var items = new Dictionary<string, string>
                 {

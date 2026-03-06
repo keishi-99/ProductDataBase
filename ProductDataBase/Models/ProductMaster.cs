@@ -41,16 +41,19 @@ namespace ProductDatabase {
 
         // ===== 内部更新処理（基底クラスを拡張）=====
 
+        // 基底クラスのフラグ更新に加えSheetPrintTypeフラグも更新する
         protected override void UpdatePrintFlags() {
             base.UpdatePrintFlags();
             UpdateSheetPrintTypeFlags();
         }
 
+        // 基底クラスの更新に加えIsRegType9フラグを設定する
         protected override void UpdateRegTypeFlags() {
             base.UpdateRegTypeFlags();
             IsRegType9 = RegType == 9;
         }
 
+        // 基底クラスの更新に加え製品固有の印刷フラグを展開する
         protected override void UpdateSerialPrintTypeFlags() {
             base.UpdateSerialPrintTypeFlags();
             var flags = (SerialPrintTypeFlags)_serialPrintType;
@@ -60,6 +63,7 @@ namespace ProductDatabase {
             IsLast4Digits = flags.HasFlag(SerialPrintTypeFlags.Last4Digits);
         }
 
+        // SheetPrintTypeのビットフラグをboolプロパティに展開する
         private void UpdateSheetPrintTypeFlags() {
             var flags = (SheetPrintTypeFlags)_sheetPrintType;
             IsCheckSheetPrint = flags.HasFlag(SheetPrintTypeFlags.CheckSheet);
@@ -77,6 +81,7 @@ namespace ProductDatabase {
             _ => throw new InvalidOperationException("不明なシリアル桁数です。")
         };
 
+        // DataRowから製品マスターの各フィールドを読み込む
         public void LoadFrom(DataRow row) {
             ProductID = Convert.ToInt32(row["ProductID"]);
             CategoryName = row.Field<string>("CategoryName") ?? string.Empty;
@@ -92,6 +97,7 @@ namespace ProductDatabase {
             SheetPrintType = Convert.ToInt32(row["SheetPrintType"]);
         }
 
+        // 製品マスターデータを初期値にリセットする
         public void Reset() {
             ProductID = 0;
             CategoryName = string.Empty;

@@ -25,6 +25,7 @@ namespace ProductDatabase {
             InitializeComponent();
         }
 
+        // 呼び出し元ウィンドウの種類に応じて印刷設定とパスを読み込みPropertyGridに反映する
         private void LoadSettings() {
             Font = new System.Drawing.Font(AppSettings.FontName, AppSettings.FontSize);
             switch (Owner) {
@@ -50,6 +51,7 @@ namespace ProductDatabase {
                     break;
             }
         }
+        // 設定ファイルパスとDocumentPrintSettingsをセットし対象シリアルタイプの設定をPropertyGridに表示する
         private void LoadSettingsFromWindow(DocumentPrintSettings settings, string filePath) {
             DocumentPrintSettings = settings;
             _documentPrintSettingFilePath = filePath;
@@ -62,6 +64,7 @@ namespace ProductDatabase {
                 _ => null
             };
         }
+        // 現在の印刷設定をJSONにシリアライズして設定ファイルに保存しウィンドウを閉じる
         private void SaveProductPrintSettings() {
             try {
                 DocumentPrintSettings.SetSettingsType(_isLabelPrint, _isBarcodePrint, _isNameplatePrint);

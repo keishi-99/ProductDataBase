@@ -9,6 +9,7 @@
             ShowInTaskbar = false;
         }
 
+        // フォーム表示後にControlBoxを無効化してユーザーが手動で閉じられないようにする
         protected override void OnShown(EventArgs e) {
             base.OnShown(e);
             // ユーザーが閉じられないようにする
