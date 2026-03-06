@@ -41,7 +41,7 @@ namespace ProductDatabase {
             _appSettings = appSettings;
         }
 
-        // ロードイベント
+        // フォームロード時に初期UI設定・DBからのリビジョン取得・印刷設定読み込みを行う
         private void LoadEvents() {
             try {
                 Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
@@ -105,7 +105,7 @@ namespace ProductDatabase {
                 Close();
             }
         }
-        // 印刷UI設定
+        // 製品マスターの印刷フラグに応じてメニューの有効無効を切り替え印刷設定を読み込む
         private void ConfigurePrintSettings() {
             FirstSerialNumberCheckBox.Checked = true;
 
@@ -115,6 +115,7 @@ namespace ProductDatabase {
 
             LoadSettings();
         }
+        // 製品・型式に対応するJSON印刷設定ファイルを読み込んでProductPrintSettingsに反映する
         private void LoadSettings() {
             try {
                 ProductPrintSettings = new DocumentPrintSettings();
@@ -126,7 +127,7 @@ namespace ProductDatabase {
                 MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        // 登録処理
+        // 入力チェック後に確認ダイアログを表示してDB登録と印刷処理を実行する
         private void RegisterCheck(bool isPrint) {
             if (!DataCheck()) { return; }
 
@@ -154,6 +155,7 @@ namespace ProductDatabase {
                     break;
             }
         }
+        // 再印刷テーブルにレコードを挿入しバックアップとログ記録を行う
         private bool Registration() {
             try {
                 using SqliteConnection con = new(GetConnectionRegistration());
@@ -188,6 +190,7 @@ namespace ProductDatabase {
                 return false;
             }
         }
+        // 再印刷テーブルへのINSERT文を実行し生成されたROWIDを作業データに保存する
         private void InsertProduct(SqliteConnection connection) {
             var commandText =
                 $"""
@@ -242,6 +245,7 @@ namespace ProductDatabase {
             _productRegisterWork.RowID = connection.ExecuteScalar<int>("SELECT last_insert_rowid();");
         }
 
+        // 入力値のバリデーションを行いシリアルリストと作業データをセットする
         private bool DataCheck() {
             var revision = RevisionTextBox.Text.Trim();
             if (RevisionCheckBox.Checked) {
@@ -310,7 +314,7 @@ namespace ProductDatabase {
             return true;
         }
 
-        // 印刷処理
+        // isPrintがtrueなら印刷ダイアログ経由で印刷しfalseならプレビューを表示する
         private bool Print(bool isPrint) {
             try {
                 using System.Drawing.Printing.PrintDocument pd = new();
@@ -367,6 +371,7 @@ namespace ProductDatabase {
                 return false;
             }
         }
+        // シリアルコードと日付情報からテキストフォーマットに従ってラベル印字コードを生成する
         private string GenerateCode(int serialCode) {
             var regDate = DateTime.TryParse(_productRegisterWork.RegDate, out var parsedDate)
                 ? parsedDate
@@ -395,7 +400,7 @@ namespace ProductDatabase {
 
             return outputCode;
         }
-        // チェックボックスイベント
+        // チェックボックスのOn/Offに連動して関連する入力コントロールの有効無効を切り替える
         private void CheckBoxChecked(object sender, EventArgs e) {
             var checkBox = (CheckBox)sender;
 
@@ -442,14 +447,14 @@ namespace ProductDatabase {
             }
             ValidateAllInputs();
         }
-        // 入力数値のみ
+        // 数字とバックスペース以外のキー入力を無効化して数値入力専用にする
         private void NumericOnly(object sender, KeyPressEventArgs e) {
             // 0～9と、バックスペース以外の時は、イベントをキャンセルする
             if (e.KeyChar is (< '0' or > '9') and not '\b') {
                 e.Handled = true;
             }
         }
-        // QR入力処理
+        // QRコードテキストを「//」区切りで分割して製番・数量・注番を各入力欄にセットする
         private void QrInput() {
             try {
                 if (string.IsNullOrWhiteSpace(QrCodeTextBox.Text)) { return; }
@@ -467,7 +472,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        // 取得情報表示
+        // 現在の製品・作業データのフィールド値をリスト形式のサブウィンドウで確認表示する
         private void ShowInfo() {
             var items = new Dictionary<string, string>
                 {
@@ -527,7 +532,7 @@ namespace ProductDatabase {
             form.ShowDialog();
         }
 
-        // 入力チェック
+        // 全入力コントロールを検証し問題があればエラー表示して印刷ボタンを無効化する
         private void ValidateAllInputs() {
             ErrorMessageLabel.Text = "";
 
@@ -608,6 +613,7 @@ namespace ProductDatabase {
             }
 
         }
+        // エラーメッセージを赤字で表示して全印刷ボタンを無効化する
         private void ShowError(string message) {
             ErrorMessageLabel.Text = message;
             ErrorMessageLabel.ForeColor = Color.Red;
@@ -618,6 +624,7 @@ namespace ProductDatabase {
             バーコード印刷プレビューToolStripMenuItem.Enabled = false;
         }
 
+        // 入力コントロール変更時にすべての入力検証を再実行する
         private void InputControls_TextChanged(object? sender, EventArgs e) {
             ValidateAllInputs();
         }

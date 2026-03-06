@@ -8,6 +8,7 @@
             InitializeComponent();
         }
 
+        // ロード時にフォーカスを温度欄にセットしEnterキーで次欄・OKへ移動するキーハンドラを登録する
         private void LoadEvents() {
             ActiveControl = TemperatureTextBox;
             TemperatureTextBox.KeyPress += (sender, e) => {
@@ -22,6 +23,7 @@
             };
         }
 
+        // 温度・湿度の入力値をプロパティに保存してダイアログをOKで閉じる
         private void OkButton() {
             Temperature = TemperatureTextBox.Text;
             Humidity = HumidityTextBox.Text;

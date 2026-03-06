@@ -47,7 +47,7 @@ namespace ProductDatabase {
             _appSettings = appSettings;
         }
 
-        // ロードイベント
+        // フォームロード時にUIを初期化しDBから在庫数取得・チェックボックス状態設定・印刷設定読み込みを行う
         private void LoadEvents() {
             try {
                 Font = new Font(_appSettings.FontName, _appSettings.FontSize);
@@ -103,6 +103,7 @@ namespace ProductDatabase {
                 Close();
             }
         }
+        // 指定パスのJSONファイルから印刷設定を読み込みSubstratePrintSettingsに反映する
         private void LoadSettings(string settingFilePath) {
             try {
                 var jsonString = File.ReadAllText(settingFilePath);
@@ -111,7 +112,7 @@ namespace ProductDatabase {
                 MessageBox.Show($"設定ファイルの読み込みに失敗しました。{Environment.NewLine}{ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        // 登録処理
+        // 入力検証後にDB登録を行いラベル印刷フラグに応じて印刷またはプレビューを実行してウィンドウを閉じる
         private void ProcessRegistration(bool isPrint) {
             try {
 
@@ -149,6 +150,7 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = true;
             }
         }
+        // トランザクションで基板登録テーブルに入荷/不良レコードを挿入しログ記録とバックアップを行う
         private bool Registration() {
             using var con = new SqliteConnection(GetConnectionRegistration());
             con.Open();
@@ -333,6 +335,7 @@ namespace ProductDatabase {
             }
 
         }
+        // 入力値の数値チェックと範囲検証を行いWorkオブジェクトへ値をセットしてシリアルリストを生成する
         private bool ValidateData() {
 
             var quantity = 0;
@@ -392,7 +395,7 @@ namespace ProductDatabase {
             return true;
         }
 
-        // 印刷処理
+        // PrintDocumentを使って基板ラベルを印刷またはプレビュー表示する
         private void PrintStart(bool isPrint) {
             try {
                 using System.Drawing.Printing.PrintDocument pd = new();
@@ -452,7 +455,7 @@ namespace ProductDatabase {
             }
         }
 
-        // 在庫数取得
+        // DBから対象基板の現在庫数を集計して文字列で返す
         private string GetStockQuantity() {
             using var con = new SqliteConnection(GetConnectionRegistration());
 
@@ -475,7 +478,7 @@ namespace ProductDatabase {
             return stock?.ToString() ?? "0";
         }
 
-        // コメント用テンプレート
+        // ComboBoxで選択したテンプレート文字列をコメントテキストボックスに追記する
         private void TemplateComment() {
             var templateWord = CommentComboBox.SelectedIndex switch {
                 0 => "[Rev.UP]変更点番号:",
@@ -483,7 +486,7 @@ namespace ProductDatabase {
             };
             CommentTextBox.Text = $"{CommentTextBox.Text}{templateWord}";
         }
-        // チェックボックスイベント
+        // チェックボックスのON/OFFに応じて対応する入力コントロールの有効状態を切り替え入力検証を再実行する
         private void CheckBoxChecked(object sender, EventArgs e) {
             var checkBox = (CheckBox)sender;
 
@@ -540,14 +543,14 @@ namespace ProductDatabase {
             }
             ValidateAllInputs();
         }
-        // 入力数値のみ
+        // KeyPressイベントで数字とバックスペース以外の入力をキャンセルする
         private void NumericOnly(object sender, KeyPressEventArgs e) {
             // 0～9と、バックスペース以外の時は、イベントをキャンセルする
             if (e.KeyChar is (< '0' or > '9') and not '\b') {
                 e.Handled = true;
             }
         }
-        // QR入力処理
+        // QRコードテキストを"//"区切りでパースし製番・数量・注文番号の各フィールドに反映する
         private void QrInput() {
             try {
                 if (string.IsNullOrWhiteSpace(QrCodeTextBox.Text)) { return; }
@@ -565,7 +568,7 @@ namespace ProductDatabase {
                 throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", ex);
             }
         }
-        // 取得情報表示
+        // 現在の基板・作業データのフィールド値をListViewで確認表示するデバッグ用ダイアログを開く
         private void ShowInfo() {
             var items = new Dictionary<string, string>
                 {
@@ -615,7 +618,7 @@ namespace ProductDatabase {
             };
             form.ShowDialog();
         }
-        // 基板設定を開く
+        // 基板マスター情報をもとに基板仕様Excelファイルを開く
         private void OpenSubstrateInformation() {
             try {
                 ExcelServiceClosedXml.SubstrateInformationClosedXml.OpenSubstrateInformationClosedXml(_substrateMaster);
@@ -624,7 +627,7 @@ namespace ProductDatabase {
             }
         }
 
-        // 入力チェック
+        // 有効なテキストボックスの入力状態・製番桁数・数量・担当者選択を検証しエラー時は登録ボタンを無効化する
         private void ValidateAllInputs() {
             ErrorMessageLabel.Text = "";
             RegisterButton.Enabled = true;
@@ -681,6 +684,7 @@ namespace ProductDatabase {
             }
 
         }
+        // エラーメッセージラベルに赤字でメッセージを表示し登録ボタンと印刷プレビューを無効化する
         private void ShowError(string message) {
             ErrorMessageLabel.Text = message;
             ErrorMessageLabel.ForeColor = Color.Red;
@@ -688,6 +692,7 @@ namespace ProductDatabase {
             印刷プレビューToolStripMenuItem.Enabled = false;
         }
 
+        // 入力コントロール変更時にすべての入力検証を再実行する
         private void InputControls_TextChanged(object? sender, EventArgs e) {
             ValidateAllInputs();
         }

@@ -14,7 +14,7 @@ namespace ProductDatabase {
             _appSettings = appSettings;
         }
 
-        // ロードイベント
+        // ロード時に品目候補リストを重複除去してListBoxに表示し先頭を選択する
         private void LoadEvents() {
             SeveralListBox.Items.Clear();
             Font = new Font(_appSettings.FontName, _appSettings.FontSize);
@@ -38,6 +38,7 @@ namespace ProductDatabase {
             SeveralListBox.SelectedIndex = 0;
         }
 
+        // ListBoxの選択インデックスをSelectedIndexプロパティに保存する
         private void ReturnedIndex() { SelectedIndex = SeveralListBox.SelectedIndex; }
 
         private void SeveralDialogWindow_Load(object sender, EventArgs e) { LoadEvents(); }

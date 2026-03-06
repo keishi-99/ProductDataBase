@@ -161,6 +161,7 @@ namespace ProductDatabase.ExcelService {
                     HasSubstrateInput = hasValue,
                 };
             }
+            // 検索名でフォルダを検索し一致するExcelファイルのパスを返す（複数一致時はダイアログで選択）
             private static string FindExcelFile(string directoryPath, string searchName) {
                 var filePaths = string.IsNullOrEmpty(searchName)
                     ? []

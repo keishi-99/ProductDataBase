@@ -12,6 +12,7 @@ namespace ProductDatabase {
         public string RegDate { get; set; } = string.Empty;
         public string Comment { get; set; } = string.Empty;
 
+        // 基板登録作業データを初期値にリセットする
         public void Reset() {
             SubstrateID = 0;
             ProductNumber = string.Empty;

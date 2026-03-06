@@ -46,7 +46,7 @@ namespace ProductDatabase {
             _appSettings = appSettings;
         }
 
-        // ロードイベント
+        // フォームロード時にUIを初期化し対象製品の基板在庫・使用状況をDBから取得してDataGridViewに表示する
         private void LoadEvents() {
             try {
                 Font = new Font(_appSettings.FontName, _appSettings.FontSize);
@@ -198,7 +198,7 @@ namespace ProductDatabase {
             [12f] = new() { RowHeight = 24, ColumnWidths = [220, 40, 40, 40, 24] },
             [14f] = new() { RowHeight = 25, ColumnWidths = [230, 60, 60, 60, 25] }
         };
-        // 変更登録
+        // 数量チェック後にDB登録を実行し登録完了後はフォームを編集不可にしてリスト印刷ボタンを有効化する
         private void ChangeRegistration() {
             try {
                 if (!QuantityCheck()) { return; }
@@ -229,6 +229,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        // 各基板のDgvで入力された使用数が在庫範囲内か・必要数と一致するかを検証しOK/NGを返す
         private bool QuantityCheck() {
             try {
                 switch (_productMaster.RegType) {
@@ -294,6 +295,7 @@ namespace ProductDatabase {
                 return false;
             }
         }
+        // トランザクションで基板テーブルの使用数を更新（既存行の修正または新規挿入）し製品テーブルも更新してバックアップとログを記録する
         private void Registration() {
             try {
                 _productRegisterWork.RegDate = RegistrationDateTimePicker.Value.ToShortDateString();
@@ -530,10 +532,11 @@ namespace ProductDatabase {
             }
         }
 
+        // 空文字・空白文字列はDBNull.Valueに変換してDB挿入/更新時のNULL処理を統一する
         private static object ToDbValue(string? value) {
             return string.IsNullOrWhiteSpace(value) ? DBNull.Value : value;
         }
-        // リスト印刷
+        // 基板変更済み製品情報をもとにExcel製品一覧を生成する
         private void GenerateList() {
             try {
                 // --- 処理中カーソルに変更 ---
@@ -548,7 +551,7 @@ namespace ProductDatabase {
             }
         }
 
-        // チェックボックスイベント
+        // チェックボックスのON/OFFに応じて対応するDataGridViewの表示・有効状態を切り替え未チェック時は警告を表示する
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
             var checkBox = (CheckBox)sender;
             var dataGridView = GetDataGridViewForCheckBox(checkBox.Name);
@@ -564,7 +567,7 @@ namespace ProductDatabase {
                                MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
-        // 入力チェック
+        // 担当者選択状態を検証しエラーがあればメッセージ表示と登録ボタン無効化を行う
         private void ValidateAllInputs() {
             ErrorMessageLabel.Text = "";
             RegisterButton.Enabled = true;
@@ -575,16 +578,19 @@ namespace ProductDatabase {
             }
 
         }
+        // エラーメッセージラベルに赤字でメッセージを表示し登録ボタンを無効化する
         private void ShowError(string message) {
             ErrorMessageLabel.Text = message;
             ErrorMessageLabel.ForeColor = Color.Red;
             RegisterButton.Enabled = false;
         }
 
+        // 入力コントロール変更時にすべての入力検証を再実行する
         private void InputControls_TextChanged(object? sender, EventArgs e) {
             ValidateAllInputs();
         }
 
+        // チェックボックス名から対応するDataGridViewを返す
         private DataGridView? GetDataGridViewForCheckBox(string checkBoxName) {
             return checkBoxName switch {
                 "Substrate1CheckBox" => Substrate1DataGridView,

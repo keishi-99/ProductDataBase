@@ -16,6 +16,7 @@ namespace ProductDatabase {
         public int SerialFirstNumber { get; set; }
         public int SerialLastNumber { get; set; }
 
+        // 製品登録作業データを初期値にリセットする
         public void Reset() {
             RowID = 0;
             ProductID = 0;
