@@ -1,7 +1,5 @@
 ﻿using Dapper;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
 using ProductDatabase.Other;
 using System.Data;
 using System.Data.Odbc;
@@ -21,365 +19,7 @@ namespace ProductDatabase {
         private string _pwd = string.Empty;
 
         readonly string _jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "General", "appsettings.json");
-
-        [Flags]
-        public enum SerialPrintTypeFlags {
-            None = 0,
-            Label = 1 << 0,         // 00001
-            Barcode = 1 << 1,       // 00010
-            Nameplate = 1 << 2,     // 00100
-            Underline = 1 << 3,     // 01000
-            Last4Digits = 1 << 4    // 10000
-        }
-
-        [Flags]
-        public enum SheetPrintTypeFlags {
-            None = 0,
-            CheckSheet = 1 << 0,    // 00001
-            List = 1 << 1,          // 00010
-        }
-
-        public class ProductRepository {
-
-            public DataTable ProductDataTable { get; } = new();
-            public DataTable SubstrateDataTable { get; } = new();
-            public DataTable ProductUseSubstrate { get; } = new();
-
-            public void LoadAll() {
-
-                ProductDataTable.Clear();
-                SubstrateDataTable.Clear();
-                ProductUseSubstrate.Clear();
-
-                using var con = new SqliteConnection(GetConnectionRegistration());
-                con.Open();
-
-                using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.ProductTableName};")) {
-                    ProductDataTable.Load(reader);
-                }
-
-                using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.SubstrateTableName};")) {
-                    SubstrateDataTable.Load(reader);
-                }
-
-                using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.VProductUseSubstrate};")) {
-                    ProductUseSubstrate.Load(reader);
-                }
-            }
-
-            public DataRow GetSubstrateById(long id) {
-                return SubstrateDataTable
-                    .AsEnumerable()
-                    .SingleOrDefault(r => r.Field<long>("SubstrateID") == id)
-                    ?? throw new InvalidOperationException($"基板ID [{id}] が見つかりません。");
-            }
-
-            public DataRow GetProductById(long id) {
-                return ProductDataTable
-                    .AsEnumerable()
-                    .SingleOrDefault(r => r.Field<long>("ProductID") == id)
-                    ?? throw new InvalidOperationException($"製品ID [{id}] が見つかりません。");
-            }
-
-            // 製品IDから使用基板リストを取得
-            public static List<SubstrateInfo> GetUseSubstrates(int productKey) {
-                using var con = new SqliteConnection(GetConnectionRegistration());
-
-                var sql =
-                    $"""
-                    SELECT 
-                        S_SubstrateID as SubstrateID,
-                        SubstrateName,
-                        SubstrateModel
-                    FROM {Constants.VProductUseSubstrate}
-                    WHERE P_ProductID = @ProductKey
-                    """
-                    ;
-
-                return [.. con.Query<SubstrateInfo>(sql, new { ProductKey = productKey })];
-            }
-
-            public void Clear() {
-                ProductDataTable.Clear();
-                SubstrateDataTable.Clear();
-                ProductUseSubstrate.Clear();
-            }
-        }
-
-        public class ProductMaster {
-            public int ProductID { get; set; }
-            public string CategoryName { get; set; } = string.Empty;
-            public string ProductName { get; set; } = string.Empty;
-            public string ProductModel { get; set; } = string.Empty;
-            public string ProductType { get; set; } = string.Empty;
-            public string Initial { get; set; } = string.Empty;
-            public int SerialDigitType { get; set; }
-            public int SerialDigit => SerialDigitType switch {
-                3 or 101 or 102 => 3,
-                4 => 4,
-                _ => 0
-            };
-            public int RevisionGroup { get; set; }
-            public int CheckBin { get; set; }
-            public List<SubstrateInfo> UseSubstrates { get; set; } = [];
-
-            private int _regType;
-            public int RegType {
-                get => _regType;
-                set {
-                    _regType = value;
-                    UpdatePrintFlags();
-                }
-            }
-
-            private int _serialPrintType;
-            public int SerialPrintType {
-                get => _serialPrintType;
-                set {
-                    _serialPrintType = value;
-                    UpdatePrintFlags();
-                }
-            }
-
-            private int _sheetPrintType;
-            public int SheetPrintType {
-                get => _sheetPrintType;
-                set {
-                    _sheetPrintType = value;
-                    UpdatePrintFlags();
-                }
-            }
-
-            // ===== 結果フラグ =====
-
-            public bool IsLabelPrint { get; private set; }
-            public bool IsBarcodePrint { get; private set; }
-            public bool IsNameplatePrint { get; private set; }
-            public bool IsLast4Digits { get; private set; }
-            public bool IsUnderlinePrint { get; private set; }
-
-            public bool IsCheckSheetPrint { get; private set; }
-            public bool IsListPrint { get; private set; }
-
-            public bool IsSerialGeneration { get; private set; }
-            public bool IsRegType9 { get; private set; }
-
-            // ===== 内部更新処理 =====
-
-            private void UpdatePrintFlags() {
-                UpdateRegTypeFlags();
-                UpdateSerialPrintTypeFlags();
-                UpdateSheetPrintTypeFlags();
-            }
-
-            private void UpdateRegTypeFlags() {
-                IsRegType9 = RegType == 9;
-                IsSerialGeneration = RegType is 1 or 2 or 3 or 9;
-            }
-
-            private void UpdateSerialPrintTypeFlags() {
-                var flags = (SerialPrintTypeFlags)_serialPrintType;
-
-                IsLabelPrint = flags.HasFlag(SerialPrintTypeFlags.Label);
-                IsBarcodePrint = flags.HasFlag(SerialPrintTypeFlags.Barcode);
-                IsNameplatePrint = flags.HasFlag(SerialPrintTypeFlags.Nameplate);
-                IsUnderlinePrint = flags.HasFlag(SerialPrintTypeFlags.Underline);
-                IsLast4Digits = flags.HasFlag(SerialPrintTypeFlags.Last4Digits);
-            }
-
-            private void UpdateSheetPrintTypeFlags() {
-                var flags = (SheetPrintTypeFlags)_sheetPrintType;
-
-                IsCheckSheetPrint = flags.HasFlag(SheetPrintTypeFlags.CheckSheet);
-                IsListPrint = flags.HasFlag(SheetPrintTypeFlags.List);
-            }
-
-            public void LoadFrom(DataRow row) {
-                ProductID = Convert.ToInt32(row["ProductID"]);
-                CategoryName = row.Field<string>("CategoryName") ?? string.Empty;
-                ProductName = row.Field<string>("ProductName") ?? string.Empty;
-                ProductType = row.Field<string>("ProductType") ?? string.Empty;
-                ProductModel = row.Field<string>("ProductModel") ?? string.Empty;
-                Initial = row.Field<string>("Initial") ?? string.Empty;
-                RevisionGroup = Convert.ToInt32(row["RevisionGroup"]);
-                RegType = Convert.ToInt32(row["RegType"]);
-                CheckBin = Convert.ToInt32(row["Checkbox"].ToString(), 2);
-                SerialDigitType = Convert.ToInt32(row["SerialType"]);
-                SerialPrintType = Convert.ToInt32(row["SerialPrintType"]);
-                SheetPrintType = Convert.ToInt32(row["SheetPrintType"]);
-            }
-
-            public void Reset() {
-                ProductID = 0;
-                CategoryName = string.Empty;
-                ProductName = string.Empty;
-                ProductModel = string.Empty;
-                ProductType = string.Empty;
-                Initial = string.Empty;
-                SerialDigitType = 0;
-                RevisionGroup = 0;
-                CheckBin = 0;
-                UseSubstrates = [];
-                RegType = 0;
-                SerialPrintType = 0;
-                SheetPrintType = 0;
-            }
-        }
-        public class SubstrateInfo {
-            public int SubstrateID { get; set; }
-            public string SubstrateName { get; set; } = string.Empty;
-            public string SubstrateModel { get; set; } = string.Empty;
-        }
-        public class ProductRegisterWork {
-            public int RowID { get; set; }
-            public int ProductID { get; set; }
-            public string OrderNumber { get; set; } = string.Empty;
-            public string ProductNumber { get; set; } = string.Empty;
-            public string OLesNumber { get; set; } = string.Empty;
-            public string SerialFirst { get; set; } = string.Empty;
-            public string SerialLast { get; set; } = string.Empty;
-            public int Quantity { get; set; }
-            public string RegDate { get; set; } = string.Empty;
-            public string Person { get; set; } = string.Empty;
-            public string Revision { get; set; } = string.Empty;
-            public string Comment { get; set; } = string.Empty;
-
-            public int SerialFirstNumber { get; set; }
-            public int SerialLastNumber { get; set; }
-
-            public void Reset() {
-                RowID = 0;
-                ProductID = 0;
-                ProductNumber = string.Empty;
-                OrderNumber = string.Empty;
-                SerialFirst = string.Empty;
-                SerialLast = string.Empty;
-                Quantity = 0;
-                RegDate = string.Empty;
-                Person = string.Empty;
-                Revision = string.Empty;
-                Comment = string.Empty;
-                SerialFirstNumber = 0;
-                SerialLastNumber = 0;
-            }
-        }
-
-        public class SubstrateMaster {
-            public int SubstrateID { get; set; }
-            public string CategoryName { get; set; } = string.Empty;
-            public string ProductName { get; set; } = string.Empty;
-            public string SubstrateName { get; set; } = string.Empty;
-            public string SubstrateModel { get; set; } = string.Empty;
-            public int CheckBin { get; set; }
-
-            private int _regType;
-            public int RegType {
-                get => _regType;
-                set {
-                    _regType = value;
-                    UpdatePrintFlags();
-                }
-            }
-
-            private int _serialPrintType;
-            public int SerialPrintType {
-                get => _serialPrintType;
-                set {
-                    _serialPrintType = value;
-                    UpdatePrintFlags();
-                }
-            }
-
-            // ===== 結果フラグ =====
-
-            public bool IsLabelPrint { get; private set; }
-
-            public bool IsSerialGeneration { get; private set; }
-
-            // ===== 内部更新処理 =====
-
-            private void UpdatePrintFlags() {
-                UpdateRegTypeFlags();
-                UpdateSerialPrintTypeFlags();
-            }
-
-            private void UpdateRegTypeFlags() {
-                IsSerialGeneration = RegType is 1 or 2 or 3 or 9;
-            }
-
-            private void UpdateSerialPrintTypeFlags() {
-                var flags = (SerialPrintTypeFlags)_serialPrintType;
-
-                IsLabelPrint = flags.HasFlag(SerialPrintTypeFlags.Label);
-            }
-
-            public void LoadFrom(DataRow row) {
-                SubstrateID = Convert.ToInt32(row["SubstrateID"]);
-                CategoryName = row.Field<string>("CategoryName") ?? string.Empty;
-                ProductName = row.Field<string>("ProductName") ?? string.Empty;
-                SubstrateName = row.Field<string>("SubstrateName") ?? string.Empty;
-                SubstrateModel = row.Field<string>("SubstrateModel") ?? string.Empty;
-                RegType = Convert.ToInt32(row["RegType"]);
-                CheckBin = Convert.ToInt32(row["Checkbox"].ToString(), 2);
-                SerialPrintType = Convert.ToInt32(row["SerialPrintType"]);
-            }
-
-            public void Reset() {
-                SubstrateID = 0;
-                CategoryName = string.Empty;
-                ProductName = string.Empty;
-                SubstrateName = string.Empty;
-                SubstrateModel = string.Empty;
-                RegType = 0;
-                CheckBin = 0;
-                SerialPrintType = 0;
-            }
-        }
-        public class SubstrateRegisterWork {
-            public int SubstrateID { get; set; }
-
-            public string ProductNumber { get; set; } = string.Empty;
-            public string OrderNumber { get; set; } = string.Empty;
-            public int AddQuantity { get; set; }
-            public int DefectQuantity { get; set; }
-            public int UseQuantity { get; set; }
-
-            public string Person { get; set; } = string.Empty;
-            public string RegDate { get; set; } = string.Empty;
-            public string Comment { get; set; } = string.Empty;
-
-            public void Reset() {
-                SubstrateID = 0;
-                ProductNumber = string.Empty;
-                OrderNumber = string.Empty;
-                AddQuantity = 0;
-                DefectQuantity = 0;
-                UseQuantity = 0;
-                Person = string.Empty;
-                RegDate = string.Empty;
-                Comment = string.Empty;
-            }
-        }
-
-        public class QrSettings {
-            public List<string> CategoryItemNumber { get; set; } = [];
-            public List<string> CategoryProductName { get; set; } = [];
-            public List<string> CategorySubstrateName { get; set; } = [];
-            public List<string> CategoryProductType { get; set; } = [];
-            public List<string> CategoryType { get; set; } = [];
-        }
-        public class AppSettings {
-            public List<string> PersonList { get; set; } = [];
-            public string FontName { get; set; } = "Meiryo UI";
-            public float FontSize { get; set; } = 9;
-            public bool IsAdministrator { get; set; } = false;
-            public bool IsAuthorizedUser { get; set; } = false;
-        }
-        public class Config {
-            public string BackupFolderPath { get; set; } = string.Empty;
-            public string[] Administrators { get; set; } = [];
-            public string[] AuthorizedUsers { get; set; } = [];
-        }
+        private static readonly System.Text.Json.JsonSerializerOptions s_jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         private readonly ProductRepository _productRepository;
 
@@ -404,16 +44,9 @@ namespace ProductDatabase {
             _appSettings = new AppSettings();
         }
 
-        public static string GetConnectionRegistration() {
-            var productRegistryPath = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
-            return !File.Exists(productRegistryPath)
-                ? throw new FileNotFoundException("ファイルが見つかりません。", productRegistryPath)
-                : new SqliteConnectionStringBuilder() { DataSource = productRegistryPath, Pooling = false }.ToString();
-        }
-
         private static FileStream? s_lockStream;
 
-        // ロードイベント
+        // フォームロード時にファイルロック・設定読み込み・DBデータ取得・日次バックアップ作成を行いUIを初期化する
         private void LoadEvents() {
             try {
                 // ファイルロック
@@ -435,38 +68,31 @@ namespace ProductDatabase {
                 if (!File.Exists(_jsonFilePath)) {
                     throw new DirectoryNotFoundException($"'{_jsonFilePath}'\nが見つかりません。");
                 }
-                var jsonText = File.ReadAllText(_jsonFilePath);
-                var jsonObj = JObject.Parse(jsonText);
+                var generalSettings = System.Text.Json.JsonSerializer.Deserialize<GeneralSettings>(
+                    File.ReadAllText(_jsonFilePath),
+                    s_jsonOptions
+                ) ?? new GeneralSettings();
 
-                // CloneFolderPathを取得
-                CommonUtils.s_backupPath = jsonObj["BackupFolderPath"]?.ToString() ?? string.Empty;
+                // バックアップパス取得
+                CommonUtils.BackupPath = generalSettings.BackupFolderPath;
 
                 // バックアップ作成
                 CreateDailyBackup();
 
                 // 担当者取得
-                _appSettings.PersonList.Clear();
-                foreach (var person in jsonObj["Persons"]!) {
-                    _appSettings.PersonList.Add(person.ToString()!);
-                }
+                _appSettings.PersonList = [.. generalSettings.Persons];
 
                 // 認証ユーザー名を取得
-                var userSet = (jsonObj["AuthorizedUsers"] as JArray)?
-                    .Select(u => (string)u!)
-                    .Where(u => u != null)
-                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
-                _appSettings.IsAuthorizedUser = userSet?.Contains(Environment.UserName) ?? false;
+                _appSettings.IsAuthorizedUser = generalSettings.AuthorizedUsers
+                    .Contains(Environment.UserName, StringComparer.OrdinalIgnoreCase);
 
                 // 管理者ユーザー名を取得
-                var adminSet = (jsonObj["Administrators"] as JArray)?
-                    .Select(u => (string)u!)
-                    .Where(u => u != null)
-                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
-                _appSettings.IsAdministrator = adminSet?.Contains(Environment.UserName) ?? false;
+                _appSettings.IsAdministrator = generalSettings.Administrators
+                    .Contains(Environment.UserName, StringComparer.OrdinalIgnoreCase);
 
-                _dsn = jsonObj["DSN"]?.ToString() ?? string.Empty;
-                _uid = jsonObj["UID"]?.ToString() ?? string.Empty;
-                _pwd = jsonObj["PWD"]?.ToString() ?? string.Empty;
+                _dsn = generalSettings.DSN;
+                _uid = generalSettings.UID;
+                _pwd = generalSettings.PWD;
 
                 _productRepository.LoadAll();
 
@@ -477,17 +103,18 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        // 当日分のバックアップが未作成の場合のみDBをバックアップフォルダにコピーする
         private static void CreateDailyBackup() {
             // フォルダ未設定
-            if (string.IsNullOrWhiteSpace(CommonUtils.s_backupPath)) {
+            if (string.IsNullOrWhiteSpace(CommonUtils.BackupPath)) {
                 MessageBox.Show("フォルダが設定されていません。バックアップは保存されません。",
                     string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
             // ネットワークフォルダが見つからない
-            if (!Directory.Exists(CommonUtils.s_backupPath)) {
-                MessageBox.Show($"'{CommonUtils.s_backupPath}'\nが見つかりません。バックアップは保存されません。",
+            if (!Directory.Exists(CommonUtils.BackupPath)) {
+                MessageBox.Show($"'{CommonUtils.BackupPath}'\nが見つかりません。バックアップは保存されません。",
                     string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
@@ -499,7 +126,7 @@ namespace ProductDatabase {
             var day = today.Day;
 
             // パス生成
-            string backupFolder = Path.Combine(CommonUtils.s_backupPath, "db", "backup", $"{year}", $"{month:00}");
+            string backupFolder = Path.Combine(CommonUtils.BackupPath, "db", "backup", $"{year}", $"{month:00}");
             string backupFile = Path.Combine(backupFolder, $"_bak_{year}-{month:00}-{day:00}.db");
             string productRegistryFile = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
 
@@ -509,6 +136,7 @@ namespace ProductDatabase {
                 File.Copy(productRegistryFile, backupFile, overwrite: false);
             }
         }
+        // 各マスター・作業データをリセットしDBを再読み込みする
         private void ResetFields() {
             _productMaster.Reset();
             _productRegisterWork.Reset();
@@ -520,6 +148,7 @@ namespace ProductDatabase {
 
             _appSettings.FontSize = _fontSize;
         }
+        // 実行中のEXEファイルをロックして二重起動を防止する
         private static void LockSelf() {
             try {
                 string exePath = Application.ExecutablePath;
@@ -528,18 +157,7 @@ namespace ProductDatabase {
                 // 失敗しても無視
             }
         }
-        // 登録ボタン処理
-        public class ListItem<T> {
-            public T Id { get; set; } = default!;
-            public string Name { get; set; } = string.Empty;
-
-            public override string ToString() => Name;
-        }
-        public enum ProductOperationMode {
-            Register,
-            RePrint,
-            SubstrateChange
-        }
+        // ラジオボタンのモードに応じて選択品目の基板登録・製品登録・再印刷・基板変更ウィンドウを開く
         private void Registration() {
             ResetFields();
 
@@ -565,6 +183,7 @@ namespace ProductDatabase {
 
             QRCodeTextBox.Text = string.Empty;
         }
+        // 指定基板IDのマスターを読み込み基板登録ウィンドウを開く
         private void HandleSubstrateRegistration(int substrateId) {
 
             var row = _productRepository.GetSubstrateById(substrateId);
@@ -574,6 +193,7 @@ namespace ProductDatabase {
             using SubstrateRegistrationWindow window = new(_substrateMaster, _substrateRegisterWork, _appSettings);
             window.ShowDialog(this);
         }
+        // 指定製品IDのマスターを読み込みモードに応じた製品操作ウィンドウを開く
         private void HandleProductRegistration(int productId, ProductOperationMode mode) {
 
             var row = _productRepository.GetProductById(productId);
@@ -601,7 +221,7 @@ namespace ProductDatabase {
                     break;
             }
         }
-        // 履歴ボタン処理
+        // 品目選択有無に応じてマスターをセットし履歴ウィンドウをダイアログで開く
         private void History() {
 
             ResetFields();
@@ -623,6 +243,7 @@ namespace ProductDatabase {
 
             window.ShowDialog(this);
         }
+        // 品目未選択時にカテゴリ名・製品名のみマスターにセットする
         private void LoadHistoryWithoutSelection() {
             switch (RadioButtonNumber) {
                 case 1:
@@ -635,6 +256,7 @@ namespace ProductDatabase {
                     break;
             }
         }
+        // 品目選択時に該当マスターデータをDBから読み込む
         private void LoadHistoryWithSelection(int itemId) {
             switch (RadioButtonNumber) {
                 case 1:
@@ -655,7 +277,7 @@ namespace ProductDatabase {
             { 3, new CategoryConfig("ProductType",   "ProductID",   "ProductType")   }, // 再印刷
             { 4, new CategoryConfig("ProductType",   "ProductID",   "ProductType")   }  // 基板変更
         };
-        // 処理カテゴリセレクト
+        // ラジオボタン選択時にモードに応じたマスターデータをフィルタしてCategoryListBox1にカテゴリ一覧を表示する
         private void CategorySelect(object sender) {
 
             RegisterButton.Enabled = false;
@@ -714,7 +336,7 @@ namespace ProductDatabase {
             CategoryListBox1.Items.AddRange([.. categoryNames]);
             HistoryButton.Enabled = RadioButtonNumber != 4;
         }
-        // 製品カテゴリセレクト
+        // カテゴリ選択時に一致する製品名またはSubstrateNameの一覧をListBox2に表示する
         private void CategoryListBox1Select() {
             RegisterButton.Enabled = false;
             HistoryButton.Enabled = RadioButtonNumber != 4;
@@ -740,6 +362,7 @@ namespace ProductDatabase {
 
             CategoryListBox2.Items.AddRange([.. productNames]);
         }
+        // 製品名セレクト：カテゴリ・製品名に一致する品目一覧をListBox3に表示する
         private void CategoryListBox2Select() {
             RegisterButton.Enabled = false;
             HistoryButton.Enabled = RadioButtonNumber != 4;
@@ -773,11 +396,12 @@ namespace ProductDatabase {
 
             CategoryListBox3.Items.AddRange([.. items.Cast<object>()]);
         }
+        // 品目セレクト：選択確定時に登録ボタンを有効化する
         private void CategoryListBox3Select() {
             RegisterButton.Enabled = true;
         }
 
-        // QRコード読み取り
+        // QR/バーコード入力を解析してSQLiteを検索し品目候補に応じた登録ウィンドウを開く
         private void CodeScan() {
             try {
                 if (string.IsNullOrWhiteSpace(QRCodeTextBox.Text)) { return; }
@@ -808,6 +432,7 @@ namespace ProductDatabase {
                 CleanupAfterScan();
             }
         }
+        // コードスキャン前にUIと各設定データをリセットしフォームを無効化する
         private void ResetFieldsForCodeScan() {
             CategoryRadioButton1.Checked = CategoryRadioButton2.Checked = CategoryRadioButton3.Checked = CategoryRadioButton4.Checked = false;
             CategoryListBox1.Items.Clear();
@@ -821,6 +446,7 @@ namespace ProductDatabase {
             ResetFields();
             Enabled = false;
         }
+        // QRコードテキストを解析して製番・品目番号・数量・注番を取得する
         private void ParseQRCodeInput() {
             try {
                 string[] separator = ["//"];
@@ -838,6 +464,7 @@ namespace ProductDatabase {
                 throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}", ex);
             }
         }
+        // バーコードの手配管理番号からODBCで手配情報を取得して各フィールドにセットする
         private void BarcodeInput() {
             using var con = new OdbcConnection($"DSN={_dsn}; UID={_uid}; PWD={_pwd}");
             con.Open();
@@ -864,6 +491,7 @@ namespace ProductDatabase {
             public int 手配数 { get; set; }
             public string 請求先注番 { get; set; } = string.Empty;
         }
+        // 品目番号から不要なサフィックスを除去して正規化する
         private void ProcessCategoryItemData() {
             var pattern = @"-(?:SMT|H|GH).*";
             var result = Regex.Replace(_productMaster.ProductModel, pattern, string.Empty);
@@ -871,8 +499,9 @@ namespace ProductDatabase {
                 .Replace("-ACGH", "-AC")
                 .Replace("-DCGH", "-DC");
         }
+        // 品目番号でSQLiteを検索し一致する基板・製品情報をリストに追加する
         private void FetchDataFromSQLite() {
-            using var con = new SqliteConnection(GetConnectionRegistration());
+            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
 
             var sql =
                 $"""
@@ -918,6 +547,7 @@ namespace ProductDatabase {
                 }
             }
         }
+        // 品目情報を各カテゴリリストに追加する
         private void AddToLists(string itemNumber, string productName, string productType, string substrateName, string type) {
             _qrSettings.CategoryItemNumber.Add(itemNumber);
             _qrSettings.CategoryProductName.Add(productName);
@@ -925,11 +555,13 @@ namespace ProductDatabase {
             _qrSettings.CategorySubstrateName.Add(substrateName);
             _qrSettings.CategoryType.Add(type);
         }
+        // 複数候補がある場合に選択ダイアログを表示し選択インデックスを返す
         private int ShowDialogWindowForMultipleItems() {
             using SeveralDialogWindow window = new(_qrSettings, _appSettings);
             window.ShowDialog(this);
             return window.SelectedIndex;
         }
+        // 選択された品目のタイプに応じて基板または製品の登録処理を実行する
         private void HandleSelectedItem(int listIndex) {
             var productName = _qrSettings.CategoryProductName[listIndex];
             var productType = _qrSettings.CategoryProductType[listIndex];
@@ -947,6 +579,7 @@ namespace ProductDatabase {
                     throw new Exception($"一致する情報がありません。{Environment.NewLine}品目番号:{_productMaster.ProductModel}{Environment.NewLine}");
             }
         }
+        // 製品名と基板名で基板マスターを検索し基板登録ウィンドウを開く
         private void HandleSubstrateSelection(string productName, string substrateName) {
             var substrateRet = _productRepository.SubstrateDataTable
                 .AsEnumerable()
@@ -955,6 +588,7 @@ namespace ProductDatabase {
                 .ToArray();
             OpenSubstrateRegistrationWindow(substrateRet);
         }
+        // 基板マスターと作業データをセットして基板登録ウィンドウを表示する
         private void OpenSubstrateRegistrationWindow(DataRow[] substrateRet) {
             _substrateMaster.LoadFrom(substrateRet[0]);
             _substrateRegisterWork.ProductNumber = _productRegisterWork.ProductNumber;
@@ -963,6 +597,7 @@ namespace ProductDatabase {
             using SubstrateRegistrationWindow window = new(_substrateMaster, _substrateRegisterWork, _appSettings);
             window.ShowDialog(this);
         }
+        // 製品名と型式で製品マスターを検索し製品登録ウィンドウを開く
         private void HandleProductSelection(string productName, string productType) {
             var productRet = _productRepository.ProductDataTable
                 .AsEnumerable()
@@ -971,18 +606,20 @@ namespace ProductDatabase {
                 .ToArray();
             OpenProductRegistrationWindow(productRet);
         }
+        // 製品マスターと使用基板情報をセットして製品登録ウィンドウを表示する
         private void OpenProductRegistrationWindow(DataRow[] productRet) {
             _productMaster.LoadFrom(productRet[0]);
             _productMaster.UseSubstrates = ProductRepository.GetUseSubstrates(_productMaster.ProductID);
             using ProductRegistration1Window window = new(_productMaster, _productRegisterWork, _appSettings);
             window.ShowDialog(this);
         }
+        // スキャン後にフォームを再有効化してQRコード入力欄にフォーカスを戻す
         private void CleanupAfterScan() {
             Enabled = true;
             QRCodeTextBox.Focus();
         }
 
-        // フォント変更
+        // ラジオボタン選択に応じてアプリ全体のフォントサイズを変更する
         private void FontChange(object sender) {
             var radioButton = (RadioButton)sender;
 
@@ -996,7 +633,7 @@ namespace ProductDatabase {
             _appSettings.FontSize = _fontSize;
             Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
         }
-        // excel
+        // ExcelのパスをInteropで取得しEXEを直接起動して指定ファイルを開く
         private static void OpenExcel(string filePath) {
             Microsoft.Office.Interop.Excel.Application? xlApp = null;
             try {

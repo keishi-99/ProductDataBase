@@ -1,8 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.Sqlite;
-using Newtonsoft.Json.Linq;
 using ProductDatabase.Other;
-using static ProductDatabase.MainWindow;
+using static ProductDatabase.ProductRepository;
 
 namespace ProductDatabase {
     public partial class ProductRegistration1Window : Form {
@@ -29,7 +28,7 @@ namespace ProductDatabase {
             _appSettings = appSettings;
         }
 
-        // ロードイベント
+        // フォームロード時にUI初期化・DBからのリビジョン/シリアル取得・機種別メッセージ表示を行う
         private void LoadEvents() {
             try {
                 Font = new Font(_appSettings.FontName, _appSettings.FontSize);
@@ -111,13 +110,7 @@ namespace ProductDatabase {
                     var nextSerialNumber = serialLastNum + 1;
 
                     // シリアル番号の桁数に応じて、閾値とリセット値を設定
-                    (var minNumber, var maxNumber, var digit) = _productMaster.SerialDigitType switch {
-                        3 => (1, 999, 3),
-                        4 => (1, 9999, 4),
-                        101 => (1, 899, 3),
-                        102 => (901, 999, 3),
-                        _ => throw new InvalidOperationException("不明なシリアル桁数です。")
-                    };
+                    (var minNumber, var maxNumber, var digit) = _productMaster.GetSerialRange();
 
                     if (nextSerialNumber > maxNumber || nextSerialNumber < minNumber) {// あるいは firstSerialが minNumber未満の場合も対象に
                         MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -141,30 +134,12 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        // 登録チェック
+        // 入力値の最終検証を行い問題なければ製品登録2ウィンドウを開く
         private void RegisterCheck() {
             try {
-                var anyTextBoxEnabled = false;
-                var allTextBoxesFilled = true;
-
-                foreach (Control control in Controls) {
-                    if (control is TextBoxBase textBox && textBox.Enabled) {
-                        anyTextBoxEnabled = true;
-                        if (string.IsNullOrWhiteSpace(textBox.Text) && textBox.Name != "QrCodeTextBox") {
-                            allTextBoxesFilled = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (PersonComboBox.SelectedIndex == -1 && PersonComboBox.Enabled) {
-                    MessageBox.Show("担当者が選択されていません。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    PersonComboBox.Focus();
-                    return;
-                }
-
-                if (!anyTextBoxEnabled) { throw new Exception("何も入力されていません"); }
-                if (!allTextBoxesFilled || (PersonCheckBox.Checked && string.IsNullOrWhiteSpace(PersonComboBox.Text))) { throw new Exception("空欄があります。"); }
+                // ValidateAllInputs が既にリアルタイムでチェック済みのため、エラー状態なら早期リターン
+                ValidateAllInputs();
+                if (!RegisterButton.Enabled) return;
 
                 var revision = RevisionTextBox.Text.Trim();
                 if (RevisionCheckBox.Checked) {
@@ -224,13 +199,7 @@ namespace ProductDatabase {
 
                     var calculatedLastSerial = quantity + firstSerial - 1;
 
-                    (var minNumber, var maxNumber, var digit) = _productMaster.SerialDigitType switch {
-                        3 => (1, 999, 3),
-                        4 => (1, 9999, 4),
-                        101 => (1, 899, 3),
-                        102 => (901, 999, 3),
-                        _ => throw new InvalidOperationException("不明なシリアル桁数です。")
-                    };
+                    (var minNumber, var maxNumber, var digit) = _productMaster.GetSerialRange();
 
                     if (calculatedLastSerial > maxNumber || firstSerial < minNumber) {
                         MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -261,7 +230,7 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = true;
             }
         }
-        // revisionの変更
+        // 確認ダイアログを経てDBにRevision変更レコードを挿入しログ記録する
         private void RevisionChange() {
             var result = MessageBox.Show("レビジョンを変更しますか？",
                 "確認",
@@ -346,7 +315,7 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        // コメント用テンプレート
+        // 選択されたテンプレートワードをコメントTextBoxに追記する
         private void TemplateComment() {
             var templateWord = CommentComboBox.SelectedIndex switch {
                 0 => "[Rev.UP]変更点番号:",
@@ -354,7 +323,7 @@ namespace ProductDatabase {
             };
             CommentTextBox.Text = $"{CommentTextBox.Text}{templateWord}";
         }
-        // チェックボックスイベント
+        // チェックボックスのOn/Offに連動して関連する入力コントロールの有効無効を切り替える
         private void CheckBoxChecked(object sender, EventArgs e) {
             var checkBox = (CheckBox)sender;
 
@@ -403,14 +372,14 @@ namespace ProductDatabase {
             }
             ValidateAllInputs();
         }
-        // 入力数値のみ
+        // 数字とバックスペース以外のキー入力を無効化して数値入力専用にする
         private void NumericOnly(object sender, KeyPressEventArgs e) {
             // 0～9と、バックスペース以外の時は、イベントをキャンセルする
             if (e.KeyChar is (< '0' or > '9') and not '\b') {
                 e.Handled = true;
             }
         }
-        // QR入力処理
+        // QRコードテキストを「//」区切りで解析して製番・数量・注番を各入力欄にセットする
         private void QrInput() {
             if (string.IsNullOrWhiteSpace(QrCodeTextBox.Text)) { return; }
             string[] separator = ["//"];
@@ -420,18 +389,16 @@ namespace ProductDatabase {
                 MessageBox.Show("QRコードが正しくありません。");
                 return;
             }
-            if (arr is not null) {
-                ManufacturingNumberMaskedTextBox.Text = arr[0];
-                QuantityTextBox.Text = arr[2];
-                OrderNumberTextBox.Text = arr[3];
-            }
+            ManufacturingNumberMaskedTextBox.Text = arr[0];
+            QuantityTextBox.Text = arr[2];
+            OrderNumberTextBox.Text = arr[3];
         }
-        // ログ出力
+        // Revision変更の操作内容をログファイルに記録する
         private static void LogRegistration(ProductMaster productMaster, ProductRegisterWork productRegisterWork, long id) {
             string[] logMessageArray = [
                 $"[Rev変更]",
                 $"[{productMaster.CategoryName}]",
-                $"ID{id}]",
+                $"[ID{id}]",
                 $"[]",
                 $"[]",
                 $"[]",
@@ -448,7 +415,7 @@ namespace ProductDatabase {
             ];
             CommonUtils.Logger.AppendLog(logMessageArray);
         }
-        // 取得情報表示
+        // 現在の製品マスターのフィールド値をリスト形式のサブウィンドウで確認表示する
         private void ShowInfo() {
             var items = new Dictionary<string, string>
                 {
@@ -501,14 +468,13 @@ namespace ProductDatabase {
             form.ShowDialog();
         }
 
-        // JSON から機種別注意メッセージ取得
+        // JSONファイルから製品名に対応する注意メッセージを取得する
         public static string? GetProductMessage(string filePath, string productName) {
             var jsonText = File.ReadAllText(filePath);
-            var jsonObj = JObject.Parse(jsonText);
-
-            return jsonObj[productName]?.ToString();
+            var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(jsonText);
+            return dict?.GetValueOrDefault(productName);
         }
-        // 注意メッセージ更新
+        // 入力ダイアログで編集した注意メッセージをJSONファイルに上書き保存する
         private static readonly object s_fileLock = new();
         private void ProductMessageChange() {
             lock (s_fileLock) {
@@ -516,20 +482,17 @@ namespace ProductDatabase {
                     throw new FileNotFoundException($"{_messageFilePath}\nが見つかりません。");
                 }
 
-                var json = JObject.Parse(File.ReadAllText(_messageFilePath));
+                var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(
+                    File.ReadAllText(_messageFilePath)) ?? new();
 
-                string currentMessage = json.ContainsKey(_productMaster.ProductName)
-                    ? json[_productMaster.ProductName]!.ToString()
-                    : "";
+                dict.TryGetValue(_productMaster.ProductName, out var currentMessage);
 
-                using var dialog = new InputDialog("メッセージ編集", "メッセージを入力してください", currentMessage);
+                using var dialog = new InputDialog("メッセージ編集", "メッセージを入力してください", currentMessage ?? "");
 
                 if (dialog.ShowDialog() == DialogResult.OK) {
-                    string newMessage = dialog.InputText;
-
-                    json[_productMaster.ProductName] = newMessage;
-
-                    File.WriteAllText(_messageFilePath, json.ToString());
+                    dict[_productMaster.ProductName] = dialog.InputText;
+                    File.WriteAllText(_messageFilePath, System.Text.Json.JsonSerializer.Serialize(
+                        dict, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
                 }
             }
         }
@@ -587,7 +550,7 @@ namespace ProductDatabase {
             }
         }
 
-        // 入力チェック
+        // 全入力コントロールを検証し問題があればエラー表示して登録ボタンを無効化する
         private void ValidateAllInputs() {
             ErrorMessageLabel.Text = "";
             RegisterButton.Enabled = true;
@@ -662,12 +625,14 @@ namespace ProductDatabase {
             }
 
         }
+        // エラーメッセージを赤字で表示して登録ボタンを無効化する
         private void ShowError(string message) {
             ErrorMessageLabel.Text = message;
             ErrorMessageLabel.ForeColor = Color.Red;
             RegisterButton.Enabled = false;
         }
 
+        // 入力コントロール変更時にすべての入力検証を再実行する
         private void InputControls_TextChanged(object? sender, EventArgs e) {
             ValidateAllInputs();
         }

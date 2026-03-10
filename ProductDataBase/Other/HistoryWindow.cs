@@ -3,7 +3,7 @@ using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using System.Data;
-using static ProductDatabase.MainWindow;
+using static ProductDatabase.ProductRepository;
 
 namespace ProductDatabase {
     public partial class HistoryWindow : Form {
@@ -144,6 +144,7 @@ namespace ProductDatabase {
             DataBaseDataGridView.RowTemplate.Height += 10;
         }
 
+        // ロード時に初期UIを設定しラジオボタンモードに応じた表示制御を行う
         private void LoadEvents() {
             Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
 
@@ -187,6 +188,7 @@ namespace ProductDatabase {
             }
         }
 
+        // クエリを実行してDataGridViewにバインドしカラムヘッダーを日本語に変換する
         private void LoadDataAndDisplay(string categoryName, string query, params (string name, object value)[] parameters) {
             using SqliteConnection con = new(GetConnectionRegistration());
 
@@ -228,6 +230,7 @@ namespace ProductDatabase {
             DataBaseDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
         }
 
+        // ラジオボタン選択に応じて基板登録履歴または在庫サマリーを表示する
         private void ViewSubstrateRegistrationLog() {
             if (CategoryRadioButton1.Checked) {
                 _tableName = "Substrate";
@@ -340,6 +343,7 @@ namespace ProductDatabase {
             }
         }
 
+        // フィルター条件に基づいて製品登録履歴を取得しDataGridViewに表示する
         private void ViewProductRegistration() {
             _tableName = "Product";
             編集モードToolStripMenuItem.Enabled = _appSettings.IsAdministrator;
@@ -401,6 +405,7 @@ namespace ProductDatabase {
                 ("@ProductID", _productMaster.ProductID)
             );
         }
+        // フィルター条件に基づいてシリアル番号履歴を取得しDataGridViewに表示する
         private void ViewSerialLog() {
             _tableName = "Serial";
             編集モードToolStripMenuItem.Enabled = _appSettings.IsAdministrator;
@@ -450,6 +455,7 @@ namespace ProductDatabase {
             );
         }
 
+        // 製品型式でフィルタして再印刷履歴をDataGridViewに表示する
         private void ViewReprintLog() {
             編集モードToolStripMenuItem.Enabled = false;
 
@@ -491,6 +497,7 @@ namespace ProductDatabase {
 
         private SqliteConnection? _editModeConnection;
         private SqliteTransaction? _editModeTransaction;
+        // トランザクションを開始してDataGridViewを編集可能状態に切り替える
         private void EditMode() {
             try {
                 _editModeConnection = new SqliteConnection(GetConnectionRegistration());
@@ -557,6 +564,7 @@ namespace ProductDatabase {
             }
         }
 
+        // DataTableの変更をDBにコミットしログを記録してウィンドウを閉じる
         private void SaveRegistrationLog() {
             List<string[]> pendingLogs = [];
 
@@ -614,6 +622,7 @@ namespace ProductDatabase {
             }
         }
 
+        // 編集モードのトランザクションとDB接続を解放してリセットする
         private void CleanupEditMode() {
             _editModeTransaction?.Dispose();
             _editModeTransaction = null;
@@ -622,6 +631,7 @@ namespace ProductDatabase {
             _editModeConnection = null;
         }
 
+        // 基板履歴の変更行を走査して更新・削除をDBに反映しログを積む
         private void ProcessSubstrateChanges(DataTable changes, List<string[]> pendingLogs) {
             foreach (var row in changes.Rows.OfType<DataRow>()) {
                 if (row.RowState == DataRowState.Modified) {
@@ -635,6 +645,7 @@ namespace ProductDatabase {
             }
         }
 
+        // 基板履歴の編集前後の値を操作ログリストに追加する
         private void LogSubstrateEdit(DataRow row, List<string[]> pendingLogs) {
             pendingLogs.Add([
                 "[基板履歴編集:前]",
@@ -674,6 +685,7 @@ namespace ProductDatabase {
                 $"コメント[{GetValue(row, "Comment")}]"
             ]);
         }
+        // 基板履歴テーブルの指定行を更新するUPDATE文を実行する
         private void UpdateSubstrateRow(IDbConnection connection, DataRow row) {
             var sql =
                 $"""
@@ -705,6 +717,7 @@ namespace ProductDatabase {
             }, _editModeTransaction);
         }
 
+        // 基板履歴の削除対象行の値を操作ログリストに追加する
         private void LogSubstrateDelete(DataRow row, List<string[]> pendingLogs) {
             pendingLogs.Add([
                 "[基板履歴削除]",
@@ -725,6 +738,7 @@ namespace ProductDatabase {
                 $"コメント[{GetValue(row, "Comment", DataRowVersion.Original)}]"
             ]);
         }
+        // 基板履歴テーブルの指定行を論理削除（IsDeleted=1）する
         private void DeleteSubstrateRow(IDbConnection connection, DataRow row) {
             var sql =
                 $"""
@@ -740,6 +754,7 @@ namespace ProductDatabase {
             }, _editModeTransaction);
         }
 
+        // 製品履歴の変更行を走査して更新・削除（関連基板・シリアル含む）をDBに反映しログを積む
         private void ProcessProductChanges(DataTable changes, List<string[]> pendingLogs) {
             foreach (var row in changes.Rows.OfType<DataRow>()) {
                 if (row.RowState == DataRowState.Modified) {
@@ -756,6 +771,7 @@ namespace ProductDatabase {
                 }
             }
         }
+        // 製品履歴テーブルの編集可能フィールドをUPDATE文で更新する
         private void UpdateProductRow(IDbConnection connection, DataRow row) {
             var sql =
                 $"""
@@ -785,6 +801,7 @@ namespace ProductDatabase {
             }, _editModeTransaction);
         }
 
+        // 製品履歴の編集前後の値を操作ログリストに追加する
         private void LogProductEdit(DataRow row, List<string[]> pendingLogs) {
             pendingLogs.Add([
                 $"[製品履歴編集:前]",
@@ -824,6 +841,7 @@ namespace ProductDatabase {
                 $"コメント[{GetValue(row, "Comment")}]"
             ]);
         }
+        // 製品履歴の削除対象行の値を操作ログリストに追加する
         private void LogProductDelete(DataRow row, List<string[]> pendingLogs) {
             pendingLogs.Add([
                 "[製品履歴削除]",
@@ -844,6 +862,7 @@ namespace ProductDatabase {
                 $"コメント[{GetValue(row, "Comment", DataRowVersion.Original)}]"
             ]);
         }
+        // 製品削除に連動して論理削除される基板履歴の内容を操作ログリストに追加する
         private void LogProductSubstrateDelete(IDbConnection connection, DataRow row, List<string[]> pendingLogs) {
             var sql =
                 $"""
@@ -890,6 +909,7 @@ namespace ProductDatabase {
                 ]);
             }
         }
+        // 製品削除に連動して削除されるシリアル履歴の内容を操作ログリストに追加する
         private void LogProductSerialDelete(IDbConnection connection, DataRow row, List<string[]> pendingLogs) {
             var sql =
                 $"""
@@ -921,6 +941,7 @@ namespace ProductDatabase {
             }
         }
 
+        // 製品履歴テーブルの指定行を論理削除（IsDeleted=1）する
         private void DeleteProductRow(IDbConnection connection, DataRow row) {
             var sql =
                 $"""
@@ -935,6 +956,7 @@ namespace ProductDatabase {
                 ID = row["ID", DataRowVersion.Original]
             }, _editModeTransaction);
         }
+        // 製品削除に連動してUseIDが一致する基板履歴を論理削除する
         private void DeleteProductSubstrateRow(IDbConnection connection, DataRow row) {
             var sql = $"""
         UPDATE {Constants.TSubstrateTableName}
@@ -948,6 +970,7 @@ namespace ProductDatabase {
                 ID = row["ID", DataRowVersion.Original]
             }, _editModeTransaction);
         }
+        // 製品削除に連動してUsedIDが一致するシリアルを物理削除する
         private void DeleteProductSerialRow(IDbConnection connection, DataRow row) {
             var sql =
                 $"""
@@ -960,6 +983,7 @@ namespace ProductDatabase {
             }, _editModeTransaction);
         }
 
+        // シリアル履歴の削除行を走査してDBからの物理削除とログ記録を行う
         private void ProcessSerialChanges(DataTable changes, List<string[]> pendingLogs) {
             foreach (var row in changes.Rows.OfType<DataRow>()) {
                 if (row.RowState == DataRowState.Deleted) {
@@ -968,6 +992,7 @@ namespace ProductDatabase {
                 }
             }
         }
+        // シリアル履歴の削除対象行の値を操作ログリストに追加する
         private void LogSerialDelete(DataRow row, List<string[]> pendingLogs) {
             pendingLogs.Add([
             $"[シリアル履歴削除]",
@@ -988,6 +1013,7 @@ namespace ProductDatabase {
                 $"[]",
             ]);
         }
+        // シリアルテーブルから指定rowidの行を物理削除する
         private void DeleteSerialRow(IDbConnection connection, DataRow row) {
             var sql =
                 $"""
@@ -1000,11 +1026,13 @@ namespace ProductDatabase {
             }, _editModeTransaction);
         }
 
+        // DataRowから指定カラムの値を文字列で取得しDBNull の場合は空文字を返す
         private static string GetValue(DataRow row, string columnName, DataRowVersion version = DataRowVersion.Current) {
             var value = row[columnName, version];
             return value == DBNull.Value ? "" : value.ToString() ?? "";
         }
 
+        // ラジオボタンのTagとモード番号の組み合わせで表示する履歴の種類を切り替える
         private void CategorySelect(object sender) {
             var selectedRadioButton = (RadioButton)sender;
             if (!selectedRadioButton.Checked) { return; }
@@ -1027,6 +1055,7 @@ namespace ProductDatabase {
                 MessageBox.Show("無効な選択です。", "[CategorySelect]エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+        // 選択カラムとキーワードでDataGridViewのRowFilterを設定して表示を絞り込む
         private void HistoryTableFilter() {
             if (DataBaseDataGridView.DataSource is not System.Data.DataTable historyTable) {
                 return;
@@ -1042,6 +1071,7 @@ namespace ProductDatabase {
                 historyTable.DefaultView.RowFilter = $"{_listColFilter[CategoryComboBox.SelectedIndex]} LIKE '*{FilterStringTextBox.Text}*'";
             }
         }
+        // 選択行の基板情報を読み込み基板登録ウィンドウを開いて在庫を調整する
         private void InventoryAdjustment() {
             var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
             _substrateMaster.SubstrateID = Convert.ToInt32(DataBaseDataGridView.Rows[i].Cells["SubstrateID"].Value);
@@ -1078,6 +1108,7 @@ namespace ProductDatabase {
             window.ShowDialog(this);
             LoadEvents();
         }
+        // 選択行の製品IDに紐づく使用基板一覧をサブウィンドウに表示する
         private void ShowUsedSubstrateDetails() {
             if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
 
@@ -1136,6 +1167,7 @@ namespace ProductDatabase {
             dataGridView.DataSource = dt;
             dataForm.ShowDialog();
         }
+        // 選択行の製品情報をセットしてExcel製造報告書を生成する
         private void GenerateReport() {
             try {
                 Cursor.Current = Cursors.WaitCursor;
@@ -1159,7 +1191,7 @@ namespace ProductDatabase {
                 Cursor.Current = Cursors.Default;
             }
         }
-        // リスト作成
+        // 選択行の製品情報をセットしてExcel製品一覧を生成する
         private void GenerateList() {
             try {
                 Cursor.Current = Cursors.WaitCursor;
@@ -1184,7 +1216,7 @@ namespace ProductDatabase {
                 Cursor.Current = Cursors.Default;
             }
         }
-        // チェックシート作成
+        // 選択行の製品情報をセットしてExcelチェックシートを生成する
         private void GenerateCheckSheet() {
             try {
                 Cursor.Current = Cursors.WaitCursor;
@@ -1208,6 +1240,7 @@ namespace ProductDatabase {
             }
         }
 
+        // フォームクローズ時に未コミットトランザクションをコミットしDB接続を解放する
         private void ClosedEvents() {
             if (_editModeTransaction is not null) {
                 _editModeTransaction.Commit();

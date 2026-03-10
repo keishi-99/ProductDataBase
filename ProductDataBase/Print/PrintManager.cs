@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using ZXing;
 using ZXing.Windows.Compatibility;
-using static ProductDatabase.MainWindow;
+using static ProductDatabase.ProductRepository;
 using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase.Print {
@@ -46,6 +46,7 @@ namespace ProductDatabase.Print {
         public static SerialType CurrentSerialType { get; set; }
         public enum SerialType { Label, Barcode, Nameplate, Substrate }
 
+        // 製品印刷に必要なマスター・作業データ・シリアルリストを初期化する
         public static void ProductInitialize(ProductMaster productMaster, ProductRegisterWork productRegisterWork, DocumentPrintSettings productPrintSettings, List<string> serialList) {
             ProductMaster = productMaster;
             ProductRegisterWork = productRegisterWork;
@@ -59,6 +60,7 @@ namespace ProductDatabase.Print {
             s_isUnderlinePrint = ProductMaster.IsUnderlinePrint;
             s_isLast4Digits = ProductMaster.IsLast4Digits;
         }
+        // 基板印刷に必要なマスター・作業データ・シリアルリストを初期化する
         public static void SubstrateInitialize(SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork, DocumentPrintSettings documentPrintSettings, List<string> serialList) {
             SubstrateMaster = substrateMaster;
             SubstrateRegisterWork = substrateRegisterWork;
@@ -76,6 +78,7 @@ namespace ProductDatabase.Print {
             return (float)(mm / MmPerInch * dpi);
         }
 
+        // 1ページ分のシリアルラベルを印刷（またはプレビュー）し次ページが必要ならtrueを返す
         public static bool PrintSerialCommon(PrintPageEventArgs e, bool isPreview, int startLine, SerialType serialType) {
             try {
                 if (e.Graphics is null) { throw new InvalidOperationException("Graphics オブジェクトを取得できません。"); }
@@ -167,6 +170,7 @@ namespace ProductDatabase.Print {
                 return false;
             }
         }
+        // 1枚分のラベルBitmapをシリアルタイプに応じて生成しプレビュー時は枠線を描画する
         private static Bitmap MakeLabelImage(string text, SerialType serialType, bool fontUnderline, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY, bool isPreview) {
 
             var widthPx = (int)Math.Round(labelWidthPx);
@@ -202,6 +206,7 @@ namespace ProductDatabase.Print {
 
             return labelImage;
         }
+        // 設定フォントと位置でテキストラベルを描画する（下線オプションあり）
         private static void DrawLabel(Graphics g, string text, bool fontUnderline, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY) {
 
             if (PrintSettings.LabelPrintSettings is null) { return; }
@@ -221,6 +226,7 @@ namespace ProductDatabase.Print {
 
             g.DrawString(text, textFont, Brushes.Black, layoutRect, sf);
         }
+        // CODE128バーコードと下部テキストをラベルBitmapに描画する
         private static void DrawBarcode(Graphics g, string text, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY) {
 
             if (PrintSettings.BarcodePrintSettings is null) { return; }
@@ -269,6 +275,7 @@ namespace ProductDatabase.Print {
             var layoutRectBarcode = new RectangleF(barcodePosX, barcodePosY, barcodeWidthPx, barcodeHeightPx);
             g.DrawImage(barcodeBitmap, layoutRectBarcode);
         }
+        // ヘッダーフォーマット文字列内のプレースホルダーをマスターデータの値に置換する
         private static string ConvertHeaderString(SerialType serialType, string s) {
 
             var map = serialType switch {
@@ -284,6 +291,7 @@ namespace ProductDatabase.Print {
 
             return s;
         }
+        // 製品マスター・作業データのプレースホルダーと実値のマッピング辞書を生成する
         private static Dictionary<string, string> CreateProductMap() {
 
             if (ProductMaster is null) {
@@ -304,6 +312,7 @@ namespace ProductDatabase.Print {
                 ["{U}"] = ProductRegisterWork.Person,
             };
         }
+        // 基板マスター・作業データのプレースホルダーと実値のマッピング辞書を生成する
         private static Dictionary<string, string> CreateSubstrateMap() {
 
             if (SubstrateMaster is null) {
@@ -326,6 +335,7 @@ namespace ProductDatabase.Print {
         }
 
 
+        // 最終シリアル印刷後に次の開始行番号をページ上に描画する
         private static void DrawFinalRowMark(Graphics graphics, int rowNumber, float posX, float posY, float width, float height, Font font) {
             using var sf = new StringFormat {
                 Alignment = StringAlignment.Near,
@@ -335,7 +345,7 @@ namespace ProductDatabase.Print {
             graphics.DrawString(rowNumber.ToString(), font, Brushes.Black, layoutRect, sf);
         }
 
-        // b-pac印刷処理
+        // b-pacを使用してNameplateテンプレートにシリアルをセットし指定枚数を連続印刷する
         public static void PrintUsingBPac(NameplatePrintSettings nameplatePrintSettings, List<string> serialList) {
 
             int copiesPerLabel = nameplatePrintSettings.CopiesPerLabel;
@@ -377,6 +387,7 @@ namespace ProductDatabase.Print {
                 NameplatePrintSettings = new NameplatePrintSettings();
             }
 
+            // 印刷フラグに応じてラベル・バーコード・銘版の設定インスタンスをnullまたは既存値に設定する
             public void SetSettingsType(bool isLabelPrint, bool isBarcodePrint, bool isNameplatePrint) {
                 LabelPrintSettings = isLabelPrint ? (LabelPrintSettings ?? new LabelPrintSettings()) : null;
                 BarcodePrintSettings = isBarcodePrint ? (BarcodePrintSettings ?? new BarcodePrintSettings()) : null;
@@ -456,11 +467,13 @@ namespace ProductDatabase.Print {
         }
 
         public class FontJsonConverter : JsonConverter<Font> {
+            // JSON文字列をFont型に変換して返す
             public override Font Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
                 var fontString = reader.GetString()!;
                 return (Font)TypeDescriptor.GetConverter(typeof(Font)).ConvertFromString(fontString)!;
             }
 
+            // Font型をJSON文字列に変換して書き込む
             public override void Write(Utf8JsonWriter writer, Font value, JsonSerializerOptions options) {
                 var fontString = TypeDescriptor.GetConverter(typeof(Font)).ConvertToString(value)!;
                 writer.WriteStringValue(fontString);
