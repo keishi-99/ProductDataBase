@@ -2,7 +2,7 @@
 using Microsoft.Data.Sqlite;
 using ProductDatabase.Other;
 using System.Data;
-using static ProductDatabase.MainWindow;
+using static ProductDatabase.ProductRepository;
 
 namespace ProductDatabase {
     public partial class SubstrateChange1 : Form {
@@ -33,7 +33,7 @@ namespace ProductDatabase {
 
         }
 
-        // ロードイベント
+        // フォームロード時にDBから対象製品の複数台登録履歴を取得しDataGridViewに表示する
         private void LoadEvents() {
             Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
 
@@ -112,7 +112,7 @@ namespace ProductDatabase {
 
         }
 
-        // 基板変更フォームを開く
+        // DataGridViewで選択した行の製品情報をWorkに格納しSubstrateChange2フォームをダイアログで開く
         private void OpenSubstrateChangeWindow() {
 
             var i = SubstrateChangeDataGridView.SelectedCells[0].RowIndex;

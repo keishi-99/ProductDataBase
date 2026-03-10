@@ -9,7 +9,7 @@ namespace ProductDatabase.Other {
     }
 
     internal partial class CommonUtils {
-        public static string s_backupPath = string.Empty;
+        public static string BackupPath { get; set; } = string.Empty;
         /// <summary>
         /// ファイルをコピーします。
         /// </summary>
@@ -46,7 +46,7 @@ namespace ProductDatabase.Other {
                 }
             }
         }
-        // ログ作成
+        // 月次CSVログファイルへの追記と共有フォルダへのコピーを管理するクラス
         public static class Logger {
             private static readonly string s_logDirectory = Path.Combine(Environment.CurrentDirectory, "db", "logs");
             private static readonly object s_lockObject = new();
@@ -69,8 +69,8 @@ namespace ProductDatabase.Other {
 
                         File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
 
-                        if (!string.IsNullOrEmpty(s_backupPath)) {
-                            var cloneFilePath = Path.Combine(s_backupPath, "db", "logs", logFileName);
+                        if (!string.IsNullOrEmpty(BackupPath)) {
+                            var cloneFilePath = Path.Combine(BackupPath, "db", "logs", logFileName);
                             if (cloneFilePath != logFilePath) {
                                 CopyWithRetry(logFilePath, cloneFilePath, true);
                             }
@@ -81,7 +81,7 @@ namespace ProductDatabase.Other {
                 }
             }
         }
-        // バックアップ作成
+        // DBファイルのタイムスタンプ付きバックアップ作成と古いバックアップの自動削除を管理するクラス
         public static class BackupManager {
             private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup");
             private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
@@ -105,9 +105,9 @@ namespace ProductDatabase.Other {
                         CopyWithRetry(s_originalFilePath, backupFilePath, true);
                         ManageBackupFiles();
 
-                        if (!string.IsNullOrEmpty(s_backupPath)) {
-                            var backupPath = Path.Combine(s_backupPath, "db", "ProductRegistry.db");
-                            if (Environment.CurrentDirectory != s_backupPath) {
+                        if (!string.IsNullOrEmpty(BackupPath)) {
+                            var backupPath = Path.Combine(BackupPath, "db", "ProductRegistry.db");
+                            if (Environment.CurrentDirectory != BackupPath) {
                                 CopyWithRetry(s_originalFilePath, backupPath, true);
                             }
                         }
@@ -137,6 +137,17 @@ namespace ProductDatabase.Other {
                 }
             }
         }
+        /// <summary>
+        /// 月コードを取得します（10月→X, 11月→Y, 12月→Z, それ以外→MM形式）。
+        /// </summary>
+        public static string ToMonthCode(DateTime date) =>
+            date.Month switch {
+                10 => "X",
+                11 => "Y",
+                12 => "Z",
+                var m => m.ToString("00")
+            };
+
         // CapsLockがオンになっていたらCapsLockを解除する
         public static partial class Keyboard {
             private const byte VK_CAPITAL = 0x14; // CapsLock の仮想キーコード
