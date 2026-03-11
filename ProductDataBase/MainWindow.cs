@@ -469,13 +469,13 @@ namespace ProductDatabase {
             using var con = new OdbcConnection($"DSN={_dsn}; UID={_uid}; PWD={_pwd}");
             con.Open();
 
+            var param = new DynamicParameters();
+            param.Add("手配管理番号", QRCodeTextBox.Text);
             var result = con.QueryFirstOrDefault<OrderDto>(
-                @"""
-                SELECT *
-                FROM V_宮崎手配情報
-                WHERE 手配管理番号 = ?;
-                """,
-                new { 手配管理番号 = QRCodeTextBox.Text })
+                @"SELECT *
+                  FROM V_宮崎手配情報
+                  WHERE 手配管理番号 = ?",
+                param)
                 ?? throw new Exception($"一致する情報がありません。{Environment.NewLine}手配管理番号:{QRCodeTextBox.Text}");
 
             _productRegisterWork.ProductNumber = result.手配製番 ?? string.Empty;
