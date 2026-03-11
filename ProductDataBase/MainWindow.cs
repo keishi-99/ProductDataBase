@@ -472,7 +472,7 @@ namespace ProductDatabase {
             var param = new DynamicParameters();
             param.Add("手配管理番号", QRCodeTextBox.Text);
             var result = con.QueryFirstOrDefault<OrderDto>(
-                @"SELECT *
+                @"SELECT 手配製番, 品目番号, 品目名称, 手配数, 請求先注番
                   FROM V_宮崎手配情報
                   WHERE 手配管理番号 = ?",
                 param)
