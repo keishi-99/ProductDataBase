@@ -1,4 +1,4 @@
-namespace ProductDatabase {
+namespace ProductDatabase.Models {
     public class ProductRegisterWork {
         public int RowID { get; set; }
         public int ProductID { get; set; }

@@ -1,12 +1,13 @@
 ﻿using ClosedXML.Excel;
 using Dapper;
 using Microsoft.Data.Sqlite;
+using ProductDatabase.Models;
 using ProductDatabase.Other;
 using ZXing;
 using ZXing.QrCode;
 using ZXing.QrCode.Internal;
 using ZXing.Windows.Compatibility;
-using static ProductDatabase.ProductRepository;
+using static ProductDatabase.Data.ProductRepository;
 
 namespace ProductDatabase.ExcelService {
     internal class ExcelServiceClosedXml {

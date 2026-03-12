@@ -2,7 +2,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
-using static ProductDatabase.ProductRepository;
+using ProductDatabase.Models;
+using static ProductDatabase.Data.ProductRepository;
 using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
 

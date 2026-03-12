@@ -1,8 +1,9 @@
 ﻿using Dapper;
 using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
+using ProductDatabase.Models;
 using ProductDatabase.Other;
-using static ProductDatabase.ProductRepository;
+using static ProductDatabase.Data.ProductRepository;
 
 namespace ProductDatabase {
     public partial class SubstrateChange2 : Form {

@@ -1,9 +1,10 @@
 ﻿using Dapper;
 using Microsoft.Data.Sqlite;
 using ProductDatabase.ExcelService;
+using ProductDatabase.Models;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
-using static ProductDatabase.ProductRepository;
+using static ProductDatabase.Data.ProductRepository;
 using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
 

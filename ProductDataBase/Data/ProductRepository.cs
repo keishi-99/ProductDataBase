@@ -1,9 +1,10 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
+using ProductDatabase.Models;
 using ProductDatabase.Other;
 using System.Data;
 
-namespace ProductDatabase {
+namespace ProductDatabase.Data {
     public class ProductRepository {
 
         public DataTable ProductDataTable { get; } = new();
