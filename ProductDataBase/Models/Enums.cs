@@ -1,4 +1,4 @@
-namespace ProductDatabase {
+namespace ProductDatabase.Models {
 
     [Flags]
     public enum SerialPrintTypeFlags {

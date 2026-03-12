@@ -1,4 +1,4 @@
-namespace ProductDatabase {
+namespace ProductDatabase.Models {
     public class SubstrateRegisterWork {
         public int SubstrateID { get; set; }
 

@@ -1,4 +1,4 @@
-namespace ProductDatabase {
+namespace ProductDatabase.Models {
     public class QrSettings {
         public List<string> CategoryItemNumber { get; set; } = [];
         public List<string> CategoryProductName { get; set; } = [];

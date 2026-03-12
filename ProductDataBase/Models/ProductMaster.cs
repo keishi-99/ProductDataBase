@@ -1,6 +1,6 @@
 using System.Data;
 
-namespace ProductDatabase {
+namespace ProductDatabase.Models {
     public class ProductMaster : PrintMasterBase {
         public int ProductID { get; set; }
         public string CategoryName { get; set; } = string.Empty;

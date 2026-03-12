@@ -1,4 +1,4 @@
-namespace ProductDatabase {
+namespace ProductDatabase.Models {
     /// <summary>
     /// ProductMaster / SubstrateMaster の共通印刷フラグ管理ロジックを持つ基底クラス。
     /// </summary>

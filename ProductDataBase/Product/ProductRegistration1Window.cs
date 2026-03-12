@@ -1,7 +1,8 @@
 ﻿using Dapper;
 using Microsoft.Data.Sqlite;
+using ProductDatabase.Models;
 using ProductDatabase.Other;
-using static ProductDatabase.ProductRepository;
+using static ProductDatabase.Data.ProductRepository;
 
 namespace ProductDatabase {
     public partial class ProductRegistration1Window : Form {
@@ -476,6 +477,7 @@ namespace ProductDatabase {
         }
         // 入力ダイアログで編集した注意メッセージをJSONファイルに上書き保存する
         private static readonly object s_fileLock = new();
+        private static readonly System.Text.Json.JsonSerializerOptions s_jsonOptions = new() { WriteIndented = true };
         private void ProductMessageChange() {
             lock (s_fileLock) {
                 if (!File.Exists(_messageFilePath)) {
@@ -483,7 +485,7 @@ namespace ProductDatabase {
                 }
 
                 var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(
-                    File.ReadAllText(_messageFilePath)) ?? new();
+                    File.ReadAllText(_messageFilePath)) ?? [];
 
                 dict.TryGetValue(_productMaster.ProductName, out var currentMessage);
 
@@ -492,7 +494,7 @@ namespace ProductDatabase {
                 if (dialog.ShowDialog() == DialogResult.OK) {
                     dict[_productMaster.ProductName] = dialog.InputText;
                     File.WriteAllText(_messageFilePath, System.Text.Json.JsonSerializer.Serialize(
-                        dict, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                        dict, s_jsonOptions));
                 }
             }
         }
