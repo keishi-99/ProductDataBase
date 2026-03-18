@@ -107,7 +107,8 @@ namespace ProductDatabase.Other {
             }
 
             return [.. productUseSubstrate.AsEnumerable()
-                    .Where(r => r.Field<long?>("P_ProductID") == productId)
+                    .Where(r => r.Field<long?>("P_ProductID") == productId
+                             && r.Field<long?>("S_SubstrateID").HasValue)
                     .Select(r => new SubstrateInfo {
                         SubstrateID = r.Field<long>("S_SubstrateID"),
                         SubstrateName = r["SubstrateName"]?.ToString() ?? "",
