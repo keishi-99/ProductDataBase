@@ -302,7 +302,7 @@ namespace ProductDatabase.MasterManagement {
         private void SubstrateCheckedListBox_ItemCheck(object sender, ItemCheckEventArgs e) {
             // LoadSubstrateCheckedList実行中のItems.Clear()による誤発火を無視する
             if (_isLoadingSubstrateList) return;
-            var item = (ListItem<long>)SubstrateCheckedListBox.Items[e.Index];
+            if (SubstrateCheckedListBox.Items[e.Index] is not ListItem<long> item) return;
             _substrateCheckState[item.Id] = (e.NewValue == CheckState.Checked);
         }
 
