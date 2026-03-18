@@ -459,7 +459,7 @@ namespace ProductDatabase.MasterManagement {
             this.SubstrateProductNameFilterTextBox.Location = new Point(56, 23);
             this.SubstrateProductNameFilterTextBox.Name = "SubstrateProductNameFilterTextBox";
             this.SubstrateProductNameFilterTextBox.Size = new Size(200, 23);
-            this.SubstrateProductNameFilterTextBox.TabIndex = 29;
+            this.SubstrateProductNameFilterTextBox.TabIndex = 0;
             this.SubstrateProductNameFilterTextBox.TextChanged += this.SubstrateProductNameFilterTextBox_TextChanged;
             //
             // SubstrateModelFilterLabel
@@ -474,7 +474,7 @@ namespace ProductDatabase.MasterManagement {
             this.SubstrateModelFilterTextBox.Location = new Point(332, 23);
             this.SubstrateModelFilterTextBox.Name = "SubstrateModelFilterTextBox";
             this.SubstrateModelFilterTextBox.Size = new Size(200, 23);
-            this.SubstrateModelFilterTextBox.TabIndex = 30;
+            this.SubstrateModelFilterTextBox.TabIndex = 1;
             this.SubstrateModelFilterTextBox.TextChanged += this.SubstrateModelFilterTextBox_TextChanged;
             //
             // SubstrateCheckedListBox
