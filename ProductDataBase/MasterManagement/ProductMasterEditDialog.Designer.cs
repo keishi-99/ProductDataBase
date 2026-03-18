@@ -53,6 +53,10 @@ namespace ProductDatabase.MasterManagement {
             this.CheckBinCheckBox9 = new CheckBox();
             this.CheckBinCheckBox10 = new CheckBox();
             this.UseSubstrateGroupBox = new GroupBox();
+            this.SubstrateProductNameFilterLabel = new Label();
+            this.SubstrateProductNameFilterTextBox = new TextBox();
+            this.SubstrateModelFilterLabel = new Label();
+            this.SubstrateModelFilterTextBox = new TextBox();
             this.SubstrateCheckedListBox = new CheckedListBox();
             this.SaveButton = new Button();
             this.DialogCancelButton = new Button();
@@ -431,25 +435,60 @@ namespace ProductDatabase.MasterManagement {
             // 
             // UseSubstrateGroupBox
             // 
+            this.UseSubstrateGroupBox.Controls.Add(this.SubstrateProductNameFilterLabel);
+            this.UseSubstrateGroupBox.Controls.Add(this.SubstrateProductNameFilterTextBox);
+            this.UseSubstrateGroupBox.Controls.Add(this.SubstrateModelFilterLabel);
+            this.UseSubstrateGroupBox.Controls.Add(this.SubstrateModelFilterTextBox);
             this.UseSubstrateGroupBox.Controls.Add(this.SubstrateCheckedListBox);
             this.UseSubstrateGroupBox.Location = new Point(12, 573);
             this.UseSubstrateGroupBox.Name = "UseSubstrateGroupBox";
-            this.UseSubstrateGroupBox.Size = new Size(736, 200);
+            this.UseSubstrateGroupBox.Size = new Size(736, 250);
             this.UseSubstrateGroupBox.TabIndex = 4;
             this.UseSubstrateGroupBox.TabStop = false;
             this.UseSubstrateGroupBox.Text = "使用基板（M_ProductUseSubstrate）";
-            // 
+            //
+            // SubstrateProductNameFilterLabel
+            //
+            this.SubstrateProductNameFilterLabel.AutoSize = true;
+            this.SubstrateProductNameFilterLabel.Location = new Point(8, 27);
+            this.SubstrateProductNameFilterLabel.Name = "SubstrateProductNameFilterLabel";
+            this.SubstrateProductNameFilterLabel.Text = "製品名:";
+            //
+            // SubstrateProductNameFilterTextBox
+            //
+            this.SubstrateProductNameFilterTextBox.Location = new Point(56, 23);
+            this.SubstrateProductNameFilterTextBox.Name = "SubstrateProductNameFilterTextBox";
+            this.SubstrateProductNameFilterTextBox.Size = new Size(200, 23);
+            this.SubstrateProductNameFilterTextBox.TabIndex = 0;
+            this.SubstrateProductNameFilterTextBox.TextChanged += this.SubstrateProductNameFilterTextBox_TextChanged;
+            //
+            // SubstrateModelFilterLabel
+            //
+            this.SubstrateModelFilterLabel.AutoSize = true;
+            this.SubstrateModelFilterLabel.Location = new Point(268, 27);
+            this.SubstrateModelFilterLabel.Name = "SubstrateModelFilterLabel";
+            this.SubstrateModelFilterLabel.Text = "基板型式:";
+            //
+            // SubstrateModelFilterTextBox
+            //
+            this.SubstrateModelFilterTextBox.Location = new Point(332, 23);
+            this.SubstrateModelFilterTextBox.Name = "SubstrateModelFilterTextBox";
+            this.SubstrateModelFilterTextBox.Size = new Size(200, 23);
+            this.SubstrateModelFilterTextBox.TabIndex = 1;
+            this.SubstrateModelFilterTextBox.TextChanged += this.SubstrateModelFilterTextBox_TextChanged;
+            //
             // SubstrateCheckedListBox
-            // 
+            //
             this.SubstrateCheckedListBox.CheckOnClick = true;
-            this.SubstrateCheckedListBox.Location = new Point(8, 22);
+            this.SubstrateCheckedListBox.Location = new Point(8, 77);
             this.SubstrateCheckedListBox.Name = "SubstrateCheckedListBox";
-            this.SubstrateCheckedListBox.Size = new Size(718, 166);
+            this.SubstrateCheckedListBox.Size = new Size(718, 161);
             this.SubstrateCheckedListBox.TabIndex = 28;
+            this.SubstrateCheckedListBox.ItemCheck += this.SubstrateCheckedListBox_ItemCheck;
             // 
             // SaveButton
             // 
-            this.SaveButton.Location = new Point(538, 785);
+            this.SaveButton.Location = new Point(538, 835);
             this.SaveButton.Name = "SaveButton";
             this.SaveButton.Size = new Size(100, 35);
             this.SaveButton.TabIndex = 29;
@@ -459,7 +498,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             // DialogCancelButton
             // 
-            this.DialogCancelButton.Location = new Point(648, 785);
+            this.DialogCancelButton.Location = new Point(648, 835);
             this.DialogCancelButton.Name = "DialogCancelButton";
             this.DialogCancelButton.Size = new Size(100, 35);
             this.DialogCancelButton.TabIndex = 30;
@@ -471,7 +510,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(760, 832);
+            this.ClientSize = new Size(760, 882);
             this.Controls.Add(this.BasicInfoGroupBox);
             this.Controls.Add(this.SerialGroupBox);
             this.Controls.Add(this.PrintGroupBox);
@@ -550,6 +589,10 @@ namespace ProductDatabase.MasterManagement {
 
         // セクション5
         private GroupBox        UseSubstrateGroupBox;
+        private Label           SubstrateProductNameFilterLabel;
+        private TextBox         SubstrateProductNameFilterTextBox;
+        private Label           SubstrateModelFilterLabel;
+        private TextBox         SubstrateModelFilterTextBox;
         private CheckedListBox  SubstrateCheckedListBox;
 
         // ボタン
