@@ -276,6 +276,18 @@ namespace ProductDatabase.MasterManagement {
             _product.CheckBin = checkBin;
         }
 
+        // 製品名フィルターのテキスト変更時ハンドラ（Task2で実装予定）
+        private void SubstrateProductNameFilterTextBox_TextChanged(object sender, EventArgs e) {
+        }
+
+        // 基板型式フィルターのテキスト変更時ハンドラ（Task2で実装予定）
+        private void SubstrateModelFilterTextBox_TextChanged(object sender, EventArgs e) {
+        }
+
+        // チェックリストのアイテムチェック時ハンドラ（Task2で実装予定）
+        private void SubstrateCheckedListBox_ItemCheck(object sender, ItemCheckEventArgs e) {
+        }
+
         // ComboBoxのアイテムを保持する内部クラス
         private sealed class ComboItem(int value, string label) {
             public int Value { get; } = value;
