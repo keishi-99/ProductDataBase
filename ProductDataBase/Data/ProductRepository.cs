@@ -86,7 +86,6 @@ namespace ProductDatabase.Data {
         // 製品マスターを新規登録し採番されたProductIDを返す
         public int InsertProduct(ProductMaster product) {
             using var con = new SqliteConnection(GetConnectionRegistration());
-            con.Open();
 
             var sql =
                 $"""
@@ -204,7 +203,6 @@ namespace ProductDatabase.Data {
         // 基板マスターを新規登録し採番されたSubstrateIDを返す
         public int InsertSubstrate(SubstrateMaster substrate) {
             using var con = new SqliteConnection(GetConnectionRegistration());
-            con.Open();
 
             var sql =
                 $"""
@@ -315,11 +313,9 @@ namespace ProductDatabase.Data {
                 "DELETE FROM M_ProductUseSubstrate WHERE ProductID = @ProductId",
                 new { ProductId = productId }, tx);
 
-            foreach (var substrateId in substrateIds) {
-                con.Execute(
-                    "INSERT INTO M_ProductUseSubstrate (ProductID, SubstrateID) VALUES (@ProductId, @SubstrateId)",
-                    new { ProductId = productId, SubstrateId = substrateId }, tx);
-            }
+            var insertSql = "INSERT INTO M_ProductUseSubstrate (ProductID, SubstrateID) VALUES (@ProductId, @SubstrateId)";
+            var insertData = substrateIds.Select(id => new { ProductId = productId, SubstrateId = id });
+            con.Execute(insertSql, insertData, tx);
 
             tx.Commit();
         }
