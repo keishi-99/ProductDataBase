@@ -69,7 +69,7 @@ namespace ProductDatabase {
                 // ComboBoxへ担当者を追加
                 PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
 
-                // DB2へ接続し対象製品テーブルの最新のシリアル,レビジョン取得
+                // DB2へ接続し対象製品テーブルの最新のシリアル,リビジョン取得
                 using SqliteConnection con = new(GetConnectionRegistration());
 
                 // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
@@ -233,7 +233,7 @@ namespace ProductDatabase {
         }
         // 確認ダイアログを経てDBにRevision変更レコードを挿入しログ記録する
         private void RevisionChange() {
-            var result = MessageBox.Show("レビジョンを変更しますか？",
+            var result = MessageBox.Show("リビジョンを変更しますか？",
                 "確認",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Exclamation,

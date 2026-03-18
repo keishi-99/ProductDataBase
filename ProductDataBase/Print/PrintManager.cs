@@ -38,7 +38,7 @@ namespace ProductDatabase.Print {
         private static bool s_isUnderlinePrint;
         private static bool s_isLast4Digits;
 
-        // 4桁以上の型式番号の下4桁を取得するプロパティ
+        // 4桁以上の製品型式の下4桁を取得するプロパティ
         public static string Last4ProductModel =>
             ProductMaster.ProductModel.Length >= 4
                 ? ProductMaster.ProductModel[^4..]

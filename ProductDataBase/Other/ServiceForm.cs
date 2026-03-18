@@ -18,7 +18,7 @@ namespace ProductDatabase.Other {
 
         // ロード時にM_ProductDefを取得してカテゴリ一覧をListBox1に表示する
         private void LoadEvents() {
-            var strSqlQuery = "SELECT * FROM M_ProductDef WHERE Visible = 1 ORDER BY SortNumber ASC;";
+            var strSqlQuery = "SELECT * FROM M_ProductDef WHERE Visible = 1;";
 
             using SqliteConnection con = new(GetConnectionRegistration());
             con.Open();
@@ -29,6 +29,8 @@ namespace ProductDatabase.Other {
             var categoryNames = ServiceInfo.ServiceDataTable.AsEnumerable()
                 .Select(row => row.Field<string?>("CategoryName") ?? string.Empty)
                 .Distinct()
+                .OrderBy(name => name == "Other" ? 1 : 0)
+                .ThenBy(name => name)
                 .ToList();
 
             CategoryListBox1.Items.AddRange([.. categoryNames]);

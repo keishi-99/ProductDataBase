@@ -33,6 +33,7 @@
             this.ConfigListToolStripMenuItem = new ToolStripMenuItem();
             this.ConfigCheckSheetToolStripMenuItem = new ToolStripMenuItem();
             this.ConfigSubstrateInformationToolStripMenuItem = new ToolStripMenuItem();
+            this.MasterManagementToolStripMenuItem = new ToolStripMenuItem();
             this.CategoryRadioButton1 = new RadioButton();
             this.CategoryRadioButton2 = new RadioButton();
             this.CategoryRadioButton3 = new RadioButton();
@@ -96,38 +97,45 @@
             // 
             // 設定ToolStripMenuItem
             // 
-            this.設定ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.ConfigReportToolStripMenuItem, this.ConfigListToolStripMenuItem, this.ConfigCheckSheetToolStripMenuItem, this.ConfigSubstrateInformationToolStripMenuItem });
+            this.設定ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.ConfigReportToolStripMenuItem, this.ConfigListToolStripMenuItem, this.ConfigCheckSheetToolStripMenuItem, this.ConfigSubstrateInformationToolStripMenuItem, this.MasterManagementToolStripMenuItem });
             this.設定ToolStripMenuItem.Name = "設定ToolStripMenuItem";
             this.設定ToolStripMenuItem.Size = new Size(43, 20);
             this.設定ToolStripMenuItem.Text = "設定";
-            // 
+            //
             // ConfigReportToolStripMenuItem
-            // 
+            //
             this.ConfigReportToolStripMenuItem.Name = "ConfigReportToolStripMenuItem";
             this.ConfigReportToolStripMenuItem.Size = new Size(180, 22);
             this.ConfigReportToolStripMenuItem.Text = "成績書設定";
             this.ConfigReportToolStripMenuItem.Click += this.ConfigReportToolStripMenuItem_Click;
-            // 
+            //
             // ConfigListToolStripMenuItem
-            // 
+            //
             this.ConfigListToolStripMenuItem.Name = "ConfigListToolStripMenuItem";
             this.ConfigListToolStripMenuItem.Size = new Size(180, 22);
             this.ConfigListToolStripMenuItem.Text = "基板リスト設定";
             this.ConfigListToolStripMenuItem.Click += this.ConfigListToolStripMenuItem_Click;
-            // 
+            //
             // ConfigCheckSheetToolStripMenuItem
-            // 
+            //
             this.ConfigCheckSheetToolStripMenuItem.Name = "ConfigCheckSheetToolStripMenuItem";
             this.ConfigCheckSheetToolStripMenuItem.Size = new Size(180, 22);
             this.ConfigCheckSheetToolStripMenuItem.Text = "チェックシート設定";
             this.ConfigCheckSheetToolStripMenuItem.Click += this.ConfigCheckSheetToolStripMenuItem_Click;
-            // 
+            //
             // ConfigSubstrateInformationToolStripMenuItem
-            // 
+            //
             this.ConfigSubstrateInformationToolStripMenuItem.Name = "ConfigSubstrateInformationToolStripMenuItem";
             this.ConfigSubstrateInformationToolStripMenuItem.Size = new Size(180, 22);
             this.ConfigSubstrateInformationToolStripMenuItem.Text = "基板情報設定";
             this.ConfigSubstrateInformationToolStripMenuItem.Click += this.ConfigSubstrateInformationToolStripMenuItem_Click;
+            //
+            // MasterManagementToolStripMenuItem
+            //
+            this.MasterManagementToolStripMenuItem.Name = "MasterManagementToolStripMenuItem";
+            this.MasterManagementToolStripMenuItem.Size = new Size(180, 22);
+            this.MasterManagementToolStripMenuItem.Text = "マスター管理";
+            this.MasterManagementToolStripMenuItem.Click += this.MasterManagementToolStripMenuItem_Click;
             // 
             // CategoryRadioButton1
             // 
@@ -217,9 +225,9 @@
             this.CategoryListBox3.TabIndex = 7;
             this.CategoryListBox3.SelectedIndexChanged += this.CategoryListBox3_SelectedIndexChanged;
             this.CategoryListBox3.KeyDown += this.CategoryListBox3_KeyDown;
-            // 
+            //
             // HistoryButton
-            // 
+            //
             this.HistoryButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             this.HistoryButton.Font = new Font("Meiryo UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 128);
             this.HistoryButton.Location = new Point(307, 389);
@@ -466,5 +474,6 @@
         private ToolStripMenuItem ConfigListToolStripMenuItem;
         private ToolStripMenuItem ConfigCheckSheetToolStripMenuItem;
         private ToolStripMenuItem ConfigSubstrateInformationToolStripMenuItem;
+        private ToolStripMenuItem MasterManagementToolStripMenuItem;
     }
 }

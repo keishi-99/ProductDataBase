@@ -1032,7 +1032,7 @@
             this.label105.Name = "label105";
             this.label105.Size = new Size(49, 15);
             this.label105.TabIndex = 80;
-            this.label105.Text = "レビジョン";
+            this.label105.Text = "リビジョン";
             // 
             // label104
             // 
