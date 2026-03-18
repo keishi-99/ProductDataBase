@@ -17,6 +17,9 @@ namespace ProductDatabase.MasterManagement {
         // 基板チェック状態管理（フィルタリング時もチェック状態を保持するため辞書で管理）
         private Dictionary<long, bool> _substrateCheckState = [];
 
+        // LoadSubstrateCheckedList実行中のItemCheck誤発火を防ぐフラグ
+        private bool _isLoadingSubstrateList = false;
+
         public ProductMasterEditDialog(ProductRepository repository, DataRow? sourceRow) {
             InitializeComponent();
             _repository = repository;
@@ -83,32 +86,37 @@ namespace ProductDatabase.MasterManagement {
 
         // 全基板マスターをCheckedListBoxに描画する（チェック済みは常に表示、未チェックはフィルターで絞り込み）
         private void LoadSubstrateCheckedList() {
-            var productNameFilter = SubstrateProductNameFilterTextBox.Text.Trim();
-            var modelFilter = SubstrateModelFilterTextBox.Text.Trim();
+            _isLoadingSubstrateList = true;
+            try {
+                var productNameFilter = SubstrateProductNameFilterTextBox.Text.Trim();
+                var modelFilter = SubstrateModelFilterTextBox.Text.Trim();
 
-            SubstrateCheckedListBox.Items.Clear();
+                SubstrateCheckedListBox.Items.Clear();
 
-            foreach (DataRow row in _repository.SubstrateDataTable.Rows) {
-                var substrateId = row.Field<long>("SubstrateID");
-                var productName = row["ProductName"]?.ToString() ?? string.Empty;
-                var substrateName = row["SubstrateName"]?.ToString() ?? string.Empty;
-                var substrateModel = row["SubstrateModel"]?.ToString() ?? string.Empty;
+                foreach (DataRow row in _repository.SubstrateDataTable.Rows) {
+                    var substrateId = row.Field<long>("SubstrateID");
+                    var productName = row["ProductName"]?.ToString() ?? string.Empty;
+                    var substrateName = row["SubstrateName"]?.ToString() ?? string.Empty;
+                    var substrateModel = row["SubstrateModel"]?.ToString() ?? string.Empty;
 
-                var isChecked = _substrateCheckState.GetValueOrDefault(substrateId, false);
+                    var isChecked = _substrateCheckState.GetValueOrDefault(substrateId, false);
 
-                var matchesFilter =
-                    (string.IsNullOrEmpty(productNameFilter) ||
-                     productName.Contains(productNameFilter, StringComparison.OrdinalIgnoreCase)) &&
-                    (string.IsNullOrEmpty(modelFilter) ||
-                     substrateModel.Contains(modelFilter, StringComparison.OrdinalIgnoreCase));
+                    var matchesFilter =
+                        (string.IsNullOrEmpty(productNameFilter) ||
+                         productName.Contains(productNameFilter, StringComparison.OrdinalIgnoreCase)) &&
+                        (string.IsNullOrEmpty(modelFilter) ||
+                         substrateModel.Contains(modelFilter, StringComparison.OrdinalIgnoreCase));
 
-                if (!isChecked && !matchesFilter) continue;
+                    if (!isChecked && !matchesFilter) continue;
 
-                var item = new ListItem<long> {
-                    Id = substrateId,
-                    Name = $"{productName} - {substrateName} [{substrateModel}]"
-                };
-                SubstrateCheckedListBox.Items.Add(item, isChecked);
+                    var item = new ListItem<long> {
+                        Id = substrateId,
+                        Name = $"{productName} - {substrateName} [{substrateModel}]"
+                    };
+                    SubstrateCheckedListBox.Items.Add(item, isChecked);
+                }
+            } finally {
+                _isLoadingSubstrateList = false;
             }
         }
 
@@ -292,6 +300,8 @@ namespace ProductDatabase.MasterManagement {
 
         // チェック状態の変化を辞書に同期する
         private void SubstrateCheckedListBox_ItemCheck(object sender, ItemCheckEventArgs e) {
+            // LoadSubstrateCheckedList実行中のItems.Clear()による誤発火を無視する
+            if (_isLoadingSubstrateList) return;
             var item = (ListItem<long>)SubstrateCheckedListBox.Items[e.Index];
             _substrateCheckState[item.Id] = (e.NewValue == CheckState.Checked);
         }
