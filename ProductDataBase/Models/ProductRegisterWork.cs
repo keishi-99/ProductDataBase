@@ -1,7 +1,7 @@
 namespace ProductDatabase.Models {
     public class ProductRegisterWork {
         public int RowID { get; set; }
-        public int ProductID { get; set; }
+        public long ProductID { get; set; }
         public string OrderNumber { get; set; } = string.Empty;
         public string ProductNumber { get; set; } = string.Empty;
         public string OLesNumber { get; set; } = string.Empty;

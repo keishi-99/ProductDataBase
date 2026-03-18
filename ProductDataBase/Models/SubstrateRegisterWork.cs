@@ -1,6 +1,6 @@
 namespace ProductDatabase.Models {
     public class SubstrateRegisterWork {
-        public int SubstrateID { get; set; }
+        public long SubstrateID { get; set; }
 
         public string ProductNumber { get; set; } = string.Empty;
         public string OrderNumber { get; set; } = string.Empty;

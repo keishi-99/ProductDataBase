@@ -2,7 +2,7 @@ using System.Data;
 
 namespace ProductDatabase.Models {
     public class ProductMaster : PrintMasterBase {
-        public int ProductID { get; set; }
+        public long ProductID { get; set; }
         public string CategoryName { get; set; } = string.Empty;
         public string ProductName { get; set; } = string.Empty;
         public string ProductModel { get; set; } = string.Empty;
@@ -85,19 +85,19 @@ namespace ProductDatabase.Models {
 
         // DataRowから製品マスターの各フィールドを読み込む
         public void LoadFrom(DataRow row) {
-            ProductID = Convert.ToInt32(row["ProductID"]);
+            ProductID = row.Field<long>("ProductID");
             CategoryName = row.Field<string>("CategoryName") ?? string.Empty;
             ProductName = row.Field<string>("ProductName") ?? string.Empty;
             ProductType = row.Field<string>("ProductType") ?? string.Empty;
             ProductModel = row.Field<string>("ProductModel") ?? string.Empty;
             Initial = row.Field<string>("Initial") ?? string.Empty;
-            RevisionGroup = Convert.ToInt32(row["RevisionGroup"]);
-            RegType = Convert.ToInt32(row["RegType"]);
-            CheckBin = Convert.ToInt32(row["Checkbox"].ToString(), 2);
-            SerialDigitType = Convert.ToInt32(row["SerialType"]);
-            SerialPrintType = Convert.ToInt32(row["SerialPrintType"]);
-            SheetPrintType = Convert.ToInt32(row["SheetPrintType"]);
-            Visible = row["Visible"] != DBNull.Value && Convert.ToInt32(row["Visible"]) == 1;
+            RevisionGroup = (int)row.Field<long>("RevisionGroup");
+            RegType = (int)row.Field<long>("RegType");
+            CheckBin = Convert.ToInt32(row["Checkbox"].ToString(), 2); // バイナリ文字列変換のため維持
+            SerialDigitType = (int)row.Field<long>("SerialType");
+            SerialPrintType = (int)row.Field<long>("SerialPrintType");
+            SheetPrintType = (int)row.Field<long>("SheetPrintType");
+            Visible = row.Field<long?>("Visible") == 1;
         }
 
         // 製品マスターデータを初期値にリセットする

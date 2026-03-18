@@ -46,13 +46,13 @@ namespace ProductDatabase.MasterManagement {
             var query = _repository.ProductDataTable.AsEnumerable()
                 .Where(FilterProduct)
                 .Select(r => new {
-                    ProductID = Convert.ToInt32(r["ProductID"]),
+                    ProductID = r.Field<long>("ProductID"),
                     CategoryName = r["CategoryName"]?.ToString() ?? string.Empty,
                     ProductName = r["ProductName"]?.ToString() ?? string.Empty,
                     ProductType = r["ProductType"]?.ToString() ?? string.Empty,
                     ProductModel = r["ProductModel"]?.ToString() ?? string.Empty,
-                    RegType = Convert.ToInt32(r["RegType"]),
-                    Visible = r["Visible"] != DBNull.Value ? Convert.ToInt32(r["Visible"]) : 0
+                    RegType = (int)r.Field<long>("RegType"),
+                    Visible = (int)(r.Field<long?>("Visible") ?? 0L)
                 });
 
             var rows = (_productSortColumn, _productSortAscending) switch {
@@ -86,13 +86,13 @@ namespace ProductDatabase.MasterManagement {
             var query = _repository.SubstrateDataTable.AsEnumerable()
                 .Where(FilterSubstrate)
                 .Select(r => new {
-                    SubstrateID = Convert.ToInt32(r["SubstrateID"]),
+                    SubstrateID = r.Field<long>("SubstrateID"),
                     CategoryName = r["CategoryName"]?.ToString() ?? string.Empty,
                     ProductName = r["ProductName"]?.ToString() ?? string.Empty,
                     SubstrateName = r["SubstrateName"]?.ToString() ?? string.Empty,
                     SubstrateModel = r["SubstrateModel"]?.ToString() ?? string.Empty,
-                    RegType = Convert.ToInt32(r["RegType"]),
-                    Visible = r["Visible"] != DBNull.Value ? Convert.ToInt32(r["Visible"]) : 0
+                    RegType = (int)r.Field<long>("RegType"),
+                    Visible = (int)(r.Field<long?>("Visible") ?? 0L)
                 });
 
             var rows = (_substrateSortColumn, _substrateSortAscending) switch {
@@ -190,9 +190,9 @@ namespace ProductDatabase.MasterManagement {
                 return;
             }
 
-            var productId = Convert.ToInt32(ProductDataGridView.SelectedRows[0].Cells["ProductID"].Value);
+            var productId = (long)ProductDataGridView.SelectedRows[0].Cells["ProductID"].Value;
             var row = _repository.ProductDataTable.AsEnumerable()
-                .FirstOrDefault(r => Convert.ToInt32(r["ProductID"]) == productId);
+                .FirstOrDefault(r => r.Field<long>("ProductID") == productId);
 
             if (row == null) {
                 MessageBox.Show("製品データが見つかりません。", string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -212,7 +212,7 @@ namespace ProductDatabase.MasterManagement {
                 return;
             }
 
-            var productId = Convert.ToInt32(ProductDataGridView.SelectedRows[0].Cells["ProductID"].Value);
+            var productId = (long)ProductDataGridView.SelectedRows[0].Cells["ProductID"].Value;
             var productName = ProductDataGridView.SelectedRows[0].Cells["ProductName"].Value?.ToString() ?? string.Empty;
             var productModel = ProductDataGridView.SelectedRows[0].Cells["ProductModel"].Value?.ToString() ?? string.Empty;
 
@@ -250,9 +250,9 @@ namespace ProductDatabase.MasterManagement {
                 return;
             }
 
-            var substrateId = Convert.ToInt32(SubstrateDataGridView.SelectedRows[0].Cells["SubstrateID"].Value);
+            var substrateId = (long)SubstrateDataGridView.SelectedRows[0].Cells["SubstrateID"].Value;
             var row = _repository.SubstrateDataTable.AsEnumerable()
-                .FirstOrDefault(r => Convert.ToInt32(r["SubstrateID"]) == substrateId);
+                .FirstOrDefault(r => r.Field<long>("SubstrateID") == substrateId);
 
             if (row == null) {
                 MessageBox.Show("基板データが見つかりません。", string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -272,7 +272,7 @@ namespace ProductDatabase.MasterManagement {
                 return;
             }
 
-            var substrateId = Convert.ToInt32(SubstrateDataGridView.SelectedRows[0].Cells["SubstrateID"].Value);
+            var substrateId = (long)SubstrateDataGridView.SelectedRows[0].Cells["SubstrateID"].Value;
             var substrateName = SubstrateDataGridView.SelectedRows[0].Cells["SubstrateName"].Value?.ToString() ?? string.Empty;
             var substrateModel = SubstrateDataGridView.SelectedRows[0].Cells["SubstrateModel"].Value?.ToString() ?? string.Empty;
 

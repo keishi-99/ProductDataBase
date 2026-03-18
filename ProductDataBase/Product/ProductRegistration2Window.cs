@@ -219,7 +219,7 @@ namespace ProductDatabase {
             }
         }
         // 基板IDの在庫データをDBから取得してDataGridViewに表示し在庫が0以下ならtrueを返す
-        private bool FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, int substrateID) {
+        private bool FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, long substrateID) {
             var intQuantity = _productRegisterWork.Quantity;
 
             var commandText =
@@ -506,7 +506,7 @@ namespace ProductDatabase {
             }
         }
         // 基板IDと製造番号から在庫情報を取得して注文番号を返す
-        private string GetSubstrateInfo(SqliteConnection connection, int substrateID, string substrateNumber) {
+        private string GetSubstrateInfo(SqliteConnection connection, long substrateID, string substrateNumber) {
             var commandText =
                 $"""
                 SELECT
@@ -547,7 +547,7 @@ namespace ProductDatabase {
             public int Stock { get; set; }
         }
         // 基板使用履歴テーブルに使用数（Decrease）をINSERTして製品IDと紐づける
-        private void InsertSubstrate(SqliteConnection connection, int substrateID, string substrateNumber, string orderNumber, long useValue, long? useID) {
+        private void InsertSubstrate(SqliteConnection connection, long substrateID, string substrateNumber, string orderNumber, long useValue, long? useID) {
             var commandText =
                 $"""
                 INSERT INTO {Constants.TSubstrateTableName}

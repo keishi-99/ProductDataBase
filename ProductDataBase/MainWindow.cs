@@ -166,7 +166,7 @@ namespace ProductDatabase {
         private void Registration() {
             ResetFields();
 
-            if (CategoryListBox3.SelectedItem is not ListItem<int> item) { return; }
+            if (CategoryListBox3.SelectedItem is not ListItem<long> item) { return; }
 
             switch (RadioButtonNumber) {
                 case 1:
@@ -189,7 +189,7 @@ namespace ProductDatabase {
             QRCodeTextBox.Text = string.Empty;
         }
         // 指定基板IDのマスターを読み込み基板登録ウィンドウを開く
-        private void HandleSubstrateRegistration(int substrateId) {
+        private void HandleSubstrateRegistration(long substrateId) {
 
             var row = _productRepository.GetSubstrateById(substrateId);
 
@@ -199,7 +199,7 @@ namespace ProductDatabase {
             window.ShowDialog(this);
         }
         // 指定製品IDのマスターを読み込みモードに応じた製品操作ウィンドウを開く
-        private void HandleProductRegistration(int productId, ProductOperationMode mode) {
+        private void HandleProductRegistration(long productId, ProductOperationMode mode) {
 
             var row = _productRepository.GetProductById(productId);
 
@@ -231,7 +231,7 @@ namespace ProductDatabase {
 
             ResetFields();
 
-            if (CategoryListBox3.SelectedItem is not ListItem<int> item) {
+            if (CategoryListBox3.SelectedItem is not ListItem<long> item) {
                 LoadHistoryWithoutSelection();
             }
             else {
@@ -262,7 +262,7 @@ namespace ProductDatabase {
             }
         }
         // 品目選択時に該当マスターデータをDBから読み込む
-        private void LoadHistoryWithSelection(int itemId) {
+        private void LoadHistoryWithSelection(long itemId) {
             switch (RadioButtonNumber) {
                 case 1:
                     _substrateMaster.LoadFrom(_productRepository.GetSubstrateById(itemId));
@@ -315,16 +315,12 @@ namespace ProductDatabase {
             // フィルタ済み行を保持
             _currentTargetRows = sourceTable
                 .AsEnumerable()
-                .Where(r => r["Visible"] != DBNull.Value &&
-                            Convert.ToInt32(r["Visible"]) == 1)
+                .Where(r => r.Field<long?>("Visible") == 1)
                 .Where(r => RadioButtonNumber switch {
                     1 => true,
                     2 => true,
-                    3 => r["SerialPrintType"] != DBNull.Value &&
-                         Convert.ToInt32(r["SerialPrintType"]) != 0,
-                    4 => r["SheetPrintType"] != DBNull.Value &&
-                        (Convert.ToInt32(r["SheetPrintType"]) == 2 ||
-                         Convert.ToInt32(r["SheetPrintType"]) == 3),
+                    3 => r.Field<long?>("SerialPrintType") is long spt && spt != 0,
+                    4 => r.Field<long?>("SheetPrintType") is long shp && (shp == 2 || shp == 3),
                     _ => false
                 });
 
@@ -390,8 +386,8 @@ namespace ProductDatabase {
                 .ToArray();
 
             var items = selectedRows
-                .Select(r => new ListItem<int> {
-                    Id = Convert.ToInt32(r[config.IdKey]),
+                .Select(r => new ListItem<long> {
+                    Id = r.Field<long>(config.IdKey),
                     Name = r[config.NameKey]?.ToString() ?? string.Empty
                 })
                 .GroupBy(x => x.Id)
