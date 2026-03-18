@@ -78,6 +78,7 @@ namespace ProductDatabase.MasterManagement {
                              && r.Field<long?>("S_SubstrateID").HasValue)
                     .Select(r => r.Field<long>("S_SubstrateID")));
 
+                // DB整合性が壊れていてSubstrateDataTableに存在しないIDが紐づいている場合を安全に無視する
                 foreach (var id in linkedIds)
                     if (_substrateCheckState.ContainsKey(id))
                         _substrateCheckState[id] = true;
