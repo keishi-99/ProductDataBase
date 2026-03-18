@@ -14,6 +14,9 @@ namespace ProductDatabase.MasterManagement {
         // 編集対象の元データ行（新規追加時はnull）
         private readonly DataRow? _sourceRow;
 
+        // 基板チェック状態管理（フィルタリング時もチェック状態を保持するため辞書で管理）
+        private Dictionary<long, bool> _substrateCheckState = [];
+
         public ProductMasterEditDialog(ProductRepository repository, DataRow? sourceRow) {
             InitializeComponent();
             _repository = repository;
@@ -34,11 +37,9 @@ namespace ProductDatabase.MasterManagement {
                 VisibleCheckBox.Checked = true;
             }
 
-            // フィールド反映後に製品名でフィルタしてリストを構築する
+            // チェック状態辞書を初期化してからリストを構築する
+            InitSubstrateCheckState();
             LoadSubstrateCheckedList();
-
-            // 新規追加時：製品名が変わったらリストを再フィルタする
-            ProductNameTextBox.TextChanged += (s, e) => LoadSubstrateCheckedList();
 
             this.Text = _isNewRecord ? "製品マスター追加" : "製品マスター編集";
         }
@@ -62,38 +63,51 @@ namespace ProductDatabase.MasterManagement {
             SerialTypeComboBox.SelectedIndex = 0;
         }
 
-        // 製品名が一致する基板マスターをCheckedListBoxに読み込み、既存紐づけをチェック状態にする
-        private void LoadSubstrateCheckedList() {
-            SubstrateCheckedListBox.Items.Clear();
+        // チェック状態辞書を初期化する（全基板IDをキーに、編集時は既存紐づきをtrue）
+        private void InitSubstrateCheckState() {
+            _substrateCheckState = _repository.SubstrateDataTable.AsEnumerable()
+                .ToDictionary(r => r.Field<long>("SubstrateID"), _ => false);
 
-            var filterProductName = ProductNameTextBox.Text.Trim();
-
-            // 既存の紐づき基板IDを取得（編集時のみ）
-            var linkedSubstrateIds = new HashSet<long>();
             if (!_isNewRecord && _sourceRow != null) {
                 var productId = _sourceRow.Field<long>("ProductID");
-                linkedSubstrateIds = [.. _repository.ProductUseSubstrate.AsEnumerable()
+                var linkedIds = new HashSet<long>(_repository.ProductUseSubstrate.AsEnumerable()
                     .Where(r => r.Field<long?>("P_ProductID") == productId
                              && r.Field<long?>("S_SubstrateID").HasValue)
-                    .Select(r => r.Field<long>("S_SubstrateID"))];
+                    .Select(r => r.Field<long>("S_SubstrateID")));
+
+                foreach (var id in linkedIds)
+                    if (_substrateCheckState.ContainsKey(id))
+                        _substrateCheckState[id] = true;
             }
+        }
 
-            // 製品名が一致する基板のみ追加し、紐づき状態のものはチェック済みにする
+        // 全基板マスターをCheckedListBoxに描画する（チェック済みは常に表示、未チェックはフィルターで絞り込み）
+        private void LoadSubstrateCheckedList() {
+            var productNameFilter = SubstrateProductNameFilterTextBox.Text.Trim();
+            var modelFilter = SubstrateModelFilterTextBox.Text.Trim();
+
+            SubstrateCheckedListBox.Items.Clear();
+
             foreach (DataRow row in _repository.SubstrateDataTable.Rows) {
-                var substrateProductName = row["ProductName"]?.ToString() ?? string.Empty;
-                if (!string.IsNullOrEmpty(filterProductName) &&
-                    !substrateProductName.Equals(filterProductName, StringComparison.OrdinalIgnoreCase)) {
-                    continue;
-                }
-
                 var substrateId = row.Field<long>("SubstrateID");
+                var productName = row["ProductName"]?.ToString() ?? string.Empty;
                 var substrateName = row["SubstrateName"]?.ToString() ?? string.Empty;
                 var substrateModel = row["SubstrateModel"]?.ToString() ?? string.Empty;
+
+                var isChecked = _substrateCheckState.GetValueOrDefault(substrateId, false);
+
+                var matchesFilter =
+                    (string.IsNullOrEmpty(productNameFilter) ||
+                     productName.Contains(productNameFilter, StringComparison.OrdinalIgnoreCase)) &&
+                    (string.IsNullOrEmpty(modelFilter) ||
+                     substrateModel.Contains(modelFilter, StringComparison.OrdinalIgnoreCase));
+
+                if (!isChecked && !matchesFilter) continue;
+
                 var item = new ListItem<long> {
                     Id = substrateId,
-                    Name = $"{substrateName} [{substrateModel}]"
+                    Name = $"{productName} - {substrateName} [{substrateModel}]"
                 };
-                var isChecked = linkedSubstrateIds.Contains(substrateId);
                 SubstrateCheckedListBox.Items.Add(item, isChecked);
             }
         }
@@ -172,10 +186,10 @@ namespace ProductDatabase.MasterManagement {
                     _repository.UpdateProduct(_product);
                 }
 
-                // 使用基板の紐づけ更新
-                var selectedSubstrateIds = SubstrateCheckedListBox.CheckedItems
-                    .Cast<ListItem<long>>()
-                    .Select(item => item.Id)
+                // 使用基板の紐づけ更新（辞書から取得することでフィルター非表示のチェック済みも含める）
+                var selectedSubstrateIds = _substrateCheckState
+                    .Where(kvp => kvp.Value)
+                    .Select(kvp => kvp.Key)
                     .ToList();
                 _repository.UpdateProductUseSubstrates(productId, selectedSubstrateIds);
 
@@ -276,17 +290,18 @@ namespace ProductDatabase.MasterManagement {
             _product.CheckBin = checkBin;
         }
 
-        // 製品名フィルターのテキスト変更時ハンドラ（Task2で実装予定）
-        private void SubstrateProductNameFilterTextBox_TextChanged(object sender, EventArgs e) {
-        }
-
-        // 基板型式フィルターのテキスト変更時ハンドラ（Task2で実装予定）
-        private void SubstrateModelFilterTextBox_TextChanged(object sender, EventArgs e) {
-        }
-
-        // チェックリストのアイテムチェック時ハンドラ（Task2で実装予定）
+        // チェック状態の変化を辞書に同期する
         private void SubstrateCheckedListBox_ItemCheck(object sender, ItemCheckEventArgs e) {
+            var item = (ListItem<long>)SubstrateCheckedListBox.Items[e.Index];
+            _substrateCheckState[item.Id] = (e.NewValue == CheckState.Checked);
         }
+
+        // フィルターテキスト変更時にリストを再描画する
+        private void SubstrateProductNameFilterTextBox_TextChanged(object sender, EventArgs e)
+            => LoadSubstrateCheckedList();
+
+        private void SubstrateModelFilterTextBox_TextChanged(object sender, EventArgs e)
+            => LoadSubstrateCheckedList();
 
         // ComboBoxのアイテムを保持する内部クラス
         private sealed class ComboItem(int value, string label) {
