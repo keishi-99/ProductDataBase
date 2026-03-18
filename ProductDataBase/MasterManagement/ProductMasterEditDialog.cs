@@ -72,14 +72,12 @@ namespace ProductDatabase.MasterManagement {
             var linkedSubstrateIds = new HashSet<int>();
             if (!_isNewRecord && _sourceRow != null) {
                 var productId = Convert.ToInt32(_sourceRow["ProductID"]);
-                foreach (DataRow row in _repository.ProductUseSubstrate.Rows) {
-                    if (row["P_ProductID"] != DBNull.Value &&
-                        Convert.ToInt32(row["P_ProductID"]) == productId) {
-                        if (row["S_SubstrateID"] != DBNull.Value) {
-                            linkedSubstrateIds.Add(Convert.ToInt32(row["S_SubstrateID"]));
-                        }
-                    }
-                }
+                linkedSubstrateIds = _repository.ProductUseSubstrate.AsEnumerable()
+                    .Where(r => r["P_ProductID"] != DBNull.Value
+                             && Convert.ToInt32(r["P_ProductID"]) == productId
+                             && r["S_SubstrateID"] != DBNull.Value)
+                    .Select(r => Convert.ToInt32(r["S_SubstrateID"]))
+                    .ToHashSet();
             }
 
             // 製品名が一致する基板のみ追加し、紐づき状態のものはチェック済みにする
