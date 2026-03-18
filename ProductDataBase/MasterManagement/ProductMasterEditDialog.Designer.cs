@@ -156,7 +156,7 @@ namespace ProductDatabase.MasterManagement {
             this.InitialLabel.Name = "InitialLabel";
             this.InitialLabel.Size = new Size(59, 15);
             this.InitialLabel.TabIndex = 4;
-            this.InitialLabel.Text = "シリアル頭文字:";
+            this.InitialLabel.Text = "シリアル接頭文字:";
             // 
             // InitialTextBox
             // 
