@@ -24,7 +24,8 @@ namespace ProductDatabase.MasterManagement {
             if (!_isNewRecord && _sourceRow != null) {
                 _substrate.LoadFrom(_sourceRow);
                 PopulateFields();
-            } else {
+            }
+            else {
                 // 新規追加時のデフォルト値
                 VisibleCheckBox.Checked = true;
             }
@@ -132,7 +133,7 @@ namespace ProductDatabase.MasterManagement {
             }
 
             // 基板型式の重複チェック
-            int excludeId = _isNewRecord ? 0 : _substrate.SubstrateID;
+            long excludeId = _isNewRecord ? 0 : _substrate.SubstrateID;
             if (_repository.ExistsSubstrateModel(SubstrateModelTextBox.Text.Trim(), excludeId)) {
                 MessageBox.Show(
                     $"基板型式 [{SubstrateModelTextBox.Text.Trim()}] は既に登録されています。",

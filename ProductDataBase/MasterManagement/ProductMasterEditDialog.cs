@@ -69,15 +69,13 @@ namespace ProductDatabase.MasterManagement {
             var filterProductName = ProductNameTextBox.Text.Trim();
 
             // 既存の紐づき基板IDを取得（編集時のみ）
-            var linkedSubstrateIds = new HashSet<int>();
+            var linkedSubstrateIds = new HashSet<long>();
             if (!_isNewRecord && _sourceRow != null) {
-                var productId = Convert.ToInt32(_sourceRow["ProductID"]);
-                linkedSubstrateIds = _repository.ProductUseSubstrate.AsEnumerable()
-                    .Where(r => r["P_ProductID"] != DBNull.Value
-                             && Convert.ToInt32(r["P_ProductID"]) == productId
-                             && r["S_SubstrateID"] != DBNull.Value)
-                    .Select(r => Convert.ToInt32(r["S_SubstrateID"]))
-                    .ToHashSet();
+                var productId = _sourceRow.Field<long>("ProductID");
+                linkedSubstrateIds = [.. _repository.ProductUseSubstrate.AsEnumerable()
+                    .Where(r => r.Field<long?>("P_ProductID") == productId
+                             && r.Field<long?>("S_SubstrateID").HasValue)
+                    .Select(r => r.Field<long>("S_SubstrateID"))];
             }
 
             // 製品名が一致する基板のみ追加し、紐づき状態のものはチェック済みにする
@@ -88,10 +86,10 @@ namespace ProductDatabase.MasterManagement {
                     continue;
                 }
 
-                var substrateId = Convert.ToInt32(row["SubstrateID"]);
+                var substrateId = row.Field<long>("SubstrateID");
                 var substrateName = row["SubstrateName"]?.ToString() ?? string.Empty;
                 var substrateModel = row["SubstrateModel"]?.ToString() ?? string.Empty;
-                var item = new ListItem<int> {
+                var item = new ListItem<long> {
                     Id = substrateId,
                     Name = $"{substrateName} [{substrateModel}]"
                 };
@@ -165,7 +163,7 @@ namespace ProductDatabase.MasterManagement {
             try {
                 CollectFieldValues();
 
-                int productId;
+                long productId;
                 if (_isNewRecord) {
                     productId = _repository.InsertProduct(_product);
                 }
@@ -176,7 +174,7 @@ namespace ProductDatabase.MasterManagement {
 
                 // 使用基板の紐づけ更新
                 var selectedSubstrateIds = SubstrateCheckedListBox.CheckedItems
-                    .Cast<ListItem<int>>()
+                    .Cast<ListItem<long>>()
                     .Select(item => item.Id)
                     .ToList();
                 _repository.UpdateProductUseSubstrates(productId, selectedSubstrateIds);
@@ -217,7 +215,7 @@ namespace ProductDatabase.MasterManagement {
                 return false;
             }
             // 製品型式の重複チェック
-            int excludeId = _isNewRecord ? 0 : _product.ProductID;
+            long excludeId = _isNewRecord ? 0 : _product.ProductID;
             if (_repository.ExistsProductModel(ProductModelTextBox.Text.Trim(), excludeId)) {
                 MessageBox.Show(
                     $"製品型式 [{ProductModelTextBox.Text.Trim()}] は既に登録されています。",

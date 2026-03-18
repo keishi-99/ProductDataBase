@@ -20,7 +20,7 @@ namespace ProductDatabase {
         public string PrintSettingPath { get; } = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
 
         private class SubstrateStockDto {
-            public int SubstrateID { get; set; }
+            public long SubstrateID { get; set; }
             public string SubstrateName { get; set; } = string.Empty;
             public string SubstrateModel { get; set; } = string.Empty;
             public string SubstrateNumber { get; set; } = string.Empty;
