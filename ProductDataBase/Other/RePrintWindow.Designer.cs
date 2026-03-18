@@ -250,7 +250,7 @@
             this.RevisionCheckBox.Size = new Size(68, 19);
             this.RevisionCheckBox.TabIndex = 95;
             this.RevisionCheckBox.TabStop = false;
-            this.RevisionCheckBox.Text = "レビジョン";
+            this.RevisionCheckBox.Text = "リビジョン";
             this.RevisionCheckBox.UseVisualStyleBackColor = true;
             this.RevisionCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 

@@ -8,6 +8,7 @@ namespace ProductDatabase.Models {
         public string SubstrateName { get; set; } = string.Empty;
         public string SubstrateModel { get; set; } = string.Empty;
         public int CheckBin { get; set; }
+        public bool Visible { get; set; } = true;
 
         // DataRowから基板マスターの各フィールドを読み込む
         public void LoadFrom(DataRow row) {
@@ -19,6 +20,7 @@ namespace ProductDatabase.Models {
             RegType = Convert.ToInt32(row["RegType"]);
             CheckBin = Convert.ToInt32(row["Checkbox"].ToString(), 2);
             SerialPrintType = Convert.ToInt32(row["SerialPrintType"]);
+            Visible = row["Visible"] != DBNull.Value && Convert.ToInt32(row["Visible"]) == 1;
         }
 
         // 基板マスターデータを初期値にリセットする
@@ -31,6 +33,7 @@ namespace ProductDatabase.Models {
             RegType = 0;
             CheckBin = 0;
             SerialPrintType = 0;
+            Visible = true;
         }
     }
 }

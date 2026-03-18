@@ -100,6 +100,9 @@ namespace ProductDatabase {
 
                 this.Activate();
                 QRCodePanel.Enabled = _appSettings.IsAuthorizedUser;
+
+                // 管理者のみマスター管理メニューを有効にする
+                MasterManagementToolStripMenuItem.Enabled = _appSettings.IsAdministrator;
                 QRCodeTextBox.Select();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -325,14 +328,14 @@ namespace ProductDatabase {
                     _ => false
                 });
 
-            // CategoryName 列の重複除外＋SortNumber 昇順
+            // CategoryName 列の重複除外＋名前順（"Other" は末尾）
             var categoryNames = _currentTargetRows
-                .Where(r => r["CategoryName"] != DBNull.Value &&
-                            r["SortNumber"] != DBNull.Value)
-                .OrderBy(r => Convert.ToInt32(r["SortNumber"]))
+                .Where(r => r["CategoryName"] != DBNull.Value)
                 .Select(r => r["CategoryName"]!.ToString()!)
                 .Where(name => !string.IsNullOrWhiteSpace(name))
                 .Distinct()
+                .OrderBy(name => name == "Other" ? 1 : 0)
+                .ThenBy(name => name)
                 .ToList();
 
             CategoryListBox1.Items.AddRange([.. categoryNames]);
@@ -693,6 +696,18 @@ namespace ProductDatabase {
         }
         private void QRCodeButton_Click(object sender, EventArgs e) { CodeScan(); }
         private void QRCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
+
+        // マスター管理画面を管理者専用ダイアログで開く
+        private void MasterManagementToolStripMenuItem_Click(object sender, EventArgs e) {
+            try {
+                using var window = new MasterManagement.MasterManagementWindow(_productRepository);
+                window.ShowDialog(this);
+                // マスターデータが変更されている可能性があるためキャッシュを更新する
+                _productRepository.LoadAll();
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
     }
 }

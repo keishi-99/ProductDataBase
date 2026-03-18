@@ -18,6 +18,8 @@ namespace ProductDatabase.Models {
         public int CheckBin { get; set; }
         public List<SubstrateInfo> UseSubstrates { get; set; } = [];
 
+        public bool Visible { get; set; } = true;
+
         private int _sheetPrintType;
         public int SheetPrintType {
             get => _sheetPrintType;
@@ -95,6 +97,7 @@ namespace ProductDatabase.Models {
             SerialDigitType = Convert.ToInt32(row["SerialType"]);
             SerialPrintType = Convert.ToInt32(row["SerialPrintType"]);
             SheetPrintType = Convert.ToInt32(row["SheetPrintType"]);
+            Visible = row["Visible"] != DBNull.Value && Convert.ToInt32(row["Visible"]) == 1;
         }
 
         // 製品マスターデータを初期値にリセットする
@@ -112,6 +115,7 @@ namespace ProductDatabase.Models {
             RegType = 0;
             SerialPrintType = 0;
             SheetPrintType = 0;
+            Visible = true;
         }
     }
 }
