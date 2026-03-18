@@ -88,6 +88,7 @@ namespace ProductDatabase.MasterManagement {
         // 全基板マスターをCheckedListBoxに描画する（チェック済みは常に表示、未チェックはフィルターで絞り込み）
         private void LoadSubstrateCheckedList() {
             _isLoadingSubstrateList = true;
+            SubstrateCheckedListBox.BeginUpdate();
             try {
                 var productNameFilter = SubstrateProductNameFilterTextBox.Text.Trim();
                 var modelFilter = SubstrateModelFilterTextBox.Text.Trim();
@@ -117,6 +118,7 @@ namespace ProductDatabase.MasterManagement {
                     SubstrateCheckedListBox.Items.Add(item, isChecked);
                 }
             } finally {
+                SubstrateCheckedListBox.EndUpdate();
                 _isLoadingSubstrateList = false;
             }
         }
