@@ -195,9 +195,13 @@ namespace ProductDatabase {
         private void InsertProduct(SqliteConnection connection) {
             var commandText =
                 $"""
-                INSERT INTO {Constants.TRePrintTableName} 
+                INSERT INTO {Constants.TRePrintTableName}
                 (
                     ProductID,
+                    ProductName,
+                    ProductType,
+                    ProductModel,
+                    SerialPrintType,
                     OrderNumber,
                     ProductNumber,
                     OLesNumber,
@@ -210,9 +214,13 @@ namespace ProductDatabase {
                     SerialLast,
                     Comment
                 )
-                VALUES 
+                VALUES
                 (
                     @ProductID,
+                    @ProductName,
+                    @ProductType,
+                    @ProductModel,
+                    @SerialPrintType,
                     @OrderNumber,
                     @ProductNumber,
                     @OLesNumber,
@@ -230,6 +238,10 @@ namespace ProductDatabase {
 
             connection.Execute(commandText, new {
                 _productMaster.ProductID,
+                _productMaster.ProductName,
+                _productMaster.ProductType,
+                _productMaster.ProductModel,
+                _productMaster.SerialPrintType,
                 OrderNumber = _productRegisterWork.OrderNumber.NullIfWhiteSpace(),
                 ProductNumber = _productRegisterWork.ProductNumber.NullIfWhiteSpace(),
                 OLesNumber = _productRegisterWork.OLesNumber.NullIfWhiteSpace(),
@@ -312,6 +324,9 @@ namespace ProductDatabase {
 
             _serialFirst = GenerateCode(_productRegisterWork.SerialFirstNumber);
             _serialLast = GenerateCode(_productRegisterWork.SerialLastNumber);
+
+            _productRegisterWork.SerialFirst = _serialFirst;
+            _productRegisterWork.SerialLast = _serialLast;
             return true;
         }
 
