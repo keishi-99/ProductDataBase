@@ -990,7 +990,6 @@ namespace ProductDatabase {
         private void RefreshCurrentView() {
             switch (_tableName) {
                 case "Substrate":
-                case "SubstrateStock":
                     ViewSubstrateRegistrationLog();
                     break;
                 case "Product":
