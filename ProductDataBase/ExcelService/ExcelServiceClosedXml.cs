@@ -330,45 +330,41 @@ namespace ProductDatabase.ExcelService {
                 public string? QrCodeRange { get; set; }
                 public bool HasSubstrateInput { get; set; }
             }
-            // リストを生成するメインメソッド
+            // リストを生成するメインメソッド（例外は呼び出し元に伝播する）
             public static void GenerateList(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
-                try {
-                    // 1. Excel設定の読み込みとワークブックの準備
-                    var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsm");
-                    if (!File.Exists(configPath)) {
-                        throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
-                    }
-
-                    // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
-                    using var fs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-                    // FileStreamからXLWorkbookを読み込む
-                    using var workBook = new XLWorkbook(fs);
-
-                    var (targetSheetName, productName, resultRow, configSheet) = LoadExcelConfiguration(workBook, productMaster.ProductModel);
-
-                    // 2. 製品情報の設定とExcelへの書き込み
-                    var productCellRanges = GetProductCellRanges(configSheet, resultRow);
-                    var targetSheet = workBook.Worksheet(targetSheetName) ?? throw new Exception($"テンプレートシート:[{targetSheetName}]が見つかりません。");
-                    PopulateProductDetails(targetSheet, productMaster, productRegisterWork, productCellRanges, productName);
-
-                    // 3. データベースから使用済み基板情報を取得
-                    var usedSubstrate = GetUsedSubstrateData(productRegisterWork);
-
-                    // 4. 基板情報のExcelへの書き込み
-                    UpdateSubstrateDetailsInExcel(configSheet, targetSheet, resultRow, usedSubstrate);
-
-                    // 5. QRコードの生成と埋め込み
-                    if (!string.IsNullOrEmpty(productCellRanges.QrCodeRange)) {
-                        GenerateAndEmbedQrCode(targetSheet, productMaster, productRegisterWork, productCellRanges.QrCodeRange);
-                    }
-
-                    // 6. Excelファイルの保存と印刷
-                    var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyList.xlsm");
-                    SaveAndPrintExcel(workBook, temporarilyPath, targetSheetName);
-                } catch (Exception ex) {
-                    MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // 1. Excel設定の読み込みとワークブックの準備
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsm");
+                if (!File.Exists(configPath)) {
+                    throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
                 }
+
+                // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
+                using var fs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+                // FileStreamからXLWorkbookを読み込む
+                using var workBook = new XLWorkbook(fs);
+
+                var (targetSheetName, productName, resultRow, configSheet) = LoadExcelConfiguration(workBook, productMaster.ProductModel);
+
+                // 2. 製品情報の設定とExcelへの書き込み
+                var productCellRanges = GetProductCellRanges(configSheet, resultRow);
+                var targetSheet = workBook.Worksheet(targetSheetName) ?? throw new Exception($"テンプレートシート:[{targetSheetName}]が見つかりません。");
+                PopulateProductDetails(targetSheet, productMaster, productRegisterWork, productCellRanges, productName);
+
+                // 3. データベースから使用済み基板情報を取得
+                var usedSubstrate = GetUsedSubstrateData(productRegisterWork);
+
+                // 4. 基板情報のExcelへの書き込み
+                UpdateSubstrateDetailsInExcel(configSheet, targetSheet, resultRow, usedSubstrate);
+
+                // 5. QRコードの生成と埋め込み
+                if (!string.IsNullOrEmpty(productCellRanges.QrCodeRange)) {
+                    GenerateAndEmbedQrCode(targetSheet, productMaster, productRegisterWork, productCellRanges.QrCodeRange);
+                }
+
+                // 6. Excelファイルの保存と印刷
+                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyList.xlsm");
+                SaveAndPrintExcel(workBook, temporarilyPath, targetSheetName);
             }
 
             // Excel設定を読み込むメソッド
