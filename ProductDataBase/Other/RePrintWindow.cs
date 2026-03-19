@@ -395,7 +395,7 @@ namespace ProductDatabase {
                 ["{MM}"] = regDate.ToString("MM"),
                 ["{R}"] = _productRegisterWork.Revision,
                 ["{M}"] = monthCode[^1..],
-                ["{S}"] = Convert.ToInt32(serialCode).ToString($"D{_productMaster.SerialDigit}")
+                ["{S}"] = (int.TryParse(serialCode, out var sc) ? sc : 0).ToString($"D{_productMaster.SerialDigit}")
             };
 
             foreach (var kv in map) {

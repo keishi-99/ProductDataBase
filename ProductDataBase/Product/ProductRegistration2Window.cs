@@ -248,7 +248,7 @@ namespace ProductDatabase {
 
             foreach (var row in results) {
                 var strSubstrateNumber = $"{row.SubstrateNumber}";
-                var intStock = Convert.ToInt32(row.Stock);
+                var intStock = int.TryParse(row.Stock?.ToString(), out var stock) ? stock : 0;
 
                 objDgv?.Rows.Add(strSubstrateNumber, intStock);
 
@@ -499,7 +499,7 @@ namespace ProductDatabase {
                     }
 
                     var substrateNumber = row.Cells[0].Value.ToString() ?? string.Empty;
-                    var useValue = Convert.ToInt32(row.Cells[2].Value);
+                    var useValue = int.TryParse(row.Cells[2].Value?.ToString(), out var useVal) ? useVal : 0;
                     var orderNumber = GetSubstrateInfo(connection, substrateID, substrateNumber);
                     InsertSubstrate(connection, substrateID, substrateNumber, orderNumber, useValue, useID);
                 }
@@ -702,11 +702,11 @@ namespace ProductDatabase {
                                 for (var j = 0; j < dgvRowCnt; j++) {
                                     var boolCbx = objDgv.Rows[j].Cells[3].Value is not null && (bool)objDgv.Rows[j].Cells[3].Value;
                                     if (boolCbx) {
-                                        var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value.ToString());
+                                        var stockValue = int.TryParse(objDgv.Rows[j].Cells[1].Value?.ToString(), out var sv) ? sv : 0;
                                         if (objDgv.Rows[j].Cells[2].Value is null) {
                                             throw new Exception("使用数が入力されていません。");
                                         }
-                                        var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value.ToString());
+                                        var useValue = int.TryParse(objDgv.Rows[j].Cells[2].Value?.ToString(), out var uv) ? uv : 0;
                                         if (useValue <= 0) {
                                             throw new Exception("使用数が0以下になっています。");
                                         }
@@ -942,7 +942,7 @@ namespace ProductDatabase {
                 ["{MM}"] = regDate.ToString("MM"),
                 ["{R}"] = _productRegisterWork.Revision,
                 ["{M}"] = monthCode[^1..],
-                ["{S}"] = Convert.ToInt32(serialCode).ToString($"D{_productMaster.SerialDigit}")
+                ["{S}"] = (int.TryParse(serialCode, out var sc) ? sc : 0).ToString($"D{_productMaster.SerialDigit}")
             };
 
             foreach (var kv in map) {

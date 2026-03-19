@@ -81,7 +81,7 @@ namespace ProductDatabase.Other {
             var selectedRows = ServiceInfo.ServiceDataTable.Select($"CategoryName = '{CategoryListBox1.SelectedItem}' AND ProductName = '{CategoryListBox2.SelectedItem}' AND ProductType = '{CategoryListBox3.SelectedItem}'");
 
             if (selectedRows.Length > 0) {
-                ServiceInfo.ServiceProductID = Convert.ToInt64(selectedRows[0]["ProductID"]);
+                ServiceInfo.ServiceProductID = long.TryParse(selectedRows[0]["ProductID"]?.ToString(), out var pid) ? pid : 0;
                 ServiceInfo.ServiceCategoryName = selectedRows[0]["CategoryName"].ToString() ?? string.Empty;
                 ServiceInfo.ServiceProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
                 ServiceInfo.ServiceProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
