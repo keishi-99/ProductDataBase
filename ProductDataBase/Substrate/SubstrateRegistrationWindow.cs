@@ -624,28 +624,6 @@ namespace ProductDatabase {
             ExcelServiceClosedXml.SubstrateInformationClosedXml.OpenSubstrateInformationClosedXml(_substrateMaster);
         }
 
-        // STAスレッドで処理を実行し、Taskとして返す（COM Interop用）
-        // RunContinuationsAsynchronously: await後の継続処理がSTAスレッドで実行されるのを防ぐ
-        private static Task RunOnStaThreadAsync(Action action)
-        {
-            var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-            var thread = new Thread(() =>
-            {
-                try
-                {
-                    action();
-                    tcs.SetResult();
-                }
-                catch (Exception ex)
-                {
-                    tcs.SetException(ex);
-                }
-            });
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
-            return tcs.Task;
-        }
-
         // 有効なテキストボックスの入力状態・製番桁数・数量・担当者選択を検証しエラー時は登録ボタンを無効化する
         private void ValidateAllInputs() {
             ErrorMessageLabel.Text = "";
@@ -725,7 +703,7 @@ namespace ProductDatabase {
             OpenSubstrateInformationButton.Enabled = false;
             try
             {
-                await RunOnStaThreadAsync(OpenSubstrateInformation);
+                await CommonUtils.RunOnStaThreadAsync(OpenSubstrateInformation);
             }
             catch (Exception ex)
             {
