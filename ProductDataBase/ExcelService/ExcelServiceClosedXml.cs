@@ -33,42 +33,66 @@ namespace ProductDatabase.ExcelService {
                 public bool HasSubstrateInput { get; set; }
             }
 
-            // レポートを生成するメインメソッド
-            public static void GenerateReport(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
+            // UIスレッドで呼ぶ: Config読み込み + ファイル選択 + 保存先選択
+            // OperationCanceledException（ダイアログキャンセル）は null を返す
+            // その他の例外は呼び出し元に伝播する
+            public static (string templateFilePath, string savePath, ReportConfigClosedXml config)?
+                PrepareReport(string productModel, string productNumber) {
                 try {
-                    // 1. 設定ファイルを読み込み、レポート設定を取得
                     var configWorkbook = LoadConfigWorkbook();
-                    var reportConfig = GetReportConfig(configWorkbook, productMaster.ProductModel);
+                    var reportConfig = GetReportConfig(configWorkbook, productModel);
 
-                    // 2. レポートテンプレートを読み込み
-                    var filePath = reportConfig.FilePath;
-                    if (!File.Exists(filePath)) {
-                        throw new FileNotFoundException($"設定ファイルが見つかりません: {filePath}");
-                    }
+                    var savePath = ShowSaveDialog(reportConfig, productNumber);
+                    if (savePath is null) return null; // SaveFileDialog キャンセル
 
-                    using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    var reportWorkbook = new XLWorkbook(fs);
-
-                    // 3. レポートシートにデータを挿入
-                    PopulateReportSheet(reportWorkbook, productMaster, productRegisterWork, reportConfig);
-
-                    // 基板情報の入力がある場合のみ処理を実行
-                    if (reportConfig.HasSubstrateInput) {
-                        // 4. データベースから使用済み基板情報を取得
-                        var usedSubstrate = GetUsedSubstrateData(productRegisterWork);
-
-                        // 5. 基板情報のExcelへの書き込み
-                        UpdateSubstrateDetailsInExcel(reportWorkbook, reportConfig, usedSubstrate);
-                    }
-
-                    // 6. レポートを保存
-                    SaveReport(reportWorkbook, productRegisterWork, reportConfig);
-
-                    MessageBox.Show("成績書が正常に生成されました。", "完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                } catch (Exception ex) {
-                    // エラーメッセージをユーザーに表示
-                    MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return (reportConfig.FilePath, savePath, reportConfig);
+                } catch (OperationCanceledException) {
+                    return null; // OpenFileDialog キャンセル
                 }
+
+                static string? ShowSaveDialog(ReportConfigClosedXml config, string productNumber) {
+                    if (!Directory.Exists(config.SaveDirectory)) {
+                        MessageBox.Show($"設定されている保存先が見つかりませんでした。\r\n{config.SaveDirectory}", "ファイル選択", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+
+                    using SaveFileDialog saveFileDialog = new() {
+                        Filter = $"Excel Files (*{config.FileExtension})|*{config.FileExtension}|All Files (*.*)|*.*",
+                        FileName = $"{config.FileName} のコピー{productNumber}{config.FileExtension}",
+                        Title = "保存先を選択してください",
+                        InitialDirectory = string.IsNullOrWhiteSpace(config.SaveDirectory)
+                            ? Environment.CurrentDirectory
+                            : config.SaveDirectory
+                    };
+                    return saveFileDialog.ShowDialog() == DialogResult.OK
+                        ? saveFileDialog.FileName
+                        : null;
+                }
+            }
+
+            // STAスレッドで呼ぶ: ClosedXML 読み書き + SaveAs のみ
+            // MessageBox を含めない。例外はすべて呼び出し元に伝播する
+            public static void ExecuteReport(
+                ProductMaster productMaster,
+                ProductRegisterWork productRegisterWork,
+                string templateFilePath,
+                string savePath,
+                ReportConfigClosedXml config) {
+                if (!File.Exists(templateFilePath)) {
+                    throw new FileNotFoundException($"設定ファイルが見つかりません: {templateFilePath}");
+                }
+
+                using var fs = new FileStream(templateFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                var reportWorkbook = new XLWorkbook(fs);
+
+                PopulateReportSheet(reportWorkbook, productMaster, productRegisterWork, config);
+
+                if (config.HasSubstrateInput) {
+                    var usedSubstrate = GetUsedSubstrateData(productRegisterWork);
+                    UpdateSubstrateDetailsInExcel(reportWorkbook, config, usedSubstrate);
+                }
+
+                ForcePageBreakPreview(reportWorkbook);
+                reportWorkbook.SaveAs(savePath);
             }
 
             // 設定Excelワークブックを読み込む
@@ -287,36 +311,6 @@ namespace ProductDatabase.ExcelService {
                 }
             }
 
-            // 変更されたレポートをファイルに保存する
-            private static void SaveReport(XLWorkbook reportWorkbook, ProductRegisterWork productRegisterWork, ReportConfigClosedXml config) {
-                var fileName = config.FileName;
-                var fileExtension = config.FileExtension;
-                var initialDirectory = config.SaveDirectory;
-
-                if (!Directory.Exists(initialDirectory)) {
-                    MessageBox.Show($"設定されている保存先が見つかりませんでした。\r\n{initialDirectory}", "ファイル選択", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-
-                using SaveFileDialog saveFileDialog = new() {
-                    Filter = $"Excel Files (*{fileExtension})|*{fileExtension}|All Files (*.*)|*.*",
-                    FileName = $"{fileName} のコピー{productRegisterWork.ProductNumber}{fileExtension}",
-                    Title = "保存先を選択してください",
-                    InitialDirectory = string.IsNullOrWhiteSpace(initialDirectory)
-                        ? Environment.CurrentDirectory  // Nullの場合はデフォルトディレクトリを使用
-                        : initialDirectory
-                };
-
-                if (saveFileDialog.ShowDialog() == DialogResult.OK) {
-                    var outputPath = saveFileDialog.FileName;
-                    // 保存前に改ページプレビューを強制設定
-                    ForcePageBreakPreview(reportWorkbook);
-                    reportWorkbook.SaveAs(outputPath);
-                }
-                else {
-                    // ユーザーが保存をキャンセルした場合の処理
-                    throw new OperationCanceledException("キャンセルされました。");
-                }
-            }
         }
 
         // リスト
