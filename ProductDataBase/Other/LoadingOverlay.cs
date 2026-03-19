@@ -65,10 +65,10 @@ namespace ProductDatabase.Other {
                 }
 
                 // スピナー（薄い背景円 + 回転する円弧）
-                const int spinnerSize = 48;
-                int spinnerX = cardX + (CardW - spinnerSize) / 2;
+                const int SpinnerSize = 48;
+                int spinnerX = cardX + (CardW - SpinnerSize) / 2;
                 int spinnerY = cardY + 18;
-                var spinnerRect = new RectangleF(spinnerX, spinnerY, spinnerSize, spinnerSize);
+                var spinnerRect = new RectangleF(spinnerX, spinnerY, SpinnerSize, SpinnerSize);
 
                 using (var bgPen = new Pen(Color.FromArgb(220, 220, 220), 5f)) {
                     bgPen.StartCap = LineCap.Round;
@@ -85,10 +85,10 @@ namespace ProductDatabase.Other {
                 // 「処理中...」テキスト
                 using var font = new Font("Meiryo UI", 9f);
                 using var textBrush = new SolidBrush(Color.FromArgb(80, 80, 80));
-                const string text = "処理中...";
-                var textSize = g.MeasureString(text, font);
+                const string Text = "処理中...";
+                var textSize = g.MeasureString(Text, font);
                 g.DrawString(
-                    text, font, textBrush,
+                    Text, font, textBrush,
                     cardX + (CardW - textSize.Width) / 2f,
                     cardY + CardH - 26f);
             }
