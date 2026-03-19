@@ -889,7 +889,7 @@ namespace ProductDatabase {
                         };
                         if (pdlg.ShowDialog() == DialogResult.OK) {
                             using (var overlay = new LoadingOverlay(this)) {
-                                await Task.Run(() => pd.Print());
+                                await CommonUtils.RunOnStaThreadAsync(() => pd.Print());
                             }
                         }
                         else {

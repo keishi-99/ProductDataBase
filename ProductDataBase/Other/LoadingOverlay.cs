@@ -10,7 +10,7 @@ namespace ProductDatabase.Other {
         public LoadingOverlay(Control parent) {
             _parent = parent;
             _panel = new OverlayPanel {
-                Bounds = parent.ClientRectangle
+                Dock = DockStyle.Fill
             };
             parent.Controls.Add(_panel);
             _panel.BringToFront();
