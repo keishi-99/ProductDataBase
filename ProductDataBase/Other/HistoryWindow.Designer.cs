@@ -1,4 +1,4 @@
-﻿namespace ProductDatabase {
+namespace ProductDatabase {
     partial class HistoryWindow {
         /// <summary>
         /// Required designer variable.
@@ -35,28 +35,33 @@
             this.GenerateCheckSheetButton = new Button();
             this.AllSubstrateCheckBox = new CheckBox();
             this.menuStrip1 = new MenuStrip();
-            this.ファイルToolStripMenuItem = new ToolStripMenuItem();
-            this.編集モードToolStripMenuItem = new ToolStripMenuItem();
+            this.オプションToolStripMenuItem = new ToolStripMenuItem();
+            this.在庫調整ToolStripMenuItem = new ToolStripMenuItem();
+            this.編集ToolStripMenuItem = new ToolStripMenuItem();
+            this.編集開始ToolStripMenuItem = new ToolStripMenuItem();
             this.編集終了ToolStripMenuItem = new ToolStripMenuItem();
             this.GroupModelCheckBox = new CheckBox();
             this.ShowUsedSubstrateButton = new Button();
-            this.オプションToolStripMenuItem = new ToolStripMenuItem();
-            this.在庫調整ToolStripMenuItem = new ToolStripMenuItem();
+            this.EditContextMenuStrip = new ContextMenuStrip();
+            this.EditContextMenuItem = new ToolStripMenuItem();
+            this.EditContextMenuSeparator = new ToolStripSeparator();
+            this.DeleteContextMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).BeginInit();
             this.menuStrip1.SuspendLayout();
+            this.EditContextMenuStrip.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
             // DataBaseDataGridView
-            // 
+            //
             this.DataBaseDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             this.DataBaseDataGridView.EditMode = DataGridViewEditMode.EditOnF2;
             this.DataBaseDataGridView.Location = new Point(0, 27);
             this.DataBaseDataGridView.Name = "DataBaseDataGridView";
             this.DataBaseDataGridView.Size = new Size(1184, 467);
             this.DataBaseDataGridView.TabIndex = 0;
-            // 
+            //
             // CategoryComboBox
-            // 
+            //
             this.CategoryComboBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.CategoryComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             this.CategoryComboBox.FormattingEnabled = true;
@@ -65,9 +70,9 @@
             this.CategoryComboBox.Size = new Size(121, 23);
             this.CategoryComboBox.TabIndex = 1;
             this.CategoryComboBox.SelectedIndexChanged += this.CategoryComboBox_SelectedIndexChanged;
-            // 
+            //
             // FilterStringTextBox
-            // 
+            //
             this.FilterStringTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.FilterStringTextBox.Location = new Point(139, 502);
             this.FilterStringTextBox.MaxLength = 50;
@@ -75,9 +80,9 @@
             this.FilterStringTextBox.Size = new Size(100, 23);
             this.FilterStringTextBox.TabIndex = 2;
             this.FilterStringTextBox.TextChanged += this.FilterStringTextBox_TextChanged;
-            // 
+            //
             // CategoryRadioButton1
-            // 
+            //
             this.CategoryRadioButton1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.CategoryRadioButton1.Appearance = Appearance.Button;
             this.CategoryRadioButton1.Location = new Point(261, 500);
@@ -90,9 +95,9 @@
             this.CategoryRadioButton1.TextAlign = ContentAlignment.MiddleCenter;
             this.CategoryRadioButton1.UseVisualStyleBackColor = true;
             this.CategoryRadioButton1.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
-            // 
+            //
             // CategoryRadioButton2
-            // 
+            //
             this.CategoryRadioButton2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.CategoryRadioButton2.Appearance = Appearance.Button;
             this.CategoryRadioButton2.Location = new Point(359, 500);
@@ -105,9 +110,9 @@
             this.CategoryRadioButton2.TextAlign = ContentAlignment.MiddleCenter;
             this.CategoryRadioButton2.UseVisualStyleBackColor = true;
             this.CategoryRadioButton2.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
-            // 
+            //
             // StockCheckBox
-            // 
+            //
             this.StockCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.StockCheckBox.AutoSize = true;
             this.StockCheckBox.Location = new Point(623, 506);
@@ -117,9 +122,9 @@
             this.StockCheckBox.Text = "在庫有のみ";
             this.StockCheckBox.UseVisualStyleBackColor = true;
             this.StockCheckBox.CheckedChanged += this.StockCheckBox_CheckedChanged;
-            // 
+            //
             // GenerateReportButton
-            // 
+            //
             this.GenerateReportButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             this.GenerateReportButton.Location = new Point(1080, 500);
             this.GenerateReportButton.Name = "GenerateReportButton";
@@ -128,9 +133,9 @@
             this.GenerateReportButton.Text = "成績書作成";
             this.GenerateReportButton.UseVisualStyleBackColor = true;
             this.GenerateReportButton.Click += this.GenerateReportButton_Click;
-            // 
+            //
             // GenerateListButton
-            // 
+            //
             this.GenerateListButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             this.GenerateListButton.Location = new Point(982, 500);
             this.GenerateListButton.Name = "GenerateListButton";
@@ -139,9 +144,9 @@
             this.GenerateListButton.Text = "リスト作成";
             this.GenerateListButton.UseVisualStyleBackColor = true;
             this.GenerateListButton.Click += this.GenerateListButton_Click;
-            // 
+            //
             // CategoryRadioButton3
-            // 
+            //
             this.CategoryRadioButton3.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.CategoryRadioButton3.Appearance = Appearance.Button;
             this.CategoryRadioButton3.Location = new Point(457, 500);
@@ -154,9 +159,9 @@
             this.CategoryRadioButton3.TextAlign = ContentAlignment.MiddleCenter;
             this.CategoryRadioButton3.UseVisualStyleBackColor = true;
             this.CategoryRadioButton3.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
-            // 
+            //
             // GenerateCheckSheetButton
-            // 
+            //
             this.GenerateCheckSheetButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             this.GenerateCheckSheetButton.Location = new Point(884, 500);
             this.GenerateCheckSheetButton.Name = "GenerateCheckSheetButton";
@@ -165,9 +170,9 @@
             this.GenerateCheckSheetButton.Text = "チェックシート";
             this.GenerateCheckSheetButton.UseVisualStyleBackColor = true;
             this.GenerateCheckSheetButton.Click += this.GenerateCheckSheetButton_Click;
-            // 
+            //
             // AllSubstrateCheckBox
-            // 
+            //
             this.AllSubstrateCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.AllSubstrateCheckBox.AutoSize = true;
             this.AllSubstrateCheckBox.Location = new Point(555, 506);
@@ -177,41 +182,56 @@
             this.AllSubstrateCheckBox.Text = "全基板";
             this.AllSubstrateCheckBox.UseVisualStyleBackColor = true;
             this.AllSubstrateCheckBox.CheckedChanged += this.AllSubstrateCheckBox_CheckedChanged;
-            // 
+            //
             // menuStrip1
-            // 
-            this.menuStrip1.Items.AddRange(new ToolStripItem[] { this.ファイルToolStripMenuItem, this.オプションToolStripMenuItem });
+            //
+            this.menuStrip1.Items.AddRange(new ToolStripItem[] { this.オプションToolStripMenuItem, this.編集ToolStripMenuItem });
             this.menuStrip1.Location = new Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new Size(1184, 24);
             this.menuStrip1.TabIndex = 12;
             this.menuStrip1.Text = "menuStrip1";
-            // 
-            // ファイルToolStripMenuItem
-            // 
-            this.ファイルToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.編集モードToolStripMenuItem, this.編集終了ToolStripMenuItem });
-            this.ファイルToolStripMenuItem.Name = "ファイルToolStripMenuItem";
-            this.ファイルToolStripMenuItem.Size = new Size(53, 20);
-            this.ファイルToolStripMenuItem.Text = "ファイル";
-            // 
-            // 編集モードToolStripMenuItem
-            // 
-            this.編集モードToolStripMenuItem.Enabled = false;
-            this.編集モードToolStripMenuItem.Name = "編集モードToolStripMenuItem";
-            this.編集モードToolStripMenuItem.Size = new Size(180, 22);
-            this.編集モードToolStripMenuItem.Text = "編集モード";
-            this.編集モードToolStripMenuItem.Click += this.編集ToolStripMenuItem_Click;
-            // 
+            //
+            // オプションToolStripMenuItem
+            //
+            this.オプションToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.在庫調整ToolStripMenuItem });
+            this.オプションToolStripMenuItem.Name = "オプションToolStripMenuItem";
+            this.オプションToolStripMenuItem.Size = new Size(62, 20);
+            this.オプションToolStripMenuItem.Text = "オプション";
+            //
+            // 在庫調整ToolStripMenuItem
+            //
+            this.在庫調整ToolStripMenuItem.Enabled = false;
+            this.在庫調整ToolStripMenuItem.Name = "在庫調整ToolStripMenuItem";
+            this.在庫調整ToolStripMenuItem.Size = new Size(180, 22);
+            this.在庫調整ToolStripMenuItem.Text = "在庫調整";
+            this.在庫調整ToolStripMenuItem.Click += this.在庫調整ToolStripMenuItem_Click;
+            //
+            // 編集ToolStripMenuItem
+            //
+            this.編集ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.編集開始ToolStripMenuItem, this.編集終了ToolStripMenuItem });
+            this.編集ToolStripMenuItem.Name = "編集ToolStripMenuItem";
+            this.編集ToolStripMenuItem.Size = new Size(44, 20);
+            this.編集ToolStripMenuItem.Text = "編集";
+            this.編集ToolStripMenuItem.Visible = false;
+            //
+            // 編集開始ToolStripMenuItem
+            //
+            this.編集開始ToolStripMenuItem.Name = "編集開始ToolStripMenuItem";
+            this.編集開始ToolStripMenuItem.Size = new Size(180, 22);
+            this.編集開始ToolStripMenuItem.Text = "編集開始";
+            this.編集開始ToolStripMenuItem.Click += this.編集開始ToolStripMenuItem_Click;
+            //
             // 編集終了ToolStripMenuItem
-            // 
-            this.編集終了ToolStripMenuItem.Enabled = false;
+            //
             this.編集終了ToolStripMenuItem.Name = "編集終了ToolStripMenuItem";
             this.編集終了ToolStripMenuItem.Size = new Size(180, 22);
             this.編集終了ToolStripMenuItem.Text = "編集終了";
+            this.編集終了ToolStripMenuItem.Visible = false;
             this.編集終了ToolStripMenuItem.Click += this.編集終了ToolStripMenuItem_Click;
-            // 
+            //
             // GroupModelCheckBox
-            // 
+            //
             this.GroupModelCheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.GroupModelCheckBox.AutoSize = true;
             this.GroupModelCheckBox.Location = new Point(712, 506);
@@ -221,9 +241,9 @@
             this.GroupModelCheckBox.Text = "型式毎";
             this.GroupModelCheckBox.UseVisualStyleBackColor = true;
             this.GroupModelCheckBox.CheckedChanged += this.GroupModelCheckBox_CheckedChanged;
-            // 
+            //
             // ShowUsedSubstrateButton
-            // 
+            //
             this.ShowUsedSubstrateButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             this.ShowUsedSubstrateButton.Location = new Point(786, 500);
             this.ShowUsedSubstrateButton.Name = "ShowUsedSubstrateButton";
@@ -232,24 +252,37 @@
             this.ShowUsedSubstrateButton.Text = "使用基板";
             this.ShowUsedSubstrateButton.UseVisualStyleBackColor = true;
             this.ShowUsedSubstrateButton.Click += this.ShowUsedSubstrateButton_Click;
-            // 
-            // オプションToolStripMenuItem
-            // 
-            this.オプションToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.在庫調整ToolStripMenuItem });
-            this.オプションToolStripMenuItem.Name = "オプションToolStripMenuItem";
-            this.オプションToolStripMenuItem.Size = new Size(62, 20);
-            this.オプションToolStripMenuItem.Text = "オプション";
-            // 
-            // 在庫調整ToolStripMenuItem
-            // 
-            this.在庫調整ToolStripMenuItem.Enabled = false;
-            this.在庫調整ToolStripMenuItem.Name = "在庫調整ToolStripMenuItem";
-            this.在庫調整ToolStripMenuItem.Size = new Size(180, 22);
-            this.在庫調整ToolStripMenuItem.Text = "在庫調整";
-            this.在庫調整ToolStripMenuItem.Click += this.在庫調整ToolStripMenuItem_Click;
-            // 
+            //
+            // EditContextMenuStrip
+            //
+            this.EditContextMenuStrip.Items.AddRange(new ToolStripItem[] {
+                this.EditContextMenuItem,
+                this.EditContextMenuSeparator,
+                this.DeleteContextMenuItem });
+            this.EditContextMenuStrip.Name = "EditContextMenuStrip";
+            this.EditContextMenuStrip.Opening += this.EditContextMenuStrip_Opening;
+            //
+            // EditContextMenuItem
+            //
+            this.EditContextMenuItem.Name = "EditContextMenuItem";
+            this.EditContextMenuItem.Size = new Size(180, 22);
+            this.EditContextMenuItem.Text = "編集";
+            this.EditContextMenuItem.Click += this.EditContextMenuItem_Click;
+            //
+            // EditContextMenuSeparator
+            //
+            this.EditContextMenuSeparator.Name = "EditContextMenuSeparator";
+            this.EditContextMenuSeparator.Size = new Size(177, 6);
+            //
+            // DeleteContextMenuItem
+            //
+            this.DeleteContextMenuItem.Name = "DeleteContextMenuItem";
+            this.DeleteContextMenuItem.Size = new Size(180, 22);
+            this.DeleteContextMenuItem.Text = "削除";
+            this.DeleteContextMenuItem.Click += this.DeleteContextMenuItem_Click;
+            //
             // HistoryWindow
-            // 
+            //
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(1184, 537);
@@ -275,11 +308,11 @@
             this.ShowInTaskbar = false;
             this.StartPosition = FormStartPosition.CenterParent;
             this.Text = "データベース";
-            this.FormClosed += this.HistoryWindow_FormClosed;
             this.Load += this.HistoryWindow_Load;
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.EditContextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -298,12 +331,16 @@
         private Button GenerateCheckSheetButton;
         private CheckBox AllSubstrateCheckBox;
         private MenuStrip menuStrip1;
-        private ToolStripMenuItem ファイルToolStripMenuItem;
-        private ToolStripMenuItem 編集モードToolStripMenuItem;
+        private ToolStripMenuItem オプションToolStripMenuItem;
+        private ToolStripMenuItem 在庫調整ToolStripMenuItem;
+        private ToolStripMenuItem 編集ToolStripMenuItem;
+        private ToolStripMenuItem 編集開始ToolStripMenuItem;
         private ToolStripMenuItem 編集終了ToolStripMenuItem;
         private CheckBox GroupModelCheckBox;
         private Button ShowUsedSubstrateButton;
-        private ToolStripMenuItem オプションToolStripMenuItem;
-        private ToolStripMenuItem 在庫調整ToolStripMenuItem;
+        private ContextMenuStrip EditContextMenuStrip;
+        private ToolStripMenuItem EditContextMenuItem;
+        private ToolStripSeparator EditContextMenuSeparator;
+        private ToolStripMenuItem DeleteContextMenuItem;
     }
 }
