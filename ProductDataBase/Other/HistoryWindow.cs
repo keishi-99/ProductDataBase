@@ -1071,9 +1071,9 @@ namespace ProductDatabase {
                 _substrateMaster.SubstrateName = result.SubstrateName ?? string.Empty;
                 _substrateMaster.SubstrateModel = result.SubstrateModel ?? string.Empty;
                 _substrateMaster.ProductName = result.ProductName ?? string.Empty;
-                _substrateMaster.RegType = int.TryParse(result.RegType?.ToString(), out var rt) ? rt : 0;
+                _substrateMaster.RegType = int.TryParse(result.RegType?.ToString(), out int rt) ? rt : 0;
                 _substrateMaster.CheckBin = Convert.ToInt32(result.Checkbox?.ToString() ?? "0", 2); // バイナリ文字列変換のため維持
-                _substrateMaster.SerialPrintType = int.TryParse(result.SerialPrintType?.ToString(), out var spt) ? spt : 0;
+                _substrateMaster.SerialPrintType = int.TryParse(result.SerialPrintType?.ToString(), out int spt) ? spt : 0;
             }
 
             using SubstrateRegistrationWindow window = new(_substrateMaster, _substrateRegisterWork, _appSettings);

@@ -248,7 +248,7 @@ namespace ProductDatabase {
 
             foreach (var row in results) {
                 var strSubstrateNumber = $"{row.SubstrateNumber}";
-                var intStock = int.TryParse(row.Stock?.ToString(), out var stock) ? stock : 0;
+                var intStock = int.TryParse(row.Stock?.ToString(), out int stock) ? stock : 0;
 
                 objDgv?.Rows.Add(strSubstrateNumber, intStock);
 
@@ -888,9 +888,8 @@ namespace ProductDatabase {
                             Document = pd
                         };
                         if (pdlg.ShowDialog() == DialogResult.OK) {
-                            using (var overlay = new LoadingOverlay(this)) {
-                                await CommonUtils.RunOnStaThreadAsync(() => pd.Print());
-                            }
+                            using var overlay = new LoadingOverlay(this);
+                            await CommonUtils.RunOnStaThreadAsync(() => pd.Print());
                         }
                         else {
                             return false;
@@ -942,7 +941,7 @@ namespace ProductDatabase {
                 ["{MM}"] = regDate.ToString("MM"),
                 ["{R}"] = _productRegisterWork.Revision,
                 ["{M}"] = monthCode[^1..],
-                ["{S}"] = (int.TryParse(serialCode, out var sc) ? sc : 0).ToString($"D{_productMaster.SerialDigit}")
+                ["{S}"] = serialCode.ToString($"D{_productMaster.SerialDigit}")
             };
 
             foreach (var kv in map) {
@@ -1045,7 +1044,8 @@ namespace ProductDatabase {
             GenerateReportButton.Enabled = true;
             if (taskException is not null) {
                 MessageBox.Show(taskException.Message, $"[{nameof(GenerateReport)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } else {
+            }
+            else {
                 MessageBox.Show("成績書が正常に生成されました。", "完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
