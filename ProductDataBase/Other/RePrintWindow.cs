@@ -22,8 +22,6 @@ namespace ProductDatabase {
         private readonly AppSettings _appSettings;
 
         private string _serialType = string.Empty;
-        private string _serialFirst = string.Empty;
-        private string _serialLast = string.Empty;
         private readonly List<string> _serialList = [];
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox",  "FirstSerialNumberCheckBox",
@@ -176,8 +174,8 @@ namespace ProductDatabase {
                     $"タイプ[{_productMaster.ProductType}]",
                     $"型式[{_productMaster.ProductModel}]",
                     $"数量[{_productRegisterWork.Quantity}]",
-                    $"シリアル先頭[{_serialFirst}]",
-                    $"シリアル末尾[{_serialLast}]",
+                    $"シリアル先頭[{_productRegisterWork.SerialFirst}]",
+                    $"シリアル末尾[{_productRegisterWork.SerialLast}]",
                     $"Revision[{_productRegisterWork.Revision}]",
                     $"登録日[{_productRegisterWork.RegDate}]",
                     $"担当者[{_productRegisterWork.Person}]",
@@ -238,9 +236,9 @@ namespace ProductDatabase {
 
             connection.Execute(commandText, new {
                 _productMaster.ProductID,
-                _productMaster.ProductName,
-                _productMaster.ProductType,
-                _productMaster.ProductModel,
+                ProductName = _productMaster.ProductName.NullIfWhiteSpace(),
+                ProductType = _productMaster.ProductType.NullIfWhiteSpace(),
+                ProductModel = _productMaster.ProductModel.NullIfWhiteSpace(),
                 _productMaster.SerialPrintType,
                 OrderNumber = _productRegisterWork.OrderNumber.NullIfWhiteSpace(),
                 ProductNumber = _productRegisterWork.ProductNumber.NullIfWhiteSpace(),
@@ -322,11 +320,8 @@ namespace ProductDatabase {
                 _serialList.Add(GenerateCode(_productRegisterWork.SerialFirstNumber + i));
             }
 
-            _serialFirst = GenerateCode(_productRegisterWork.SerialFirstNumber);
-            _serialLast = GenerateCode(_productRegisterWork.SerialLastNumber);
-
-            _productRegisterWork.SerialFirst = _serialFirst;
-            _productRegisterWork.SerialLast = _serialLast;
+            _productRegisterWork.SerialFirst = GenerateCode(_productRegisterWork.SerialFirstNumber);
+            _productRegisterWork.SerialLast = GenerateCode(_productRegisterWork.SerialLastNumber);
             return true;
         }
 
