@@ -137,6 +137,23 @@ namespace ProductDatabase.Other {
                 }
             }
         }
+        // STAスレッドで処理を実行し Task として返す（COM Interop・ダイアログ用）
+        // RunContinuationsAsynchronously: await後の継続処理がSTAスレッドで実行されるのを防ぐ
+        public static Task RunOnStaThreadAsync(Action action) {
+            var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var thread = new Thread(() => {
+                try {
+                    action();
+                    tcs.SetResult();
+                } catch (Exception ex) {
+                    tcs.SetException(ex);
+                }
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            return tcs.Task;
+        }
+
         /// <summary>
         /// 月コードを取得します（10月→X, 11月→Y, 12月→Z, それ以外→MM形式）。
         /// </summary>

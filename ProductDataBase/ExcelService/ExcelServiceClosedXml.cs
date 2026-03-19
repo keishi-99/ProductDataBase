@@ -33,42 +33,66 @@ namespace ProductDatabase.ExcelService {
                 public bool HasSubstrateInput { get; set; }
             }
 
-            // レポートを生成するメインメソッド
-            public static void GenerateReport(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
+            // UIスレッドで呼ぶ: Config読み込み + ファイル選択 + 保存先選択
+            // OperationCanceledException（ダイアログキャンセル）は null を返す
+            // その他の例外は呼び出し元に伝播する
+            public static (string templateFilePath, string savePath, ReportConfigClosedXml config)?
+                PrepareReport(string productModel, string productNumber) {
                 try {
-                    // 1. 設定ファイルを読み込み、レポート設定を取得
                     var configWorkbook = LoadConfigWorkbook();
-                    var reportConfig = GetReportConfig(configWorkbook, productMaster.ProductModel);
+                    var reportConfig = GetReportConfig(configWorkbook, productModel);
 
-                    // 2. レポートテンプレートを読み込み
-                    var filePath = reportConfig.FilePath;
-                    if (!File.Exists(filePath)) {
-                        throw new FileNotFoundException($"設定ファイルが見つかりません: {filePath}");
-                    }
+                    var savePath = ShowSaveDialog(reportConfig, productNumber);
+                    if (savePath is null) return null; // SaveFileDialog キャンセル
 
-                    using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    var reportWorkbook = new XLWorkbook(fs);
-
-                    // 3. レポートシートにデータを挿入
-                    PopulateReportSheet(reportWorkbook, productMaster, productRegisterWork, reportConfig);
-
-                    // 基板情報の入力がある場合のみ処理を実行
-                    if (reportConfig.HasSubstrateInput) {
-                        // 4. データベースから使用済み基板情報を取得
-                        var usedSubstrate = GetUsedSubstrateData(productRegisterWork);
-
-                        // 5. 基板情報のExcelへの書き込み
-                        UpdateSubstrateDetailsInExcel(reportWorkbook, reportConfig, usedSubstrate);
-                    }
-
-                    // 6. レポートを保存
-                    SaveReport(reportWorkbook, productRegisterWork, reportConfig);
-
-                    MessageBox.Show("成績書が正常に生成されました。", "完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                } catch (Exception ex) {
-                    // エラーメッセージをユーザーに表示
-                    MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return (reportConfig.FilePath, savePath, reportConfig);
+                } catch (OperationCanceledException) {
+                    return null; // OpenFileDialog キャンセル
                 }
+
+                static string? ShowSaveDialog(ReportConfigClosedXml config, string productNumber) {
+                    if (!Directory.Exists(config.SaveDirectory)) {
+                        MessageBox.Show($"設定されている保存先が見つかりませんでした。\r\n{config.SaveDirectory}", "ファイル選択", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+
+                    using SaveFileDialog saveFileDialog = new() {
+                        Filter = $"Excel Files (*{config.FileExtension})|*{config.FileExtension}|All Files (*.*)|*.*",
+                        FileName = $"{config.FileName} のコピー{productNumber}{config.FileExtension}",
+                        Title = "保存先を選択してください",
+                        InitialDirectory = string.IsNullOrWhiteSpace(config.SaveDirectory)
+                            ? Environment.CurrentDirectory
+                            : config.SaveDirectory
+                    };
+                    return saveFileDialog.ShowDialog() == DialogResult.OK
+                        ? saveFileDialog.FileName
+                        : null;
+                }
+            }
+
+            // STAスレッドで呼ぶ: ClosedXML 読み書き + SaveAs のみ
+            // MessageBox を含めない。例外はすべて呼び出し元に伝播する
+            public static void ExecuteReport(
+                ProductMaster productMaster,
+                ProductRegisterWork productRegisterWork,
+                string templateFilePath,
+                string savePath,
+                ReportConfigClosedXml config) {
+                if (!File.Exists(templateFilePath)) {
+                    throw new FileNotFoundException($"設定ファイルが見つかりません: {templateFilePath}");
+                }
+
+                using var fs = new FileStream(templateFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                var reportWorkbook = new XLWorkbook(fs);
+
+                PopulateReportSheet(reportWorkbook, productMaster, productRegisterWork, config);
+
+                if (config.HasSubstrateInput) {
+                    var usedSubstrate = GetUsedSubstrateData(productRegisterWork);
+                    UpdateSubstrateDetailsInExcel(reportWorkbook, config, usedSubstrate);
+                }
+
+                ForcePageBreakPreview(reportWorkbook);
+                reportWorkbook.SaveAs(savePath);
             }
 
             // 設定Excelワークブックを読み込む
@@ -287,36 +311,6 @@ namespace ProductDatabase.ExcelService {
                 }
             }
 
-            // 変更されたレポートをファイルに保存する
-            private static void SaveReport(XLWorkbook reportWorkbook, ProductRegisterWork productRegisterWork, ReportConfigClosedXml config) {
-                var fileName = config.FileName;
-                var fileExtension = config.FileExtension;
-                var initialDirectory = config.SaveDirectory;
-
-                if (!Directory.Exists(initialDirectory)) {
-                    MessageBox.Show($"設定されている保存先が見つかりませんでした。\r\n{initialDirectory}", "ファイル選択", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-
-                using SaveFileDialog saveFileDialog = new() {
-                    Filter = $"Excel Files (*{fileExtension})|*{fileExtension}|All Files (*.*)|*.*",
-                    FileName = $"{fileName} のコピー{productRegisterWork.ProductNumber}{fileExtension}",
-                    Title = "保存先を選択してください",
-                    InitialDirectory = string.IsNullOrWhiteSpace(initialDirectory)
-                        ? Environment.CurrentDirectory  // Nullの場合はデフォルトディレクトリを使用
-                        : initialDirectory
-                };
-
-                if (saveFileDialog.ShowDialog() == DialogResult.OK) {
-                    var outputPath = saveFileDialog.FileName;
-                    // 保存前に改ページプレビューを強制設定
-                    ForcePageBreakPreview(reportWorkbook);
-                    reportWorkbook.SaveAs(outputPath);
-                }
-                else {
-                    // ユーザーが保存をキャンセルした場合の処理
-                    throw new OperationCanceledException("キャンセルされました。");
-                }
-            }
         }
 
         // リスト
@@ -336,45 +330,41 @@ namespace ProductDatabase.ExcelService {
                 public string? QrCodeRange { get; set; }
                 public bool HasSubstrateInput { get; set; }
             }
-            // リストを生成するメインメソッド
+            // リストを生成するメインメソッド（例外は呼び出し元に伝播する）
             public static void GenerateList(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
-                try {
-                    // 1. Excel設定の読み込みとワークブックの準備
-                    var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsm");
-                    if (!File.Exists(configPath)) {
-                        throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
-                    }
-
-                    // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
-                    using var fs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-                    // FileStreamからXLWorkbookを読み込む
-                    using var workBook = new XLWorkbook(fs);
-
-                    var (targetSheetName, productName, resultRow, configSheet) = LoadExcelConfiguration(workBook, productMaster.ProductModel);
-
-                    // 2. 製品情報の設定とExcelへの書き込み
-                    var productCellRanges = GetProductCellRanges(configSheet, resultRow);
-                    var targetSheet = workBook.Worksheet(targetSheetName) ?? throw new Exception($"テンプレートシート:[{targetSheetName}]が見つかりません。");
-                    PopulateProductDetails(targetSheet, productMaster, productRegisterWork, productCellRanges, productName);
-
-                    // 3. データベースから使用済み基板情報を取得
-                    var usedSubstrate = GetUsedSubstrateData(productRegisterWork);
-
-                    // 4. 基板情報のExcelへの書き込み
-                    UpdateSubstrateDetailsInExcel(configSheet, targetSheet, resultRow, usedSubstrate);
-
-                    // 5. QRコードの生成と埋め込み
-                    if (!string.IsNullOrEmpty(productCellRanges.QrCodeRange)) {
-                        GenerateAndEmbedQrCode(targetSheet, productMaster, productRegisterWork, productCellRanges.QrCodeRange);
-                    }
-
-                    // 6. Excelファイルの保存と印刷
-                    var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyList.xlsm");
-                    SaveAndPrintExcel(workBook, temporarilyPath, targetSheetName);
-                } catch (Exception ex) {
-                    MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // 1. Excel設定の読み込みとワークブックの準備
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsm");
+                if (!File.Exists(configPath)) {
+                    throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
                 }
+
+                // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
+                using var fs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+                // FileStreamからXLWorkbookを読み込む
+                using var workBook = new XLWorkbook(fs);
+
+                var (targetSheetName, productName, resultRow, configSheet) = LoadExcelConfiguration(workBook, productMaster.ProductModel);
+
+                // 2. 製品情報の設定とExcelへの書き込み
+                var productCellRanges = GetProductCellRanges(configSheet, resultRow);
+                var targetSheet = workBook.Worksheet(targetSheetName) ?? throw new Exception($"テンプレートシート:[{targetSheetName}]が見つかりません。");
+                PopulateProductDetails(targetSheet, productMaster, productRegisterWork, productCellRanges, productName);
+
+                // 3. データベースから使用済み基板情報を取得
+                var usedSubstrate = GetUsedSubstrateData(productRegisterWork);
+
+                // 4. 基板情報のExcelへの書き込み
+                UpdateSubstrateDetailsInExcel(configSheet, targetSheet, resultRow, usedSubstrate);
+
+                // 5. QRコードの生成と埋め込み
+                if (!string.IsNullOrEmpty(productCellRanges.QrCodeRange)) {
+                    GenerateAndEmbedQrCode(targetSheet, productMaster, productRegisterWork, productCellRanges.QrCodeRange);
+                }
+
+                // 6. Excelファイルの保存と印刷
+                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyList.xlsm");
+                SaveAndPrintExcel(workBook, temporarilyPath, targetSheetName);
             }
 
             // Excel設定を読み込むメソッド
@@ -605,72 +595,68 @@ namespace ProductDatabase.ExcelService {
                 public List<string> SheetNames { get; set; } = [];
             }
 
-            // Excelチェックシートを生成し、データを書き込み、印刷します。
-            public static void GenerateCheckSheet(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
-                // 設定ファイルのパスを構築
+            // UIスレッドで呼ぶ: Config読み込み + InputDialog（温度・湿度）
+            // OperationCanceledException（InputDialog キャンセル）は null を返す
+            // その他の例外は呼び出し元に伝播する
+            public static (CheckSheetConfigData configData, string temperature, string humidity)?
+                PrepareCheckSheet(ProductMaster productMaster) {
                 var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
-                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsm");
 
                 if (!File.Exists(configPath)) {
                     throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
                 }
 
-                // Excelが開かれていても読み取れるようにFileShare.ReadWrite指定
-                var fs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                var workBook = new XLWorkbook(fs);
+                CheckSheetConfigData excelData;
+                using (var fs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var workBook = new XLWorkbook(fs)) {
+                    (_, excelData) = LoadAndExtractConfig(workBook, productMaster);
+                }
 
                 try {
-
-                    // 1. 設定ファイルの読み込みとメインシートの取得
-                    var (configBook, excelData) = LoadAndExtractConfig(workBook, productMaster);
-
-                    // 2. 温度・湿度入力ダイアログの表示と値の取得
-                    (string temperature, string humidity) = GetTemperatureAndHumidity(excelData);
-
-                    // 3. 日付のフォーマット
-                    var formattedDate = FormatDate(productRegisterWork.RegDate, excelData.DateFormat);
-
-                    // 4. EPPlusでExcelファイルを編集
-
-                    // 対象のブックを読み込み
-                    XLWorkbook targetBook;
-                    FileStream? targetFs = null; // FileStream を保持（Dispose 用）
-
-                    if (string.IsNullOrWhiteSpace(excelData.BaseFilePath)) {
-                        targetBook = workBook; // 既存の configBook を使う
-                    }
-                    else {
-                        targetFs = new FileStream(excelData.BaseFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                        targetBook = new XLWorkbook(targetFs);
-                    }
-
-                    try {
-                        // 各シートに対して値を書き込む
-                        PopulateExcelSheets(targetBook, productMaster, productRegisterWork, temperature, humidity, formattedDate, excelData);
-
-                        // 不要なシートを非表示にする
-                        HideSheets(targetBook, excelData.SheetNames);
-
-                        // ブックを保存
-                        SaveWorkbook(targetBook, temporarilyPath);
-                    } finally {
-                        // 新規に作った場合だけ Dispose
-                        if (targetBook != workBook)
-                            targetBook.Dispose();
-
-                        // FileStream がある場合は Dispose
-                        targetFs?.Dispose();
-                    }
-
-                    // 5. Excel Interopを使用して印刷
-                    PrintExcelFile(temporarilyPath);
-                } catch (Exception ex) {
-                    // エラーメッセージを表示
-                    MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                } finally {
-                    workBook.Dispose();
-                    fs.Dispose();
+                    var (temperature, humidity) = GetTemperatureAndHumidity(excelData);
+                    return (excelData, temperature, humidity);
+                } catch (OperationCanceledException) {
+                    return null; // InputDialog キャンセル
                 }
+            }
+
+            // STAスレッドで呼ぶ: ClosedXML 処理 + COM Interop（Excel 起動）
+            // 例外はすべて呼び出し元に伝播する
+            public static void ExecuteCheckSheet(
+                ProductMaster productMaster,
+                ProductRegisterWork productRegisterWork,
+                CheckSheetConfigData excelData,
+                string temperature,
+                string humidity) {
+                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
+                var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsm");
+
+                var formattedDate = FormatDate(productRegisterWork.RegDate, excelData.DateFormat);
+
+                using var configFs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var configBook = new XLWorkbook(configFs);
+
+                XLWorkbook targetBook;
+                FileStream? targetFs = null;
+
+                if (string.IsNullOrWhiteSpace(excelData.BaseFilePath)) {
+                    targetBook = configBook;
+                } else {
+                    targetFs = new FileStream(excelData.BaseFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    targetBook = new XLWorkbook(targetFs);
+                }
+
+                try {
+                    PopulateExcelSheets(targetBook, productMaster, productRegisterWork, temperature, humidity, formattedDate, excelData);
+                    HideSheets(targetBook, excelData.SheetNames);
+                    SaveWorkbook(targetBook, temporarilyPath);
+                } finally {
+                    if (targetBook != configBook)
+                        targetBook.Dispose();
+                    targetFs?.Dispose();
+                }
+
+                PrintExcelFile(temporarilyPath);
             }
 
             // Excel設定ファイルを読み込み、メインシートから設定データを抽出します。
