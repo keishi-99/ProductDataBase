@@ -872,19 +872,13 @@ namespace ProductDatabase.ExcelService {
 
         // 基板設定を開く
         public static class SubstrateInformationClosedXml {
-            // 基板設定ファイルを開くメソッド
+            // 基板設定ファイルを開くメソッド（例外は呼び出し元でハンドルする）
             public static void OpenSubstrateInformationClosedXml(SubstrateMaster substrateMaster) {
-                try {
-                    // 1. 設定ファイルを読み込み、レポート設定を取得
-                    var configBook = LoadConfigWorkbook();
-                    var (filePath, fileName) = GetSubstrateConfig(configBook, substrateMaster.SubstrateModel);
+                // 1. 設定ファイルを読み込み、レポート設定を取得
+                var configBook = LoadConfigWorkbook();
+                var (filePath, fileName) = GetSubstrateConfig(configBook, substrateMaster.SubstrateModel);
 
-                    OpenExcel(filePath, fileName);
-
-                } catch (Exception ex) {
-                    // エラーメッセージを表示
-                    MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                OpenExcel(filePath, fileName);
             }
 
             // 設定Excelワークブックを読み込む
