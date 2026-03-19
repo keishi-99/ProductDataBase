@@ -619,19 +619,16 @@ namespace ProductDatabase {
             };
             form.ShowDialog();
         }
-        // 基板マスター情報をもとに基板仕様Excelファイルを開く
+        // 基板マスター情報をもとに基板仕様Excelファイルを開く（例外はcaller側でハンドル）
         private void OpenSubstrateInformation() {
-            try {
-                ExcelServiceClosedXml.SubstrateInformationClosedXml.OpenSubstrateInformationClosedXml(_substrateMaster);
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            ExcelServiceClosedXml.SubstrateInformationClosedXml.OpenSubstrateInformationClosedXml(_substrateMaster);
         }
 
         // STAスレッドで処理を実行し、Taskとして返す（COM Interop用）
+        // RunContinuationsAsynchronously: await後の継続処理がSTAスレッドで実行されるのを防ぐ
         private static Task RunOnStaThreadAsync(Action action)
         {
-            var tcs = new TaskCompletionSource();
+            var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             var thread = new Thread(() =>
             {
                 try
@@ -729,6 +726,11 @@ namespace ProductDatabase {
             try
             {
                 await RunOnStaThreadAsync(OpenSubstrateInformation);
+            }
+            catch (Exception ex)
+            {
+                // UIスレッドで MessageBox を表示（スレッド安全）
+                MessageBox.Show(ex.Message, $"[{nameof(OpenSubstrateInformationButton_Click)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
