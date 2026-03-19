@@ -539,16 +539,25 @@ namespace ProductDatabase {
         }
         // 基板変更済み製品情報をもとにExcel製品一覧を生成する
         private void GenerateList() {
-            try {
-                // --- 処理中カーソルに変更 ---
-                Cursor.Current = Cursors.WaitCursor;
+            SubstrateListPrintButton.Enabled = false;
+            Exception? taskException = null;
+            using var loadingForm = new LoadingForm();
+            loadingForm.Load += async (_, _) => {
+                try {
+                    await CommonUtils.RunOnStaThreadAsync(() =>
+                        ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(
+                            _productMaster, _productRegisterWork));
+                } catch (Exception ex) {
+                    taskException = ex;
+                } finally {
+                    loadingForm.Close();
+                }
+            };
+            loadingForm.ShowDialog(this);
 
-                ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(_productMaster, _productRegisterWork);
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } finally {
-                // --- 通常カーソルに戻す ---
-                Cursor.Current = Cursors.Default;
+            SubstrateListPrintButton.Enabled = true;
+            if (taskException is not null) {
+                MessageBox.Show(taskException.Message, $"[{nameof(GenerateList)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
