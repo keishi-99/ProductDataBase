@@ -2,18 +2,18 @@
     public partial class LoadingForm : Form {
         public LoadingForm() {
             InitializeComponent();
-            ControlBox = false;
             StartPosition = FormStartPosition.CenterParent;
-            FormBorderStyle = FormBorderStyle.FixedSingle;
-            ShowIcon = false;
+            FormBorderStyle = FormBorderStyle.None;
             ShowInTaskbar = false;
-        }
 
-        // フォーム表示後にControlBoxを無効化してユーザーが手動で閉じられないようにする
-        protected override void OnShown(EventArgs e) {
-            base.OnShown(e);
-            // ユーザーが閉じられないようにする
-            this.ControlBox = false;
+            // 「処理中...」ラベルをフォーム下部に追加
+            var label = new Label {
+                Text = "処理中...",
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.Bottom,
+                Height = 28
+            };
+            Controls.Add(label);
         }
     }
 }
