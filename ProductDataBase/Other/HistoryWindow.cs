@@ -1142,7 +1142,7 @@ namespace ProductDatabase {
         }
 
         // 選択行の製品情報をセットしてExcel製造報告書を生成する
-        private void GenerateReport() {
+        private async Task GenerateReport() {
             if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
             var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
             _productRegisterWork.RowID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
@@ -1167,8 +1167,7 @@ namespace ProductDatabase {
 
             GenerateReportButton.Enabled = false;
             Exception? taskException = null;
-            using var loadingForm = new LoadingForm();
-            loadingForm.Load += async (_, _) => {
+            using (var overlay = new LoadingOverlay(this)) {
                 try {
                     await CommonUtils.RunOnStaThreadAsync(() =>
                         ExcelServiceClosedXml.ReportGeneratorClosedXml.ExecuteReport(
@@ -1178,11 +1177,8 @@ namespace ProductDatabase {
                             prepared.Value.config));
                 } catch (Exception ex) {
                     taskException = ex;
-                } finally {
-                    loadingForm.Close();
                 }
-            };
-            loadingForm.ShowDialog(this);
+            }
 
             GenerateReportButton.Enabled = true;
             if (taskException is not null) {
@@ -1193,7 +1189,7 @@ namespace ProductDatabase {
         }
 
         // 選択行の製品情報をセットしてExcel製品一覧を生成する
-        private void GenerateList() {
+        private async Task GenerateList() {
             if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
             var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
             _productRegisterWork.RowID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
@@ -1208,19 +1204,15 @@ namespace ProductDatabase {
 
             GenerateListButton.Enabled = false;
             Exception? taskException = null;
-            using var loadingForm = new LoadingForm();
-            loadingForm.Load += async (_, _) => {
+            using (var overlay = new LoadingOverlay(this)) {
                 try {
                     await CommonUtils.RunOnStaThreadAsync(() =>
                         ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(
                             _productMaster, _productRegisterWork));
                 } catch (Exception ex) {
                     taskException = ex;
-                } finally {
-                    loadingForm.Close();
                 }
-            };
-            loadingForm.ShowDialog(this);
+            }
 
             GenerateListButton.Enabled = true;
             if (taskException is not null) {
@@ -1229,7 +1221,7 @@ namespace ProductDatabase {
         }
 
         // 選択行の製品情報をセットしてExcelチェックシートを生成する
-        private void GenerateCheckSheet() {
+        private async Task GenerateCheckSheet() {
             if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
             var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
             _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
@@ -1252,8 +1244,7 @@ namespace ProductDatabase {
 
             GenerateCheckSheetButton.Enabled = false;
             Exception? taskException = null;
-            using var loadingForm = new LoadingForm();
-            loadingForm.Load += async (_, _) => {
+            using (var overlay = new LoadingOverlay(this)) {
                 try {
                     await CommonUtils.RunOnStaThreadAsync(() =>
                         ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.ExecuteCheckSheet(
@@ -1263,11 +1254,8 @@ namespace ProductDatabase {
                             prepared.Value.humidity));
                 } catch (Exception ex) {
                     taskException = ex;
-                } finally {
-                    loadingForm.Close();
                 }
-            };
-            loadingForm.ShowDialog(this);
+            }
 
             GenerateCheckSheetButton.Enabled = true;
             if (taskException is not null) {
@@ -1334,9 +1322,9 @@ namespace ProductDatabase {
         private void DeleteContextMenuItem_Click(object sender, EventArgs e) { DeleteSelectedRows(); }
         private void 在庫調整ToolStripMenuItem_Click(object sender, EventArgs e) { InventoryAdjustment(); }
         private void ShowUsedSubstrateButton_Click(object sender, EventArgs e) { ShowUsedSubstrateDetails(); }
-        private void GenerateReportButton_Click(object sender, EventArgs e) { GenerateReport(); }
-        private void GenerateListButton_Click(object sender, EventArgs e) { GenerateList(); }
-        private void GenerateCheckSheetButton_Click(object sender, EventArgs e) { GenerateCheckSheet(); }
+        private async void GenerateReportButton_Click(object sender, EventArgs e) { await GenerateReport(); }
+        private async void GenerateListButton_Click(object sender, EventArgs e) { await GenerateList(); }
+        private async void GenerateCheckSheetButton_Click(object sender, EventArgs e) { await GenerateCheckSheet(); }
         private void CategoryComboBox_SelectedIndexChanged(object sender, EventArgs e) { HistoryTableFilter(); }
         private void FilterStringTextBox_TextChanged(object sender, EventArgs e) { HistoryTableFilter(); }
         private void CategoryRadioButton_CheckedChanged(object sender, EventArgs e) { CategorySelect(sender); }

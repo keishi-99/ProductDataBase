@@ -310,7 +310,7 @@ namespace ProductDatabase {
             }
         }
         // 重複チェック・数量検証・シリアル検証を経てDB登録・ログ記録・印刷処理を実行する
-        private void RegisterCheck() {
+        private async Task RegisterCheck() {
             try {
                 _serialList.Clear();
 
@@ -340,8 +340,8 @@ namespace ProductDatabase {
                 MessageBox.Show("登録しました。");
 
                 // 印刷処理
-                HandleLabelPrinting();
-                HandleBarcodePrinting();
+                await HandleLabelPrinting();
+                await HandleBarcodePrinting();
 
                 HandlePostRegistration();
                 GenerateReportButton.Enabled = true;
@@ -799,23 +799,23 @@ namespace ProductDatabase {
             return SerialType.Label;
         }
         // IsLabelPrintが有効な場合にシリアルラベルの印刷を実行する
-        private void HandleLabelPrinting() {
+        private async Task HandleLabelPrinting() {
             if (_productMaster.IsLabelPrint) {
                 MessageBox.Show("シリアルラベルを印刷します。");
                 CurrentSerialType = SerialType.Label;
 
-                if (!Print(true)) {
+                if (!await Print(true)) {
                     throw new OperationCanceledException("キャンセルしました。");
                 }
             }
         }
         // IsBarcodePrintが有効な場合にバーコードラベルの印刷を実行する
-        private void HandleBarcodePrinting() {
+        private async Task HandleBarcodePrinting() {
             if (_productMaster.IsBarcodePrint) {
                 MessageBox.Show("バーコードラベルを印刷します。");
                 CurrentSerialType = SerialType.Barcode;
 
-                if (!Print(true)) {
+                if (!await Print(true)) {
                     throw new OperationCanceledException("キャンセルしました。");
                 }
             }
@@ -862,7 +862,7 @@ namespace ProductDatabase {
         public ServiceInformation ServiceInfo { get; set; } = new();
 
         // isPrintがtrueなら印刷ダイアログ経由で印刷しfalseならプレビューを表示する
-        private bool Print(bool isPrint) {
+        private async Task<bool> Print(bool isPrint) {
             try {
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
@@ -888,16 +888,9 @@ namespace ProductDatabase {
                             Document = pd
                         };
                         if (pdlg.ShowDialog() == DialogResult.OK) {
-                            using var loadingForm = new LoadingForm();
-                            Task.Run(() => {
-                                try {
-                                    pd.Print();
-                                } finally {
-                                    loadingForm.Invoke(new System.Action(() => loadingForm.Close()));
-                                }
-                            });
-
-                            loadingForm.ShowDialog();
+                            using (var overlay = new LoadingOverlay(this)) {
+                                await Task.Run(() => pd.Print());
+                            }
                         }
                         else {
                             return false;
@@ -1022,7 +1015,7 @@ namespace ProductDatabase {
             }
         }
         // 登録済み製品情報をもとにExcel成績書を生成する
-        private void GenerateReport() {
+        private async Task GenerateReport() {
             // [UIスレッド] 前処理: Config読み込み + ファイル選択 + 保存先選択
             (string templateFilePath, string savePath, ExcelServiceClosedXml.ReportGeneratorClosedXml.ReportConfigClosedXml config)? prepared;
             try {
@@ -1036,9 +1029,7 @@ namespace ProductDatabase {
 
             GenerateReportButton.Enabled = false;
             Exception? taskException = null;
-            using var loadingForm = new LoadingForm();
-            loadingForm.Load += async (_, _) => {
-                // ※ try は await を含む全体を包む。await より前に同期処理を追加しないこと。
+            using (var overlay = new LoadingOverlay(this)) {
                 try {
                     await CommonUtils.RunOnStaThreadAsync(() =>
                         ExcelServiceClosedXml.ReportGeneratorClosedXml.ExecuteReport(
@@ -1048,11 +1039,8 @@ namespace ProductDatabase {
                             prepared.Value.config));
                 } catch (Exception ex) {
                     taskException = ex;
-                } finally {
-                    loadingForm.Close();
                 }
-            };
-            loadingForm.ShowDialog(this); // Load イベント完了後にリターン
+            } // オーバーレイをここで除去してからメッセージを表示
 
             GenerateReportButton.Enabled = true;
             if (taskException is not null) {
@@ -1062,22 +1050,18 @@ namespace ProductDatabase {
             }
         }
         // 登録済み製品情報をもとにExcel製品一覧を生成する
-        private void GenerateList() {
+        private async Task GenerateList() {
             SubstrateListPrintButton.Enabled = false;
             Exception? taskException = null;
-            using var loadingForm = new LoadingForm();
-            loadingForm.Load += async (_, _) => {
+            using (var overlay = new LoadingOverlay(this)) {
                 try {
                     await CommonUtils.RunOnStaThreadAsync(() =>
                         ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(
                             _productMaster, _productRegisterWork));
                 } catch (Exception ex) {
                     taskException = ex;
-                } finally {
-                    loadingForm.Close();
                 }
-            };
-            loadingForm.ShowDialog(this);
+            }
 
             SubstrateListPrintButton.Enabled = true;
             if (taskException is not null) {
@@ -1085,7 +1069,7 @@ namespace ProductDatabase {
             }
         }
         // 登録済み製品情報をもとにExcelチェックシートを生成する
-        private void GenerateCheckSheet() {
+        private async Task GenerateCheckSheet() {
             // [UIスレッド] 前処理: Config読み込み + InputDialog（温度・湿度）
             (ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.CheckSheetConfigData configData, string temperature, string humidity)? prepared;
             try {
@@ -1098,8 +1082,7 @@ namespace ProductDatabase {
 
             CheckSheetPrintButton.Enabled = false;
             Exception? taskException = null;
-            using var loadingForm = new LoadingForm();
-            loadingForm.Load += async (_, _) => {
+            using (var overlay = new LoadingOverlay(this)) {
                 try {
                     await CommonUtils.RunOnStaThreadAsync(() =>
                         ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.ExecuteCheckSheet(
@@ -1109,11 +1092,8 @@ namespace ProductDatabase {
                             prepared.Value.humidity));
                 } catch (Exception ex) {
                     taskException = ex;
-                } finally {
-                    loadingForm.Close();
                 }
-            };
-            loadingForm.ShowDialog(this);
+            }
 
             CheckSheetPrintButton.Enabled = true;
             if (taskException is not null) {
@@ -1189,8 +1169,8 @@ namespace ProductDatabase {
         private void ProductRegistration2Window_FormClosing(object sender, FormClosingEventArgs e) {
             ClosingEvents();
         }
-        private void RegisterButton_Click(object sender, EventArgs e) {
-            RegisterCheck();
+        private async void RegisterButton_Click(object sender, EventArgs e) {
+            await RegisterCheck();
         }
         private void CloseButton_Click(object sender, EventArgs e) {
             Close();
@@ -1201,23 +1181,23 @@ namespace ProductDatabase {
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) {
             Close();
         }
-        private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
+        private async void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             CurrentSerialType = SerialType.Label;
             if (_sqliteConnection is null) {
                 MessageBox.Show("データベース接続が確立されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             SerialCheck(_sqliteConnection, false);
-            Print(false);
+            await Print(false);
         }
-        private void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
+        private async void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             CurrentSerialType = SerialType.Barcode;
             if (_sqliteConnection is null) {
                 MessageBox.Show("データベース接続が確立されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             SerialCheck(_sqliteConnection, false);
-            Print(false);
+            await Print(false);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             CurrentSerialType = SerialType.Label;
@@ -1245,9 +1225,9 @@ namespace ProductDatabase {
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
         private void NamePlatePrintButton_Click(object sender, EventArgs e) { PrintManager.PrintUsingBPac(NameplatePrintSettings, _serialList); }
-        private void GenerateReportButton_Click(object sender, EventArgs e) { GenerateReport(); }
-        private void SubstrateListPrintButton_Click(object sender, EventArgs e) { GenerateList(); }
-        private void CheckSheetPrintButton_Click(object sender, EventArgs e) { GenerateCheckSheet(); }
+        private async void GenerateReportButton_Click(object sender, EventArgs e) { await GenerateReport(); }
+        private async void SubstrateListPrintButton_Click(object sender, EventArgs e) { await GenerateList(); }
+        private async void CheckSheetPrintButton_Click(object sender, EventArgs e) { await GenerateCheckSheet(); }
 
     }
     public static class StringExtensions {

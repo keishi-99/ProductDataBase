@@ -127,7 +127,7 @@ namespace ProductDatabase {
             }
         }
         // 入力チェック後に確認ダイアログを表示してDB登録と印刷処理を実行する
-        private void RegisterCheck(bool isPrint) {
+        private async Task RegisterCheck(bool isPrint) {
             if (!DataCheck()) { return; }
 
             if (isPrint) {
@@ -147,7 +147,7 @@ namespace ProductDatabase {
                     PrintManager.PrintUsingBPac(NameplatePrintSettings, _serialList);
                     break;
                 default:
-                    if (!Print(isPrint)) {
+                    if (!await Print(isPrint)) {
                         MessageBox.Show("キャンセルしました。");
                         return;
                     }
@@ -326,7 +326,7 @@ namespace ProductDatabase {
         }
 
         // isPrintがtrueなら印刷ダイアログ経由で印刷しfalseならプレビューを表示する
-        private bool Print(bool isPrint) {
+        private async Task<bool> Print(bool isPrint) {
             try {
                 using System.Drawing.Printing.PrintDocument pd = new();
                 var isPreview = !isPrint;
@@ -347,16 +347,9 @@ namespace ProductDatabase {
                             Document = pd
                         };
                         if (pdlg.ShowDialog() == DialogResult.OK) {
-                            using var loadingForm = new LoadingForm();
-                            Task.Run(() => {
-                                try {
-                                    pd.Print();
-                                } finally {
-                                    loadingForm.Invoke(new System.Action(() => loadingForm.Close()));
-                                }
-                            });
-
-                            loadingForm.ShowDialog();
+                            using (var overlay = new LoadingOverlay(this)) {
+                                await Task.Run(() => pd.Print());
+                            }
                         }
                         else {
                             return false;
@@ -642,26 +635,26 @@ namespace ProductDatabase {
 
         private void RePrintWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
-        private void LabelPrintButton_Click(object sender, EventArgs e) {
+        private async void LabelPrintButton_Click(object sender, EventArgs e) {
             _serialType = "Label";
-            RegisterCheck(true);
+            await RegisterCheck(true);
         }
-        private void BarcodePrintButton_Click(object sender, EventArgs e) {
+        private async void BarcodePrintButton_Click(object sender, EventArgs e) {
             _serialType = "Barcode";
-            RegisterCheck(true);
+            await RegisterCheck(true);
         }
-        private void NamePlatePrintButton_Click(object sender, EventArgs e) {
+        private async void NamePlatePrintButton_Click(object sender, EventArgs e) {
             _serialType = "Nameplate";
-            RegisterCheck(true);
+            await RegisterCheck(true);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
-        private void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
+        private async void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Label";
-            RegisterCheck(false);
+            await RegisterCheck(false);
         }
-        private void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
+        private async void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             _serialType = "Barcode";
-            RegisterCheck(false);
+            await RegisterCheck(false);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             CurrentSerialType = SerialType.Label;

@@ -114,7 +114,7 @@ namespace ProductDatabase {
             }
         }
         // 入力検証後にDB登録を行いラベル印刷フラグに応じて印刷またはプレビューを実行してウィンドウを閉じる
-        private void ProcessRegistration(bool isPrint) {
+        private async Task ProcessRegistration(bool isPrint) {
             try {
 
                 if (!ValidateData()) { return; }
@@ -137,7 +137,7 @@ namespace ProductDatabase {
                     if (isPrint) {
                         MessageBox.Show("登録完了 続けて印刷します。");
                     }
-                    PrintStart(isPrint);
+                    await PrintStart(isPrint);
                 }
                 else if (DefectQuantityCheckBox.Checked) {
                     MessageBox.Show("登録完了");
@@ -397,7 +397,7 @@ namespace ProductDatabase {
         }
 
         // PrintDocumentを使って基板ラベルを印刷またはプレビュー表示する
-        private void PrintStart(bool isPrint) {
+        private async Task PrintStart(bool isPrint) {
             try {
                 using System.Drawing.Printing.PrintDocument pd = new();
 
@@ -424,16 +424,9 @@ namespace ProductDatabase {
                             Document = pd
                         };
                         if (pdlg.ShowDialog() == DialogResult.OK) {
-                            using var loadingForm = new LoadingForm();
-                            Task.Run(() => {
-                                try {
-                                    pd.Print();
-                                } finally {
-                                    loadingForm.Invoke(new System.Action(() => loadingForm.Close()));
-                                }
-                            });
-
-                            loadingForm.ShowDialog();
+                            using (var overlay = new LoadingOverlay(this)) {
+                                await Task.Run(() => pd.Print());
+                            }
                         }
                         break;
                     case false:
@@ -696,8 +689,8 @@ namespace ProductDatabase {
 
         private void SubstrateRegistrationWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
-        private void RegisterButton_Click(object sender, EventArgs e) { ProcessRegistration(true); }
-        private void PrintButton_Click(object sender, EventArgs e) { ProcessRegistration(true); }
+        private async void RegisterButton_Click(object sender, EventArgs e) { await ProcessRegistration(true); }
+        private async void PrintButton_Click(object sender, EventArgs e) { await ProcessRegistration(true); }
         private async void OpenSubstrateInformationButton_Click(object sender, EventArgs e)
         {
             OpenSubstrateInformationButton.Enabled = false;
@@ -718,7 +711,7 @@ namespace ProductDatabase {
         private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void DefectQuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
-        private void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { ProcessRegistration(false); }
+        private async void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { await ProcessRegistration(false); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             CurrentSerialType = SerialType.Substrate;
             using (var ls = new PrintSettingsWindow {
