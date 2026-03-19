@@ -23,7 +23,7 @@ namespace ProductDatabase {
         private string _tableName = string.Empty;
 
         // DataGridView の既定の背景色（編集モード終了時に復元する）
-        private Color _originalGridBackColor;
+        private readonly Color _originalGridBackColor;
 
         private readonly Dictionary<string, Dictionary<string, string>> _headerTextMap = new() {
                 {
@@ -541,7 +541,7 @@ namespace ProductDatabase {
         }
 
         // 基板履歴テーブルの指定行を更新するUPDATE文を実行する
-        private void UpdateSubstrateRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
+        private static void UpdateSubstrateRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
             var sql =
                 $"""
                 UPDATE {Constants.TSubstrateTableName}
@@ -595,7 +595,7 @@ namespace ProductDatabase {
         }
 
         // 基板履歴テーブルの指定行を論理削除（IsDeleted=1）する
-        private void DeleteSubstrateRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
+        private static void DeleteSubstrateRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
             var sql =
                 $"""
                 UPDATE {Constants.TSubstrateTableName}
@@ -611,7 +611,7 @@ namespace ProductDatabase {
         }
 
         // 製品履歴テーブルの編集可能フィールドをUPDATE文で更新する
-        private void UpdateProductRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
+        private static void UpdateProductRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
             var sql =
                 $"""
                 UPDATE {Constants.TProductTableName}
@@ -784,7 +784,7 @@ namespace ProductDatabase {
         }
 
         // 製品履歴テーブルの指定行を論理削除（IsDeleted=1）する
-        private void DeleteProductRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
+        private static void DeleteProductRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
             var sql =
                 $"""
                 UPDATE {Constants.TProductTableName}
@@ -800,7 +800,7 @@ namespace ProductDatabase {
         }
 
         // 製品削除に連動してUseIDが一致する基板履歴を論理削除する
-        private void DeleteProductSubstrateRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
+        private static void DeleteProductSubstrateRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
             var sql = $"""
         UPDATE {Constants.TSubstrateTableName}
         SET
@@ -815,7 +815,7 @@ namespace ProductDatabase {
         }
 
         // 製品削除に連動してUsedIDが一致するシリアルを物理削除する
-        private void DeleteProductSerialRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
+        private static void DeleteProductSerialRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
             var sql =
                 $"""
                 DELETE FROM {Constants.TSerialTableName}
@@ -850,7 +850,7 @@ namespace ProductDatabase {
         }
 
         // シリアルテーブルから指定rowidの行を物理削除する
-        private void DeleteSerialRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
+        private static void DeleteSerialRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
             var sql =
                 $"""
                 DELETE FROM {Constants.TSerialTableName}
@@ -926,7 +926,8 @@ namespace ProductDatabase {
                 foreach (DataGridViewRow dgvRow in selectedRows) {
                     if (dgvRow.DataBoundItem is DataRowView drv) { rowsToDelete.Add(drv.Row); }
                 }
-            } else {
+            }
+            else {
                 if (DataBaseDataGridView.CurrentCell is null) { return; }
                 var idx = DataBaseDataGridView.CurrentCell.RowIndex;
                 if (DataBaseDataGridView.Rows[idx].DataBoundItem is DataRowView drv) {
@@ -1239,13 +1240,13 @@ namespace ProductDatabase {
 
         // 下部のボタン・チェックボックスの有効/無効を切り替える
         private void SetBottomControlsEnabled(bool enabled) {
-            GenerateReportButton.Enabled      = enabled;
-            GenerateListButton.Enabled        = enabled;
-            GenerateCheckSheetButton.Enabled  = enabled;
-            ShowUsedSubstrateButton.Enabled   = enabled;
-            AllSubstrateCheckBox.Enabled      = enabled;
-            StockCheckBox.Enabled             = enabled;
-            GroupModelCheckBox.Enabled        = enabled;
+            GenerateReportButton.Enabled = enabled;
+            GenerateListButton.Enabled = enabled;
+            GenerateCheckSheetButton.Enabled = enabled;
+            ShowUsedSubstrateButton.Enabled = enabled;
+            AllSubstrateCheckBox.Enabled = enabled;
+            StockCheckBox.Enabled = enabled;
+            GroupModelCheckBox.Enabled = enabled;
         }
 
         // 右クリックメニューを開く前にテーブル種別・行選択に応じて項目を制御する
@@ -1263,7 +1264,7 @@ namespace ProductDatabase {
             }
 
             // テーブル種別に応じてメニュー項目の有効/無効を設定する
-            EditContextMenuItem.Enabled   = (_tableName == "Product");
+            EditContextMenuItem.Enabled = (_tableName == "Product");
             DeleteContextMenuItem.Enabled = (_tableName != string.Empty);
         }
 
