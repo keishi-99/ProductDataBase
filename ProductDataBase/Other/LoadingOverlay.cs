@@ -53,11 +53,11 @@ namespace ProductDatabase.Other {
                 g.FillRectangle(overlayBrush, ClientRectangle);
 
                 // 中央の白いカード（角丸）
-                const int cardW = 130;
-                const int cardH = 110;
-                int cardX = (Width - cardW) / 2;
-                int cardY = (Height - cardH) / 2;
-                var cardRect = new RectangleF(cardX, cardY, cardW, cardH);
+                const int CardW = 130;
+                const int CardH = 110;
+                int cardX = (Width - CardW) / 2;
+                int cardY = (Height - CardH) / 2;
+                var cardRect = new RectangleF(cardX, cardY, CardW, CardH);
 
                 using (var cardBrush = new SolidBrush(Color.White))
                 using (var cardPath = CreateRoundedRect(cardRect, 10f)) {
@@ -66,7 +66,7 @@ namespace ProductDatabase.Other {
 
                 // スピナー（薄い背景円 + 回転する円弧）
                 const int spinnerSize = 48;
-                int spinnerX = cardX + (cardW - spinnerSize) / 2;
+                int spinnerX = cardX + (CardW - spinnerSize) / 2;
                 int spinnerY = cardY + 18;
                 var spinnerRect = new RectangleF(spinnerX, spinnerY, spinnerSize, spinnerSize);
 
@@ -89,8 +89,8 @@ namespace ProductDatabase.Other {
                 var textSize = g.MeasureString(text, font);
                 g.DrawString(
                     text, font, textBrush,
-                    cardX + (cardW - textSize.Width) / 2f,
-                    cardY + cardH - 26f);
+                    cardX + (CardW - textSize.Width) / 2f,
+                    cardY + CardH - 26f);
             }
 
             // 角丸四角形のパスを生成する
