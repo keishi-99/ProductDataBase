@@ -1023,38 +1023,101 @@ namespace ProductDatabase {
         }
         // 登録済み製品情報をもとにExcel成績書を生成する
         private void GenerateReport() {
+            // [UIスレッド] 前処理: Config読み込み + ファイル選択 + 保存先選択
+            (string templateFilePath, string savePath, ExcelServiceClosedXml.ReportGeneratorClosedXml.ReportConfigClosedXml config)? prepared;
             try {
-                Cursor.Current = Cursors.WaitCursor;
-
-                ExcelServiceClosedXml.ReportGeneratorClosedXml.GenerateReport(_productMaster, _productRegisterWork);
+                prepared = ExcelServiceClosedXml.ReportGeneratorClosedXml.PrepareReport(
+                    _productMaster.ProductModel, _productRegisterWork.ProductNumber);
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } finally {
-                Cursor.Current = Cursors.Default;
+                MessageBox.Show(ex.Message, $"[{nameof(GenerateReport)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (prepared is null) return; // キャンセル
+
+            GenerateReportButton.Enabled = false;
+            Exception? taskException = null;
+            using var loadingForm = new LoadingForm();
+            loadingForm.Load += async (_, _) => {
+                // ※ try は await を含む全体を包む。await より前に同期処理を追加しないこと。
+                try {
+                    await CommonUtils.RunOnStaThreadAsync(() =>
+                        ExcelServiceClosedXml.ReportGeneratorClosedXml.ExecuteReport(
+                            _productMaster, _productRegisterWork,
+                            prepared.Value.templateFilePath,
+                            prepared.Value.savePath,
+                            prepared.Value.config));
+                } catch (Exception ex) {
+                    taskException = ex;
+                } finally {
+                    loadingForm.Close();
+                }
+            };
+            loadingForm.ShowDialog(this); // Load イベント完了後にリターン
+
+            GenerateReportButton.Enabled = true;
+            if (taskException is not null) {
+                MessageBox.Show(taskException.Message, $"[{nameof(GenerateReport)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            } else {
+                MessageBox.Show("成績書が正常に生成されました。", "完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
         // 登録済み製品情報をもとにExcel製品一覧を生成する
         private void GenerateList() {
-            try {
-                Cursor.Current = Cursors.WaitCursor;
+            SubstrateListPrintButton.Enabled = false;
+            Exception? taskException = null;
+            using var loadingForm = new LoadingForm();
+            loadingForm.Load += async (_, _) => {
+                try {
+                    await CommonUtils.RunOnStaThreadAsync(() =>
+                        ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(
+                            _productMaster, _productRegisterWork));
+                } catch (Exception ex) {
+                    taskException = ex;
+                } finally {
+                    loadingForm.Close();
+                }
+            };
+            loadingForm.ShowDialog(this);
 
-                ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(_productMaster, _productRegisterWork);
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } finally {
-                Cursor.Current = Cursors.Default;
+            SubstrateListPrintButton.Enabled = true;
+            if (taskException is not null) {
+                MessageBox.Show(taskException.Message, $"[{nameof(GenerateList)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         // 登録済み製品情報をもとにExcelチェックシートを生成する
         private void GenerateCheckSheet() {
+            // [UIスレッド] 前処理: Config読み込み + InputDialog（温度・湿度）
+            (ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.CheckSheetConfigData configData, string temperature, string humidity)? prepared;
             try {
-                Cursor.Current = Cursors.WaitCursor;
-
-                ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.GenerateCheckSheet(_productMaster, _productRegisterWork);
+                prepared = ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.PrepareCheckSheet(_productMaster);
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } finally {
-                Cursor.Current = Cursors.WaitCursor;
+                MessageBox.Show(ex.Message, $"[{nameof(GenerateCheckSheet)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (prepared is null) return; // キャンセル
+
+            CheckSheetPrintButton.Enabled = false;
+            Exception? taskException = null;
+            using var loadingForm = new LoadingForm();
+            loadingForm.Load += async (_, _) => {
+                try {
+                    await CommonUtils.RunOnStaThreadAsync(() =>
+                        ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.ExecuteCheckSheet(
+                            _productMaster, _productRegisterWork,
+                            prepared.Value.configData,
+                            prepared.Value.temperature,
+                            prepared.Value.humidity));
+                } catch (Exception ex) {
+                    taskException = ex;
+                } finally {
+                    loadingForm.Close();
+                }
+            };
+            loadingForm.ShowDialog(this);
+
+            CheckSheetPrintButton.Enabled = true;
+            if (taskException is not null) {
+                MessageBox.Show(taskException.Message, $"[{nameof(GenerateCheckSheet)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
