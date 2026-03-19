@@ -250,7 +250,7 @@ namespace ProductDatabase {
                 _productMaster.RevisionGroup,
                 SerialFirst = _productRegisterWork.SerialFirst.NullIfWhiteSpace(),
                 SerialLast = _productRegisterWork.SerialLast.NullIfWhiteSpace(),
-                _productRegisterWork.Comment
+                Comment = _productRegisterWork.Comment.NullIfWhiteSpace()
             });
 
             _productRegisterWork.RowID = connection.ExecuteScalar<int>("SELECT last_insert_rowid();");
