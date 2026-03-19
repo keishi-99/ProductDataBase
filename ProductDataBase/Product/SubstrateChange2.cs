@@ -538,22 +538,18 @@ namespace ProductDatabase {
             return string.IsNullOrWhiteSpace(value) ? DBNull.Value : value;
         }
         // 基板変更済み製品情報をもとにExcel製品一覧を生成する
-        private void GenerateList() {
+        private async Task GenerateList() {
             SubstrateListPrintButton.Enabled = false;
             Exception? taskException = null;
-            using var loadingForm = new LoadingForm();
-            loadingForm.Load += async (_, _) => {
+            using (var overlay = new LoadingOverlay(this)) {
                 try {
                     await CommonUtils.RunOnStaThreadAsync(() =>
                         ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(
                             _productMaster, _productRegisterWork));
                 } catch (Exception ex) {
                     taskException = ex;
-                } finally {
-                    loadingForm.Close();
                 }
-            };
-            loadingForm.ShowDialog(this);
+            }
 
             SubstrateListPrintButton.Enabled = true;
             if (taskException is not null) {
@@ -624,7 +620,7 @@ namespace ProductDatabase {
 
         private void SubstrateChange2_Load(object sender, EventArgs e) { LoadEvents(); }
         private void RegisterButton_Click(object sender, EventArgs e) { ChangeRegistration(); }
-        private void SubstrateListPrintButton_Click(object sender, EventArgs e) { GenerateList(); }
+        private async void SubstrateListPrintButton_Click(object sender, EventArgs e) { await GenerateList(); }
         private void CloseButton_Click(object sender, EventArgs e) { Close(); }
     }
 }
