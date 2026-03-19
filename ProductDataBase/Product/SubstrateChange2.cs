@@ -253,9 +253,9 @@ namespace ProductDatabase {
                                 for (var j = 0; j < dgvRowCnt; j++) {
                                     var boolCbx = objDgv.Rows[j].Cells[4].Value is not null && (bool)objDgv.Rows[j].Cells[4].Value;
                                     if (boolCbx) {
-                                        var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value.ToString());
-                                        var usedValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value.ToString());
-                                        var useValue = Convert.ToInt32(objDgv.Rows[j].Cells[3].Value.ToString());
+                                        var stockValue = int.TryParse(objDgv.Rows[j].Cells[1].Value?.ToString(), out var sv1) ? sv1 : 0;
+                                        var usedValue = int.TryParse(objDgv.Rows[j].Cells[2].Value?.ToString(), out var usd1) ? usd1 : 0;
+                                        var useValue = int.TryParse(objDgv.Rows[j].Cells[3].Value?.ToString(), out var use1) ? use1 : 0;
 
                                         if (useValue < 0) {
                                             throw new Exception("使用数が0以下になっています。");
@@ -321,12 +321,12 @@ namespace ProductDatabase {
                                     var dgvRowCnt = objDgv.Rows.Count;
 
                                     for (var j = 0; j <= dgvRowCnt - 1; j++) {
-                                        var usedValue = Convert.ToInt32(objDgv.Rows[j].Cells[2].Value);
+                                        var usedValue = int.TryParse(objDgv.Rows[j].Cells[2].Value?.ToString(), out var usd2) ? usd2 : 0;
                                         var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[4].Value);
-                                        var useValue = boolCbx ? Convert.ToInt32(objDgv.Rows[j].Cells[3].Value) : 0;
+                                        var useValue = boolCbx ? (int.TryParse(objDgv.Rows[j].Cells[3].Value?.ToString(), out var use2) ? use2 : 0) : 0;
                                         if (boolCbx) {
                                             var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
-                                            var stockValue = Convert.ToInt32(objDgv.Rows[j].Cells[1].Value);
+                                            var stockValue = int.TryParse(objDgv.Rows[j].Cells[1].Value?.ToString(), out var sv2) ? sv2 : 0;
 
                                             var sql =
                                                 $"""

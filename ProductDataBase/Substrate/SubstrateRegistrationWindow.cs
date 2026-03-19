@@ -161,7 +161,7 @@ namespace ProductDatabase {
                 var orderNumber = _substrateRegisterWork.OrderNumber;
                 var substrateNumber = _substrateRegisterWork.ProductNumber;
                 var quantity = _substrateRegisterWork.AddQuantity;
-                var defectQuantity = string.IsNullOrWhiteSpace(DefectQuantityTextBox.Text) ? 0 : Convert.ToInt32(DefectQuantityTextBox.Text);
+                var defectQuantity = int.TryParse(DefectQuantityTextBox.Text, out var dq) ? dq : 0;
                 var registrationDate = _substrateRegisterWork.RegDate;
                 var person = _substrateRegisterWork.Person;
                 var comment = _substrateRegisterWork.Comment;

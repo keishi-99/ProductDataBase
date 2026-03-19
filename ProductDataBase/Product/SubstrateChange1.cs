@@ -118,14 +118,14 @@ namespace ProductDatabase {
 
             var i = SubstrateChangeDataGridView.SelectedCells[0].RowIndex;
 
-            _productRegisterWork.RowID = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["ID"].Value);
+            _productRegisterWork.RowID = int.TryParse(SubstrateChangeDataGridView.Rows[i].Cells["ID"].Value?.ToString(), out var rowId) ? rowId : 0;
             _productRegisterWork.OrderNumber = SubstrateChangeDataGridView.Rows[i].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
             _productRegisterWork.ProductNumber = SubstrateChangeDataGridView.Rows[i].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.Quantity = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["Quantity"].Value);
+            _productRegisterWork.Quantity = int.TryParse(SubstrateChangeDataGridView.Rows[i].Cells["Quantity"].Value?.ToString(), out var qty) ? qty : 0;
             _productRegisterWork.Revision = SubstrateChangeDataGridView.Rows[i].Cells["Revision"].Value.ToString() ?? string.Empty;
             _productRegisterWork.SerialFirst = SubstrateChangeDataGridView.Rows[i].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
             _productRegisterWork.SerialLast = SubstrateChangeDataGridView.Rows[i].Cells["SerialLast"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.SerialLastNumber = Convert.ToInt32(SubstrateChangeDataGridView.Rows[i].Cells["SerialLastNumber"].Value);
+            _productRegisterWork.SerialLastNumber = int.TryParse(SubstrateChangeDataGridView.Rows[i].Cells["SerialLastNumber"].Value?.ToString(), out var sln) ? sln : 0;
             _productRegisterWork.Comment = SubstrateChangeDataGridView.Rows[i].Cells["Comment"].Value.ToString() ?? string.Empty;
             using SubstrateChange2 window = new(_productMaster, _productRegisterWork, _appSettings);
             window.Closed += (s, e) => this.Close();

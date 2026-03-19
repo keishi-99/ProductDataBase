@@ -1046,7 +1046,7 @@ namespace ProductDatabase {
         // 選択行の基板情報を読み込み基板登録ウィンドウを開いて在庫を調整する
         private void InventoryAdjustment() {
             var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
-            _substrateMaster.SubstrateID = Convert.ToInt32(DataBaseDataGridView.Rows[i].Cells["SubstrateID"].Value);
+            _substrateMaster.SubstrateID = int.TryParse(DataBaseDataGridView.Rows[i].Cells["SubstrateID"].Value?.ToString(), out var subId) ? subId : 0;
             _substrateRegisterWork.OrderNumber = DataBaseDataGridView.Rows[i].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
             _substrateRegisterWork.ProductNumber = DataBaseDataGridView.Rows[i].Cells["SubstrateNumber"].Value.ToString() ?? string.Empty;
 
@@ -1071,9 +1071,9 @@ namespace ProductDatabase {
                 _substrateMaster.SubstrateName = result.SubstrateName ?? string.Empty;
                 _substrateMaster.SubstrateModel = result.SubstrateModel ?? string.Empty;
                 _substrateMaster.ProductName = result.ProductName ?? string.Empty;
-                _substrateMaster.RegType = Convert.ToInt32(result.RegType);
-                _substrateMaster.CheckBin = Convert.ToInt32(result.Checkbox?.ToString() ?? "0", 2);
-                _substrateMaster.SerialPrintType = Convert.ToInt32(result.SerialPrintType);
+                _substrateMaster.RegType = int.TryParse(result.RegType?.ToString(), out var rt) ? rt : 0;
+                _substrateMaster.CheckBin = Convert.ToInt32(result.Checkbox?.ToString() ?? "0", 2); // バイナリ文字列変換のため維持
+                _substrateMaster.SerialPrintType = int.TryParse(result.SerialPrintType?.ToString(), out var spt) ? spt : 0;
             }
 
             using SubstrateRegistrationWindow window = new(_substrateMaster, _substrateRegisterWork, _appSettings);
@@ -1120,7 +1120,7 @@ namespace ProductDatabase {
                 """;
 
             var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
-            var id = Convert.ToInt32(DataBaseDataGridView.Rows[i].Cells["ID"].Value);
+            var id = int.TryParse(DataBaseDataGridView.Rows[i].Cells["ID"].Value?.ToString(), out var idVal) ? idVal : 0;
 
             var results = con.Query(sql, new { ID = id }).ToList();
             var dt = new DataTable();
@@ -1145,7 +1145,7 @@ namespace ProductDatabase {
         private async Task GenerateReport() {
             if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
             var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
-            _productRegisterWork.RowID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
+            _productRegisterWork.RowID = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value?.ToString(), out var rid1) ? rid1 : 0;
             _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
             _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
             _productMaster.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
@@ -1192,7 +1192,7 @@ namespace ProductDatabase {
         private async Task GenerateList() {
             if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
             var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
-            _productRegisterWork.RowID = Convert.ToInt32(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value);
+            _productRegisterWork.RowID = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value?.ToString(), out var rid2) ? rid2 : 0;
             _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
             _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
             _productMaster.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
