@@ -243,6 +243,7 @@ namespace ProductDatabase {
         private void ViewSubstrateRegistrationLog() {
             if (CategoryRadioButton1.Checked) {
                 _tableName = "Substrate";
+                在庫調整ToolStripMenuItem.Enabled = false;
                 StockCheckBox.Visible = false;
                 AllSubstrateCheckBox.Visible = true;
                 GroupModelCheckBox.Visible = false;
@@ -1058,7 +1059,7 @@ namespace ProductDatabase {
                     SubstrateModel,
                     ProductName,
                     RegType,
-                    CheckBox,
+                    Checkbox,
                     SerialPrintType
                 FROM {Constants.SubstrateTableName}
                 WHERE SubstrateID = @SubstrateID;
@@ -1071,7 +1072,7 @@ namespace ProductDatabase {
                 _substrateMaster.SubstrateModel = result.SubstrateModel ?? string.Empty;
                 _substrateMaster.ProductName = result.ProductName ?? string.Empty;
                 _substrateMaster.RegType = Convert.ToInt32(result.RegType);
-                _substrateMaster.CheckBin = Convert.ToInt32(result.CheckBox?.ToString() ?? "0", 2);
+                _substrateMaster.CheckBin = Convert.ToInt32(result.Checkbox?.ToString() ?? "0", 2);
                 _substrateMaster.SerialPrintType = Convert.ToInt32(result.SerialPrintType);
             }
 
