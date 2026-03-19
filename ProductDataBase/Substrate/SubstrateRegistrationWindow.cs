@@ -628,6 +628,27 @@ namespace ProductDatabase {
             }
         }
 
+        // STAスレッドで処理を実行し、Taskとして返す（COM Interop用）
+        private static Task RunOnStaThreadAsync(Action action)
+        {
+            var tcs = new TaskCompletionSource();
+            var thread = new Thread(() =>
+            {
+                try
+                {
+                    action();
+                    tcs.SetResult();
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            return tcs.Task;
+        }
+
         // 有効なテキストボックスの入力状態・製番桁数・数量・担当者選択を検証しエラー時は登録ボタンを無効化する
         private void ValidateAllInputs() {
             ErrorMessageLabel.Text = "";
@@ -702,7 +723,18 @@ namespace ProductDatabase {
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
         private void RegisterButton_Click(object sender, EventArgs e) { ProcessRegistration(true); }
         private void PrintButton_Click(object sender, EventArgs e) { ProcessRegistration(true); }
-        private void OpenSubstrateInformationButton_Click(object sender, EventArgs e) { OpenSubstrateInformation(); }
+        private async void OpenSubstrateInformationButton_Click(object sender, EventArgs e)
+        {
+            OpenSubstrateInformationButton.Enabled = false;
+            try
+            {
+                await RunOnStaThreadAsync(OpenSubstrateInformation);
+            }
+            finally
+            {
+                OpenSubstrateInformationButton.Enabled = true;
+            }
+        }
         private void TemplateButton_Click(object sender, EventArgs e) { TemplateComment(); }
         private void QuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private void DefectQuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
