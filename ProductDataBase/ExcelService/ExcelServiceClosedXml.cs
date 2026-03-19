@@ -308,6 +308,8 @@ namespace ProductDatabase.ExcelService {
 
                 if (saveFileDialog.ShowDialog() == DialogResult.OK) {
                     var outputPath = saveFileDialog.FileName;
+                    // 保存前に改ページプレビューを強制設定
+                    ForcePageBreakPreview(reportWorkbook);
                     reportWorkbook.SaveAs(outputPath);
                 }
                 else {
@@ -348,6 +350,7 @@ namespace ProductDatabase.ExcelService {
 
                     // FileStreamからXLWorkbookを読み込む
                     using var workBook = new XLWorkbook(fs);
+
                     var (targetSheetName, productName, resultRow, configSheet) = LoadExcelConfiguration(workBook, productMaster.ProductModel);
 
                     // 2. 製品情報の設定とExcelへの書き込み
@@ -533,6 +536,8 @@ namespace ProductDatabase.ExcelService {
 
             // Excelファイルを保存し、印刷処理を行うメソッド
             private static void SaveAndPrintExcel(XLWorkbook workBook, string temporarilyPath, string sheetName) {
+                // 保存前に改ページプレビューを強制設定
+                ForcePageBreakPreview(workBook);
                 workBook.SaveAs(temporarilyPath);
 
                 // 印刷 (COM Interop)
@@ -800,6 +805,8 @@ namespace ProductDatabase.ExcelService {
             // ワークブックをファイルに保存します。
             private static void SaveWorkbook(XLWorkbook targetBook, string outputPath) {
                 try {
+                    // 保存前に改ページプレビューを強制設定
+                    ForcePageBreakPreview(targetBook);
                     targetBook.SaveAs(outputPath);
                 } catch (IOException ex) {
                     throw new IOException($"Excelファイルの保存に失敗しました: {outputPath}. 詳細: {ex.Message}", ex);
@@ -840,6 +847,28 @@ namespace ProductDatabase.ExcelService {
                 }
             }
         }
+
+        // 保存前に全シートのビューを改ページプレビューに強制設定する
+        // ClosedXML が view 属性を正しく読み取れないバグへの暫定対応
+        // バグ修正後は CaptureSheetViews / RestoreSheetViews に切り替える
+        private static void ForcePageBreakPreview(XLWorkbook workbook) {
+            foreach (var ws in workbook.Worksheets) {
+                ws.SheetView.View = XLSheetViewOptions.PageBreakPreview;
+            }
+        }
+
+        // ClosedXML バグ修正後に使用予定
+        // private static Dictionary<string, XLSheetViewOptions> CaptureSheetViews(XLWorkbook workbook) {
+        //     return workbook.Worksheets.ToDictionary(ws => ws.Name, ws => ws.SheetView.View);
+        // }
+        //
+        // private static void RestoreSheetViews(XLWorkbook workbook, Dictionary<string, XLSheetViewOptions> views) {
+        //     foreach (var ws in workbook.Worksheets) {
+        //         if (views.TryGetValue(ws.Name, out var view)) {
+        //             ws.SheetView.View = view;
+        //         }
+        //     }
+        // }
 
         // 基板設定を開く
         public static class SubstrateInformationClosedXml {
