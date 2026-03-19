@@ -347,9 +347,8 @@ namespace ProductDatabase {
                             Document = pd
                         };
                         if (pdlg.ShowDialog() == DialogResult.OK) {
-                            using (var overlay = new LoadingOverlay(this)) {
-                                await CommonUtils.RunOnStaThreadAsync(() => pd.Print());
-                            }
+                            using var overlay = new LoadingOverlay(this);
+                            await CommonUtils.RunOnStaThreadAsync(() => pd.Print());
                         }
                         else {
                             return false;
@@ -395,7 +394,7 @@ namespace ProductDatabase {
                 ["{MM}"] = regDate.ToString("MM"),
                 ["{R}"] = _productRegisterWork.Revision,
                 ["{M}"] = monthCode[^1..],
-                ["{S}"] = (int.TryParse(serialCode, out var sc) ? sc : 0).ToString($"D{_productMaster.SerialDigit}")
+                ["{S}"] = serialCode.ToString($"D{_productMaster.SerialDigit}")
             };
 
             foreach (var kv in map) {
