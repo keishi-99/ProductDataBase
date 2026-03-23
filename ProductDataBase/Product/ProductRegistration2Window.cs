@@ -753,6 +753,7 @@ namespace ProductDatabase {
         // シリアルリストを生成しDBに既存シリアルがないか重複チェックする
         private void SerialCheck(SqliteConnection connection, bool print = true) {
 
+            _serialList.Clear();
             CurrentSerialType = GetSerialTypeFromProductMaster();
 
             for (var i = 0; i < _productRegisterWork.Quantity; i++) {
