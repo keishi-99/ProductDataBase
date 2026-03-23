@@ -134,12 +134,25 @@ namespace ProductDatabase.Print {
 
                         var isLastCopy = CopiesRemainingPerSerial == 1;
 
-                        // タイプ4で残り1の場合、最後のラベルに下線をつける
-                        var fontUnderline = _isUnderlinePrint && isLastCopy;
+                        // 残り枚数に基づいてフォントとテキストを決定する
+                        var isSecondToLastCopy = CopiesRemainingPerSerial == 2;
 
-                        var printText = _isLast4Digits && isLastCopy
-                            ? Last4ProductModel
-                            : _serialList[PrintCount];
+                        bool fontUnderline;
+                        string printText;
+
+                        if (_isUnderlinePrint && _isLast4Digits) {
+                            // 両方Trueの場合: 末尾2枚目→シリアル+下線、末尾1枚目→Last4ProductModel
+                            fontUnderline = isSecondToLastCopy;
+                            printText = isLastCopy
+                                ? Last4ProductModel
+                                : _serialList[PrintCount];
+                        } else {
+                            // 片方のみ、または両方Falseの場合: 既存ロジック
+                            fontUnderline = _isUnderlinePrint && isLastCopy;
+                            printText = _isLast4Digits && isLastCopy
+                                ? Last4ProductModel
+                                : _serialList[PrintCount];
+                        }
 
                         using var labelImage = MakeLabelImage(printText, serialType, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY, isPreview);
 
