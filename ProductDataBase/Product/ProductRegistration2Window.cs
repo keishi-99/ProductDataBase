@@ -328,13 +328,15 @@ namespace ProductDatabase {
 
                 DisableControls();
 
-                Registration(_sqliteConnection, _sqliteTransaction);
+                using (var overlay = new LoadingOverlay(this)) {
+                    Registration(_sqliteConnection, _sqliteTransaction);
 
-                LogRegistration(_productMaster, _productRegisterWork);
-                BackupManager.CreateBackup();
+                    LogRegistration(_productMaster, _productRegisterWork);
+                    BackupManager.CreateBackup();
 
-                // 登録チェック
-                RegistrationCheck(_sqliteConnection);
+                    // 登録チェック
+                    RegistrationCheck(_sqliteConnection);
+                }
 
                 // 登録完了メッセージ
                 MessageBox.Show("登録しました。");

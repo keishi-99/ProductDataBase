@@ -122,8 +122,9 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = false;
 
                 if (!PrintOnlyCheckBox.Checked && isPrint) {
-                    if (!Registration()) {
-                        return;
+                    if (!CheckDuplicate()) { return; }
+                    using (var overlay = new LoadingOverlay(this)) {
+                        if (!Registration()) { return; }
                     }
                 }
 
@@ -151,6 +152,50 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = true;
             }
         }
+        // 入荷登録時に製番の重複を確認し、ユーザーがキャンセルした場合はfalseを返す
+        private bool CheckDuplicate() {
+            if (!IsRegistration || !QuantityCheckBox.Checked || DefectQuantityCheckBox.Checked) { return true; }
+
+            var substrateNumber = _substrateRegisterWork.ProductNumber;
+            var commandText =
+                $"""
+                SELECT
+                    SubstrateID,
+                    SubstrateName,
+                    SubstrateModel,
+                    SubstrateNumber,
+                    OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                FROM
+                    {Constants.VSubstrateTableName}
+                WHERE
+                    SubstrateID = @SubstrateID
+                    AND SubstrateNumber = @SubstrateNumber
+                GROUP BY
+                    SubstrateID,
+                    SubstrateName,
+                    SubstrateModel,
+                    SubstrateNumber,
+                    OrderNumber
+                ORDER BY
+                    MIN(ID)
+                LIMIT 1
+                ;
+                """;
+            using var con = new SqliteConnection(GetConnectionRegistration());
+            con.Open();
+            var result = con.QueryFirstOrDefault<SubstrateStockDto>(
+                commandText,
+                new {
+                    _substrateMaster.SubstrateID,
+                    SubstrateNumber = substrateNumber
+                });
+            var substrateName = result?.SubstrateName ?? string.Empty;
+            if (substrateName != string.Empty && _substrateMaster.SubstrateName == substrateName) {
+                var dialogResult = MessageBox.Show($"[{substrateNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.No) { return false; }
+            }
+            return true;
+        }
         // トランザクションで基板登録テーブルに入荷/不良レコードを挿入しログ記録とバックアップを行う
         private bool Registration() {
             using var con = new SqliteConnection(GetConnectionRegistration());
@@ -167,52 +212,6 @@ namespace ProductDatabase {
                 var comment = _substrateRegisterWork.Comment;
                 var rowId = string.Empty;
                 var commandText = string.Empty;
-
-                // 製番が新規かチェック
-                if (IsRegistration) {
-                    commandText =
-                        $"""
-                        SELECT
-                            SubstrateID,
-                            SubstrateName,
-                            SubstrateModel,
-                            SubstrateNumber,
-                            OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                        FROM
-                            {Constants.VSubstrateTableName}
-                        WHERE
-                            SubstrateID = @SubstrateID
-                            AND SubstrateNumber = @SubstrateNumber
-                        GROUP BY
-                            SubstrateID, 
-                            SubstrateName,
-                            SubstrateModel,
-                            SubstrateNumber,
-                            OrderNumber
-                        ORDER BY
-                            MIN(ID)
-                        LIMIT 1
-                        ;
-                        """;
-                    var result = con.QueryFirstOrDefault<SubstrateStockDto>(
-                        commandText,
-                        new {
-                            _substrateMaster.SubstrateID,
-                            SubstrateNumber = substrateNumber
-                        },
-                        transaction: transaction);
-
-                    var substrateName = result?.SubstrateName ?? string.Empty;
-
-                    if (substrateName != string.Empty) {
-                        if (_substrateMaster.SubstrateName == substrateName) {
-                            if (QuantityCheckBox.Checked && !DefectQuantityCheckBox.Checked) {
-                                var dialogResult = MessageBox.Show($"[{substrateNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
-                                if (dialogResult == DialogResult.No) { return false; }
-                            }
-                        }
-                    }
-                }
 
                 // 不良処理時在庫チェック
                 if (DefectQuantityCheckBox.Checked) {
