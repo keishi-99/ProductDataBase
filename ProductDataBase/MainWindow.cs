@@ -21,7 +21,7 @@ namespace ProductDatabase {
         private string _pwd = string.Empty;
 
         readonly string _jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "General", "appsettings.json");
-        private static readonly System.Text.Json.JsonSerializerOptions s_jsonOptions = new() { PropertyNameCaseInsensitive = true };
+        private static readonly System.Text.Json.JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         private readonly ProductRepository _productRepository;
 
@@ -46,7 +46,7 @@ namespace ProductDatabase {
             _appSettings = new AppSettings();
         }
 
-        private static FileStream? s_lockStream;
+        private static FileStream? _lockStream;
 
         // フォームロード時にファイルロック・設定読み込み・DBデータ取得・日次バックアップ作成を行いUIを初期化する
         private void LoadEvents() {
@@ -72,7 +72,7 @@ namespace ProductDatabase {
                 }
                 var generalSettings = System.Text.Json.JsonSerializer.Deserialize<GeneralSettings>(
                     File.ReadAllText(_jsonFilePath),
-                    s_jsonOptions
+                    _jsonOptions
                 ) ?? new GeneralSettings();
 
                 // バックアップパス取得
@@ -157,7 +157,7 @@ namespace ProductDatabase {
         private static void LockSelf() {
             try {
                 string exePath = Application.ExecutablePath;
-                s_lockStream = new FileStream(exePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                _lockStream = new FileStream(exePath, FileMode.Open, FileAccess.Read, FileShare.Read);
             } catch {
                 // 失敗しても無視
             }

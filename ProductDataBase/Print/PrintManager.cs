@@ -33,10 +33,10 @@ namespace ProductDatabase.Print {
 
         public static int SerialPrintType { get; private set; }
 
-        private static List<string> s_serialList = [];
+        private static List<string> _serialList = [];
 
-        private static bool s_isUnderlinePrint;
-        private static bool s_isLast4Digits;
+        private static bool _isUnderlinePrint;
+        private static bool _isLast4Digits;
 
         // 4桁以上の製品型式の下4桁を取得するプロパティ
         public static string Last4ProductModel =>
@@ -53,13 +53,13 @@ namespace ProductDatabase.Print {
             ProductRegisterWork = productRegisterWork;
             DocumentPrintSettings = productPrintSettings ?? throw new ArgumentNullException(nameof(productPrintSettings));
 
-            s_serialList = serialList;
+            _serialList = serialList;
             PageCount = 1;
             PrintCount = 0;
             SerialPrintType = productMaster.SerialPrintType;
 
-            s_isUnderlinePrint = ProductMaster.IsUnderlinePrint;
-            s_isLast4Digits = ProductMaster.IsLast4Digits;
+            _isUnderlinePrint = ProductMaster.IsUnderlinePrint;
+            _isLast4Digits = ProductMaster.IsLast4Digits;
         }
         // 基板印刷に必要なマスター・作業データ・シリアルリストを初期化する
         public static void SubstrateInitialize(SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork, DocumentPrintSettings documentPrintSettings, List<string> serialList) {
@@ -67,7 +67,7 @@ namespace ProductDatabase.Print {
             SubstrateRegisterWork = substrateRegisterWork;
             DocumentPrintSettings = documentPrintSettings ?? throw new ArgumentNullException(nameof(documentPrintSettings));
 
-            s_serialList = serialList;
+            _serialList = serialList;
             PageCount = 1;
             PrintCount = 0;
             SerialPrintType = substrateMaster.SerialPrintType;
@@ -135,11 +135,11 @@ namespace ProductDatabase.Print {
                         var isLastCopy = CopiesRemainingPerSerial == 1;
 
                         // タイプ4で残り1の場合、最後のラベルに下線をつける
-                        var fontUnderline = s_isUnderlinePrint && isLastCopy;
+                        var fontUnderline = _isUnderlinePrint && isLastCopy;
 
-                        var printText = s_isLast4Digits && isLastCopy
+                        var printText = _isLast4Digits && isLastCopy
                             ? Last4ProductModel
-                            : s_serialList[PrintCount];
+                            : _serialList[PrintCount];
 
                         using var labelImage = MakeLabelImage(printText, serialType, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY, isPreview);
 
@@ -151,7 +151,7 @@ namespace ProductDatabase.Print {
                             CopiesRemainingPerSerial = copiesPerLabel;
                             PrintCount++;
 
-                            if (s_serialList.Count <= PrintCount) {
+                            if (_serialList.Count <= PrintCount) {
                                 DrawFinalRowMark(e.Graphics, y + 1, 0, posY, 0, labelHeightPx, headerFont);
                                 return false;
                             }
@@ -159,7 +159,7 @@ namespace ProductDatabase.Print {
                     }
                 }
 
-                if (s_serialList.Count > PrintCount) {
+                if (_serialList.Count > PrintCount) {
                     PageCount++;
                     return true;
                 }

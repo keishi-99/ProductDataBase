@@ -84,7 +84,7 @@ namespace ProductDatabase.Data {
         }
 
         // 製品マスターを新規登録し採番されたProductIDを返す
-        public long InsertProduct(ProductMaster product) {
+        public static long InsertProduct(ProductMaster product) {
             using var con = new SqliteConnection(GetConnectionRegistration());
 
             var sql =
@@ -119,7 +119,7 @@ namespace ProductDatabase.Data {
         }
 
         // 製品マスターを更新する
-        public void UpdateProduct(ProductMaster product) {
+        public static void UpdateProduct(ProductMaster product) {
             using var con = new SqliteConnection(GetConnectionRegistration());
 
             var sql =
@@ -160,7 +160,7 @@ namespace ProductDatabase.Data {
         }
 
         // 製品マスターを物理削除する（実績存在チェック・関連紐づけ削除を含む）
-        public void DeleteProduct(long productId) {
+        public static void DeleteProduct(long productId) {
             using var con = new SqliteConnection(GetConnectionRegistration());
             con.Open();
             using var tx = con.BeginTransaction();
@@ -185,7 +185,7 @@ namespace ProductDatabase.Data {
         }
 
         // 指定ProductIDの製品実績が存在するか確認する
-        public bool ExistsProductResult(long productId) {
+        public static bool ExistsProductResult(long productId) {
             using var con = new SqliteConnection(GetConnectionRegistration());
             return con.ExecuteScalar<int>(
                 $"SELECT COUNT(*) FROM {Constants.TProductTableName} WHERE ProductID = @ProductId",
@@ -193,7 +193,7 @@ namespace ProductDatabase.Data {
         }
 
         // ProductModelの重複を確認する（excludeIdは編集時に自身を除外するために使用）
-        public bool ExistsProductModel(string productModel, long excludeId = 0) {
+        public static bool ExistsProductModel(string productModel, long excludeId = 0) {
             using var con = new SqliteConnection(GetConnectionRegistration());
             return con.ExecuteScalar<int>(
                 $"SELECT COUNT(*) FROM {Constants.ProductTableName} WHERE ProductModel = @ProductModel AND ProductID != @ExcludeId",
@@ -201,7 +201,7 @@ namespace ProductDatabase.Data {
         }
 
         // 基板マスターを新規登録し採番されたSubstrateIDを返す
-        public long InsertSubstrate(SubstrateMaster substrate) {
+        public static long InsertSubstrate(SubstrateMaster substrate) {
             using var con = new SqliteConnection(GetConnectionRegistration());
 
             var sql =
@@ -230,7 +230,7 @@ namespace ProductDatabase.Data {
         }
 
         // 基板マスターを更新する
-        public void UpdateSubstrate(SubstrateMaster substrate) {
+        public static void UpdateSubstrate(SubstrateMaster substrate) {
             using var con = new SqliteConnection(GetConnectionRegistration());
 
             var sql =
@@ -263,7 +263,7 @@ namespace ProductDatabase.Data {
         }
 
         // 基板マスターを物理削除する（実績存在チェック・関連紐づけ削除を含む）
-        public void DeleteSubstrate(long substrateId) {
+        public static void DeleteSubstrate(long substrateId) {
             using var con = new SqliteConnection(GetConnectionRegistration());
             con.Open();
             using var tx = con.BeginTransaction();
@@ -288,7 +288,7 @@ namespace ProductDatabase.Data {
         }
 
         // 指定SubstrateIDの基板実績が存在するか確認する
-        public bool ExistsSubstrateResult(long substrateId) {
+        public static bool ExistsSubstrateResult(long substrateId) {
             using var con = new SqliteConnection(GetConnectionRegistration());
             return con.ExecuteScalar<int>(
                 $"SELECT COUNT(*) FROM {Constants.TSubstrateTableName} WHERE SubstrateID = @SubstrateId",
@@ -296,7 +296,7 @@ namespace ProductDatabase.Data {
         }
 
         // SubstrateModelの重複を確認する（excludeIdは編集時に自身を除外するために使用）
-        public bool ExistsSubstrateModel(string substrateModel, long excludeId = 0) {
+        public static bool ExistsSubstrateModel(string substrateModel, long excludeId = 0) {
             using var con = new SqliteConnection(GetConnectionRegistration());
             return con.ExecuteScalar<int>(
                 $"SELECT COUNT(*) FROM {Constants.SubstrateTableName} WHERE SubstrateModel = @SubstrateModel AND SubstrateID != @ExcludeId",
@@ -304,7 +304,7 @@ namespace ProductDatabase.Data {
         }
 
         // 製品-基板紐づけを全削除してから指定リストで再登録する
-        public void UpdateProductUseSubstrates(long productId, IEnumerable<long> substrateIds) {
+        public static void UpdateProductUseSubstrates(long productId, IEnumerable<long> substrateIds) {
             using var con = new SqliteConnection(GetConnectionRegistration());
             con.Open();
             using var tx = con.BeginTransaction();
