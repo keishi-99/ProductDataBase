@@ -21,7 +21,6 @@ namespace ProductDatabase {
         private readonly ProductRegisterWork _productRegisterWork;
         private readonly AppSettings _appSettings;
 
-        private string _serialType = string.Empty;
         private readonly List<string> _serialList = [];
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox",  "FirstSerialNumberCheckBox",
@@ -142,8 +141,8 @@ namespace ProductDatabase {
                 if (!Registration()) { throw new Exception("登録できませんでした。"); }
             }
 
-            switch (_serialType) {
-                case "Nameplate":
+            switch (CurrentSerialType) {
+                case SerialType.Nameplate:
                     PrintManager.PrintUsingBPac(NameplatePrintSettings, _serialList);
                     break;
                 default:
@@ -381,10 +380,10 @@ namespace ProductDatabase {
                 : DateTime.Today;
             var monthCode = CommonUtils.ToMonthCode(regDate);
 
-            var outputCode = _serialType switch {
-                "Label" => LabelPrintSettings.TextFormat ?? string.Empty,
-                "Barcode" => BarcodePrintSettings.TextFormat ?? string.Empty,
-                "Nameplate" => NameplatePrintSettings.TextFormat ?? string.Empty,
+            var outputCode = CurrentSerialType switch {
+                SerialType.Label => LabelPrintSettings.TextFormat ?? string.Empty,
+                SerialType.Barcode => BarcodePrintSettings.TextFormat ?? string.Empty,
+                SerialType.Nameplate => NameplatePrintSettings.TextFormat ?? string.Empty,
                 _ => string.Empty
             };
 
@@ -635,30 +634,31 @@ namespace ProductDatabase {
         private void RePrintWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
         private async void LabelPrintButton_Click(object sender, EventArgs e) {
-            _serialType = "Label";
+            CurrentSerialType = SerialType.Label;
             await RegisterCheck(true);
         }
         private async void BarcodePrintButton_Click(object sender, EventArgs e) {
-            _serialType = "Barcode";
+            CurrentSerialType = SerialType.Barcode;
             await RegisterCheck(true);
         }
         private async void NamePlatePrintButton_Click(object sender, EventArgs e) {
-            _serialType = "Nameplate";
+            CurrentSerialType = SerialType.Nameplate;
             await RegisterCheck(true);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
         private async void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            _serialType = "Label";
+            CurrentSerialType = SerialType.Label;
             await RegisterCheck(false);
         }
         private async void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            _serialType = "Barcode";
+            CurrentSerialType = SerialType.Barcode;
             await RegisterCheck(false);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             CurrentSerialType = SerialType.Label;
             PrintSettingsWindow ls = new() {
-                ProductMaster = _productMaster
+                ProductMaster = _productMaster,
+                AppSettings = _appSettings
             };
             ls.ShowDialog(this);
             LoadSettings();
@@ -666,7 +666,8 @@ namespace ProductDatabase {
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             CurrentSerialType = SerialType.Barcode;
             PrintSettingsWindow ls = new() {
-                ProductMaster = _productMaster
+                ProductMaster = _productMaster,
+                AppSettings = _appSettings
             };
             ls.ShowDialog(this);
             LoadSettings();
@@ -674,7 +675,8 @@ namespace ProductDatabase {
         private void 銘版印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             CurrentSerialType = SerialType.Nameplate;
             PrintSettingsWindow ls = new() {
-                ProductMaster = _productMaster
+                ProductMaster = _productMaster,
+                AppSettings = _appSettings
             };
             ls.ShowDialog(this);
             LoadSettings();
