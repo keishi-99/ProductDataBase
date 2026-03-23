@@ -138,9 +138,7 @@ namespace ProductDatabase.Print {
                         var isSecondToLastCopy = CopiesRemainingPerSerial == 2;
 
                         // 両方Trueの場合は末尾2枚目→下線、それ以外は最終コピーのみ下線
-                        var fontUnderline = (_isUnderlinePrint && _isLast4Digits)
-                            ? isSecondToLastCopy
-                            : _isUnderlinePrint && isLastCopy;
+                        var fontUnderline = _isUnderlinePrint && (_isLast4Digits ? isSecondToLastCopy : isLastCopy);
 
                         var printText = _isLast4Digits && isLastCopy
                             ? Last4ProductModel
