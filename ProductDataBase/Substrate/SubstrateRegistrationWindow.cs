@@ -122,9 +122,9 @@ namespace ProductDatabase {
                 RegisterButton.Enabled = false;
 
                 if (!PrintOnlyCheckBox.Checked && isPrint) {
-                    if (!CheckDuplicate()) { return; }
+                    if (!await CheckDuplicate()) { return; }
                     using (var overlay = new LoadingOverlay(this)) {
-                        if (!Registration()) { return; }
+                        if (!await Task.Run(() => Registration())) { return; }
                     }
                 }
 
@@ -153,7 +153,7 @@ namespace ProductDatabase {
             }
         }
         // 入荷登録時に製番の重複を確認し、ユーザーがキャンセルした場合はfalseを返す
-        private bool CheckDuplicate() {
+        private async Task<bool> CheckDuplicate() {
             if (!IsRegistration || !QuantityCheckBox.Checked || DefectQuantityCheckBox.Checked) { return true; }
 
             var substrateNumber = _substrateRegisterWork.ProductNumber;
@@ -182,8 +182,8 @@ namespace ProductDatabase {
                 ;
                 """;
             using var con = new SqliteConnection(GetConnectionRegistration());
-            con.Open();
-            var result = con.QueryFirstOrDefault<SubstrateStockDto>(
+            await con.OpenAsync();
+            var result = await con.QueryFirstOrDefaultAsync<SubstrateStockDto>(
                 commandText,
                 new {
                     _substrateMaster.SubstrateID,
