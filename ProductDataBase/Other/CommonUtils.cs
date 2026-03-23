@@ -48,8 +48,8 @@ namespace ProductDatabase.Other {
         }
         // 月次CSVログファイルへの追記と共有フォルダへのコピーを管理するクラス
         public static class Logger {
-            private static readonly string s_logDirectory = Path.Combine(Environment.CurrentDirectory, "db", "logs");
-            private static readonly object s_lockObject = new();
+            private static readonly string _logDirectory = Path.Combine(Environment.CurrentDirectory, "db", "logs");
+            private static readonly object _lockObject = new();
 
             /// <summary>
             /// 作業ログを追記します。
@@ -57,13 +57,13 @@ namespace ProductDatabase.Other {
             /// <param name="message">記録する作業内容</param>
             public static void AppendLog(string[] message) {
                 try {
-                    lock (s_lockObject) {
-                        if (!Directory.Exists(s_logDirectory)) {
-                            Directory.CreateDirectory(s_logDirectory);
+                    lock (_lockObject) {
+                        if (!Directory.Exists(_logDirectory)) {
+                            Directory.CreateDirectory(_logDirectory);
                         }
 
                         var logFileName = $"log_{DateTime.Now:yyyyMM}.csv";
-                        var logFilePath = Path.Combine(s_logDirectory, logFileName);
+                        var logFilePath = Path.Combine(_logDirectory, logFileName);
 
                         var logEntry = $"\"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\",{string.Join(",", message.Select(m => $"\"{m.Replace("\"", "\"\"").Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ")}\""))}";
 
@@ -83,32 +83,32 @@ namespace ProductDatabase.Other {
         }
         // DBファイルのタイムスタンプ付きバックアップ作成と古いバックアップの自動削除を管理するクラス
         public static class BackupManager {
-            private static readonly string s_backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup");
-            private static readonly string s_originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
-            private static readonly int s_maxBackupFiles = 20;
-            private static readonly object s_lockObject = new();
+            private static readonly string _backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup");
+            private static readonly string _originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
+            private static readonly int _maxBackupFiles = 20;
+            private static readonly object _lockObject = new();
 
             /// <summary>
             /// バックアップを作成します。
             /// </summary>
             public static void CreateBackup() {
                 try {
-                    lock (s_lockObject) {
-                        if (!Directory.Exists(s_backupDirectory)) {
-                            Directory.CreateDirectory(s_backupDirectory);
+                    lock (_lockObject) {
+                        if (!Directory.Exists(_backupDirectory)) {
+                            Directory.CreateDirectory(_backupDirectory);
                         }
 
                         var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                         var backupFileName = $"ProductRegistry_{timestamp}.db";
-                        var backupFilePath = Path.Combine(s_backupDirectory, backupFileName);
+                        var backupFilePath = Path.Combine(_backupDirectory, backupFileName);
 
-                        CopyWithRetry(s_originalFilePath, backupFilePath, true);
+                        CopyWithRetry(_originalFilePath, backupFilePath, true);
                         ManageBackupFiles();
 
                         if (!string.IsNullOrEmpty(BackupPath)) {
                             var backupPath = Path.Combine(BackupPath, "db", "ProductRegistry.db");
                             if (Environment.CurrentDirectory != BackupPath) {
-                                CopyWithRetry(s_originalFilePath, backupPath, true);
+                                CopyWithRetry(_originalFilePath, backupPath, true);
                             }
                         }
 
@@ -123,11 +123,11 @@ namespace ProductDatabase.Other {
             /// </summary>
             private static void ManageBackupFiles() {
                 try {
-                    var backupFiles = Directory.GetFiles(s_backupDirectory, "ProductRegistry_*.db")
+                    var backupFiles = Directory.GetFiles(_backupDirectory, "ProductRegistry_*.db")
                         .OrderBy(File.GetCreationTime)
                         .ToList();
 
-                    while (backupFiles.Count > s_maxBackupFiles) {
+                    while (backupFiles.Count > _maxBackupFiles) {
                         var oldestFile = backupFiles.First();
                         DeleteWithRetry(oldestFile);
                         backupFiles.RemoveAt(0);

@@ -225,7 +225,7 @@ namespace ProductDatabase.MasterManagement {
             if (confirm != DialogResult.Yes) { return; }
 
             try {
-                _repository.DeleteProduct(productId);
+                ProductRepository.DeleteProduct(productId);
                 LoadData();
                 MessageBox.Show("削除しました。", string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
             } catch (InvalidOperationException ex) {
@@ -285,7 +285,7 @@ namespace ProductDatabase.MasterManagement {
             if (confirm != DialogResult.Yes) { return; }
 
             try {
-                _repository.DeleteSubstrate(substrateId);
+                ProductRepository.DeleteSubstrate(substrateId);
                 LoadData();
                 MessageBox.Show("削除しました。", string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
             } catch (InvalidOperationException ex) {

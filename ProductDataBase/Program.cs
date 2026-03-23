@@ -4,7 +4,7 @@ namespace ProductDatabase {
         ///  The main entry point for the application.
         /// </summary>
         ///
-        private static Mutex? s_mutex;
+        private static Mutex? _mutex;
         [STAThread]
         private static void Main() {
             // To customize application configuration such as set high DPI settings or default font,
@@ -12,7 +12,7 @@ namespace ProductDatabase {
             const string MutexName = "MyUniqueAppMutex"; // アプリケーション固有の名前を指定
 
             // ミューテックスを作成
-            s_mutex = new Mutex(true, MutexName, out var isNewInstance);
+            _mutex = new Mutex(true, MutexName, out var isNewInstance);
 
             if (!isNewInstance) {
                 // すでにインスタンスが存在する場合
@@ -39,7 +39,7 @@ namespace ProductDatabase {
             Application.Run(new MainWindow());
 
             // アプリケーション終了時にミューテックスを解放
-            s_mutex.ReleaseMutex();
+            _mutex.ReleaseMutex();
         }
     }
 }

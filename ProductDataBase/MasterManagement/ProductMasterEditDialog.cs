@@ -190,11 +190,11 @@ namespace ProductDatabase.MasterManagement {
 
                 long productId;
                 if (_isNewRecord) {
-                    productId = _repository.InsertProduct(_product);
+                    productId = ProductRepository.InsertProduct(_product);
                 }
                 else {
                     productId = _product.ProductID;
-                    _repository.UpdateProduct(_product);
+                    ProductRepository.UpdateProduct(_product);
                 }
 
                 // 使用基板の紐づけ更新（辞書から取得することでフィルター非表示のチェック済みも含める）
@@ -202,7 +202,7 @@ namespace ProductDatabase.MasterManagement {
                     .Where(kvp => kvp.Value)
                     .Select(kvp => kvp.Key)
                     .ToList();
-                _repository.UpdateProductUseSubstrates(productId, selectedSubstrateIds);
+                ProductRepository.UpdateProductUseSubstrates(productId, selectedSubstrateIds);
 
                 this.DialogResult = DialogResult.OK;
                 this.Close();
@@ -241,7 +241,7 @@ namespace ProductDatabase.MasterManagement {
             }
             // 製品型式の重複チェック
             long excludeId = _isNewRecord ? 0 : _product.ProductID;
-            if (_repository.ExistsProductModel(ProductModelTextBox.Text.Trim(), excludeId)) {
+            if (ProductRepository.ExistsProductModel(ProductModelTextBox.Text.Trim(), excludeId)) {
                 MessageBox.Show(
                     $"製品型式 [{ProductModelTextBox.Text.Trim()}] は既に登録されています。",
                     "重複エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
