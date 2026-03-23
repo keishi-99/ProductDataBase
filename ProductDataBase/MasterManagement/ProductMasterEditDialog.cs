@@ -239,16 +239,6 @@ namespace ProductDatabase.MasterManagement {
                 ProductTypeTextBox.Focus();
                 return false;
             }
-            // 製品型式の重複チェック
-            long excludeId = _isNewRecord ? 0 : _product.ProductID;
-            if (ProductRepository.ExistsProductModel(ProductModelTextBox.Text.Trim(), excludeId)) {
-                MessageBox.Show(
-                    $"製品型式 [{ProductModelTextBox.Text.Trim()}] は既に登録されています。",
-                    "重複エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                ProductModelTextBox.Focus();
-                return false;
-            }
-
             return true;
         }
 

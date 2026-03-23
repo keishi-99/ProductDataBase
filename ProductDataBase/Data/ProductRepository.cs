@@ -192,14 +192,6 @@ namespace ProductDatabase.Data {
                 new { ProductId = productId }) > 0;
         }
 
-        // ProductModelの重複を確認する（excludeIdは編集時に自身を除外するために使用）
-        public static bool ExistsProductModel(string productModel, long excludeId = 0) {
-            using var con = new SqliteConnection(GetConnectionRegistration());
-            return con.ExecuteScalar<int>(
-                $"SELECT COUNT(*) FROM {Constants.ProductTableName} WHERE ProductModel = @ProductModel AND ProductID != @ExcludeId",
-                new { ProductModel = productModel, ExcludeId = excludeId }) > 0;
-        }
-
         // 基板マスターを新規登録し採番されたSubstrateIDを返す
         public static long InsertSubstrate(SubstrateMaster substrate) {
             using var con = new SqliteConnection(GetConnectionRegistration());
