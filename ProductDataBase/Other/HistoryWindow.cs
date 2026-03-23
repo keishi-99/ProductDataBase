@@ -870,7 +870,7 @@ namespace ProductDatabase {
         }
 
         // 選択行の製品履歴を編集ダイアログで編集してDBに保存する
-        private void EditProductRecord() {
+        private async Task EditProductRecord() {
             if (DataBaseDataGridView.CurrentCell is null) { return; }
             var rowIndex = DataBaseDataGridView.CurrentCell.RowIndex;
             if (rowIndex < 0) { return; }
@@ -884,42 +884,48 @@ namespace ProductDatabase {
             if (dgvRow.DataBoundItem is not DataRowView drv) { return; }
             var row = drv.Row;
 
+            // UIスレッドでDataRowの変更を記録（Task.Run前に実施）
+            row.BeginEdit();
+            row["OrderNumber"] = dialog.OrderNumber;
+            row["ProductNumber"] = dialog.ProductNumber;
+            row["OLesNumber"] = dialog.OLesNumber;
+            row["Person"] = dialog.Person;
+            row["Comment"] = dialog.Comment;
+            row.EndEdit();
+
             List<string[]> pendingLogs = [];
-            try {
-                using var con = new SqliteConnection(GetConnectionRegistration());
-                con.Open();
-                using var tx = con.BeginTransaction();
+            using (var overlay = new LoadingOverlay(this)) {
+                try {
+                    // DB操作をバックグラウンドスレッドで実行
+                    await Task.Run(() => {
+                        using var con = new SqliteConnection(GetConnectionRegistration());
+                        con.Open();
+                        using var tx = con.BeginTransaction();
 
-                row.BeginEdit();
-                row["OrderNumber"] = dialog.OrderNumber;
-                row["ProductNumber"] = dialog.ProductNumber;
-                row["OLesNumber"] = dialog.OLesNumber;
-                row["Person"] = dialog.Person;
-                row["Comment"] = dialog.Comment;
-                row.EndEdit();
+                        // Original=変更前, Current=変更後
+                        LogProductEdit(row, pendingLogs);
+                        UpdateProductRow(con, row, tx);
 
-                // Original=変更前, Current=変更後
-                LogProductEdit(row, pendingLogs);
-                UpdateProductRow(con, row, tx);
+                        CommonUtils.BackupManager.CreateBackup();
+                        tx.Commit();
 
-                CommonUtils.BackupManager.CreateBackup();
-                tx.Commit();
+                        foreach (var log in pendingLogs) {
+                            CommonUtils.Logger.AppendLog(log);
+                        }
+                    });
 
-                foreach (var log in pendingLogs) {
-                    CommonUtils.Logger.AppendLog(log);
+                    RefreshCurrentView();
+
+                } catch (Exception ex) {
+                    // エラー時はDataRow変更を取り消す（UIスレッドで実施）
+                    row.RejectChanges();
+                    MessageBox.Show(ex.Message, "編集エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-                RefreshCurrentView();
-
-            } catch (Exception ex) {
-                // エラー時はDataRow変更を取り消す
-                row.RejectChanges();
-                MessageBox.Show(ex.Message, "編集エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         // 選択行をまとめて削除する（Substrate/Product/Serial対応、複数行選択可）
-        private void DeleteSelectedRows() {
+        private async Task DeleteSelectedRows() {
             // 選択行の収集（SelectedRowsが空の場合はCurrentCellの行を使用）
             var rowsToDelete = new List<DataRow>();
             var selectedRows = DataBaseDataGridView.SelectedRows;
@@ -942,48 +948,55 @@ namespace ProductDatabase {
                 "削除確認", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (result != DialogResult.Yes) { return; }
 
+            // Task.Run でキャプチャするため変数をローカルにコピー
+            var tableName = _tableName;
             List<string[]> pendingLogs = [];
-            try {
-                using var con = new SqliteConnection(GetConnectionRegistration());
-                con.Open();
-                using var tx = con.BeginTransaction();
+            using (var overlay = new LoadingOverlay(this)) {
+                try {
+                    // DB操作をバックグラウンドスレッドで実行
+                    await Task.Run(() => {
+                        using var con = new SqliteConnection(GetConnectionRegistration());
+                        con.Open();
+                        using var tx = con.BeginTransaction();
 
-                switch (_tableName) {
-                    case "Substrate":
-                        foreach (var row in rowsToDelete) {
-                            LogSubstrateDelete(row, pendingLogs);
-                            DeleteSubstrateRow(con, row, tx);
+                        switch (tableName) {
+                            case "Substrate":
+                                foreach (var row in rowsToDelete) {
+                                    LogSubstrateDelete(row, pendingLogs);
+                                    DeleteSubstrateRow(con, row, tx);
+                                }
+                                break;
+                            case "Product":
+                                foreach (var row in rowsToDelete) {
+                                    LogProductDelete(row, pendingLogs);
+                                    LogProductSubstrateDelete(con, row, pendingLogs, tx);
+                                    LogProductSerialDelete(con, row, pendingLogs, tx);
+                                    DeleteProductRow(con, row, tx);
+                                    DeleteProductSubstrateRow(con, row, tx);
+                                    DeleteProductSerialRow(con, row, tx);
+                                }
+                                break;
+                            case "Serial":
+                                foreach (var row in rowsToDelete) {
+                                    LogSerialDelete(row, pendingLogs);
+                                    DeleteSerialRow(con, row, tx);
+                                }
+                                break;
                         }
-                        break;
-                    case "Product":
-                        foreach (var row in rowsToDelete) {
-                            LogProductDelete(row, pendingLogs);
-                            LogProductSubstrateDelete(con, row, pendingLogs, tx);
-                            LogProductSerialDelete(con, row, pendingLogs, tx);
-                            DeleteProductRow(con, row, tx);
-                            DeleteProductSubstrateRow(con, row, tx);
-                            DeleteProductSerialRow(con, row, tx);
+
+                        CommonUtils.BackupManager.CreateBackup();
+                        tx.Commit();
+
+                        foreach (var log in pendingLogs) {
+                            CommonUtils.Logger.AppendLog(log);
                         }
-                        break;
-                    case "Serial":
-                        foreach (var row in rowsToDelete) {
-                            LogSerialDelete(row, pendingLogs);
-                            DeleteSerialRow(con, row, tx);
-                        }
-                        break;
+                    });
+
+                    RefreshCurrentView();
+
+                } catch (Exception ex) {
+                    MessageBox.Show(ex.Message, "削除エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-                CommonUtils.BackupManager.CreateBackup();
-                tx.Commit();
-
-                foreach (var log in pendingLogs) {
-                    CommonUtils.Logger.AppendLog(log);
-                }
-
-                RefreshCurrentView();
-
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "削除エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -1318,8 +1331,8 @@ namespace ProductDatabase {
         private void HistoryWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void 編集開始ToolStripMenuItem_Click(object sender, EventArgs e) { EnterEditMode(); }
         private void 編集終了ToolStripMenuItem_Click(object sender, EventArgs e) { ExitEditMode(); }
-        private void EditContextMenuItem_Click(object sender, EventArgs e) { EditProductRecord(); }
-        private void DeleteContextMenuItem_Click(object sender, EventArgs e) { DeleteSelectedRows(); }
+        private async void EditContextMenuItem_Click(object sender, EventArgs e) { await EditProductRecord(); }
+        private async void DeleteContextMenuItem_Click(object sender, EventArgs e) { await DeleteSelectedRows(); }
         private void 在庫調整ToolStripMenuItem_Click(object sender, EventArgs e) { InventoryAdjustment(); }
         private void ShowUsedSubstrateButton_Click(object sender, EventArgs e) { ShowUsedSubstrateDetails(); }
         private async void GenerateReportButton_Click(object sender, EventArgs e) { await GenerateReport(); }
