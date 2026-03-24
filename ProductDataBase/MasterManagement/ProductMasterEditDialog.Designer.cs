@@ -21,10 +21,10 @@ namespace ProductDatabase.MasterManagement {
             this.ProductModelTextBox = new TextBox();
             this.ProductTypeLabel = new Label();
             this.ProductTypeTextBox = new TextBox();
-            this.InitialLabel = new Label();
-            this.InitialTextBox = new TextBox();
             this.VisibleLabel = new Label();
             this.VisibleCheckBox = new CheckBox();
+            this.InitialLabel = new Label();
+            this.InitialTextBox = new TextBox();
             this.SerialGroupBox = new GroupBox();
             this.RegTypeLabel = new Label();
             this.RegTypeComboBox = new ComboBox();
@@ -47,11 +47,11 @@ namespace ProductDatabase.MasterManagement {
             this.CheckBinCheckBox3 = new CheckBox();
             this.CheckBinCheckBox4 = new CheckBox();
             this.CheckBinCheckBox5 = new CheckBox();
-            this.CheckBinCheckBox6 = new CheckBox();
             this.CheckBinCheckBox7 = new CheckBox();
+            this.CheckBinCheckBox10 = new CheckBox();
             this.CheckBinCheckBox8 = new CheckBox();
             this.CheckBinCheckBox9 = new CheckBox();
-            this.CheckBinCheckBox10 = new CheckBox();
+            this.CheckBinCheckBox6 = new CheckBox();
             this.UseSubstrateGroupBox = new GroupBox();
             this.SubstrateProductNameFilterLabel = new Label();
             this.SubstrateProductNameFilterTextBox = new TextBox();
@@ -78,13 +78,11 @@ namespace ProductDatabase.MasterManagement {
             this.BasicInfoGroupBox.Controls.Add(this.ProductModelTextBox);
             this.BasicInfoGroupBox.Controls.Add(this.ProductTypeLabel);
             this.BasicInfoGroupBox.Controls.Add(this.ProductTypeTextBox);
-            this.BasicInfoGroupBox.Controls.Add(this.InitialLabel);
-            this.BasicInfoGroupBox.Controls.Add(this.InitialTextBox);
             this.BasicInfoGroupBox.Controls.Add(this.VisibleLabel);
             this.BasicInfoGroupBox.Controls.Add(this.VisibleCheckBox);
             this.BasicInfoGroupBox.Location = new Point(12, 12);
             this.BasicInfoGroupBox.Name = "BasicInfoGroupBox";
-            this.BasicInfoGroupBox.Size = new Size(736, 201);
+            this.BasicInfoGroupBox.Size = new Size(415, 175);
             this.BasicInfoGroupBox.TabIndex = 0;
             this.BasicInfoGroupBox.TabStop = false;
             this.BasicInfoGroupBox.Text = "基本情報";
@@ -102,7 +100,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             this.CategoryNameTextBox.Location = new Point(130, 27);
             this.CategoryNameTextBox.Name = "CategoryNameTextBox";
-            this.CategoryNameTextBox.Size = new Size(590, 23);
+            this.CategoryNameTextBox.Size = new Size(250, 23);
             this.CategoryNameTextBox.TabIndex = 0;
             // 
             // ProductNameLabel
@@ -118,7 +116,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             this.ProductNameTextBox.Location = new Point(130, 57);
             this.ProductNameTextBox.Name = "ProductNameTextBox";
-            this.ProductNameTextBox.Size = new Size(590, 23);
+            this.ProductNameTextBox.Size = new Size(250, 23);
             this.ProductNameTextBox.TabIndex = 1;
             // 
             // ProductModelLabel
@@ -134,7 +132,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             this.ProductModelTextBox.Location = new Point(130, 87);
             this.ProductModelTextBox.Name = "ProductModelTextBox";
-            this.ProductModelTextBox.Size = new Size(590, 23);
+            this.ProductModelTextBox.Size = new Size(250, 23);
             this.ProductModelTextBox.TabIndex = 2;
             // 
             // ProductTypeLabel
@@ -150,29 +148,13 @@ namespace ProductDatabase.MasterManagement {
             // 
             this.ProductTypeTextBox.Location = new Point(130, 117);
             this.ProductTypeTextBox.Name = "ProductTypeTextBox";
-            this.ProductTypeTextBox.Size = new Size(590, 23);
+            this.ProductTypeTextBox.Size = new Size(250, 23);
             this.ProductTypeTextBox.TabIndex = 3;
-            // 
-            // InitialLabel
-            // 
-            this.InitialLabel.AutoSize = true;
-            this.InitialLabel.Location = new Point(8, 150);
-            this.InitialLabel.Name = "InitialLabel";
-            this.InitialLabel.Size = new Size(96, 15);
-            this.InitialLabel.TabIndex = 4;
-            this.InitialLabel.Text = "シリアル接頭文字:";
-            // 
-            // InitialTextBox
-            // 
-            this.InitialTextBox.Location = new Point(130, 147);
-            this.InitialTextBox.Name = "InitialTextBox";
-            this.InitialTextBox.Size = new Size(200, 23);
-            this.InitialTextBox.TabIndex = 4;
             // 
             // VisibleLabel
             // 
             this.VisibleLabel.AutoSize = true;
-            this.VisibleLabel.Location = new Point(8, 180);
+            this.VisibleLabel.Location = new Point(8, 148);
             this.VisibleLabel.Name = "VisibleLabel";
             this.VisibleLabel.Size = new Size(61, 15);
             this.VisibleLabel.TabIndex = 5;
@@ -181,11 +163,27 @@ namespace ProductDatabase.MasterManagement {
             // VisibleCheckBox
             // 
             this.VisibleCheckBox.AutoSize = true;
-            this.VisibleCheckBox.Location = new Point(130, 178);
+            this.VisibleCheckBox.Location = new Point(130, 146);
             this.VisibleCheckBox.Name = "VisibleCheckBox";
             this.VisibleCheckBox.Size = new Size(69, 19);
             this.VisibleCheckBox.TabIndex = 5;
             this.VisibleCheckBox.Text = "表示する";
+            // 
+            // InitialLabel
+            // 
+            this.InitialLabel.AutoSize = true;
+            this.InitialLabel.Location = new Point(8, 123);
+            this.InitialLabel.Name = "InitialLabel";
+            this.InitialLabel.Size = new Size(96, 15);
+            this.InitialLabel.TabIndex = 4;
+            this.InitialLabel.Text = "シリアル接頭文字:";
+            // 
+            // InitialTextBox
+            // 
+            this.InitialTextBox.Location = new Point(130, 120);
+            this.InitialTextBox.Name = "InitialTextBox";
+            this.InitialTextBox.Size = new Size(80, 23);
+            this.InitialTextBox.TabIndex = 4;
             // 
             // SerialGroupBox
             // 
@@ -195,9 +193,11 @@ namespace ProductDatabase.MasterManagement {
             this.SerialGroupBox.Controls.Add(this.SerialTypeComboBox);
             this.SerialGroupBox.Controls.Add(this.RevisionGroupLabel);
             this.SerialGroupBox.Controls.Add(this.RevisionGroupNumericUpDown);
-            this.SerialGroupBox.Location = new Point(12, 219);
+            this.SerialGroupBox.Controls.Add(this.InitialLabel);
+            this.SerialGroupBox.Controls.Add(this.InitialTextBox);
+            this.SerialGroupBox.Location = new Point(12, 193);
             this.SerialGroupBox.Name = "SerialGroupBox";
-            this.SerialGroupBox.Size = new Size(736, 128);
+            this.SerialGroupBox.Size = new Size(415, 154);
             this.SerialGroupBox.TabIndex = 1;
             this.SerialGroupBox.TabStop = false;
             this.SerialGroupBox.Text = "シリアル設定";
@@ -264,64 +264,71 @@ namespace ProductDatabase.MasterManagement {
             this.PrintGroupBox.Controls.Add(this.ListPrintCheckBox);
             this.PrintGroupBox.Location = new Point(12, 353);
             this.PrintGroupBox.Name = "PrintGroupBox";
-            this.PrintGroupBox.Size = new Size(736, 111);
+            this.PrintGroupBox.Size = new Size(415, 101);
             this.PrintGroupBox.TabIndex = 2;
             this.PrintGroupBox.TabStop = false;
             this.PrintGroupBox.Text = "印刷設定";
             // 
             // LabelPrintCheckBox
             // 
+            this.LabelPrintCheckBox.AutoSize = true;
             this.LabelPrintCheckBox.Location = new Point(6, 22);
             this.LabelPrintCheckBox.Name = "LabelPrintCheckBox";
-            this.LabelPrintCheckBox.Size = new Size(140, 22);
+            this.LabelPrintCheckBox.Size = new Size(54, 19);
             this.LabelPrintCheckBox.TabIndex = 10;
             this.LabelPrintCheckBox.Text = "ラベル";
             // 
             // BarcodePrintCheckBox
             // 
+            this.BarcodePrintCheckBox.AutoSize = true;
             this.BarcodePrintCheckBox.Location = new Point(152, 22);
             this.BarcodePrintCheckBox.Name = "BarcodePrintCheckBox";
-            this.BarcodePrintCheckBox.Size = new Size(140, 22);
+            this.BarcodePrintCheckBox.Size = new Size(72, 19);
             this.BarcodePrintCheckBox.TabIndex = 11;
             this.BarcodePrintCheckBox.Text = "バーコード";
             // 
             // NameplatePrintCheckBox
             // 
+            this.NameplatePrintCheckBox.AutoSize = true;
             this.NameplatePrintCheckBox.Location = new Point(298, 22);
             this.NameplatePrintCheckBox.Name = "NameplatePrintCheckBox";
-            this.NameplatePrintCheckBox.Size = new Size(140, 22);
+            this.NameplatePrintCheckBox.Size = new Size(50, 19);
             this.NameplatePrintCheckBox.TabIndex = 12;
             this.NameplatePrintCheckBox.Text = "銘板";
             // 
             // UnderlinePrintCheckBox
             // 
-            this.UnderlinePrintCheckBox.Location = new Point(6, 52);
+            this.UnderlinePrintCheckBox.AutoSize = true;
+            this.UnderlinePrintCheckBox.Location = new Point(6, 47);
             this.UnderlinePrintCheckBox.Name = "UnderlinePrintCheckBox";
-            this.UnderlinePrintCheckBox.Size = new Size(140, 22);
+            this.UnderlinePrintCheckBox.Size = new Size(107, 19);
             this.UnderlinePrintCheckBox.TabIndex = 13;
             this.UnderlinePrintCheckBox.Text = "下線付きシリアル";
             // 
             // Last4DigitsPrintCheckBox
             // 
-            this.Last4DigitsPrintCheckBox.Location = new Point(152, 52);
+            this.Last4DigitsPrintCheckBox.AutoSize = true;
+            this.Last4DigitsPrintCheckBox.Location = new Point(152, 47);
             this.Last4DigitsPrintCheckBox.Name = "Last4DigitsPrintCheckBox";
-            this.Last4DigitsPrintCheckBox.Size = new Size(140, 22);
+            this.Last4DigitsPrintCheckBox.Size = new Size(93, 19);
             this.Last4DigitsPrintCheckBox.TabIndex = 14;
             this.Last4DigitsPrintCheckBox.Text = "型式末尾4桁";
             // 
             // CheckSheetPrintCheckBox
             // 
-            this.CheckSheetPrintCheckBox.Location = new Point(6, 80);
+            this.CheckSheetPrintCheckBox.AutoSize = true;
+            this.CheckSheetPrintCheckBox.Location = new Point(6, 72);
             this.CheckSheetPrintCheckBox.Name = "CheckSheetPrintCheckBox";
-            this.CheckSheetPrintCheckBox.Size = new Size(140, 22);
+            this.CheckSheetPrintCheckBox.Size = new Size(85, 19);
             this.CheckSheetPrintCheckBox.TabIndex = 15;
             this.CheckSheetPrintCheckBox.Text = "チェックシート";
             // 
             // ListPrintCheckBox
             // 
-            this.ListPrintCheckBox.Location = new Point(152, 80);
+            this.ListPrintCheckBox.AutoSize = true;
+            this.ListPrintCheckBox.Location = new Point(152, 72);
             this.ListPrintCheckBox.Name = "ListPrintCheckBox";
-            this.ListPrintCheckBox.Size = new Size(140, 22);
+            this.ListPrintCheckBox.Size = new Size(50, 19);
             this.ListPrintCheckBox.TabIndex = 16;
             this.ListPrintCheckBox.Text = "リスト";
             // 
@@ -333,105 +340,116 @@ namespace ProductDatabase.MasterManagement {
             this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox3);
             this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox4);
             this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox5);
-            this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox6);
             this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox7);
+            this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox10);
             this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox8);
             this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox9);
-            this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox10);
-            this.CheckBinGroupBox.Location = new Point(12, 470);
+            this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox6);
+            this.CheckBinGroupBox.Location = new Point(12, 460);
             this.CheckBinGroupBox.Name = "CheckBinGroupBox";
-            this.CheckBinGroupBox.Size = new Size(736, 82);
+            this.CheckBinGroupBox.Size = new Size(415, 146);
             this.CheckBinGroupBox.TabIndex = 3;
             this.CheckBinGroupBox.TabStop = false;
             this.CheckBinGroupBox.Text = "登録フォーム表示項目";
             // 
             // CheckBinCheckBox0
             // 
-            this.CheckBinCheckBox0.Location = new Point(8, 24);
+            this.CheckBinCheckBox0.AutoSize = true;
+            this.CheckBinCheckBox0.Location = new Point(6, 22);
             this.CheckBinCheckBox0.Name = "CheckBinCheckBox0";
-            this.CheckBinCheckBox0.Size = new Size(118, 22);
+            this.CheckBinCheckBox0.Size = new Size(74, 19);
             this.CheckBinCheckBox0.TabIndex = 17;
             this.CheckBinCheckBox0.Text = "注文番号";
             // 
             // CheckBinCheckBox1
             // 
-            this.CheckBinCheckBox1.Location = new Point(128, 24);
+            this.CheckBinCheckBox1.AutoSize = true;
+            this.CheckBinCheckBox1.Location = new Point(6, 47);
             this.CheckBinCheckBox1.Name = "CheckBinCheckBox1";
-            this.CheckBinCheckBox1.Size = new Size(118, 22);
+            this.CheckBinCheckBox1.Size = new Size(74, 19);
             this.CheckBinCheckBox1.TabIndex = 18;
             this.CheckBinCheckBox1.Text = "製造番号";
             // 
             // CheckBinCheckBox2
             // 
-            this.CheckBinCheckBox2.Location = new Point(248, 24);
+            this.CheckBinCheckBox2.AutoSize = true;
+            this.CheckBinCheckBox2.Location = new Point(6, 72);
             this.CheckBinCheckBox2.Name = "CheckBinCheckBox2";
-            this.CheckBinCheckBox2.Size = new Size(118, 22);
+            this.CheckBinCheckBox2.Size = new Size(50, 19);
             this.CheckBinCheckBox2.TabIndex = 19;
             this.CheckBinCheckBox2.Text = "数量";
             // 
             // CheckBinCheckBox3
             // 
-            this.CheckBinCheckBox3.Location = new Point(368, 24);
+            this.CheckBinCheckBox3.AutoSize = true;
+            this.CheckBinCheckBox3.Location = new Point(6, 97);
             this.CheckBinCheckBox3.Name = "CheckBinCheckBox3";
-            this.CheckBinCheckBox3.Size = new Size(118, 22);
+            this.CheckBinCheckBox3.Size = new Size(110, 19);
             this.CheckBinCheckBox3.TabIndex = 20;
             this.CheckBinCheckBox3.Text = "先頭シリアル番号";
             // 
             // CheckBinCheckBox4
             // 
-            this.CheckBinCheckBox4.Location = new Point(488, 24);
+            this.CheckBinCheckBox4.AutoSize = true;
+            this.CheckBinCheckBox4.Location = new Point(6, 122);
             this.CheckBinCheckBox4.Name = "CheckBinCheckBox4";
-            this.CheckBinCheckBox4.Size = new Size(118, 22);
+            this.CheckBinCheckBox4.Size = new Size(66, 19);
             this.CheckBinCheckBox4.TabIndex = 21;
             this.CheckBinCheckBox4.Text = "リビジョン";
             // 
             // CheckBinCheckBox5
             // 
-            this.CheckBinCheckBox5.Location = new Point(608, 24);
+            this.CheckBinCheckBox5.AutoSize = true;
+            this.CheckBinCheckBox5.Location = new Point(152, 22);
             this.CheckBinCheckBox5.Name = "CheckBinCheckBox5";
-            this.CheckBinCheckBox5.Size = new Size(118, 22);
+            this.CheckBinCheckBox5.Size = new Size(50, 19);
             this.CheckBinCheckBox5.TabIndex = 22;
             this.CheckBinCheckBox5.Text = "予備";
             // 
-            // CheckBinCheckBox6
-            // 
-            this.CheckBinCheckBox6.Location = new Point(8, 50);
-            this.CheckBinCheckBox6.Name = "CheckBinCheckBox6";
-            this.CheckBinCheckBox6.Size = new Size(118, 22);
-            this.CheckBinCheckBox6.TabIndex = 23;
-            this.CheckBinCheckBox6.Text = "OLes番号";
-            // 
             // CheckBinCheckBox7
             // 
-            this.CheckBinCheckBox7.Location = new Point(128, 50);
+            this.CheckBinCheckBox7.AutoSize = true;
+            this.CheckBinCheckBox7.Location = new Point(152, 72);
             this.CheckBinCheckBox7.Name = "CheckBinCheckBox7";
-            this.CheckBinCheckBox7.Size = new Size(118, 22);
+            this.CheckBinCheckBox7.Size = new Size(50, 19);
             this.CheckBinCheckBox7.TabIndex = 24;
             this.CheckBinCheckBox7.Text = "予備";
             // 
+            // CheckBinCheckBox10
+            // 
+            this.CheckBinCheckBox10.AutoSize = true;
+            this.CheckBinCheckBox10.Location = new Point(298, 22);
+            this.CheckBinCheckBox10.Name = "CheckBinCheckBox10";
+            this.CheckBinCheckBox10.Size = new Size(59, 19);
+            this.CheckBinCheckBox10.TabIndex = 27;
+            this.CheckBinCheckBox10.Text = "コメント";
+            // 
             // CheckBinCheckBox8
             // 
-            this.CheckBinCheckBox8.Location = new Point(248, 50);
+            this.CheckBinCheckBox8.AutoSize = true;
+            this.CheckBinCheckBox8.Location = new Point(152, 97);
             this.CheckBinCheckBox8.Name = "CheckBinCheckBox8";
-            this.CheckBinCheckBox8.Size = new Size(118, 22);
+            this.CheckBinCheckBox8.Size = new Size(62, 19);
             this.CheckBinCheckBox8.TabIndex = 25;
             this.CheckBinCheckBox8.Text = "登録日";
             // 
             // CheckBinCheckBox9
             // 
-            this.CheckBinCheckBox9.Location = new Point(368, 50);
+            this.CheckBinCheckBox9.AutoSize = true;
+            this.CheckBinCheckBox9.Location = new Point(152, 122);
             this.CheckBinCheckBox9.Name = "CheckBinCheckBox9";
-            this.CheckBinCheckBox9.Size = new Size(118, 22);
+            this.CheckBinCheckBox9.Size = new Size(62, 19);
             this.CheckBinCheckBox9.TabIndex = 26;
             this.CheckBinCheckBox9.Text = "担当者";
             // 
-            // CheckBinCheckBox10
+            // CheckBinCheckBox6
             // 
-            this.CheckBinCheckBox10.Location = new Point(488, 50);
-            this.CheckBinCheckBox10.Name = "CheckBinCheckBox10";
-            this.CheckBinCheckBox10.Size = new Size(118, 22);
-            this.CheckBinCheckBox10.TabIndex = 27;
-            this.CheckBinCheckBox10.Text = "コメント";
+            this.CheckBinCheckBox6.AutoSize = true;
+            this.CheckBinCheckBox6.Location = new Point(152, 47);
+            this.CheckBinCheckBox6.Name = "CheckBinCheckBox6";
+            this.CheckBinCheckBox6.Size = new Size(79, 19);
+            this.CheckBinCheckBox6.TabIndex = 23;
+            this.CheckBinCheckBox6.Text = "OLes番号";
             // 
             // UseSubstrateGroupBox
             // 
@@ -440,9 +458,9 @@ namespace ProductDatabase.MasterManagement {
             this.UseSubstrateGroupBox.Controls.Add(this.SubstrateModelFilterLabel);
             this.UseSubstrateGroupBox.Controls.Add(this.SubstrateModelFilterTextBox);
             this.UseSubstrateGroupBox.Controls.Add(this.SubstrateCheckedListBox);
-            this.UseSubstrateGroupBox.Location = new Point(12, 558);
+            this.UseSubstrateGroupBox.Location = new Point(444, 12);
             this.UseSubstrateGroupBox.Name = "UseSubstrateGroupBox";
-            this.UseSubstrateGroupBox.Size = new Size(736, 250);
+            this.UseSubstrateGroupBox.Size = new Size(464, 594);
             this.UseSubstrateGroupBox.TabIndex = 4;
             this.UseSubstrateGroupBox.TabStop = false;
             this.UseSubstrateGroupBox.Text = "使用基板（M_ProductUseSubstrate）";
@@ -450,7 +468,7 @@ namespace ProductDatabase.MasterManagement {
             // SubstrateProductNameFilterLabel
             // 
             this.SubstrateProductNameFilterLabel.AutoSize = true;
-            this.SubstrateProductNameFilterLabel.Location = new Point(8, 27);
+            this.SubstrateProductNameFilterLabel.Location = new Point(6, 30);
             this.SubstrateProductNameFilterLabel.Name = "SubstrateProductNameFilterLabel";
             this.SubstrateProductNameFilterLabel.Size = new Size(48, 15);
             this.SubstrateProductNameFilterLabel.TabIndex = 0;
@@ -458,7 +476,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             // SubstrateProductNameFilterTextBox
             // 
-            this.SubstrateProductNameFilterTextBox.Location = new Point(56, 23);
+            this.SubstrateProductNameFilterTextBox.Location = new Point(78, 22);
             this.SubstrateProductNameFilterTextBox.Name = "SubstrateProductNameFilterTextBox";
             this.SubstrateProductNameFilterTextBox.Size = new Size(200, 23);
             this.SubstrateProductNameFilterTextBox.TabIndex = 0;
@@ -467,7 +485,7 @@ namespace ProductDatabase.MasterManagement {
             // SubstrateModelFilterLabel
             // 
             this.SubstrateModelFilterLabel.AutoSize = true;
-            this.SubstrateModelFilterLabel.Location = new Point(268, 27);
+            this.SubstrateModelFilterLabel.Location = new Point(6, 60);
             this.SubstrateModelFilterLabel.Name = "SubstrateModelFilterLabel";
             this.SubstrateModelFilterLabel.Size = new Size(60, 15);
             this.SubstrateModelFilterLabel.TabIndex = 1;
@@ -475,7 +493,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             // SubstrateModelFilterTextBox
             // 
-            this.SubstrateModelFilterTextBox.Location = new Point(332, 23);
+            this.SubstrateModelFilterTextBox.Location = new Point(78, 52);
             this.SubstrateModelFilterTextBox.Name = "SubstrateModelFilterTextBox";
             this.SubstrateModelFilterTextBox.Size = new Size(200, 23);
             this.SubstrateModelFilterTextBox.TabIndex = 1;
@@ -484,15 +502,15 @@ namespace ProductDatabase.MasterManagement {
             // SubstrateCheckedListBox
             // 
             this.SubstrateCheckedListBox.CheckOnClick = true;
-            this.SubstrateCheckedListBox.Location = new Point(8, 77);
+            this.SubstrateCheckedListBox.Location = new Point(6, 92);
             this.SubstrateCheckedListBox.Name = "SubstrateCheckedListBox";
-            this.SubstrateCheckedListBox.Size = new Size(718, 148);
+            this.SubstrateCheckedListBox.Size = new Size(452, 490);
             this.SubstrateCheckedListBox.TabIndex = 28;
             this.SubstrateCheckedListBox.ItemCheck += this.SubstrateCheckedListBox_ItemCheck;
             // 
             // SaveButton
             // 
-            this.SaveButton.Location = new Point(538, 814);
+            this.SaveButton.Location = new Point(349, 612);
             this.SaveButton.Name = "SaveButton";
             this.SaveButton.Size = new Size(100, 35);
             this.SaveButton.TabIndex = 29;
@@ -502,7 +520,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             // DialogCancelButton
             // 
-            this.DialogCancelButton.Location = new Point(648, 814);
+            this.DialogCancelButton.Location = new Point(459, 612);
             this.DialogCancelButton.Name = "DialogCancelButton";
             this.DialogCancelButton.Size = new Size(100, 35);
             this.DialogCancelButton.TabIndex = 30;
@@ -514,7 +532,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(760, 861);
+            this.ClientSize = new Size(922, 652);
             this.Controls.Add(this.BasicInfoGroupBox);
             this.Controls.Add(this.SerialGroupBox);
             this.Controls.Add(this.PrintGroupBox);
@@ -536,7 +554,9 @@ namespace ProductDatabase.MasterManagement {
             this.SerialGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)this.RevisionGroupNumericUpDown).EndInit();
             this.PrintGroupBox.ResumeLayout(false);
+            this.PrintGroupBox.PerformLayout();
             this.CheckBinGroupBox.ResumeLayout(false);
+            this.CheckBinGroupBox.PerformLayout();
             this.UseSubstrateGroupBox.ResumeLayout(false);
             this.UseSubstrateGroupBox.PerformLayout();
             this.ResumeLayout(false);
