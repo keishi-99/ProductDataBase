@@ -932,8 +932,11 @@ namespace ProductDatabase {
         // シリアルコードと日付情報からテキストフォーマットに従ってラベル印字コードを生成する
         // type を指定した場合はそのタイプのフォーマットを使用する（null の場合は CurrentSerialType を使用）
         private string GenerateCode(int serialCode, SerialType? type = null) {
-            var monthCode = DateTime.Parse(_productRegisterWork.RegDate).ToString("MM");
+            var regDate = DateTime.TryParse(_productRegisterWork.RegDate, out var parsedDate)
+                ? parsedDate
+                : DateTime.Today;
 
+            var monthCode = regDate.ToString("MM");
             monthCode = monthCode switch {
                 "10" => "X",
                 "11" => "Y",
@@ -948,8 +951,6 @@ namespace ProductDatabase {
                 SerialType.Nameplate => NameplatePrintSettings.TextFormat ?? string.Empty,
                 _ => string.Empty
             };
-
-            var regDate = DateTime.Parse(_productRegisterWork.RegDate);
 
             var map = new Dictionary<string, string> {
                 ["{T}"] = _productMaster.Initial,
