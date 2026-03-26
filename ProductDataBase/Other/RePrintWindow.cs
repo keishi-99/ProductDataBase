@@ -21,7 +21,6 @@ namespace ProductDatabase {
         private readonly ProductRegisterWork _productRegisterWork;
         private readonly AppSettings _appSettings;
 
-        private readonly List<string> _serialList = [];
         private readonly List<string> _checkBoxNames = [
                     "OrderNumberCheckBox", "ManufacturingNumberCheckBox", "QuantityCheckBox",  "FirstSerialNumberCheckBox",
                     "RevisionCheckBox", "ExtraCheckBox1", "ExtraCheckBox2", "ExtraCheckBox3", "RegistrationDateCheckBox",
@@ -141,12 +140,14 @@ namespace ProductDatabase {
                 if (!Registration()) { throw new Exception("登録できませんでした。"); }
             }
 
+            var printList = GenerateSerialListForType(CurrentSerialType);
+
             switch (CurrentSerialType) {
                 case SerialType.Nameplate:
-                    PrintManager.PrintUsingBPac(NameplatePrintSettings, _serialList);
+                    PrintManager.PrintUsingBPac(NameplatePrintSettings, printList);
                     break;
                 default:
-                    if (!await Print(isPrint)) {
+                    if (!await Print(isPrint, printList)) {
                         MessageBox.Show("キャンセルしました。");
                         return;
                     }
@@ -313,19 +314,13 @@ namespace ProductDatabase {
             _productRegisterWork.SerialFirstNumber = firstSerial;
             _productRegisterWork.SerialLastNumber = _productRegisterWork.SerialFirstNumber + _productRegisterWork.Quantity - 1;
 
-            _serialList.Clear();
-
-            for (var i = 0; i < quantity; i++) {
-                _serialList.Add(GenerateCode(_productRegisterWork.SerialFirstNumber + i));
-            }
-
             _productRegisterWork.SerialFirst = GenerateCode(_productRegisterWork.SerialFirstNumber);
             _productRegisterWork.SerialLast = GenerateCode(_productRegisterWork.SerialLastNumber);
             return true;
         }
 
         // isPrintがtrueなら印刷ダイアログ経由で印刷しfalseならプレビューを表示する
-        private async Task<bool> Print(bool isPrint) {
+        private async Task<bool> Print(bool isPrint, List<string> serialList) {
             try {
                 using System.Drawing.Printing.PrintDocument pd = new();
                 var isPreview = !isPrint;
@@ -333,7 +328,7 @@ namespace ProductDatabase {
                 var startLine = (int)PrintPositionNumericUpDown.Value - 1;
 
                 pd.BeginPrint += (sender, e) => {
-                    PrintManager.ProductInitialize(_productMaster, _productRegisterWork, ProductPrintSettings, _serialList);
+                    PrintManager.ProductInitialize(_productMaster, _productRegisterWork, ProductPrintSettings, serialList);
                 };
                 pd.PrintPage += (sender, e) => {
                     bool hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, CurrentSerialType);
@@ -374,13 +369,15 @@ namespace ProductDatabase {
             }
         }
         // シリアルコードと日付情報からテキストフォーマットに従ってラベル印字コードを生成する
-        private string GenerateCode(int serialCode) {
+        // type を指定した場合はそのタイプのフォーマットを使用する（null の場合は CurrentSerialType を使用）
+        private string GenerateCode(int serialCode, SerialType? type = null) {
             var regDate = DateTime.TryParse(_productRegisterWork.RegDate, out var parsedDate)
                 ? parsedDate
                 : DateTime.Today;
             var monthCode = CommonUtils.ToMonthCode(regDate);
 
-            var outputCode = CurrentSerialType switch {
+            var resolvedType = type ?? CurrentSerialType;
+            var outputCode = resolvedType switch {
                 SerialType.Label => LabelPrintSettings.TextFormat ?? string.Empty,
                 SerialType.Barcode => BarcodePrintSettings.TextFormat ?? string.Empty,
                 SerialType.Nameplate => NameplatePrintSettings.TextFormat ?? string.Empty,
@@ -401,6 +398,12 @@ namespace ProductDatabase {
             }
 
             return outputCode;
+        }
+        // 指定タイプのフォーマットでシリアルリストを生成して返す（CurrentSerialType を変更しない）
+        private List<string> GenerateSerialListForType(SerialType type) {
+            return Enumerable.Range(0, _productRegisterWork.Quantity)
+                .Select(i => GenerateCode(_productRegisterWork.SerialFirstNumber + i, type))
+                .ToList();
         }
         // チェックボックスのOn/Offに連動して関連する入力コントロールの有効無効を切り替える
         private void CheckBoxChecked(object sender, EventArgs e) {
