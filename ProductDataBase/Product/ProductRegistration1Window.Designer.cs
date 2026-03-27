@@ -69,9 +69,11 @@
             this.MessageTextBox = new RichTextBox();
             this.ErrorMessageLabel = new Label();
             this.groupBox1 = new GroupBox();
+            this.groupBox2 = new GroupBox();
             this.ProductRegistration1MenuStrip.SuspendLayout();
             this.panelCommentTextBox.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // RegisterButton
@@ -542,7 +544,7 @@
             // MessageTextBox
             // 
             this.MessageTextBox.ForeColor = Color.Red;
-            this.MessageTextBox.Location = new Point(313, 300);
+            this.MessageTextBox.Location = new Point(0, 0);
             this.MessageTextBox.MaxLength = 100;
             this.MessageTextBox.Name = "MessageTextBox";
             this.MessageTextBox.ReadOnly = true;
@@ -573,14 +575,23 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "QRコード入力用";
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.MessageTextBox);
+            this.groupBox2.Location = new Point(313, 300);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new Size(299, 64);
+            this.groupBox2.TabIndex = 1004;
+            this.groupBox2.TabStop = false;
+            // 
             // ProductRegistration1Window
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 455);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.ErrorMessageLabel);
-            this.Controls.Add(this.MessageTextBox);
             this.Controls.Add(this.RNumberCheckBox);
             this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.RevisionChangeButton);
@@ -632,6 +643,7 @@
             this.panelCommentTextBox.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -684,5 +696,6 @@
         private RichTextBox MessageTextBox;
         private Label ErrorMessageLabel;
         private GroupBox groupBox1;
+        private GroupBox groupBox2;
     }
 }
