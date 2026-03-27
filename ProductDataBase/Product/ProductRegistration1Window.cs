@@ -480,7 +480,7 @@ namespace ProductDatabase {
         private static readonly object s_fileLock = new();
         private static readonly System.Text.Json.JsonSerializerOptions s_jsonOptions = new() {
             WriteIndented = true,
-            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All)
         };
         private void ProductMessageChange() {
             lock (s_fileLock) {
