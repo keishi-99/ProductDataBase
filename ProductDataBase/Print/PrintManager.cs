@@ -1,12 +1,11 @@
 ﻿using bpac;
+using ProductDatabase.Models;
 using System.ComponentModel;
 using System.Drawing.Printing;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ZXing;
 using ZXing.Windows.Compatibility;
-using ProductDatabase.Models;
-using static ProductDatabase.Data.ProductRepository;
 using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase.Print {
@@ -33,7 +32,8 @@ namespace ProductDatabase.Print {
 
         public static int SerialPrintType { get; private set; }
 
-        private static List<string> _serialList = [];
+        private record SerialEntry(string Serial, int Copies, bool IsOLes);
+        private static List<SerialEntry> _serialEntries = [];
 
         private static bool _isUnderlinePrint;
         private static bool _isLast4Digits;
@@ -45,15 +45,33 @@ namespace ProductDatabase.Print {
                 : string.Empty;
 
         public static SerialType CurrentSerialType { get; set; }
-        public enum SerialType { Label, Barcode, Nameplate, Substrate }
+        public enum SerialType { Label, OLesLabel, Barcode, Nameplate, Substrate }
 
         // 製品印刷に必要なマスター・作業データ・シリアルリストを初期化する
-        public static void ProductInitialize(ProductMaster productMaster, ProductRegisterWork productRegisterWork, DocumentPrintSettings productPrintSettings, List<string> serialList) {
+        // olesLabelList を指定した場合は Label・OLes を交互に含むリストを内部で生成する
+        public static void ProductInitialize(ProductMaster productMaster, ProductRegisterWork productRegisterWork, DocumentPrintSettings productPrintSettings, List<string> labelList, List<string>? olesLabelList = null) {
             ProductMaster = productMaster;
             ProductRegisterWork = productRegisterWork;
             DocumentPrintSettings = productPrintSettings ?? throw new ArgumentNullException(nameof(productPrintSettings));
 
-            _serialList = serialList;
+            var copiesPerLabel = productPrintSettings.LabelPrintSettings?.CopiesPerLabel ?? 1;
+            var copiesPerOles = productPrintSettings.LabelPrintSettings?.CopiesPerOLesLabel ?? 0;
+
+            if (olesLabelList != null && copiesPerOles > 0) {
+                if (olesLabelList.Count != labelList.Count) {
+                    throw new ArgumentException($"ラベルリストとO-Lesリストの件数が一致しません（Label:{labelList.Count}, OLes:{olesLabelList.Count}）。");
+                }
+                var entries = new List<SerialEntry>(labelList.Count + olesLabelList.Count);
+                for (var i = 0; i < labelList.Count; i++) {
+                    entries.Add(new SerialEntry(labelList[i], copiesPerLabel, false));
+                    entries.Add(new SerialEntry(olesLabelList[i], copiesPerOles, true));
+                }
+                _serialEntries = entries;
+            }
+            else {
+                _serialEntries = labelList.Select(s => new SerialEntry(s, copiesPerLabel, false)).ToList();
+            }
+
             PageCount = 1;
             PrintCount = 0;
             SerialPrintType = productMaster.SerialPrintType;
@@ -67,7 +85,8 @@ namespace ProductDatabase.Print {
             SubstrateRegisterWork = substrateRegisterWork;
             DocumentPrintSettings = documentPrintSettings ?? throw new ArgumentNullException(nameof(documentPrintSettings));
 
-            _serialList = serialList;
+            var copiesPerLabel = documentPrintSettings.LabelPrintSettings?.CopiesPerLabel ?? 1;
+            _serialEntries = serialList.Select(s => new SerialEntry(s, copiesPerLabel, false)).ToList();
             PageCount = 1;
             PrintCount = 0;
             SerialPrintType = substrateMaster.SerialPrintType;
@@ -109,9 +128,8 @@ namespace ProductDatabase.Print {
                 var headerString = ConvertHeaderString(serialType, printSettings.HeaderTextFormat);
                 var headerFont = printSettings.HeaderFont;
 
-                var copiesPerLabel = printSettings.CopiesPerLabel;
-                CopiesRemainingPerSerial = copiesPerLabel;
-                if (labelCountX == 0 || labelCountY == 0 || copiesPerLabel == 0) {
+                CopiesRemainingPerSerial = _serialEntries[PrintCount].Copies;
+                if (labelCountX == 0 || labelCountY == 0 || printSettings.CopiesPerLabel == 0) {
                     throw new Exception("印刷設定が異常です。");
                 }
 
@@ -137,12 +155,14 @@ namespace ProductDatabase.Print {
                         // 残り枚数に基づいてフォントとテキストを決定する
                         var isSecondToLastCopy = CopiesRemainingPerSerial == 2;
 
-                        // 両方Trueの場合は末尾2枚目→下線、それ以外は最終コピーのみ下線
-                        var fontUnderline = _isUnderlinePrint && (_isLast4Digits ? isSecondToLastCopy : isLastCopy);
+                        var entry = _serialEntries[PrintCount];
 
-                        var printText = _isLast4Digits && isLastCopy
+                        // 両方Trueの場合は末尾2枚目→下線、それ以外は最終コピーのみ下線
+                        var fontUnderline = !entry.IsOLes && _isUnderlinePrint && (_isLast4Digits ? isSecondToLastCopy : isLastCopy);
+
+                        var printText = !entry.IsOLes && _isLast4Digits && isLastCopy
                             ? Last4ProductModel
-                            : _serialList[PrintCount];
+                            : entry.Serial;
 
                         using var labelImage = MakeLabelImage(printText, serialType, fontUnderline, labelWidthPx, labelHeightPx, dpiX, dpiY, isPreview);
 
@@ -151,18 +171,19 @@ namespace ProductDatabase.Print {
                         CopiesRemainingPerSerial--;
 
                         if (CopiesRemainingPerSerial <= 0) {
-                            CopiesRemainingPerSerial = copiesPerLabel;
                             PrintCount++;
 
-                            if (_serialList.Count <= PrintCount) {
+                            if (_serialEntries.Count <= PrintCount) {
                                 DrawFinalRowMark(e.Graphics, y + 1, 0, posY, 0, labelHeightPx, headerFont);
                                 return false;
                             }
+
+                            CopiesRemainingPerSerial = _serialEntries[PrintCount].Copies;
                         }
                     }
                 }
 
-                if (_serialList.Count > PrintCount) {
+                if (_serialEntries.Count > PrintCount) {
                     PageCount++;
                     return true;
                 }
@@ -437,15 +458,19 @@ namespace ProductDatabase.Print {
             [Category("印字設定"), DisplayName("中心に配置 (縦)")]
             public bool AlignTextCenterY { get; set; }
             [Category("印字設定"), DisplayName("印字フォーマット"), Description("{T}(型式)  {R}(リビジョン)  {S}(シリアル)  {Y}(製造年)  {M}(製造月(1桁))  {MM}(製造月(2桁))")]
-            public string TextFormat { get; set; } = string.Empty;
+            public string LabelTextFormat { get; set; } = string.Empty;
 
             [Category("印字設定"), DisplayName("印字フォント"), JsonConverter(typeof(FontJsonConverter))]
             public Font TextFont { get; set; } = SystemFonts.DefaultFont;
 
+            [Category("O-Lesラベル設定"), DisplayName("O-Lesラベル発行枚数")]
+            public int CopiesPerOLesLabel { get; set; }
+            [Category("O-Lesラベル設定"), DisplayName("O-Lesラベル 印字フォーマット"), Description("{OT}(O-Les型式)  {T}(型式)  {R}(リビジョン)  {S}(シリアル)  {Y}(製造年)  {M}(製造月(1桁))  {MM}(製造月(2桁))")]
+            public string OLesLabelTextFormat { get; set; } = string.Empty;
+
         }
 
         public class LabelPrintSettings : PrintSettingsBase {
-            // ラベル固有の設定（今後増える場合にここに追加）
         }
 
         public class BarcodePrintSettings : PrintSettingsBase {

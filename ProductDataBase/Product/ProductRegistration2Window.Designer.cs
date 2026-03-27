@@ -1381,7 +1381,7 @@
             this.銘版印刷設定ToolStripMenuItem.Size = new Size(186, 22);
             this.銘版印刷設定ToolStripMenuItem.Text = "銘版印刷設定";
             this.銘版印刷設定ToolStripMenuItem.Click += this.銘版印刷設定ToolStripMenuItem_Click;
-            // 
+            //
             // ProductRegistration2Window
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);

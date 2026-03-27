@@ -26,6 +26,8 @@ namespace ProductDatabase.MasterManagement {
             this.InitialLabel = new Label();
             this.InitialTextBox = new TextBox();
             this.SerialGroupBox = new GroupBox();
+            this.OLesInitialLabel = new Label();
+            this.OLesInitialTextBox = new TextBox();
             this.RegTypeLabel = new Label();
             this.RegTypeComboBox = new ComboBox();
             this.SerialTypeLabel = new Label();
@@ -38,6 +40,7 @@ namespace ProductDatabase.MasterManagement {
             this.NameplatePrintCheckBox = new CheckBox();
             this.UnderlinePrintCheckBox = new CheckBox();
             this.Last4DigitsPrintCheckBox = new CheckBox();
+            this.OLesSerialPrintCheckBox = new CheckBox();
             this.CheckSheetPrintCheckBox = new CheckBox();
             this.ListPrintCheckBox = new CheckBox();
             this.CheckBinGroupBox = new GroupBox();
@@ -182,11 +185,13 @@ namespace ProductDatabase.MasterManagement {
             // 
             this.InitialTextBox.Location = new Point(130, 120);
             this.InitialTextBox.Name = "InitialTextBox";
-            this.InitialTextBox.Size = new Size(80, 23);
+            this.InitialTextBox.Size = new Size(51, 23);
             this.InitialTextBox.TabIndex = 4;
             // 
             // SerialGroupBox
             // 
+            this.SerialGroupBox.Controls.Add(this.OLesInitialLabel);
+            this.SerialGroupBox.Controls.Add(this.OLesInitialTextBox);
             this.SerialGroupBox.Controls.Add(this.RegTypeLabel);
             this.SerialGroupBox.Controls.Add(this.RegTypeComboBox);
             this.SerialGroupBox.Controls.Add(this.SerialTypeLabel);
@@ -201,6 +206,22 @@ namespace ProductDatabase.MasterManagement {
             this.SerialGroupBox.TabIndex = 1;
             this.SerialGroupBox.TabStop = false;
             this.SerialGroupBox.Text = "シリアル設定";
+            // 
+            // OLesInitialLabel
+            // 
+            this.OLesInitialLabel.AutoSize = true;
+            this.OLesInitialLabel.Location = new Point(207, 123);
+            this.OLesInitialLabel.Name = "OLesInitialLabel";
+            this.OLesInitialLabel.Size = new Size(94, 15);
+            this.OLesInitialLabel.TabIndex = 10;
+            this.OLesInitialLabel.Text = "O-Les接頭文字:";
+            // 
+            // OLesInitialTextBox
+            // 
+            this.OLesInitialTextBox.Location = new Point(329, 120);
+            this.OLesInitialTextBox.Name = "OLesInitialTextBox";
+            this.OLesInitialTextBox.Size = new Size(51, 23);
+            this.OLesInitialTextBox.TabIndex = 11;
             // 
             // RegTypeLabel
             // 
@@ -260,6 +281,7 @@ namespace ProductDatabase.MasterManagement {
             this.PrintGroupBox.Controls.Add(this.NameplatePrintCheckBox);
             this.PrintGroupBox.Controls.Add(this.UnderlinePrintCheckBox);
             this.PrintGroupBox.Controls.Add(this.Last4DigitsPrintCheckBox);
+            this.PrintGroupBox.Controls.Add(this.OLesSerialPrintCheckBox);
             this.PrintGroupBox.Controls.Add(this.CheckSheetPrintCheckBox);
             this.PrintGroupBox.Controls.Add(this.ListPrintCheckBox);
             this.PrintGroupBox.Location = new Point(12, 353);
@@ -277,6 +299,7 @@ namespace ProductDatabase.MasterManagement {
             this.LabelPrintCheckBox.Size = new Size(54, 19);
             this.LabelPrintCheckBox.TabIndex = 10;
             this.LabelPrintCheckBox.Text = "ラベル";
+            this.LabelPrintCheckBox.CheckedChanged += this.LabelPrintCheckBox_CheckedChanged;
             // 
             // BarcodePrintCheckBox
             // 
@@ -313,6 +336,15 @@ namespace ProductDatabase.MasterManagement {
             this.Last4DigitsPrintCheckBox.Size = new Size(93, 19);
             this.Last4DigitsPrintCheckBox.TabIndex = 14;
             this.Last4DigitsPrintCheckBox.Text = "型式末尾4桁";
+            // 
+            // OLesSerialPrintCheckBox
+            // 
+            this.OLesSerialPrintCheckBox.AutoSize = true;
+            this.OLesSerialPrintCheckBox.Location = new Point(298, 47);
+            this.OLesSerialPrintCheckBox.Name = "OLesSerialPrintCheckBox";
+            this.OLesSerialPrintCheckBox.Size = new Size(96, 19);
+            this.OLesSerialPrintCheckBox.TabIndex = 17;
+            this.OLesSerialPrintCheckBox.Text = "O-Lesシリアル";
             // 
             // CheckSheetPrintCheckBox
             // 
@@ -595,6 +627,7 @@ namespace ProductDatabase.MasterManagement {
         private CheckBox        NameplatePrintCheckBox;
         private CheckBox        UnderlinePrintCheckBox;
         private CheckBox        Last4DigitsPrintCheckBox;
+        private CheckBox        OLesSerialPrintCheckBox;
         private CheckBox        CheckSheetPrintCheckBox;
         private CheckBox        ListPrintCheckBox;
 
@@ -623,5 +656,7 @@ namespace ProductDatabase.MasterManagement {
         // ボタン
         private Button          SaveButton;
         private Button          DialogCancelButton;
+        private Label OLesInitialLabel;
+        private TextBox OLesInitialTextBox;
     }
 }

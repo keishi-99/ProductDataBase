@@ -452,27 +452,34 @@ namespace ProductDatabase {
 
             _productRegisterWork.RowID = connection.ExecuteScalar<int>("SELECT last_insert_rowid();", transaction: _sqliteTransaction);
         }
-        // シリアルリストの各シリアルをシリアルテーブルにINSERTする
+        // シリアルリストの各シリアルをシリアルテーブルにINSERTする（フォーマット2有効時はOLesSerialも記録）
         private void InsertSerial(SqliteConnection connection) {
             var commandText =
                 $"""
-                INSERT INTO {Constants.TSerialTableName} 
+                INSERT INTO {Constants.TSerialTableName}
                 (
                     Serial,
+                    OLesSerial,
                     UsedID,
                     ProductName
                 )
-                VALUES 
+                VALUES
                 (
-                    @Serial, 
-                    @productRowId, 
+                    @Serial,
+                    @OLesSerial,
+                    @productRowId,
                     @ProductName
                 )
                 ;
                 """;
 
-            var serialData = _serialList.Select(serial => new {
+            var olesSerialList = (_productMaster.IsOLesLabelPrint && !string.IsNullOrEmpty(LabelPrintSettings.OLesLabelTextFormat))
+                ? GenerateSerialListForType(SerialType.OLesLabel)
+                : null;
+
+            var serialData = _serialList.Select((serial, i) => new {
                 Serial = serial,
+                OLesSerial = (olesSerialList != null && i < olesSerialList.Count) ? olesSerialList[i] : null,
                 productRowId = _productRegisterWork.RowID,
                 _productMaster.ProductName
             }).ToList();
@@ -760,6 +767,7 @@ namespace ProductDatabase {
                 _serialList.Add(GenerateCode(_productRegisterWork.SerialFirstNumber + i));
             }
 
+
             if (!print) {
                 return;
             }
@@ -804,14 +812,14 @@ namespace ProductDatabase {
             if (_productMaster.IsNameplatePrint) { return SerialType.Nameplate; }
             return SerialType.Label;
         }
-        // IsLabelPrintが有効な場合にラベル専用リストを生成してシリアルラベルの印刷を実行する
+        // IsLabelPrintが有効な場合にシリアルラベルを印刷する
+        // IsOLesLabelPrint かつ枚数>0 の場合は Label・OLes を交互に含む1つの印刷ジョブとして実行する
         private async Task HandleLabelPrinting() {
             if (_productMaster.IsLabelPrint) {
                 MessageBox.Show("シリアルラベルを印刷します。");
                 CurrentSerialType = SerialType.Label;
-                var labelList = GenerateSerialListForType(SerialType.Label);
-
-                if (!await Print(true, labelList)) {
+                var labelList = GenerateLabelList();
+                if (!await Print(true, labelList, GenerateOlesListOrNull())) {
                     throw new OperationCanceledException("キャンセルしました。");
                 }
             }
@@ -838,6 +846,9 @@ namespace ProductDatabase {
         private List<string> GenerateSerialListForType(SerialType type) {
             return [.. Enumerable.Range(0, _productRegisterWork.Quantity).Select(i => GenerateCode(_productRegisterWork.SerialFirstNumber + i, type))];
         }
+        private List<string> GenerateLabelList() => GenerateSerialListForType(SerialType.Label);
+        private List<string>? GenerateOlesListOrNull() =>
+            _productMaster.IsOLesLabelPrint ? GenerateSerialListForType(SerialType.OLesLabel) : null;
         // シリアルタイプを決定してシリアル先頭・末尾のコード文字列を生成する
         private void GenerateSerialCodes() {
             CurrentSerialType = GetSerialTypeFromProductMaster();
@@ -875,7 +886,8 @@ namespace ProductDatabase {
 
         // isPrintがtrueなら印刷ダイアログ経由で印刷しfalseならプレビューを表示する
         // serialList を渡した場合はそのリストを使用する（null の場合は _serialList を使用）
-        private async Task<bool> Print(bool isPrint, List<string>? serialList = null) {
+        // olesLabelList を渡した場合は OLes 交互印刷として PrintManager に委譲する
+        private async Task<bool> Print(bool isPrint, List<string>? serialList = null, List<string>? olesLabelList = null) {
             try {
                 // PrintDocumentオブジェクトの作成
                 using System.Drawing.Printing.PrintDocument pd = new();
@@ -889,7 +901,7 @@ namespace ProductDatabase {
                 };
 
                 pd.BeginPrint += (sender, e) => {
-                    PrintManager.ProductInitialize(_productMaster, _productRegisterWork, ProductPrintSettings, printList);
+                    PrintManager.ProductInitialize(_productMaster, _productRegisterWork, ProductPrintSettings, printList, olesLabelList);
                 };
                 pd.PrintPage += (sender, e) => {
                     var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, CurrentSerialType);
@@ -936,24 +948,20 @@ namespace ProductDatabase {
                 ? parsedDate
                 : DateTime.Today;
 
-            var monthCode = regDate.ToString("MM");
-            monthCode = monthCode switch {
-                "10" => "X",
-                "11" => "Y",
-                "12" => "Z",
-                _ => monthCode
-            };
+            var monthCode = CommonUtils.ToMonthCode(regDate);
 
             var resolvedType = type ?? CurrentSerialType;
             var outputCode = resolvedType switch {
-                SerialType.Label => LabelPrintSettings.TextFormat ?? string.Empty,
-                SerialType.Barcode => BarcodePrintSettings.TextFormat ?? string.Empty,
+                SerialType.Label => LabelPrintSettings.LabelTextFormat ?? string.Empty,
+                SerialType.Barcode => BarcodePrintSettings.LabelTextFormat ?? string.Empty,
                 SerialType.Nameplate => NameplatePrintSettings.TextFormat ?? string.Empty,
+                SerialType.OLesLabel => LabelPrintSettings.OLesLabelTextFormat ?? string.Empty,
                 _ => string.Empty
             };
 
             var map = new Dictionary<string, string> {
                 ["{T}"] = _productMaster.Initial,
+                ["{OT}"] = _productMaster.OLesInitial,
                 ["{Y}"] = regDate.ToString("yy"),
                 ["{MM}"] = regDate.ToString("MM"),
                 ["{R}"] = _productRegisterWork.Revision,
@@ -1136,6 +1144,7 @@ namespace ProductDatabase {
                     {"SerialFirstNumber", $"{_productRegisterWork.SerialFirstNumber}"},
                     {"SerialLastNumber", $"{_serialLastNumber}"},
                     {"Initial", $"{_productMaster.Initial}"},
+                    {"OLesInitial", $"{_productMaster.OLesInitial}"},
                     {"RegType", $"{_productMaster.RegType}"},
                     {"SerialPrintType", $"{_productMaster.SerialPrintType}"},
                     {"SheetPrintType", $"{_productMaster.SheetPrintType}"},
@@ -1200,8 +1209,7 @@ namespace ProductDatabase {
         }
         private async void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             CurrentSerialType = SerialType.Label;
-            var labelList = GenerateSerialListForType(SerialType.Label);
-            await Print(false, labelList);
+            await Print(false, GenerateLabelList(), GenerateOlesListOrNull());
         }
         private async void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
             CurrentSerialType = SerialType.Barcode;
