@@ -489,7 +489,7 @@ namespace ProductDatabase.Print {
             [Category("印字設定"), DisplayName("発行枚数")]
             public int CopiesPerLabel { get; set; }
             [Category("印字設定"), DisplayName("印字フォーマット"), Description("{T}(型式)  {R}(リビジョン)  {S}(シリアル)  {Y}(製造年)  {M}(製造月(1桁))  {MM}(製造月(2桁))")]
-            public string TextFormat { get; set; } = string.Empty;
+            public string NameplateTextFormat { get; set; } = string.Empty;
             [Category("印字設定"), DisplayName("テンプレートファイルのパス"), Editor(typeof(System.Windows.Forms.Design.FileNameEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public string TemplatePath { get; set; } = string.Empty;
         }

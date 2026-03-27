@@ -69,9 +69,11 @@
             this.MessageTextBox = new RichTextBox();
             this.ErrorMessageLabel = new Label();
             this.groupBox1 = new GroupBox();
+            this.groupBox2 = new GroupBox();
             this.ProductRegistration1MenuStrip.SuspendLayout();
             this.panelCommentTextBox.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // RegisterButton
@@ -88,7 +90,7 @@
             // TemplateButton
             // 
             this.TemplateButton.Enabled = false;
-            this.TemplateButton.Location = new Point(543, 340);
+            this.TemplateButton.Location = new Point(543, 269);
             this.TemplateButton.Name = "TemplateButton";
             this.TemplateButton.Size = new Size(75, 25);
             this.TemplateButton.TabIndex = 24;
@@ -102,7 +104,7 @@
             this.CommentComboBox.DropDownWidth = 150;
             this.CommentComboBox.Enabled = false;
             this.CommentComboBox.FormattingEnabled = true;
-            this.CommentComboBox.Location = new Point(313, 341);
+            this.CommentComboBox.Location = new Point(313, 270);
             this.CommentComboBox.Name = "CommentComboBox";
             this.CommentComboBox.Size = new Size(224, 23);
             this.CommentComboBox.TabIndex = 23;
@@ -117,7 +119,7 @@
             this.CommentTextBox.Multiline = true;
             this.CommentTextBox.Name = "CommentTextBox";
             this.CommentTextBox.ScrollBars = ScrollBars.Vertical;
-            this.CommentTextBox.Size = new Size(305, 193);
+            this.CommentTextBox.Size = new Size(305, 123);
             this.CommentTextBox.TabIndex = 22;
             // 
             // CommentCheckBox
@@ -476,7 +478,7 @@
             this.panelCommentTextBox.Controls.Add(this.CommentTextBox);
             this.panelCommentTextBox.Location = new Point(313, 141);
             this.panelCommentTextBox.Name = "panelCommentTextBox";
-            this.panelCommentTextBox.Size = new Size(305, 193);
+            this.panelCommentTextBox.Size = new Size(305, 123);
             this.panelCommentTextBox.TabIndex = 22;
             // 
             // QrCodeTextBox
@@ -541,19 +543,16 @@
             // 
             // MessageTextBox
             // 
-            this.MessageTextBox.Enabled = false;
             this.MessageTextBox.ForeColor = Color.Red;
-            this.MessageTextBox.Location = new Point(168, 377);
+            this.MessageTextBox.Location = new Point(0, 0);
             this.MessageTextBox.MaxLength = 100;
-            this.MessageTextBox.Multiline = false;
             this.MessageTextBox.Name = "MessageTextBox";
             this.MessageTextBox.ReadOnly = true;
-            this.MessageTextBox.ScrollBars = RichTextBoxScrollBars.None;
-            this.MessageTextBox.Size = new Size(450, 25);
+            this.MessageTextBox.ScrollBars = RichTextBoxScrollBars.ForcedVertical;
+            this.MessageTextBox.Size = new Size(299, 64);
             this.MessageTextBox.TabIndex = 999;
             this.MessageTextBox.TabStop = false;
             this.MessageTextBox.Text = "";
-            this.MessageTextBox.WordWrap = false;
             // 
             // ErrorMessageLabel
             // 
@@ -576,14 +575,23 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "QRコード入力用";
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.MessageTextBox);
+            this.groupBox2.Location = new Point(313, 300);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new Size(299, 64);
+            this.groupBox2.TabIndex = 1004;
+            this.groupBox2.TabStop = false;
+            // 
             // ProductRegistration1Window
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(630, 455);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.ErrorMessageLabel);
-            this.Controls.Add(this.MessageTextBox);
             this.Controls.Add(this.RNumberCheckBox);
             this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.RevisionChangeButton);
@@ -635,6 +643,7 @@
             this.panelCommentTextBox.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -687,5 +696,6 @@
         private RichTextBox MessageTextBox;
         private Label ErrorMessageLabel;
         private GroupBox groupBox1;
+        private GroupBox groupBox2;
     }
 }
