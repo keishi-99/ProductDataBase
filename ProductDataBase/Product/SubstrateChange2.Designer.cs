@@ -96,7 +96,7 @@
             this.dataGridViewTextBoxColumn0104 = new DataGridViewTextBoxColumn();
             this.dataGridViewCheckBoxColumn0101 = new DataGridViewCheckBoxColumn();
             this.Substrate1CheckBox = new CheckBox();
-            this.Label1 = new Label();
+            this.Label = new Label();
             this.OrderNumberTextBox = new TextBox();
             this.label2 = new Label();
             this.ManufacturingNumberTextBox = new TextBox();
@@ -936,14 +936,14 @@
             this.Substrate1CheckBox.UseVisualStyleBackColor = true;
             this.Substrate1CheckBox.CheckedChanged += this.CheckBox_CheckedChanged;
             // 
-            // Label1
+            // Label
             // 
-            this.Label1.AutoSize = true;
-            this.Label1.Location = new Point(28, 542);
-            this.Label1.Name = "Label1";
-            this.Label1.Size = new Size(55, 15);
-            this.Label1.TabIndex = 58;
-            this.Label1.Text = "注文番号";
+            this.Label.AutoSize = true;
+            this.Label.Location = new Point(28, 542);
+            this.Label.Name = "Label";
+            this.Label.Size = new Size(55, 15);
+            this.Label.TabIndex = 58;
+            this.Label.Text = "注文番号";
             // 
             // OrderNumberTextBox
             // 
@@ -1495,7 +1495,7 @@
             this.MainPanel.Controls.Add(this.SubstrateListPrintButton);
             this.MainPanel.Controls.Add(this.OrderNumberTextBox);
             this.MainPanel.Controls.Add(this.RegisterButton);
-            this.MainPanel.Controls.Add(this.Label1);
+            this.MainPanel.Controls.Add(this.Label);
             this.MainPanel.Controls.Add(this.CloseButton);
             this.MainPanel.Dock = DockStyle.Fill;
             this.MainPanel.Location = new Point(0, 0);
@@ -1575,7 +1575,7 @@
         private CheckBox Substrate2CheckBox;
         private DataGridView Substrate1DataGridView;
         private CheckBox Substrate1CheckBox;
-        private Label Label1;
+        private Label Label;
         private TextBox OrderNumberTextBox;
         private Label label2;
         private TextBox ManufacturingNumberTextBox;

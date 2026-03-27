@@ -15,7 +15,7 @@ namespace ProductDatabase {
         public BarcodePrintSettings BarcodePrintSettings => ProductPrintSettings.BarcodePrintSettings ?? new BarcodePrintSettings();
         public NameplatePrintSettings NameplatePrintSettings => ProductPrintSettings.NameplatePrintSettings ?? new NameplatePrintSettings();
 
-        public string printSettingPath = string.Empty;
+        public string PrintSettingPath = string.Empty;
 
         private readonly ProductMaster _productMaster;
         private readonly ProductRegisterWork _productRegisterWork;
@@ -116,9 +116,9 @@ namespace ProductDatabase {
         private void LoadSettings() {
             try {
                 ProductPrintSettings = new DocumentPrintSettings();
-                printSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", _productMaster.CategoryName, _productMaster.ProductName, $"PrintConfig_{_productMaster.ProductName}_{_productMaster.ProductID}_{_productMaster.ProductModel}.json");
-                if (!File.Exists(printSettingPath)) { throw new DirectoryNotFoundException($"ラベル印刷用設定ファイルがありません。"); }
-                var jsonString = File.ReadAllText(printSettingPath);
+                PrintSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", _productMaster.CategoryName, _productMaster.ProductName, $"PrintConfig_{_productMaster.ProductName}_{_productMaster.ProductID}_{_productMaster.ProductModel}.json");
+                if (!File.Exists(PrintSettingPath)) { throw new DirectoryNotFoundException($"ラベル印刷用設定ファイルがありません。"); }
+                var jsonString = File.ReadAllText(PrintSettingPath);
                 ProductPrintSettings = System.Text.Json.JsonSerializer.Deserialize<DocumentPrintSettings>(jsonString) ?? new DocumentPrintSettings();
             } catch (Exception ex) {
                 MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -140,14 +140,19 @@ namespace ProductDatabase {
                 if (!Registration()) { throw new Exception("登録できませんでした。"); }
             }
 
-            var printList = GenerateSerialListForType(CurrentSerialType);
-
             switch (CurrentSerialType) {
                 case SerialType.Nameplate:
-                    PrintManager.PrintUsingBPac(NameplatePrintSettings, printList);
+                    PrintManager.PrintUsingBPac(NameplatePrintSettings, GenerateSerialListForType(CurrentSerialType));
                     break;
+                case SerialType.Label: {
+                        if (!await Print(isPrint, GenerateLabelList(), GenerateOlesListOrNull())) {
+                            MessageBox.Show("キャンセルしました。");
+                            return;
+                        }
+                        break;
+                    }
                 default:
-                    if (!await Print(isPrint, printList)) {
+                    if (!await Print(isPrint, GenerateSerialListForType(CurrentSerialType))) {
                         MessageBox.Show("キャンセルしました。");
                         return;
                     }
@@ -320,7 +325,8 @@ namespace ProductDatabase {
         }
 
         // isPrintがtrueなら印刷ダイアログ経由で印刷しfalseならプレビューを表示する
-        private async Task<bool> Print(bool isPrint, List<string> serialList) {
+        // olesLabelList を渡した場合は OLes 交互印刷として PrintManager に委譲する
+        private async Task<bool> Print(bool isPrint, List<string> serialList, List<string>? olesLabelList = null) {
             try {
                 using System.Drawing.Printing.PrintDocument pd = new();
                 var isPreview = !isPrint;
@@ -328,7 +334,7 @@ namespace ProductDatabase {
                 var startLine = (int)PrintPositionNumericUpDown.Value - 1;
 
                 pd.BeginPrint += (sender, e) => {
-                    PrintManager.ProductInitialize(_productMaster, _productRegisterWork, ProductPrintSettings, serialList);
+                    PrintManager.ProductInitialize(_productMaster, _productRegisterWork, ProductPrintSettings, serialList, olesLabelList);
                 };
                 pd.PrintPage += (sender, e) => {
                     bool hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, CurrentSerialType);
@@ -378,14 +384,16 @@ namespace ProductDatabase {
 
             var resolvedType = type ?? CurrentSerialType;
             var outputCode = resolvedType switch {
-                SerialType.Label => LabelPrintSettings.TextFormat ?? string.Empty,
-                SerialType.Barcode => BarcodePrintSettings.TextFormat ?? string.Empty,
+                SerialType.Label => LabelPrintSettings.LabelTextFormat ?? string.Empty,
+                SerialType.OLesLabel => LabelPrintSettings.OLesLabelTextFormat ?? string.Empty,
+                SerialType.Barcode => BarcodePrintSettings.LabelTextFormat ?? string.Empty,
                 SerialType.Nameplate => NameplatePrintSettings.TextFormat ?? string.Empty,
                 _ => string.Empty
             };
 
             var map = new Dictionary<string, string> {
                 ["{T}"] = _productMaster.Initial,
+                ["{OT}"] = _productMaster.OLesInitial,
                 ["{Y}"] = regDate.ToString("yy"),
                 ["{MM}"] = regDate.ToString("MM"),
                 ["{R}"] = _productRegisterWork.Revision,
@@ -405,6 +413,9 @@ namespace ProductDatabase {
                 .Select(i => GenerateCode(_productRegisterWork.SerialFirstNumber + i, type))
                 .ToList();
         }
+        private List<string> GenerateLabelList() => GenerateSerialListForType(SerialType.Label);
+        private List<string>? GenerateOlesListOrNull() =>
+            _productMaster.IsOLesLabelPrint ? GenerateSerialListForType(SerialType.OLesLabel) : null;
         // チェックボックスのOn/Offに連動して関連する入力コントロールの有効無効を切り替える
         private void CheckBoxChecked(object sender, EventArgs e) {
             var checkBox = (CheckBox)sender;

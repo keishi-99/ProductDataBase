@@ -91,11 +91,11 @@ namespace ProductDatabase.Data {
                 $"""
                 INSERT INTO {Constants.ProductTableName}
                     (CategoryName, ProductName, ProductType, ProductModel, Initial,
-                     RevisionGroup, RegType, SerialType, Checkbox,
+                     OLesInitial, RevisionGroup, RegType, SerialType, Checkbox,
                      SerialPrintType, SheetPrintType, Visible)
                 VALUES
                     (@CategoryName, @ProductName, @ProductType, @ProductModel, @Initial,
-                     @RevisionGroup, @RegType, @SerialType, @Checkbox,
+                     @OLesInitial, @RevisionGroup, @RegType, @SerialType, @Checkbox,
                      @SerialPrintType, @SheetPrintType, @Visible);
                 SELECT last_insert_rowid();
                 """;
@@ -108,6 +108,7 @@ namespace ProductDatabase.Data {
                 product.ProductType,
                 product.ProductModel,
                 product.Initial,
+                product.OLesInitial,
                 product.RevisionGroup,
                 product.RegType,
                 SerialType = product.SerialDigitType,
@@ -130,6 +131,7 @@ namespace ProductDatabase.Data {
                     ProductType     = @ProductType,
                     ProductModel    = @ProductModel,
                     Initial         = @Initial,
+                    OLesInitial     = @OLesInitial,
                     RevisionGroup   = @RevisionGroup,
                     RegType         = @RegType,
                     SerialType      = @SerialType,
@@ -148,6 +150,7 @@ namespace ProductDatabase.Data {
                 product.ProductType,
                 product.ProductModel,
                 product.Initial,
+                product.OLesInitial,
                 product.RevisionGroup,
                 product.RegType,
                 SerialType = product.SerialDigitType,

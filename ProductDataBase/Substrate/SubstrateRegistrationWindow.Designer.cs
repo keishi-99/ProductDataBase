@@ -31,9 +31,9 @@
             this.印刷設定ToolStripMenuItem = new ToolStripMenuItem();
             this.ヘルプToolStripMenuItem = new ToolStripMenuItem();
             this.取得情報ToolStripMenuItem = new ToolStripMenuItem();
-            this.ProductNameLabel1 = new Label();
+            this.ProductNameLabel = new Label();
             this.ProductNameLabel2 = new Label();
-            this.SubstrateModelLabel1 = new Label();
+            this.SubstrateModelLabel = new Label();
             this.SubstrateModelLabel2 = new Label();
             this.OrderNumberCheckBox = new CheckBox();
             this.OrderNumberTextBox = new TextBox();
@@ -68,7 +68,7 @@
             this.textToUpperCheckBox = new CheckBox();
             this.RegistrationDateTimePicker = new DateTimePicker();
             this.OpenSubstrateInformationButton = new Button();
-            this.StockLabel1 = new Label();
+            this.StockLabel = new Label();
             this.StockLabel2 = new Label();
             this.otherNumberCheckBox = new CheckBox();
             this.ErrorMessageLabel = new Label();
@@ -138,18 +138,18 @@
             this.取得情報ToolStripMenuItem.Text = "取得情報";
             this.取得情報ToolStripMenuItem.Click += this.取得情報ToolStripMenuItem_Click;
             // 
-            // ProductNameLabel1
+            // ProductNameLabel
             // 
-            this.ProductNameLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            this.ProductNameLabel1.AutoSize = true;
-            this.ProductNameLabel1.BorderStyle = BorderStyle.Fixed3D;
-            this.ProductNameLabel1.Location = new Point(28, 39);
-            this.ProductNameLabel1.Margin = new Padding(4, 0, 4, 0);
-            this.ProductNameLabel1.Name = "ProductNameLabel1";
-            this.ProductNameLabel1.Size = new Size(54, 17);
-            this.ProductNameLabel1.TabIndex = 999;
-            this.ProductNameLabel1.Text = "製品名 :";
-            this.ProductNameLabel1.TextAlign = ContentAlignment.MiddleRight;
+            this.ProductNameLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.ProductNameLabel.AutoSize = true;
+            this.ProductNameLabel.BorderStyle = BorderStyle.Fixed3D;
+            this.ProductNameLabel.Location = new Point(28, 39);
+            this.ProductNameLabel.Margin = new Padding(4, 0, 4, 0);
+            this.ProductNameLabel.Name = "ProductNameLabel";
+            this.ProductNameLabel.Size = new Size(54, 17);
+            this.ProductNameLabel.TabIndex = 999;
+            this.ProductNameLabel.Text = "製品名 :";
+            this.ProductNameLabel.TextAlign = ContentAlignment.MiddleRight;
             // 
             // ProductNameLabel2
             // 
@@ -163,18 +163,18 @@
             this.ProductNameLabel2.Text = "---";
             this.ProductNameLabel2.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // SubstrateModelLabel1
+            // SubstrateModelLabel
             // 
-            this.SubstrateModelLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            this.SubstrateModelLabel1.AutoSize = true;
-            this.SubstrateModelLabel1.BorderStyle = BorderStyle.Fixed3D;
-            this.SubstrateModelLabel1.Location = new Point(16, 62);
-            this.SubstrateModelLabel1.Margin = new Padding(4, 0, 4, 0);
-            this.SubstrateModelLabel1.Name = "SubstrateModelLabel1";
-            this.SubstrateModelLabel1.Size = new Size(66, 17);
-            this.SubstrateModelLabel1.TabIndex = 999;
-            this.SubstrateModelLabel1.Text = "基板型式 :";
-            this.SubstrateModelLabel1.TextAlign = ContentAlignment.MiddleRight;
+            this.SubstrateModelLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.SubstrateModelLabel.AutoSize = true;
+            this.SubstrateModelLabel.BorderStyle = BorderStyle.Fixed3D;
+            this.SubstrateModelLabel.Location = new Point(16, 62);
+            this.SubstrateModelLabel.Margin = new Padding(4, 0, 4, 0);
+            this.SubstrateModelLabel.Name = "SubstrateModelLabel";
+            this.SubstrateModelLabel.Size = new Size(66, 17);
+            this.SubstrateModelLabel.TabIndex = 999;
+            this.SubstrateModelLabel.Text = "基板型式 :";
+            this.SubstrateModelLabel.TextAlign = ContentAlignment.MiddleRight;
             // 
             // SubstrateModelLabel2
             // 
@@ -561,18 +561,18 @@
             this.OpenSubstrateInformationButton.UseVisualStyleBackColor = true;
             this.OpenSubstrateInformationButton.Click += this.OpenSubstrateInformationButton_Click;
             // 
-            // StockLabel1
+            // StockLabel
             // 
-            this.StockLabel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            this.StockLabel1.AutoSize = true;
-            this.StockLabel1.BorderStyle = BorderStyle.Fixed3D;
-            this.StockLabel1.Location = new Point(28, 85);
-            this.StockLabel1.Margin = new Padding(4, 0, 4, 0);
-            this.StockLabel1.Name = "StockLabel1";
-            this.StockLabel1.Size = new Size(54, 17);
-            this.StockLabel1.TabIndex = 999;
-            this.StockLabel1.Text = "在庫数 :";
-            this.StockLabel1.TextAlign = ContentAlignment.MiddleRight;
+            this.StockLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.StockLabel.AutoSize = true;
+            this.StockLabel.BorderStyle = BorderStyle.Fixed3D;
+            this.StockLabel.Location = new Point(28, 85);
+            this.StockLabel.Margin = new Padding(4, 0, 4, 0);
+            this.StockLabel.Name = "StockLabel";
+            this.StockLabel.Size = new Size(54, 17);
+            this.StockLabel.TabIndex = 999;
+            this.StockLabel.Text = "在庫数 :";
+            this.StockLabel.TextAlign = ContentAlignment.MiddleRight;
             // 
             // StockLabel2
             // 
@@ -637,7 +637,7 @@
             this.Controls.Add(this.ErrorMessageLabel);
             this.Controls.Add(this.otherNumberCheckBox);
             this.Controls.Add(this.StockLabel2);
-            this.Controls.Add(this.StockLabel1);
+            this.Controls.Add(this.StockLabel);
             this.Controls.Add(this.OpenSubstrateInformationButton);
             this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.PrintButton);
@@ -668,9 +668,9 @@
             this.Controls.Add(this.OrderNumberTextBox);
             this.Controls.Add(this.OrderNumberCheckBox);
             this.Controls.Add(this.SubstrateModelLabel2);
-            this.Controls.Add(this.SubstrateModelLabel1);
+            this.Controls.Add(this.SubstrateModelLabel);
             this.Controls.Add(this.ProductNameLabel2);
-            this.Controls.Add(this.ProductNameLabel1);
+            this.Controls.Add(this.ProductNameLabel);
             this.Controls.Add(this.SubstrateRegistrationMenuStrip);
             this.Controls.Add(this.CommentTextBoxPanel);
             this.Font = new Font("Meiryo UI", 9F);
@@ -705,9 +705,9 @@
         private ToolStripMenuItem 印刷設定ToolStripMenuItem;
         private ToolStripMenuItem ヘルプToolStripMenuItem;
         private ToolStripMenuItem 取得情報ToolStripMenuItem;
-        private Label ProductNameLabel1;
+        private Label ProductNameLabel;
         private Label ProductNameLabel2;
-        private Label SubstrateModelLabel1;
+        private Label SubstrateModelLabel;
         private Label SubstrateModelLabel2;
         private CheckBox OrderNumberCheckBox;
         private TextBox OrderNumberTextBox;
@@ -742,7 +742,7 @@
         private CheckBox textToUpperCheckBox;
         private DateTimePicker RegistrationDateTimePicker;
         private Button OpenSubstrateInformationButton;
-        private Label StockLabel1;
+        private Label StockLabel;
         private Label StockLabel2;
         private CheckBox otherNumberCheckBox;
         private Label ErrorMessageLabel;

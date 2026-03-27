@@ -425,6 +425,7 @@ namespace ProductDatabase {
                     {"ProductModel", $"{_productMaster.ProductModel}"},
                     {"RevisionGroup", $"{_productMaster.RevisionGroup}"},
                     {"Initial", $"{_productMaster.Initial}"},
+                    {"OLesInitial", $"{_productMaster.OLesInitial}"},
                     {"RegType", $"{_productMaster.RegType}"},
                     {"SerialPrintType", $"{_productMaster.SerialPrintType}"},
                     {"SheetPrintType", $"{_productMaster.SheetPrintType}"},

@@ -383,7 +383,7 @@ namespace ProductDatabase {
                 ["{S}"] = substrateNumber
             };
 
-            var outputCodes = LabelPrintSettings.TextFormat ?? string.Empty;
+            var outputCodes = LabelPrintSettings.LabelTextFormat ?? string.Empty;
             foreach (var kv in map) {
                 outputCodes = outputCodes.Replace(kv.Key, kv.Value);
             }

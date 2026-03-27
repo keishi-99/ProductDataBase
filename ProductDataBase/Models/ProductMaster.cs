@@ -8,6 +8,7 @@ namespace ProductDatabase.Models {
         public string ProductModel { get; set; } = string.Empty;
         public string ProductType { get; set; } = string.Empty;
         public string Initial { get; set; } = string.Empty;
+        public string OLesInitial { get; set; } = string.Empty;
         public int SerialDigitType { get; set; }
         public int SerialDigit => SerialDigitType switch {
             3 or 101 or 102 => 3,
@@ -33,6 +34,7 @@ namespace ProductDatabase.Models {
 
         public bool IsBarcodePrint { get; private set; }
         public bool IsNameplatePrint { get; private set; }
+        public bool IsOLesLabelPrint { get; private set; }
         public bool IsLast4Digits { get; private set; }
         public bool IsUnderlinePrint { get; private set; }
 
@@ -61,6 +63,7 @@ namespace ProductDatabase.Models {
             var flags = (SerialPrintTypeFlags)_serialPrintType;
             IsBarcodePrint = flags.HasFlag(SerialPrintTypeFlags.Barcode);
             IsNameplatePrint = flags.HasFlag(SerialPrintTypeFlags.Nameplate);
+            IsOLesLabelPrint = flags.HasFlag(SerialPrintTypeFlags.OLesSerial);
             IsUnderlinePrint = flags.HasFlag(SerialPrintTypeFlags.Underline);
             IsLast4Digits = flags.HasFlag(SerialPrintTypeFlags.Last4Digits);
         }
@@ -91,6 +94,7 @@ namespace ProductDatabase.Models {
             ProductType = row.Field<string>("ProductType") ?? string.Empty;
             ProductModel = row.Field<string>("ProductModel") ?? string.Empty;
             Initial = row.Field<string>("Initial") ?? string.Empty;
+            OLesInitial = row.Field<string>("OLesInitial") ?? string.Empty;
             RevisionGroup = (int)row.Field<long>("RevisionGroup");
             RegType = (int)row.Field<long>("RegType");
             CheckBin = Convert.ToInt32(row["Checkbox"].ToString(), 2); // バイナリ文字列変換のため維持
@@ -108,6 +112,7 @@ namespace ProductDatabase.Models {
             ProductModel = string.Empty;
             ProductType = string.Empty;
             Initial = string.Empty;
+            OLesInitial = string.Empty;
             SerialDigitType = 0;
             RevisionGroup = 0;
             CheckBin = 0;

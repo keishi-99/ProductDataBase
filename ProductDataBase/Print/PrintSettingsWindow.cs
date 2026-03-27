@@ -1,4 +1,4 @@
-﻿using System.Text.Encodings.Web;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
@@ -44,7 +44,7 @@ namespace ProductDatabase {
                     _isLabelPrint = ProductMaster.IsLabelPrint;
                     _isBarcodePrint = ProductMaster.IsBarcodePrint;
                     _isNameplatePrint = ProductMaster.IsNameplatePrint;
-                    LoadSettingsFromWindow(rePrintWindow.ProductPrintSettings, rePrintWindow.printSettingPath);
+                    LoadSettingsFromWindow(rePrintWindow.ProductPrintSettings, rePrintWindow.PrintSettingPath);
                     break;
                 default:
                     MessageBox.Show("この画面を開くには正しいウィンドウから開いてください。");

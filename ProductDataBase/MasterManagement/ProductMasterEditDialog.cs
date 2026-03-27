@@ -40,6 +40,9 @@ namespace ProductDatabase.MasterManagement {
                 VisibleCheckBox.Checked = true;
             }
 
+            // OLesSerial は Label が有効な場合のみ選択可能
+            OLesSerialPrintCheckBox.Enabled = LabelPrintCheckBox.Checked;
+
             // チェック状態辞書を初期化してからリストを構築する
             InitSubstrateCheckState();
             LoadSubstrateCheckedList();
@@ -130,6 +133,7 @@ namespace ProductDatabase.MasterManagement {
             ProductModelTextBox.Text = _product.ProductModel;
             ProductTypeTextBox.Text = _product.ProductType;
             InitialTextBox.Text = _product.Initial;
+            OLesInitialTextBox.Text = _product.OLesInitial;
             VisibleCheckBox.Checked = _product.Visible;
 
             // RegType ComboBox
@@ -146,6 +150,7 @@ namespace ProductDatabase.MasterManagement {
             LabelPrintCheckBox.Checked = spf.HasFlag(SerialPrintTypeFlags.Label);
             BarcodePrintCheckBox.Checked = spf.HasFlag(SerialPrintTypeFlags.Barcode);
             NameplatePrintCheckBox.Checked = spf.HasFlag(SerialPrintTypeFlags.Nameplate);
+            OLesSerialPrintCheckBox.Checked = spf.HasFlag(SerialPrintTypeFlags.OLesSerial);
             UnderlinePrintCheckBox.Checked = spf.HasFlag(SerialPrintTypeFlags.Underline);
             Last4DigitsPrintCheckBox.Checked = spf.HasFlag(SerialPrintTypeFlags.Last4Digits);
 
@@ -249,13 +254,14 @@ namespace ProductDatabase.MasterManagement {
             _product.ProductModel = ProductModelTextBox.Text.Trim();
             _product.ProductType = ProductTypeTextBox.Text.Trim();
             _product.Initial = InitialTextBox.Text.Trim();
+            _product.OLesInitial = OLesInitialTextBox.Text.Trim();
             _product.Visible = VisibleCheckBox.Checked;
 
             // RegType
             _product.RegType = RegTypeComboBox.SelectedItem is ComboItem regItem ? regItem.Value : 0;
 
             // SerialType（SerialDigitType に格納）
-            _product.SerialDigitType = SerialTypeComboBox.SelectedItem is ComboItem serialItem ? serialItem.Value : 3;
+            _product.SerialDigitType = SerialTypeComboBox.SelectedItem is ComboItem serialItem ? serialItem.Value : 0;
 
             // RevisionGroup
             _product.RevisionGroup = (int)RevisionGroupNumericUpDown.Value;
@@ -265,6 +271,7 @@ namespace ProductDatabase.MasterManagement {
             if (LabelPrintCheckBox.Checked) spf |= (int)SerialPrintTypeFlags.Label;
             if (BarcodePrintCheckBox.Checked) spf |= (int)SerialPrintTypeFlags.Barcode;
             if (NameplatePrintCheckBox.Checked) spf |= (int)SerialPrintTypeFlags.Nameplate;
+            if (OLesSerialPrintCheckBox.Checked) spf |= (int)SerialPrintTypeFlags.OLesSerial;
             if (UnderlinePrintCheckBox.Checked) spf |= (int)SerialPrintTypeFlags.Underline;
             if (Last4DigitsPrintCheckBox.Checked) spf |= (int)SerialPrintTypeFlags.Last4Digits;
             _product.SerialPrintType = spf;
@@ -297,6 +304,14 @@ namespace ProductDatabase.MasterManagement {
             if (_isLoadingSubstrateList) return;
             if (SubstrateCheckedListBox.Items[e.Index] is not ListItem<long> item) return;
             _substrateCheckState[item.Id] = (e.NewValue == CheckState.Checked);
+        }
+
+        // Label チェック状態変化時に OLesSerial の有効・無効を切り替える
+        private void LabelPrintCheckBox_CheckedChanged(object sender, EventArgs e) {
+            if (!LabelPrintCheckBox.Checked) {
+                OLesSerialPrintCheckBox.Checked = false;
+            }
+            OLesSerialPrintCheckBox.Enabled = LabelPrintCheckBox.Checked;
         }
 
         // フィルターテキスト変更時にリストを再描画する
