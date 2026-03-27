@@ -387,7 +387,7 @@ namespace ProductDatabase {
                 SerialType.Label => LabelPrintSettings.LabelTextFormat ?? string.Empty,
                 SerialType.OLesLabel => LabelPrintSettings.OLesLabelTextFormat ?? string.Empty,
                 SerialType.Barcode => BarcodePrintSettings.LabelTextFormat ?? string.Empty,
-                SerialType.Nameplate => NameplatePrintSettings.LabelTextFormat ?? string.Empty,
+                SerialType.Nameplate => NameplatePrintSettings.NameplateTextFormat ?? string.Empty,
                 _ => string.Empty
             };
 
