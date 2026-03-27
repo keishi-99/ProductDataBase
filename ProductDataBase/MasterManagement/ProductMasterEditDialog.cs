@@ -62,6 +62,7 @@ namespace ProductDatabase.MasterManagement {
             RegTypeComboBox.SelectedIndex = 0;
 
             SerialTypeComboBox.Items.Clear();
+            SerialTypeComboBox.Items.Add(new ComboItem(0, "0  - なし（シリアル生成なし）"));
             SerialTypeComboBox.Items.Add(new ComboItem(3, "3  - 3桁 (001〜999)"));
             SerialTypeComboBox.Items.Add(new ComboItem(4, "4  - 4桁 (0001〜9999)"));
             SerialTypeComboBox.Items.Add(new ComboItem(101, "101 - 3桁 (001〜899)"));

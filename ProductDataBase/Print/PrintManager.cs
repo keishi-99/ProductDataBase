@@ -463,14 +463,13 @@ namespace ProductDatabase.Print {
             [Category("印字設定"), DisplayName("印字フォント"), JsonConverter(typeof(FontJsonConverter))]
             public Font TextFont { get; set; } = SystemFonts.DefaultFont;
 
+        }
+
+        public class LabelPrintSettings : PrintSettingsBase {
             [Category("O-Lesラベル設定"), DisplayName("O-Lesラベル発行枚数")]
             public int CopiesPerOLesLabel { get; set; }
             [Category("O-Lesラベル設定"), DisplayName("O-Lesラベル 印字フォーマット"), Description("{OT}(O-Les型式)  {T}(型式)  {R}(リビジョン)  {S}(シリアル)  {Y}(製造年)  {M}(製造月(1桁))  {MM}(製造月(2桁))")]
             public string OLesLabelTextFormat { get; set; } = string.Empty;
-
-        }
-
-        public class LabelPrintSettings : PrintSettingsBase {
         }
 
         public class BarcodePrintSettings : PrintSettingsBase {
