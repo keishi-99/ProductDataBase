@@ -954,7 +954,7 @@ namespace ProductDatabase {
             var outputCode = resolvedType switch {
                 SerialType.Label => LabelPrintSettings.LabelTextFormat ?? string.Empty,
                 SerialType.Barcode => BarcodePrintSettings.LabelTextFormat ?? string.Empty,
-                SerialType.Nameplate => NameplatePrintSettings.TextFormat ?? string.Empty,
+                SerialType.Nameplate => NameplatePrintSettings.LabelTextFormat ?? string.Empty,
                 SerialType.OLesLabel => LabelPrintSettings.OLesLabelTextFormat ?? string.Empty,
                 _ => string.Empty
             };
