@@ -88,7 +88,7 @@
             // TemplateButton
             // 
             this.TemplateButton.Enabled = false;
-            this.TemplateButton.Location = new Point(543, 340);
+            this.TemplateButton.Location = new Point(543, 269);
             this.TemplateButton.Name = "TemplateButton";
             this.TemplateButton.Size = new Size(75, 25);
             this.TemplateButton.TabIndex = 24;
@@ -102,7 +102,7 @@
             this.CommentComboBox.DropDownWidth = 150;
             this.CommentComboBox.Enabled = false;
             this.CommentComboBox.FormattingEnabled = true;
-            this.CommentComboBox.Location = new Point(313, 341);
+            this.CommentComboBox.Location = new Point(313, 270);
             this.CommentComboBox.Name = "CommentComboBox";
             this.CommentComboBox.Size = new Size(224, 23);
             this.CommentComboBox.TabIndex = 23;
@@ -117,7 +117,7 @@
             this.CommentTextBox.Multiline = true;
             this.CommentTextBox.Name = "CommentTextBox";
             this.CommentTextBox.ScrollBars = ScrollBars.Vertical;
-            this.CommentTextBox.Size = new Size(305, 193);
+            this.CommentTextBox.Size = new Size(305, 123);
             this.CommentTextBox.TabIndex = 22;
             // 
             // CommentCheckBox
@@ -476,7 +476,7 @@
             this.panelCommentTextBox.Controls.Add(this.CommentTextBox);
             this.panelCommentTextBox.Location = new Point(313, 141);
             this.panelCommentTextBox.Name = "panelCommentTextBox";
-            this.panelCommentTextBox.Size = new Size(305, 193);
+            this.panelCommentTextBox.Size = new Size(305, 123);
             this.panelCommentTextBox.TabIndex = 22;
             // 
             // QrCodeTextBox
@@ -541,19 +541,16 @@
             // 
             // MessageTextBox
             // 
-            this.MessageTextBox.Enabled = false;
             this.MessageTextBox.ForeColor = Color.Red;
-            this.MessageTextBox.Location = new Point(168, 377);
+            this.MessageTextBox.Location = new Point(313, 300);
             this.MessageTextBox.MaxLength = 100;
-            this.MessageTextBox.Multiline = false;
             this.MessageTextBox.Name = "MessageTextBox";
             this.MessageTextBox.ReadOnly = true;
-            this.MessageTextBox.ScrollBars = RichTextBoxScrollBars.None;
-            this.MessageTextBox.Size = new Size(450, 25);
+            this.MessageTextBox.ScrollBars = RichTextBoxScrollBars.ForcedVertical;
+            this.MessageTextBox.Size = new Size(299, 64);
             this.MessageTextBox.TabIndex = 999;
             this.MessageTextBox.TabStop = false;
             this.MessageTextBox.Text = "";
-            this.MessageTextBox.WordWrap = false;
             // 
             // ErrorMessageLabel
             // 
