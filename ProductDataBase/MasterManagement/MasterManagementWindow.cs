@@ -52,6 +52,9 @@ namespace ProductDatabase.MasterManagement {
                     ProductType = r["ProductType"]?.ToString() ?? string.Empty,
                     ProductModel = r["ProductModel"]?.ToString() ?? string.Empty,
                     RegType = (int)r.Field<long>("RegType"),
+                    SerialPrintType = (int)(r.Field<long?>("SerialPrintType") ?? 0L),
+                    SheetPrintType = (int)(r.Field<long?>("SheetPrintType") ?? 0L),
+                    SerialType = (int)(r.Field<long?>("SerialType") ?? 0L),
                     Visible = (int)(r.Field<long?>("Visible") ?? 0L)
                 });
 
@@ -68,6 +71,12 @@ namespace ProductDatabase.MasterManagement {
                 ("ProductModel", false) => query.OrderByDescending(r => r.ProductModel),
                 ("RegType", true) => query.OrderBy(r => r.RegType),
                 ("RegType", false) => query.OrderByDescending(r => r.RegType),
+                ("SerialPrintType", true) => query.OrderBy(r => r.SerialPrintType),
+                ("SerialPrintType", false) => query.OrderByDescending(r => r.SerialPrintType),
+                ("SheetPrintType", true) => query.OrderBy(r => r.SheetPrintType),
+                ("SheetPrintType", false) => query.OrderByDescending(r => r.SheetPrintType),
+                ("SerialType", true) => query.OrderBy(r => r.SerialType),
+                ("SerialType", false) => query.OrderByDescending(r => r.SerialType),
                 ("Visible", true) => query.OrderBy(r => r.Visible),
                 ("Visible", false) => query.OrderByDescending(r => r.Visible),
                 _ => query.OrderBy(r => r.ProductID)
@@ -129,8 +138,11 @@ namespace ProductDatabase.MasterManagement {
                 { "ProductName",  "製品名" },
                 { "ProductType",  "製品タイプ" },
                 { "ProductModel", "製品型式" },
-                { "RegType",      "登録タイプ" },
-                { "Visible",      "表示" }
+                { "RegType",         "登録タイプ" },
+                { "SerialPrintType", "シリアル印字タイプ" },
+                { "SheetPrintType",  "シート印字タイプ" },
+                { "SerialType",      "シリアル桁数タイプ" },
+                { "Visible",         "表示" }
             };
             foreach (DataGridViewColumn col in ProductDataGridView.Columns) {
                 if (headers.TryGetValue(col.Name, out var header)) {

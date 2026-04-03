@@ -44,8 +44,8 @@ namespace ProductDatabase.MasterManagement {
             // 
             // MasterTabControl
             // 
-            this.MasterTabControl.Controls.Add(this.ProductTabPage);
             this.MasterTabControl.Controls.Add(this.SubstrateTabPage);
+            this.MasterTabControl.Controls.Add(this.ProductTabPage);
             this.MasterTabControl.Dock = DockStyle.Fill;
             this.MasterTabControl.Location = new Point(0, 0);
             this.MasterTabControl.Name = "MasterTabControl";
@@ -62,7 +62,7 @@ namespace ProductDatabase.MasterManagement {
             this.ProductTabPage.Name = "ProductTabPage";
             this.ProductTabPage.Padding = new Padding(3);
             this.ProductTabPage.Size = new Size(952, 612);
-            this.ProductTabPage.TabIndex = 0;
+            this.ProductTabPage.TabIndex = 1;
             this.ProductTabPage.Text = "製品マスター";
             this.ProductTabPage.UseVisualStyleBackColor = true;
             // 
@@ -70,6 +70,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             this.ProductDataGridView.AllowUserToAddRows = false;
             this.ProductDataGridView.AllowUserToDeleteRows = false;
+            this.ProductDataGridView.AllowUserToResizeRows = false;
             this.ProductDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             this.ProductDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ProductDataGridView.Dock = DockStyle.Fill;
@@ -160,7 +161,7 @@ namespace ProductDatabase.MasterManagement {
             this.SubstrateTabPage.Name = "SubstrateTabPage";
             this.SubstrateTabPage.Padding = new Padding(3);
             this.SubstrateTabPage.Size = new Size(952, 612);
-            this.SubstrateTabPage.TabIndex = 1;
+            this.SubstrateTabPage.TabIndex = 0;
             this.SubstrateTabPage.Text = "基板マスター";
             this.SubstrateTabPage.UseVisualStyleBackColor = true;
             // 
@@ -168,6 +169,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             this.SubstrateDataGridView.AllowUserToAddRows = false;
             this.SubstrateDataGridView.AllowUserToDeleteRows = false;
+            this.SubstrateDataGridView.AllowUserToResizeRows = false;
             this.SubstrateDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             this.SubstrateDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.SubstrateDataGridView.Dock = DockStyle.Fill;
