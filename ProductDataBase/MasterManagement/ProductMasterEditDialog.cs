@@ -1,10 +1,6 @@
 using ProductDatabase.Data;
 using ProductDatabase.Models;
-using ProductDatabase.Print;
 using System.Data;
-using System.Text.Json;
-using static ProductDatabase.Print.PrintManager;
-using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase.MasterManagement {
     public partial class ProductMasterEditDialog : Form {
@@ -25,20 +21,6 @@ namespace ProductDatabase.MasterManagement {
         // LoadSubstrateCheckedList実行中のItemCheck誤発火を防ぐフラグ
         private bool _isLoadingSubstrateList = false;
 
-        // 印刷設定のシリアライズ・デシリアライズで共有するオプション
-        private static readonly JsonSerializerOptions s_jsonOptions = new() {
-            PropertyNamingPolicy = null,
-            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-        };
-
-        // PrintSettingsWindow から参照される印刷設定（読み込み後に保持）
-        public DocumentPrintSettings ProductPrintSettings { get; private set; } = new DocumentPrintSettings();
-
-        // PrintSettingsWindow から参照される設定ファイルパス
-        public string PrintSettingPath => Path.Combine(
-            Environment.CurrentDirectory, "config", "Product",
-            _product.CategoryName, _product.ProductName,
-            $"PrintConfig_{_product.ProductName}_{_product.ProductID}_{_product.ProductModel}.json");
 
         public ProductMasterEditDialog(ProductRepository repository, DataRow? sourceRow, AppSettings appSettings) {
             InitializeComponent();
@@ -63,9 +45,6 @@ namespace ProductDatabase.MasterManagement {
 
             // OLesSerial は Label が有効な場合のみ選択可能
             OLesSerialPrintCheckBox.Enabled = LabelPrintCheckBox.Checked;
-
-            // 新規追加時は ProductID がないため印刷詳細設定を無効化する
-            PrintDetailSettingsButton.Enabled = !_isNewRecord;
 
             // チェック状態辞書を初期化してからリストを構築する
             InitSubstrateCheckState();
@@ -345,58 +324,6 @@ namespace ProductDatabase.MasterManagement {
 
         private void SubstrateModelFilterTextBox_TextChanged(object sender, EventArgs e)
             => LoadSubstrateCheckedList();
-
-        // JSON から印刷設定を読み込み ProductPrintSettings を更新する
-        private void LoadPrintSettings() {
-            try {
-                ProductPrintSettings = new DocumentPrintSettings();
-                if (!File.Exists(PrintSettingPath)) { return; }
-                var json = File.ReadAllText(PrintSettingPath);
-                ProductPrintSettings = JsonSerializer.Deserialize<DocumentPrintSettings>(json, s_jsonOptions) ?? new DocumentPrintSettings();
-            } catch (Exception ex) {
-                MessageBox.Show($"印刷設定の読み込みに失敗しました。{Environment.NewLine}{ex.Message}",
-                    $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        // 指定した SerialType の印刷設定ウィンドウを開く
-        private void OpenPrintSettings(SerialType serialType) {
-            // PrintSettingPath が UI の最新値に依存するため、先に _product へ反映する
-            CollectFieldValues();
-            if (string.IsNullOrWhiteSpace(_product.CategoryName) || string.IsNullOrWhiteSpace(_product.ProductName) || string.IsNullOrWhiteSpace(_product.ProductModel)) {
-                MessageBox.Show("印刷設定を開くには、カテゴリ名、製品名、製品型式を入力してください。",
-                    "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            if (!File.Exists(PrintSettingPath)) {
-                MessageBox.Show("印刷設定ファイルが見つかりませんでした。",
-                    "印刷設定", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            LoadPrintSettings();
-            CurrentSerialType = serialType;
-            using PrintSettingsWindow window = new() {
-                AppSettings = _appSettings
-            };
-            window.ShowDialog(this);
-            LoadPrintSettings();
-        }
-
-        // 印刷詳細設定ボタン：ContextMenuStrip をボタン直下に表示する
-        private void PrintDetailSettingsButton_Click(object sender, EventArgs e)
-            => PrintDetailContextMenuStrip.Show(
-                PrintDetailSettingsButton,
-                new Point(0, PrintDetailSettingsButton.Height));
-
-        private void LabelSettingsMenuItem_Click(object sender, EventArgs e)
-            => OpenPrintSettings(SerialType.Label);
-
-        private void BarcodeSettingsMenuItem_Click(object sender, EventArgs e)
-            => OpenPrintSettings(SerialType.Barcode);
-
-        private void NameplateSettingsMenuItem_Click(object sender, EventArgs e)
-            => OpenPrintSettings(SerialType.Nameplate);
 
         // ComboBoxのアイテムを保持する内部クラス
         private sealed class ComboItem(int value, string label) {

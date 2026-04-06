@@ -19,6 +19,11 @@ namespace ProductDatabase.MasterManagement {
             this.ProductAddButton = new Button();
             this.ProductEditButton = new Button();
             this.ProductDeleteButton = new Button();
+            this.ProductPrintDetailContextMenuStrip = new ContextMenuStrip();
+            this.ProductLabelSettingsMenuItem = new ToolStripMenuItem();
+            this.ProductBarcodeSettingsMenuItem = new ToolStripMenuItem();
+            this.ProductNameplateSettingsMenuItem = new ToolStripMenuItem();
+            this.ProductPrintDetailSettingsButton = new Button();
             this.ProductSearchPanel = new Panel();
             this.ProductSearchLabel = new Label();
             this.ProductSearchBox = new TextBox();
@@ -89,6 +94,7 @@ namespace ProductDatabase.MasterManagement {
             this.ProductButtonPanel.Controls.Add(this.ProductAddButton);
             this.ProductButtonPanel.Controls.Add(this.ProductEditButton);
             this.ProductButtonPanel.Controls.Add(this.ProductDeleteButton);
+            this.ProductButtonPanel.Controls.Add(this.ProductPrintDetailSettingsButton);
             this.ProductButtonPanel.Dock = DockStyle.Bottom;
             this.ProductButtonPanel.Location = new Point(3, 575);
             this.ProductButtonPanel.Name = "ProductButtonPanel";
@@ -124,7 +130,44 @@ namespace ProductDatabase.MasterManagement {
             this.ProductDeleteButton.Text = "削除";
             this.ProductDeleteButton.UseVisualStyleBackColor = true;
             this.ProductDeleteButton.Click += this.ProductDeleteButton_Click;
-            // 
+            //
+            // ProductPrintDetailContextMenuStrip
+            //
+            this.ProductPrintDetailContextMenuStrip.Items.AddRange(new ToolStripItem[] {
+                this.ProductLabelSettingsMenuItem,
+                this.ProductBarcodeSettingsMenuItem,
+                this.ProductNameplateSettingsMenuItem
+            });
+            this.ProductPrintDetailContextMenuStrip.Name = "ProductPrintDetailContextMenuStrip";
+            //
+            // ProductLabelSettingsMenuItem
+            //
+            this.ProductLabelSettingsMenuItem.Name = "ProductLabelSettingsMenuItem";
+            this.ProductLabelSettingsMenuItem.Text = "ラベル設定";
+            this.ProductLabelSettingsMenuItem.Click += this.ProductLabelSettingsMenuItem_Click;
+            //
+            // ProductBarcodeSettingsMenuItem
+            //
+            this.ProductBarcodeSettingsMenuItem.Name = "ProductBarcodeSettingsMenuItem";
+            this.ProductBarcodeSettingsMenuItem.Text = "バーコード設定";
+            this.ProductBarcodeSettingsMenuItem.Click += this.ProductBarcodeSettingsMenuItem_Click;
+            //
+            // ProductNameplateSettingsMenuItem
+            //
+            this.ProductNameplateSettingsMenuItem.Name = "ProductNameplateSettingsMenuItem";
+            this.ProductNameplateSettingsMenuItem.Text = "銘版設定";
+            this.ProductNameplateSettingsMenuItem.Click += this.ProductNameplateSettingsMenuItem_Click;
+            //
+            // ProductPrintDetailSettingsButton
+            //
+            this.ProductPrintDetailSettingsButton.Location = new Point(264, 3);
+            this.ProductPrintDetailSettingsButton.Name = "ProductPrintDetailSettingsButton";
+            this.ProductPrintDetailSettingsButton.Size = new Size(120, 28);
+            this.ProductPrintDetailSettingsButton.TabIndex = 3;
+            this.ProductPrintDetailSettingsButton.Text = "印刷詳細設定 ▼";
+            this.ProductPrintDetailSettingsButton.UseVisualStyleBackColor = true;
+            this.ProductPrintDetailSettingsButton.Click += this.ProductPrintDetailSettingsButton_Click;
+            //
             // ProductSearchPanel
             // 
             this.ProductSearchPanel.Controls.Add(this.ProductSearchLabel);
@@ -291,6 +334,11 @@ namespace ProductDatabase.MasterManagement {
         private Button ProductAddButton;
         private Button ProductEditButton;
         private Button ProductDeleteButton;
+        private ContextMenuStrip ProductPrintDetailContextMenuStrip;
+        private ToolStripMenuItem ProductLabelSettingsMenuItem;
+        private ToolStripMenuItem ProductBarcodeSettingsMenuItem;
+        private ToolStripMenuItem ProductNameplateSettingsMenuItem;
+        private Button ProductPrintDetailSettingsButton;
         private TabPage SubstrateTabPage;
         private Panel SubstrateSearchPanel;
         private Label SubstrateSearchLabel;

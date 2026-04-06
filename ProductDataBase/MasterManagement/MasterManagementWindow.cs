@@ -1,6 +1,13 @@
 using ProductDatabase.Data;
 using ProductDatabase.Models;
+using ProductDatabase.Print;
 using System.Data;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Unicode;
+using static ProductDatabase.Print.PrintManager;
+using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase.MasterManagement {
     public partial class MasterManagementWindow : Form {
@@ -21,6 +28,18 @@ namespace ProductDatabase.MasterManagement {
         // 基板グリッドのソート状態
         private string _substrateSortColumn = "SubstrateID";
         private bool _substrateSortAscending = true;
+
+        // 印刷設定のシリアライズ・デシリアライズで共有するオプション
+        private static readonly JsonSerializerOptions s_jsonOptions = new() {
+            PropertyNamingPolicy = null,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        };
+
+        // PrintSettingsWindow から参照される印刷設定（読み込み後に保持）
+        public DocumentPrintSettings ProductPrintSettings { get; private set; } = new DocumentPrintSettings();
+
+        // PrintSettingsWindow から参照される設定ファイルパス（選択行のDB保存済み値から生成）
+        public string PrintSettingPath { get; private set; } = string.Empty;
 
         public MasterManagementWindow(ProductRepository repository, AppSettings appSettings) {
             InitializeComponent();
@@ -345,6 +364,82 @@ namespace ProductDatabase.MasterManagement {
                 _substrateSortAscending = true;
             }
             BindSubstrateGrid();
+        }
+
+        // 印刷詳細設定ボタン：ContextMenuStrip をボタン直下に表示する
+        private void ProductPrintDetailSettingsButton_Click(object sender, EventArgs e)
+            => ProductPrintDetailContextMenuStrip.Show(
+                ProductPrintDetailSettingsButton,
+                new Point(0, ProductPrintDetailSettingsButton.Height));
+
+        private void ProductLabelSettingsMenuItem_Click(object sender, EventArgs e)
+            => OpenPrintSettings(SerialType.Label);
+
+        private void ProductBarcodeSettingsMenuItem_Click(object sender, EventArgs e)
+            => OpenPrintSettings(SerialType.Barcode);
+
+        private void ProductNameplateSettingsMenuItem_Click(object sender, EventArgs e)
+            => OpenPrintSettings(SerialType.Nameplate);
+
+        // 選択中の製品の印刷設定ウィンドウを開く
+        private void OpenPrintSettings(SerialType serialType) {
+            if (ProductDataGridView.SelectedRows.Count == 0) {
+                MessageBox.Show("印刷設定を開く製品を選択してください。", string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var row = ProductDataGridView.SelectedRows[0];
+            var categoryName = row.Cells["CategoryName"].Value?.ToString() ?? string.Empty;
+            var productName  = row.Cells["ProductName"].Value?.ToString() ?? string.Empty;
+            var productModel = row.Cells["ProductModel"].Value?.ToString() ?? string.Empty;
+            var productId    = (long)row.Cells["ProductID"].Value;
+
+            // DB保存済みの値からパスを生成するためUIの未保存変更に影響されない
+            PrintSettingPath = Path.Combine(
+                Environment.CurrentDirectory, "config", "Product",
+                categoryName, productName,
+                $"PrintConfig_{productName}_{productId}_{productModel}.json");
+
+            if (!File.Exists(PrintSettingPath)) {
+                var result = MessageBox.Show(
+                    "印刷設定ファイルが存在しません。新規作成しますか？",
+                    "印刷設定",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+                if (result != DialogResult.Yes) { return; }
+
+                try {
+                    Directory.CreateDirectory(Path.GetDirectoryName(PrintSettingPath)!);
+                    var defaultSettings = new DocumentPrintSettings();
+                    var createOptions = new JsonSerializerOptions {
+                        WriteIndented = true,
+                        PropertyNamingPolicy = null,
+                        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                    };
+                    File.WriteAllText(PrintSettingPath, JsonSerializer.Serialize(defaultSettings, createOptions));
+                    ProductPrintSettings = defaultSettings;
+                } catch (Exception ex) {
+                    MessageBox.Show($"印刷設定ファイルの作成に失敗しました。{Environment.NewLine}{ex.Message}",
+                        $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            } else {
+                try {
+                    var json = File.ReadAllText(PrintSettingPath);
+                    ProductPrintSettings = JsonSerializer.Deserialize<DocumentPrintSettings>(json, s_jsonOptions) ?? new DocumentPrintSettings();
+                } catch (Exception ex) {
+                    MessageBox.Show($"印刷設定の読み込みに失敗しました。{Environment.NewLine}{ex.Message}",
+                        $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
+            CurrentSerialType = serialType;
+            using PrintSettingsWindow window = new() { AppSettings = _appSettings };
+            window.ShowDialog(this);
         }
 
         // ソートグリフ（↑↓）をグリッドのヘッダーに反映する
