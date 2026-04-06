@@ -102,7 +102,8 @@ namespace ProductDatabase {
                 QRCodePanel.Enabled = _appSettings.IsAuthorizedUser;
 
                 // 管理者のみマスター管理メニューを有効にする
-                MasterManagementToolStripMenuItem.Enabled = _appSettings.IsAdministrator;
+                //MasterManagementToolStripMenuItem.Enabled = _appSettings.IsAdministrator;
+                MasterManagementToolStripMenuItem.Enabled = true;
                 QRCodeTextBox.Select();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
