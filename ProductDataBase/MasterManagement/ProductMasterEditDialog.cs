@@ -346,7 +346,10 @@ namespace ProductDatabase.MasterManagement {
                 ProductPrintSettings = new DocumentPrintSettings();
                 if (!File.Exists(PrintSettingPath)) { return; }
                 var json = File.ReadAllText(PrintSettingPath);
-                ProductPrintSettings = JsonSerializer.Deserialize<DocumentPrintSettings>(json) ?? new DocumentPrintSettings();
+                ProductPrintSettings = JsonSerializer.Deserialize<DocumentPrintSettings>(json, new JsonSerializerOptions {
+                    PropertyNamingPolicy = null,
+                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+                }) ?? new DocumentPrintSettings();
             } catch (Exception ex) {
                 MessageBox.Show($"印刷設定の読み込みに失敗しました。{Environment.NewLine}{ex.Message}",
                     $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー",
@@ -356,6 +359,8 @@ namespace ProductDatabase.MasterManagement {
 
         // 指定した SerialType の印刷設定ウィンドウを開く
         private void OpenPrintSettings(SerialType serialType) {
+            // PrintSettingPath が UI の最新値に依存するため、先に _product へ反映する
+            CollectFieldValues();
             if (!File.Exists(PrintSettingPath)) {
                 MessageBox.Show("印刷設定ファイルが見つかりませんでした。",
                     "印刷設定", MessageBoxButtons.OK, MessageBoxIcon.Warning);
