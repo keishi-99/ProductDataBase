@@ -46,11 +46,11 @@ namespace ProductDatabase.Other {
 
         // 保存ボタン：コントロールの値をプロパティに格納してダイアログを閉じる（空欄はnull）
         private void SaveButton_Click(object sender, EventArgs e) {
-            OrderNumber = string.IsNullOrEmpty(OrderNumberTextBox.Text) ? null : OrderNumberTextBox.Text;
-            ProductNumber = string.IsNullOrEmpty(ProductNumberTextBox.Text) ? null : ProductNumberTextBox.Text;
-            OLesNumber = string.IsNullOrEmpty(OLesNumberTextBox.Text) ? null : OLesNumberTextBox.Text;
-            Person = string.IsNullOrEmpty(PersonTextBox.Text) ? null : PersonTextBox.Text;
-            Comment = string.IsNullOrEmpty(CommentTextBox.Text) ? null : CommentTextBox.Text;
+            OrderNumber = string.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? null : OrderNumberTextBox.Text;
+            ProductNumber = string.IsNullOrWhiteSpace(ProductNumberTextBox.Text) ? null : ProductNumberTextBox.Text;
+            OLesNumber = string.IsNullOrWhiteSpace(OLesNumberTextBox.Text) ? null : OLesNumberTextBox.Text;
+            Person = string.IsNullOrWhiteSpace(PersonTextBox.Text) ? null : PersonTextBox.Text;
+            Comment = string.IsNullOrWhiteSpace(CommentTextBox.Text) ? null : CommentTextBox.Text;
 
             this.DialogResult = DialogResult.OK;
             this.Close();

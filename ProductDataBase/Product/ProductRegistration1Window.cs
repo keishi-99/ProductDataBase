@@ -299,7 +299,7 @@ namespace ProductDatabase {
                     _productRegisterWork.RegDate,
                     _productMaster.RevisionGroup,
                     SerialLastNumber = serialLastNum,
-                    _productRegisterWork.Comment
+                    Comment = _productRegisterWork.Comment.NullIfWhiteSpace()
                 }, transaction: transaction);
 
                 var id = connection.ExecuteScalar<int>("SELECT last_insert_rowid();", transaction: transaction);
