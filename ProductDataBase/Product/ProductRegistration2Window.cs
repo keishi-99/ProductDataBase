@@ -447,7 +447,7 @@ namespace ProductDatabase {
                 SerialFirst = _productRegisterWork.SerialFirst.NullIfWhiteSpace(),
                 SerialLast = _productRegisterWork.SerialLast.NullIfWhiteSpace(),
                 SerialLastNumber = _productMaster.IsSerialGeneration ? (int?)_serialLastNumber : null,
-                Comment = comment
+                Comment = comment.NullIfWhiteSpace()
             }, transaction: _sqliteTransaction);
 
             _productRegisterWork.RowID = connection.ExecuteScalar<int>("SELECT last_insert_rowid();", transaction: _sqliteTransaction);
