@@ -25,6 +25,12 @@ namespace ProductDatabase.MasterManagement {
         // LoadSubstrateCheckedList実行中のItemCheck誤発火を防ぐフラグ
         private bool _isLoadingSubstrateList = false;
 
+        // 印刷設定のシリアライズ・デシリアライズで共有するオプション
+        private static readonly JsonSerializerOptions s_jsonOptions = new() {
+            PropertyNamingPolicy = null,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        };
+
         // PrintSettingsWindow から参照される印刷設定（読み込み後に保持）
         public DocumentPrintSettings ProductPrintSettings { get; private set; } = new DocumentPrintSettings();
 
@@ -346,7 +352,7 @@ namespace ProductDatabase.MasterManagement {
                 ProductPrintSettings = new DocumentPrintSettings();
                 if (!File.Exists(PrintSettingPath)) { return; }
                 var json = File.ReadAllText(PrintSettingPath);
-                ProductPrintSettings = JsonSerializer.Deserialize<DocumentPrintSettings>(json) ?? new DocumentPrintSettings();
+                ProductPrintSettings = JsonSerializer.Deserialize<DocumentPrintSettings>(json, s_jsonOptions) ?? new DocumentPrintSettings();
             } catch (Exception ex) {
                 MessageBox.Show($"印刷設定の読み込みに失敗しました。{Environment.NewLine}{ex.Message}",
                     $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー",
@@ -356,6 +362,13 @@ namespace ProductDatabase.MasterManagement {
 
         // 指定した SerialType の印刷設定ウィンドウを開く
         private void OpenPrintSettings(SerialType serialType) {
+            // PrintSettingPath が UI の最新値に依存するため、先に _product へ反映する
+            CollectFieldValues();
+            if (string.IsNullOrWhiteSpace(_product.CategoryName) || string.IsNullOrWhiteSpace(_product.ProductName) || string.IsNullOrWhiteSpace(_product.ProductModel)) {
+                MessageBox.Show("印刷設定を開くには、カテゴリ名、製品名、製品型式を入力してください。",
+                    "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             if (!File.Exists(PrintSettingPath)) {
                 MessageBox.Show("印刷設定ファイルが見つかりませんでした。",
                     "印刷設定", MessageBoxButtons.OK, MessageBoxIcon.Warning);
