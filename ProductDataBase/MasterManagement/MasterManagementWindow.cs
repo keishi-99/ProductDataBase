@@ -6,6 +6,7 @@ namespace ProductDatabase.MasterManagement {
     public partial class MasterManagementWindow : Form {
 
         private readonly ProductRepository _repository;
+        private readonly AppSettings _appSettings;
 
         // 製品タブの検索フィルタ文字列
         private string _productSearchText = string.Empty;
@@ -21,9 +22,10 @@ namespace ProductDatabase.MasterManagement {
         private string _substrateSortColumn = "SubstrateID";
         private bool _substrateSortAscending = true;
 
-        public MasterManagementWindow(ProductRepository repository) {
+        public MasterManagementWindow(ProductRepository repository, AppSettings appSettings) {
             InitializeComponent();
             _repository = repository;
+            _appSettings = appSettings;
         }
 
         private void MasterManagementWindow_Load(object sender, EventArgs e) {
@@ -189,7 +191,7 @@ namespace ProductDatabase.MasterManagement {
 
         // 製品を追加する
         private void ProductAddButton_Click(object sender, EventArgs e) {
-            using var dialog = new ProductMasterEditDialog(_repository, null);
+            using var dialog = new ProductMasterEditDialog(_repository, null, _appSettings);
             if (dialog.ShowDialog(this) == DialogResult.OK) {
                 LoadData();
             }
@@ -211,7 +213,7 @@ namespace ProductDatabase.MasterManagement {
                 return;
             }
 
-            using var dialog = new ProductMasterEditDialog(_repository, row);
+            using var dialog = new ProductMasterEditDialog(_repository, row, _appSettings);
             if (dialog.ShowDialog(this) == DialogResult.OK) {
                 LoadData();
             }
