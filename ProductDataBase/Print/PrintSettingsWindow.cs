@@ -34,8 +34,8 @@ namespace ProductDatabase {
                 case RePrintWindow rePrintWindow:
                     LoadSettingsFromWindow(rePrintWindow.ProductPrintSettings, rePrintWindow.PrintSettingPath);
                     break;
-                case ProductMasterEditDialog masterDialog:
-                    LoadSettingsFromWindow(masterDialog.ProductPrintSettings, masterDialog.PrintSettingPath);
+                case MasterManagementWindow masterWindow:
+                    LoadSettingsFromWindow(masterWindow.ProductPrintSettings, masterWindow.PrintSettingPath);
                     break;
                 default:
                     MessageBox.Show("この画面を開くには正しいウィンドウから開いてください。");

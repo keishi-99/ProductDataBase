@@ -43,11 +43,6 @@ namespace ProductDatabase.MasterManagement {
             this.OLesSerialPrintCheckBox = new CheckBox();
             this.CheckSheetPrintCheckBox = new CheckBox();
             this.ListPrintCheckBox = new CheckBox();
-            this.PrintDetailContextMenuStrip = new ContextMenuStrip();
-            this.LabelSettingsMenuItem = new ToolStripMenuItem();
-            this.BarcodeSettingsMenuItem = new ToolStripMenuItem();
-            this.NameplateSettingsMenuItem = new ToolStripMenuItem();
-            this.PrintDetailSettingsButton = new Button();
             this.CheckBinGroupBox = new GroupBox();
             this.CheckBinCheckBox0 = new CheckBox();
             this.CheckBinCheckBox1 = new CheckBox();
@@ -289,7 +284,7 @@ namespace ProductDatabase.MasterManagement {
             this.PrintGroupBox.Controls.Add(this.OLesSerialPrintCheckBox);
             this.PrintGroupBox.Controls.Add(this.CheckSheetPrintCheckBox);
             this.PrintGroupBox.Controls.Add(this.ListPrintCheckBox);
-            this.PrintGroupBox.Controls.Add(this.PrintDetailSettingsButton);
+
             this.PrintGroupBox.Location = new Point(12, 353);
             this.PrintGroupBox.Name = "PrintGroupBox";
             this.PrintGroupBox.Size = new Size(415, 126);
@@ -369,43 +364,6 @@ namespace ProductDatabase.MasterManagement {
             this.ListPrintCheckBox.Size = new Size(50, 19);
             this.ListPrintCheckBox.TabIndex = 16;
             this.ListPrintCheckBox.Text = "リスト";
-            //
-            // PrintDetailContextMenuStrip
-            //
-            this.PrintDetailContextMenuStrip.Items.AddRange(new ToolStripItem[] {
-                this.LabelSettingsMenuItem,
-                this.BarcodeSettingsMenuItem,
-                this.NameplateSettingsMenuItem
-            });
-            this.PrintDetailContextMenuStrip.Name = "PrintDetailContextMenuStrip";
-            //
-            // LabelSettingsMenuItem
-            //
-            this.LabelSettingsMenuItem.Name = "LabelSettingsMenuItem";
-            this.LabelSettingsMenuItem.Text = "ラベル設定";
-            this.LabelSettingsMenuItem.Click += this.LabelSettingsMenuItem_Click;
-            //
-            // BarcodeSettingsMenuItem
-            //
-            this.BarcodeSettingsMenuItem.Name = "BarcodeSettingsMenuItem";
-            this.BarcodeSettingsMenuItem.Text = "バーコード設定";
-            this.BarcodeSettingsMenuItem.Click += this.BarcodeSettingsMenuItem_Click;
-            //
-            // NameplateSettingsMenuItem
-            //
-            this.NameplateSettingsMenuItem.Name = "NameplateSettingsMenuItem";
-            this.NameplateSettingsMenuItem.Text = "銘版設定";
-            this.NameplateSettingsMenuItem.Click += this.NameplateSettingsMenuItem_Click;
-            //
-            // PrintDetailSettingsButton
-            //
-            this.PrintDetailSettingsButton.Location = new Point(6, 97);
-            this.PrintDetailSettingsButton.Name = "PrintDetailSettingsButton";
-            this.PrintDetailSettingsButton.Size = new Size(120, 23);
-            this.PrintDetailSettingsButton.TabIndex = 18;
-            this.PrintDetailSettingsButton.Text = "印刷詳細設定 ▼";
-            this.PrintDetailSettingsButton.UseVisualStyleBackColor = true;
-            this.PrintDetailSettingsButton.Click += this.PrintDetailSettingsButton_Click;
             //
             // CheckBinGroupBox
             //
@@ -703,10 +661,5 @@ namespace ProductDatabase.MasterManagement {
         private TextBox OLesInitialTextBox;
 
         // 印刷詳細設定
-        private ContextMenuStrip    PrintDetailContextMenuStrip;
-        private ToolStripMenuItem   LabelSettingsMenuItem;
-        private ToolStripMenuItem   BarcodeSettingsMenuItem;
-        private ToolStripMenuItem   NameplateSettingsMenuItem;
-        private Button              PrintDetailSettingsButton;
     }
 }
