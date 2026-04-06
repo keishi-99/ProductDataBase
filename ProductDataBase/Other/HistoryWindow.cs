@@ -888,11 +888,11 @@ namespace ProductDatabase {
 
             // UIスレッドでDataRowの変更を記録（Task.Run前に実施）
             row.BeginEdit();
-            row["OrderNumber"]   = dialog.OrderNumber   ?? DBNull.Value;
-            row["ProductNumber"] = dialog.ProductNumber ?? DBNull.Value;
-            row["OLesNumber"]    = dialog.OLesNumber    ?? DBNull.Value;
-            row["Person"]        = dialog.Person        ?? DBNull.Value;
-            row["Comment"]       = dialog.Comment       ?? DBNull.Value;
+            row["OrderNumber"]   = (object?)dialog.OrderNumber   ?? DBNull.Value;
+            row["ProductNumber"] = (object?)dialog.ProductNumber ?? DBNull.Value;
+            row["OLesNumber"]    = (object?)dialog.OLesNumber    ?? DBNull.Value;
+            row["Person"]        = (object?)dialog.Person        ?? DBNull.Value;
+            row["Comment"]       = (object?)dialog.Comment       ?? DBNull.Value;
             row.EndEdit();
 
             List<string[]> pendingLogs = [];
