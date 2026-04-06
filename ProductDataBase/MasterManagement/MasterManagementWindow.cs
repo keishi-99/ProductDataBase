@@ -2,7 +2,10 @@ using ProductDatabase.Data;
 using ProductDatabase.Models;
 using ProductDatabase.Print;
 using System.Data;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Unicode;
 using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
 
@@ -398,19 +401,40 @@ namespace ProductDatabase.MasterManagement {
                 $"PrintConfig_{productName}_{productId}_{productModel}.json");
 
             if (!File.Exists(PrintSettingPath)) {
-                MessageBox.Show("印刷設定ファイルが見つかりませんでした。",
-                    "印刷設定", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+                var result = MessageBox.Show(
+                    "印刷設定ファイルが存在しません。新規作成しますか？",
+                    "印刷設定",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+                if (result != DialogResult.Yes) { return; }
 
-            try {
-                var json = File.ReadAllText(PrintSettingPath);
-                ProductPrintSettings = JsonSerializer.Deserialize<DocumentPrintSettings>(json, s_jsonOptions) ?? new DocumentPrintSettings();
-            } catch (Exception ex) {
-                MessageBox.Show($"印刷設定の読み込みに失敗しました。{Environment.NewLine}{ex.Message}",
-                    $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                try {
+                    Directory.CreateDirectory(Path.GetDirectoryName(PrintSettingPath)!);
+                    var defaultSettings = new DocumentPrintSettings();
+                    var createOptions = new JsonSerializerOptions {
+                        WriteIndented = true,
+                        PropertyNamingPolicy = null,
+                        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                    };
+                    File.WriteAllText(PrintSettingPath, JsonSerializer.Serialize(defaultSettings, createOptions));
+                    ProductPrintSettings = defaultSettings;
+                } catch (Exception ex) {
+                    MessageBox.Show($"印刷設定ファイルの作成に失敗しました。{Environment.NewLine}{ex.Message}",
+                        $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            } else {
+                try {
+                    var json = File.ReadAllText(PrintSettingPath);
+                    ProductPrintSettings = JsonSerializer.Deserialize<DocumentPrintSettings>(json, s_jsonOptions) ?? new DocumentPrintSettings();
+                } catch (Exception ex) {
+                    MessageBox.Show($"印刷設定の読み込みに失敗しました。{Environment.NewLine}{ex.Message}",
+                        $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
             }
 
             CurrentSerialType = serialType;
