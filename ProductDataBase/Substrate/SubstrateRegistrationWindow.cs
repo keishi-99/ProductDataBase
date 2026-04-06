@@ -713,9 +713,7 @@ namespace ProductDatabase {
         private async void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { await ProcessRegistration(false); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             CurrentSerialType = SerialType.Substrate;
-            using (var ls = new PrintSettingsWindow {
-                SubstrateMaster = _substrateMaster
-            }) {
+            using (var ls = new PrintSettingsWindow()) {
                 ls.ShowDialog(this);
             }
             LoadSettings(PrintSettingPath);

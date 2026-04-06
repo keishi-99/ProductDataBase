@@ -2,6 +2,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
+using ProductDatabase.MasterManagement;
 using ProductDatabase.Models;
 using static ProductDatabase.Data.ProductRepository;
 using static ProductDatabase.Print.PrintManager;
@@ -14,13 +15,7 @@ namespace ProductDatabase {
         private string _documentPrintSettingFilePath = string.Empty;
         private JsonSerializerOptions? _jsonSerializerOptions;
 
-        public ProductMaster ProductMaster { get; set; } = new ProductMaster();
-        public SubstrateMaster SubstrateMaster { get; set; } = new SubstrateMaster();
         public AppSettings AppSettings { get; set; } = new AppSettings();
-
-        private bool _isLabelPrint;
-        private bool _isBarcodePrint;
-        private bool _isNameplatePrint;
 
         public PrintSettingsWindow() {
             InitializeComponent();
@@ -31,20 +26,16 @@ namespace ProductDatabase {
             Font = new System.Drawing.Font(AppSettings.FontName, AppSettings.FontSize);
             switch (Owner) {
                 case ProductRegistration2Window productWindow:
-                    _isLabelPrint = ProductMaster.IsLabelPrint;
-                    _isBarcodePrint = ProductMaster.IsBarcodePrint;
-                    _isNameplatePrint = ProductMaster.IsNameplatePrint;
                     LoadSettingsFromWindow(productWindow.ProductPrintSettings, productWindow.PrintSettingPath);
                     break;
                 case SubstrateRegistrationWindow substrateWindow:
-                    _isLabelPrint = SubstrateMaster.IsLabelPrint;
                     LoadSettingsFromWindow(substrateWindow.SubstratePrintSettings, substrateWindow.PrintSettingPath);
                     break;
                 case RePrintWindow rePrintWindow:
-                    _isLabelPrint = ProductMaster.IsLabelPrint;
-                    _isBarcodePrint = ProductMaster.IsBarcodePrint;
-                    _isNameplatePrint = ProductMaster.IsNameplatePrint;
                     LoadSettingsFromWindow(rePrintWindow.ProductPrintSettings, rePrintWindow.PrintSettingPath);
+                    break;
+                case ProductMasterEditDialog masterDialog:
+                    LoadSettingsFromWindow(masterDialog.ProductPrintSettings, masterDialog.PrintSettingPath);
                     break;
                 default:
                     MessageBox.Show("この画面を開くには正しいウィンドウから開いてください。");
@@ -68,7 +59,6 @@ namespace ProductDatabase {
         // 現在の印刷設定をJSONにシリアライズして設定ファイルに保存しウィンドウを閉じる
         private void SaveProductPrintSettings() {
             try {
-                DocumentPrintSettings.SetSettingsType(_isLabelPrint, _isBarcodePrint, _isNameplatePrint);
                 _jsonSerializerOptions ??= new JsonSerializerOptions {
                     WriteIndented = true,
                     PropertyNamingPolicy = null,

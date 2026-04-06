@@ -697,7 +697,7 @@ namespace ProductDatabase {
         // マスター管理画面を管理者専用ダイアログで開く
         private void MasterManagementToolStripMenuItem_Click(object sender, EventArgs e) {
             try {
-                using var window = new MasterManagement.MasterManagementWindow(_productRepository);
+                using var window = new MasterManagement.MasterManagementWindow(_productRepository, _appSettings);
                 window.ShowDialog(this);
                 // マスターデータが変更されている可能性があるためキャッシュを更新する
                 _productRepository.LoadAll();

@@ -1219,7 +1219,6 @@ namespace ProductDatabase {
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             CurrentSerialType = SerialType.Label;
             using PrintSettingsWindow ls = new() {
-                ProductMaster = _productMaster,
                 AppSettings = _appSettings
             };
             ls.ShowDialog(this);
@@ -1228,7 +1227,6 @@ namespace ProductDatabase {
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             CurrentSerialType = SerialType.Barcode;
             using PrintSettingsWindow ls = new() {
-                ProductMaster = _productMaster,
                 AppSettings = _appSettings
             };
             ls.ShowDialog(this);
@@ -1237,7 +1235,6 @@ namespace ProductDatabase {
         private void 銘版印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             CurrentSerialType = SerialType.Nameplate;
             using PrintSettingsWindow ls = new() {
-                ProductMaster = _productMaster,
                 AppSettings = _appSettings
             };
             ls.ShowDialog(this);
