@@ -26,6 +26,8 @@ namespace ProductDatabase.MasterManagement {
             this.InitialLabel = new Label();
             this.InitialTextBox = new TextBox();
             this.SerialGroupBox = new GroupBox();
+            this.OLesSerialSuffixLabel = new Label();
+            this.OLesSerialSuffixTtextBox = new TextBox();
             this.OLesInitialLabel = new Label();
             this.OLesInitialTextBox = new TextBox();
             this.RegTypeLabel = new Label();
@@ -190,6 +192,8 @@ namespace ProductDatabase.MasterManagement {
             // 
             // SerialGroupBox
             // 
+            this.SerialGroupBox.Controls.Add(this.OLesSerialSuffixLabel);
+            this.SerialGroupBox.Controls.Add(this.OLesSerialSuffixTtextBox);
             this.SerialGroupBox.Controls.Add(this.OLesInitialLabel);
             this.SerialGroupBox.Controls.Add(this.OLesInitialTextBox);
             this.SerialGroupBox.Controls.Add(this.RegTypeLabel);
@@ -202,15 +206,32 @@ namespace ProductDatabase.MasterManagement {
             this.SerialGroupBox.Controls.Add(this.InitialTextBox);
             this.SerialGroupBox.Location = new Point(12, 193);
             this.SerialGroupBox.Name = "SerialGroupBox";
-            this.SerialGroupBox.Size = new Size(415, 154);
+            this.SerialGroupBox.Size = new Size(415, 184);
             this.SerialGroupBox.TabIndex = 1;
             this.SerialGroupBox.TabStop = false;
             this.SerialGroupBox.Text = "シリアル設定";
             // 
+            // OLesSerialSuffixLabel
+            // 
+            this.OLesSerialSuffixLabel.AutoSize = true;
+            this.OLesSerialSuffixLabel.Location = new Point(207, 152);
+            this.OLesSerialSuffixLabel.Name = "OLesSerialSuffixLabel";
+            this.OLesSerialSuffixLabel.Size = new Size(94, 15);
+            this.OLesSerialSuffixLabel.TabIndex = 12;
+            this.OLesSerialSuffixLabel.Text = "O-Les接尾文字:";
+            // 
+            // OLesSerialSuffixTtextBox
+            // 
+            this.OLesSerialSuffixTtextBox.Location = new Point(329, 149);
+            this.OLesSerialSuffixTtextBox.MaxLength = 1;
+            this.OLesSerialSuffixTtextBox.Name = "OLesSerialSuffixTtextBox";
+            this.OLesSerialSuffixTtextBox.Size = new Size(51, 23);
+            this.OLesSerialSuffixTtextBox.TabIndex = 13;
+            // 
             // OLesInitialLabel
             // 
             this.OLesInitialLabel.AutoSize = true;
-            this.OLesInitialLabel.Location = new Point(207, 123);
+            this.OLesInitialLabel.Location = new Point(8, 152);
             this.OLesInitialLabel.Name = "OLesInitialLabel";
             this.OLesInitialLabel.Size = new Size(94, 15);
             this.OLesInitialLabel.TabIndex = 10;
@@ -218,7 +239,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             // OLesInitialTextBox
             // 
-            this.OLesInitialTextBox.Location = new Point(329, 120);
+            this.OLesInitialTextBox.Location = new Point(130, 149);
             this.OLesInitialTextBox.Name = "OLesInitialTextBox";
             this.OLesInitialTextBox.Size = new Size(51, 23);
             this.OLesInitialTextBox.TabIndex = 11;
@@ -245,9 +266,9 @@ namespace ProductDatabase.MasterManagement {
             this.SerialTypeLabel.AutoSize = true;
             this.SerialTypeLabel.Location = new Point(8, 62);
             this.SerialTypeLabel.Name = "SerialTypeLabel";
-            this.SerialTypeLabel.Size = new Size(98, 15);
+            this.SerialTypeLabel.Size = new Size(72, 15);
             this.SerialTypeLabel.TabIndex = 8;
-            this.SerialTypeLabel.Text = "シリアル桁数タイプ:";
+            this.SerialTypeLabel.Text = "シリアル桁数:";
             // 
             // SerialTypeComboBox
             // 
@@ -284,10 +305,9 @@ namespace ProductDatabase.MasterManagement {
             this.PrintGroupBox.Controls.Add(this.OLesSerialPrintCheckBox);
             this.PrintGroupBox.Controls.Add(this.CheckSheetPrintCheckBox);
             this.PrintGroupBox.Controls.Add(this.ListPrintCheckBox);
-
-            this.PrintGroupBox.Location = new Point(12, 353);
+            this.PrintGroupBox.Location = new Point(12, 383);
             this.PrintGroupBox.Name = "PrintGroupBox";
-            this.PrintGroupBox.Size = new Size(415, 126);
+            this.PrintGroupBox.Size = new Size(415, 96);
             this.PrintGroupBox.TabIndex = 2;
             this.PrintGroupBox.TabStop = false;
             this.PrintGroupBox.Text = "印刷設定";
@@ -364,9 +384,9 @@ namespace ProductDatabase.MasterManagement {
             this.ListPrintCheckBox.Size = new Size(50, 19);
             this.ListPrintCheckBox.TabIndex = 16;
             this.ListPrintCheckBox.Text = "リスト";
-            //
+            // 
             // CheckBinGroupBox
-            //
+            // 
             this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox0);
             this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox1);
             this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox2);
@@ -493,7 +513,7 @@ namespace ProductDatabase.MasterManagement {
             this.UseSubstrateGroupBox.Controls.Add(this.SubstrateCheckedListBox);
             this.UseSubstrateGroupBox.Location = new Point(444, 12);
             this.UseSubstrateGroupBox.Name = "UseSubstrateGroupBox";
-            this.UseSubstrateGroupBox.Size = new Size(464, 594);
+            this.UseSubstrateGroupBox.Size = new Size(464, 614);
             this.UseSubstrateGroupBox.TabIndex = 4;
             this.UseSubstrateGroupBox.TabStop = false;
             this.UseSubstrateGroupBox.Text = "使用基板（M_ProductUseSubstrate）";
@@ -535,9 +555,9 @@ namespace ProductDatabase.MasterManagement {
             // SubstrateCheckedListBox
             // 
             this.SubstrateCheckedListBox.CheckOnClick = true;
-            this.SubstrateCheckedListBox.Location = new Point(6, 92);
+            this.SubstrateCheckedListBox.Location = new Point(6, 100);
             this.SubstrateCheckedListBox.Name = "SubstrateCheckedListBox";
-            this.SubstrateCheckedListBox.Size = new Size(452, 490);
+            this.SubstrateCheckedListBox.Size = new Size(452, 508);
             this.SubstrateCheckedListBox.TabIndex = 28;
             this.SubstrateCheckedListBox.ItemCheck += this.SubstrateCheckedListBox_ItemCheck;
             // 
@@ -659,6 +679,8 @@ namespace ProductDatabase.MasterManagement {
         private Button          DialogCancelButton;
         private Label OLesInitialLabel;
         private TextBox OLesInitialTextBox;
+        private Label OLesSerialSuffixLabel;
+        private TextBox OLesSerialSuffixTtextBox;
 
         // 印刷詳細設定
     }

@@ -116,6 +116,10 @@ namespace ProductDatabase {
                     if (nextSerialNumber > maxNumber || nextSerialNumber < minNumber) {// あるいは firstSerialが minNumber未満の場合も対象に
                         MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         nextSerialNumber = minNumber;
+                        // O-Lesラベル印刷対象の場合はサフィックスをインクリメントする
+                        if (_productMaster.IsOLesLabelPrint) {
+                            _productRegisterWork.IsOLesSerialSuffixIncrement = true;
+                        }
                     }
 
                     FirstSerialNumberTextBox.Text = nextSerialNumber.ToString();
@@ -206,6 +210,10 @@ namespace ProductDatabase {
                         MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         FirstSerialNumberTextBox.Text = minNumber.ToString();
                         firstSerial = minNumber;
+                        // O-Lesラベル印刷対象の場合はサフィックスをインクリメントする
+                        if (_productMaster.IsOLesLabelPrint) {
+                            _productRegisterWork.IsOLesSerialSuffixIncrement = true;
+                        }
                     }
                 }
 

@@ -90,6 +90,12 @@ namespace ProductDatabase {
 
                 ConfigurePrintSettings();
 
+                // {SA} を使用するフォーマットでシリアルがリセットされた場合、印刷プレビューに反映されるようインメモリ値を先行更新する
+                // DBへの永続化は登録完了時（Registration）に行う
+                if (ShouldIncrementOLesSuffix) {
+                    _productMaster.OLesSerialSuffix = GetNextOLesSuffix(_productMaster.OLesSerialSuffix);
+                }
+
             } catch (SqliteException ex) {
                 MessageBox.Show($"データベースがロックされています。: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
@@ -379,6 +385,14 @@ namespace ProductDatabase {
                     default:
                         throw new Exception("RegType unknown");
                 }
+
+                if (ShouldIncrementOLesSuffix) {
+                    connection.Execute(
+                        $"UPDATE {Constants.ProductTableName} SET OLesSerialSuffix = @Suffix WHERE ProductID = @ProductID;",
+                        new { Suffix = _productMaster.OLesSerialSuffix, _productMaster.ProductID },
+                        transaction: _sqliteTransaction);
+                }
+
                 transaction.Commit();
                 _isTransactionCommitted = true;
 
@@ -804,6 +818,38 @@ namespace ProductDatabase {
                 var message = string.Join(Environment.NewLine, list);
                 throw new Exception($"{message}{Environment.NewLine}は既に使用されているシリアルです。");
             }
+
+            // O-Les シリアルの重複チェック
+            if (_productMaster.IsOLesLabelPrint && !string.IsNullOrEmpty(LabelPrintSettings.OLesLabelTextFormat)) {
+                var olesList = GenerateSerialListForType(SerialType.OLesLabel)
+                    .Select(x => x.Trim())
+                    .ToList();
+
+                var olesSql =
+                    $"""
+                    SELECT
+                        s.OLesSerial
+                    FROM
+                        {Constants.TSerialTableName} AS s
+                    WHERE
+                        s.ProductName = @ProductName
+                    AND
+                        s.OLesSerial IN @OlesList
+                    ;
+                    """;
+
+                var duplicatedOlesSerials = connection.Query<string>(
+                    olesSql,
+                    new {
+                        _productMaster.ProductName,
+                        OlesList = olesList
+                    }).ToList();
+
+                if (duplicatedOlesSerials.Count > 0) {
+                    var message = string.Join(Environment.NewLine, duplicatedOlesSerials);
+                    throw new Exception($"{message}{Environment.NewLine}は既に使用されているO-Lesシリアルです。");
+                }
+            }
         }
         // 製品マスターの印刷フラグからDB保存基準のシリアルタイプを決定する（Label > Barcode > Nameplate）
         private SerialType GetSerialTypeFromProductMaster() {
@@ -966,7 +1012,8 @@ namespace ProductDatabase {
                 ["{MM}"] = regDate.ToString("MM"),
                 ["{R}"] = _productRegisterWork.Revision,
                 ["{M}"] = monthCode[^1..],
-                ["{S}"] = serialCode.ToString($"D{_productMaster.SerialDigit}")
+                ["{S}"] = serialCode.ToString($"D{_productMaster.SerialDigit}"),
+                ["{SA}"] = _productMaster.OLesSerialSuffix
             };
 
             foreach (var kv in map) {
@@ -975,6 +1022,17 @@ namespace ProductDatabase {
 
             return outputCode;
         }
+        // サフィックスを1文字インクリメントする（空文字→'A'、'Z'→'A' に循環）
+        private static string GetNextOLesSuffix(string current) {
+            if (string.IsNullOrEmpty(current)) return "A";
+            var c = char.ToUpperInvariant(current[0]);
+            return c >= 'Z' ? "A" : ((char)(c + 1)).ToString();
+        }
+        // O-Les シリアルサフィックスをインクリメントすべき条件（リセットフラグ・印刷設定・フォーマット全て満たす場合）
+        private bool ShouldIncrementOLesSuffix =>
+            _productRegisterWork.IsOLesSerialSuffixIncrement
+            && _productMaster.IsOLesLabelPrint
+            && LabelPrintSettings.OLesLabelTextFormat?.Contains("{SA}") == true;
         // 基板チェックボックスのOn/Offに連動して対応DataGridViewの表示と有効状態を切り替える
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
             var checkBox = (System.Windows.Forms.CheckBox)sender;
