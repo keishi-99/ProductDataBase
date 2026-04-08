@@ -27,7 +27,7 @@ namespace ProductDatabase.MasterManagement {
             this.InitialTextBox = new TextBox();
             this.SerialGroupBox = new GroupBox();
             this.OLesSerialSuffixLabel = new Label();
-            this.OLesSerialSuffixTtextBox = new TextBox();
+            this.OLesSerialSuffixTextBox = new TextBox();
             this.OLesInitialLabel = new Label();
             this.OLesInitialTextBox = new TextBox();
             this.RegTypeLabel = new Label();
@@ -193,7 +193,7 @@ namespace ProductDatabase.MasterManagement {
             // SerialGroupBox
             // 
             this.SerialGroupBox.Controls.Add(this.OLesSerialSuffixLabel);
-            this.SerialGroupBox.Controls.Add(this.OLesSerialSuffixTtextBox);
+            this.SerialGroupBox.Controls.Add(this.OLesSerialSuffixTextBox);
             this.SerialGroupBox.Controls.Add(this.OLesInitialLabel);
             this.SerialGroupBox.Controls.Add(this.OLesInitialTextBox);
             this.SerialGroupBox.Controls.Add(this.RegTypeLabel);
@@ -220,13 +220,13 @@ namespace ProductDatabase.MasterManagement {
             this.OLesSerialSuffixLabel.TabIndex = 12;
             this.OLesSerialSuffixLabel.Text = "O-Les接尾文字:";
             // 
-            // OLesSerialSuffixTtextBox
+            // OLesSerialSuffixTextBox
             // 
-            this.OLesSerialSuffixTtextBox.Location = new Point(329, 149);
-            this.OLesSerialSuffixTtextBox.MaxLength = 1;
-            this.OLesSerialSuffixTtextBox.Name = "OLesSerialSuffixTtextBox";
-            this.OLesSerialSuffixTtextBox.Size = new Size(51, 23);
-            this.OLesSerialSuffixTtextBox.TabIndex = 13;
+            this.OLesSerialSuffixTextBox.Location = new Point(329, 149);
+            this.OLesSerialSuffixTextBox.MaxLength = 1;
+            this.OLesSerialSuffixTextBox.Name = "OLesSerialSuffixTextBox";
+            this.OLesSerialSuffixTextBox.Size = new Size(51, 23);
+            this.OLesSerialSuffixTextBox.TabIndex = 13;
             // 
             // OLesInitialLabel
             // 
@@ -680,7 +680,7 @@ namespace ProductDatabase.MasterManagement {
         private Label OLesInitialLabel;
         private TextBox OLesInitialTextBox;
         private Label OLesSerialSuffixLabel;
-        private TextBox OLesSerialSuffixTtextBox;
+        private TextBox OLesSerialSuffixTextBox;
 
         // 印刷詳細設定
     }

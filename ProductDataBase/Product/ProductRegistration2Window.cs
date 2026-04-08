@@ -90,11 +90,6 @@ namespace ProductDatabase {
 
                 ConfigurePrintSettings();
 
-                // {SA} を使用するフォーマットでシリアルがリセットされた場合、印刷プレビューに反映されるようインメモリ値を先行更新する
-                // DBへの永続化は登録完了時（Registration）に行う
-                if (ShouldIncrementOLesSuffix) {
-                    _productMaster.OLesSerialSuffix = GetNextOLesSuffix(_productMaster.OLesSerialSuffix);
-                }
 
             } catch (SqliteException ex) {
                 MessageBox.Show($"データベースがロックされています。: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -387,14 +382,19 @@ namespace ProductDatabase {
                 }
 
                 if (ShouldIncrementOLesSuffix) {
+                    var nextSuffix = GetNextOLesSuffix(_productMaster.OLesSerialSuffix);
                     connection.Execute(
                         $"UPDATE {Constants.ProductTableName} SET OLesSerialSuffix = @Suffix WHERE ProductID = @ProductID;",
-                        new { Suffix = _productMaster.OLesSerialSuffix, _productMaster.ProductID },
-                        transaction: _sqliteTransaction);
+                        new { Suffix = nextSuffix, _productMaster.ProductID },
+                        transaction: transaction);
                 }
 
                 transaction.Commit();
                 _isTransactionCommitted = true;
+
+                if (ShouldIncrementOLesSuffix) {
+                    _productMaster.OLesSerialSuffix = GetNextOLesSuffix(_productMaster.OLesSerialSuffix);
+                }
 
             } catch (Exception) {
                 transaction.Rollback();
@@ -1013,7 +1013,7 @@ namespace ProductDatabase {
                 ["{R}"] = _productRegisterWork.Revision,
                 ["{M}"] = monthCode[^1..],
                 ["{S}"] = serialCode.ToString($"D{_productMaster.SerialDigit}"),
-                ["{SA}"] = _productMaster.OLesSerialSuffix
+                ["{SA}"] = ShouldIncrementOLesSuffix ? GetNextOLesSuffix(_productMaster.OLesSerialSuffix) : _productMaster.OLesSerialSuffix
             };
 
             foreach (var kv in map) {
@@ -1022,11 +1022,12 @@ namespace ProductDatabase {
 
             return outputCode;
         }
-        // サフィックスを1文字インクリメントする（空文字→'A'、'Z'→'A' に循環）
+        // サフィックスを1文字インクリメントする（空文字→'A'、'A'〜'Y'→次の文字、'Z'または範囲外→'A' に循環）
         private static string GetNextOLesSuffix(string current) {
-            if (string.IsNullOrEmpty(current)) return "A";
+            if (string.IsNullOrWhiteSpace(current)) return "A";
             var c = char.ToUpperInvariant(current[0]);
-            return c >= 'Z' ? "A" : ((char)(c + 1)).ToString();
+            if (c < 'A' || c >= 'Z') return "A";
+            return ((char)(c + 1)).ToString();
         }
         // O-Les シリアルサフィックスをインクリメントすべき条件（リセットフラグ・印刷設定・フォーマット全て満たす場合）
         private bool ShouldIncrementOLesSuffix =>
