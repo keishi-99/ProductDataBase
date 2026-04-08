@@ -72,7 +72,7 @@ namespace ProductDatabase {
                         if (_productMaster.SheetPrintType == 3) {
                             break;
                         }
-                        LoadSubstrateData(_sqliteConnection);
+                        LoadSubstrateData(_sqliteConnection, _sqliteTransaction);
                         break;
                     case 9:
                         using (ServiceForm window = new(ServiceInfo)) {
@@ -81,7 +81,7 @@ namespace ProductDatabase {
                             }
                             ServiceInfo = window.ServiceInfo;
                         }
-                        LoadSubstrateData(_sqliteConnection);
+                        LoadSubstrateData(_sqliteConnection, _sqliteTransaction);
                         break;
                     default:
                         HideAllControls();
@@ -147,7 +147,7 @@ namespace ProductDatabase {
             _serialLastNumber = _productRegisterWork.SerialFirstNumber + _productRegisterWork.Quantity - 1;
         }
         // 使用基板一覧をDBから取得してチェックボックスとDataGridViewに表示し在庫不足を警告する
-        private void LoadSubstrateData(SqliteConnection connection) {
+        private void LoadSubstrateData(SqliteConnection connection, SqliteTransaction transaction) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = _productMaster.RegType == 9;
             var useSubstrates = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrates : _productMaster.UseSubstrates);
@@ -165,7 +165,7 @@ namespace ProductDatabase {
                 SetupCheckBox(objCbx, substrateName, substrateModel);
                 SetupDataGridView(objDgv);
 
-                if (FetchAndDisplaySubstrateData(connection, objDgv, substrateID)) {
+                if (FetchAndDisplaySubstrateData(connection, objDgv, substrateID, transaction)) {
                     shortageSubstrateName += $"[{substrateName}]{Environment.NewLine}";
                 }
             }
@@ -220,7 +220,7 @@ namespace ProductDatabase {
             }
         }
         // 基板IDの在庫データをDBから取得してDataGridViewに表示し在庫が0以下ならtrueを返す
-        private bool FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, long substrateID) {
+        private bool FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, long substrateID, SqliteTransaction transaction) {
             var intQuantity = _productRegisterWork.Quantity;
 
             var commandText =
@@ -245,7 +245,7 @@ namespace ProductDatabase {
                 ;
                 """;
 
-            var results = connection.Query(commandText, new { SubstrateID = substrateID }, transaction: _sqliteTransaction);
+            var results = connection.Query(commandText, new { SubstrateID = substrateID }, transaction: transaction);
 
             foreach (var row in results) {
                 var strSubstrateNumber = $"{row.SubstrateNumber}";
@@ -319,7 +319,7 @@ namespace ProductDatabase {
                     throw new InvalidOperationException("編集モード用の接続が初期化されていません。");
                 }
 
-                if (!NumberCheck(_sqliteConnection) || !QuantityCheck()) {
+                if (!NumberCheck(_sqliteConnection, _sqliteTransaction) || !QuantityCheck()) {
                     return;
                 }
                 if (_productMaster.IsSerialGeneration) {
@@ -358,14 +358,14 @@ namespace ProductDatabase {
         // RegTypeに応じて製品・シリアル・基板のINSERT処理を呼び出しトランザクションをコミットする
         private void Registration(SqliteConnection connection, SqliteTransaction transaction) {
             try {
-                InsertProduct(connection);
+                InsertProduct(connection, transaction);
 
                 switch (_productMaster.RegType) {
                     case 0:
                         break;
                     case 1:
                         if (_productMaster.IsSerialGeneration) {
-                            InsertSerial(connection);
+                            InsertSerial(connection, transaction);
                         }
                         break;
                     case 2:
@@ -373,16 +373,17 @@ namespace ProductDatabase {
                     case 4:
                     case 9:
                         if (_productMaster.IsSerialGeneration) {
-                            InsertSerial(connection);
+                            InsertSerial(connection, transaction);
                         }
-                        RegisterSubstrate(connection);
+                        RegisterSubstrate(connection, transaction);
                         break;
                     default:
                         throw new Exception("RegType unknown");
                 }
 
+                string? nextSuffix = null;
                 if (ShouldIncrementOLesSuffix) {
-                    var nextSuffix = GetNextOLesSuffix(_productMaster.OLesSerialSuffix);
+                    nextSuffix = GetNextOLesSuffix(_productMaster.OLesSerialSuffix);
                     connection.Execute(
                         $"UPDATE {Constants.ProductTableName} SET OLesSerialSuffix = @Suffix WHERE ProductID = @ProductID;",
                         new { Suffix = nextSuffix, _productMaster.ProductID },
@@ -392,8 +393,8 @@ namespace ProductDatabase {
                 transaction.Commit();
                 _isTransactionCommitted = true;
 
-                if (ShouldIncrementOLesSuffix) {
-                    _productMaster.OLesSerialSuffix = GetNextOLesSuffix(_productMaster.OLesSerialSuffix);
+                if (nextSuffix != null) {
+                    _productMaster.OLesSerialSuffix = nextSuffix;
                 }
 
             } catch (Exception) {
@@ -405,7 +406,7 @@ namespace ProductDatabase {
         }
 
         // 製品履歴テーブルにレコードをINSERTして生成されたROWIDを作業データに保存する
-        private void InsertProduct(SqliteConnection connection) {
+        private void InsertProduct(SqliteConnection connection, SqliteTransaction transaction) {
             var commandText =
                 $"""
                 INSERT INTO {Constants.TProductTableName}
@@ -462,12 +463,12 @@ namespace ProductDatabase {
                 SerialLast = _productRegisterWork.SerialLast.NullIfWhiteSpace(),
                 SerialLastNumber = _productMaster.IsSerialGeneration ? (int?)_serialLastNumber : null,
                 Comment = comment.NullIfWhiteSpace()
-            }, transaction: _sqliteTransaction);
+            }, transaction: transaction);
 
-            _productRegisterWork.RowID = connection.ExecuteScalar<int>("SELECT last_insert_rowid();", transaction: _sqliteTransaction);
+            _productRegisterWork.RowID = connection.ExecuteScalar<int>("SELECT last_insert_rowid();", transaction: transaction);
         }
         // シリアルリストの各シリアルをシリアルテーブルにINSERTする（フォーマット2有効時はOLesSerialも記録）
-        private void InsertSerial(SqliteConnection connection) {
+        private void InsertSerial(SqliteConnection connection, SqliteTransaction transaction) {
             var commandText =
                 $"""
                 INSERT INTO {Constants.TSerialTableName}
@@ -498,10 +499,10 @@ namespace ProductDatabase {
                 _productMaster.ProductName
             }).ToList();
 
-            connection.Execute(commandText, serialData, transaction: _sqliteTransaction);
+            connection.Execute(commandText, serialData, transaction: transaction);
         }
         // DataGridViewでチェックされた基板番号・使用数を読み取り基板履歴テーブルにINSERTする
-        private void RegisterSubstrate(SqliteConnection connection) {
+        private void RegisterSubstrate(SqliteConnection connection, SqliteTransaction transaction) {
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = _productMaster.RegType == 9;
             var useSubstrates = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrates : _productMaster.UseSubstrates);
@@ -525,13 +526,13 @@ namespace ProductDatabase {
 
                     var substrateNumber = row.Cells[0].Value.ToString() ?? string.Empty;
                     var useValue = int.TryParse(row.Cells[2].Value?.ToString(), out var useVal) ? useVal : 0;
-                    var orderNumber = GetSubstrateInfo(connection, substrateID, substrateNumber);
-                    InsertSubstrate(connection, substrateID, substrateNumber, orderNumber, useValue, useID);
+                    var orderNumber = GetSubstrateInfo(connection, substrateID, substrateNumber, transaction);
+                    InsertSubstrate(connection, substrateID, substrateNumber, orderNumber, useValue, useID, transaction);
                 }
             }
         }
         // 基板IDと製造番号から在庫情報を取得して注文番号を返す
-        private string GetSubstrateInfo(SqliteConnection connection, long substrateID, string substrateNumber) {
+        private string GetSubstrateInfo(SqliteConnection connection, long substrateID, string substrateNumber, SqliteTransaction transaction) {
             var commandText =
                 $"""
                 SELECT
@@ -557,7 +558,7 @@ namespace ProductDatabase {
             var result = connection.QueryFirstOrDefault<SubstrateStockInfo>(
                 commandText,
                 new { SubstrateID = substrateID, SubstrateNumber = substrateNumber },
-                transaction: _sqliteTransaction);
+                transaction: transaction);
 
             return result
                 ?.OrderNumber
@@ -572,7 +573,7 @@ namespace ProductDatabase {
             public int Stock { get; set; }
         }
         // 基板使用履歴テーブルに使用数（Decrease）をINSERTして製品IDと紐づける
-        private void InsertSubstrate(SqliteConnection connection, long substrateID, string substrateNumber, string orderNumber, long useValue, long? useID) {
+        private void InsertSubstrate(SqliteConnection connection, long substrateID, string substrateNumber, string orderNumber, long useValue, long? useID, SqliteTransaction transaction) {
             var commandText =
                 $"""
                 INSERT INTO {Constants.TSubstrateTableName}
@@ -611,7 +612,7 @@ namespace ProductDatabase {
                 RegDate = _productRegisterWork.RegDate.NullIfWhiteSpace(),
                 Comment = comment.NullIfWhiteSpace(),
                 UseID = useID
-            }, transaction: _sqliteTransaction);
+            }, transaction: transaction);
         }
 
         // 登録したIDがDB上に存在するか確認し見つからない場合は例外をスローする
@@ -648,7 +649,7 @@ namespace ProductDatabase {
         }
 
         // 製番と注文番号の重複登録をDBで確認しユーザーに続行可否を確認する
-        private bool NumberCheck(SqliteConnection connection) {
+        private bool NumberCheck(SqliteConnection connection, SqliteTransaction transaction) {
 
             if (!string.IsNullOrEmpty(_productRegisterWork.ProductNumber)) {
                 // 製番が新規かチェック
@@ -656,7 +657,7 @@ namespace ProductDatabase {
                 var existingModel = connection.QueryFirstOrDefault<string>(
                     productNumberQuery,
                     new { _productMaster.ProductName, _productRegisterWork.ProductNumber },
-                    transaction: _sqliteTransaction); if (existingModel != null) {
+                    transaction: transaction); if (existingModel != null) {
                     if (existingModel == _productMaster.ProductModel) {
                         Activate();
                         var result = MessageBox.Show($"製番[{_productRegisterWork.ProductNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
@@ -678,7 +679,7 @@ namespace ProductDatabase {
                 var existingModel = connection.QueryFirstOrDefault<string>(
                     orderNumberQuery,
                     new { _productMaster.ProductName, _productRegisterWork.OrderNumber },
-                    transaction: _sqliteTransaction); if (existingModel != null) {
+                    transaction: transaction); if (existingModel != null) {
                     if (existingModel == _productMaster.ProductModel) {
                         Activate();
                         var result = MessageBox.Show($"注文番号[{_productRegisterWork.OrderNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
@@ -1013,7 +1014,7 @@ namespace ProductDatabase {
                 ["{R}"] = _productRegisterWork.Revision,
                 ["{M}"] = monthCode[^1..],
                 ["{S}"] = serialCode.ToString($"D{_productMaster.SerialDigit}"),
-                ["{SA}"] = ShouldIncrementOLesSuffix ? GetNextOLesSuffix(_productMaster.OLesSerialSuffix) : _productMaster.OLesSerialSuffix
+                ["{SA}"] = ShouldIncrementOLesSuffix && !_isTransactionCommitted ? GetNextOLesSuffix(_productMaster.OLesSerialSuffix) : _productMaster.OLesSerialSuffix
             };
 
             foreach (var kv in map) {
