@@ -90,7 +90,6 @@ namespace ProductDatabase {
 
                 ConfigurePrintSettings();
 
-
             } catch (SqliteException ex) {
                 MessageBox.Show($"データベースがロックされています。: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
@@ -1014,7 +1013,7 @@ namespace ProductDatabase {
                 ["{R}"] = _productRegisterWork.Revision,
                 ["{M}"] = monthCode[^1..],
                 ["{S}"] = serialCode.ToString($"D{_productMaster.SerialDigit}"),
-                ["{SA}"] = ShouldIncrementOLesSuffix && !_isTransactionCommitted ? GetNextOLesSuffix(_productMaster.OLesSerialSuffix) : _productMaster.OLesSerialSuffix
+                ["{SA}"] = ShouldApplyNextOLesSuffix ? GetNextOLesSuffix(_productMaster.OLesSerialSuffix) : _productMaster.OLesSerialSuffix
             };
 
             foreach (var kv in map) {
@@ -1023,18 +1022,19 @@ namespace ProductDatabase {
 
             return outputCode;
         }
-        // サフィックスを1文字インクリメントする（空文字→'A'、'A'〜'Y'→次の文字、'Z'または範囲外→'A' に循環）
         private static string GetNextOLesSuffix(string current) {
             if (string.IsNullOrWhiteSpace(current)) return "A";
             var c = char.ToUpperInvariant(current[0]);
-            if (c < 'A' || c >= 'Z') return "A";
+            if (c < 'A' || c >= 'Z') return "A";  // 'Z' は 'A' へ循環、範囲外文字も 'A' にフォールバック
             return ((char)(c + 1)).ToString();
         }
-        // O-Les シリアルサフィックスをインクリメントすべき条件（リセットフラグ・印刷設定・フォーマット全て満たす場合）
         private bool ShouldIncrementOLesSuffix =>
             _productRegisterWork.IsOLesSerialSuffixIncrement
             && _productMaster.IsOLesLabelPrint
-            && LabelPrintSettings.OLesLabelTextFormat?.Contains("{SA}") == true;
+            && LabelPrintSettings.OLesLabelTextFormat?.Contains("{SA}") is true;
+        // コミット前のみ次サフィックスをプレビューに反映する（コミット後はモデルが更新済みのため不要）
+        private bool ShouldApplyNextOLesSuffix =>
+            !_isTransactionCommitted && ShouldIncrementOLesSuffix;
         // 基板チェックボックスのOn/Offに連動して対応DataGridViewの表示と有効状態を切り替える
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
             var checkBox = (System.Windows.Forms.CheckBox)sender;
