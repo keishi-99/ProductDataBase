@@ -9,6 +9,7 @@ namespace ProductDatabase.Models {
         public string ProductType { get; set; } = string.Empty;
         public string Initial { get; set; } = string.Empty;
         public string OLesInitial { get; set; } = string.Empty;
+        public string OLesSerialSuffix { get; set; } = string.Empty;
         public int SerialDigitType { get; set; }
         public int SerialDigit => SerialDigitType switch {
             3 or 101 or 102 => 3,
@@ -95,6 +96,7 @@ namespace ProductDatabase.Models {
             ProductModel = row.Field<string>("ProductModel") ?? string.Empty;
             Initial = row.Field<string>("Initial") ?? string.Empty;
             OLesInitial = row.Field<string>("OLesInitial") ?? string.Empty;
+            OLesSerialSuffix = row.Field<string>("OLesSerialSuffix") ?? string.Empty;
             RevisionGroup = (int)row.Field<long>("RevisionGroup");
             RegType = (int)row.Field<long>("RegType");
             CheckBin = Convert.ToInt32(row["Checkbox"].ToString(), 2); // バイナリ文字列変換のため維持
@@ -113,6 +115,7 @@ namespace ProductDatabase.Models {
             ProductType = string.Empty;
             Initial = string.Empty;
             OLesInitial = string.Empty;
+            OLesSerialSuffix = string.Empty;
             SerialDigitType = 0;
             RevisionGroup = 0;
             CheckBin = 0;

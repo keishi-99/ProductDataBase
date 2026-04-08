@@ -306,6 +306,7 @@ namespace ProductDatabase {
             if (calculatedLastSerial > maxNumber || firstSerial < minNumber) {
                 MessageBox.Show($"シリアルが範囲外になるため、{minNumber.ToString().PadLeft(digit, '0')}から開始します。", "シリアル番号リセット", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 FirstSerialNumberTextBox.Text = minNumber.ToString();
+                firstSerial = minNumber;
             }
 
             _productRegisterWork.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
@@ -398,7 +399,8 @@ namespace ProductDatabase {
                 ["{MM}"] = regDate.ToString("MM"),
                 ["{R}"] = _productRegisterWork.Revision,
                 ["{M}"] = monthCode[^1..],
-                ["{S}"] = serialCode.ToString($"D{_productMaster.SerialDigit}")
+                ["{S}"] = serialCode.ToString($"D{_productMaster.SerialDigit}"),
+                ["{SA}"] = _productMaster.OLesSerialSuffix
             };
 
             foreach (var kv in map) {

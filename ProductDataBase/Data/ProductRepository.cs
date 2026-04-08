@@ -91,11 +91,11 @@ namespace ProductDatabase.Data {
                 $"""
                 INSERT INTO {Constants.ProductTableName}
                     (CategoryName, ProductName, ProductType, ProductModel, Initial,
-                     OLesInitial, RevisionGroup, RegType, SerialType, Checkbox,
+                     OLesInitial, OLesSerialSuffix, RevisionGroup, RegType, SerialType, Checkbox,
                      SerialPrintType, SheetPrintType, Visible)
                 VALUES
                     (@CategoryName, @ProductName, @ProductType, @ProductModel, @Initial,
-                     @OLesInitial, @RevisionGroup, @RegType, @SerialType, @Checkbox,
+                     @OLesInitial, @OLesSerialSuffix, @RevisionGroup, @RegType, @SerialType, @Checkbox,
                      @SerialPrintType, @SheetPrintType, @Visible);
                 SELECT last_insert_rowid();
                 """;
@@ -109,6 +109,7 @@ namespace ProductDatabase.Data {
                 product.ProductModel,
                 product.Initial,
                 product.OLesInitial,
+                product.OLesSerialSuffix,
                 product.RevisionGroup,
                 product.RegType,
                 SerialType = product.SerialDigitType,
@@ -131,8 +132,9 @@ namespace ProductDatabase.Data {
                     ProductType     = @ProductType,
                     ProductModel    = @ProductModel,
                     Initial         = @Initial,
-                    OLesInitial     = @OLesInitial,
-                    RevisionGroup   = @RevisionGroup,
+                    OLesInitial         = @OLesInitial,
+                    OLesSerialSuffix    = @OLesSerialSuffix,
+                    RevisionGroup       = @RevisionGroup,
                     RegType         = @RegType,
                     SerialType      = @SerialType,
                     Checkbox        = @Checkbox,
@@ -151,6 +153,7 @@ namespace ProductDatabase.Data {
                 product.ProductModel,
                 product.Initial,
                 product.OLesInitial,
+                product.OLesSerialSuffix,
                 product.RevisionGroup,
                 product.RegType,
                 SerialType = product.SerialDigitType,

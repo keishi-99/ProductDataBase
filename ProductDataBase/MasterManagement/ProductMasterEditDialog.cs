@@ -138,6 +138,7 @@ namespace ProductDatabase.MasterManagement {
             ProductTypeTextBox.Text = _product.ProductType;
             InitialTextBox.Text = _product.Initial;
             OLesInitialTextBox.Text = _product.OLesInitial;
+            OLesSerialSuffixTtextBox.Text = _product.OLesSerialSuffix;
             VisibleCheckBox.Checked = _product.Visible;
 
             // RegType ComboBox
@@ -259,6 +260,7 @@ namespace ProductDatabase.MasterManagement {
             _product.ProductType = ProductTypeTextBox.Text.Trim();
             _product.Initial = InitialTextBox.Text.Trim();
             _product.OLesInitial = OLesInitialTextBox.Text.Trim();
+            _product.OLesSerialSuffix = OLesSerialSuffixTtextBox.Text.Trim();
             _product.Visible = VisibleCheckBox.Checked;
 
             // RegType

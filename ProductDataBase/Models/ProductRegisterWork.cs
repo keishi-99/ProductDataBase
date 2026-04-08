@@ -15,6 +15,7 @@ namespace ProductDatabase.Models {
 
         public int SerialFirstNumber { get; set; }
         public int SerialLastNumber { get; set; }
+        public bool IsOLesSerialSuffixIncrement { get; set; }
 
         // 製品登録作業データを初期値にリセットする
         public void Reset() {
@@ -31,6 +32,7 @@ namespace ProductDatabase.Models {
             Comment = string.Empty;
             SerialFirstNumber = 0;
             SerialLastNumber = 0;
+            IsOLesSerialSuffixIncrement = false;
         }
     }
 }
