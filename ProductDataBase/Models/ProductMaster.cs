@@ -7,9 +7,9 @@ namespace ProductDatabase.Models {
         public string ProductName { get; set; } = string.Empty;
         public string ProductModel { get; set; } = string.Empty;
         public string ProductType { get; set; } = string.Empty;
-        public string Initial { get; set; } = string.Empty;
-        public string OLesInitial { get; set; } = string.Empty;
-        public string OLesSerialSuffix { get; set; } = string.Empty;
+        public string? Initial { get; set; }
+        public string? OLesInitial { get; set; }
+        public string? OLesSerialSuffix { get; set; }
         public int SerialDigitType { get; set; }
         public int SerialDigit => SerialDigitType switch {
             3 or 101 or 102 => 3,
@@ -94,9 +94,9 @@ namespace ProductDatabase.Models {
             ProductName = row.Field<string>("ProductName") ?? string.Empty;
             ProductType = row.Field<string>("ProductType") ?? string.Empty;
             ProductModel = row.Field<string>("ProductModel") ?? string.Empty;
-            Initial = row.Field<string>("Initial") ?? string.Empty;
-            OLesInitial = row.Field<string>("OLesInitial") ?? string.Empty;
-            OLesSerialSuffix = row.Field<string>("OLesSerialSuffix") ?? string.Empty;
+            Initial = row.Field<string?>("Initial");
+            OLesInitial = row.Field<string?>("OLesInitial");
+            OLesSerialSuffix = row.Field<string?>("OLesSerialSuffix");
             RevisionGroup = (int)row.Field<long>("RevisionGroup");
             RegType = (int)row.Field<long>("RegType");
             CheckBin = Convert.ToInt32(row["Checkbox"].ToString(), 2); // バイナリ文字列変換のため維持
@@ -113,9 +113,9 @@ namespace ProductDatabase.Models {
             ProductName = string.Empty;
             ProductModel = string.Empty;
             ProductType = string.Empty;
-            Initial = string.Empty;
-            OLesInitial = string.Empty;
-            OLesSerialSuffix = string.Empty;
+            Initial = null;
+            OLesInitial = null;
+            OLesSerialSuffix = null;
             SerialDigitType = 0;
             RevisionGroup = 0;
             CheckBin = 0;

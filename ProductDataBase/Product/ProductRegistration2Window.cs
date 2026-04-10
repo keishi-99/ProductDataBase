@@ -1006,14 +1006,14 @@ namespace ProductDatabase {
             };
 
             var map = new Dictionary<string, string> {
-                ["{T}"] = _productMaster.Initial,
-                ["{OT}"] = _productMaster.OLesInitial,
+                ["{T}"] = _productMaster.Initial ?? string.Empty,
+                ["{OT}"] = _productMaster.OLesInitial ?? string.Empty,
                 ["{Y}"] = regDate.ToString("yy"),
                 ["{MM}"] = regDate.ToString("MM"),
                 ["{R}"] = _productRegisterWork.Revision,
                 ["{M}"] = monthCode[^1..],
                 ["{S}"] = serialCode.ToString($"D{_productMaster.SerialDigit}"),
-                ["{SA}"] = ShouldApplyNextOLesSuffix ? GetNextOLesSuffix(_productMaster.OLesSerialSuffix) : _productMaster.OLesSerialSuffix
+                ["{SA}"] = ShouldApplyNextOLesSuffix ? GetNextOLesSuffix(_productMaster.OLesSerialSuffix) : (_productMaster.OLesSerialSuffix ?? string.Empty)
             };
 
             foreach (var kv in map) {
@@ -1022,7 +1022,7 @@ namespace ProductDatabase {
 
             return outputCode;
         }
-        private static string GetNextOLesSuffix(string current) {
+        private static string GetNextOLesSuffix(string? current) {
             if (string.IsNullOrWhiteSpace(current)) return "A";
             var c = char.ToUpperInvariant(current[0]);
             if (c < 'A' || c >= 'Z') return "A";  // 'Z' は 'A' へ循環、範囲外文字も 'A' にフォールバック
