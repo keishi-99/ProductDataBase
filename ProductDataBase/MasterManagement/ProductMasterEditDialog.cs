@@ -136,9 +136,9 @@ namespace ProductDatabase.MasterManagement {
             ProductNameTextBox.Text = _product.ProductName;
             ProductModelTextBox.Text = _product.ProductModel;
             ProductTypeTextBox.Text = _product.ProductType;
-            InitialTextBox.Text = _product.Initial;
-            OLesInitialTextBox.Text = _product.OLesInitial;
-            OLesSerialSuffixTextBox.Text = _product.OLesSerialSuffix;
+            InitialTextBox.Text = _product.Initial ?? string.Empty;
+            OLesInitialTextBox.Text = _product.OLesInitial ?? string.Empty;
+            OLesSerialSuffixTextBox.Text = _product.OLesSerialSuffix ?? string.Empty;
             VisibleCheckBox.Checked = _product.Visible;
 
             // RegType ComboBox
@@ -258,9 +258,9 @@ namespace ProductDatabase.MasterManagement {
             _product.ProductName = ProductNameTextBox.Text.Trim();
             _product.ProductModel = ProductModelTextBox.Text.Trim();
             _product.ProductType = ProductTypeTextBox.Text.Trim();
-            _product.Initial = InitialTextBox.Text.Trim();
-            _product.OLesInitial = OLesInitialTextBox.Text.Trim();
-            _product.OLesSerialSuffix = OLesSerialSuffixTextBox.Text.Trim();
+            _product.Initial = string.IsNullOrWhiteSpace(InitialTextBox.Text) ? null : InitialTextBox.Text.Trim();
+            _product.OLesInitial = string.IsNullOrWhiteSpace(OLesInitialTextBox.Text) ? null : OLesInitialTextBox.Text.Trim();
+            _product.OLesSerialSuffix = string.IsNullOrWhiteSpace(OLesSerialSuffixTextBox.Text) ? null : OLesSerialSuffixTextBox.Text.Trim();
             _product.Visible = VisibleCheckBox.Checked;
 
             // RegType
