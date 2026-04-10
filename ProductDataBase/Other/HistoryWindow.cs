@@ -908,11 +908,11 @@ namespace ProductDatabase {
                     LogProductEdit(row, pendingLogs);
                     UpdateProductRow(con, row, tx);
 
-                    CommonUtils.BackupManager.CreateBackup();
+                    BackupManager.CreateBackup();
                     tx.Commit();
 
                     foreach (var log in pendingLogs) {
-                        CommonUtils.Logger.AppendLog(log);
+                        Logger.AppendLog(log);
                     }
                 });
 
@@ -985,11 +985,11 @@ namespace ProductDatabase {
                             break;
                     }
 
-                    CommonUtils.BackupManager.CreateBackup();
+                    BackupManager.CreateBackup();
                     tx.Commit();
 
                     foreach (var log in pendingLogs) {
-                        CommonUtils.Logger.AppendLog(log);
+                        Logger.AppendLog(log);
                     }
                 });
 

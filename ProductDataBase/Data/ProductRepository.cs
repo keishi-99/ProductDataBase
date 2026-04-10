@@ -198,107 +198,58 @@ namespace ProductDatabase.Data {
                 new { ProductId = productId }) > 0;
         }
 
-        // 基板マスターを新規登録し採番されたSubstrateIDを返す
-        public static long InsertSubstrate(SubstrateMaster substrate) {
+        // 品目番号でSQLiteを検索し一致する基板・製品情報のリストを返す
+        public static List<ProductSearchItem> SearchByModel(string productModel) {
             using var con = new SqliteConnection(GetConnectionRegistration());
-
             var sql =
                 $"""
-                INSERT INTO {Constants.SubstrateTableName}
-                    (CategoryName, ProductName, SubstrateName, SubstrateModel,
-                     RegType, Checkbox, SerialPrintType, Visible)
-                VALUES
-                    (@CategoryName, @ProductName, @SubstrateName, @SubstrateModel,
-                     @RegType, @Checkbox, @SerialPrintType, @Visible);
-                SELECT last_insert_rowid();
+                SELECT
+                    s.SubItemNumber,
+                    s.SubstrateName,
+                    s.ProductName AS sName,
+                    p.ProductName AS pName,
+                    p.ProductType,
+                    p.ProItemNumber
+                FROM
+                    {Constants.ProductTableName} AS p
+                FULL JOIN
+                    {Constants.SubstrateTableName} AS s
+                ON
+                    s.SubItemNumber = p.ProItemNumber
+                WHERE
+                    s.SubItemNumber LIKE '%' || @ProductModel || '%'
+                OR
+                    p.ProItemNumber LIKE '%' || @ProductModel || '%'
                 """;
 
-            var checkBin = Convert.ToString(substrate.CheckBin, 2).PadLeft(11, '0');
-
-            return con.ExecuteScalar<long>(sql, new {
-                substrate.CategoryName,
-                substrate.ProductName,
-                substrate.SubstrateName,
-                substrate.SubstrateModel,
-                substrate.RegType,
-                Checkbox = checkBin,
-                substrate.SerialPrintType,
-                Visible = substrate.Visible ? 1 : 0
-            });
-        }
-
-        // 基板マスターを更新する
-        public static void UpdateSubstrate(SubstrateMaster substrate) {
-            using var con = new SqliteConnection(GetConnectionRegistration());
-
-            var sql =
-                $"""
-                UPDATE {Constants.SubstrateTableName} SET
-                    CategoryName    = @CategoryName,
-                    ProductName     = @ProductName,
-                    SubstrateName   = @SubstrateName,
-                    SubstrateModel  = @SubstrateModel,
-                    RegType         = @RegType,
-                    Checkbox        = @Checkbox,
-                    SerialPrintType = @SerialPrintType,
-                    Visible         = @Visible
-                WHERE SubstrateID = @SubstrateID
-                """;
-
-            var checkBin = Convert.ToString(substrate.CheckBin, 2).PadLeft(11, '0');
-
-            con.Execute(sql, new {
-                substrate.CategoryName,
-                substrate.ProductName,
-                substrate.SubstrateName,
-                substrate.SubstrateModel,
-                substrate.RegType,
-                Checkbox = checkBin,
-                substrate.SerialPrintType,
-                Visible = substrate.Visible ? 1 : 0,
-                substrate.SubstrateID
-            });
-        }
-
-        // 基板マスターを物理削除する（実績存在チェック・関連紐づけ削除を含む）
-        public static void DeleteSubstrate(long substrateId) {
-            using var con = new SqliteConnection(GetConnectionRegistration());
-            con.Open();
-            using var tx = con.BeginTransaction();
-
-            var count = con.ExecuteScalar<int>(
-                $"SELECT COUNT(*) FROM {Constants.TSubstrateTableName} WHERE SubstrateID = @SubstrateId",
-                new { SubstrateId = substrateId }, tx);
-
-            if (count > 0) {
-                throw new InvalidOperationException("この基板には基板登録実績があるため削除できません。");
+            var rows = con.Query(sql, new { ProductModel = productModel }).ToList();
+            if (rows.Count == 0) {
+                throw new Exception($"品目番号が見つかりません。\n品目番号:[{productModel}]");
             }
 
-            con.Execute(
-                "DELETE FROM M_ProductUseSubstrate WHERE SubstrateID = @SubstrateId",
-                new { SubstrateId = substrateId }, tx);
+            var items = new List<ProductSearchItem>();
+            foreach (var row in rows) {
+                var colSub = row.SubItemNumber?.ToString() ?? string.Empty;
+                var colPro = row.ProItemNumber?.ToString() ?? string.Empty;
 
-            con.Execute(
-                $"DELETE FROM {Constants.SubstrateTableName} WHERE SubstrateID = @SubstrateId",
-                new { SubstrateId = substrateId }, tx);
-
-            tx.Commit();
-        }
-
-        // 指定SubstrateIDの基板実績が存在するか確認する
-        public static bool ExistsSubstrateResult(long substrateId) {
-            using var con = new SqliteConnection(GetConnectionRegistration());
-            return con.ExecuteScalar<int>(
-                $"SELECT COUNT(*) FROM {Constants.TSubstrateTableName} WHERE SubstrateID = @SubstrateId",
-                new { SubstrateId = substrateId }) > 0;
-        }
-
-        // SubstrateModelの重複を確認する（excludeIdは編集時に自身を除外するために使用）
-        public static bool ExistsSubstrateModel(string substrateModel, long excludeId = 0) {
-            using var con = new SqliteConnection(GetConnectionRegistration());
-            return con.ExecuteScalar<int>(
-                $"SELECT COUNT(*) FROM {Constants.SubstrateTableName} WHERE SubstrateModel = @SubstrateModel AND SubstrateID != @ExcludeId",
-                new { SubstrateModel = substrateModel, ExcludeId = excludeId }) > 0;
+                if (!string.IsNullOrWhiteSpace(colSub)) {
+                    items.Add(new ProductSearchItem(
+                        colSub,
+                        row.sName?.ToString() ?? string.Empty,
+                        string.Empty,
+                        row.SubstrateName?.ToString() ?? string.Empty,
+                        "1"));
+                }
+                if (!string.IsNullOrWhiteSpace(colPro)) {
+                    items.Add(new ProductSearchItem(
+                        colPro,
+                        row.pName?.ToString() ?? string.Empty,
+                        row.ProductType?.ToString() ?? string.Empty,
+                        string.Empty,
+                        "2"));
+                }
+            }
+            return items;
         }
 
         // 製品-基板紐づけを全削除してから指定リストで再登録する
@@ -318,4 +269,12 @@ namespace ProductDatabase.Data {
             tx.Commit();
         }
     }
+
+    // SearchByModel の検索結果1件を表すレコード
+    public sealed record ProductSearchItem(
+        string ItemNumber,
+        string ProductName,
+        string ProductType,
+        string SubstrateName,
+        string Type);
 }

@@ -507,7 +507,7 @@ namespace ProductDatabase {
                 }
 
                 // バックアップ作成
-                CommonUtils.BackupManager.CreateBackup();
+                BackupManager.CreateBackup();
                 // ログ出力
                 string[] logMessageArray = [
                     $"[基板変更]",
@@ -527,7 +527,7 @@ namespace ProductDatabase {
                     $"担当者[{_productRegisterWork.Person}]",
                     $"コメント[{_productRegisterWork.Comment}]"
                 ];
-                CommonUtils.Logger.AppendLog(logMessageArray);
+                Logger.AppendLog(logMessageArray);
             } catch (Exception) {
                 throw;
             }

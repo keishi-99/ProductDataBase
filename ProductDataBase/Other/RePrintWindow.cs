@@ -17,6 +17,7 @@ namespace ProductDatabase {
 
         public string PrintSettingPath = string.Empty;
 
+        private readonly PrintManager _printManager = new();
         private readonly ProductMaster _productMaster;
         private readonly ProductRegisterWork _productRegisterWork;
         private readonly AppSettings _appSettings;
@@ -140,9 +141,9 @@ namespace ProductDatabase {
                 if (!Registration()) { throw new Exception("登録できませんでした。"); }
             }
 
-            switch (CurrentSerialType) {
+            switch (_printManager.CurrentSerialType) {
                 case SerialType.Nameplate:
-                    PrintManager.PrintUsingBPac(NameplatePrintSettings, GenerateSerialListForType(CurrentSerialType));
+                    _printManager.PrintUsingBPac(NameplatePrintSettings, GenerateSerialListForType(_printManager.CurrentSerialType));
                     break;
                 case SerialType.Label: {
                         if (!await Print(isPrint, GenerateLabelList(), GenerateOlesListOrNull())) {
@@ -152,7 +153,7 @@ namespace ProductDatabase {
                         break;
                     }
                 default:
-                    if (!await Print(isPrint, GenerateSerialListForType(CurrentSerialType))) {
+                    if (!await Print(isPrint, GenerateSerialListForType(_printManager.CurrentSerialType))) {
                         MessageBox.Show("キャンセルしました。");
                         return;
                     }
@@ -166,7 +167,7 @@ namespace ProductDatabase {
                 InsertProduct(con);
 
                 // バックアップ作成
-                CommonUtils.BackupManager.CreateBackup();
+                BackupManager.CreateBackup();
                 // ログ出力
                 string[] logMessageArray = [
                     $"[再印刷]",
@@ -186,7 +187,7 @@ namespace ProductDatabase {
                     $"担当者[{_productRegisterWork.Person}]",
                     $"コメント[{_productRegisterWork.Comment}]"
                 ];
-                CommonUtils.Logger.AppendLog(logMessageArray);
+                Logger.AppendLog(logMessageArray);
 
                 return true;
             } catch (Exception ex) {
@@ -335,10 +336,10 @@ namespace ProductDatabase {
                 var startLine = (int)PrintPositionNumericUpDown.Value - 1;
 
                 pd.BeginPrint += (sender, e) => {
-                    PrintManager.ProductInitialize(_productMaster, _productRegisterWork, ProductPrintSettings, serialList, olesLabelList);
+                    _printManager.ProductInitialize(_productMaster, _productRegisterWork, ProductPrintSettings, serialList, olesLabelList);
                 };
                 pd.PrintPage += (sender, e) => {
-                    bool hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, CurrentSerialType);
+                    bool hasMore = _printManager.PrintSerialCommon(e, isPreview, startLine, _printManager.CurrentSerialType);
                     e.HasMorePages = hasMore;
                 };
 
@@ -376,14 +377,14 @@ namespace ProductDatabase {
             }
         }
         // シリアルコードと日付情報からテキストフォーマットに従ってラベル印字コードを生成する
-        // type を指定した場合はそのタイプのフォーマットを使用する（null の場合は CurrentSerialType を使用）
+        // type を指定した場合はそのタイプのフォーマットを使用する（null の場合は _printManager.CurrentSerialType を使用）
         private string GenerateCode(int serialCode, SerialType? type = null) {
             var regDate = DateTime.TryParse(_productRegisterWork.RegDate, out var parsedDate)
                 ? parsedDate
                 : DateTime.Today;
             var monthCode = CommonUtils.ToMonthCode(regDate);
 
-            var resolvedType = type ?? CurrentSerialType;
+            var resolvedType = type ?? _printManager.CurrentSerialType;
             var outputCode = resolvedType switch {
                 SerialType.Label => LabelPrintSettings.LabelTextFormat ?? string.Empty,
                 SerialType.OLesLabel => LabelPrintSettings.OLesLabelTextFormat ?? string.Empty,
@@ -409,7 +410,7 @@ namespace ProductDatabase {
 
             return outputCode;
         }
-        // 指定タイプのフォーマットでシリアルリストを生成して返す（CurrentSerialType を変更しない）
+        // 指定タイプのフォーマットでシリアルリストを生成して返す（_printManager.CurrentSerialType を変更しない）
         private List<string> GenerateSerialListForType(SerialType type) {
             return Enumerable.Range(0, _productRegisterWork.Quantity)
                 .Select(i => GenerateCode(_productRegisterWork.SerialFirstNumber + i, type))
@@ -650,46 +651,46 @@ namespace ProductDatabase {
         private void RePrintWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
         private async void LabelPrintButton_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Label;
+            _printManager.CurrentSerialType = SerialType.Label;
             await RegisterCheck(true);
         }
         private async void BarcodePrintButton_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Barcode;
+            _printManager.CurrentSerialType = SerialType.Barcode;
             await RegisterCheck(true);
         }
         private async void NamePlatePrintButton_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Nameplate;
+            _printManager.CurrentSerialType = SerialType.Nameplate;
             await RegisterCheck(true);
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
         private async void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Label;
+            _printManager.CurrentSerialType = SerialType.Label;
             await RegisterCheck(false);
         }
         private async void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Barcode;
+            _printManager.CurrentSerialType = SerialType.Barcode;
             await RegisterCheck(false);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Label;
+            _printManager.CurrentSerialType = SerialType.Label;
             PrintSettingsWindow ls = new() {
-                AppSettings = _appSettings
+                AppSettings = _appSettings, CurrentSerialType = _printManager.CurrentSerialType
             };
             ls.ShowDialog(this);
             LoadSettings();
         }
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Barcode;
+            _printManager.CurrentSerialType = SerialType.Barcode;
             PrintSettingsWindow ls = new() {
-                AppSettings = _appSettings
+                AppSettings = _appSettings, CurrentSerialType = _printManager.CurrentSerialType
             };
             ls.ShowDialog(this);
             LoadSettings();
         }
         private void 銘版印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Nameplate;
+            _printManager.CurrentSerialType = SerialType.Nameplate;
             PrintSettingsWindow ls = new() {
-                AppSettings = _appSettings
+                AppSettings = _appSettings, CurrentSerialType = _printManager.CurrentSerialType
             };
             ls.ShowDialog(this);
             LoadSettings();

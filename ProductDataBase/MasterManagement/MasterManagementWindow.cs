@@ -12,6 +12,7 @@ using static ProductDatabase.Print.PrintOptions;
 namespace ProductDatabase.MasterManagement {
     public partial class MasterManagementWindow : Form {
 
+        private readonly PrintManager _printManager = new();
         private readonly ProductRepository _repository;
         private readonly AppSettings _appSettings;
 
@@ -318,7 +319,7 @@ namespace ProductDatabase.MasterManagement {
             if (confirm != DialogResult.Yes) { return; }
 
             try {
-                ProductRepository.DeleteSubstrate(substrateId);
+                SubstrateRepository.DeleteSubstrate(substrateId);
                 LoadData();
                 MessageBox.Show("削除しました。", string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
             } catch (InvalidOperationException ex) {
@@ -437,8 +438,8 @@ namespace ProductDatabase.MasterManagement {
                 }
             }
 
-            CurrentSerialType = serialType;
-            using PrintSettingsWindow window = new() { AppSettings = _appSettings };
+            _printManager.CurrentSerialType = serialType;
+            using PrintSettingsWindow window = new() { AppSettings = _appSettings, CurrentSerialType = _printManager.CurrentSerialType };
             window.ShowDialog(this);
         }
 

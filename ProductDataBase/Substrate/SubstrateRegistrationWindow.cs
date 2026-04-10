@@ -11,6 +11,7 @@ using static ProductDatabase.Print.PrintOptions;
 namespace ProductDatabase {
     public partial class SubstrateRegistrationWindow : Form {
 
+        private readonly PrintManager _printManager = new();
         private readonly SubstrateMaster _substrateMaster;
         private readonly SubstrateRegisterWork _substrateRegisterWork;
         private readonly AppSettings _appSettings;
@@ -318,12 +319,12 @@ namespace ProductDatabase {
                     $"担当者[{person}]",
                     $"コメント[{comment}]"
                 ];
-                CommonUtils.Logger.AppendLog(logMessageArray);
+                Logger.AppendLog(logMessageArray);
 
                 transaction.Commit();
 
                 // バックアップ作成
-                CommonUtils.BackupManager.CreateBackup();
+                BackupManager.CreateBackup();
 
                 return true;
             } catch (Exception ex) {
@@ -402,13 +403,13 @@ namespace ProductDatabase {
 
                 var isPreview = !isPrint;
                 var startLine = (int)PrintPositionNumericUpDown.Value - 1;
-                CurrentSerialType = SerialType.Substrate;
+                _printManager.CurrentSerialType = SerialType.Substrate;
 
                 pd.BeginPrint += (sender, e) => {
-                    PrintManager.SubstrateInitialize(_substrateMaster, _substrateRegisterWork, SubstratePrintSettings, _serialList);
+                    _printManager.SubstrateInitialize(_substrateMaster, _substrateRegisterWork, SubstratePrintSettings, _serialList);
                 };
                 pd.PrintPage += (sender, e) => {
-                    var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, CurrentSerialType);
+                    var hasMore = _printManager.PrintSerialCommon(e, isPreview, startLine, _printManager.CurrentSerialType);
                     e.HasMorePages = hasMore;
                 };
 
@@ -712,8 +713,8 @@ namespace ProductDatabase {
         private void DefectQuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private async void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { await ProcessRegistration(false); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Substrate;
-            using (var ls = new PrintSettingsWindow()) {
+            _printManager.CurrentSerialType = SerialType.Substrate;
+            using (var ls = new PrintSettingsWindow() { AppSettings = _appSettings, CurrentSerialType = _printManager.CurrentSerialType }) {
                 ls.ShowDialog(this);
             }
             LoadSettings(PrintSettingPath);

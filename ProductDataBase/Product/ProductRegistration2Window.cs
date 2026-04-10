@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.Sqlite;
+using ProductDatabase.Data;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
@@ -21,13 +22,12 @@ namespace ProductDatabase {
 
         public string PrintSettingPath { get; set; } = string.Empty;
 
+        private readonly PrintManager _printManager = new();
         private readonly ProductMaster _productMaster;
         private readonly ProductRegisterWork _productRegisterWork;
         private readonly AppSettings _appSettings;
 
         private int _serialLastNumber;
-        private bool _isTransactionCommitted = false;
-
         private readonly List<string> _serialList = [];
         private readonly List<string> _checkBoxNames = [
                         "Substrate1CheckBox", "Substrate2CheckBox", "Substrate3CheckBox", "Substrate4CheckBox","Substrate5CheckBox",
@@ -40,8 +40,7 @@ namespace ProductDatabase {
                         "Substrate11DataGridView", "Substrate12DataGridView", "Substrate13DataGridView", "Substrate14DataGridView","Substrate15DataGridView"
                         ];
 
-        private SqliteConnection? _sqliteConnection;
-        private SqliteTransaction? _sqliteTransaction;
+        private readonly DbTransactionScope _dbScope = new();
 
         public ProductRegistration2Window(ProductMaster productMaster, ProductRegisterWork productRegisterWork, AppSettings appSettings) {
             InitializeComponent();
@@ -53,10 +52,7 @@ namespace ProductDatabase {
         // フォームロード時にDB接続・トランザクション開始・UIと基板データ初期化・印刷設定読み込みを行う
         private void LoadEvents() {
             try {
-                _sqliteConnection = new SqliteConnection(GetConnectionRegistration());
-                _sqliteConnection.Open();
-                _sqliteTransaction = _sqliteConnection.BeginTransaction();
-                _isTransactionCommitted = false;
+                _dbScope.Begin();
 
                 SetFont();
                 InitializeUIControls();
@@ -72,7 +68,7 @@ namespace ProductDatabase {
                         if (_productMaster.SheetPrintType == 3) {
                             break;
                         }
-                        LoadSubstrateData(_sqliteConnection, _sqliteTransaction);
+                        LoadSubstrateData(_dbScope.Connection, _dbScope.Transaction);
                         break;
                     case 9:
                         using (ServiceForm window = new(ServiceInfo)) {
@@ -81,7 +77,7 @@ namespace ProductDatabase {
                             }
                             ServiceInfo = window.ServiceInfo;
                         }
-                        LoadSubstrateData(_sqliteConnection, _sqliteTransaction);
+                        LoadSubstrateData(_dbScope.Connection, _dbScope.Transaction);
                         break;
                     default:
                         HideAllControls();
@@ -101,24 +97,12 @@ namespace ProductDatabase {
         }
         // フォームクローズ時にトランザクションをコミットまたはロールバックしDB接続を解放する
         private void ClosingEvents(bool shouldCommit = true) {
-            try {
-                if (_sqliteTransaction is not null && !_isTransactionCommitted) {
-                    if (shouldCommit) {
-                        _sqliteTransaction.Commit();
-                    }
-                    else {
-                        _sqliteTransaction.Rollback();
-                    }
-                    _isTransactionCommitted = true;
-                }
-            } finally {
-                _sqliteTransaction?.Dispose();
-                _sqliteTransaction = null;
-                _sqliteConnection?.Close();
-                _sqliteConnection?.Dispose();
-                _sqliteConnection = null;
-                _isTransactionCommitted = false;
+            if (shouldCommit) {
+                _dbScope.Commit();
+            } else {
+                _dbScope.Rollback();
             }
+            _dbScope.Dispose();
         }
         // 設定フォントをフォームに適用する
         private void SetFont() {
@@ -314,15 +298,11 @@ namespace ProductDatabase {
             try {
                 _serialList.Clear();
 
-                if (_sqliteConnection is null || _sqliteTransaction is null) {
-                    throw new InvalidOperationException("編集モード用の接続が初期化されていません。");
-                }
-
-                if (!NumberCheck(_sqliteConnection, _sqliteTransaction) || !QuantityCheck()) {
+                if (!NumberCheck(_dbScope.Connection, _dbScope.Transaction) || !QuantityCheck()) {
                     return;
                 }
                 if (_productMaster.IsSerialGeneration) {
-                    SerialCheck(_sqliteConnection);
+                    SerialCheck(_dbScope.Connection);
                     GenerateSerialCodes();
                 }
 
@@ -330,13 +310,13 @@ namespace ProductDatabase {
 
                 using (var overlay = new LoadingOverlay(this)) {
                     await Task.Run(() => {
-                        Registration(_sqliteConnection, _sqliteTransaction);
+                        Registration(_dbScope.Connection, _dbScope.Transaction);
 
                         LogRegistration(_productMaster, _productRegisterWork);
                         BackupManager.CreateBackup();
 
                         // 登録チェック
-                        RegistrationCheck(_sqliteConnection);
+                        RegistrationCheck(_dbScope.Connection);
                     });
                 }
 
@@ -389,16 +369,14 @@ namespace ProductDatabase {
                         transaction: transaction);
                 }
 
-                transaction.Commit();
-                _isTransactionCommitted = true;
+                _dbScope.Commit();
 
                 if (nextSuffix != null) {
                     _productMaster.OLesSerialSuffix = nextSuffix;
                 }
 
             } catch (Exception) {
-                transaction.Rollback();
-                _isTransactionCommitted = true;
+                _dbScope.Rollback();
                 MessageBox.Show("登録に失敗しました。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 throw;
             }
@@ -644,7 +622,7 @@ namespace ProductDatabase {
                 $"担当者[{productRegisterWork.Person}]",
                 $"コメント[{productRegisterWork.Comment}]"
             ];
-            CommonUtils.Logger.AppendLog(logMessageArray);
+            Logger.AppendLog(logMessageArray);
         }
 
         // 製番と注文番号の重複登録をDBで確認しユーザーに続行可否を確認する
@@ -775,7 +753,7 @@ namespace ProductDatabase {
         private void SerialCheck(SqliteConnection connection, bool print = true) {
 
             _serialList.Clear();
-            CurrentSerialType = GetSerialTypeFromProductMaster();
+            _printManager.CurrentSerialType = GetSerialTypeFromProductMaster();
 
             for (var i = 0; i < _productRegisterWork.Quantity; i++) {
                 _serialList.Add(GenerateCode(_productRegisterWork.SerialFirstNumber + i));
@@ -863,7 +841,7 @@ namespace ProductDatabase {
         private async Task HandleLabelPrinting() {
             if (_productMaster.IsLabelPrint) {
                 MessageBox.Show("シリアルラベルを印刷します。");
-                CurrentSerialType = SerialType.Label;
+                _printManager.CurrentSerialType = SerialType.Label;
                 var labelList = GenerateLabelList();
                 if (!await Print(true, labelList, GenerateOlesListOrNull())) {
                     throw new OperationCanceledException("キャンセルしました。");
@@ -874,7 +852,7 @@ namespace ProductDatabase {
         private async Task HandleBarcodePrinting() {
             if (_productMaster.IsBarcodePrint) {
                 MessageBox.Show("バーコードラベルを印刷します。");
-                CurrentSerialType = SerialType.Barcode;
+                _printManager.CurrentSerialType = SerialType.Barcode;
                 var barcodeList = GenerateSerialListForType(SerialType.Barcode);
 
                 if (!await Print(true, barcodeList)) {
@@ -888,7 +866,7 @@ namespace ProductDatabase {
             SerialPrintPositionNumericUpDown.Enabled = false;
             BarcodePrintPositionNumericUpDown.Enabled = false;
         }
-        // 指定タイプのフォーマットでシリアルリストを生成して返す（CurrentSerialType を変更しない）
+        // 指定タイプのフォーマットでシリアルリストを生成して返す（_printManager.CurrentSerialType を変更しない）
         private List<string> GenerateSerialListForType(SerialType type) {
             return [.. Enumerable.Range(0, _productRegisterWork.Quantity).Select(i => GenerateCode(_productRegisterWork.SerialFirstNumber + i, type))];
         }
@@ -897,7 +875,7 @@ namespace ProductDatabase {
             _productMaster.IsOLesLabelPrint ? GenerateSerialListForType(SerialType.OLesLabel) : null;
         // シリアルタイプを決定してシリアル先頭・末尾のコード文字列を生成する
         private void GenerateSerialCodes() {
-            CurrentSerialType = GetSerialTypeFromProductMaster();
+            _printManager.CurrentSerialType = GetSerialTypeFromProductMaster();
             _productRegisterWork.SerialFirst = GenerateCode(_productRegisterWork.SerialFirstNumber);
             _productRegisterWork.SerialLast = GenerateCode(_serialLastNumber);
         }
@@ -940,17 +918,17 @@ namespace ProductDatabase {
                 var isPreview = !isPrint;
                 var printList = serialList ?? _serialList;
 
-                var startLine = CurrentSerialType switch {
+                var startLine = _printManager.CurrentSerialType switch {
                     SerialType.Label => (int)SerialPrintPositionNumericUpDown.Value - 1,
                     SerialType.Barcode => (int)BarcodePrintPositionNumericUpDown.Value - 1,
                     _ => throw new Exception("SerialPrintType unknown")
                 };
 
                 pd.BeginPrint += (sender, e) => {
-                    PrintManager.ProductInitialize(_productMaster, _productRegisterWork, ProductPrintSettings, printList, olesLabelList);
+                    _printManager.ProductInitialize(_productMaster, _productRegisterWork, ProductPrintSettings, printList, olesLabelList);
                 };
                 pd.PrintPage += (sender, e) => {
-                    var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, CurrentSerialType);
+                    var hasMore = _printManager.PrintSerialCommon(e, isPreview, startLine, _printManager.CurrentSerialType);
                     e.HasMorePages = hasMore;
                 };
 
@@ -988,7 +966,7 @@ namespace ProductDatabase {
             }
         }
         // シリアルコードと日付情報からテキストフォーマットに従ってラベル印字コードを生成する
-        // type を指定した場合はそのタイプのフォーマットを使用する（null の場合は CurrentSerialType を使用）
+        // type を指定した場合はそのタイプのフォーマットを使用する（null の場合は _printManager.CurrentSerialType を使用）
         private string GenerateCode(int serialCode, SerialType? type = null) {
             var regDate = DateTime.TryParse(_productRegisterWork.RegDate, out var parsedDate)
                 ? parsedDate
@@ -996,7 +974,7 @@ namespace ProductDatabase {
 
             var monthCode = CommonUtils.ToMonthCode(regDate);
 
-            var resolvedType = type ?? CurrentSerialType;
+            var resolvedType = type ?? _printManager.CurrentSerialType;
             var outputCode = resolvedType switch {
                 SerialType.Label => LabelPrintSettings.LabelTextFormat ?? string.Empty,
                 SerialType.Barcode => BarcodePrintSettings.LabelTextFormat ?? string.Empty,
@@ -1034,7 +1012,7 @@ namespace ProductDatabase {
             && LabelPrintSettings.OLesLabelTextFormat?.Contains("{SA}") is true;
         // コミット前のみ次サフィックスをプレビューに反映する（コミット後はモデルが更新済みのため不要）
         private bool ShouldApplyNextOLesSuffix =>
-            !_isTransactionCommitted && ShouldIncrementOLesSuffix;
+            !_dbScope.IsCommitted && ShouldIncrementOLesSuffix;
         // 基板チェックボックスのOn/Offに連動して対応DataGridViewの表示と有効状態を切り替える
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
             var checkBox = (System.Windows.Forms.CheckBox)sender;
@@ -1268,34 +1246,34 @@ namespace ProductDatabase {
             Close();
         }
         private async void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Label;
+            _printManager.CurrentSerialType = SerialType.Label;
             await Print(false, GenerateLabelList(), GenerateOlesListOrNull());
         }
         private async void バーコード印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Barcode;
+            _printManager.CurrentSerialType = SerialType.Barcode;
             var barcodeList = GenerateSerialListForType(SerialType.Barcode);
             await Print(false, barcodeList);
         }
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Label;
+            _printManager.CurrentSerialType = SerialType.Label;
             using PrintSettingsWindow ls = new() {
-                AppSettings = _appSettings
+                AppSettings = _appSettings, CurrentSerialType = _printManager.CurrentSerialType
             };
             ls.ShowDialog(this);
             LoadSettings();
         }
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Barcode;
+            _printManager.CurrentSerialType = SerialType.Barcode;
             using PrintSettingsWindow ls = new() {
-                AppSettings = _appSettings
+                AppSettings = _appSettings, CurrentSerialType = _printManager.CurrentSerialType
             };
             ls.ShowDialog(this);
             LoadSettings();
         }
         private void 銘版印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Nameplate;
+            _printManager.CurrentSerialType = SerialType.Nameplate;
             using PrintSettingsWindow ls = new() {
-                AppSettings = _appSettings
+                AppSettings = _appSettings, CurrentSerialType = _printManager.CurrentSerialType
             };
             ls.ShowDialog(this);
             LoadSettings();
@@ -1303,7 +1281,7 @@ namespace ProductDatabase {
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
         private void NamePlatePrintButton_Click(object sender, EventArgs e) {
             var nameplateList = GenerateSerialListForType(SerialType.Nameplate);
-            PrintManager.PrintUsingBPac(NameplatePrintSettings, nameplateList);
+            _printManager.PrintUsingBPac(NameplatePrintSettings, nameplateList);
         }
         private async void GenerateReportButton_Click(object sender, EventArgs e) { await GenerateReport(); }
         private async void SubstrateListPrintButton_Click(object sender, EventArgs e) { await GenerateList(); }

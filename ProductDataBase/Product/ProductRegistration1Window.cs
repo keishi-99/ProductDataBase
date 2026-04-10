@@ -422,7 +422,7 @@ namespace ProductDatabase {
                 $"[]",
                 $"コメント[{productRegisterWork.Comment}]"
             ];
-            CommonUtils.Logger.AppendLog(logMessageArray);
+            Logger.AppendLog(logMessageArray);
         }
         // 現在の製品マスターのフィールド値をリスト形式のサブウィンドウで確認表示する
         private void ShowInfo() {
