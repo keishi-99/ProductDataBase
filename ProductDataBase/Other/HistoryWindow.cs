@@ -1,10 +1,10 @@
-using Dapper;
 using Microsoft.Data.Sqlite;
+using ProductDatabase.Data;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Models;
 using ProductDatabase.Other;
+using ProductDatabase.Services;
 using System.Data;
-using static ProductDatabase.Data.ProductRepository;
 
 namespace ProductDatabase {
     public partial class HistoryWindow : Form {
@@ -198,22 +198,10 @@ namespace ProductDatabase {
             }
         }
 
-        // クエリを実行してDataGridViewにバインドしカラムヘッダーを日本語に変換する
-        private void LoadDataAndDisplay(string categoryName, string query, params (string name, object value)[] parameters) {
-            using SqliteConnection con = new(GetConnectionRegistration());
+        // DataTableをDataGridViewにバインドしカラムヘッダーを日本語に変換する
+        private void LoadDataAndDisplay(string categoryName, DataTable data) {
+            _historyTable = data;
 
-            var dynamicParams = new DynamicParameters();
-            foreach (var (name, value) in parameters) {
-                dynamicParams.Add(name, value);
-            }
-
-            using var reader = con.ExecuteReader(query, dynamicParams);
-
-            // DataTableに読み込み
-            _historyTable = new DataTable();
-            _historyTable.Load(reader);
-
-            // DataGridViewにバインド
             DataBaseDataGridView.Columns.Clear();
             DataBaseDataGridView.DataSource = _historyTable;
 
@@ -248,54 +236,8 @@ namespace ProductDatabase {
                 StockCheckBox.Visible = false;
                 AllSubstrateCheckBox.Visible = true;
                 GroupModelCheckBox.Visible = false;
-
-                var substrateCategoryFilter = !string.IsNullOrEmpty(_substrateMaster.CategoryName) ? " AND s.CategoryName = @CategoryName" : string.Empty;
-                var stockFilter = !string.IsNullOrEmpty(_substrateMaster.ProductName) ? " AND s.ProductName = @ProductName" : string.Empty;
-                var substrateIdFilter = !AllSubstrateCheckBox.Checked ? " AND s.SubstrateID = @SubstrateID" : string.Empty;
-
-                var query =
-                    $"""
-                    SELECT
-                        s.ID,
-                        s.SubstrateID,
-                        s.ProductName,
-                        s.SubstrateName,
-                        s.SubstrateModel,
-                        s.OrderNumber,
-                        s.SubstrateNumber,
-                        s.Increase,
-                        s.Decrease,
-                        s.Defect,
-                        p.ProductType,
-                        p.ProductNumber,
-                        p.OrderNumber,
-                        s.Person,
-                        s.RegDate,
-                        s.Comment,
-                        s.UseID,
-                        s.CreatedAt
-                    FROM
-                        {Constants.VSubstrateTableName} AS s
-                    LEFT JOIN
-                        {Constants.VProductTableName} AS p
-                    ON
-                        s.UseID = p.ID
-                    WHERE
-                        s.IsDeleted = 0
-                        {substrateCategoryFilter}
-                        {stockFilter}
-                        {substrateIdFilter}
-                    ORDER BY
-                        s.ID DESC
-                    ;
-                    """;
-
                 LoadDataAndDisplay("Substrate",
-                    query, ("@CategoryName",
-                    _substrateMaster.CategoryName),
-                    ("@ProductName", _substrateMaster.ProductName),
-                    ("@SubstrateID", _substrateMaster.SubstrateID)
-                );
+                    HistoryRepository.QuerySubstrateHistory(_substrateMaster, AllSubstrateCheckBox.Checked));
             }
             if (CategoryRadioButton2.Checked) {
                 _tableName = string.Empty;
@@ -303,52 +245,12 @@ namespace ProductDatabase {
                 StockCheckBox.Visible = true;
                 AllSubstrateCheckBox.Visible = true;
                 GroupModelCheckBox.Visible = true;
-
-                var substrateCategoryFilter = !string.IsNullOrEmpty(_substrateMaster.CategoryName) ? " AND CategoryName = @CategoryName" : string.Empty;
-                var stockFilter = !string.IsNullOrEmpty(_substrateMaster.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
-                var substrateId = !AllSubstrateCheckBox.Checked ? _substrateMaster.SubstrateID : 0;
-                var substrateIdFilter = (substrateId != 0) ? " AND SubstrateID = @SubstrateID" : string.Empty;
-                var inStock = StockCheckBox.Checked ? " AND Stock > 0" : string.Empty;
-
-                var selectClause = GroupModelCheckBox.Checked
-                    ? "SubstrateID, ProductName, SubstrateName, SubstrateModel, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock"
-                    : "SubstrateID, ProductName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock";
-
-                var groupByClause = GroupModelCheckBox.Checked
-                    ? "SubstrateName, SubstrateID"
-                    : "SubstrateName, SubstrateID, SubstrateNumber, OrderNumber";
-
-                var orderByClause = GroupModelCheckBox.Checked
-                    ? "SubstrateModel"
-                    : "MIN(ID) DESC";
-
-                var query =
-                    $"""
-                    SELECT
-                        {selectClause}
-                    FROM
-                        {Constants.VSubstrateTableName}
-                    WHERE
-                        IsDeleted = 0
-                        {substrateCategoryFilter}
-                        {stockFilter}
-                        {substrateIdFilter}
-                    GROUP BY
-                        {groupByClause}
-                    HAVING
-                        1=1 {inStock}
-                    ORDER BY
-                        {orderByClause}
-                    ;
-                    """;
-
                 LoadDataAndDisplay("SubstrateStock",
-                    query, ("@CategoryName",
-                    _substrateMaster.CategoryName),
-                    ("@ProductName",
-                    _substrateMaster.ProductName),
-                    ("@SubstrateID", _substrateMaster.SubstrateID)
-                );
+                    HistoryRepository.QuerySubstrateStock(
+                        _substrateMaster,
+                        AllSubstrateCheckBox.Checked,
+                        StockCheckBox.Checked,
+                        GroupModelCheckBox.Checked));
             }
         }
 
@@ -367,51 +269,8 @@ namespace ProductDatabase {
                 GenerateListButton.Visible = _productMaster.IsListPrint;
                 GenerateCheckSheetButton.Visible = _productMaster.IsCheckSheetPrint;
             }
-
-            var productCategoryFilter = !string.IsNullOrEmpty(_productMaster.CategoryName) ? " AND CategoryName = @CategoryName" : string.Empty;
-            var productNameFilter = !string.IsNullOrEmpty(_productMaster.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
-            var productId = CategoryRadioButton1.Checked ? _productMaster.ProductID : 0;
-            var productIdFilter = (productId != 0) ? " AND ProductID = @ProductID" : string.Empty;
-
-            var query =
-                $"""
-                SELECT
-                    ID,
-                    ProductID,
-                    CategoryName,
-                    ProductName,
-                    ProductType,
-                    ProductModel,
-                    OrderNumber,
-                    ProductNumber,
-                    OLesNumber,
-                    Quantity,
-                    SerialFirst,
-                    SerialLast,
-                    Revision,
-                    RevisionGroup,
-                    SerialLastNumber,
-                    Person,
-                    RegDate,
-                    Comment,
-                    CreatedAt
-                FROM
-                    {Constants.VProductTableName}
-                WHERE
-                    IsDeleted = 0
-                    {productCategoryFilter}
-                    {productNameFilter}
-                    {productIdFilter}
-                ORDER BY
-                    ID DESC;
-                """;
-
             LoadDataAndDisplay("Product",
-                query, ("@CategoryName",
-                _productMaster.CategoryName),
-                ("@ProductName", _productMaster.ProductName),
-                ("@ProductID", _productMaster.ProductID)
-            );
+                HistoryRepository.QueryProductHistory(_productMaster, !CategoryRadioButton1.Checked));
         }
 
         // フィルター条件に基づいてシリアル番号履歴を取得しDataGridViewに表示する
@@ -421,454 +280,14 @@ namespace ProductDatabase {
             ShowUsedSubstrateButton.Visible = false;
             GenerateListButton.Visible = false;
             GenerateCheckSheetButton.Visible = false;
-
-            var substrateCategoryFilter = !string.IsNullOrEmpty(_productMaster.CategoryName) ? " AND (p.CategoryName = @CategoryName OR p.CategoryName IS NULL)" : string.Empty;
-            var productNameFilter = !string.IsNullOrEmpty(_productMaster.ProductName) ? " AND s.ProductName = @ProductName" : string.Empty;
-            var productId = CategoryRadioButton1.Checked ? _productMaster.ProductID : 0;
-            var productIdFilter = (productId != 0) ? " AND ProductID = @ProductID" : string.Empty;
-
-            var query =
-                $"""
-                SELECT
-                    s.rowid,
-                    s.Serial,
-                    s.OLesSerial,
-                    p.OrderNumber,
-                    p.ProductNumber,
-                    s.ProductName,
-                    p.ProductType,
-                    p.ProductModel,
-                    p.RegDate,
-                    s.usedID
-                FROM
-                    {Constants.TSerialTableName} AS s
-                LEFT JOIN
-                    {Constants.VProductTableName} AS p
-                ON
-                    s.UsedID = p.ID
-                WHERE
-                    1=1
-                    {substrateCategoryFilter}
-                    {productNameFilter}
-                    {productIdFilter}
-                ORDER BY
-                    s.rowid DESC
-                ;
-                """;
-
             LoadDataAndDisplay("Serial",
-                query,
-                ("@CategoryName", _productMaster.CategoryName),
-                ("@ProductName", _productMaster.ProductName),
-                ("@ProductID", _productMaster.ProductID)
-            );
+                HistoryRepository.QuerySerialHistory(_productMaster, !CategoryRadioButton1.Checked));
         }
 
         // 製品型式でフィルタして再印刷履歴をDataGridViewに表示する
         private void ViewReprintLog() {
-            var productModelFilter = !string.IsNullOrEmpty(_productMaster.ProductModel) ? " AND ProductModel = @ProductModel" : string.Empty;
-
-            var query =
-                $"""
-                SELECT
-                    ID,
-                    SerialPrintType,
-                    ProductName,
-                    OrderNumber,
-                    ProductNumber,
-                    ProductType,
-                    ProductModel,
-                    Quantity,
-                    Person,
-                    RegDate,
-                    Revision,
-                    SerialFirst,
-                    SerialLast,
-                    Comment,
-                    CreatedAt
-                FROM
-                    T_Reprint
-                WHERE
-                    1=1
-                    {productModelFilter}
-                ORDER BY
-                    ID DESC
-                ;
-                """;
-
             LoadDataAndDisplay("Reprint",
-                query, ("@ProductModel",
-                _productMaster.ProductModel)
-            );
-        }
-
-        // 基板履歴の編集前後の値を操作ログリストに追加する
-        private void LogSubstrateEdit(DataRow row, List<string[]> pendingLogs) {
-            pendingLogs.Add([
-                "[基板履歴編集:前]",
-                $"[{_substrateMaster.CategoryName}]",
-                $"ID[{GetValue(row, "ID", DataRowVersion.Original)}]",
-                $"注文番号[{GetValue(row, "OrderNumber", DataRowVersion.Original)}]",
-                $"製造番号[{GetValue(row, "SubstrateNumber", DataRowVersion.Original)}]",
-                $"[]",
-                $"製品名[{GetValue(row,"ProductName", DataRowVersion.Original)}]",
-                $"基板名[{GetValue(row,"SubstrateName", DataRowVersion.Original)}]",
-                $"型式[{GetValue(row, "SubstrateModel", DataRowVersion.Original)}]",
-                $"追加数[{GetValue(row, "Increase", DataRowVersion.Original)}]",
-                $"使用数[{GetValue(row, "Decrease", DataRowVersion.Original)}]",
-                $"減少数[{GetValue(row, "Defect", DataRowVersion.Original)}]",
-                $"[]",
-                $"登録日[{GetValue(row, "RegDate", DataRowVersion.Original)}]",
-                $"担当者[{GetValue(row, "Person", DataRowVersion.Original)}]",
-                $"コメント[{GetValue(row, "Comment", DataRowVersion.Original)}]"
-            ]);
-
-            pendingLogs.Add([
-                "[基板履歴編集:後]",
-                $"[{_substrateMaster.CategoryName}]",
-                $"ID[{GetValue(row, "ID")}]",
-                $"注文番号[{GetValue(row,"OrderNumber")}]",
-                $"製造番号[{GetValue(row,"SubstrateNumber")}]",
-                $"[]",
-                $"製品名[{GetValue(row, "ProductName")}]",
-                $"基板名[{GetValue(row, "SubstrateName")}]",
-                $"型式[{GetValue(row, "SubstrateModel")}]",
-                $"追加数[{GetValue(row, "Increase")}]",
-                $"使用数[{GetValue(row, "Decrease")}]",
-                $"減少数[{GetValue(row, "Defect")}]",
-                $"[]",
-                $"登録日[{GetValue(row, "RegDate")}]",
-                $"担当者[{GetValue(row, "Person")}]",
-                $"コメント[{GetValue(row, "Comment")}]"
-            ]);
-        }
-
-        // 基板履歴テーブルの指定行を更新するUPDATE文を実行する
-        private static void UpdateSubstrateRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
-            var sql =
-                $"""
-                UPDATE {Constants.TSubstrateTableName}
-                SET
-                    SubstrateNumber = @SubstrateNumber,
-                    OrderNumber = @OrderNumber,
-                    Increase = @Increase,
-                    Decrease = @Decrease,
-                    Defect = @Defect,
-                    Person = @Person,
-                    RegDate = @RegDate,
-                    Comment = @Comment,
-                    UseId = @UseId
-                WHERE ID = @ID;
-                """;
-
-            connection.Execute(sql, new {
-                SubstrateNumber = row["SubstrateNumber"],
-                OrderNumber = row["OrderNumber"],
-                Increase = row["Increase"],
-                Decrease = row["Decrease"],
-                Defect = row["Defect"],
-                RegDate = row["RegDate"],
-                Person = row["Person"],
-                Comment = row["Comment"],
-                UseId = row["UseId"],
-                ID = row["ID"]
-            }, transaction);
-        }
-
-        // 基板履歴の削除対象行の値を操作ログリストに追加する
-        private void LogSubstrateDelete(DataRow row, List<string[]> pendingLogs) {
-            pendingLogs.Add([
-                "[基板履歴削除]",
-                $"[{_substrateMaster.CategoryName}]",
-                $"ID[{GetValue(row, "ID")}]",
-                $"注文番号[{GetValue(row, "OrderNumber")}]",
-                $"製造番号[{GetValue(row, "SubstrateNumber")}]",
-                $"[]",
-                $"製品名[{GetValue(row,"ProductName")}]",
-                $"基板名[{GetValue(row,"SubstrateName")}]",
-                $"型式[{GetValue(row, "SubstrateModel")}]",
-                $"追加数[{GetValue(row, "Increase")}]",
-                $"使用数[{GetValue(row, "Decrease")}]",
-                $"減少数[{GetValue(row, "Defect")}]",
-                $"[]",
-                $"登録日[{GetValue(row, "RegDate")}]",
-                $"担当者[{GetValue(row, "Person")}]",
-                $"コメント[{GetValue(row, "Comment")}]"
-            ]);
-        }
-
-        // 基板履歴テーブルの指定行を論理削除（IsDeleted=1）する
-        private static void DeleteSubstrateRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
-            var sql =
-                $"""
-                UPDATE {Constants.TSubstrateTableName}
-                SET
-                    IsDeleted = 1,
-                    DeletedAt = datetime('now', 'localtime')
-                WHERE ID = @ID;
-                """;
-
-            connection.Execute(sql, new {
-                ID = row["ID"]
-            }, transaction);
-        }
-
-        // 製品履歴テーブルの編集可能フィールドをUPDATE文で更新する
-        private static void UpdateProductRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
-            var sql =
-                $"""
-                UPDATE {Constants.TProductTableName}
-                SET
-                    OrderNumber = @OrderNumber,
-                    ProductNumber = @ProductNumber,
-                    OLesNumber = @OLesNumber,
-                    Person = @Person,
-                    RegDate = @RegDate,
-                    Revision = @Revision,
-                    RevisionGroup = @RevisionGroup,
-                    Comment = @Comment
-                WHERE ID = @ID;
-                """;
-
-            connection.Execute(sql, new {
-                ID = row["ID"],
-                OrderNumber = row["OrderNumber"],
-                ProductNumber = row["ProductNumber"],
-                OLesNumber = row["OLesNumber"],
-                Person = row["Person"],
-                RegDate = row["RegDate"],
-                Revision = row["Revision"],
-                RevisionGroup = row["RevisionGroup"],
-                Comment = row["Comment"]
-            }, transaction);
-        }
-
-        // 製品履歴の編集前後の値を操作ログリストに追加する
-        private void LogProductEdit(DataRow row, List<string[]> pendingLogs) {
-            pendingLogs.Add([
-                $"[製品履歴編集:前]",
-                $"[{_productMaster.CategoryName}]",
-                $"ID[{row["ID", DataRowVersion.Original]}]",
-                $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
-                $"製造番号[{row["ProductNumber", DataRowVersion.Original]}]",
-                $"OLes番号[{row["OLesNumber", DataRowVersion.Original]}]",
-                $"製品名[{row["ProductName", DataRowVersion.Original]}]",
-                $"タイプ[{row["ProductType", DataRowVersion.Original]}]",
-                $"型式[{row["ProductModel", DataRowVersion.Original]}]",
-                $"数量[{row["Quantity", DataRowVersion.Original]}]",
-                $"シリアル先頭[{row["SerialFirst", DataRowVersion.Original]}]",
-                $"シリアル末尾[{row["SerialLast", DataRowVersion.Original]}]",
-                $"Revision[{row["Revision", DataRowVersion.Original]}]",
-                $"登録日[{row["RegDate", DataRowVersion.Original]}]",
-                $"担当者[{row["Person", DataRowVersion.Original]}]",
-                $"コメント[{row["Comment", DataRowVersion.Original]}]"
-            ]);
-
-            pendingLogs.Add([
-                $"[製品履歴編集:後]",
-                $"[{_productMaster.CategoryName}]",
-                $"ID[{GetValue(row,"ID")}]",
-                $"注文番号[{GetValue(row,"OrderNumber")}]",
-                $"製造番号[{GetValue(row,"ProductNumber")}]",
-                $"OLes番号[{GetValue(row,"OLesNumber")}]",
-                $"製品名[{GetValue(row, "ProductName")}]",
-                $"タイプ[{GetValue(row, "ProductType")}]",
-                $"型式[{GetValue(row, "ProductModel")}]",
-                $"数量[{GetValue(row, "Quantity")}]",
-                $"シリアル先頭[{GetValue(row, "SerialFirst")}]",
-                $"シリアル末尾[{GetValue(row, "SerialLast")}]",
-                $"Revision[{GetValue(row, "Revision")}]",
-                $"登録日[{GetValue(row, "RegDate")}]",
-                $"担当者[{GetValue(row, "Person")}]",
-                $"コメント[{GetValue(row, "Comment")}]"
-            ]);
-        }
-
-        // 製品履歴の削除対象行の値を操作ログリストに追加する
-        private void LogProductDelete(DataRow row, List<string[]> pendingLogs) {
-            pendingLogs.Add([
-                "[製品履歴削除]",
-                $"[{_productMaster.CategoryName}]",
-                $"ID[{GetValue(row, "ID")}]",
-                $"注文番号[{GetValue(row, "OrderNumber")}]",
-                $"製造番号[{GetValue(row, "ProductNumber")}]",
-                $"OLes番号[{GetValue(row, "OLesNumber")}]",
-                $"製品名[{GetValue(row,"ProductName")}]",
-                $"タイプ[{GetValue(row,"ProductType")}]",
-                $"型式[{GetValue(row, "ProductModel")}]",
-                $"数量[{GetValue(row, "Quantity")}]",
-                $"シリアル先頭[{GetValue(row, "SerialFirst")}]",
-                $"シリアル末尾[{GetValue(row, "SerialLast")}]",
-                $"Revision[{GetValue(row, "Revision")}]",
-                $"登録日[{GetValue(row, "RegDate")}]",
-                $"担当者[{GetValue(row, "Person")}]",
-                $"コメント[{GetValue(row, "Comment")}]"
-            ]);
-        }
-
-        // 製品削除に連動して論理削除される基板履歴の内容を操作ログリストに追加する
-        private void LogProductSubstrateDelete(IDbConnection connection, DataRow row, List<string[]> pendingLogs, IDbTransaction transaction) {
-            var sql =
-                $"""
-                SELECT
-                    ID,
-                    OrderNumber,
-                    SubstrateNumber,
-                    ProductName,
-                    SubstrateName,
-                    SubstrateModel,
-                    Increase,
-                    Decrease,
-                    Defect,
-                    RegDate,
-                    Person,
-                    Comment,
-                    UseID
-                FROM {Constants.VSubstrateTableName}
-                WHERE UseID = @ID;
-                """;
-
-            var results = connection.Query(sql, new {
-                ID = row["ID"]
-            }, transaction);
-
-            foreach (var item in results) {
-                pendingLogs.Add([
-                    $"[製品削除に伴う基板削除]",
-                    $"[{_substrateMaster.CategoryName}]",
-                    $"ID[{item.ID}]",
-                    $"注文番号[{item.OrderNumber}]",
-                    $"製造番号[{item.SubstrateNumber}]",
-                    $"[]",
-                    $"製品名[{item.ProductName}]",
-                    $"基板名[{item.SubstrateName}]",
-                    $"型式[{item.SubstrateModel}]",
-                    $"追加数[{item.Increase}]",
-                    $"使用数[{item.Decrease}]",
-                    $"減少数[{item.Defect}]",
-                    $"登録日[{item.RegDate}]",
-                    $"担当者[{item.Person}]",
-                    $"コメント[{item.Comment}]",
-                    $"UseID[{item.UseID}]",
-                ]);
-            }
-        }
-
-        // 製品削除に連動して削除されるシリアル履歴の内容を操作ログリストに追加する
-        private void LogProductSerialDelete(IDbConnection connection, DataRow row, List<string[]> pendingLogs, IDbTransaction transaction) {
-            var sql =
-                $"""
-                SELECT
-                    rowid,
-                    ProductName,
-                    Serial,
-                    UsedID
-                FROM {Constants.TSerialTableName}
-                WHERE UsedID = @ID;
-                """;
-
-            var results = connection.Query(sql, new {
-                ID = row["ID"]
-            }, transaction);
-
-            foreach (var item in results) {
-                pendingLogs.Add([
-                    $"[製品削除に伴うシリアル削除]",
-                    $"[{_productMaster.CategoryName}]",
-                    $"ID[{item.rowid}]",
-                    $"製品名[{item.ProductName}]",
-                    $"Serial[{item.Serial}]",
-                    $"UsedID[{item.UsedID}]",
-                    $"[]", $"[]", $"[]", $"[]",
-                    $"[]", $"[]", $"[]", $"[]",
-                    $"[]", $"[]",
-                ]);
-            }
-        }
-
-        // 製品履歴テーブルの指定行を論理削除（IsDeleted=1）する
-        private static void DeleteProductRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
-            var sql =
-                $"""
-                UPDATE {Constants.TProductTableName}
-                SET
-                    IsDeleted = 1,
-                    DeletedAt = datetime('now', 'localtime')
-                WHERE ID = @ID;
-                """;
-
-            connection.Execute(sql, new {
-                ID = row["ID"]
-            }, transaction);
-        }
-
-        // 製品削除に連動してUseIDが一致する基板履歴を論理削除する
-        private static void DeleteProductSubstrateRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
-            var sql = $"""
-        UPDATE {Constants.TSubstrateTableName}
-        SET
-            IsDeleted = 1,
-            DeletedAt = datetime('now', 'localtime')
-        WHERE UseID = @ID;
-        """;
-
-            connection.Execute(sql, new {
-                ID = row["ID"]
-            }, transaction);
-        }
-
-        // 製品削除に連動してUsedIDが一致するシリアルを物理削除する
-        private static void DeleteProductSerialRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
-            var sql =
-                $"""
-                DELETE FROM {Constants.TSerialTableName}
-                WHERE UsedID = @ID;
-                """;
-
-            connection.Execute(sql, new {
-                ID = row["ID"]
-            }, transaction);
-        }
-
-        // シリアル履歴の削除対象行の値を操作ログリストに追加する
-        private void LogSerialDelete(DataRow row, List<string[]> pendingLogs) {
-            pendingLogs.Add([
-            $"[シリアル履歴削除]",
-                $"[{_productMaster.CategoryName}]",
-                $"ID[{GetValue(row, "rowid")}]",
-                $"製品名[{GetValue(row, "ProductName")}]",
-                $"Serial[{GetValue(row, "Serial")}]",
-                $"UsedID[{GetValue(row, "UsedID")}]",
-                $"[]",
-                $"[]",
-                $"[]",
-                $"[]",
-                $"[]",
-                $"[]",
-                $"[]",
-                $"[]",
-                $"[]",
-                $"[]",
-            ]);
-        }
-
-        // シリアルテーブルから指定rowidの行を物理削除する
-        private static void DeleteSerialRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
-            var sql =
-                $"""
-                DELETE FROM {Constants.TSerialTableName}
-                WHERE rowid = @rowid;
-                """;
-
-            connection.Execute(sql, new {
-                rowid = row["rowid"]
-            }, transaction);
-        }
-
-        // DataRowから指定カラムの値を文字列で取得しDBNull の場合は空文字を返す
-        private static string GetValue(DataRow row, string columnName, DataRowVersion version = DataRowVersion.Current) {
-            var value = row[columnName, version];
-            return value == DBNull.Value ? "" : value.ToString() ?? "";
+                HistoryRepository.QueryReprintHistory(_productMaster.ProductModel));
         }
 
         // 選択行の製品履歴を編集ダイアログで編集してDBに保存する
@@ -882,11 +301,10 @@ namespace ProductDatabase {
             using var dialog = new Other.HistoryEditDialog(dgvRow);
             if (dialog.ShowDialog(this) != DialogResult.OK) { return; }
 
-            // DataRowを取得してBeginEdit/EndEditで変更を記録（Original/Currentが使えるようになる）
+            // UIスレッドでDataRowの変更を記録（Task.Run前に実施）
             if (dgvRow.DataBoundItem is not DataRowView drv) { return; }
             var row = drv.Row;
 
-            // UIスレッドでDataRowの変更を記録（Task.Run前に実施）
             row.BeginEdit();
             row["OrderNumber"]   = (object?)dialog.OrderNumber   ?? DBNull.Value;
             row["ProductNumber"] = (object?)dialog.ProductNumber ?? DBNull.Value;
@@ -900,13 +318,13 @@ namespace ProductDatabase {
             try {
                 // DB操作をバックグラウンドスレッドで実行
                 await Task.Run(() => {
-                    using var con = new SqliteConnection(GetConnectionRegistration());
+                    using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
                     con.Open();
                     using var tx = con.BeginTransaction();
 
                     // Original=変更前, Current=変更後
-                    LogProductEdit(row, pendingLogs);
-                    UpdateProductRow(con, row, tx);
+                    HistoryAuditLogger.LogProductEdit(row, pendingLogs, _productMaster.CategoryName);
+                    HistoryRepository.UpdateProductRow(con, row, tx);
 
                     BackupManager.CreateBackup();
                     tx.Commit();
@@ -956,31 +374,34 @@ namespace ProductDatabase {
             try {
                 // DB操作をバックグラウンドスレッドで実行
                 await Task.Run(() => {
-                    using var con = new SqliteConnection(GetConnectionRegistration());
+                    using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
                     con.Open();
                     using var tx = con.BeginTransaction();
 
                     switch (tableName) {
                         case "Substrate":
                             foreach (var row in rowsToDelete) {
-                                LogSubstrateDelete(row, pendingLogs);
-                                DeleteSubstrateRow(con, row, tx);
+                                HistoryAuditLogger.LogSubstrateDelete(row, pendingLogs, _substrateMaster.CategoryName);
+                                HistoryRepository.DeleteSubstrateRow(con, row, tx);
                             }
                             break;
                         case "Product":
                             foreach (var row in rowsToDelete) {
-                                LogProductDelete(row, pendingLogs);
-                                LogProductSubstrateDelete(con, row, pendingLogs, tx);
-                                LogProductSerialDelete(con, row, pendingLogs, tx);
-                                DeleteProductRow(con, row, tx);
-                                DeleteProductSubstrateRow(con, row, tx);
-                                DeleteProductSerialRow(con, row, tx);
+                                var id = Convert.ToInt64(row["ID"]);
+                                var substrates = HistoryRepository.GetSubstratesByUseId(con, id, tx);
+                                var serials    = HistoryRepository.GetSerialsByUsedId(con, id, tx);
+                                HistoryAuditLogger.LogProductDelete(row, pendingLogs, _productMaster.CategoryName);
+                                HistoryAuditLogger.LogProductSubstrateDelete(substrates, pendingLogs, _substrateMaster.CategoryName);
+                                HistoryAuditLogger.LogProductSerialDelete(serials, pendingLogs, _productMaster.CategoryName);
+                                HistoryRepository.DeleteProductRow(con, row, tx);
+                                HistoryRepository.DeleteProductSubstrateRow(con, row, tx);
+                                HistoryRepository.DeleteProductSerialRow(con, row, tx);
                             }
                             break;
                         case "Serial":
                             foreach (var row in rowsToDelete) {
-                                LogSerialDelete(row, pendingLogs);
-                                DeleteSerialRow(con, row, tx);
+                                HistoryAuditLogger.LogSerialDelete(row, pendingLogs, _productMaster.CategoryName);
+                                HistoryRepository.DeleteSerialRow(con, row, tx);
                             }
                             break;
                     }
@@ -1060,33 +481,18 @@ namespace ProductDatabase {
         private void InventoryAdjustment() {
             var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
             _substrateMaster.SubstrateID = int.TryParse(DataBaseDataGridView.Rows[i].Cells["SubstrateID"].Value?.ToString(), out var subId) ? subId : 0;
-            _substrateRegisterWork.OrderNumber = DataBaseDataGridView.Rows[i].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
+            _substrateRegisterWork.OrderNumber   = DataBaseDataGridView.Rows[i].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
             _substrateRegisterWork.ProductNumber = DataBaseDataGridView.Rows[i].Cells["SubstrateNumber"].Value.ToString() ?? string.Empty;
 
-            using SqliteConnection con = new(GetConnectionRegistration());
-            var sql =
-                $"""
-                SELECT
-                    SubstrateID,
-                    SubstrateName,
-                    SubstrateModel,
-                    ProductName,
-                    RegType,
-                    Checkbox,
-                    SerialPrintType
-                FROM {Constants.SubstrateTableName}
-                WHERE SubstrateID = @SubstrateID;
-                """;
-
-            var result = con.QueryFirstOrDefault(sql, new { _substrateMaster.SubstrateID });
+            var result = HistoryRepository.QuerySubstrateMasterById(_substrateMaster.SubstrateID);
 
             if (result != null) {
-                _substrateMaster.SubstrateName = result.SubstrateName ?? string.Empty;
-                _substrateMaster.SubstrateModel = result.SubstrateModel ?? string.Empty;
-                _substrateMaster.ProductName = result.ProductName ?? string.Empty;
-                _substrateMaster.RegType = int.TryParse(result.RegType?.ToString(), out int rt) ? rt : 0;
-                _substrateMaster.CheckBin = Convert.ToInt32(result.Checkbox?.ToString() ?? "0", 2); // バイナリ文字列変換のため維持
-                _substrateMaster.SerialPrintType = int.TryParse(result.SerialPrintType?.ToString(), out int spt) ? spt : 0;
+                _substrateMaster.SubstrateName    = result.SubstrateName ?? string.Empty;
+                _substrateMaster.SubstrateModel   = result.SubstrateModel ?? string.Empty;
+                _substrateMaster.ProductName      = result.ProductName ?? string.Empty;
+                _substrateMaster.RegType          = int.TryParse(result.RegType?.ToString(), out int rt) ? rt : 0;
+                _substrateMaster.CheckBin         = Convert.ToInt32(result.Checkbox?.ToString() ?? "0", 2); // バイナリ文字列変換のため維持
+                _substrateMaster.SerialPrintType  = int.TryParse(result.SerialPrintType?.ToString(), out int spt) ? spt : 0;
             }
 
             using SubstrateRegistrationWindow window = new(_substrateMaster, _substrateRegisterWork, _appSettings);
@@ -1118,39 +524,10 @@ namespace ProductDatabase {
 
             dataForm.Controls.Add(dataGridView);
 
-            using SqliteConnection con = new(GetConnectionRegistration());
-            var sql =
-                $"""
-                SELECT
-                    ID,
-                    SubstrateName,
-                    SubstrateModel,
-                    SubstrateNumber,
-                    Decrease
-                FROM {Constants.VSubstrateTableName}
-                WHERE UseID = @ID
-                ORDER BY SubstrateModel ASC;
-                """;
-
             var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
             var id = int.TryParse(DataBaseDataGridView.Rows[i].Cells["ID"].Value?.ToString(), out var idVal) ? idVal : 0;
 
-            var results = con.Query(sql, new { ID = id }).ToList();
-            var dt = new DataTable();
-
-            if (results.Count != 0) {
-                // 動的オブジェクトからDataTableを作成
-                var firstRow = results.First() as IDictionary<string, object>;
-                foreach (var key in firstRow!.Keys) {
-                    dt.Columns.Add(key);
-                }
-                foreach (var row in results) {
-                    var dict = row as IDictionary<string, object>;
-                    dt.Rows.Add([.. dict!.Values]);
-                }
-            }
-
-            dataGridView.DataSource = dt;
+            dataGridView.DataSource = HistoryRepository.QueryUsedSubstrates(id);
             dataForm.ShowDialog();
         }
 
@@ -1158,14 +535,14 @@ namespace ProductDatabase {
         private async Task GenerateReport() {
             if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
             var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
-            _productRegisterWork.RowID = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value?.ToString(), out var rid1) ? rid1 : 0;
-            _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.RowID         = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value?.ToString(), out var rid1) ? rid1 : 0;
+            _productRegisterWork.OrderNumber   = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
             _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
-            _productMaster.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
-            _productRegisterWork.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
+            _productMaster.ProductModel        = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.Quantity      = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
+            _productRegisterWork.RegDate       = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.SerialFirst   = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.SerialLast    = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
 
             // [UIスレッド] 前処理: Config読み込み + ファイル選択 + 保存先選択
             (string templateFilePath, string savePath, ExcelServiceClosedXml.ReportGeneratorClosedXml.ReportConfigClosedXml config)? prepared;
@@ -1206,15 +583,15 @@ namespace ProductDatabase {
         private async Task GenerateList() {
             if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
             var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
-            _productRegisterWork.RowID = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value?.ToString(), out var rid2) ? rid2 : 0;
-            _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.RowID         = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value?.ToString(), out var rid2) ? rid2 : 0;
+            _productRegisterWork.OrderNumber   = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
             _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
-            _productMaster.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
-            _productRegisterWork.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.Comment = DataBaseDataGridView.Rows[selectRow].Cells["Comment"].Value.ToString() ?? string.Empty;
+            _productMaster.ProductModel        = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.Quantity      = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
+            _productRegisterWork.RegDate       = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.SerialFirst   = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.SerialLast    = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.Comment       = DataBaseDataGridView.Rows[selectRow].Cells["Comment"].Value.ToString() ?? string.Empty;
 
             GenerateListButton.Enabled = false;
             Exception? taskException = null;
@@ -1239,12 +616,12 @@ namespace ProductDatabase {
             if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
             var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
             _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
-            _productMaster.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
-            _productRegisterWork.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.OrderNumber   = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
+            _productMaster.ProductModel        = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.Quantity      = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
+            _productRegisterWork.RegDate       = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.SerialFirst   = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.SerialLast    = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
 
             // [UIスレッド] 前処理: Config読み込み + InputDialog（温度・湿度）
             (ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.CheckSheetConfigData configData, string temperature, string humidity)? prepared;
@@ -1301,13 +678,13 @@ namespace ProductDatabase {
 
         // 下部のボタン・チェックボックスの有効/無効を切り替える
         private void SetBottomControlsEnabled(bool enabled) {
-            GenerateReportButton.Enabled = enabled;
-            GenerateListButton.Enabled = enabled;
+            GenerateReportButton.Enabled     = enabled;
+            GenerateListButton.Enabled       = enabled;
             GenerateCheckSheetButton.Enabled = enabled;
-            ShowUsedSubstrateButton.Enabled = enabled;
-            AllSubstrateCheckBox.Enabled = enabled;
-            StockCheckBox.Enabled = enabled;
-            GroupModelCheckBox.Enabled = enabled;
+            ShowUsedSubstrateButton.Enabled  = enabled;
+            AllSubstrateCheckBox.Enabled     = enabled;
+            StockCheckBox.Enabled            = enabled;
+            GroupModelCheckBox.Enabled       = enabled;
         }
 
         // 右クリックメニューを開く前にテーブル種別・行選択に応じて項目を制御する
@@ -1325,7 +702,7 @@ namespace ProductDatabase {
             }
 
             // テーブル種別に応じてメニュー項目の有効/無効を設定する
-            EditContextMenuItem.Enabled = (_tableName == "Product");
+            EditContextMenuItem.Enabled   = (_tableName == "Product");
             DeleteContextMenuItem.Enabled = (_tableName != string.Empty);
         }
 
