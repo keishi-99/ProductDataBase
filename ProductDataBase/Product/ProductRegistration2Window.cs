@@ -803,9 +803,9 @@ namespace ProductDatabase {
         // 登録済み製品情報をもとにExcel成績書を生成する
         private async Task GenerateReport() {
             // [UIスレッド] 前処理: Config読み込み + ファイル選択 + 保存先選択
-            (string templateFilePath, string savePath, ExcelServiceClosedXml.ReportGeneratorClosedXml.ReportConfigClosedXml config)? prepared;
+            (string templateFilePath, string savePath, ReportGeneratorClosedXml.ReportConfigClosedXml config)? prepared;
             try {
-                prepared = ExcelServiceClosedXml.ReportGeneratorClosedXml.PrepareReport(
+                prepared = ReportGeneratorClosedXml.PrepareReport(
                     _productMaster.ProductModel, _productRegisterWork.ProductNumber);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{nameof(GenerateReport)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -818,7 +818,7 @@ namespace ProductDatabase {
             using (var overlay = new LoadingOverlay(this)) {
                 try {
                     await CommonUtils.RunOnStaThreadAsync(() =>
-                        ExcelServiceClosedXml.ReportGeneratorClosedXml.ExecuteReport(
+                        ReportGeneratorClosedXml.ExecuteReport(
                             _productMaster, _productRegisterWork,
                             prepared.Value.templateFilePath,
                             prepared.Value.savePath,
@@ -843,7 +843,7 @@ namespace ProductDatabase {
             using (var overlay = new LoadingOverlay(this)) {
                 try {
                     await CommonUtils.RunOnStaThreadAsync(() =>
-                        ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(
+                        ListGeneratorClosedXml.GenerateList(
                             _productMaster, _productRegisterWork));
                 } catch (Exception ex) {
                     taskException = ex;
@@ -858,9 +858,9 @@ namespace ProductDatabase {
         // 登録済み製品情報をもとにExcelチェックシートを生成する
         private async Task GenerateCheckSheet() {
             // [UIスレッド] 前処理: Config読み込み + InputDialog（温度・湿度）
-            (ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.CheckSheetConfigData configData, string temperature, string humidity)? prepared;
+            (CheckSheetGeneratorClosedXml.CheckSheetConfigData configData, string temperature, string humidity)? prepared;
             try {
-                prepared = ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.PrepareCheckSheet(_productMaster);
+                prepared = CheckSheetGeneratorClosedXml.PrepareCheckSheet(_productMaster);
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{nameof(GenerateCheckSheet)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -872,7 +872,7 @@ namespace ProductDatabase {
             using (var overlay = new LoadingOverlay(this)) {
                 try {
                     await CommonUtils.RunOnStaThreadAsync(() =>
-                        ExcelServiceClosedXml.CheckSheetGeneratorClosedXml.ExecuteCheckSheet(
+                        CheckSheetGeneratorClosedXml.ExecuteCheckSheet(
                             _productMaster, _productRegisterWork,
                             prepared.Value.configData,
                             prepared.Value.temperature,

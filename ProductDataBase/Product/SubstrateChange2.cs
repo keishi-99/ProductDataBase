@@ -544,7 +544,7 @@ namespace ProductDatabase {
             using (var overlay = new LoadingOverlay(this)) {
                 try {
                     await CommonUtils.RunOnStaThreadAsync(() =>
-                        ExcelServiceClosedXml.ListGeneratorClosedXml.GenerateList(
+                        ListGeneratorClosedXml.GenerateList(
                             _productMaster, _productRegisterWork));
                 } catch (Exception ex) {
                     taskException = ex;

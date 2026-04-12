@@ -614,7 +614,7 @@ namespace ProductDatabase {
         }
         // 基板マスター情報をもとに基板仕様Excelファイルを開く（例外はcaller側でハンドル）
         private void OpenSubstrateInformation() {
-            ExcelServiceClosedXml.SubstrateInformationClosedXml.OpenSubstrateInformationClosedXml(_substrateMaster);
+            SubstrateInformationClosedXml.OpenSubstrateInformationClosedXml(_substrateMaster);
         }
 
         // 有効なテキストボックスの入力状態・製番桁数・数量・担当者選択を検証しエラー時は登録ボタンを無効化する
