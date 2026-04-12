@@ -1,8 +1,32 @@
+using ProductDatabase.Models;
+using ProductDatabase.Other;
 using System.Data;
 
 namespace ProductDatabase.Services {
     // 履歴編集・削除操作の監査ログエントリを整形するクラス
     internal static class HistoryAuditLogger {
+
+        // 製品登録操作の監査ログをファイルに記録する
+        public static void LogProductRegistration(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
+            Logger.AppendLog([
+                "[製品登録]",
+                $"[{productMaster.CategoryName}]",
+                $"ID[{productRegisterWork.RowID}]",
+                $"注文番号[{productRegisterWork.OrderNumber}]",
+                $"製造番号[{productRegisterWork.ProductNumber}]",
+                $"OLes番号[{productRegisterWork.OLesNumber}]",
+                $"製品名[{productMaster.ProductName}]",
+                $"タイプ[{productMaster.ProductType}]",
+                $"型式[{productMaster.ProductModel}]",
+                $"数量[{productRegisterWork.Quantity}]",
+                $"シリアル先頭[{productRegisterWork.SerialFirst}]",
+                $"シリアル末尾[{productRegisterWork.SerialLast}]",
+                $"Revision[{productRegisterWork.Revision}]",
+                $"登録日[{productRegisterWork.RegDate}]",
+                $"担当者[{productRegisterWork.Person}]",
+                $"コメント[{productRegisterWork.Comment}]"
+            ]);
+        }
 
         // 基板履歴編集の編集前後ログエントリを追加する
         public static void LogSubstrateEdit(DataRow row, List<string[]> pendingLogs, string categoryName) {
