@@ -1,7 +1,6 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
-using ProductDatabase.Models;
-using ProductDatabase.Other;
+using ProductDatabase.Common;
 using System.Data;
 
 namespace ProductDatabase.Data {
@@ -119,14 +118,14 @@ namespace ProductDatabase.Data {
                 """;
 
             connection.Execute(sql, new {
-                SubstrateID     = substrateId,
+                SubstrateID = substrateId,
                 SubstrateNumber = substrateNumber.NullIfWhiteSpace(),
-                OrderNumber     = orderNumber.NullIfWhiteSpace(),
-                Increase        = (object?)increase ?? DBNull.Value,
-                Defect          = defect.HasValue ? (object?)-defect.Value : DBNull.Value,
-                Person          = person.NullIfWhiteSpace(),
-                RegDate         = regDate.NullIfWhiteSpace(),
-                Comment         = comment.NullIfWhiteSpace()
+                OrderNumber = orderNumber.NullIfWhiteSpace(),
+                Increase = (object?)increase ?? DBNull.Value,
+                Defect = defect.HasValue ? (object?)-defect.Value : DBNull.Value,
+                Person = person.NullIfWhiteSpace(),
+                RegDate = regDate.NullIfWhiteSpace(),
+                Comment = comment.NullIfWhiteSpace()
             }, transaction: transaction);
 
             return connection.ExecuteScalar<string>("SELECT last_insert_rowid();", transaction: transaction) ?? string.Empty;
@@ -150,12 +149,12 @@ namespace ProductDatabase.Data {
 
         // 基板在庫情報DTO
         public sealed class SubstrateStockInfo {
-            public long   SubstrateID     { get; set; }
-            public string SubstrateName   { get; set; } = string.Empty;
-            public string SubstrateModel  { get; set; } = string.Empty;
+            public long SubstrateID { get; set; }
+            public string SubstrateName { get; set; } = string.Empty;
+            public string SubstrateModel { get; set; } = string.Empty;
             public string SubstrateNumber { get; set; } = string.Empty;
-            public string OrderNumber     { get; set; } = string.Empty;
-            public int    Stock           { get; set; }
+            public string OrderNumber { get; set; } = string.Empty;
+            public int Stock { get; set; }
         }
     }
 }

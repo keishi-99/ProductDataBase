@@ -1,4 +1,4 @@
-namespace ProductDatabase.Other {
+namespace ProductDatabase.History {
     partial class HistoryEditDialog {
         private System.ComponentModel.IContainer components = null;
 

@@ -7,7 +7,7 @@ using ZXing.QrCode;
 using ZXing.QrCode.Internal;
 using ZXing.Windows.Compatibility;
 
-namespace ProductDatabase.ExcelService {
+namespace ProductDatabase.Excel {
     // 製品登録リストのExcel生成を担当するクラス
     internal static class ListGeneratorClosedXml {
 
@@ -81,31 +81,31 @@ namespace ProductDatabase.ExcelService {
         // 製品情報に関連するExcelのセル範囲を取得する
         private static ProductCellRanges GetProductCellRanges(IXLWorksheet configSheet, int resultRow) {
             return new ProductCellRanges {
-                ProductNameRange  = configSheet.Cell(resultRow, 4).GetString(),
+                ProductNameRange = configSheet.Cell(resultRow, 4).GetString(),
                 ProductNumberRange = configSheet.Cell(resultRow, 5).GetString(),
-                OrderNumberRange  = configSheet.Cell(resultRow, 6).GetString(),
-                RegDateRange      = configSheet.Cell(resultRow, 7).GetString(),
+                OrderNumberRange = configSheet.Cell(resultRow, 6).GetString(),
+                RegDateRange = configSheet.Cell(resultRow, 7).GetString(),
                 ProductModelConfig = configSheet.Cell(resultRow, 8).GetString(),
-                ProductModelRange  = configSheet.Cell(resultRow, 9).GetString(),
-                QuantityRange     = configSheet.Cell(resultRow, 10).GetString(),
-                SerialFirstRange  = configSheet.Cell(resultRow, 11).GetString(),
-                SerialLastRange   = configSheet.Cell(resultRow, 12).GetString(),
-                CommentRange      = configSheet.Cell(resultRow, 13).GetString(),
-                QrCodeRange       = configSheet.Cell(resultRow, 14).GetString(),
+                ProductModelRange = configSheet.Cell(resultRow, 9).GetString(),
+                QuantityRange = configSheet.Cell(resultRow, 10).GetString(),
+                SerialFirstRange = configSheet.Cell(resultRow, 11).GetString(),
+                SerialLastRange = configSheet.Cell(resultRow, 12).GetString(),
+                CommentRange = configSheet.Cell(resultRow, 13).GetString(),
+                QrCodeRange = configSheet.Cell(resultRow, 14).GetString(),
             };
         }
 
         // 製品情報をExcelシートに書き込む
         private static void PopulateProductDetails(IXLWorksheet targetSheet, ProductMaster productMaster, ProductRegisterWork productRegisterWork, ProductCellRanges ranges, string productName) {
-            SetValue(ranges.ProductNameRange,   productName);
+            SetValue(ranges.ProductNameRange, productName);
             SetValue(ranges.ProductNumberRange, productRegisterWork.ProductNumber);
-            SetValue(ranges.OrderNumberRange,   productRegisterWork.OrderNumber);
-            SetValue(ranges.RegDateRange,       productRegisterWork.RegDate);
-            SetValue(ranges.ProductModelRange,  productMaster.ProductModel);
-            SetValue(ranges.QuantityRange,      productRegisterWork.Quantity.ToString());
-            SetValue(ranges.SerialFirstRange,   productRegisterWork.SerialFirst);
-            SetValue(ranges.SerialLastRange,    productRegisterWork.SerialLast);
-            SetValue(ranges.CommentRange,       productRegisterWork.Comment);
+            SetValue(ranges.OrderNumberRange, productRegisterWork.OrderNumber);
+            SetValue(ranges.RegDateRange, productRegisterWork.RegDate);
+            SetValue(ranges.ProductModelRange, productMaster.ProductModel);
+            SetValue(ranges.QuantityRange, productRegisterWork.Quantity.ToString());
+            SetValue(ranges.SerialFirstRange, productRegisterWork.SerialFirst);
+            SetValue(ranges.SerialLastRange, productRegisterWork.SerialLast);
+            SetValue(ranges.CommentRange, productRegisterWork.Comment);
 
             void SetValue(string? range, string? value) {
                 if (string.IsNullOrEmpty(range) || string.IsNullOrEmpty(value)) { return; }
@@ -119,15 +119,16 @@ namespace ProductDatabase.ExcelService {
             var usedSubstrate = new List<(string, List<string>, List<int>)>();
 
             foreach (DataRow row in table.Rows) {
-                var substrateModel  = row["SubstrateModel"]?.ToString()  ?? string.Empty;
+                var substrateModel = row["SubstrateModel"]?.ToString() ?? string.Empty;
                 var substrateNumber = row["SubstrateNumber"]?.ToString() ?? string.Empty;
-                var decrease        = row["Decrease"] is DBNull ? 0 : Convert.ToInt32(row["Decrease"]);
+                var decrease = row["Decrease"] is DBNull ? 0 : Convert.ToInt32(row["Decrease"]);
 
                 var existingIndex = usedSubstrate.FindIndex(x => x.Item1 == substrateModel);
                 if (existingIndex != -1) {
                     usedSubstrate[existingIndex].Item2.Add(substrateNumber);
                     usedSubstrate[existingIndex].Item3.Add(-decrease);
-                } else {
+                }
+                else {
                     usedSubstrate.Add((substrateModel, new List<string> { substrateNumber }, new List<int> { -decrease }));
                 }
             }
@@ -186,18 +187,18 @@ namespace ProductDatabase.ExcelService {
             ExcelHelper.ForcePageBreakPreview(workBook);
             workBook.SaveAs(temporarilyPath);
 
-            Microsoft.Office.Interop.Excel.Application? xlApp    = null;
-            Microsoft.Office.Interop.Excel.Workbooks?   xlBooks  = null;
-            Microsoft.Office.Interop.Excel.Workbook?    xlBook   = null;
-            Microsoft.Office.Interop.Excel.Sheets?      xlSheets = null;
-            Microsoft.Office.Interop.Excel.Worksheet?   xlSheet  = null;
+            Microsoft.Office.Interop.Excel.Application? xlApp = null;
+            Microsoft.Office.Interop.Excel.Workbooks? xlBooks = null;
+            Microsoft.Office.Interop.Excel.Workbook? xlBook = null;
+            Microsoft.Office.Interop.Excel.Sheets? xlSheets = null;
+            Microsoft.Office.Interop.Excel.Worksheet? xlSheet = null;
 
             try {
                 xlApp = new Microsoft.Office.Interop.Excel.Application { Visible = true };
                 xlBooks = xlApp.Workbooks;
-                xlBook  = xlBooks.Open(temporarilyPath, ReadOnly: true);
+                xlBook = xlBooks.Open(temporarilyPath, ReadOnly: true);
                 xlSheets = xlBook.Sheets;
-                xlSheet  = (Microsoft.Office.Interop.Excel.Worksheet?)xlSheets[sheetName];
+                xlSheet = (Microsoft.Office.Interop.Excel.Worksheet?)xlSheets[sheetName];
                 xlSheet?.Activate();
             } finally {
                 ExcelHelper.ReleaseComObject(xlSheet);

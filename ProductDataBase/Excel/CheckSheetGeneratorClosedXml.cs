@@ -2,7 +2,7 @@ using ClosedXML.Excel;
 using ProductDatabase.Models;
 using ProductDatabase.Other;
 
-namespace ProductDatabase.ExcelService {
+namespace ProductDatabase.Excel {
     // チェックシートのExcel生成を担当するクラス
     internal static class CheckSheetGeneratorClosedXml {
 
@@ -55,12 +55,12 @@ namespace ProductDatabase.ExcelService {
             CheckSheetConfigData excelData,
             string temperature,
             string humidity) {
-            var configPath      = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
+            var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
             var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsm");
 
             var formattedDate = FormatDate(productRegisterWork.RegDate, excelData.DateFormat);
 
-            using var configFs   = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var configFs = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using var configBook = new XLWorkbook(configFs);
 
             XLWorkbook targetBook;
@@ -68,8 +68,9 @@ namespace ProductDatabase.ExcelService {
 
             if (string.IsNullOrWhiteSpace(excelData.BaseFilePath)) {
                 targetBook = configBook;
-            } else {
-                targetFs   = new FileStream(excelData.BaseFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            }
+            else {
+                targetFs = new FileStream(excelData.BaseFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 targetBook = new XLWorkbook(targetFs);
             }
 
@@ -99,17 +100,17 @@ namespace ProductDatabase.ExcelService {
             var resultRow = targetCell.Address.RowNumber;
 
             var excelData = new CheckSheetConfigData {
-                ProductModelRange    = configSheet.Cell(resultRow, 3).GetString(),
-                ProductNumberRange   = configSheet.Cell(resultRow, 4).GetString(),
-                OrderNumberRange     = configSheet.Cell(resultRow, 5).GetString(),
-                QuantityRange        = configSheet.Cell(resultRow, 6).GetString(),
-                SerialFirstRange     = configSheet.Cell(resultRow, 7).GetString(),
-                SerialLastRange      = configSheet.Cell(resultRow, 8).GetString(),
-                RegDateRange         = configSheet.Cell(resultRow, 9).GetString(),
-                DateFormat           = configSheet.Cell(resultRow, 10).GetString(),
-                RegTemperatureRange  = configSheet.Cell(resultRow, 11).GetString(),
-                RegHumidityRange     = configSheet.Cell(resultRow, 12).GetString(),
-                BaseFilePath         = configSheet.Cell(resultRow, 13).GetString(),
+                ProductModelRange = configSheet.Cell(resultRow, 3).GetString(),
+                ProductNumberRange = configSheet.Cell(resultRow, 4).GetString(),
+                OrderNumberRange = configSheet.Cell(resultRow, 5).GetString(),
+                QuantityRange = configSheet.Cell(resultRow, 6).GetString(),
+                SerialFirstRange = configSheet.Cell(resultRow, 7).GetString(),
+                SerialLastRange = configSheet.Cell(resultRow, 8).GetString(),
+                RegDateRange = configSheet.Cell(resultRow, 9).GetString(),
+                DateFormat = configSheet.Cell(resultRow, 10).GetString(),
+                RegTemperatureRange = configSheet.Cell(resultRow, 11).GetString(),
+                RegHumidityRange = configSheet.Cell(resultRow, 12).GetString(),
+                BaseFilePath = configSheet.Cell(resultRow, 13).GetString(),
                 SheetNames = [.. Enumerable.Range(14, 21)
                     .Select(column => configSheet.Cell(resultRow, column).GetString())
                     .TakeWhile(sheetName => !string.IsNullOrEmpty(sheetName))]
@@ -141,7 +142,7 @@ namespace ProductDatabase.ExcelService {
             return dateFormat switch {
                 "1" => date.ToString("yyyy年MM月dd日"),
                 "2" => date.ToString("yyyy-MM-dd"),
-                _   => string.Empty
+                _ => string.Empty
             };
         }
 
@@ -150,15 +151,15 @@ namespace ProductDatabase.ExcelService {
             foreach (var sheetName in excelData.SheetNames) {
                 var targetSheet = targetBook.Worksheet(sheetName) ?? throw new Exception($"シート[{sheetName}]が見つかりません。");
 
-                WriteCellValue(targetSheet, excelData.ProductModelRange,   productMaster.ProductModel);
-                WriteCellValue(targetSheet, excelData.ProductNumberRange,  productRegisterWork.ProductNumber);
-                WriteCellValue(targetSheet, excelData.OrderNumberRange,    productRegisterWork.OrderNumber);
-                WriteCellValue(targetSheet, excelData.QuantityRange,       productRegisterWork.Quantity.ToString());
-                WriteCellValue(targetSheet, excelData.SerialFirstRange,    productRegisterWork.SerialFirst);
-                WriteCellValue(targetSheet, excelData.SerialLastRange,     productRegisterWork.SerialLast);
-                WriteCellValue(targetSheet, excelData.RegDateRange,        formattedDate);
+                WriteCellValue(targetSheet, excelData.ProductModelRange, productMaster.ProductModel);
+                WriteCellValue(targetSheet, excelData.ProductNumberRange, productRegisterWork.ProductNumber);
+                WriteCellValue(targetSheet, excelData.OrderNumberRange, productRegisterWork.OrderNumber);
+                WriteCellValue(targetSheet, excelData.QuantityRange, productRegisterWork.Quantity.ToString());
+                WriteCellValue(targetSheet, excelData.SerialFirstRange, productRegisterWork.SerialFirst);
+                WriteCellValue(targetSheet, excelData.SerialLastRange, productRegisterWork.SerialLast);
+                WriteCellValue(targetSheet, excelData.RegDateRange, formattedDate);
                 WriteCellValue(targetSheet, excelData.RegTemperatureRange, temperature);
-                WriteCellValue(targetSheet, excelData.RegHumidityRange,    humidity);
+                WriteCellValue(targetSheet, excelData.RegHumidityRange, humidity);
             }
         }
 
@@ -196,14 +197,14 @@ namespace ProductDatabase.ExcelService {
 
         // COM Interop を使用してExcelファイルを開く
         private static void PrintExcelFile(string filePath) {
-            Microsoft.Office.Interop.Excel.Application? xlApp   = null;
-            Microsoft.Office.Interop.Excel.Workbooks?   xlBooks = null;
-            Microsoft.Office.Interop.Excel.Workbook?    xlBook  = null;
+            Microsoft.Office.Interop.Excel.Application? xlApp = null;
+            Microsoft.Office.Interop.Excel.Workbooks? xlBooks = null;
+            Microsoft.Office.Interop.Excel.Workbook? xlBook = null;
 
             try {
-                xlApp   = new Microsoft.Office.Interop.Excel.Application { Visible = true };
+                xlApp = new Microsoft.Office.Interop.Excel.Application { Visible = true };
                 xlBooks = xlApp.Workbooks;
-                xlBook  = xlBooks.Open(filePath, ReadOnly: true);
+                xlBook = xlBooks.Open(filePath, ReadOnly: true);
             } catch (Exception ex) {
                 throw new Exception($"エラーが発生しました。詳細: {ex.Message}", ex);
             } finally {

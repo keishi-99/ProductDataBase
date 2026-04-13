@@ -1,7 +1,7 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
+using ProductDatabase.Common;
 using ProductDatabase.Models;
-using ProductDatabase.Other;
 using System.Data;
 
 namespace ProductDatabase.Data {
@@ -11,8 +11,8 @@ namespace ProductDatabase.Data {
         // 基板登録履歴を取得する
         public static DataTable QuerySubstrateHistory(SubstrateMaster substrateMaster, bool allSubstrates) {
             var substrateCategoryFilter = !string.IsNullOrEmpty(substrateMaster.CategoryName) ? " AND s.CategoryName = @CategoryName" : string.Empty;
-            var productNameFilter       = !string.IsNullOrEmpty(substrateMaster.ProductName)  ? " AND s.ProductName = @ProductName"  : string.Empty;
-            var substrateIdFilter       = !allSubstrates ? " AND s.SubstrateID = @SubstrateID"                                        : string.Empty;
+            var productNameFilter = !string.IsNullOrEmpty(substrateMaster.ProductName) ? " AND s.ProductName = @ProductName" : string.Empty;
+            var substrateIdFilter = !allSubstrates ? " AND s.SubstrateID = @SubstrateID" : string.Empty;
 
             var query = $"""
                 SELECT
@@ -51,25 +51,25 @@ namespace ProductDatabase.Data {
 
             var p = new DynamicParameters();
             p.Add("@CategoryName", substrateMaster.CategoryName);
-            p.Add("@ProductName",  substrateMaster.ProductName);
-            p.Add("@SubstrateID",  substrateMaster.SubstrateID);
+            p.Add("@ProductName", substrateMaster.ProductName);
+            p.Add("@SubstrateID", substrateMaster.SubstrateID);
             return ExecuteQuery(query, p);
         }
 
         // 基板在庫サマリーを取得する
         public static DataTable QuerySubstrateStock(SubstrateMaster substrateMaster, bool allSubstrates, bool inStock, bool groupByModel) {
             var substrateCategoryFilter = !string.IsNullOrEmpty(substrateMaster.CategoryName) ? " AND CategoryName = @CategoryName" : string.Empty;
-            var productNameFilter       = !string.IsNullOrEmpty(substrateMaster.ProductName)  ? " AND ProductName = @ProductName"  : string.Empty;
-            var substrateId             = !allSubstrates ? substrateMaster.SubstrateID : 0;
-            var substrateIdFilter       = (substrateId != 0) ? " AND SubstrateID = @SubstrateID" : string.Empty;
-            var inStockFilter           = inStock ? " AND Stock > 0" : string.Empty;
+            var productNameFilter = !string.IsNullOrEmpty(substrateMaster.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
+            var substrateId = !allSubstrates ? substrateMaster.SubstrateID : 0;
+            var substrateIdFilter = (substrateId != 0) ? " AND SubstrateID = @SubstrateID" : string.Empty;
+            var inStockFilter = inStock ? " AND Stock > 0" : string.Empty;
 
             var selectClause = groupByModel
                 ? "SubstrateID, ProductName, SubstrateName, SubstrateModel, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock"
                 : "SubstrateID, ProductName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock";
 
-            var groupByClause = groupByModel ? "SubstrateName, SubstrateID"                      : "SubstrateName, SubstrateID, SubstrateNumber, OrderNumber";
-            var orderByClause = groupByModel ? "SubstrateModel"                                   : "MIN(ID) DESC";
+            var groupByClause = groupByModel ? "SubstrateName, SubstrateID" : "SubstrateName, SubstrateID, SubstrateNumber, OrderNumber";
+            var orderByClause = groupByModel ? "SubstrateModel" : "MIN(ID) DESC";
 
             var query = $"""
                 SELECT
@@ -91,17 +91,17 @@ namespace ProductDatabase.Data {
 
             var p = new DynamicParameters();
             p.Add("@CategoryName", substrateMaster.CategoryName);
-            p.Add("@ProductName",  substrateMaster.ProductName);
-            p.Add("@SubstrateID",  substrateMaster.SubstrateID);
+            p.Add("@ProductName", substrateMaster.ProductName);
+            p.Add("@SubstrateID", substrateMaster.SubstrateID);
             return ExecuteQuery(query, p);
         }
 
         // 製品登録履歴を取得する
         public static DataTable QueryProductHistory(ProductMaster productMaster, bool allProducts) {
             var productCategoryFilter = !string.IsNullOrEmpty(productMaster.CategoryName) ? " AND CategoryName = @CategoryName" : string.Empty;
-            var productNameFilter     = !string.IsNullOrEmpty(productMaster.ProductName)  ? " AND ProductName = @ProductName"  : string.Empty;
-            var productId             = !allProducts ? productMaster.ProductID : 0;
-            var productIdFilter       = (productId != 0) ? " AND ProductID = @ProductID" : string.Empty;
+            var productNameFilter = !string.IsNullOrEmpty(productMaster.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
+            var productId = !allProducts ? productMaster.ProductID : 0;
+            var productIdFilter = (productId != 0) ? " AND ProductID = @ProductID" : string.Empty;
 
             var query = $"""
                 SELECT
@@ -137,17 +137,17 @@ namespace ProductDatabase.Data {
 
             var p = new DynamicParameters();
             p.Add("@CategoryName", productMaster.CategoryName);
-            p.Add("@ProductName",  productMaster.ProductName);
-            p.Add("@ProductID",    productMaster.ProductID);
+            p.Add("@ProductName", productMaster.ProductName);
+            p.Add("@ProductID", productMaster.ProductID);
             return ExecuteQuery(query, p);
         }
 
         // シリアル番号履歴を取得する
         public static DataTable QuerySerialHistory(ProductMaster productMaster, bool allProducts) {
-            var categoryFilter  = !string.IsNullOrEmpty(productMaster.CategoryName) ? " AND (p.CategoryName = @CategoryName OR p.CategoryName IS NULL)" : string.Empty;
+            var categoryFilter = !string.IsNullOrEmpty(productMaster.CategoryName) ? " AND (p.CategoryName = @CategoryName OR p.CategoryName IS NULL)" : string.Empty;
             var productNameFilter = !string.IsNullOrEmpty(productMaster.ProductName) ? " AND s.ProductName = @ProductName" : string.Empty;
-            var productId         = !allProducts ? productMaster.ProductID : 0;
-            var productIdFilter   = (productId != 0) ? " AND ProductID = @ProductID" : string.Empty;
+            var productId = !allProducts ? productMaster.ProductID : 0;
+            var productIdFilter = (productId != 0) ? " AND ProductID = @ProductID" : string.Empty;
 
             var query = $"""
                 SELECT
@@ -178,8 +178,8 @@ namespace ProductDatabase.Data {
 
             var p = new DynamicParameters();
             p.Add("@CategoryName", productMaster.CategoryName);
-            p.Add("@ProductName",  productMaster.ProductName);
-            p.Add("@ProductID",    productMaster.ProductID);
+            p.Add("@ProductName", productMaster.ProductName);
+            p.Add("@ProductID", productMaster.ProductID);
             return ExecuteQuery(query, p);
         }
 
@@ -308,15 +308,15 @@ namespace ProductDatabase.Data {
                 """;
             connection.Execute(sql, new {
                 SubstrateNumber = row["SubstrateNumber"],
-                OrderNumber     = row["OrderNumber"],
-                Increase        = row["Increase"],
-                Decrease        = row["Decrease"],
-                Defect          = row["Defect"],
-                RegDate         = row["RegDate"],
-                Person          = row["Person"],
-                Comment         = row["Comment"],
-                UseId           = row["UseId"],
-                ID              = row["ID"]
+                OrderNumber = row["OrderNumber"],
+                Increase = row["Increase"],
+                Decrease = row["Decrease"],
+                Defect = row["Defect"],
+                RegDate = row["RegDate"],
+                Person = row["Person"],
+                Comment = row["Comment"],
+                UseId = row["UseId"],
+                ID = row["ID"]
             }, transaction);
         }
 
@@ -348,15 +348,15 @@ namespace ProductDatabase.Data {
                 WHERE ID = @ID;
                 """;
             connection.Execute(sql, new {
-                ID            = row["ID"],
-                OrderNumber   = row["OrderNumber"],
+                ID = row["ID"],
+                OrderNumber = row["OrderNumber"],
                 ProductNumber = row["ProductNumber"],
-                OLesNumber    = row["OLesNumber"],
-                Person        = row["Person"],
-                RegDate       = row["RegDate"],
-                Revision      = row["Revision"],
+                OLesNumber = row["OLesNumber"],
+                Person = row["Person"],
+                RegDate = row["RegDate"],
+                Revision = row["Revision"],
                 RevisionGroup = row["RevisionGroup"],
-                Comment       = row["Comment"]
+                Comment = row["Comment"]
             }, transaction);
         }
 

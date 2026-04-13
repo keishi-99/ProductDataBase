@@ -1,6 +1,7 @@
-﻿using ProductDatabase.Data;
+﻿using ProductDatabase.Common;
+using ProductDatabase.Data;
+using ProductDatabase.History;
 using ProductDatabase.Models;
-using ProductDatabase.Other;
 using ProductDatabase.Services;
 using System.Data;
 

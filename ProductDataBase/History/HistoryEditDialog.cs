@@ -1,4 +1,4 @@
-namespace ProductDatabase.Other {
+namespace ProductDatabase.History {
     public partial class HistoryEditDialog : Form {
 
         // 外部から読み取る編集後の値（空欄はnullとして扱う）

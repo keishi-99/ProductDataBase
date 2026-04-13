@@ -1,4 +1,4 @@
-namespace ProductDatabase.Other {
+namespace ProductDatabase.Common {
     // ファイルコピー・削除のリトライ処理と共有バックアップパス管理を提供するユーティリティクラス
     internal static class FileUtils {
 

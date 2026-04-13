@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.Common;
 using ProductDatabase.Data;
-using ProductDatabase.ExcelService;
+using ProductDatabase.Excel;
 using ProductDatabase.Models;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
@@ -552,20 +553,14 @@ namespace ProductDatabase {
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
         private async void RegisterButton_Click(object sender, EventArgs e) { await ProcessRegistration(true); }
         private async void PrintButton_Click(object sender, EventArgs e) { await ProcessRegistration(true); }
-        private async void OpenSubstrateInformationButton_Click(object sender, EventArgs e)
-        {
+        private async void OpenSubstrateInformationButton_Click(object sender, EventArgs e) {
             OpenSubstrateInformationButton.Enabled = false;
-            try
-            {
+            try {
                 await CommonUtils.RunOnStaThreadAsync(OpenSubstrateInformation);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 // UIスレッドで MessageBox を表示（スレッド安全）
                 MessageBox.Show(ex.Message, $"[{nameof(OpenSubstrateInformationButton_Click)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
+            } finally {
                 OpenSubstrateInformationButton.Enabled = true;
             }
         }

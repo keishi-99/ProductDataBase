@@ -1,6 +1,6 @@
 using Dapper;
+using ProductDatabase.Common;
 using ProductDatabase.Models;
-using ProductDatabase.Other;
 using System.Data;
 
 namespace ProductDatabase.Data {
@@ -51,18 +51,18 @@ namespace ProductDatabase.Data {
 
             connection.Execute(commandText, new {
                 productMaster.ProductID,
-                OrderNumber      = productRegisterWork.OrderNumber.NullIfWhiteSpace(),
-                ProductNumber    = productRegisterWork.ProductNumber.NullIfWhiteSpace(),
-                OLesNumber       = productRegisterWork.OLesNumber.NullIfWhiteSpace(),
+                OrderNumber = productRegisterWork.OrderNumber.NullIfWhiteSpace(),
+                ProductNumber = productRegisterWork.ProductNumber.NullIfWhiteSpace(),
+                OLesNumber = productRegisterWork.OLesNumber.NullIfWhiteSpace(),
                 productRegisterWork.Quantity,
-                Person           = productRegisterWork.Person.NullIfWhiteSpace(),
-                RegDate          = productRegisterWork.RegDate.NullIfWhiteSpace(),
-                Revision         = productRegisterWork.Revision.NullIfWhiteSpace(),
+                Person = productRegisterWork.Person.NullIfWhiteSpace(),
+                RegDate = productRegisterWork.RegDate.NullIfWhiteSpace(),
+                Revision = productRegisterWork.Revision.NullIfWhiteSpace(),
                 productMaster.RevisionGroup,
-                SerialFirst      = productRegisterWork.SerialFirst.NullIfWhiteSpace(),
-                SerialLast       = productRegisterWork.SerialLast.NullIfWhiteSpace(),
+                SerialFirst = productRegisterWork.SerialFirst.NullIfWhiteSpace(),
+                SerialLast = productRegisterWork.SerialLast.NullIfWhiteSpace(),
                 SerialLastNumber = productMaster.IsSerialGeneration ? (int?)serialLastNumber : null,
-                Comment          = comment.NullIfWhiteSpace()
+                Comment = comment.NullIfWhiteSpace()
             }, transaction: transaction);
 
             return connection.ExecuteScalar<long>("SELECT last_insert_rowid();", transaction: transaction);
@@ -156,14 +156,14 @@ namespace ProductDatabase.Data {
                 """;
 
             connection.Execute(commandText, new {
-                SubstrateID     = substrateID,
+                SubstrateID = substrateID,
                 SubstrateNumber = substrateNumber.NullIfWhiteSpace(),
-                OrderNumber     = orderNumber.NullIfWhiteSpace(),
-                Decrease        = 0 - useValue,
-                Person          = person.NullIfWhiteSpace(),
-                RegDate         = regDate.NullIfWhiteSpace(),
-                Comment         = comment.NullIfWhiteSpace(),
-                UseID           = useID
+                OrderNumber = orderNumber.NullIfWhiteSpace(),
+                Decrease = 0 - useValue,
+                Person = person.NullIfWhiteSpace(),
+                RegDate = regDate.NullIfWhiteSpace(),
+                Comment = comment.NullIfWhiteSpace(),
+                UseID = useID
             }, transaction: transaction);
         }
 
@@ -198,7 +198,7 @@ namespace ProductDatabase.Data {
 
             return connection.Query<string>(sql, new {
                 ProductName = productName,
-                SerialList  = serialList.Select(x => x.Trim()).ToList()
+                SerialList = serialList.Select(x => x.Trim()).ToList()
             }).ToList();
         }
 
@@ -218,7 +218,7 @@ namespace ProductDatabase.Data {
 
             return connection.Query<string>(sql, new {
                 ProductName = productName,
-                OlesList    = olesList
+                OlesList = olesList
             }).ToList();
         }
 
@@ -339,10 +339,10 @@ namespace ProductDatabase.Data {
 
         // 基板在庫情報（FetchSubstrateStock / GetSubstrateOrderNumber 共通）
         public sealed class SubstrateStockInfo {
-            public string SubstrateName   { get; set; } = string.Empty;
+            public string SubstrateName { get; set; } = string.Empty;
             public string SubstrateNumber { get; set; } = string.Empty;
-            public string OrderNumber     { get; set; } = string.Empty;
-            public int    Stock           { get; set; }
+            public string OrderNumber { get; set; } = string.Empty;
+            public int Stock { get; set; }
         }
     }
 

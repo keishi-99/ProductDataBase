@@ -391,9 +391,9 @@ namespace ProductDatabase.MasterManagement {
 
             var row = ProductDataGridView.SelectedRows[0];
             var categoryName = row.Cells["CategoryName"].Value?.ToString() ?? string.Empty;
-            var productName  = row.Cells["ProductName"].Value?.ToString() ?? string.Empty;
+            var productName = row.Cells["ProductName"].Value?.ToString() ?? string.Empty;
             var productModel = row.Cells["ProductModel"].Value?.ToString() ?? string.Empty;
-            var productId    = (long)row.Cells["ProductID"].Value;
+            var productId = (long)row.Cells["ProductID"].Value;
 
             // DB保存済みの値からパスを生成するためUIの未保存変更に影響されない
             PrintSettingPath = Path.Combine(
@@ -426,7 +426,8 @@ namespace ProductDatabase.MasterManagement {
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-            } else {
+            }
+            else {
                 try {
                     var json = File.ReadAllText(PrintSettingPath);
                     ProductPrintSettings = JsonSerializer.Deserialize<DocumentPrintSettings>(json, s_jsonOptions) ?? new DocumentPrintSettings();

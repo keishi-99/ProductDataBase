@@ -1,6 +1,5 @@
 ﻿using ProductDatabase.Data;
 using ProductDatabase.Models;
-using ProductDatabase.Other;
 using System.Data;
 
 namespace ProductDatabase {
