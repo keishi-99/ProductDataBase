@@ -1,55 +1,52 @@
 ﻿using bpac;
 using ProductDatabase.Models;
-using System.ComponentModel;
 using System.Drawing.Printing;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using ZXing;
 using ZXing.Windows.Compatibility;
 using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase.Print {
     // シリアル印刷管理クラス
-    public static class PrintManager {
+    public class PrintManager {
 
-        public static ProductMaster ProductMaster { get; private set; } = default!;
-        public static ProductRegisterWork ProductRegisterWork { get; private set; } = default!;
+        public ProductMaster ProductMaster { get; private set; } = default!;
+        public ProductRegisterWork ProductRegisterWork { get; private set; } = default!;
 
-        public static SubstrateMaster SubstrateMaster { get; private set; } = default!;
-        public static SubstrateRegisterWork SubstrateRegisterWork { get; private set; } = default!;
+        public SubstrateMaster SubstrateMaster { get; private set; } = default!;
+        public SubstrateRegisterWork SubstrateRegisterWork { get; private set; } = default!;
 
-        public static DocumentPrintSettings DocumentPrintSettings { get; private set; } = new();
+        public DocumentPrintSettings DocumentPrintSettings { get; private set; } = new();
 
         // 各種設定へのアクセスプロパティ
-        public static LabelPrintSettings LabelPrintSettings => DocumentPrintSettings.LabelPrintSettings ?? throw new InvalidOperationException("LabelPrintSettings が null です。");
-        public static BarcodePrintSettings BarcodePrintSettings => DocumentPrintSettings.BarcodePrintSettings ?? throw new InvalidOperationException("BarcodePrintSettings が null です。");
-        private static DocumentPrintSettings PrintSettings => DocumentPrintSettings ?? throw new InvalidOperationException("DocumentPrintSettings が null です。");
+        public LabelPrintSettings LabelPrintSettings => DocumentPrintSettings.LabelPrintSettings ?? throw new InvalidOperationException("LabelPrintSettings が null です。");
+        public BarcodePrintSettings BarcodePrintSettings => DocumentPrintSettings.BarcodePrintSettings ?? throw new InvalidOperationException("BarcodePrintSettings が null です。");
+        private DocumentPrintSettings PrintSettings => DocumentPrintSettings ?? throw new InvalidOperationException("DocumentPrintSettings が null です。");
 
         // 印刷状態を保持するプロパティ
-        public static int PrintCount { get; private set; }
-        public static int CopiesRemainingPerSerial { get; private set; }
-        public static int PageCount { get; private set; }
+        public int PrintCount { get; private set; }
+        public int CopiesRemainingPerSerial { get; private set; }
+        public int PageCount { get; private set; }
 
-        public static int SerialPrintType { get; private set; }
+        public int SerialPrintType { get; private set; }
 
         private record SerialEntry(string Serial, int Copies, bool IsOLes);
-        private static List<SerialEntry> _serialEntries = [];
+        private List<SerialEntry> _serialEntries = [];
 
-        private static bool _isUnderlinePrint;
-        private static bool _isLast4Digits;
+        private bool _isUnderlinePrint;
+        private bool _isLast4Digits;
 
         // 4桁以上の製品型式の下4桁を取得するプロパティ
-        public static string Last4ProductModel =>
+        public string Last4ProductModel =>
             ProductMaster.ProductModel.Length >= 4
                 ? ProductMaster.ProductModel[^4..]
                 : string.Empty;
 
-        public static SerialType CurrentSerialType { get; set; }
+        public SerialType CurrentSerialType { get; set; }
         public enum SerialType { Label, OLesLabel, Barcode, Nameplate, Substrate }
 
         // 製品印刷に必要なマスター・作業データ・シリアルリストを初期化する
         // olesLabelList を指定した場合は Label・OLes を交互に含むリストを内部で生成する
-        public static void ProductInitialize(ProductMaster productMaster, ProductRegisterWork productRegisterWork, DocumentPrintSettings productPrintSettings, List<string> labelList, List<string>? olesLabelList = null) {
+        public void ProductInitialize(ProductMaster productMaster, ProductRegisterWork productRegisterWork, DocumentPrintSettings productPrintSettings, List<string> labelList, List<string>? olesLabelList = null) {
             ProductMaster = productMaster;
             ProductRegisterWork = productRegisterWork;
             DocumentPrintSettings = productPrintSettings ?? throw new ArgumentNullException(nameof(productPrintSettings));
@@ -80,7 +77,7 @@ namespace ProductDatabase.Print {
             _isLast4Digits = ProductMaster.IsLast4Digits;
         }
         // 基板印刷に必要なマスター・作業データ・シリアルリストを初期化する
-        public static void SubstrateInitialize(SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork, DocumentPrintSettings documentPrintSettings, List<string> serialList) {
+        public void SubstrateInitialize(SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork, DocumentPrintSettings documentPrintSettings, List<string> serialList) {
             SubstrateMaster = substrateMaster;
             SubstrateRegisterWork = substrateRegisterWork;
             DocumentPrintSettings = documentPrintSettings ?? throw new ArgumentNullException(nameof(documentPrintSettings));
@@ -93,13 +90,13 @@ namespace ProductDatabase.Print {
         }
 
         // ミリメートルをピクセルに変換するヘルパーメソッド
-        private static float ConvertMmToPixel(double mm, float dpi) {
+        private float ConvertMmToPixel(double mm, float dpi) {
             const float MmPerInch = 25.4f;
             return (float)(mm / MmPerInch * dpi);
         }
 
         // 1ページ分のシリアルラベルを印刷（またはプレビュー）し次ページが必要ならtrueを返す
-        public static bool PrintSerialCommon(PrintPageEventArgs e, bool isPreview, int startLine, SerialType serialType) {
+        public bool PrintSerialCommon(PrintPageEventArgs e, bool isPreview, int startLine, SerialType serialType) {
             try {
                 if (e.Graphics is null) { throw new InvalidOperationException("Graphics オブジェクトを取得できません。"); }
 
@@ -196,7 +193,7 @@ namespace ProductDatabase.Print {
             }
         }
         // 1枚分のラベルBitmapをシリアルタイプに応じて生成しプレビュー時は枠線を描画する
-        private static Bitmap MakeLabelImage(string text, SerialType serialType, bool fontUnderline, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY, bool isPreview) {
+        private Bitmap MakeLabelImage(string text, SerialType serialType, bool fontUnderline, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY, bool isPreview) {
 
             var widthPx = (int)Math.Round(labelWidthPx);
             var heightPx = (int)Math.Round(labelHeightPx);
@@ -232,7 +229,7 @@ namespace ProductDatabase.Print {
             return labelImage;
         }
         // 設定フォントと位置でテキストラベルを描画する（下線オプションあり）
-        private static void DrawLabel(Graphics g, string text, bool fontUnderline, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY) {
+        private void DrawLabel(Graphics g, string text, bool fontUnderline, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY) {
 
             if (PrintSettings.LabelPrintSettings is null) { return; }
             var fontName = PrintSettings.LabelPrintSettings.TextFont.Name;
@@ -252,7 +249,7 @@ namespace ProductDatabase.Print {
             g.DrawString(text, textFont, Brushes.Black, layoutRect, sf);
         }
         // CODE128バーコードと下部テキストをラベルBitmapに描画する
-        private static void DrawBarcode(Graphics g, string text, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY) {
+        private void DrawBarcode(Graphics g, string text, float labelWidthPx, float labelHeightPx, float dpiX, float dpiY) {
 
             if (PrintSettings.BarcodePrintSettings is null) { return; }
             var fontName = PrintSettings.BarcodePrintSettings.TextFont.Name;
@@ -301,7 +298,7 @@ namespace ProductDatabase.Print {
             g.DrawImage(barcodeBitmap, layoutRectBarcode);
         }
         // ヘッダーフォーマット文字列内のプレースホルダーをマスターデータの値に置換する
-        private static string ConvertHeaderString(SerialType serialType, string s) {
+        private string ConvertHeaderString(SerialType serialType, string s) {
 
             var map = serialType switch {
                 SerialType.Label => CreateProductMap(),
@@ -317,7 +314,7 @@ namespace ProductDatabase.Print {
             return s;
         }
         // 製品マスター・作業データのプレースホルダーと実値のマッピング辞書を生成する
-        private static Dictionary<string, string> CreateProductMap() {
+        private Dictionary<string, string> CreateProductMap() {
 
             if (ProductMaster is null) {
                 throw new Exception("ProductMaster nullです。");
@@ -338,7 +335,7 @@ namespace ProductDatabase.Print {
             };
         }
         // 基板マスター・作業データのプレースホルダーと実値のマッピング辞書を生成する
-        private static Dictionary<string, string> CreateSubstrateMap() {
+        private Dictionary<string, string> CreateSubstrateMap() {
 
             if (SubstrateMaster is null) {
                 throw new Exception("SubstrateMaster nullです。");
@@ -361,7 +358,7 @@ namespace ProductDatabase.Print {
 
 
         // 最終シリアル印刷後に次の開始行番号をページ上に描画する
-        private static void DrawFinalRowMark(Graphics graphics, int rowNumber, float posX, float posY, float width, float height, Font font) {
+        private void DrawFinalRowMark(Graphics graphics, int rowNumber, float posX, float posY, float width, float height, Font font) {
             using var sf = new StringFormat {
                 Alignment = StringAlignment.Near,
                 LineAlignment = StringAlignment.Center
@@ -371,7 +368,7 @@ namespace ProductDatabase.Print {
         }
 
         // b-pacを使用してNameplateテンプレートにシリアルをセットし指定枚数を連続印刷する
-        public static void PrintUsingBPac(NameplatePrintSettings nameplatePrintSettings, List<string> serialList) {
+        public void PrintUsingBPac(NameplatePrintSettings nameplatePrintSettings, List<string> serialList) {
 
             int copiesPerLabel = nameplatePrintSettings.CopiesPerLabel;
             var templatePath = nameplatePrintSettings.TemplatePath;
@@ -396,115 +393,6 @@ namespace ProductDatabase.Print {
                     doc.Close();
                     System.Runtime.InteropServices.Marshal.ReleaseComObject(doc);
                 }
-            }
-        }
-    }
-    public class PrintOptions {
-
-        public class DocumentPrintSettings {
-            public LabelPrintSettings? LabelPrintSettings { get; set; }
-            public BarcodePrintSettings? BarcodePrintSettings { get; set; }
-            public NameplatePrintSettings? NameplatePrintSettings { get; set; }
-
-            public DocumentPrintSettings() {
-                LabelPrintSettings = new LabelPrintSettings();
-                BarcodePrintSettings = new BarcodePrintSettings();
-                NameplatePrintSettings = new NameplatePrintSettings();
-            }
-
-            // 印刷フラグに応じてラベル・バーコード・銘版の設定インスタンスをnullまたは既存値に設定する
-            public void SetSettingsType(bool isLabelPrint, bool isBarcodePrint, bool isNameplatePrint) {
-                LabelPrintSettings = isLabelPrint ? (LabelPrintSettings ?? new LabelPrintSettings()) : null;
-                BarcodePrintSettings = isBarcodePrint ? (BarcodePrintSettings ?? new BarcodePrintSettings()) : null;
-                NameplatePrintSettings = isNameplatePrint ? (NameplatePrintSettings ?? new NameplatePrintSettings()) : null;
-            }
-        }
-
-        public abstract class PrintSettingsBase {
-            [Category("\t用紙設定"), DisplayName("ラベル幅 (mm)")]
-            public double LabelWidth { get; set; }
-            [Category("\t用紙設定"), DisplayName("ラベル高さ (mm)")]
-            public double LabelHeight { get; set; }
-            [Category("\t用紙設定"), DisplayName("配置数 (行)")]
-            public int LabelsPerRow { get; set; }
-            [Category("\t用紙設定"), DisplayName("配置数 (列)")]
-            public int LabelsPerColumn { get; set; }
-            [Category("\t用紙設定"), DisplayName("余白左 (mm)")]
-            public double MarginX { get; set; }
-            [Category("\t用紙設定"), DisplayName("余白上 (mm)")]
-            public double MarginY { get; set; }
-            [Category("\t用紙設定"), DisplayName("ラベル間隔 横 (mm)")]
-            public double IntervalX { get; set; }
-            [Category("\t用紙設定"), DisplayName("ラベル間隔 縦 (mm)")]
-            public double IntervalY { get; set; }
-            [Category("\t用紙設定"), DisplayName("ヘッダー開始位置 左 (mm)")]
-            public double HeaderPositionX { get; set; }
-            [Category("\t用紙設定"), DisplayName("ヘッダー開始位置 上 (mm)")]
-            public double HeaderPositionY { get; set; }
-            [Category("\t用紙設定"), DisplayName("ヘッダー フォーマット"), Description("{D}(印刷日)  {M}(製番)  {O}(注番)  {T}(型式)  {P}(製品名)  {N}(台数)  {U}(担当者)")]
-            public string HeaderTextFormat { get; set; } = string.Empty;
-
-            [Category("\t用紙設定"), DisplayName("ヘッダー フォント"), JsonConverter(typeof(FontJsonConverter))]
-            public Font HeaderFont { get; set; } = SystemFonts.DefaultFont;
-
-            [Category("印字設定"), DisplayName("発行枚数")]
-            public int CopiesPerLabel { get; set; }
-            [Category("印字設定"), DisplayName("印字位置 左 (mm)")]
-            public double TextPositionX { get; set; }
-            [Category("印字設定"), DisplayName("印字位置 上 (mm)")]
-            public double TextPositionY { get; set; }
-            [Category("印字設定"), DisplayName("中心に配置 (横)")]
-            public bool AlignTextCenterX { get; set; }
-            [Category("印字設定"), DisplayName("中心に配置 (縦)")]
-            public bool AlignTextCenterY { get; set; }
-            [Category("印字設定"), DisplayName("印字フォーマット"), Description("{T}(型式)  {R}(リビジョン)  {S}(シリアル)  {Y}(製造年)  {M}(製造月(1桁))  {MM}(製造月(2桁))")]
-            public string LabelTextFormat { get; set; } = string.Empty;
-
-            [Category("印字設定"), DisplayName("印字フォント"), JsonConverter(typeof(FontJsonConverter))]
-            public Font TextFont { get; set; } = SystemFonts.DefaultFont;
-
-        }
-
-        public class LabelPrintSettings : PrintSettingsBase {
-            [Category("O-Lesラベル設定"), DisplayName("O-Lesラベル発行枚数")]
-            public int CopiesPerOLesLabel { get; set; }
-            [Category("O-Lesラベル設定"), DisplayName("O-Lesラベル 印字フォーマット"), Description("{OT}(O-Les接頭)  {SA}(O-Les接尾)  {T}(型式)  {R}(リビジョン)  {S}(シリアル)  {Y}(製造年)  {M}(製造月(1桁))  {MM}(製造月(2桁))")]
-            public string OLesLabelTextFormat { get; set; } = string.Empty;
-        }
-
-        public class BarcodePrintSettings : PrintSettingsBase {
-            [Category("印字設定"), DisplayName("バーコード幅 (mm)")]
-            public double BarcodeWidth { get; set; }
-            [Category("印字設定"), DisplayName("バーコード高さ (mm)")]
-            public double BarcodeHeight { get; set; }
-            [Category("印字設定"), DisplayName("バーコード位置 左 (mm)")]
-            public double BarcodePositionX { get; set; }
-            [Category("印字設定"), DisplayName("バーコード位置 上 (mm)")]
-            public double BarcodePositionY { get; set; }
-            [Category("印字設定"), DisplayName("中心に配置 (横)")]
-            public bool AlignBarcodeCenterX { get; set; }
-        }
-
-        public class NameplatePrintSettings {
-            [Category("印字設定"), DisplayName("発行枚数")]
-            public int CopiesPerLabel { get; set; }
-            [Category("印字設定"), DisplayName("印字フォーマット"), Description("{T}(型式)  {R}(リビジョン)  {S}(シリアル)  {Y}(製造年)  {M}(製造月(1桁))  {MM}(製造月(2桁))")]
-            public string NameplateTextFormat { get; set; } = string.Empty;
-            [Category("印字設定"), DisplayName("テンプレートファイルのパス"), Editor(typeof(System.Windows.Forms.Design.FileNameEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public string TemplatePath { get; set; } = string.Empty;
-        }
-
-        public class FontJsonConverter : JsonConverter<Font> {
-            // JSON文字列をFont型に変換して返す
-            public override Font Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
-                var fontString = reader.GetString()!;
-                return (Font)TypeDescriptor.GetConverter(typeof(Font)).ConvertFromString(fontString)!;
-            }
-
-            // Font型をJSON文字列に変換して書き込む
-            public override void Write(Utf8JsonWriter writer, Font value, JsonSerializerOptions options) {
-                var fontString = TypeDescriptor.GetConverter(typeof(Font)).ConvertToString(value)!;
-                writer.WriteStringValue(fontString);
             }
         }
     }

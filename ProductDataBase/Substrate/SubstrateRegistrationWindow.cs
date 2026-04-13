@@ -1,16 +1,17 @@
-﻿using Dapper;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.Data;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Models;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
-using static ProductDatabase.Data.ProductRepository;
+using ProductDatabase.Services;
 using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase {
     public partial class SubstrateRegistrationWindow : Form {
 
+        private readonly PrintManager _printManager = new();
         private readonly SubstrateMaster _substrateMaster;
         private readonly SubstrateRegisterWork _substrateRegisterWork;
         private readonly AppSettings _appSettings;
@@ -18,15 +19,6 @@ namespace ProductDatabase {
         public DocumentPrintSettings SubstratePrintSettings { get; set; } = new DocumentPrintSettings();
         public LabelPrintSettings LabelPrintSettings => SubstratePrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
         public string PrintSettingPath { get; } = Path.Combine(Environment.CurrentDirectory, "config", "Substrate", "SubstrateConfig.json");
-
-        private class SubstrateStockDto {
-            public long SubstrateID { get; set; }
-            public string SubstrateName { get; set; } = string.Empty;
-            public string SubstrateModel { get; set; } = string.Empty;
-            public string SubstrateNumber { get; set; } = string.Empty;
-            public string OrderNumber { get; set; } = string.Empty;
-            public int Stock { get; set; }
-        }
 
         private readonly List<string> _serialList = [];
         private readonly List<string> _checkBoxNames = [
@@ -157,38 +149,9 @@ namespace ProductDatabase {
             if (!IsRegistration || !QuantityCheckBox.Checked || DefectQuantityCheckBox.Checked) { return true; }
 
             var substrateNumber = _substrateRegisterWork.ProductNumber;
-            var commandText =
-                $"""
-                SELECT
-                    SubstrateID,
-                    SubstrateName,
-                    SubstrateModel,
-                    SubstrateNumber,
-                    OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                FROM
-                    {Constants.VSubstrateTableName}
-                WHERE
-                    SubstrateID = @SubstrateID
-                    AND SubstrateNumber = @SubstrateNumber
-                GROUP BY
-                    SubstrateID,
-                    SubstrateName,
-                    SubstrateModel,
-                    SubstrateNumber,
-                    OrderNumber
-                ORDER BY
-                    MIN(ID)
-                LIMIT 1
-                ;
-                """;
-            using var con = new SqliteConnection(GetConnectionRegistration());
-            await con.OpenAsync();
-            var result = await con.QueryFirstOrDefaultAsync<SubstrateStockDto>(
-                commandText,
-                new {
-                    _substrateMaster.SubstrateID,
-                    SubstrateNumber = substrateNumber
-                });
+            var result = await SubstrateRegistrationRepository.FindPreviousRegistrationAsync(
+                _substrateMaster.SubstrateID, substrateNumber);
+
             var substrateName = result?.SubstrateName ?? string.Empty;
             if (substrateName != string.Empty && _substrateMaster.SubstrateName == substrateName) {
                 var dialogResult = MessageBox.Show($"[{substrateNumber}]は過去に登録があります。再度登録しますか？", "", MessageBoxButtons.YesNo);
@@ -198,56 +161,20 @@ namespace ProductDatabase {
         }
         // トランザクションで基板登録テーブルに入荷/不良レコードを挿入しログ記録とバックアップを行う
         private bool Registration() {
-            using var con = new SqliteConnection(GetConnectionRegistration());
+            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
             con.Open();
 
             using var transaction = con.BeginTransaction();
             try {
-                var orderNumber = _substrateRegisterWork.OrderNumber;
                 var substrateNumber = _substrateRegisterWork.ProductNumber;
                 var quantity = _substrateRegisterWork.AddQuantity;
                 var defectQuantity = int.TryParse(DefectQuantityTextBox.Text, out var dq) ? dq : 0;
-                var registrationDate = _substrateRegisterWork.RegDate;
-                var person = _substrateRegisterWork.Person;
-                var comment = _substrateRegisterWork.Comment;
-                var rowId = string.Empty;
-                var commandText = string.Empty;
 
                 // 不良処理時在庫チェック
                 if (DefectQuantityCheckBox.Checked) {
-                    commandText =
-                        $"""
-                        SELECT
-                            SubstrateID,
-                            SubstrateName,
-                            SubstrateModel,
-                            SubstrateNumber,
-                            OrderNumber,SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                        FROM
-                            {Constants.VSubstrateTableName}
-                        WHERE
-                            SubstrateID = @SubstrateID 
-                            AND SubstrateModel = @SubstrateModel 
-                            AND SubstrateNumber = @SubstrateNumber
-                        GROUP BY
-                            SubstrateID, 
-                            SubstrateName, 
-                            SubstrateModel,
-                            SubstrateNumber,
-                            OrderNumber
-                        ORDER BY
-                            MIN(ID)
-                        LIMIT 1
-                        ;
-                        """;
-                    var stockResult = con.QueryFirstOrDefault<SubstrateStockDto>(
-                        commandText,
-                        new {
-                            _substrateMaster.SubstrateID,
-                            _substrateMaster.SubstrateModel,
-                            SubstrateNumber = substrateNumber
-                        },
-                        transaction: transaction)
+                    var stockResult = SubstrateRegistrationRepository.GetDefectStock(
+                        con, transaction,
+                        _substrateMaster.SubstrateID, _substrateMaster.SubstrateModel, substrateNumber)
                         ?? throw new Exception($"[{substrateNumber}]は登録がありません。");
 
                     if (stockResult.Stock < defectQuantity) {
@@ -256,74 +183,27 @@ namespace ProductDatabase {
                 }
 
                 // 基板登録テーブルへ追加
-                commandText =
-                    $"""
-                    INSERT INTO {Constants.TSubstrateTableName}
-                    (
-                        SubstrateID,
-                        SubstrateNumber,
-                        OrderNumber,
-                        Increase,
-                        Defect,
-                        Person,
-                        RegDate,
-                        Comment
-                    )
-                    VALUES 
-                    (
-                        @SubstrateID,
-                        @SubstrateNumber,
-                        @OrderNumber,
-                        @Increase,
-                        @Defect,
-                        @Person,
-                        @RegDate,
-                        @Comment
-                    )
-                    ;
-                    """;
-
-                con.Execute(commandText, new {
+                var rowId = SubstrateRegistrationRepository.InsertSubstrateRecord(
+                    con, transaction,
                     _substrateMaster.SubstrateID,
-                    SubstrateNumber = string.IsNullOrWhiteSpace(substrateNumber) ? (object)DBNull.Value : substrateNumber,
-                    OrderNumber = string.IsNullOrWhiteSpace(orderNumber) ? (object)DBNull.Value : orderNumber,
-                    Increase = QuantityCheckBox.Checked ? (object)quantity : DBNull.Value,
-                    Defect = DefectQuantityCheckBox.Checked ? (object)$"-{defectQuantity}" : DBNull.Value,
-                    RegDate = string.IsNullOrWhiteSpace(registrationDate) ? (object)DBNull.Value : registrationDate,
-                    Person = string.IsNullOrWhiteSpace(person) ? (object)DBNull.Value : person,
-                    Comment = string.IsNullOrWhiteSpace(comment) ? (object)DBNull.Value : comment
-                }, transaction: transaction);
-
-                rowId = con.ExecuteScalar<string>("SELECT last_insert_rowid();", transaction: transaction);
+                    substrateNumber,
+                    _substrateRegisterWork.OrderNumber,
+                    QuantityCheckBox.Checked ? quantity : (int?)null,
+                    DefectQuantityCheckBox.Checked ? defectQuantity : (int?)null,
+                    _substrateRegisterWork.Person,
+                    _substrateRegisterWork.RegDate,
+                    _substrateRegisterWork.Comment);
 
                 // ログ出力
                 var logQuantity = QuantityCheckBox.Checked ? quantity.ToString() : string.Empty;
                 var logDefectQuantity = DefectQuantityCheckBox.Checked ? (0 - defectQuantity).ToString() : string.Empty;
 
-                string[] logMessageArray = [
-                    $"[基板登録]",
-                    $"[{_substrateMaster.CategoryName}]",
-                    $"ID[{rowId}]",
-                    $"注文番号[{orderNumber}]",
-                    $"製造番号[{substrateNumber}]",
-                    $"[]",
-                    $"製品名[{_substrateMaster.ProductName}]",
-                    $"基板名[{_substrateMaster.SubstrateName}]",
-                    $"型式[{_substrateMaster.SubstrateModel}]",
-                    $"追加数[{logQuantity}]",
-                    $"使用数[]",
-                    $"減少数[{logDefectQuantity}]",
-                    $"[]",
-                    $"登録日[{registrationDate}]",
-                    $"担当者[{person}]",
-                    $"コメント[{comment}]"
-                ];
-                CommonUtils.Logger.AppendLog(logMessageArray);
-
                 transaction.Commit();
 
+                HistoryAuditLogger.LogSubstrateRegistration(_substrateMaster, _substrateRegisterWork, rowId, logQuantity, logDefectQuantity);
+
                 // バックアップ作成
-                CommonUtils.BackupManager.CreateBackup();
+                BackupManager.CreateBackup();
 
                 return true;
             } catch (Exception ex) {
@@ -402,13 +282,13 @@ namespace ProductDatabase {
 
                 var isPreview = !isPrint;
                 var startLine = (int)PrintPositionNumericUpDown.Value - 1;
-                CurrentSerialType = SerialType.Substrate;
+                _printManager.CurrentSerialType = SerialType.Substrate;
 
                 pd.BeginPrint += (sender, e) => {
-                    PrintManager.SubstrateInitialize(_substrateMaster, _substrateRegisterWork, SubstratePrintSettings, _serialList);
+                    _printManager.SubstrateInitialize(_substrateMaster, _substrateRegisterWork, SubstratePrintSettings, _serialList);
                 };
                 pd.PrintPage += (sender, e) => {
-                    var hasMore = PrintManager.PrintSerialCommon(e, isPreview, startLine, CurrentSerialType);
+                    var hasMore = _printManager.PrintSerialCommon(e, isPreview, startLine, _printManager.CurrentSerialType);
                     e.HasMorePages = hasMore;
                 };
 
@@ -450,25 +330,7 @@ namespace ProductDatabase {
 
         // DBから対象基板の現在庫数を集計して文字列で返す
         private string GetStockQuantity() {
-            using var con = new SqliteConnection(GetConnectionRegistration());
-
-            var commandText =
-                $"""
-                SELECT
-                    SubstrateID,
-                    SubstrateName,
-                    SubstrateModel,
-                    SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
-                FROM {Constants.VSubstrateTableName}
-                WHERE SubstrateID = @SubstrateID
-                GROUP BY SubstrateID, SubstrateName, SubstrateModel
-                """;
-
-            var stock = con.ExecuteScalar<int?>(
-                commandText,
-                new { _substrateMaster.SubstrateID });
-
-            return stock?.ToString() ?? "0";
+            return SubstrateRegistrationRepository.GetTotalStock(_substrateMaster.SubstrateID)?.ToString() ?? "0";
         }
 
         // ComboBoxで選択したテンプレート文字列をコメントテキストボックスに追記する
@@ -613,7 +475,7 @@ namespace ProductDatabase {
         }
         // 基板マスター情報をもとに基板仕様Excelファイルを開く（例外はcaller側でハンドル）
         private void OpenSubstrateInformation() {
-            ExcelServiceClosedXml.SubstrateInformationClosedXml.OpenSubstrateInformationClosedXml(_substrateMaster);
+            SubstrateInformationClosedXml.OpenSubstrateInformationClosedXml(_substrateMaster);
         }
 
         // 有効なテキストボックスの入力状態・製番桁数・数量・担当者選択を検証しエラー時は登録ボタンを無効化する
@@ -712,8 +574,8 @@ namespace ProductDatabase {
         private void DefectQuantityTextBox_KeyPress(object sender, KeyPressEventArgs e) { NumericOnly(sender, e); }
         private async void 印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) { await ProcessRegistration(false); }
         private void 印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
-            CurrentSerialType = SerialType.Substrate;
-            using (var ls = new PrintSettingsWindow()) {
+            _printManager.CurrentSerialType = SerialType.Substrate;
+            using (var ls = new PrintSettingsWindow() { AppSettings = _appSettings, CurrentSerialType = _printManager.CurrentSerialType }) {
                 ls.ShowDialog(this);
             }
             LoadSettings(PrintSettingPath);

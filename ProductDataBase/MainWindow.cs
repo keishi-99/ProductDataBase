@@ -1,13 +1,8 @@
-﻿using Dapper;
-using Microsoft.Data.Sqlite;
-using ProductDatabase.Data;
+﻿using ProductDatabase.Data;
 using ProductDatabase.Models;
 using ProductDatabase.Other;
+using ProductDatabase.Services;
 using System.Data;
-using System.Data.Odbc;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
@@ -16,12 +11,9 @@ namespace ProductDatabase {
         private float _fontSize = SystemFonts.DefaultFont.Size;
         private IEnumerable<DataRow> _currentTargetRows = [];
 
-        private string _dsn = string.Empty;
-        private string _uid = string.Empty;
-        private string _pwd = string.Empty;
+        private BarcodeService? _barcodeService;
 
         readonly string _jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "General", "appsettings.json");
-        private static readonly System.Text.Json.JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         private readonly ProductRepository _productRepository;
 
@@ -67,19 +59,13 @@ namespace ProductDatabase {
                 CategoryListBox3.Items.Clear();
 
                 // 設定ファイル読み込み
-                if (!File.Exists(_jsonFilePath)) {
-                    throw new DirectoryNotFoundException($"'{_jsonFilePath}'\nが見つかりません。");
-                }
-                var generalSettings = System.Text.Json.JsonSerializer.Deserialize<GeneralSettings>(
-                    File.ReadAllText(_jsonFilePath),
-                    _jsonOptions
-                ) ?? new GeneralSettings();
+                var generalSettings = SettingsLoader.Load(_jsonFilePath);
 
                 // バックアップパス取得
-                CommonUtils.BackupPath = generalSettings.BackupFolderPath;
+                FileUtils.BackupPath = generalSettings.BackupFolderPath;
 
                 // バックアップ作成
-                CreateDailyBackup();
+                BackupManager.CreateDailyBackup();
 
                 // 担当者取得
                 _appSettings.PersonList = [.. generalSettings.Persons];
@@ -92,9 +78,7 @@ namespace ProductDatabase {
                 _appSettings.IsAdministrator = generalSettings.Administrators
                     .Contains(Environment.UserName, StringComparer.OrdinalIgnoreCase);
 
-                _dsn = generalSettings.DSN;
-                _uid = generalSettings.UID;
-                _pwd = generalSettings.PWD;
+                _barcodeService = new BarcodeService(generalSettings.DSN, generalSettings.UID, generalSettings.PWD);
 
                 _productRepository.LoadAll();
 
@@ -107,39 +91,6 @@ namespace ProductDatabase {
                 QRCodeTextBox.Select();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        // 当日分のバックアップが未作成の場合のみDBをバックアップフォルダにコピーする
-        private static void CreateDailyBackup() {
-            // フォルダ未設定
-            if (string.IsNullOrWhiteSpace(CommonUtils.BackupPath)) {
-                MessageBox.Show("フォルダが設定されていません。バックアップは保存されません。",
-                    string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            // ネットワークフォルダが見つからない
-            if (!Directory.Exists(CommonUtils.BackupPath)) {
-                MessageBox.Show($"'{CommonUtils.BackupPath}'\nが見つかりません。バックアップは保存されません。",
-                    string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            // バックアップ処理
-            var today = DateTime.Today;
-            var year = today.Year;
-            var month = today.Month;
-            var day = today.Day;
-
-            // パス生成
-            string backupFolder = Path.Combine(CommonUtils.BackupPath, "db", "backup", $"{year}", $"{month:00}");
-            string backupFile = Path.Combine(backupFolder, $"_bak_{year}-{month:00}-{day:00}.db");
-            string productRegistryFile = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
-
-            // 当日バックアップがなければ作成
-            if (!File.Exists(backupFile)) {
-                Directory.CreateDirectory(backupFolder);
-                File.Copy(productRegistryFile, backupFile, overwrite: false);
             }
         }
         // 各マスター・作業データをリセットしDBを再読み込みする
@@ -451,111 +402,41 @@ namespace ProductDatabase {
         // QRコードテキストを解析して製番・品目番号・数量・注番を取得する
         private void ParseQRCodeInput() {
             try {
-                string[] separator = ["//"];
-                var arr = QRCodeTextBox.Text.Split(separator, StringSplitOptions.None);
-                if (arr.Length == 1) {
-                    _productMaster.ProductModel = QRCodeTextBox.Text;
-                    return;
+                var parsed = QrCodeParser.Parse(QRCodeTextBox.Text);
+                _productMaster.ProductModel = parsed.ProductModel;
+                if (!string.IsNullOrEmpty(parsed.ProductNumber)) {
+                    _productRegisterWork.ProductNumber = parsed.ProductNumber;
+                    _productRegisterWork.Quantity = parsed.Quantity;
+                    _productRegisterWork.OrderNumber = parsed.OrderNumber;
                 }
-                if (arr.Length != 4) { throw new Exception("QRコードが正しくありません。"); }
-                _productRegisterWork.ProductNumber = arr[0];
-                _productMaster.ProductModel = arr[1];
-                _productRegisterWork.Quantity = int.TryParse(arr[2], out var result) ? result : throw new Exception("数量に数値以外が入力されています。");
-                _productRegisterWork.OrderNumber = arr[3];
             } catch (Exception ex) {
                 throw new Exception($"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー{Environment.NewLine}{ex.Message}", ex);
             }
         }
         // バーコードの手配管理番号からODBCで手配情報を取得して各フィールドにセットする
         private void BarcodeInput() {
-            using var con = new OdbcConnection($"DSN={_dsn}; UID={_uid}; PWD={_pwd}");
-            con.Open();
-
-            var param = new DynamicParameters();
-            param.Add("手配管理番号", QRCodeTextBox.Text);
-            var result = con.QueryFirstOrDefault<OrderDto>(
-                @"SELECT 手配製番, 品目番号, 品目名称, 手配数, 請求先注番
-                  FROM V_宮崎手配情報
-                  WHERE 手配管理番号 = ?",
-                param)
-                ?? throw new Exception($"一致する情報がありません。{Environment.NewLine}手配管理番号:{QRCodeTextBox.Text}");
-
-            _productRegisterWork.ProductNumber = result.手配製番 ?? string.Empty;
-            _productMaster.ProductModel = result.品目番号 ?? string.Empty;
-            _productMaster.ProductName = result.品目名称 ?? string.Empty;
-            _productRegisterWork.Quantity = result.手配数;
-            _productRegisterWork.OrderNumber = result.請求先注番 ?? string.Empty;
-        }
-        private sealed class OrderDto {
-            public string 手配製番 { get; set; } = string.Empty;
-            public string 品目番号 { get; set; } = string.Empty;
-            public string 品目名称 { get; set; } = string.Empty;
-            public int 手配数 { get; set; }
-            public string 請求先注番 { get; set; } = string.Empty;
+            var result = (_barcodeService ?? throw new InvalidOperationException("BarcodeService が初期化されていません。"))
+                .Query(QRCodeTextBox.Text);
+            _productRegisterWork.ProductNumber = result.ProductNumber;
+            _productMaster.ProductModel = result.ProductModel;
+            _productMaster.ProductName = result.ProductName;
+            _productRegisterWork.Quantity = result.Quantity;
+            _productRegisterWork.OrderNumber = result.OrderNumber;
         }
         // 品目番号から不要なサフィックスを除去して正規化する
         private void ProcessCategoryItemData() {
-            var pattern = @"-(?:SMT|H|GH).*";
-            var result = Regex.Replace(_productMaster.ProductModel, pattern, string.Empty);
-            _productMaster.ProductModel = result
-                .Replace("-ACGH", "-AC")
-                .Replace("-DCGH", "-DC");
+            _productMaster.ProductModel = QrCodeParser.NormalizeProductModel(_productMaster.ProductModel);
         }
         // 品目番号でSQLiteを検索し一致する基板・製品情報をリストに追加する
         private void FetchDataFromSQLite() {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-
-            var sql =
-                $"""
-                SELECT
-                    s.SubItemNumber,
-                    s.SubstrateName,
-                    s.ProductName AS sName,
-                    p.ProductName AS pName,
-                    p.ProductType,
-                    p.ProItemNumber
-                FROM
-                    {Constants.ProductTableName} AS p
-                FULL JOIN
-                    {Constants.SubstrateTableName} AS s
-                ON
-                    s.SubItemNumber = p.ProItemNumber
-                WHERE
-                    s.SubItemNumber LIKE '%' || @ProductModel || '%'
-                OR
-                    p.ProItemNumber LIKE '%' || @ProductModel || '%'
-                """;
-
-            var results = con.Query(sql, new { _productMaster.ProductModel });
-
-            if (!results.Any()) {
-                throw new Exception($"品目番号が見つかりません。\n品目番号:[{_productMaster.ProductModel}]");
+            var items = ProductRepository.SearchByModel(_productMaster.ProductModel);
+            foreach (var item in items) {
+                _qrSettings.CategoryItemNumber.Add(item.ItemNumber);
+                _qrSettings.CategoryProductName.Add(item.ProductName);
+                _qrSettings.CategoryProductType.Add(item.ProductType);
+                _qrSettings.CategorySubstrateName.Add(item.SubstrateName);
+                _qrSettings.CategoryType.Add(item.Type);
             }
-
-            foreach (var row in results) {
-                var colSubItemNumber = row.SubItemNumber?.ToString() ?? string.Empty;
-                var colProItemNumber = row.ProItemNumber?.ToString() ?? string.Empty;
-
-                if (!string.IsNullOrWhiteSpace(colSubItemNumber)) {
-                    var productName = row.sName?.ToString() ?? string.Empty;
-                    var substrateName = row.SubstrateName?.ToString() ?? string.Empty;
-                    AddToLists(colSubItemNumber, productName, string.Empty, substrateName, "1");
-                }
-
-                if (!string.IsNullOrWhiteSpace(colProItemNumber)) {
-                    var productName = row.pName?.ToString() ?? string.Empty;
-                    var productType = row.ProductType?.ToString() ?? string.Empty;
-                    AddToLists(colProItemNumber, productName, productType, string.Empty, "2");
-                }
-            }
-        }
-        // 品目情報を各カテゴリリストに追加する
-        private void AddToLists(string itemNumber, string productName, string productType, string substrateName, string type) {
-            _qrSettings.CategoryItemNumber.Add(itemNumber);
-            _qrSettings.CategoryProductName.Add(productName);
-            _qrSettings.CategoryProductType.Add(productType);
-            _qrSettings.CategorySubstrateName.Add(substrateName);
-            _qrSettings.CategoryType.Add(type);
         }
         // 複数候補がある場合に選択ダイアログを表示し選択インデックスを返す
         private int ShowDialogWindowForMultipleItems() {
@@ -635,45 +516,23 @@ namespace ProductDatabase {
             _appSettings.FontSize = _fontSize;
             Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
         }
-        // ExcelのパスをInteropで取得しEXEを直接起動して指定ファイルを開く
-        private static void OpenExcel(string filePath) {
-            Microsoft.Office.Interop.Excel.Application? xlApp = null;
-            try {
-                xlApp = new Microsoft.Office.Interop.Excel.Application();
-                var excelFullPath = Path.Combine(xlApp.Path, "EXCEL.EXE");
-                xlApp.Quit();
-
-                using var process = Process.Start(new ProcessStartInfo {
-                    FileName = excelFullPath,
-                    Arguments = $"\"{filePath}\"",
-                    UseShellExecute = true
-                });
-            } finally {
-                if (xlApp != null) {
-                    Marshal.ReleaseComObject(xlApp);
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                }
-            }
-        }
-
         private void MainWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void ReloadToolStripMenuItem_Click(object sender, EventArgs e) { LoadEvents(); }
         private void ConfigReportToolStripMenuItem_Click(object sender, EventArgs e) {
             var reportConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsm");
-            OpenExcel(reportConfigPath);
+            ExcelLauncher.Open(reportConfigPath);
         }
         private void ConfigListToolStripMenuItem_Click(object sender, EventArgs e) {
             var listConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsm");
-            OpenExcel(listConfigPath);
+            ExcelLauncher.Open(listConfigPath);
         }
         private void ConfigCheckSheetToolStripMenuItem_Click(object sender, EventArgs e) {
             var checkSheetConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
-            OpenExcel(checkSheetConfigPath);
+            ExcelLauncher.Open(checkSheetConfigPath);
         }
         private void ConfigSubstrateInformationToolStripMenuItem_Click(object sender, EventArgs e) {
             var checkSheetConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsm");
-            OpenExcel(checkSheetConfigPath);
+            ExcelLauncher.Open(checkSheetConfigPath);
         }
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { Close(); }
         private void RegisterButton_Click(object sender, EventArgs e) { Registration(); }

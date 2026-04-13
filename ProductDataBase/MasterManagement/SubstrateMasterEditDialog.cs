@@ -90,10 +90,10 @@ namespace ProductDatabase.MasterManagement {
                 CollectFieldValues();
 
                 if (_isNewRecord) {
-                    ProductRepository.InsertSubstrate(_substrate);
+                    SubstrateRepository.InsertSubstrate(_substrate);
                 }
                 else {
-                    ProductRepository.UpdateSubstrate(_substrate);
+                    SubstrateRepository.UpdateSubstrate(_substrate);
                 }
 
                 this.DialogResult = DialogResult.OK;
@@ -134,7 +134,7 @@ namespace ProductDatabase.MasterManagement {
 
             // 基板型式の重複チェック
             long excludeId = _isNewRecord ? 0 : _substrate.SubstrateID;
-            if (ProductRepository.ExistsSubstrateModel(SubstrateModelTextBox.Text.Trim(), excludeId)) {
+            if (SubstrateRepository.ExistsSubstrateModel(SubstrateModelTextBox.Text.Trim(), excludeId)) {
                 MessageBox.Show(
                     $"基板型式 [{SubstrateModelTextBox.Text.Trim()}] は既に登録されています。",
                     "重複エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
