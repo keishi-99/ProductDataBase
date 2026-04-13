@@ -74,6 +74,28 @@ namespace ProductDatabase.Services {
             ]);
         }
 
+        // 基板変更操作の監査ログをファイルに記録する
+        public static void LogSubstrateChange(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
+            Logger.AppendLog([
+                "[基板変更]",
+                $"[{productMaster.CategoryName}]",
+                $"ID[{productRegisterWork.RowID}]",
+                $"注文番号[{productRegisterWork.OrderNumber}]",
+                $"製造番号[{productRegisterWork.ProductNumber}]",
+                $"[]",
+                $"製品名[{productMaster.ProductName}]",
+                $"タイプ[{productMaster.ProductType}]",
+                $"型式[{productMaster.ProductModel}]",
+                $"数量[{productRegisterWork.Quantity}]",
+                $"シリアル先頭[{productRegisterWork.SerialFirst}]",
+                $"シリアル末尾[{productRegisterWork.SerialLast}]",
+                $"Revision[{productRegisterWork.Revision}]",
+                $"登録日[{productRegisterWork.RegDate}]",
+                $"担当者[{productRegisterWork.Person}]",
+                $"コメント[{productRegisterWork.Comment}]"
+            ]);
+        }
+
         // 製品登録操作の監査ログをファイルに記録する
         public static void LogProductRegistration(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
             Logger.AppendLog([

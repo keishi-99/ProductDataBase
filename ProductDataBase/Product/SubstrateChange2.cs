@@ -1,9 +1,9 @@
-﻿using Dapper;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.Data;
 using ProductDatabase.ExcelService;
 using ProductDatabase.Models;
 using ProductDatabase.Other;
-using static ProductDatabase.Data.ProductRepository;
+using ProductDatabase.Services;
 
 namespace ProductDatabase {
     public partial class SubstrateChange2 : Form {
@@ -11,19 +11,6 @@ namespace ProductDatabase {
         private readonly ProductMaster _productMaster;
         private readonly ProductRegisterWork _productRegisterWork;
         private readonly AppSettings _appSettings;
-
-        private sealed class SubstrateStockDto {
-            public string SubstrateName { get; init; } = string.Empty;
-            public string SubstrateModel { get; init; } = string.Empty;
-            public string SubstrateNumber { get; init; } = string.Empty;
-            public int Stock { get; init; }
-            public int UsedDecrease { get; init; }
-        }
-
-        private sealed class SubstrateInfoDto {
-            public string SubstrateID { get; init; } = string.Empty;
-            public string OrderNumber { get; init; } = string.Empty;
-        }
 
         private readonly List<string> _listUsedSubstrate = [];
         private readonly List<string> _listUsedProductNumber = [];
@@ -97,67 +84,8 @@ namespace ProductDatabase {
                                     }
                                 }
                             }
-                            using SqliteConnection con = new(GetConnectionRegistration());
-
-                            var sql =
-                                $"""
-                                WITH Used AS 
-                                (
-                                    SELECT
-                                        SubstrateNumber,
-                                        COALESCE(SUM(Decrease), 0) AS UsedDecrease
-                                    FROM
-                                        {Constants.VSubstrateTableName}
-                                    WHERE
-                                        SubstrateModel = @SubstrateModel
-                                        AND UseID = @ID
-                                        AND SubstrateNumber IS NOT NULL
-                                        AND IsDeleted = 0
-                                    GROUP BY
-                                        SubstrateNumber
-                                ),
-
-                                Stocked AS 
-                                (
-                                    SELECT
-                                        SubstrateName,
-                                        SubstrateModel,
-                                        SubstrateNumber,
-                                        COALESCE(SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)), 0) AS Stock
-                                    FROM
-                                        {Constants.VSubstrateTableName}
-                                    WHERE
-                                        SubstrateModel = @SubstrateModel
-                                        AND SubstrateNumber IS NOT NULL
-                                        AND IsDeleted = 0
-                                    GROUP BY
-                                        SubstrateName,
-                                        SubstrateModel,
-                                        SubstrateNumber
-                                )
-
-                                SELECT
-                                    s.SubstrateName,
-                                    s.SubstrateModel,
-                                    s.SubstrateNumber,
-                                    s.Stock,
-                                    COALESCE(u.UsedDecrease * -1, 0) AS UsedDecrease
-                                FROM
-                                    Stocked s
-                                    LEFT JOIN Used u ON s.SubstrateNumber = u.SubstrateNumber
-                                WHERE
-                                    s.Stock > 0 
-                                    OR u.UsedDecrease IS NOT NULL
-                                ORDER BY
-                                    CASE WHEN COALESCE(u.UsedDecrease, 0) = 0 THEN 1 ELSE 0 END,
-                                    s.SubstrateNumber;
-                                """;
-
-                            var list = con.Query<SubstrateStockDto>(sql,
-                                new {
-                                    ID = _productRegisterWork.RowID,
-                                    SubstrateModel = substrateModel
-                                });
+                            var list = SubstrateChangeRepository.GetSubstrateStock(
+                                _productRegisterWork.RowID, substrateModel);
 
                             var j = 0;
 
@@ -307,7 +235,7 @@ namespace ProductDatabase {
                 switch (_productMaster.RegType) {
                     case 2:
                     case 3:
-                        using (SqliteConnection con = new(GetConnectionRegistration())) {
+                        using (SqliteConnection con = new(ProductRepository.GetConnectionRegistration())) {
                             con.Open();
                             using var transaction = con.BeginTransaction();
 
@@ -324,182 +252,57 @@ namespace ProductDatabase {
                                         var usedValue = int.TryParse(objDgv.Rows[j].Cells[2].Value?.ToString(), out var usd2) ? usd2 : 0;
                                         var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[4].Value);
                                         var useValue = boolCbx ? (int.TryParse(objDgv.Rows[j].Cells[3].Value?.ToString(), out var use2) ? use2 : 0) : 0;
+
                                         if (boolCbx) {
                                             var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
-                                            var stockValue = int.TryParse(objDgv.Rows[j].Cells[1].Value?.ToString(), out var sv2) ? sv2 : 0;
 
-                                            var sql =
-                                                $"""
-                                                SELECT
-                                                    SubstrateID,
-                                                    OrderNumber
-                                                FROM
-                                                    {Constants.VSubstrateTableName}
-                                                WHERE
-                                                    SubstrateID = @SubstrateID
-                                                    AND SubstrateNumber = @SubstrateNumber
-                                                    AND IsDeleted = 0
-                                                GROUP BY
-                                                    SubstrateID,
-                                                    SubstrateNumber,
-                                                    OrderNumber
-                                                ORDER BY
-                                                    MIN(ID)
-                                                LIMIT 1
-                                                """;
+                                            var info = SubstrateChangeRepository.GetSubstrateInfo(
+                                                con, transaction,
+                                                _productMaster.UseSubstrates[i].SubstrateID, substrateNum);
 
-                                            var info = con.QueryFirstOrDefault<SubstrateInfoDto>(sql,
-                                                new {
-                                                    _productMaster.UseSubstrates[i].SubstrateID,
-                                                    SubstrateNumber = substrateNum
-                                                },
-                                                transaction
-                                            );
-
-                                            var substrateID = info?.SubstrateID ?? "";
-                                            var orderNum = info?.OrderNumber ?? "";
-
-                                            // 基板テーブルを更新
-                                            var updateSql =
-                                                $"""
-                                                UPDATE
-                                                    {Constants.TSubstrateTableName}
-                                                SET
-                                                    Decrease = @Decrease,
-                                                    Person = @Person,
-                                                    RegDate = @RegDate,
-                                                    Comment = @Comment
-                                                WHERE
-                                                    SubstrateNumber = @SubstrateNumber
-                                                    AND IsDeleted = 0
-                                                    AND UseID = @UseID
-                                                """;
-
-                                            var affectedRows = con.Execute(updateSql,
-                                                new {
-                                                    Decrease = 0 - useValue,
-                                                    Person = ToDbValue(_productRegisterWork.Person),
-                                                    RegDate = ToDbValue(_productRegisterWork.RegDate),
-                                                    Comment = ToDbValue(_productRegisterWork.Comment),
-                                                    SubstrateNumber = objDgv.Rows[j].Cells[0].Value,
-                                                    UseID = _productRegisterWork.RowID
-                                                },
-                                                transaction
-                                            );
+                                            var affectedRows = SubstrateChangeRepository.UpdateSubstrateDecrease(
+                                                con, transaction,
+                                                useValue,
+                                                _productRegisterWork.Person,
+                                                _productRegisterWork.RegDate,
+                                                _productRegisterWork.Comment,
+                                                substrateNum,
+                                                _productRegisterWork.RowID);
 
                                             // 更新できない場合は挿入
                                             if (affectedRows == 0) {
-                                                var insertSql =
-                                                    $"""
-                                                    INSERT INTO {Constants.TSubstrateTableName}
-                                                        (
-                                                            SubstrateID,
-                                                            SubstrateNumber,
-                                                            OrderNumber,
-                                                            Decrease,
-                                                            Person,
-                                                            RegDate,
-                                                            Comment,
-                                                            UseID
-                                                        )
-                                                    VALUES
-                                                        (
-                                                            @SubstrateID,
-                                                            @SubstrateNumber,
-                                                            @OrderNumber,
-                                                            @Decrease,
-                                                            @Person,
-                                                            @RegDate,
-                                                            @Comment,
-                                                            @UseID
-                                                        )
-                                                    """;
-
-                                                con.Execute(insertSql,
-                                                    new {
-                                                        SubstrateID = ToDbValue(substrateID),
-                                                        SubstrateNumber = objDgv.Rows[j].Cells[0].Value,
-                                                        OrderNumber = ToDbValue(orderNum),
-                                                        Decrease = 0 - useValue,
-                                                        Person = ToDbValue(_productRegisterWork.Person),
-                                                        RegDate = ToDbValue(_productRegisterWork.RegDate),
-                                                        Comment = ToDbValue(_productRegisterWork.Comment),
-                                                        UseID = _productRegisterWork.RowID
-                                                    },
-                                                    transaction
-                                                );
+                                                SubstrateChangeRepository.InsertSubstrateDecrease(
+                                                    con, transaction,
+                                                    info?.SubstrateID ?? "",
+                                                    substrateNum,
+                                                    info?.OrderNumber ?? "",
+                                                    useValue,
+                                                    _productRegisterWork.Person,
+                                                    _productRegisterWork.RegDate,
+                                                    _productRegisterWork.Comment,
+                                                    _productRegisterWork.RowID);
                                             }
 
                                             if (_productMaster.IsListPrint) {
                                                 _listUsedSubstrate.Add(_productMaster.UseSubstrates[i].SubstrateName);
-                                                if (substrateNum is not null) { _listUsedProductNumber.Add(substrateNum); }
+                                                _listUsedProductNumber.Add(substrateNum);
                                                 _listUsedQuantity.Add(useValue);
                                             }
                                         }
                                         else if (usedValue != useValue && useValue == 0) {
-                                            var deleteSql =
-                                                $"""
-                                                UPDATE
-                                                    {Constants.TSubstrateTableName}
-                                                SET
-                                                    Decrease = @Decrease
-                                                WHERE
-                                                    SubstrateID = @SubstrateID
-                                                    AND SubstrateNumber = @SubstrateNumber
-                                                    AND IsDeleted = 0
-                                                    AND UseID = @UseID
-                                                """;
-
-                                            con.Execute(deleteSql,
-                                                new {
-                                                    Decrease = 0,
-                                                    _productMaster.UseSubstrates[i].SubstrateID,
-                                                    SubstrateNumber = objDgv.Rows[j].Cells[0].Value,
-                                                    UseID = _productRegisterWork.RowID
-                                                },
-                                                transaction
-                                            );
+                                            SubstrateChangeRepository.ClearSubstrateDecrease(
+                                                con, transaction,
+                                                _productMaster.UseSubstrates[i].SubstrateID,
+                                                objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty,
+                                                _productRegisterWork.RowID);
                                         }
                                     }
                                 }
                             }
 
                             // 製品テーブル更新
-                            var updateProductSql =
-                                $"""
-                                UPDATE
-                                    {Constants.TProductTableName}
-                                SET
-                                    Quantity = @Quantity,
-                                    Person = @Person,
-                                    RegDate = @RegDate,
-                                    Revision = @Revision,
-                                    RevisionGroup = @RevisionGroup,
-                                    SerialLast = @SerialLast,
-                                    SerialLastNumber = @SerialLastNumber,
-                                    Comment = @Comment
-                                WHERE
-                                    ProductNumber = @ProductNumber
-                                    AND SerialFirst = @SerialFirst
-                                    AND IsDeleted = 0
-                                """;
-
-                            con.Execute(updateProductSql,
-                                new {
-                                    OrderNumber = ToDbValue(_productRegisterWork.OrderNumber),
-                                    ProductNumber = ToDbValue(_productRegisterWork.ProductNumber),
-                                    _productRegisterWork.Quantity,
-                                    Person = ToDbValue(_productRegisterWork.Person),
-                                    RegDate = ToDbValue(_productRegisterWork.RegDate),
-                                    Revision = ToDbValue(_productRegisterWork.Revision),
-                                    _productMaster.RevisionGroup,
-                                    SerialFirst = ToDbValue(_productRegisterWork.SerialFirst),
-                                    SerialLast = ToDbValue(_productRegisterWork.SerialLast),
-                                    _productRegisterWork.SerialLastNumber,
-                                    Comment = ToDbValue(_productRegisterWork.Comment)
-                                },
-                                transaction
-                            );
+                            SubstrateChangeRepository.UpdateProduct(
+                                con, transaction, _productRegisterWork, _productMaster.RevisionGroup);
 
                             transaction.Commit();
                         }
@@ -509,33 +312,10 @@ namespace ProductDatabase {
                 // バックアップ作成
                 BackupManager.CreateBackup();
                 // ログ出力
-                string[] logMessageArray = [
-                    $"[基板変更]",
-                    $"[{_productMaster.CategoryName}]",
-                    $"ID[{_productRegisterWork.RowID}]",
-                    $"注文番号[{_productRegisterWork.OrderNumber}]",
-                    $"製造番号[{_productRegisterWork.ProductNumber}]",
-                    $"[]",
-                    $"製品名[{_productMaster.ProductName}]",
-                    $"タイプ[{_productMaster.ProductType}]",
-                    $"型式[{_productMaster.ProductModel}]",
-                    $"数量[{_productRegisterWork.Quantity}]",
-                    $"シリアル先頭[{_productRegisterWork.SerialFirst}]",
-                    $"シリアル末尾[{_productRegisterWork.SerialLast}]",
-                    $"Revision[{_productRegisterWork.Revision}]",
-                    $"登録日[{_productRegisterWork.RegDate}]",
-                    $"担当者[{_productRegisterWork.Person}]",
-                    $"コメント[{_productRegisterWork.Comment}]"
-                ];
-                Logger.AppendLog(logMessageArray);
+                HistoryAuditLogger.LogSubstrateChange(_productMaster, _productRegisterWork);
             } catch (Exception) {
                 throw;
             }
-        }
-
-        // 空文字・空白文字列はDBNull.Valueに変換してDB挿入/更新時のNULL処理を統一する
-        private static object ToDbValue(string? value) {
-            return string.IsNullOrWhiteSpace(value) ? DBNull.Value : value;
         }
         // 基板変更済み製品情報をもとにExcel製品一覧を生成する
         private async Task GenerateList() {

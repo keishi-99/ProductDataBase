@@ -1,8 +1,6 @@
-﻿using Dapper;
-using Microsoft.Data.Sqlite;
+﻿using ProductDatabase.Data;
 using ProductDatabase.Models;
 using System.Data;
-using static ProductDatabase.Data.ProductRepository;
 using static ProductDatabase.ProductRegistration2Window;
 
 namespace ProductDatabase.Other {
@@ -18,13 +16,7 @@ namespace ProductDatabase.Other {
 
         // ロード時にM_ProductDefを取得してカテゴリ一覧をListBox1に表示する
         private void LoadEvents() {
-            var strSqlQuery = "SELECT * FROM M_ProductDef WHERE Visible = 1;";
-
-            using SqliteConnection con = new(GetConnectionRegistration());
-            con.Open();
-            using (var reader = con.ExecuteReader(strSqlQuery)) {
-                ServiceInfo.ServiceDataTable.Load(reader);
-            }
+            ServiceRepository.LoadVisibleProducts(ServiceInfo.ServiceDataTable);
 
             var categoryNames = ServiceInfo.ServiceDataTable.AsEnumerable()
                 .Select(row => row.Field<string?>("CategoryName") ?? string.Empty)
@@ -86,7 +78,7 @@ namespace ProductDatabase.Other {
                 ServiceInfo.ServiceProductName = selectedRows[0]["ProductName"].ToString() ?? string.Empty;
                 ServiceInfo.ServiceProductType = selectedRows[0]["ProductType"].ToString() ?? string.Empty;
                 ServiceInfo.ServiceProductModel = selectedRows[0]["ProductModel"].ToString() ?? string.Empty;
-                ServiceInfo.ServiceUseSubstrates = GetUseSubstrates(ServiceInfo.ServiceProductID);
+                ServiceInfo.ServiceUseSubstrates = ServiceRepository.GetUseSubstrates(ServiceInfo.ServiceProductID);
                 DialogResult = DialogResult.OK;
             }
             else { DialogResult = DialogResult.Cancel; }
@@ -94,28 +86,6 @@ namespace ProductDatabase.Other {
             Close();
             return DialogResult.OK;
         }
-        // 製品IDに紐づく使用基板情報をV_ProductUseSubstrateから取得してリストで返す
-        private static List<SubstrateInfo> GetUseSubstrates(long productId) {
-
-            var productUseSubstrate = new DataTable();
-
-            using var con = new SqliteConnection(GetConnectionRegistration());
-            con.Open();
-
-            using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.VProductUseSubstrate};")) {
-                productUseSubstrate.Load(reader);
-            }
-
-            return [.. productUseSubstrate.AsEnumerable()
-                    .Where(r => r.Field<long?>("P_ProductID") == productId
-                             && r.Field<long?>("S_SubstrateID").HasValue)
-                    .Select(r => new SubstrateInfo {
-                        SubstrateID = r.Field<long>("S_SubstrateID"),
-                        SubstrateName = r["SubstrateName"]?.ToString() ?? "",
-                        SubstrateModel = r["SubstrateModel"]?.ToString() ?? ""
-                    })];
-        }
-
         private void ServiceForm_Load(object sender, EventArgs e) { LoadEvents(); }
         private void CategoryListBox1_SelectedIndexChanged(object sender, EventArgs e) { CategoryListBox1Select(); }
         private void CategoryListBox2_SelectedIndexChanged(object sender, EventArgs e) { CategoryListBox2Select(); }

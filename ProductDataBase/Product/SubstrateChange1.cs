@@ -1,9 +1,7 @@
-﻿using Dapper;
-using Microsoft.Data.Sqlite;
+﻿using ProductDatabase.Data;
 using ProductDatabase.Models;
 using ProductDatabase.Other;
 using System.Data;
-using static ProductDatabase.Data.ProductRepository;
 
 namespace ProductDatabase {
     public partial class SubstrateChange1 : Form {
@@ -38,41 +36,7 @@ namespace ProductDatabase {
         private void LoadEvents() {
             Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
 
-            HistoryTable.Clear();
-
-            using SqliteConnection con = new(GetConnectionRegistration());
-
-            var sql =
-                $"""
-                SELECT
-                    ID,
-                    ProductName,
-                    ProductType,
-                    ProductModel,
-                    OrderNumber,
-                    ProductNumber,
-                    Quantity,
-                    SerialFirst,
-                    SerialLast,
-                    SerialLastNumber,
-                    Revision,
-                    RevisionGroup,
-                    Person,
-                    RegDate,    
-                    Comment,
-                    CreatedAt
-                FROM
-                    {Constants.VProductTableName}
-                WHERE
-                    ProductID = @ProductID 
-                    AND Quantity > 1
-                ORDER BY
-                    ID DESC
-                ;
-                """;
-
-            var result = con.ExecuteReader(sql, new { _productMaster.ProductID });
-            HistoryTable.Load(result);
+            HistoryTable = SubstrateChangeRepository.GetProductHistory(_productMaster.ProductID);
 
             SubstrateChangeDataGridView.DataSource = HistoryTable;
 
