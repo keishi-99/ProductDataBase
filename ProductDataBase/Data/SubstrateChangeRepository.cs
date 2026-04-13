@@ -266,7 +266,7 @@ namespace ProductDatabase.Data {
                     {Constants.VProductTableName}
                 WHERE
                     ProductID = @ProductID
-                    AND Quantity > 1
+                    AND Quantity >= 1
                 ORDER BY
                     ID DESC
                 ;
