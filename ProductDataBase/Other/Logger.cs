@@ -22,10 +22,10 @@ namespace ProductDatabase.Other {
 
                     File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
 
-                    if (!string.IsNullOrEmpty(CommonUtils.BackupPath)) {
-                        var cloneFilePath = Path.Combine(CommonUtils.BackupPath, "db", "logs", logFileName);
+                    if (!string.IsNullOrEmpty(FileUtils.BackupPath)) {
+                        var cloneFilePath = Path.Combine(FileUtils.BackupPath, "db", "logs", logFileName);
                         if (cloneFilePath != logFilePath) {
-                            CommonUtils.CopyWithRetry(logFilePath, cloneFilePath, true);
+                            FileUtils.CopyWithRetry(logFilePath, cloneFilePath, true);
                         }
                     }
                 }

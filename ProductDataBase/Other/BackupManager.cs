@@ -20,13 +20,13 @@ namespace ProductDatabase.Other {
                     var backupFileName = $"ProductRegistry_{timestamp}.db";
                     var backupFilePath = Path.Combine(_backupDirectory, backupFileName);
 
-                    CommonUtils.CopyWithRetry(_originalFilePath, backupFilePath, true);
+                    FileUtils.CopyWithRetry(_originalFilePath, backupFilePath, true);
                     ManageBackupFiles();
 
-                    if (!string.IsNullOrEmpty(CommonUtils.BackupPath)) {
-                        var backupPath = Path.Combine(CommonUtils.BackupPath, "db", "ProductRegistry.db");
-                        if (Environment.CurrentDirectory != CommonUtils.BackupPath) {
-                            CommonUtils.CopyWithRetry(_originalFilePath, backupPath, true);
+                    if (!string.IsNullOrEmpty(FileUtils.BackupPath)) {
+                        var backupPath = Path.Combine(FileUtils.BackupPath, "db", "ProductRegistry.db");
+                        if (Environment.CurrentDirectory != FileUtils.BackupPath) {
+                            FileUtils.CopyWithRetry(_originalFilePath, backupPath, true);
                         }
                     }
                 }
@@ -38,15 +38,15 @@ namespace ProductDatabase.Other {
         // 当日分のバックアップが未作成の場合のみDBをバックアップフォルダにコピーする
         public static void CreateDailyBackup() {
             // フォルダ未設定
-            if (string.IsNullOrWhiteSpace(CommonUtils.BackupPath)) {
+            if (string.IsNullOrWhiteSpace(FileUtils.BackupPath)) {
                 MessageBox.Show("フォルダが設定されていません。バックアップは保存されません。",
                     string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
             // ネットワークフォルダが見つからない
-            if (!Directory.Exists(CommonUtils.BackupPath)) {
-                MessageBox.Show($"'{CommonUtils.BackupPath}'\nが見つかりません。バックアップは保存されません。",
+            if (!Directory.Exists(FileUtils.BackupPath)) {
+                MessageBox.Show($"'{FileUtils.BackupPath}'\nが見つかりません。バックアップは保存されません。",
                     string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
@@ -56,7 +56,7 @@ namespace ProductDatabase.Other {
             var month = today.Month;
             var day = today.Day;
 
-            var backupFolder = Path.Combine(CommonUtils.BackupPath, "db", "backup", $"{year}", $"{month:00}");
+            var backupFolder = Path.Combine(FileUtils.BackupPath, "db", "backup", $"{year}", $"{month:00}");
             var backupFile = Path.Combine(backupFolder, $"_bak_{year}-{month:00}-{day:00}.db");
             var productRegistryFile = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
 
@@ -77,7 +77,7 @@ namespace ProductDatabase.Other {
 
                 while (backupFiles.Count > _maxBackupFiles) {
                     var oldestFile = backupFiles.First();
-                    CommonUtils.DeleteWithRetry(oldestFile);
+                    FileUtils.DeleteWithRetry(oldestFile);
                     backupFiles.RemoveAt(0);
                 }
             } catch (Exception ex) {

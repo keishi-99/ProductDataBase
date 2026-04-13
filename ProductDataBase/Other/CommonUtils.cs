@@ -9,45 +9,6 @@ namespace ProductDatabase.Other {
     }
 
     internal partial class CommonUtils {
-        public static string BackupPath { get; set; } = string.Empty;
-
-        /// <summary>
-        /// ファイルをコピーします（Logger / BackupManager から使用）。
-        /// </summary>
-        internal static void CopyWithRetry(string sourceFileName, string destFileName, bool overwrite, int retryCount = 5, int delayMilliseconds = 2000) {
-            for (var attempt = 1; attempt <= retryCount; attempt++) {
-                try {
-                    if (File.Exists(sourceFileName)) {
-                        File.Copy(sourceFileName, destFileName, overwrite);
-                    }
-                    return;
-                } catch (IOException) {
-                    if (attempt == retryCount) {
-                        throw new Exception("バックアップファイルがコピーできません。");
-                    }
-                    Thread.Sleep(delayMilliseconds);
-                }
-            }
-        }
-
-        /// <summary>
-        /// ファイルを削除します（BackupManager から使用）。
-        /// </summary>
-        internal static void DeleteWithRetry(string filePath, int retryCount = 5, int delayMilliseconds = 2000) {
-            for (var attempt = 1; attempt <= retryCount; attempt++) {
-                try {
-                    if (File.Exists(filePath)) {
-                        File.Delete(filePath);
-                    }
-                    return;
-                } catch (IOException) {
-                    if (attempt == retryCount) {
-                        throw new Exception("バックアップファイルが削除できません。");
-                    }
-                    Thread.Sleep(delayMilliseconds);
-                }
-            }
-        }
 
         // STAスレッドで処理を実行し Task として返す（COM Interop・ダイアログ用）
         // RunContinuationsAsynchronously: await後の継続処理がSTAスレッドで実行されるのを防ぐ

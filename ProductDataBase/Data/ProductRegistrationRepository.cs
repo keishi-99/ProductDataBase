@@ -268,6 +268,75 @@ namespace ProductDatabase.Data {
             return connection.QueryFirstOrDefault<string>(query, new { ProductName = productName, OrderNumber = orderNumber }, transaction: transaction);
         }
 
+        // 製品名・RevisionGroupに対応する最新Revisionを返す（なければnull）
+        public static string? GetLatestRevision(IDbConnection connection, string productName, string revisionGroup) {
+            var sql =
+                $"""
+                SELECT Revision
+                FROM {Constants.VProductTableName}
+                WHERE ProductName = @ProductName
+                  AND RevisionGroup = @RevisionGroup
+                  AND IsDeleted = 0
+                ORDER BY ID DESC
+                LIMIT 1
+                """;
+            return connection.QueryFirstOrDefault<string>(sql, new { ProductName = productName, RevisionGroup = revisionGroup });
+        }
+
+        // 製品名の最新SerialLastNumberを返す（なければnull）
+        public static int? GetLatestSerialLastNumber(IDbConnection connection, string productName) {
+            var sql =
+                $"""
+                SELECT SerialLastNumber
+                FROM {Constants.VProductTableName}
+                WHERE ProductName = @ProductName
+                  AND IsDeleted = 0
+                  AND SerialLastNumber IS NOT NULL
+                ORDER BY ID DESC
+                LIMIT 1
+                """;
+            return connection.QueryFirstOrDefault<int?>(sql, new { ProductName = productName });
+        }
+
+        // Revision変更レコードをINSERTして生成されたROWIDを返す
+        public static long InsertRevisionChangeRecord(
+            IDbConnection connection, IDbTransaction transaction,
+            ProductMaster productMaster, ProductRegisterWork productRegisterWork, int serialLastNumber) {
+
+            var sql =
+                $"""
+                INSERT INTO {Constants.TProductTableName}
+                (
+                    ProductID,
+                    RegDate,
+                    Revision,
+                    RevisionGroup,
+                    SerialLastNumber,
+                    Comment
+                )
+                VALUES
+                (
+                    @ProductID,
+                    @RegDate,
+                    @Revision,
+                    @RevisionGroup,
+                    @SerialLastNumber,
+                    @Comment
+                );
+                """;
+
+            connection.Execute(sql, new {
+                productMaster.ProductID,
+                productRegisterWork.Revision,
+                productRegisterWork.RegDate,
+                productMaster.RevisionGroup,
+                SerialLastNumber = serialLastNumber,
+                Comment = productRegisterWork.Comment.NullIfWhiteSpace()
+            }, transaction: transaction);
+
+            return connection.ExecuteScalar<long>("SELECT last_insert_rowid();", transaction: transaction);
+        }
+
         // 基板在庫情報（FetchSubstrateStock / GetSubstrateOrderNumber 共通）
         public sealed class SubstrateStockInfo {
             public string SubstrateName   { get; set; } = string.Empty;

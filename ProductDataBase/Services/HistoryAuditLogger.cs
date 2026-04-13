@@ -6,6 +6,74 @@ namespace ProductDatabase.Services {
     // 履歴編集・削除操作の監査ログエントリを整形するクラス
     internal static class HistoryAuditLogger {
 
+        // Revision変更操作の監査ログをファイルに記録する
+        public static void LogRevisionChange(ProductMaster productMaster, ProductRegisterWork productRegisterWork, long id) {
+            Logger.AppendLog([
+                "[Rev変更]",
+                $"[{productMaster.CategoryName}]",
+                $"[ID{id}]",
+                $"[]",
+                $"[]",
+                $"[]",
+                $"製品名[{productMaster.ProductName}]",
+                $"タイプ[{productMaster.ProductType}]",
+                $"型式[{productMaster.ProductModel}]",
+                $"[]",
+                $"[]",
+                $"[]",
+                $"Revision[{productRegisterWork.Revision}]",
+                $"登録日[{productRegisterWork.RegDate}]",
+                $"[]",
+                $"コメント[{productRegisterWork.Comment}]"
+            ]);
+        }
+
+        // 再印刷操作の監査ログをファイルに記録する
+        public static void LogRePrint(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
+            Logger.AppendLog([
+                "[再印刷]",
+                $"[{productMaster.CategoryName}]",
+                $"[]",
+                $"注文番号[{productRegisterWork.OrderNumber}]",
+                $"製造番号[{productRegisterWork.ProductNumber}]",
+                $"[]",
+                $"製品名[{productMaster.ProductName}]",
+                $"タイプ[{productMaster.ProductType}]",
+                $"型式[{productMaster.ProductModel}]",
+                $"数量[{productRegisterWork.Quantity}]",
+                $"シリアル先頭[{productRegisterWork.SerialFirst}]",
+                $"シリアル末尾[{productRegisterWork.SerialLast}]",
+                $"Revision[{productRegisterWork.Revision}]",
+                $"登録日[{productRegisterWork.RegDate}]",
+                $"担当者[{productRegisterWork.Person}]",
+                $"コメント[{productRegisterWork.Comment}]"
+            ]);
+        }
+
+        // 基板登録操作の監査ログをファイルに記録する
+        public static void LogSubstrateRegistration(
+            SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork,
+            string rowId, string logQuantity, string logDefectQuantity) {
+            Logger.AppendLog([
+                "[基板登録]",
+                $"[{substrateMaster.CategoryName}]",
+                $"ID[{rowId}]",
+                $"注文番号[{substrateRegisterWork.OrderNumber}]",
+                $"製造番号[{substrateRegisterWork.ProductNumber}]",
+                $"[]",
+                $"製品名[{substrateMaster.ProductName}]",
+                $"基板名[{substrateMaster.SubstrateName}]",
+                $"型式[{substrateMaster.SubstrateModel}]",
+                $"追加数[{logQuantity}]",
+                $"使用数[]",
+                $"減少数[{logDefectQuantity}]",
+                $"[]",
+                $"登録日[{substrateRegisterWork.RegDate}]",
+                $"担当者[{substrateRegisterWork.Person}]",
+                $"コメント[{substrateRegisterWork.Comment}]"
+            ]);
+        }
+
         // 製品登録操作の監査ログをファイルに記録する
         public static void LogProductRegistration(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
             Logger.AppendLog([

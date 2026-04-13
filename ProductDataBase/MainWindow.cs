@@ -62,7 +62,7 @@ namespace ProductDatabase {
                 var generalSettings = SettingsLoader.Load(_jsonFilePath);
 
                 // バックアップパス取得
-                CommonUtils.BackupPath = generalSettings.BackupFolderPath;
+                FileUtils.BackupPath = generalSettings.BackupFolderPath;
 
                 // バックアップ作成
                 BackupManager.CreateDailyBackup();

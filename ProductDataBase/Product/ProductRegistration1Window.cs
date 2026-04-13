@@ -1,8 +1,8 @@
-﻿using Dapper;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.Data;
 using ProductDatabase.Models;
 using ProductDatabase.Other;
-using static ProductDatabase.Data.ProductRepository;
+using ProductDatabase.Services;
 
 namespace ProductDatabase {
     public partial class ProductRegistration1Window : Form {
@@ -69,45 +69,17 @@ namespace ProductDatabase {
                 // ComboBoxへ担当者を追加
                 PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
 
-                // DB2へ接続し対象製品テーブルの最新のシリアル,リビジョン取得
-                using SqliteConnection con = new(GetConnectionRegistration());
+                // DBから最新リビジョンとシリアル番号を取得
+                using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
 
-                // テーブル検索SQL - [[ProductName]_Product]テーブルの最新の[Revision]を取得
-                var revisionSql =
-                    $"""
-                    SELECT Revision 
-                    FROM {Constants.VProductTableName}
-                    WHERE ProductName = @ProductName 
-                      AND RevisionGroup = @RevisionGroup 
-                      AND IsDeleted = 0 
-                    ORDER BY ID DESC
-                    LIMIT 1
-                    """;
-
-                var revisionResult = con.ExecuteScalar<string>(
-                    revisionSql,
-                    new {
-                        _productMaster.ProductName,
-                        _productMaster.RevisionGroup
-                    });
+                var revisionResult = ProductRegistrationRepository.GetLatestRevision(
+                    con, _productMaster.ProductName, _productMaster.RevisionGroup.ToString());
 
                 RevisionTextBox.Text = revisionResult ?? "";
 
                 if (_productMaster.IsSerialGeneration) {
-                    var serialSql =
-                        $"""
-                        SELECT SerialLastNumber 
-                        FROM {Constants.VProductTableName} 
-                        WHERE ProductName = @ProductName 
-                          AND IsDeleted = 0 
-                          AND SerialLastNumber IS NOT NULL 
-                        ORDER BY ID DESC
-                        LIMIT 1
-                        """;
-
-                    var serialResult = con.ExecuteScalar<int?>(serialSql, new { _productMaster.ProductName })
+                    var serialLastNum = ProductRegistrationRepository.GetLatestSerialLastNumber(con, _productMaster.ProductName)
                         ?? throw new Exception("シリアル番号の取得に失敗しました。");
-                    var serialLastNum = serialResult;
                     var nextSerialNumber = serialLastNum + 1;
 
                     // シリアル番号の桁数に応じて、閾値とリセット値を設定
@@ -262,59 +234,16 @@ namespace ProductDatabase {
             _productRegisterWork.RegDate = RegistrationDateTimePicker.Value.ToShortDateString();
             _productRegisterWork.Comment = CommentTextBox.Text.Trim();
 
-            using var connection = new SqliteConnection(GetConnectionRegistration());
+            using var connection = new SqliteConnection(ProductRepository.GetConnectionRegistration());
             connection.Open();
             using var transaction = connection.BeginTransaction();
             try {
-                var commandText =
-                $"""
-                INSERT INTO {Constants.TProductTableName} 
-                (
-                    ProductID,
-                    RegDate,
-                    Revision,
-                    RevisionGroup,
-                    SerialLastNumber,
-                    Comment
-                )
-                VALUES 
-                (
-                    @ProductID, 
-                    @RegDate,
-                    @Revision,
-                    @RevisionGroup,
-                    @SerialLastNumber,
-                    @Comment
-                );
-                """;
-
-                var serialLastNum = connection.ExecuteScalar<int>(
-                    $"""
-                    SELECT SerialLastNumber
-                    FROM {Constants.VProductTableName} 
-                    WHERE ProductName = @ProductName 
-                    AND IsDeleted = 0
-                    AND SerialLastNumber IS NOT NULL 
-                    ORDER BY ID DESC
-                    LIMIT 1
-                    """,
-                    new { _productMaster.ProductName },
-                    transaction: transaction);
-
-                connection.Execute(commandText, new {
-                    _productMaster.ProductID,
-                    _productRegisterWork.Revision,
-                    _productRegisterWork.RegDate,
-                    _productMaster.RevisionGroup,
-                    SerialLastNumber = serialLastNum,
-                    Comment = _productRegisterWork.Comment.NullIfWhiteSpace()
-                }, transaction: transaction);
-
-                var id = connection.ExecuteScalar<int>("SELECT last_insert_rowid();", transaction: transaction);
+                var serialLastNum = ProductRegistrationRepository.GetLatestSerialLastNumber(connection, _productMaster.ProductName) ?? 0;
+                var id = ProductRegistrationRepository.InsertRevisionChangeRecord(connection, transaction, _productMaster, _productRegisterWork, serialLastNum);
 
                 transaction.Commit();
 
-                LogRegistration(_productMaster, _productRegisterWork, id);
+                HistoryAuditLogger.LogRevisionChange(_productMaster, _productRegisterWork, id);
 
                 MessageBox.Show("Revision変更完了", "Revision変更", MessageBoxButtons.OK, MessageBoxIcon.Information);
             } catch (Exception ex) {
@@ -401,28 +330,6 @@ namespace ProductDatabase {
             ManufacturingNumberMaskedTextBox.Text = arr[0];
             QuantityTextBox.Text = arr[2];
             OrderNumberTextBox.Text = arr[3];
-        }
-        // Revision変更の操作内容をログファイルに記録する
-        private static void LogRegistration(ProductMaster productMaster, ProductRegisterWork productRegisterWork, long id) {
-            string[] logMessageArray = [
-                $"[Rev変更]",
-                $"[{productMaster.CategoryName}]",
-                $"[ID{id}]",
-                $"[]",
-                $"[]",
-                $"[]",
-                $"製品名[{productMaster.ProductName}]",
-                $"タイプ[{productMaster.ProductType}]",
-                $"型式[{productMaster.ProductModel}]",
-                $"[]",
-                $"[]",
-                $"[]",
-                $"Revision[{productRegisterWork.Revision}]",
-                $"登録日[{productRegisterWork.RegDate}]",
-                $"[]",
-                $"コメント[{productRegisterWork.Comment}]"
-            ];
-            Logger.AppendLog(logMessageArray);
         }
         // 現在の製品マスターのフィールド値をリスト形式のサブウィンドウで確認表示する
         private void ShowInfo() {

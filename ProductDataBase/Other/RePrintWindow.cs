@@ -1,9 +1,9 @@
-﻿using Dapper;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.Data;
 using ProductDatabase.Models;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
-using static ProductDatabase.Data.ProductRepository;
+using ProductDatabase.Services;
 using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
 
@@ -75,26 +75,10 @@ namespace ProductDatabase {
                 // ComboBoxへ担当者を追加
                 PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
 
-                // DB2へ接続し対象製品テーブルの最新のシリアル,リビジョン取得
-                using SqliteConnection con = new(GetConnectionRegistration());
-                var revisionSql =
-                    $"""
-                    SELECT Revision 
-                    FROM {Constants.VProductTableName}
-                    WHERE ProductName = @ProductName 
-                        AND RevisionGroup = @RevisionGroup 
-                        AND IsDeleted = 0 
-                    ORDER BY ID DESC
-                    LIMIT 1
-                    """;
-
-                var revisionResult = con.ExecuteScalar<string>(
-                    revisionSql,
-                    new {
-                        _productMaster.ProductName,
-                        _productMaster.RevisionGroup
-                    });
-
+                // DBから最新リビジョンを取得
+                using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+                var revisionResult = ProductRegistrationRepository.GetLatestRevision(
+                    con, _productMaster.ProductName, _productMaster.RevisionGroup.ToString());
                 RevisionTextBox.Text = revisionResult ?? "";
 
                 ConfigurePrintSettings();
@@ -163,103 +147,14 @@ namespace ProductDatabase {
         // 再印刷テーブルにレコードを挿入しバックアップとログ記録を行う
         private bool Registration() {
             try {
-                using SqliteConnection con = new(GetConnectionRegistration());
-                InsertProduct(con);
-
-                // バックアップ作成
+                _productRegisterWork.RowID = RePrintRepository.InsertRePrintRecord(_productMaster, _productRegisterWork);
                 BackupManager.CreateBackup();
-                // ログ出力
-                string[] logMessageArray = [
-                    $"[再印刷]",
-                    $"[{_productMaster.CategoryName}]",
-                    $"[]",
-                    $"注文番号[{_productRegisterWork.OrderNumber}]",
-                    $"製造番号[{_productRegisterWork.ProductNumber}]",
-                    $"[]",
-                    $"製品名[{_productMaster.ProductName}]",
-                    $"タイプ[{_productMaster.ProductType}]",
-                    $"型式[{_productMaster.ProductModel}]",
-                    $"数量[{_productRegisterWork.Quantity}]",
-                    $"シリアル先頭[{_productRegisterWork.SerialFirst}]",
-                    $"シリアル末尾[{_productRegisterWork.SerialLast}]",
-                    $"Revision[{_productRegisterWork.Revision}]",
-                    $"登録日[{_productRegisterWork.RegDate}]",
-                    $"担当者[{_productRegisterWork.Person}]",
-                    $"コメント[{_productRegisterWork.Comment}]"
-                ];
-                Logger.AppendLog(logMessageArray);
-
+                HistoryAuditLogger.LogRePrint(_productMaster, _productRegisterWork);
                 return true;
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-        }
-        // 再印刷テーブルへのINSERT文を実行し生成されたROWIDを作業データに保存する
-        private void InsertProduct(SqliteConnection connection) {
-            var commandText =
-                $"""
-                INSERT INTO {Constants.TRePrintTableName}
-                (
-                    ProductID,
-                    ProductName,
-                    ProductType,
-                    ProductModel,
-                    SerialPrintType,
-                    OrderNumber,
-                    ProductNumber,
-                    OLesNumber,
-                    Quantity,
-                    Person,
-                    RegDate,
-                    Revision,
-                    RevisionGroup,
-                    SerialFirst,
-                    SerialLast,
-                    Comment
-                )
-                VALUES
-                (
-                    @ProductID,
-                    @ProductName,
-                    @ProductType,
-                    @ProductModel,
-                    @SerialPrintType,
-                    @OrderNumber,
-                    @ProductNumber,
-                    @OLesNumber,
-                    @Quantity,
-                    @Person,
-                    @RegDate,
-                    @Revision,
-                    @RevisionGroup,
-                    @SerialFirst,
-                    @SerialLast,
-                    @Comment
-                )
-                ;
-                """;
-
-            connection.Execute(commandText, new {
-                _productMaster.ProductID,
-                ProductName = _productMaster.ProductName.NullIfWhiteSpace(),
-                ProductType = _productMaster.ProductType.NullIfWhiteSpace(),
-                ProductModel = _productMaster.ProductModel.NullIfWhiteSpace(),
-                _productMaster.SerialPrintType,
-                OrderNumber = _productRegisterWork.OrderNumber.NullIfWhiteSpace(),
-                ProductNumber = _productRegisterWork.ProductNumber.NullIfWhiteSpace(),
-                OLesNumber = _productRegisterWork.OLesNumber.NullIfWhiteSpace(),
-                _productRegisterWork.Quantity,
-                Person = _productRegisterWork.Person.NullIfWhiteSpace(),
-                RegDate = _productRegisterWork.RegDate.NullIfWhiteSpace(),
-                Revision = _productRegisterWork.Revision.NullIfWhiteSpace(),
-                _productMaster.RevisionGroup,
-                SerialFirst = _productRegisterWork.SerialFirst.NullIfWhiteSpace(),
-                SerialLast = _productRegisterWork.SerialLast.NullIfWhiteSpace(),
-                Comment = _productRegisterWork.Comment.NullIfWhiteSpace()
-            });
-
-            _productRegisterWork.RowID = connection.ExecuteScalar<int>("SELECT last_insert_rowid();");
         }
 
         // 入力値のバリデーションを行いシリアルリストと作業データをセットする
