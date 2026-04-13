@@ -24,22 +24,26 @@ namespace ProductDatabase.Data {
             _committed = false;
         }
 
-        // トランザクションをコミットする
+        // トランザクションをコミットする（既にコミット/ロールバック済みの場合は何もしない）
         public void Commit() {
+            if (_committed) return;
             _transaction?.Commit();
             _committed = true;
         }
 
         // トランザクションをロールバックする（未コミットの場合のみ）
         public void Rollback() {
-            if (!_committed) {
-                _transaction?.Rollback();
-                _committed = true;
-            }
+            if (_committed) return;
+            _transaction?.Rollback();
+            _committed = true;
         }
 
         public void Dispose() {
             if (_disposed) { return; }
+            // usingブロックを抜けた際にコミットされていない場合は自動ロールバック
+            if (!_committed) {
+                _transaction?.Rollback();
+            }
             _transaction?.Dispose();
             _connection?.Close();
             _connection?.Dispose();

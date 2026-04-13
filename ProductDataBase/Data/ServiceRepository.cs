@@ -22,14 +22,13 @@ namespace ProductDatabase.Data {
             using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
             con.Open();
 
+            var query = $"SELECT * FROM {Constants.VProductUseSubstrate} WHERE P_ProductID = @ProductId AND S_SubstrateID IS NOT NULL;";
             var table = new DataTable();
-            using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.VProductUseSubstrate};")) {
+            using (var reader = con.ExecuteReader(query, new { ProductId = productId })) {
                 table.Load(reader);
             }
 
             return [.. table.AsEnumerable()
-                .Where(r => r.Field<long?>("P_ProductID") == productId
-                         && r.Field<long?>("S_SubstrateID").HasValue)
                 .Select(r => new SubstrateInfo {
                     SubstrateID   = r.Field<long>("S_SubstrateID"),
                     SubstrateName = r["SubstrateName"]?.ToString() ?? "",

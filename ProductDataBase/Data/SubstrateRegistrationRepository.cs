@@ -123,7 +123,7 @@ namespace ProductDatabase.Data {
                 SubstrateNumber = substrateNumber.NullIfWhiteSpace(),
                 OrderNumber     = orderNumber.NullIfWhiteSpace(),
                 Increase        = (object?)increase ?? DBNull.Value,
-                Defect          = defect.HasValue ? (object)$"-{defect.Value}" : DBNull.Value,
+                Defect          = defect.HasValue ? (object?)-defect.Value : DBNull.Value,
                 Person          = person.NullIfWhiteSpace(),
                 RegDate         = regDate.NullIfWhiteSpace(),
                 Comment         = comment.NullIfWhiteSpace()
