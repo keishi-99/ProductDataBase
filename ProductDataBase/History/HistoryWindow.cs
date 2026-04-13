@@ -482,8 +482,8 @@ namespace ProductDatabase.History {
         private void InventoryAdjustment() {
             var i = DataBaseDataGridView.SelectedCells[0].RowIndex;
             _substrateMaster.SubstrateID = int.TryParse(DataBaseDataGridView.Rows[i].Cells["SubstrateID"].Value?.ToString(), out var subId) ? subId : 0;
-            _substrateRegisterWork.OrderNumber = DataBaseDataGridView.Rows[i].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
-            _substrateRegisterWork.ProductNumber = DataBaseDataGridView.Rows[i].Cells["SubstrateNumber"].Value.ToString() ?? string.Empty;
+            _substrateRegisterWork.OrderNumber = DataBaseDataGridView.Rows[i].Cells["OrderNumber"].Value?.ToString() ?? string.Empty;
+            _substrateRegisterWork.ProductNumber = DataBaseDataGridView.Rows[i].Cells["SubstrateNumber"].Value?.ToString() ?? string.Empty;
 
             var result = HistoryRepository.QuerySubstrateMasterById(_substrateMaster.SubstrateID);
 
@@ -537,13 +537,13 @@ namespace ProductDatabase.History {
             if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
             var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
             _productRegisterWork.RowID = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value?.ToString(), out var rid1) ? rid1 : 0;
-            _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
-            _productMaster.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value?.ToString() ?? string.Empty;
+            _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value?.ToString() ?? string.Empty;
+            _productMaster.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value?.ToString() ?? string.Empty;
             _productRegisterWork.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
-            _productRegisterWork.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value?.ToString() ?? string.Empty;
+            _productRegisterWork.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value?.ToString() ?? string.Empty;
+            _productRegisterWork.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value?.ToString() ?? string.Empty;
 
             // [UIスレッド] 前処理: Config読み込み + ファイル選択 + 保存先選択
             (string templateFilePath, string savePath, ReportGeneratorClosedXml.ReportConfigClosedXml config)? prepared;
@@ -585,14 +585,14 @@ namespace ProductDatabase.History {
             if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
             var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
             _productRegisterWork.RowID = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["ID"].Value?.ToString(), out var rid2) ? rid2 : 0;
-            _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
-            _productMaster.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value?.ToString() ?? string.Empty;
+            _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value?.ToString() ?? string.Empty;
+            _productMaster.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value?.ToString() ?? string.Empty;
             _productRegisterWork.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
-            _productRegisterWork.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.Comment = DataBaseDataGridView.Rows[selectRow].Cells["Comment"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value?.ToString() ?? string.Empty;
+            _productRegisterWork.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value?.ToString() ?? string.Empty;
+            _productRegisterWork.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value?.ToString() ?? string.Empty;
+            _productRegisterWork.Comment = DataBaseDataGridView.Rows[selectRow].Cells["Comment"].Value?.ToString() ?? string.Empty;
 
             GenerateListButton.Enabled = false;
             Exception? taskException = null;
@@ -616,13 +616,13 @@ namespace ProductDatabase.History {
         private async Task GenerateCheckSheet() {
             if (DataBaseDataGridView.CurrentCell is null && DataBaseDataGridView.SelectedCells.Count <= 0) { return; }
             var selectRow = DataBaseDataGridView.SelectedCells[0].RowIndex;
-            _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value.ToString() ?? string.Empty;
-            _productMaster.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.ProductNumber = DataBaseDataGridView.Rows[selectRow].Cells["ProductNumber"].Value?.ToString() ?? string.Empty;
+            _productRegisterWork.OrderNumber = DataBaseDataGridView.Rows[selectRow].Cells["OrderNumber"].Value?.ToString() ?? string.Empty;
+            _productMaster.ProductModel = DataBaseDataGridView.Rows[selectRow].Cells["ProductModel"].Value?.ToString() ?? string.Empty;
             _productRegisterWork.Quantity = int.TryParse(DataBaseDataGridView.Rows[selectRow].Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
-            _productRegisterWork.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value.ToString() ?? string.Empty;
-            _productRegisterWork.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value.ToString() ?? string.Empty;
+            _productRegisterWork.RegDate = DataBaseDataGridView.Rows[selectRow].Cells["RegDate"].Value?.ToString() ?? string.Empty;
+            _productRegisterWork.SerialFirst = DataBaseDataGridView.Rows[selectRow].Cells["SerialFirst"].Value?.ToString() ?? string.Empty;
+            _productRegisterWork.SerialLast = DataBaseDataGridView.Rows[selectRow].Cells["SerialLast"].Value?.ToString() ?? string.Empty;
 
             // [UIスレッド] 前処理: Config読み込み + InputDialog（温度・湿度）
             (CheckSheetGeneratorClosedXml.CheckSheetConfigData configData, string temperature, string humidity)? prepared;
