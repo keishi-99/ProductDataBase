@@ -1,7 +1,7 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
+using ProductDatabase.Common;
 using ProductDatabase.Models;
-using ProductDatabase.Other;
 
 namespace ProductDatabase.Data {
     // 基板マスターの CRUD 操作を担当するリポジトリクラス

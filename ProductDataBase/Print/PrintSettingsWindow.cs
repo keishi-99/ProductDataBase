@@ -1,11 +1,10 @@
+using ProductDatabase.MasterManagement;
+using ProductDatabase.Models;
+using ProductDatabase.Print;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
-using ProductDatabase.MasterManagement;
-using ProductDatabase.Models;
-using ProductDatabase.Print;
-using static ProductDatabase.Data.ProductRepository;
 using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase {
@@ -52,8 +51,8 @@ namespace ProductDatabase {
             _documentPrintSettingFilePath = filePath;
 
             PrintPropertyGrid.SelectedObject = CurrentSerialType switch {
-                PrintManager.SerialType.Label     => DocumentPrintSettings.LabelPrintSettings,
-                PrintManager.SerialType.Barcode   => DocumentPrintSettings.BarcodePrintSettings,
+                PrintManager.SerialType.Label => DocumentPrintSettings.LabelPrintSettings,
+                PrintManager.SerialType.Barcode => DocumentPrintSettings.BarcodePrintSettings,
                 PrintManager.SerialType.Nameplate => DocumentPrintSettings.NameplatePrintSettings,
                 PrintManager.SerialType.Substrate => DocumentPrintSettings.LabelPrintSettings,
                 _ => null

@@ -1,6 +1,6 @@
 using ClosedXML.Excel;
 
-namespace ProductDatabase.ExcelService {
+namespace ProductDatabase.Excel {
     // Excelサービスクラス間で共有するユーティリティメソッド
     internal static class ExcelHelper {
 

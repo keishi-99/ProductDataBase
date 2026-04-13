@@ -1,7 +1,7 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
+using ProductDatabase.Common;
 using ProductDatabase.Models;
-using ProductDatabase.Other;
 using System.Data;
 
 namespace ProductDatabase.Data {
@@ -122,12 +122,12 @@ namespace ProductDatabase.Data {
                 """;
 
             return connection.Execute(sql, new {
-                Decrease    = 0 - decrease,
-                Person      = person.NullIfWhiteSpace(),
-                RegDate     = regDate.NullIfWhiteSpace(),
-                Comment     = comment.NullIfWhiteSpace(),
+                Decrease = 0 - decrease,
+                Person = person.NullIfWhiteSpace(),
+                RegDate = regDate.NullIfWhiteSpace(),
+                Comment = comment.NullIfWhiteSpace(),
                 SubstrateNumber = substrateNumber,
-                UseID       = useId
+                UseID = useId
             }, transaction: transaction);
         }
 
@@ -164,14 +164,14 @@ namespace ProductDatabase.Data {
                 """;
 
             connection.Execute(sql, new {
-                SubstrateID     = substrateId.NullIfWhiteSpace(),
+                SubstrateID = substrateId.NullIfWhiteSpace(),
                 SubstrateNumber = substrateNumber.NullIfWhiteSpace(),
-                OrderNumber     = orderNumber.NullIfWhiteSpace(),
-                Decrease        = 0 - decrease,
-                Person          = person.NullIfWhiteSpace(),
-                RegDate         = regDate.NullIfWhiteSpace(),
-                Comment         = comment.NullIfWhiteSpace(),
-                UseID           = useId
+                OrderNumber = orderNumber.NullIfWhiteSpace(),
+                Decrease = 0 - decrease,
+                Person = person.NullIfWhiteSpace(),
+                RegDate = regDate.NullIfWhiteSpace(),
+                Comment = comment.NullIfWhiteSpace(),
+                UseID = useId
             }, transaction: transaction);
         }
 
@@ -194,10 +194,10 @@ namespace ProductDatabase.Data {
                 """;
 
             connection.Execute(sql, new {
-                Decrease        = 0,
-                SubstrateID     = substrateId,
+                Decrease = 0,
+                SubstrateID = substrateId,
                 SubstrateNumber = substrateNumber,
-                UseID           = useId
+                UseID = useId
             }, transaction: transaction);
         }
 
@@ -227,15 +227,15 @@ namespace ProductDatabase.Data {
 
             connection.Execute(sql, new {
                 work.Quantity,
-                Person          = work.Person.NullIfWhiteSpace(),
-                RegDate         = work.RegDate.NullIfWhiteSpace(),
-                Revision        = work.Revision.NullIfWhiteSpace(),
-                RevisionGroup   = revisionGroup,
-                SerialFirst     = work.SerialFirst.NullIfWhiteSpace(),
-                SerialLast      = work.SerialLast.NullIfWhiteSpace(),
+                Person = work.Person.NullIfWhiteSpace(),
+                RegDate = work.RegDate.NullIfWhiteSpace(),
+                Revision = work.Revision.NullIfWhiteSpace(),
+                RevisionGroup = revisionGroup,
+                SerialFirst = work.SerialFirst.NullIfWhiteSpace(),
+                SerialLast = work.SerialLast.NullIfWhiteSpace(),
                 work.SerialLastNumber,
-                Comment         = work.Comment.NullIfWhiteSpace(),
-                ProductNumber   = work.ProductNumber.NullIfWhiteSpace()
+                Comment = work.Comment.NullIfWhiteSpace(),
+                ProductNumber = work.ProductNumber.NullIfWhiteSpace()
             }, transaction: transaction);
         }
 
@@ -280,17 +280,17 @@ namespace ProductDatabase.Data {
 
         // 基板在庫行DTO
         public sealed class SubstrateStockRow {
-            public string SubstrateName  { get; init; } = string.Empty;
-            public string SubstrateModel  { get; init; } = string.Empty;
+            public string SubstrateName { get; init; } = string.Empty;
+            public string SubstrateModel { get; init; } = string.Empty;
             public string SubstrateNumber { get; init; } = string.Empty;
-            public int    Stock           { get; init; }
-            public int    UsedDecrease    { get; init; }
+            public int Stock { get; init; }
+            public int UsedDecrease { get; init; }
         }
 
         // 基板ID・注文番号の位置情報DTO
         public sealed class SubstrateLocationInfo {
-            public string SubstrateID  { get; init; } = string.Empty;
-            public string OrderNumber  { get; init; } = string.Empty;
+            public string SubstrateID { get; init; } = string.Empty;
+            public string OrderNumber { get; init; } = string.Empty;
         }
     }
 }

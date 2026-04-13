@@ -1,4 +1,4 @@
-﻿namespace ProductDatabase.Other {
+﻿namespace ProductDatabase.Service {
     partial class ServiceForm {
         /// <summary>
         /// Required designer variable.

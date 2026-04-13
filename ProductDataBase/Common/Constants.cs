@@ -1,4 +1,4 @@
-﻿namespace ProductDatabase.Other {
+﻿namespace ProductDatabase.Common {
     public static class Constants {
         public const string ProductTableName = "M_ProductDef";
         public const string SubstrateTableName = "M_SubstrateDef";

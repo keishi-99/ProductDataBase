@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.Common;
 using ProductDatabase.Data;
 using ProductDatabase.Models;
-using ProductDatabase.Other;
 using ProductDatabase.Services;
 
 namespace ProductDatabase {

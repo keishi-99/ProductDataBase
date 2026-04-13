@@ -1,7 +1,7 @@
 using ClosedXML.Excel;
 using ProductDatabase.Models;
 
-namespace ProductDatabase.ExcelService {
+namespace ProductDatabase.Excel {
     // 基板情報ExcelファイルをCOM Interopで開くクラス
     internal static class SubstrateInformationClosedXml {
 
@@ -63,18 +63,18 @@ namespace ProductDatabase.ExcelService {
 
         // COM Interop を使用してExcelファイルを開く
         private static void OpenExcel(string filePath, string sheetName) {
-            Microsoft.Office.Interop.Excel.Application? xlApp    = null;
-            Microsoft.Office.Interop.Excel.Workbooks?   xlBooks  = null;
-            Microsoft.Office.Interop.Excel.Workbook?    xlBook   = null;
-            Microsoft.Office.Interop.Excel.Sheets?      xlSheets = null;
-            Microsoft.Office.Interop.Excel.Worksheet?   xlSheet  = null;
+            Microsoft.Office.Interop.Excel.Application? xlApp = null;
+            Microsoft.Office.Interop.Excel.Workbooks? xlBooks = null;
+            Microsoft.Office.Interop.Excel.Workbook? xlBook = null;
+            Microsoft.Office.Interop.Excel.Sheets? xlSheets = null;
+            Microsoft.Office.Interop.Excel.Worksheet? xlSheet = null;
 
             try {
-                xlApp   = new Microsoft.Office.Interop.Excel.Application { Visible = true };
+                xlApp = new Microsoft.Office.Interop.Excel.Application { Visible = true };
                 xlBooks = xlApp.Workbooks;
-                xlBook  = xlBooks.Open(filePath, ReadOnly: true);
+                xlBook = xlBooks.Open(filePath, ReadOnly: true);
                 xlSheets = xlBook.Sheets;
-                xlSheet  = (Microsoft.Office.Interop.Excel.Worksheet?)(string.IsNullOrEmpty(sheetName) ? xlSheets[1] : xlSheets[sheetName]);
+                xlSheet = (Microsoft.Office.Interop.Excel.Worksheet?)(string.IsNullOrEmpty(sheetName) ? xlSheets[1] : xlSheets[sheetName]);
                 xlSheet?.Activate();
             } finally {
                 ExcelHelper.ReleaseComObject(xlSheet);

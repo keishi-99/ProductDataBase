@@ -1,7 +1,6 @@
-﻿using System.Data;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
-namespace ProductDatabase.Other {
+namespace ProductDatabase.Common {
 
     internal static partial class NativeMethods {
         [LibraryImport("user32.dll", SetLastError = true)]

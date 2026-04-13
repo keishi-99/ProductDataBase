@@ -1,9 +1,8 @@
 ﻿using ProductDatabase.Data;
-using ProductDatabase.Models;
 using System.Data;
 using static ProductDatabase.ProductRegistration2Window;
 
-namespace ProductDatabase.Other {
+namespace ProductDatabase.Service {
     public partial class ServiceForm : Form {
 
         public ServiceInformation ServiceInfo { get; }

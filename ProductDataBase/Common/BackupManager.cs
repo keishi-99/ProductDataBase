@@ -1,4 +1,4 @@
-namespace ProductDatabase.Other {
+namespace ProductDatabase.Common {
     // DBファイルのタイムスタンプ付きバックアップ作成と古いバックアップの自動削除を管理するクラス
     internal static class BackupManager {
         private static readonly string _backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup");

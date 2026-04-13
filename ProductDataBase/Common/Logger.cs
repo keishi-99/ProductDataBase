@@ -1,4 +1,4 @@
-namespace ProductDatabase.Other {
+namespace ProductDatabase.Common {
     // 月次CSVログファイルへの追記と共有フォルダへのコピーを管理するクラス
     internal static class Logger {
         private static readonly string _logDirectory = Path.Combine(Environment.CurrentDirectory, "db", "logs");

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using ProductDatabase.Common;
 using ProductDatabase.Data;
 using ProductDatabase.Models;
 using ProductDatabase.Other;
@@ -569,7 +570,8 @@ namespace ProductDatabase {
         private void シリアルラベル印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             _printManager.CurrentSerialType = SerialType.Label;
             PrintSettingsWindow ls = new() {
-                AppSettings = _appSettings, CurrentSerialType = _printManager.CurrentSerialType
+                AppSettings = _appSettings,
+                CurrentSerialType = _printManager.CurrentSerialType
             };
             ls.ShowDialog(this);
             LoadSettings();
@@ -577,7 +579,8 @@ namespace ProductDatabase {
         private void バーコード印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             _printManager.CurrentSerialType = SerialType.Barcode;
             PrintSettingsWindow ls = new() {
-                AppSettings = _appSettings, CurrentSerialType = _printManager.CurrentSerialType
+                AppSettings = _appSettings,
+                CurrentSerialType = _printManager.CurrentSerialType
             };
             ls.ShowDialog(this);
             LoadSettings();
@@ -585,7 +588,8 @@ namespace ProductDatabase {
         private void 銘版印刷設定ToolStripMenuItem_Click(object sender, EventArgs e) {
             _printManager.CurrentSerialType = SerialType.Nameplate;
             PrintSettingsWindow ls = new() {
-                AppSettings = _appSettings, CurrentSerialType = _printManager.CurrentSerialType
+                AppSettings = _appSettings,
+                CurrentSerialType = _printManager.CurrentSerialType
             };
             ls.ShowDialog(this);
             LoadSettings();

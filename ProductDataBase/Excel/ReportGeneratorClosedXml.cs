@@ -3,7 +3,7 @@ using ProductDatabase.Data;
 using ProductDatabase.Models;
 using System.Data;
 
-namespace ProductDatabase.ExcelService {
+namespace ProductDatabase.Excel {
     // 成績書のExcel生成を担当するクラス
     internal static class ReportGeneratorClosedXml {
 
@@ -234,13 +234,14 @@ namespace ProductDatabase.ExcelService {
             var usedSubstrate = new List<(string, List<string>)>();
 
             foreach (DataRow row in table.Rows) {
-                var substrateModel  = row["SubstrateModel"]?.ToString()  ?? string.Empty;
+                var substrateModel = row["SubstrateModel"]?.ToString() ?? string.Empty;
                 var substrateNumber = row["SubstrateNumber"]?.ToString() ?? string.Empty;
 
                 var existingIndex = usedSubstrate.FindIndex(x => x.Item1 == substrateModel);
                 if (existingIndex != -1) {
                     usedSubstrate[existingIndex].Item2.Add(substrateNumber);
-                } else {
+                }
+                else {
                     usedSubstrate.Add((substrateModel, new List<string> { substrateNumber }));
                 }
             }

@@ -1,5 +1,4 @@
 ﻿using ProductDatabase.Models;
-using static ProductDatabase.Data.ProductRepository;
 
 namespace ProductDatabase {
     public partial class SeveralDialogWindow : Form {
