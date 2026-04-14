@@ -6,7 +6,7 @@ namespace Launcher {
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
-        private static Mutex? s_mutex;
+        private static Mutex? _mutex;
         [STAThread]
         static void Main() {
             // To customize application configuration such as set high DPI settings or default font,
@@ -16,7 +16,7 @@ namespace Launcher {
                 const string MutexName = "LauncherAppMutex"; // アプリケーション固有の名前を指定
 
                 // ミューテックスを作成
-                s_mutex = new Mutex(true, MutexName, out var isNewInstance);
+                _mutex = new Mutex(true, MutexName, out var isNewInstance);
 
                 if (!isNewInstance) {
                     // すでにインスタンスが存在する場合
@@ -68,9 +68,9 @@ namespace Launcher {
                 Application.Exit();
 
             } finally {
-                if (s_mutex != null) {
-                    s_mutex.ReleaseMutex();
-                    s_mutex.Dispose();
+                if (_mutex != null) {
+                    _mutex.ReleaseMutex();
+                    _mutex.Dispose();
                 }
             }
         }

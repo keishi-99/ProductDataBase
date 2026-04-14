@@ -116,9 +116,8 @@ namespace ProductDatabase {
 
                 if (!PrintOnlyCheckBox.Checked && isPrint) {
                     if (!await CheckDuplicate()) { return; }
-                    using (var overlay = new LoadingOverlay(this)) {
-                        if (!await Task.Run(() => Registration())) { return; }
-                    }
+                    using var overlay = new LoadingOverlay(this);
+                    if (!await Task.Run(() => Registration())) { return; }
                 }
 
                 if (!_substrateMaster.IsLabelPrint) {
@@ -304,9 +303,8 @@ namespace ProductDatabase {
                             Document = pd
                         };
                         if (pdlg.ShowDialog() == DialogResult.OK) {
-                            using (var overlay = new LoadingOverlay(this)) {
-                                await CommonUtils.RunOnStaThreadAsync(() => pd.Print());
-                            }
+                            using var overlay = new LoadingOverlay(this);
+                            await CommonUtils.RunOnStaThreadAsync(() => pd.Print());
                         }
                         break;
                     case false:

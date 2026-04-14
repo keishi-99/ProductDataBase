@@ -2,10 +2,7 @@ using ProductDatabase.Data;
 using ProductDatabase.Models;
 using ProductDatabase.Print;
 using System.Data;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.Unicode;
 using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
 
@@ -30,9 +27,17 @@ namespace ProductDatabase.MasterManagement {
         private string _substrateSortColumn = "SubstrateID";
         private bool _substrateSortAscending = true;
 
-        // 印刷設定のシリアライズ・デシリアライズで共有するオプション
-        private static readonly JsonSerializerOptions s_jsonOptions = new() {
+        // 印刷設定のデシリアライズ用オプション
+        private static readonly JsonSerializerOptions _jsonOptions = new() {
             PropertyNamingPolicy = null,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        };
+
+        // 印刷設定のシリアライズ（ファイル書き込み）用オプション
+        private static readonly JsonSerializerOptions _jsonWriteOptions = new() {
+            WriteIndented = true,
+            PropertyNamingPolicy = null,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All),
             DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
         };
 
@@ -412,13 +417,7 @@ namespace ProductDatabase.MasterManagement {
                 try {
                     Directory.CreateDirectory(Path.GetDirectoryName(PrintSettingPath)!);
                     var defaultSettings = new DocumentPrintSettings();
-                    var createOptions = new JsonSerializerOptions {
-                        WriteIndented = true,
-                        PropertyNamingPolicy = null,
-                        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-                    };
-                    File.WriteAllText(PrintSettingPath, JsonSerializer.Serialize(defaultSettings, createOptions));
+                    File.WriteAllText(PrintSettingPath, JsonSerializer.Serialize(defaultSettings, _jsonWriteOptions));
                     ProductPrintSettings = defaultSettings;
                 } catch (Exception ex) {
                     MessageBox.Show($"印刷設定ファイルの作成に失敗しました。{Environment.NewLine}{ex.Message}",
@@ -430,7 +429,7 @@ namespace ProductDatabase.MasterManagement {
             else {
                 try {
                     var json = File.ReadAllText(PrintSettingPath);
-                    ProductPrintSettings = JsonSerializer.Deserialize<DocumentPrintSettings>(json, s_jsonOptions) ?? new DocumentPrintSettings();
+                    ProductPrintSettings = JsonSerializer.Deserialize<DocumentPrintSettings>(json, _jsonOptions) ?? new DocumentPrintSettings();
                 } catch (Exception ex) {
                     MessageBox.Show($"印刷設定の読み込みに失敗しました。{Environment.NewLine}{ex.Message}",
                         $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー",

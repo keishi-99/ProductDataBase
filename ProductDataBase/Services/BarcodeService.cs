@@ -2,16 +2,10 @@ using Dapper;
 using System.Data.Odbc;
 
 namespace ProductDatabase.Services {
-    internal class BarcodeService {
-        private readonly string _dsn;
-        private readonly string _uid;
-        private readonly string _pwd;
-
-        public BarcodeService(string dsn, string uid, string pwd) {
-            _dsn = dsn;
-            _uid = uid;
-            _pwd = pwd;
-        }
+    internal class BarcodeService(string dsn, string uid, string pwd) {
+        private readonly string _dsn = dsn;
+        private readonly string _uid = uid;
+        private readonly string _pwd = pwd;
 
         // バーコードの手配管理番号からODBCで手配情報を取得して返す
         public BarcodeQueryResult Query(string managementNumber) {

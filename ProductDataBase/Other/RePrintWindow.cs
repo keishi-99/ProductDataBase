@@ -308,9 +308,7 @@ namespace ProductDatabase {
         }
         // 指定タイプのフォーマットでシリアルリストを生成して返す（_printManager.CurrentSerialType を変更しない）
         private List<string> GenerateSerialListForType(SerialType type) {
-            return Enumerable.Range(0, _productRegisterWork.Quantity)
-                .Select(i => GenerateCode(_productRegisterWork.SerialFirstNumber + i, type))
-                .ToList();
+            return [.. Enumerable.Range(0, _productRegisterWork.Quantity).Select(i => GenerateCode(_productRegisterWork.SerialFirstNumber + i, type))];
         }
         private List<string> GenerateLabelList() => GenerateSerialListForType(SerialType.Label);
         private List<string>? GenerateOlesListOrNull() =>
