@@ -90,7 +90,7 @@ namespace ProductDatabase.Print {
         }
 
         // ミリメートルをピクセルに変換するヘルパーメソッド
-        private float ConvertMmToPixel(double mm, float dpi) {
+        private static float ConvertMmToPixel(double mm, float dpi) {
             const float MmPerInch = 25.4f;
             return (float)(mm / MmPerInch * dpi);
         }
@@ -358,7 +358,7 @@ namespace ProductDatabase.Print {
 
 
         // 最終シリアル印刷後に次の開始行番号をページ上に描画する
-        private void DrawFinalRowMark(Graphics graphics, int rowNumber, float posX, float posY, float width, float height, Font font) {
+        private static void DrawFinalRowMark(Graphics graphics, int rowNumber, float posX, float posY, float width, float height, Font font) {
             using var sf = new StringFormat {
                 Alignment = StringAlignment.Near,
                 LineAlignment = StringAlignment.Center

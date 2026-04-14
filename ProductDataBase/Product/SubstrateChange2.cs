@@ -78,7 +78,7 @@ namespace ProductDatabase {
                                 objDgv.Columns[2].ReadOnly = true;
                                 objDgv.Columns[3].ReadOnly = false;
                                 objDgv.Columns[4].ReadOnly = false;
-                                if (s_layoutSettings.TryGetValue(Font.Size, out var layout)) {
+                                if (_layoutSettings.TryGetValue(Font.Size, out var layout)) {
                                     objDgv.RowTemplate.Height = layout.RowHeight;
                                     for (int z = 0; z < layout.ColumnWidths.Length; z++) {
                                         objDgv.Columns[z].Width = layout.ColumnWidths[z];
@@ -123,7 +123,7 @@ namespace ProductDatabase {
             public int[] ColumnWidths { get; init; } = [];
         }
 
-        private static readonly Dictionary<float, DataGridViewLayoutSettings> s_layoutSettings = new() {
+        private static readonly Dictionary<float, DataGridViewLayoutSettings> _layoutSettings = new() {
             [9f] = new() { RowHeight = 24, ColumnWidths = [130, 30, 30, 30, 24] },
             [12f] = new() { RowHeight = 24, ColumnWidths = [220, 40, 40, 40, 24] },
             [14f] = new() { RowHeight = 25, ColumnWidths = [230, 60, 60, 60, 25] }

@@ -392,13 +392,13 @@ namespace ProductDatabase {
             return dict?.GetValueOrDefault(productName);
         }
         // 入力ダイアログで編集した注意メッセージをJSONファイルに上書き保存する
-        private static readonly object s_fileLock = new();
-        private static readonly System.Text.Json.JsonSerializerOptions s_jsonOptions = new() {
+        private static readonly object _fileLock = new();
+        private static readonly System.Text.Json.JsonSerializerOptions _jsonOptions = new() {
             WriteIndented = true,
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All)
         };
         private void ProductMessageChange() {
-            lock (s_fileLock) {
+            lock (_fileLock) {
                 if (!File.Exists(_messageFilePath)) {
                     throw new FileNotFoundException($"{_messageFilePath}\nが見つかりません。");
                 }
@@ -413,7 +413,7 @@ namespace ProductDatabase {
                 if (dialog.ShowDialog() == DialogResult.OK) {
                     dict[_productMaster.ProductName] = dialog.InputText;
                     File.WriteAllText(_messageFilePath, System.Text.Json.JsonSerializer.Serialize(
-                        dict, s_jsonOptions));
+                        dict, _jsonOptions));
                 }
             }
         }
