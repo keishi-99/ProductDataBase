@@ -319,23 +319,24 @@ namespace ProductDatabase.History {
             try {
                 // DB操作をバックグラウンドスレッドで実行
                 await Task.Run(() => {
-                    using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-                    con.Open();
-                    using var tx = con.BeginTransaction();
+                    {
+                        using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+                        con.Open();
+                        using var tx = con.BeginTransaction();
 
-                    // Original=変更前, Current=変更後
-                    HistoryAuditLogger.LogProductEdit(row, pendingLogs, _productMaster.CategoryName);
-                    HistoryRepository.UpdateProductRow(con, row, tx);
+                        // Original=変更前, Current=変更後
+                        HistoryAuditLogger.LogProductEdit(row, pendingLogs, _productMaster.CategoryName);
+                        HistoryRepository.UpdateProductRow(con, row, tx);
 
-                    tx.Commit();
+                        tx.Commit();
 
-                    foreach (var log in pendingLogs) {
-                        Logger.AppendLog(log);
-                    }
+                        foreach (var log in pendingLogs) {
+                            Logger.AppendLog(log);
+                        }
+                    } // con/tx がここで破棄される
+
+                    BackupManager.CreateBackup();
                 });
-
-                // con/tx が破棄された後にUIスレッドでバックアップを実行
-                BackupManager.CreateBackup();
                 RefreshCurrentView();
 
             } catch (Exception ex) {
@@ -376,47 +377,48 @@ namespace ProductDatabase.History {
             try {
                 // DB操作をバックグラウンドスレッドで実行
                 await Task.Run(() => {
-                    using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-                    con.Open();
-                    using var tx = con.BeginTransaction();
+                    {
+                        using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+                        con.Open();
+                        using var tx = con.BeginTransaction();
 
-                    switch (tableName) {
-                        case "Substrate":
-                            foreach (var row in rowsToDelete) {
-                                HistoryAuditLogger.LogSubstrateDelete(row, pendingLogs, _substrateMaster.CategoryName);
-                                HistoryRepository.DeleteSubstrateRow(con, row, tx);
-                            }
-                            break;
-                        case "Product":
-                            foreach (var row in rowsToDelete) {
-                                var id = Convert.ToInt64(row["ID"]);
-                                var substrates = HistoryRepository.GetSubstratesByUseId(con, id, tx);
-                                var serials = HistoryRepository.GetSerialsByUsedId(con, id, tx);
-                                HistoryAuditLogger.LogProductDelete(row, pendingLogs, _productMaster.CategoryName);
-                                HistoryAuditLogger.LogProductSubstrateDelete(substrates, pendingLogs, _substrateMaster.CategoryName);
-                                HistoryAuditLogger.LogProductSerialDelete(serials, pendingLogs, _productMaster.CategoryName);
-                                HistoryRepository.DeleteProductRow(con, row, tx);
-                                HistoryRepository.DeleteProductSubstrateRow(con, row, tx);
-                                HistoryRepository.DeleteProductSerialRow(con, row, tx);
-                            }
-                            break;
-                        case "Serial":
-                            foreach (var row in rowsToDelete) {
-                                HistoryAuditLogger.LogSerialDelete(row, pendingLogs, _productMaster.CategoryName);
-                                HistoryRepository.DeleteSerialRow(con, row, tx);
-                            }
-                            break;
-                    }
+                        switch (tableName) {
+                            case "Substrate":
+                                foreach (var row in rowsToDelete) {
+                                    HistoryAuditLogger.LogSubstrateDelete(row, pendingLogs, _substrateMaster.CategoryName);
+                                    HistoryRepository.DeleteSubstrateRow(con, row, tx);
+                                }
+                                break;
+                            case "Product":
+                                foreach (var row in rowsToDelete) {
+                                    var id = Convert.ToInt64(row["ID"]);
+                                    var substrates = HistoryRepository.GetSubstratesByUseId(con, id, tx);
+                                    var serials = HistoryRepository.GetSerialsByUsedId(con, id, tx);
+                                    HistoryAuditLogger.LogProductDelete(row, pendingLogs, _productMaster.CategoryName);
+                                    HistoryAuditLogger.LogProductSubstrateDelete(substrates, pendingLogs, _substrateMaster.CategoryName);
+                                    HistoryAuditLogger.LogProductSerialDelete(serials, pendingLogs, _productMaster.CategoryName);
+                                    HistoryRepository.DeleteProductRow(con, row, tx);
+                                    HistoryRepository.DeleteProductSubstrateRow(con, row, tx);
+                                    HistoryRepository.DeleteProductSerialRow(con, row, tx);
+                                }
+                                break;
+                            case "Serial":
+                                foreach (var row in rowsToDelete) {
+                                    HistoryAuditLogger.LogSerialDelete(row, pendingLogs, _productMaster.CategoryName);
+                                    HistoryRepository.DeleteSerialRow(con, row, tx);
+                                }
+                                break;
+                        }
 
-                    tx.Commit();
+                        tx.Commit();
 
-                    foreach (var log in pendingLogs) {
-                        Logger.AppendLog(log);
-                    }
+                        foreach (var log in pendingLogs) {
+                            Logger.AppendLog(log);
+                        }
+                    } // con/tx がここで破棄される
+
+                    BackupManager.CreateBackup();
                 });
-
-                // con/tx が破棄された後にUIスレッドでバックアップを実行
-                BackupManager.CreateBackup();
                 RefreshCurrentView();
 
             } catch (Exception ex) {
