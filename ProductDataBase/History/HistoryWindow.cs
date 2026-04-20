@@ -327,8 +327,8 @@ namespace ProductDatabase.History {
                     HistoryAuditLogger.LogProductEdit(row, pendingLogs, _productMaster.CategoryName);
                     HistoryRepository.UpdateProductRow(con, row, tx);
 
-                    BackupManager.CreateBackup();
                     tx.Commit();
+                    BackupManager.CreateBackup();
 
                     foreach (var log in pendingLogs) {
                         Logger.AppendLog(log);
@@ -407,8 +407,8 @@ namespace ProductDatabase.History {
                             break;
                     }
 
-                    BackupManager.CreateBackup();
                     tx.Commit();
+                    BackupManager.CreateBackup();
 
                     foreach (var log in pendingLogs) {
                         Logger.AppendLog(log);
