@@ -328,13 +328,14 @@ namespace ProductDatabase.History {
                     HistoryRepository.UpdateProductRow(con, row, tx);
 
                     tx.Commit();
-                    BackupManager.CreateBackup();
 
                     foreach (var log in pendingLogs) {
                         Logger.AppendLog(log);
                     }
                 });
 
+                // con/tx が破棄された後にUIスレッドでバックアップを実行
+                BackupManager.CreateBackup();
                 RefreshCurrentView();
 
             } catch (Exception ex) {
@@ -408,13 +409,14 @@ namespace ProductDatabase.History {
                     }
 
                     tx.Commit();
-                    BackupManager.CreateBackup();
 
                     foreach (var log in pendingLogs) {
                         Logger.AppendLog(log);
                     }
                 });
 
+                // con/tx が破棄された後にUIスレッドでバックアップを実行
+                BackupManager.CreateBackup();
                 RefreshCurrentView();
 
             } catch (Exception ex) {
