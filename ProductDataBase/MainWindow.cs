@@ -1,6 +1,7 @@
 ﻿using ProductDatabase.Common;
 using ProductDatabase.Data;
 using ProductDatabase.History;
+using ProductDatabase.LogViewer;
 using ProductDatabase.Models;
 using ProductDatabase.Services;
 using System.Data;
@@ -553,6 +554,11 @@ namespace ProductDatabase {
         }
         private void QRCodeButton_Click(object sender, EventArgs e) { CodeScan(); }
         private void QRCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
+
+        private void LogViewerToolStripMenuItem_Click(object sender, EventArgs e) {
+            using var window = new LogViewerWindow();
+            window.ShowDialog(this);
+        }
 
         // マスター管理画面を管理者専用ダイアログで開く
         private void MasterManagementToolStripMenuItem_Click(object sender, EventArgs e) {
