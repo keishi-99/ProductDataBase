@@ -33,7 +33,7 @@ namespace ProductDatabase.LogViewer {
             LogDataGridView.ReadOnly = true;
             LogDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(LogDataGridView.Font, FontStyle.Bold);
             LogDataGridView.RowTemplate.DefaultCellStyle.Padding = new Padding(5);
-            LogDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            LogDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
             LogDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             // 表示中のセルだけ処理するため DataBindingComplete より CellFormatting の方が大量データで高速
             LogDataGridView.CellFormatting += LogDataGridView_CellFormatting;
@@ -62,9 +62,9 @@ namespace ProductDatabase.LogViewer {
                 CountLabel.Text = "ログファイルがありません";
         }
 
-        private void LoadSelectedMonth() {
+        private async Task LoadSelectedMonth() {
             if (YearMonthComboBox.SelectedItem is not YearMonthItem item) return;
-            _logTable = LoadLogFile(item.Value);
+            _logTable = await Task.Run(() => LoadLogFile(item.Value));
             _logView = _logTable.DefaultView;
             LogDataGridView.DataSource = _logView;
             RefreshOperationTypeFilter();
@@ -169,7 +169,7 @@ namespace ProductDatabase.LogViewer {
             }
 
             if (!string.IsNullOrEmpty(keyword)) {
-                var escaped = keyword.Replace("'", "''");
+                var escaped = keyword.Replace("'", "''").Replace("[", "[[]").Replace("*", "[*]").Replace("%", "[%]");
                 var colConditions = ColumnHeaders.Select(h => $"[{h}] LIKE '%{escaped}%'");
                 conditions.Add($"({string.Join(" OR ", colConditions)})");
             }
@@ -192,14 +192,15 @@ namespace ProductDatabase.LogViewer {
         }
 
         private void LogDataGridView_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e) {
-            if (e.RowIndex < 0 || e.RowIndex >= LogDataGridView.Rows.Count || e.CellStyle is null) return;
-            var cell = LogDataGridView.Rows[e.RowIndex].Cells["操作種別"];
-            var opType = cell?.Value?.ToString() ?? string.Empty;
-            e.CellStyle.BackColor = GetRowColor(opType);
+            if (e.RowIndex < 0 || e.CellStyle is null) return;
+            if (LogDataGridView.Rows[e.RowIndex].DataBoundItem is DataRowView rowView) {
+                var opType = rowView["操作種別"]?.ToString() ?? string.Empty;
+                e.CellStyle.BackColor = GetRowColor(opType);
+            }
         }
 
-        private void YearMonthComboBox_SelectedIndexChanged(object sender, EventArgs e) {
-            LoadSelectedMonth();
+        private async void YearMonthComboBox_SelectedIndexChanged(object sender, EventArgs e) {
+            await LoadSelectedMonth();
         }
 
         private void OperationTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
