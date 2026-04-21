@@ -1,3 +1,4 @@
+using ProductDatabase.Common;
 using ProductDatabase.Models;
 using System.Data;
 using System.Text;
@@ -99,13 +100,16 @@ namespace ProductDatabase.LogViewer {
             var filePath = Path.Combine(LogDirectory, $"log_{yearMonth}.csv");
             if (!File.Exists(filePath)) return table;
 
-            foreach (var line in File.ReadLines(filePath, Encoding.UTF8)) {
+            using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var reader = new StreamReader(fs, Encoding.UTF8);
+            while (reader.ReadLine() is string line) {
                 if (string.IsNullOrWhiteSpace(line)) continue;
                 var fields = ParseCsvLine(line);
                 var row = table.NewRow();
                 for (int i = 0; i < ColumnHeaders.Length; i++) {
                     var raw = i < fields.Length ? fields[i] : string.Empty;
-                    row[i] = i <= 1 ? raw : ExtractValue(raw);
+                    var header = ColumnHeaders[i];
+                    row[i] = (header == "日時" || header == "操作種別") ? raw : ExtractValue(raw);
                 }
                 table.Rows.Add(row);
             }
@@ -194,14 +198,25 @@ namespace ProductDatabase.LogViewer {
         }
 
         private static Color GetRowColor(string operationType) {
-            if (operationType.Contains("削除")) return Color.MistyRose;
-            if (operationType.Contains("編集")) return Color.LightGoldenrodYellow;
+            if (operationType is LogOperationTypes.SubstrateHistoryDelete
+                or LogOperationTypes.ProductHistoryDelete
+                or LogOperationTypes.ProductRelatedSubstrateDelete
+                or LogOperationTypes.ProductRelatedSerialDelete
+                or LogOperationTypes.SerialHistoryDelete)
+                return Color.MistyRose;
+
+            if (operationType is LogOperationTypes.SubstrateHistoryEditBefore
+                or LogOperationTypes.SubstrateHistoryEditAfter
+                or LogOperationTypes.ProductHistoryEditBefore
+                or LogOperationTypes.ProductHistoryEditAfter)
+                return Color.LightGoldenrodYellow;
+
             return operationType switch {
-                "[製品登録]" => Color.LightSkyBlue,
-                "[基板登録]" => Color.LightGreen,
-                "[基板変更]" => Color.LightYellow,
-                "[再印刷]" => Color.LightSalmon,
-                "[Rev変更]" => Color.Plum,
+                LogOperationTypes.ProductRegistration => Color.LightSkyBlue,
+                LogOperationTypes.SubstrateRegistration => Color.LightGreen,
+                LogOperationTypes.SubstrateChange => Color.LightYellow,
+                LogOperationTypes.RePrint => Color.LightSalmon,
+                LogOperationTypes.RevChange => Color.Plum,
                 _ => Color.White
             };
         }
