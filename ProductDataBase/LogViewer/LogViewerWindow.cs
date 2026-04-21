@@ -76,7 +76,7 @@ namespace ProductDatabase.LogViewer {
             try {
                 // ファイル読み込みと操作種別リストの抽出をまとめてバックグラウンドで実行
                 var (table, types) = await Task.Run(() => {
-                    var t = LoadLogFile(item.Value);
+                    var t = LoadLogFile(item.Value, cts.Token);
                     var ops = t.AsEnumerable()
                         .Select(r => r["操作種別"].ToString() ?? string.Empty)
                         .Distinct()
@@ -103,7 +103,7 @@ namespace ProductDatabase.LogViewer {
             }
         }
 
-        private static DataTable LoadLogFile(string yearMonth) {
+        private static DataTable LoadLogFile(string yearMonth, CancellationToken token) {
             var table = new DataTable();
             foreach (var header in ColumnHeaders)
                 table.Columns.Add(header);
@@ -114,6 +114,7 @@ namespace ProductDatabase.LogViewer {
             using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using var reader = new StreamReader(fs, Encoding.UTF8);
             while (reader.ReadLine() is string line) {
+                token.ThrowIfCancellationRequested();
                 if (string.IsNullOrWhiteSpace(line)) continue;
                 var fields = ParseCsvLine(line);
                 var row = table.NewRow();

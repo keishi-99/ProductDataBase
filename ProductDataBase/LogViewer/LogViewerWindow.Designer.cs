@@ -3,8 +3,9 @@ namespace ProductDatabase.LogViewer {
         private System.ComponentModel.IContainer components = null;
 
         protected override void Dispose(bool disposing) {
-            if (disposing && (components != null)) {
-                components.Dispose();
+            if (disposing) {
+                components?.Dispose();
+                _loadCts?.Dispose();
             }
             base.Dispose(disposing);
         }
