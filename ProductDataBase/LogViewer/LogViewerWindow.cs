@@ -6,9 +6,8 @@ using System.Text.RegularExpressions;
 
 namespace ProductDatabase.LogViewer {
     public partial class LogViewerWindow : Form {
-        // AppDomain.CurrentDomain.BaseDirectory を使用してファイルダイアログ等による CurrentDirectory の変化を回避する
-        private static readonly string LogDirectory =
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db", "logs");
+        // Logger と同じパスを参照して書き込み先と読み込み先のズレを防ぐ
+        private static string LogDirectory => Logger.LogDirectory;
 
         private static readonly string[] ColumnHeaders = [
             "日時", "操作種別", "カテゴリ", "ID",
@@ -21,6 +20,7 @@ namespace ProductDatabase.LogViewer {
 
         private DataTable _logTable = new();
         private DataView _logView = new();
+        private CancellationTokenSource? _loadCts;
 
         public LogViewerWindow(AppSettings appSettings) {
             InitializeComponent();
@@ -68,6 +68,11 @@ namespace ProductDatabase.LogViewer {
         private async Task LoadSelectedMonth() {
             if (YearMonthComboBox.SelectedItem is not YearMonthItem item) return;
 
+            // 前回の読み込みをキャンセルして最新の選択結果だけをUIに反映する
+            _loadCts?.Cancel();
+            _loadCts = new CancellationTokenSource();
+            var cts = _loadCts;
+
             try {
                 // ファイル読み込みと操作種別リストの抽出をまとめてバックグラウンドで実行
                 var (table, types) = await Task.Run(() => {
@@ -78,17 +83,23 @@ namespace ProductDatabase.LogViewer {
                         .OrderBy(s => s)
                         .ToList();
                     return (t, ops);
-                });
+                }, cts.Token);
+
+                if (cts.IsCancellationRequested) return;
 
                 _logTable = table;
                 _logView = _logTable.DefaultView;
                 LogDataGridView.DataSource = _logView;
                 RefreshOperationTypeFilter(types);
                 ApplyFilter();
+            } catch (OperationCanceledException) {
+                // 新しい選択に切り替わったためキャンセル済み
             } catch (Exception ex) {
-                MessageBox.Show(
-                    $"ログファイルの読み込み中にエラーが発生しました: {ex.Message}",
-                    "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (!cts.IsCancellationRequested) {
+                    MessageBox.Show(
+                        $"ログファイルの読み込み中にエラーが発生しました: {ex.Message}",
+                        "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
