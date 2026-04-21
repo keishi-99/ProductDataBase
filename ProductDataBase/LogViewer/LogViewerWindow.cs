@@ -1,3 +1,4 @@
+using ProductDatabase.Models;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -20,8 +21,9 @@ namespace ProductDatabase.LogViewer {
         private DataTable _logTable = new();
         private DataView _logView = new();
 
-        public LogViewerWindow() {
+        public LogViewerWindow(AppSettings appSettings) {
             InitializeComponent();
+            Font = new Font(appSettings.FontName, appSettings.FontSize);
             InitializeDataGridView();
             InitializeYearMonthComboBox();
         }
@@ -64,14 +66,32 @@ namespace ProductDatabase.LogViewer {
 
         private async Task LoadSelectedMonth() {
             if (YearMonthComboBox.SelectedItem is not YearMonthItem item) return;
-            _logTable = await Task.Run(() => LoadLogFile(item.Value));
-            _logView = _logTable.DefaultView;
-            LogDataGridView.DataSource = _logView;
-            RefreshOperationTypeFilter();
-            ApplyFilter();
+
+            try {
+                // ファイル読み込みと操作種別リストの抽出をまとめてバックグラウンドで実行
+                var (table, types) = await Task.Run(() => {
+                    var t = LoadLogFile(item.Value);
+                    var ops = t.AsEnumerable()
+                        .Select(r => r["操作種別"].ToString() ?? string.Empty)
+                        .Distinct()
+                        .OrderBy(s => s)
+                        .ToList();
+                    return (t, ops);
+                });
+
+                _logTable = table;
+                _logView = _logTable.DefaultView;
+                LogDataGridView.DataSource = _logView;
+                RefreshOperationTypeFilter(types);
+                ApplyFilter();
+            } catch (Exception ex) {
+                MessageBox.Show(
+                    $"ログファイルの読み込み中にエラーが発生しました: {ex.Message}",
+                    "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-        private DataTable LoadLogFile(string yearMonth) {
+        private static DataTable LoadLogFile(string yearMonth) {
             var table = new DataTable();
             foreach (var header in ColumnHeaders)
                 table.Columns.Add(header);
@@ -79,21 +99,15 @@ namespace ProductDatabase.LogViewer {
             var filePath = Path.Combine(LogDirectory, $"log_{yearMonth}.csv");
             if (!File.Exists(filePath)) return table;
 
-            try {
-                foreach (var line in File.ReadLines(filePath, Encoding.UTF8)) {
-                    if (string.IsNullOrWhiteSpace(line)) continue;
-                    var fields = ParseCsvLine(line);
-                    var row = table.NewRow();
-                    for (int i = 0; i < ColumnHeaders.Length; i++) {
-                        var raw = i < fields.Length ? fields[i] : string.Empty;
-                        row[i] = i <= 1 ? raw : ExtractValue(raw);
-                    }
-                    table.Rows.Add(row);
+            foreach (var line in File.ReadLines(filePath, Encoding.UTF8)) {
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                var fields = ParseCsvLine(line);
+                var row = table.NewRow();
+                for (int i = 0; i < ColumnHeaders.Length; i++) {
+                    var raw = i < fields.Length ? fields[i] : string.Empty;
+                    row[i] = i <= 1 ? raw : ExtractValue(raw);
                 }
-            } catch (Exception ex) {
-                MessageBox.Show(
-                    $"ログファイルの読み込み中にエラーが発生しました: {ex.Message}",
-                    "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                table.Rows.Add(row);
             }
 
             return table;
@@ -141,17 +155,13 @@ namespace ProductDatabase.LogViewer {
             return [.. fields];
         }
 
-        private void RefreshOperationTypeFilter() {
+        private void RefreshOperationTypeFilter(List<string> types) {
             var current = OperationTypeComboBox.SelectedItem?.ToString();
             OperationTypeComboBox.Items.Clear();
             OperationTypeComboBox.Items.Add("(すべて)");
 
-            foreach (var t in _logTable.AsEnumerable()
-                .Select(r => r["操作種別"].ToString() ?? string.Empty)
-                .Distinct()
-                .OrderBy(s => s)) {
+            foreach (var t in types)
                 OperationTypeComboBox.Items.Add(t);
-            }
 
             OperationTypeComboBox.SelectedItem = current ?? "(すべて)";
             if (OperationTypeComboBox.SelectedIndex < 0)
@@ -169,7 +179,12 @@ namespace ProductDatabase.LogViewer {
             }
 
             if (!string.IsNullOrEmpty(keyword)) {
-                var escaped = keyword.Replace("'", "''").Replace("[", "[[]").Replace("*", "[*]").Replace("%", "[%]");
+                var escaped = keyword
+                    .Replace("'", "''")
+                    .Replace("[", "[[]")
+                    .Replace("]", "[]]")
+                    .Replace("*", "[*]")
+                    .Replace("%", "[%]");
                 var colConditions = ColumnHeaders.Select(h => $"[{h}] LIKE '%{escaped}%'");
                 conditions.Add($"({string.Join(" OR ", colConditions)})");
             }

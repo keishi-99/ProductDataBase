@@ -556,7 +556,7 @@ namespace ProductDatabase {
         private void QRCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
 
         private void LogViewerToolStripMenuItem_Click(object sender, EventArgs e) {
-            using var window = new LogViewerWindow();
+            using var window = new LogViewerWindow(_appSettings);
             window.ShowDialog(this);
         }
 
