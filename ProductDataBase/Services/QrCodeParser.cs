@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 
 namespace ProductDatabase.Services {
-    internal static class QrCodeParser {
+    internal static partial class QrCodeParser {
 
         // QRコードテキストを解析して製番・品目番号・数量・注番を取得する
         public static QrCodeParseResult Parse(string input) {
@@ -22,9 +22,12 @@ namespace ProductDatabase.Services {
             };
         }
 
+        [GeneratedRegex(@"-(?:SMT|H|GH).*")]
+        private static partial Regex SuffixRegex();
+
         // 品目番号から不要なサフィックスを除去して正規化する
         public static string NormalizeProductModel(string productModel) {
-            var result = Regex.Replace(productModel, @"-(?:SMT|H|GH).*", string.Empty);
+            var result = SuffixRegex().Replace(productModel, string.Empty);
             return result
                 .Replace("-ACGH", "-AC")
                 .Replace("-DCGH", "-DC");

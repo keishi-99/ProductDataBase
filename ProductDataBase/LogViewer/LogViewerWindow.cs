@@ -7,16 +7,17 @@ using System.Text.RegularExpressions;
 namespace ProductDatabase.LogViewer {
     public partial class LogViewerWindow : Form {
         // Logger と同じパスを参照して書き込み先と読み込み先のズレを防ぐ
-        private static string LogDirectory => Logger.LogDirectory;
+        private static string LogDirectory => Logger._logDirectory;
 
-        private static readonly string[] ColumnHeaders = [
+        private static readonly string[] _columnHeaders = [
             "日時", "操作種別", "カテゴリ", "ID",
             "注文番号", "製造番号", "OLes番号", "製品名",
             "タイプ", "型式", "数量", "シリアル先頭",
             "シリアル末尾", "Revision", "登録日", "担当者", "コメント"
         ];
 
-        private static readonly Regex BracketRegex = new(@"\[([^\]]*)\]$", RegexOptions.Compiled);
+        [GeneratedRegex(@"\[([^\]]*)\]$")]
+        private static partial Regex BracketRegex();
 
         private DataTable _logTable = new();
         private DataView _logView = new();
@@ -105,7 +106,7 @@ namespace ProductDatabase.LogViewer {
 
         private static DataTable LoadLogFile(string yearMonth, CancellationToken token) {
             var table = new DataTable();
-            foreach (var header in ColumnHeaders)
+            foreach (var header in _columnHeaders)
                 table.Columns.Add(header);
 
             var filePath = Path.Combine(LogDirectory, $"log_{yearMonth}.csv");
@@ -118,9 +119,9 @@ namespace ProductDatabase.LogViewer {
                 if (string.IsNullOrWhiteSpace(line)) continue;
                 var fields = ParseCsvLine(line);
                 var row = table.NewRow();
-                for (int i = 0; i < ColumnHeaders.Length; i++) {
+                for (int i = 0; i < _columnHeaders.Length; i++) {
                     var raw = i < fields.Length ? fields[i] : string.Empty;
-                    var header = ColumnHeaders[i];
+                    var header = _columnHeaders[i];
                     row[i] = (header == "日時" || header == "操作種別") ? raw : ExtractValue(raw);
                 }
                 table.Rows.Add(row);
@@ -131,7 +132,7 @@ namespace ProductDatabase.LogViewer {
 
         private static string ExtractValue(string raw) {
             if (string.IsNullOrEmpty(raw)) return raw;
-            var match = BracketRegex.Match(raw);
+            var match = BracketRegex().Match(raw);
             return match.Success ? match.Groups[1].Value : raw;
         }
 
@@ -146,22 +147,27 @@ namespace ProductDatabase.LogViewer {
                     if (c == '"' && i + 1 < line.Length && line[i + 1] == '"') {
                         current.Append('"');
                         i += 2;
-                    } else if (c == '"') {
+                    }
+                    else if (c == '"') {
                         inQuotes = false;
                         i++;
-                    } else {
+                    }
+                    else {
                         current.Append(c);
                         i++;
                     }
-                } else {
+                }
+                else {
                     if (c == '"') {
                         inQuotes = true;
                         i++;
-                    } else if (c == ',') {
+                    }
+                    else if (c == ',') {
                         fields.Add(current.ToString());
                         current.Clear();
                         i++;
-                    } else {
+                    }
+                    else {
                         current.Append(c);
                         i++;
                     }
@@ -201,7 +207,7 @@ namespace ProductDatabase.LogViewer {
                     .Replace("]", "[]]")
                     .Replace("*", "[*]")
                     .Replace("%", "[%]");
-                var colConditions = ColumnHeaders.Select(h => $"[{h}] LIKE '%{escaped}%'");
+                var colConditions = _columnHeaders.Select(h => $"[{h}] LIKE '%{escaped}%'");
                 conditions.Add($"({string.Join(" OR ", colConditions)})");
             }
 
