@@ -9,7 +9,7 @@ namespace ProductDatabase.Services {
         // Revision変更操作の監査ログをファイルに記録する
         public static void LogRevisionChange(ProductMaster productMaster, ProductRegisterWork productRegisterWork, long id) {
             Logger.AppendLog([
-                "[Rev変更]",
+                LogOperationTypes.RevChange,
                 $"[{productMaster.CategoryName}]",
                 $"[ID{id}]",
                 $"[]",
@@ -31,7 +31,7 @@ namespace ProductDatabase.Services {
         // 再印刷操作の監査ログをファイルに記録する
         public static void LogRePrint(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
             Logger.AppendLog([
-                "[再印刷]",
+                LogOperationTypes.RePrint,
                 $"[{productMaster.CategoryName}]",
                 $"[]",
                 $"注文番号[{productRegisterWork.OrderNumber}]",
@@ -55,7 +55,7 @@ namespace ProductDatabase.Services {
             SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork,
             string rowId, string logQuantity, string logDefectQuantity) {
             Logger.AppendLog([
-                "[基板登録]",
+                LogOperationTypes.SubstrateRegistration,
                 $"[{substrateMaster.CategoryName}]",
                 $"ID[{rowId}]",
                 $"注文番号[{substrateRegisterWork.OrderNumber}]",
@@ -77,7 +77,7 @@ namespace ProductDatabase.Services {
         // 基板変更操作の監査ログをファイルに記録する
         public static void LogSubstrateChange(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
             Logger.AppendLog([
-                "[基板変更]",
+                LogOperationTypes.SubstrateChange,
                 $"[{productMaster.CategoryName}]",
                 $"ID[{productRegisterWork.RowID}]",
                 $"注文番号[{productRegisterWork.OrderNumber}]",
@@ -99,7 +99,7 @@ namespace ProductDatabase.Services {
         // 製品登録操作の監査ログをファイルに記録する
         public static void LogProductRegistration(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
             Logger.AppendLog([
-                "[製品登録]",
+                LogOperationTypes.ProductRegistration,
                 $"[{productMaster.CategoryName}]",
                 $"ID[{productRegisterWork.RowID}]",
                 $"注文番号[{productRegisterWork.OrderNumber}]",
@@ -121,7 +121,7 @@ namespace ProductDatabase.Services {
         // 基板履歴編集の編集前後ログエントリを追加する
         public static void LogSubstrateEdit(DataRow row, List<string[]> pendingLogs, string categoryName) {
             pendingLogs.Add([
-                "[基板履歴編集:前]",
+                LogOperationTypes.SubstrateHistoryEditBefore,
                 $"[{categoryName}]",
                 $"ID[{GetValue(row, "ID", DataRowVersion.Original)}]",
                 $"注文番号[{GetValue(row, "OrderNumber", DataRowVersion.Original)}]",
@@ -140,7 +140,7 @@ namespace ProductDatabase.Services {
             ]);
 
             pendingLogs.Add([
-                "[基板履歴編集:後]",
+                LogOperationTypes.SubstrateHistoryEditAfter,
                 $"[{categoryName}]",
                 $"ID[{GetValue(row, "ID")}]",
                 $"注文番号[{GetValue(row, "OrderNumber")}]",
@@ -162,7 +162,7 @@ namespace ProductDatabase.Services {
         // 基板履歴削除のログエントリを追加する
         public static void LogSubstrateDelete(DataRow row, List<string[]> pendingLogs, string categoryName) {
             pendingLogs.Add([
-                "[基板履歴削除]",
+                LogOperationTypes.SubstrateHistoryDelete,
                 $"[{categoryName}]",
                 $"ID[{GetValue(row, "ID")}]",
                 $"注文番号[{GetValue(row, "OrderNumber")}]",
@@ -184,7 +184,7 @@ namespace ProductDatabase.Services {
         // 製品履歴編集の編集前後ログエントリを追加する
         public static void LogProductEdit(DataRow row, List<string[]> pendingLogs, string categoryName) {
             pendingLogs.Add([
-                "[製品履歴編集:前]",
+                LogOperationTypes.ProductHistoryEditBefore,
                 $"[{categoryName}]",
                 $"ID[{row["ID", DataRowVersion.Original]}]",
                 $"注文番号[{row["OrderNumber", DataRowVersion.Original]}]",
@@ -203,7 +203,7 @@ namespace ProductDatabase.Services {
             ]);
 
             pendingLogs.Add([
-                "[製品履歴編集:後]",
+                LogOperationTypes.ProductHistoryEditAfter,
                 $"[{categoryName}]",
                 $"ID[{GetValue(row, "ID")}]",
                 $"注文番号[{GetValue(row, "OrderNumber")}]",
@@ -225,7 +225,7 @@ namespace ProductDatabase.Services {
         // 製品履歴削除のログエントリを追加する
         public static void LogProductDelete(DataRow row, List<string[]> pendingLogs, string categoryName) {
             pendingLogs.Add([
-                "[製品履歴削除]",
+                LogOperationTypes.ProductHistoryDelete,
                 $"[{categoryName}]",
                 $"ID[{GetValue(row, "ID")}]",
                 $"注文番号[{GetValue(row, "OrderNumber")}]",
@@ -248,7 +248,7 @@ namespace ProductDatabase.Services {
         public static void LogProductSubstrateDelete(IEnumerable<dynamic> substrates, List<string[]> pendingLogs, string categoryName) {
             foreach (var item in substrates) {
                 pendingLogs.Add([
-                    "[製品削除に伴う基板削除]",
+                    LogOperationTypes.ProductRelatedSubstrateDelete,
                     $"[{categoryName}]",
                     $"ID[{item.ID}]",
                     $"注文番号[{item.OrderNumber}]",
@@ -272,7 +272,7 @@ namespace ProductDatabase.Services {
         public static void LogProductSerialDelete(IEnumerable<dynamic> serials, List<string[]> pendingLogs, string categoryName) {
             foreach (var item in serials) {
                 pendingLogs.Add([
-                    "[製品削除に伴うシリアル削除]",
+                    LogOperationTypes.ProductRelatedSerialDelete,
                     $"[{categoryName}]",
                     $"ID[{item.rowid}]",
                     $"製品名[{item.ProductName}]",
@@ -288,7 +288,7 @@ namespace ProductDatabase.Services {
         // シリアル履歴削除のログエントリを追加する
         public static void LogSerialDelete(DataRow row, List<string[]> pendingLogs, string categoryName) {
             pendingLogs.Add([
-                "[シリアル履歴削除]",
+                LogOperationTypes.SerialHistoryDelete,
                 $"[{categoryName}]",
                 $"ID[{GetValue(row, "rowid")}]",
                 $"製品名[{GetValue(row, "ProductName")}]",

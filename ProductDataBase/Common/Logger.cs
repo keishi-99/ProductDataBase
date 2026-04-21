@@ -1,7 +1,8 @@
 namespace ProductDatabase.Common {
     // 月次CSVログファイルへの追記と共有フォルダへのコピーを管理するクラス
     internal static class Logger {
-        private static readonly string _logDirectory = Path.Combine(Environment.CurrentDirectory, "db", "logs");
+        // AppDomain.CurrentDomain.BaseDirectory を使用してファイルダイアログ等による CurrentDirectory の変化を回避する
+        internal static readonly string LogDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db", "logs");
         private static readonly object _lockObject = new();
 
         /// <summary>
@@ -11,12 +12,12 @@ namespace ProductDatabase.Common {
         public static void AppendLog(string[] message) {
             try {
                 lock (_lockObject) {
-                    if (!Directory.Exists(_logDirectory)) {
-                        Directory.CreateDirectory(_logDirectory);
+                    if (!Directory.Exists(LogDirectory)) {
+                        Directory.CreateDirectory(LogDirectory);
                     }
 
                     var logFileName = $"log_{DateTime.Now:yyyyMM}.csv";
-                    var logFilePath = Path.Combine(_logDirectory, logFileName);
+                    var logFilePath = Path.Combine(LogDirectory, logFileName);
 
                     var logEntry = $"\"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\",{string.Join(",", message.Select(m => $"\"{m.Replace("\"", "\"\"").Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ")}\""))}";
 

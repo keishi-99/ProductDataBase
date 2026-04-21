@@ -54,7 +54,7 @@ namespace ProductDatabase.Excel {
                     FileName = $"{config.FileName} のコピー{productNumber}{config.FileExtension}",
                     Title = "保存先を選択してください",
                     InitialDirectory = string.IsNullOrWhiteSpace(config.SaveDirectory)
-                        ? Environment.CurrentDirectory
+                        ? AppDomain.CurrentDomain.BaseDirectory
                         : config.SaveDirectory
                 };
                 return saveFileDialog.ShowDialog() == DialogResult.OK
@@ -92,7 +92,7 @@ namespace ProductDatabase.Excel {
         // 設定Excelワークブックを読み込む
         private static XLWorkbook LoadConfigWorkbook() {
             try {
-                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsm");
+                var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "ConfigReport.xlsm");
 
                 if (!File.Exists(configPath)) {
                     throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");

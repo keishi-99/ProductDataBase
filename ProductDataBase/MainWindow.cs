@@ -1,6 +1,7 @@
 ﻿using ProductDatabase.Common;
 using ProductDatabase.Data;
 using ProductDatabase.History;
+using ProductDatabase.LogViewer;
 using ProductDatabase.Models;
 using ProductDatabase.Services;
 using System.Data;
@@ -14,7 +15,7 @@ namespace ProductDatabase {
 
         private BarcodeService? _barcodeService;
 
-        readonly string _jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "General", "appsettings.json");
+        readonly string _jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config", "General", "appsettings.json");
 
         private readonly ProductRepository _productRepository;
 
@@ -520,19 +521,19 @@ namespace ProductDatabase {
         private void MainWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void ReloadToolStripMenuItem_Click(object sender, EventArgs e) { LoadEvents(); }
         private void ConfigReportToolStripMenuItem_Click(object sender, EventArgs e) {
-            var reportConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsm");
+            var reportConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "ConfigReport.xlsm");
             ExcelLauncher.Open(reportConfigPath);
         }
         private void ConfigListToolStripMenuItem_Click(object sender, EventArgs e) {
-            var listConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsm");
+            var listConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "ConfigList.xlsm");
             ExcelLauncher.Open(listConfigPath);
         }
         private void ConfigCheckSheetToolStripMenuItem_Click(object sender, EventArgs e) {
-            var checkSheetConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
+            var checkSheetConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
             ExcelLauncher.Open(checkSheetConfigPath);
         }
         private void ConfigSubstrateInformationToolStripMenuItem_Click(object sender, EventArgs e) {
-            var checkSheetConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsm");
+            var checkSheetConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsm");
             ExcelLauncher.Open(checkSheetConfigPath);
         }
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { Close(); }
@@ -553,6 +554,11 @@ namespace ProductDatabase {
         }
         private void QRCodeButton_Click(object sender, EventArgs e) { CodeScan(); }
         private void QRCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
+
+        private void LogViewerToolStripMenuItem_Click(object sender, EventArgs e) {
+            using var window = new LogViewerWindow(_appSettings);
+            window.ShowDialog(this);
+        }
 
         // マスター管理画面を管理者専用ダイアログで開く
         private void MasterManagementToolStripMenuItem_Click(object sender, EventArgs e) {

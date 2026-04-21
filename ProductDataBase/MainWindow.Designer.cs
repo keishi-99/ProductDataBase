@@ -29,6 +29,8 @@
             this.ReloadToolStripMenuItem = new ToolStripMenuItem();
             this.終了ToolStripMenuItem = new ToolStripMenuItem();
             this.設定ToolStripMenuItem = new ToolStripMenuItem();
+            this.ログToolStripMenuItem = new ToolStripMenuItem();
+            this.LogViewerToolStripMenuItem = new ToolStripMenuItem();
             this.ConfigReportToolStripMenuItem = new ToolStripMenuItem();
             this.ConfigListToolStripMenuItem = new ToolStripMenuItem();
             this.ConfigCheckSheetToolStripMenuItem = new ToolStripMenuItem();
@@ -67,7 +69,7 @@
             // 
             // MainWindowMenuStrip
             // 
-            this.MainWindowMenuStrip.Items.AddRange(new ToolStripItem[] { this.ファイルToolStripMenuItem, this.設定ToolStripMenuItem });
+            this.MainWindowMenuStrip.Items.AddRange(new ToolStripItem[] { this.ファイルToolStripMenuItem, this.設定ToolStripMenuItem, this.ログToolStripMenuItem });
             this.MainWindowMenuStrip.Location = new Point(0, 0);
             this.MainWindowMenuStrip.Name = "MainWindowMenuStrip";
             this.MainWindowMenuStrip.Size = new Size(880, 24);
@@ -136,9 +138,23 @@
             this.MasterManagementToolStripMenuItem.Size = new Size(180, 22);
             this.MasterManagementToolStripMenuItem.Text = "マスター管理";
             this.MasterManagementToolStripMenuItem.Click += this.MasterManagementToolStripMenuItem_Click;
-            // 
+            //
+            // ログToolStripMenuItem
+            //
+            this.ログToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.LogViewerToolStripMenuItem });
+            this.ログToolStripMenuItem.Name = "ログToolStripMenuItem";
+            this.ログToolStripMenuItem.Size = new Size(37, 20);
+            this.ログToolStripMenuItem.Text = "ログ";
+            //
+            // LogViewerToolStripMenuItem
+            //
+            this.LogViewerToolStripMenuItem.Name = "LogViewerToolStripMenuItem";
+            this.LogViewerToolStripMenuItem.Size = new Size(132, 22);
+            this.LogViewerToolStripMenuItem.Text = "ログ閲覧";
+            this.LogViewerToolStripMenuItem.Click += this.LogViewerToolStripMenuItem_Click;
+            //
             // CategoryRadioButton1
-            // 
+            //
             this.CategoryRadioButton1.Appearance = Appearance.Button;
             this.CategoryRadioButton1.Location = new Point(42, 47);
             this.CategoryRadioButton1.Name = "CategoryRadioButton1";
@@ -475,5 +491,7 @@
         private ToolStripMenuItem ConfigCheckSheetToolStripMenuItem;
         private ToolStripMenuItem ConfigSubstrateInformationToolStripMenuItem;
         private ToolStripMenuItem MasterManagementToolStripMenuItem;
+        private ToolStripMenuItem ログToolStripMenuItem;
+        private ToolStripMenuItem LogViewerToolStripMenuItem;
     }
 }

@@ -15,7 +15,7 @@ namespace ProductDatabase.Excel {
         // 設定Excelワークブックを読み込む
         private static XLWorkbook LoadConfigWorkbook() {
             try {
-                var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsm");
+                var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsm");
 
                 if (!File.Exists(configPath)) {
                     throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");

@@ -102,7 +102,7 @@ namespace ProductDatabase {
         private void LoadSettings() {
             try {
                 ProductPrintSettings = new DocumentPrintSettings();
-                PrintSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", _productMaster.CategoryName, _productMaster.ProductName, $"PrintConfig_{_productMaster.ProductName}_{_productMaster.ProductID}_{_productMaster.ProductModel}.json");
+                PrintSettingPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "Product", _productMaster.CategoryName, _productMaster.ProductName, $"PrintConfig_{_productMaster.ProductName}_{_productMaster.ProductID}_{_productMaster.ProductModel}.json");
                 if (!File.Exists(PrintSettingPath)) { throw new DirectoryNotFoundException($"ラベル印刷用設定ファイルがありません。"); }
                 var jsonString = File.ReadAllText(PrintSettingPath);
                 ProductPrintSettings = System.Text.Json.JsonSerializer.Deserialize<DocumentPrintSettings>(jsonString) ?? new DocumentPrintSettings();
