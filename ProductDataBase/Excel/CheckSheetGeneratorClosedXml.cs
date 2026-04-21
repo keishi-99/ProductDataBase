@@ -27,7 +27,7 @@ namespace ProductDatabase.Excel {
         // その他の例外は呼び出し元に伝播する
         public static (CheckSheetConfigData configData, string temperature, string humidity)?
             PrepareCheckSheet(ProductMaster productMaster) {
-            var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
+            var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
 
             if (!File.Exists(configPath)) {
                 throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
@@ -55,8 +55,8 @@ namespace ProductDatabase.Excel {
             CheckSheetConfigData excelData,
             string temperature,
             string humidity) {
-            var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
-            var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsm");
+            var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
+            var temporarilyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "temporarilyCheckSheet.xlsm");
 
             var formattedDate = FormatDate(productRegisterWork.RegDate, excelData.DateFormat);
 

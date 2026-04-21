@@ -28,7 +28,7 @@ namespace ProductDatabase.Excel {
 
         // リストを生成するメインメソッド（例外は呼び出し元に伝播する）
         public static void GenerateList(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
-            var configPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsm");
+            var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "ConfigList.xlsm");
             if (!File.Exists(configPath)) {
                 throw new FileNotFoundException($"設定ファイルが見つかりません: {configPath}");
             }
@@ -50,7 +50,7 @@ namespace ProductDatabase.Excel {
                 GenerateAndEmbedQrCode(targetSheet, productMaster, productRegisterWork, productCellRanges.QrCodeRange);
             }
 
-            var temporarilyPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "temporarilyList.xlsm");
+            var temporarilyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "temporarilyList.xlsm");
             SaveAndPrintExcel(workBook, temporarilyPath, targetSheetName);
         }
 

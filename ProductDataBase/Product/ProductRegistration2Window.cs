@@ -258,7 +258,7 @@ namespace ProductDatabase {
         private void LoadSettings() {
             try {
                 ProductPrintSettings = new DocumentPrintSettings();
-                PrintSettingPath = Path.Combine(Environment.CurrentDirectory, "config", "Product", _productMaster.CategoryName, _productMaster.ProductName, $"PrintConfig_{_productMaster.ProductName}_{_productMaster.ProductID}_{_productMaster.ProductModel}.json");
+                PrintSettingPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "Product", _productMaster.CategoryName, _productMaster.ProductName, $"PrintConfig_{_productMaster.ProductName}_{_productMaster.ProductID}_{_productMaster.ProductModel}.json");
                 if (!File.Exists(PrintSettingPath)) {
                     throw new DirectoryNotFoundException($"印刷用設定ファイルがありません。");
                 }

@@ -15,7 +15,7 @@ namespace ProductDatabase {
 
         private BarcodeService? _barcodeService;
 
-        readonly string _jsonFilePath = Path.Combine(Environment.CurrentDirectory, "Config", "General", "appsettings.json");
+        readonly string _jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config", "General", "appsettings.json");
 
         private readonly ProductRepository _productRepository;
 
@@ -521,19 +521,19 @@ namespace ProductDatabase {
         private void MainWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void ReloadToolStripMenuItem_Click(object sender, EventArgs e) { LoadEvents(); }
         private void ConfigReportToolStripMenuItem_Click(object sender, EventArgs e) {
-            var reportConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigReport.xlsm");
+            var reportConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "ConfigReport.xlsm");
             ExcelLauncher.Open(reportConfigPath);
         }
         private void ConfigListToolStripMenuItem_Click(object sender, EventArgs e) {
-            var listConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigList.xlsm");
+            var listConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "ConfigList.xlsm");
             ExcelLauncher.Open(listConfigPath);
         }
         private void ConfigCheckSheetToolStripMenuItem_Click(object sender, EventArgs e) {
-            var checkSheetConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
+            var checkSheetConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "ConfigCheckSheet.xlsm");
             ExcelLauncher.Open(checkSheetConfigPath);
         }
         private void ConfigSubstrateInformationToolStripMenuItem_Click(object sender, EventArgs e) {
-            var checkSheetConfigPath = Path.Combine(Environment.CurrentDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsm");
+            var checkSheetConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "General", "Excel", "ConfigSubstrateInformation.xlsm");
             ExcelLauncher.Open(checkSheetConfigPath);
         }
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e) { Close(); }

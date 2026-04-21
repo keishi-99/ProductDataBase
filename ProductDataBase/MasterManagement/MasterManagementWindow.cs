@@ -402,7 +402,7 @@ namespace ProductDatabase.MasterManagement {
 
             // DB保存済みの値からパスを生成するためUIの未保存変更に影響されない
             PrintSettingPath = Path.Combine(
-                Environment.CurrentDirectory, "config", "Product",
+                AppDomain.CurrentDomain.BaseDirectory, "config", "Product",
                 categoryName, productName,
                 $"PrintConfig_{productName}_{productId}_{productModel}.json");
 

@@ -1,8 +1,8 @@
 namespace ProductDatabase.Common {
     // DBファイルのタイムスタンプ付きバックアップ作成と古いバックアップの自動削除を管理するクラス
     internal static class BackupManager {
-        private static readonly string _backupDirectory = Path.Combine(Environment.CurrentDirectory, "db", "backup");
-        private static readonly string _originalFilePath = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
+        private static readonly string _backupDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db", "backup");
+        private static readonly string _originalFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db", "ProductRegistry.db");
         private static readonly int _maxBackupFiles = 20;
         private static readonly object _lockObject = new();
 
@@ -58,7 +58,7 @@ namespace ProductDatabase.Common {
 
             var backupFolder = Path.Combine(FileUtils.BackupPath, "db", "backup", $"{year}", $"{month:00}");
             var backupFile = Path.Combine(backupFolder, $"_bak_{year}-{month:00}-{day:00}.db");
-            var productRegistryFile = Path.Combine(Environment.CurrentDirectory, "db", "ProductRegistry.db");
+            var productRegistryFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db", "ProductRegistry.db");
 
             if (!File.Exists(backupFile)) {
                 Directory.CreateDirectory(backupFolder);
