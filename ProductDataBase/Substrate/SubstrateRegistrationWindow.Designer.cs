@@ -304,7 +304,6 @@
             this.ExtraCheckBox7.TabStop = false;
             this.ExtraCheckBox7.Text = "予備";
             this.ExtraCheckBox7.UseVisualStyleBackColor = true;
-            this.ExtraCheckBox7.Visible = false;
             this.ExtraCheckBox7.CheckedChanged += this.CheckBoxChecked;
             // 
             // ExtraTextBox1
