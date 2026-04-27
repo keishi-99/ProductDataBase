@@ -60,6 +60,7 @@ namespace ProductDatabase {
                         for (var i = 0; i < _productMaster.UseSubstrates.Count; i++) {
                             var substrateName = _productMaster.UseSubstrates[i].SubstrateName;
                             var substrateModel = _productMaster.UseSubstrates[i].SubstrateModel;
+                            var substrateId = _productMaster.UseSubstrates[i].SubstrateID;
                             var quantity = _productRegisterWork.Quantity;
                             var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
                             var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
@@ -86,7 +87,7 @@ namespace ProductDatabase {
                                 }
                             }
                             var list = SubstrateChangeRepository.GetSubstrateStock(
-                                _productRegisterWork.RowID, substrateModel);
+                                _productRegisterWork.RowID, substrateId);
 
                             var j = 0;
 
