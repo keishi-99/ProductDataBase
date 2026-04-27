@@ -1,0 +1,18 @@
+namespace ProductWebViewer.Models {
+    public class SubstrateRecord {
+        public long Id { get; set; }
+        public long SubstrateID { get; set; }
+        public string? CategoryName { get; set; }
+        public string? ProductName { get; set; }
+        public string? SubstrateName { get; set; }
+        public string? SubstrateModel { get; set; }
+        public string? OrderNumber { get; set; }
+        public string? SubstrateNumber { get; set; }
+        public long? Increase { get; set; }
+        public long? Decrease { get; set; }
+        public long? Defect { get; set; }
+        public string? Person { get; set; }
+        public string? RegDate { get; set; }
+        public string? Comment { get; set; }
+    }
+}
