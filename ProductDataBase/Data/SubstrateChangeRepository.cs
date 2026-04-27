@@ -9,7 +9,7 @@ namespace ProductDatabase.Data {
     internal static class SubstrateChangeRepository {
 
         // 基板在庫と使用済み数量を結合して返す（SubstrateChange2 LoadEvents用）
-        public static IEnumerable<SubstrateStockRow> GetSubstrateStock(long rowId, string substrateModel) {
+        public static IEnumerable<SubstrateStockRow> GetSubstrateStock(long rowId, long substrateId) {
             using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
 
             var sql =
@@ -22,7 +22,7 @@ namespace ProductDatabase.Data {
                     FROM
                         {Constants.VSubstrateTableName}
                     WHERE
-                        SubstrateModel = @SubstrateModel
+                        SubstrateID = @SubstrateID
                         AND UseID = @ID
                         AND SubstrateNumber IS NOT NULL
                         AND IsDeleted = 0
@@ -40,7 +40,7 @@ namespace ProductDatabase.Data {
                     FROM
                         {Constants.VSubstrateTableName}
                     WHERE
-                        SubstrateModel = @SubstrateModel
+                        SubstrateID = @SubstrateID
                         AND SubstrateNumber IS NOT NULL
                         AND IsDeleted = 0
                     GROUP BY
@@ -66,7 +66,7 @@ namespace ProductDatabase.Data {
                     s.SubstrateNumber;
                 """;
 
-            return con.Query<SubstrateStockRow>(sql, new { ID = rowId, SubstrateModel = substrateModel });
+            return con.Query<SubstrateStockRow>(sql, new { ID = rowId, SubstrateID = substrateId });
         }
 
         // 基板番号に紐づく基板IDと注文番号を取得する（Registration UPDATE/INSERT 前の情報取得用）
