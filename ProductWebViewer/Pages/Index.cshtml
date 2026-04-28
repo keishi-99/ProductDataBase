@@ -198,11 +198,11 @@ function showRowDetail(btn) {
         if (label !== 'コメント') cell.style.whiteSpace = 'nowrap';
         cell.textContent = value;
     });
-    new bootstrap.Modal(document.getElementById('rowDetailModal')).show();
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('rowDetailModal')).show();
 }
 
 function showUsedSubstrates(id) {
-    var modal = new bootstrap.Modal(document.getElementById('usedSubModal'));
+    var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('usedSubModal'));
     var tbody = document.getElementById('usedSubBody');
     var title = document.getElementById('usedSubModalLabel');
     title.textContent = '使用基板 (製品登録ID: ' + id + ')';
