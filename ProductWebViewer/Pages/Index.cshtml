@@ -185,7 +185,7 @@ function showRowDetail(btn) {
     var body  = document.getElementById('rowDetailBody');
     body.innerHTML = '';
     ths.forEach(function (th, i) {
-        var label = th.dataset.label !== undefined ? th.dataset.label : th.textContent.trim();
+        var label = th.dataset.label !== undefined ? th.dataset.label : (th.textContent || '').replace(/[▲▼⇅]/g, '').trim();
         if (!label) return;
         var value  = tds[i] ? tds[i].textContent.trim() : '';
         var row    = body.insertRow();
@@ -337,11 +337,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('form').forEach(function (f) {
         f.addEventListener('submit', showProgressBar);
     });
-    var _origSubmit = HTMLFormElement.prototype.submit;
-    HTMLFormElement.prototype.submit = function () {
-        showProgressBar();
-        _origSubmit.call(this);
-    };
     document.querySelectorAll('a').forEach(function (a) {
         var href = a.getAttribute('href');
         if (href && !href.startsWith('#')) {
