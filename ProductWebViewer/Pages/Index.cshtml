@@ -182,15 +182,22 @@ function showRowDetail(btn) {
     var table = tr.closest('table');
     var ths   = Array.from(table.querySelectorAll('thead th'));
     var tds   = Array.from(tr.querySelectorAll('td'));
-    var rows  = '';
+    var body  = document.getElementById('rowDetailBody');
+    body.innerHTML = '';
     ths.forEach(function (th, i) {
         var label = th.dataset.label !== undefined ? th.dataset.label : th.textContent.trim();
         if (!label) return;
-        var value   = tds[i] ? tds[i].textContent.trim() : '';
-        var tdStyle = label === 'コメント' ? '' : ' style="white-space: nowrap"';
-        rows += '<tr><th class="text-muted fw-normal small" style="width:20%">' + label + '</th><td' + tdStyle + '>' + value + '</td></tr>';
+        var value  = tds[i] ? tds[i].textContent.trim() : '';
+        var row    = body.insertRow();
+        var header = document.createElement('th');
+        header.className = 'text-muted fw-normal small';
+        header.style.width = '20%';
+        header.textContent = label;
+        row.appendChild(header);
+        var cell = row.insertCell();
+        if (label !== 'コメント') cell.style.whiteSpace = 'nowrap';
+        cell.textContent = value;
     });
-    document.getElementById('rowDetailBody').innerHTML = rows;
     new bootstrap.Modal(document.getElementById('rowDetailModal')).show();
 }
 

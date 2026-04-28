@@ -223,9 +223,9 @@ namespace ProductWebViewer.Data {
             if (!string.IsNullOrWhiteSpace(orderNumber))
                 conditions.Add("v.OrderNumber LIKE '%' || @OrderNumber || '%'");
             if (!string.IsNullOrWhiteSpace(regDateFrom))
-                conditions.Add("REPLACE(v.RegDate, '/', '-') >= @RegDateFrom");
+                conditions.Add("v.RegDate >= @RegDateFrom");
             if (!string.IsNullOrWhiteSpace(regDateTo))
-                conditions.Add("REPLACE(v.RegDate, '/', '-') <= @RegDateTo");
+                conditions.Add("v.RegDate <= @RegDateTo");
 
             return (string.Join(" AND ", conditions), new {
                 ListCategory    = listCategory,
@@ -233,8 +233,8 @@ namespace ProductWebViewer.Data {
                 ListProductType = listProductType,
                 ProductName     = productName,
                 OrderNumber     = orderNumber,
-                RegDateFrom     = regDateFrom,
-                RegDateTo       = regDateTo
+                RegDateFrom     = regDateFrom?.Replace('-', '/'),
+                RegDateTo       = regDateTo?.Replace('-', '/')
             });
         }
 

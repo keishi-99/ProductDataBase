@@ -230,9 +230,9 @@ namespace ProductWebViewer.Data {
             if (!string.IsNullOrWhiteSpace(orderNumber))
                 conditions.Add("s.OrderNumber LIKE '%' || @OrderNumber || '%'");
             if (!string.IsNullOrWhiteSpace(regDateFrom))
-                conditions.Add("REPLACE(s.RegDate, '/', '-') >= @RegDateFrom");
+                conditions.Add("s.RegDate >= @RegDateFrom");
             if (!string.IsNullOrWhiteSpace(regDateTo))
-                conditions.Add("REPLACE(s.RegDate, '/', '-') <= @RegDateTo");
+                conditions.Add("s.RegDate <= @RegDateTo");
 
             return (string.Join(" AND ", conditions), new {
                 ListCategory      = listCategory,
@@ -240,8 +240,8 @@ namespace ProductWebViewer.Data {
                 ListSubstrateName = listSubstrateName,
                 SubstrateName     = substrateName,
                 OrderNumber       = orderNumber,
-                RegDateFrom       = regDateFrom,
-                RegDateTo         = regDateTo
+                RegDateFrom       = regDateFrom?.Replace('-', '/'),
+                RegDateTo         = regDateTo?.Replace('-', '/')
             });
         }
 
