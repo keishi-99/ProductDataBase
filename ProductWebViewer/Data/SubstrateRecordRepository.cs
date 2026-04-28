@@ -3,9 +3,7 @@ using Microsoft.Data.Sqlite;
 using ProductWebViewer.Models;
 
 namespace ProductWebViewer.Data {
-    public class SubstrateRecordRepository {
-        private readonly string _connectionString;
-
+    public class SubstrateRecordRepository : RepositoryBase {
         private static readonly Dictionary<string, string> _substrateSortCols = new(StringComparer.OrdinalIgnoreCase) {
             ["ID"]             = "s.ID",
             ["CategoryName"]   = "m.CategoryName",
@@ -32,24 +30,7 @@ namespace ProductWebViewer.Data {
             ["Stock"]          = "Stock",
         };
 
-        public SubstrateRecordRepository(IConfiguration configuration) {
-            var dbPath = configuration["DatabasePath"]
-                ?? throw new InvalidOperationException("DatabasePath が appsettings.json に設定されていません。");
-
-            var fullPath = Path.IsPathRooted(dbPath)
-                ? dbPath
-                : Path.Combine(AppContext.BaseDirectory, dbPath);
-
-            if (!File.Exists(fullPath)) {
-                throw new FileNotFoundException($"DB ファイルが見つかりません: {fullPath}");
-            }
-
-            _connectionString = new SqliteConnectionStringBuilder {
-                DataSource = fullPath,
-                Mode = SqliteOpenMode.ReadOnly,
-                Pooling = false
-            }.ToString();
-        }
+        public SubstrateRecordRepository(IConfiguration configuration) : base(configuration) { }
 
         public IReadOnlyList<string> GetCategoryList() {
             using var con = new SqliteConnection(_connectionString);
@@ -263,12 +244,5 @@ namespace ProductWebViewer.Data {
             });
         }
 
-        private static string BuildOrderBy(Dictionary<string, string> cols, string sortCol, string sortDir, string defaultOrder) =>
-            cols.TryGetValue(sortCol ?? "", out var col)
-                ? $"{col} {(sortDir == "asc" ? "ASC" : "DESC")}"
-                : defaultOrder;
-
-        private static string BuildLimitOffset(int pageSize, int page) =>
-            pageSize > 0 ? $"LIMIT {pageSize} OFFSET {(page - 1) * pageSize}" : "";
     }
 }

@@ -155,8 +155,11 @@ public class IndexModel : PageModel {
     }
 
     private void ClampPage() {
-        if (PageNum < 1) PageNum = 1;
-        if (PageSize > 0 && TotalCount > 0) {
+        if (PageNum < 1 || TotalCount == 0) {
+            PageNum = 1;
+            return;
+        }
+        if (PageSize > 0) {
             var totalPages = (int)Math.Ceiling((double)TotalCount / PageSize);
             if (PageNum > totalPages) PageNum = totalPages;
         }
