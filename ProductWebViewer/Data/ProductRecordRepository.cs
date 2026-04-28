@@ -6,6 +6,36 @@ namespace ProductWebViewer.Data {
     public class ProductRecordRepository {
         private readonly string _connectionString;
 
+        private static readonly Dictionary<string, string> _productSortCols = new(StringComparer.OrdinalIgnoreCase) {
+            ["ID"]           = "v.ID",
+            ["CategoryName"] = "p.CategoryName",
+            ["ProductName"]  = "v.ProductName",
+            ["ProductModel"] = "v.ProductModel",
+            ["ProductType"]  = "v.ProductType",
+            ["OrderNumber"]  = "v.OrderNumber",
+            ["ProductNumber"]= "v.ProductNumber",
+            ["OLesNumber"]   = "v.OLesNumber",
+            ["Quantity"]     = "v.Quantity",
+            ["Person"]       = "v.Person",
+            ["RegDate"]      = "v.RegDate",
+            ["Revision"]     = "v.Revision",
+            ["SerialFirst"]  = "v.SerialFirst",
+            ["SerialLast"]   = "v.SerialLast",
+            ["Comment"]      = "v.Comment",
+        };
+
+        private static readonly Dictionary<string, string> _serialSortCols = new(StringComparer.OrdinalIgnoreCase) {
+            ["RowId"]        = "s.rowid",
+            ["Serial"]       = "s.Serial",
+            ["OLesSerial"]   = "s.OLesSerial",
+            ["OrderNumber"]  = "p.OrderNumber",
+            ["ProductNumber"]= "p.ProductNumber",
+            ["ProductName"]  = "s.ProductName",
+            ["ProductType"]  = "p.ProductType",
+            ["ProductModel"] = "p.ProductModel",
+            ["RegDate"]      = "p.RegDate",
+        };
+
         public ProductRecordRepository(IConfiguration configuration) {
             var dbPath = configuration["DatabasePath"]
                 ?? throw new InvalidOperationException("DatabasePath が appsettings.json に設定されていません。");
@@ -51,74 +81,44 @@ namespace ProductWebViewer.Data {
             return con.Query<string>(sql, new { Category = category, ProductName = productName }).AsList();
         }
 
-        public IReadOnlyList<SerialRecord> GetSerialHistory(
+        public int GetCount(
+            string? listCategory   = null,
             string? listProductName = null,
             string? listProductType = null,
-            string? serial = null) {
+            string? productName    = null,
+            string? orderNumber    = null,
+            string? regDateFrom    = null,
+            string? regDateTo      = null) {
 
             using var con = new SqliteConnection(_connectionString);
-
-            var conditions = new List<string> { "1=1" };
-            if (!string.IsNullOrWhiteSpace(listProductName))
-                conditions.Add("s.ProductName = @ListProductName");
-            if (!string.IsNullOrWhiteSpace(listProductType))
-                conditions.Add("(p.ProductType = @ListProductType OR p.ProductType IS NULL)");
-            if (!string.IsNullOrWhiteSpace(serial))
-                conditions.Add("s.Serial LIKE '%' || @Serial || '%'");
-
-            var sql = $"""
-                SELECT
-                    s.rowid AS RowId,
-                    s.Serial,
-                    s.OLesSerial,
-                    p.OrderNumber,
-                    p.ProductNumber,
-                    s.ProductName,
-                    p.ProductType,
-                    p.ProductModel,
-                    p.RegDate
-                FROM T_Serial AS s
-                LEFT JOIN V_Product AS p ON s.UsedID = p.ID
-                WHERE {string.Join(" AND ", conditions)}
-                ORDER BY s.rowid DESC
-                LIMIT 500
-                """;
-
-            return con.Query<SerialRecord>(sql, new {
-                ListProductName = listProductName,
-                ListProductType = listProductType,
-                Serial = serial
-            }).AsList();
+            var (where, param) = BuildProductWhere(listCategory, listProductName, listProductType, productName, orderNumber, regDateFrom, regDateTo);
+            return con.ExecuteScalar<int>($"""
+                SELECT COUNT(*)
+                FROM V_Product AS v
+                LEFT JOIN M_ProductDef AS p ON v.ProductID = p.ProductID
+                WHERE {where}
+                """, param);
         }
 
         public IReadOnlyList<ProductRecord> GetAll(
-            string? listCategory = null,
+            string? listCategory   = null,
             string? listProductName = null,
             string? listProductType = null,
-            string? productName = null,
-            string? orderNumber = null,
-            string? regDateFrom = null,
-            string? regDateTo = null) {
+            string? productName    = null,
+            string? orderNumber    = null,
+            string? regDateFrom    = null,
+            string? regDateTo      = null,
+            string  sortCol  = "",
+            string  sortDir  = "desc",
+            int     page     = 1,
+            int     pageSize = 100) {
 
             using var con = new SqliteConnection(_connectionString);
+            var (where, param) = BuildProductWhere(listCategory, listProductName, listProductType, productName, orderNumber, regDateFrom, regDateTo);
+            var orderBy     = BuildOrderBy(_productSortCols, sortCol, sortDir, "v.ID DESC");
+            var limitOffset = BuildLimitOffset(pageSize, page);
 
-            var conditions = new List<string> { "v.IsDeleted = 0" };
-            if (!string.IsNullOrWhiteSpace(listCategory))
-                conditions.Add("p.CategoryName = @ListCategory");
-            if (!string.IsNullOrWhiteSpace(listProductName))
-                conditions.Add("v.ProductName = @ListProductName");
-            if (!string.IsNullOrWhiteSpace(listProductType))
-                conditions.Add("v.ProductType = @ListProductType");
-            if (!string.IsNullOrWhiteSpace(productName))
-                conditions.Add("v.ProductName LIKE '%' || @ProductName || '%'");
-            if (!string.IsNullOrWhiteSpace(orderNumber))
-                conditions.Add("v.OrderNumber LIKE '%' || @OrderNumber || '%'");
-            if (!string.IsNullOrWhiteSpace(regDateFrom))
-                conditions.Add("v.RegDate >= @RegDateFrom");
-            if (!string.IsNullOrWhiteSpace(regDateTo))
-                conditions.Add("v.RegDate <= @RegDateTo");
-
-            var sql = $"""
+            return con.Query<ProductRecord>($"""
                 SELECT
                     v.ID,
                     v.ProductID,
@@ -138,20 +138,130 @@ namespace ProductWebViewer.Data {
                     v.Comment
                 FROM V_Product AS v
                 LEFT JOIN M_ProductDef AS p ON v.ProductID = p.ProductID
-                WHERE {string.Join(" AND ", conditions)}
-                ORDER BY v.ID DESC
-                LIMIT 500
-                """;
+                WHERE {where}
+                ORDER BY {orderBy}
+                {limitOffset}
+                """, param).AsList();
+        }
 
-            return con.Query<ProductRecord>(sql, new {
-                ListCategory = listCategory,
+        public int GetSerialCount(
+            string? listProductName = null,
+            string? listProductType = null,
+            string? serial          = null) {
+
+            using var con = new SqliteConnection(_connectionString);
+            var (where, param) = BuildSerialWhere(listProductName, listProductType, serial);
+            return con.ExecuteScalar<int>($"""
+                SELECT COUNT(*)
+                FROM T_Serial AS s
+                LEFT JOIN V_Product AS p ON s.UsedID = p.ID
+                WHERE {where}
+                """, param);
+        }
+
+        public IReadOnlyList<SerialRecord> GetSerialHistory(
+            string? listProductName = null,
+            string? listProductType = null,
+            string? serial          = null,
+            string  sortCol  = "",
+            string  sortDir  = "desc",
+            int     page     = 1,
+            int     pageSize = 100) {
+
+            using var con = new SqliteConnection(_connectionString);
+            var (where, param) = BuildSerialWhere(listProductName, listProductType, serial);
+            var orderBy     = BuildOrderBy(_serialSortCols, sortCol, sortDir, "s.rowid DESC");
+            var limitOffset = BuildLimitOffset(pageSize, page);
+
+            return con.Query<SerialRecord>($"""
+                SELECT
+                    s.rowid AS RowId,
+                    s.Serial,
+                    s.OLesSerial,
+                    p.OrderNumber,
+                    p.ProductNumber,
+                    s.ProductName,
+                    p.ProductType,
+                    p.ProductModel,
+                    p.RegDate
+                FROM T_Serial AS s
+                LEFT JOIN V_Product AS p ON s.UsedID = p.ID
+                WHERE {where}
+                ORDER BY {orderBy}
+                {limitOffset}
+                """, param).AsList();
+        }
+
+        public IReadOnlyList<UsedSubstrateRecord> GetUsedSubstrates(long id) {
+            using var con = new SqliteConnection(_connectionString);
+            return con.Query<UsedSubstrateRecord>("""
+                SELECT
+                    ID,
+                    SubstrateName,
+                    SubstrateModel,
+                    SubstrateNumber,
+                    Decrease
+                FROM V_Substrate
+                WHERE UseID = @ID
+                ORDER BY SubstrateModel ASC
+                """, new { ID = id }).AsList();
+        }
+
+        private static (string where, object param) BuildProductWhere(
+            string? listCategory, string? listProductName, string? listProductType,
+            string? productName, string? orderNumber, string? regDateFrom, string? regDateTo) {
+
+            var conditions = new List<string> { "v.IsDeleted = 0" };
+            if (!string.IsNullOrWhiteSpace(listCategory))
+                conditions.Add("p.CategoryName = @ListCategory");
+            if (!string.IsNullOrWhiteSpace(listProductName))
+                conditions.Add("v.ProductName = @ListProductName");
+            if (!string.IsNullOrWhiteSpace(listProductType))
+                conditions.Add("v.ProductType = @ListProductType");
+            if (!string.IsNullOrWhiteSpace(productName))
+                conditions.Add("v.ProductName LIKE '%' || @ProductName || '%'");
+            if (!string.IsNullOrWhiteSpace(orderNumber))
+                conditions.Add("v.OrderNumber LIKE '%' || @OrderNumber || '%'");
+            if (!string.IsNullOrWhiteSpace(regDateFrom))
+                conditions.Add("REPLACE(v.RegDate, '/', '-') >= @RegDateFrom");
+            if (!string.IsNullOrWhiteSpace(regDateTo))
+                conditions.Add("REPLACE(v.RegDate, '/', '-') <= @RegDateTo");
+
+            return (string.Join(" AND ", conditions), new {
+                ListCategory    = listCategory,
                 ListProductName = listProductName,
                 ListProductType = listProductType,
-                ProductName = productName,
-                OrderNumber = orderNumber,
-                RegDateFrom = regDateFrom,
-                RegDateTo = regDateTo
-            }).AsList();
+                ProductName     = productName,
+                OrderNumber     = orderNumber,
+                RegDateFrom     = regDateFrom,
+                RegDateTo       = regDateTo
+            });
         }
+
+        private static (string where, object param) BuildSerialWhere(
+            string? listProductName, string? listProductType, string? serial) {
+
+            var conditions = new List<string> { "1=1" };
+            if (!string.IsNullOrWhiteSpace(listProductName))
+                conditions.Add("s.ProductName = @ListProductName");
+            if (!string.IsNullOrWhiteSpace(listProductType))
+                conditions.Add("(p.ProductType = @ListProductType OR p.ProductType IS NULL)");
+            if (!string.IsNullOrWhiteSpace(serial))
+                conditions.Add("s.Serial LIKE '%' || @Serial || '%'");
+
+            return (string.Join(" AND ", conditions), new {
+                ListProductName = listProductName,
+                ListProductType = listProductType,
+                Serial          = serial
+            });
+        }
+
+        private static string BuildOrderBy(Dictionary<string, string> cols, string sortCol, string sortDir, string defaultOrder) =>
+            cols.TryGetValue(sortCol ?? "", out var col)
+                ? $"{col} {(sortDir == "asc" ? "ASC" : "DESC")}"
+                : defaultOrder;
+
+        private static string BuildLimitOffset(int pageSize, int page) =>
+            pageSize > 0 ? $"LIMIT {pageSize} OFFSET {(page - 1) * pageSize}" : "";
     }
 }
