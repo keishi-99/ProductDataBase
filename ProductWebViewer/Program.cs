@@ -10,15 +10,13 @@ builder.Services.AddSingleton<SubstrateRecordRepository>();
 
 var app = builder.Build();
 
+app.UseHttpsRedirection();
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
     app.UseHsts();
-}
-else
-{
-    app.UseHttpsRedirection();
 }
 
 app.UseRouting();

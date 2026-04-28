@@ -8,10 +8,12 @@ namespace ProductWebViewer.Pages;
 public class IndexModel : PageModel {
     private readonly ProductRecordRepository _productRepo;
     private readonly SubstrateRecordRepository _substrateRepo;
+    private readonly ILogger<IndexModel> _logger;
 
-    public IndexModel(ProductRecordRepository productRepo, SubstrateRecordRepository substrateRepo) {
+    public IndexModel(ProductRecordRepository productRepo, SubstrateRecordRepository substrateRepo, ILogger<IndexModel> logger) {
         _productRepo = productRepo;
         _substrateRepo = substrateRepo;
+        _logger = logger;
     }
 
     [BindProperty(SupportsGet = true)] public string Tab { get; set; } = "product";
@@ -70,7 +72,8 @@ public class IndexModel : PageModel {
             var records = _productRepo.GetUsedSubstrates(id);
             return new JsonResult(records);
         } catch (Exception ex) {
-            return new JsonResult(new { error = ex.Message });
+            _logger.LogError(ex, "使用基板データの取得中にエラーが発生しました。");
+            return new JsonResult(new { error = "データの取得中にエラーが発生しました。" });
         }
     }
 
@@ -132,7 +135,8 @@ public class IndexModel : PageModel {
                 }
             }
         } catch (Exception ex) {
-            ErrorMessage = ex.Message;
+            _logger.LogError(ex, "データの処理中にエラーが発生しました。");
+            ErrorMessage = "データの処理中にエラーが発生しました。";
         }
     }
 

@@ -212,15 +212,15 @@ function showUsedSubstrates(id) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">使用基板なし</td></tr>';
                 return;
             }
-            tbody.innerHTML = data.map(function (r) {
-                return '<tr>'
-                    + '<td>' + (r.id ?? '') + '</td>'
-                    + '<td>' + (r.substrateName ?? '') + '</td>'
-                    + '<td>' + (r.substrateModel ?? '') + '</td>'
-                    + '<td>' + (r.substrateNumber ?? '') + '</td>'
-                    + '<td>' + (r.decrease ?? '') + '</td>'
-                    + '</tr>';
-            }).join('');
+            tbody.innerHTML = '';
+            data.forEach(function (r) {
+                var tr = tbody.insertRow();
+                tr.insertCell().textContent = r.id ?? '';
+                tr.insertCell().textContent = r.substrateName ?? '';
+                tr.insertCell().textContent = r.substrateModel ?? '';
+                tr.insertCell().textContent = r.substrateNumber ?? '';
+                tr.insertCell().textContent = r.decrease ?? '';
+            });
         })
         .catch(function () {
             tbody.innerHTML = '<tr><td colspan="5" class="text-danger">データ取得に失敗しました。</td></tr>';
