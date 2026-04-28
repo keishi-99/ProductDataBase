@@ -12,15 +12,18 @@ namespace ProductWebViewer.Data {
                 ? dbPath
                 : Path.Combine(AppContext.BaseDirectory, dbPath);
 
-            if (!File.Exists(fullPath)) {
-                throw new FileNotFoundException($"DB ファイルが見つかりません: {fullPath}");
-            }
-
             _connectionString = new SqliteConnectionStringBuilder {
                 DataSource = fullPath,
                 Mode = SqliteOpenMode.ReadOnly,
                 Pooling = false
             }.ToString();
+
+            try {
+                using var con = new SqliteConnection(_connectionString);
+                con.Open();
+            } catch (SqliteException ex) {
+                throw new FileNotFoundException($"DB ファイルが見つかりません: {fullPath}", ex);
+            }
         }
 
         protected static string BuildOrderBy(Dictionary<string, string> cols, string sortCol, string sortDir, string defaultOrder) =>
