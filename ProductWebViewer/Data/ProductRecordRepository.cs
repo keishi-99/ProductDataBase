@@ -249,7 +249,7 @@ namespace ProductWebViewer.Data {
         private static (string where, object param) BuildSerialWhere(
             string? listCategory, string? listProductName, string? listProductType, string? productName, string? orderNumber, string? productNumber, string? regDateFrom, string? regDateTo, string? serial) {
 
-            var conditions = new List<string> { "1=1" };
+            var conditions = new List<string> { "p.IsDeleted = 0" };
             if (!string.IsNullOrWhiteSpace(listCategory))
                 conditions.Add("p.CategoryName = @ListCategory");
             if (!string.IsNullOrWhiteSpace(listProductName))
@@ -257,7 +257,7 @@ namespace ProductWebViewer.Data {
             if (!string.IsNullOrWhiteSpace(listProductType))
                 conditions.Add("p.ProductType = @ListProductType");
             if (!string.IsNullOrWhiteSpace(productName))
-                conditions.Add("s.ProductName LIKE '%' || @ProductName || '%'");
+                conditions.Add("p.ProductName LIKE '%' || @ProductName || '%'");
             if (!string.IsNullOrWhiteSpace(orderNumber))
                 conditions.Add("p.OrderNumber LIKE '%' || @OrderNumber || '%'");
             if (!string.IsNullOrWhiteSpace(productNumber))

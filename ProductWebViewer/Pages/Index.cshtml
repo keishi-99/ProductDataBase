@@ -147,6 +147,9 @@
     #page-overlay.show {
         display: flex;
     }
+    #usedSubModal thead th {
+        background-color: var(--bs-tertiary-bg);
+    }
 </style>
 }
 
@@ -715,16 +718,16 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="row g-2 mb-2 align-items-center">
             <div class="col-auto">
                 <input type="search" class="form-control form-control-sm" name="FilterSubstrateName"
-                       value="@Model.FilterSubstrateName" placeholder="基板名（テキスト）" />
+                       style="width: 150px" value="@Model.FilterSubstrateName" placeholder="基板名（テキスト）" />
             </div>
             @if (!(isStock && Model.StockGroup != "detail")) {
                 <div class="col-auto">
                     <input type="search" class="form-control form-control-sm" name="FilterSubstrateOrderNumber"
-                           value="@Model.FilterSubstrateOrderNumber" placeholder="注文番号" />
+                           style="width: 150px" value="@Model.FilterSubstrateOrderNumber" placeholder="注文番号" />
                 </div>
                 <div class="col-auto">
                     <input type="search" class="form-control form-control-sm" name="FilterSubstrateNumber"
-                           value="@Model.FilterSubstrateNumber" placeholder="製造番号" />
+                           style="width: 150px" value="@Model.FilterSubstrateNumber" placeholder="製造番号" />
                 </div>
             }
             @if (!isStock) {
