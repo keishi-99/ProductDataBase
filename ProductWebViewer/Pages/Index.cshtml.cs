@@ -19,6 +19,7 @@ public class IndexModel : PageModel {
     [BindProperty(SupportsGet = true)] public string Tab { get; set; } = "product";
     [BindProperty(SupportsGet = true)] public string SubTab { get; set; } = "records";
     [BindProperty(SupportsGet = true)] public string StockGroup { get; set; } = "model";
+    // 初回表示（未検索）と「0件ヒット」を区別するためのフラグ
     [BindProperty(SupportsGet = true)] public bool HasSearched { get; set; }
 
     // ページネーション・ソート
@@ -148,6 +149,9 @@ public class IndexModel : PageModel {
         }
     }
 
+    // ページネーション番号リストを生成する。
+    // null はページ番号の間に表示する "..." (省略記号) を表す。
+    // 現在ページ±1 の範囲を常に表示し、先頭・末尾は固定で表示する。
     public IEnumerable<int?> GetPageNumbers() {
         if (PageSize <= 0 || TotalCount <= 0) return [];
         var totalPages = (int)Math.Ceiling((double)TotalCount / PageSize);
@@ -162,6 +166,7 @@ public class IndexModel : PageModel {
         return pages;
     }
 
+    // フィルター変更などで総ページ数が減った場合に PageNum を有効範囲内に収める
     private void ClampPage() {
         if (PageNum < 1 || TotalCount == 0) {
             PageNum = 1;

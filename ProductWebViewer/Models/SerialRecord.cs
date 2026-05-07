@@ -1,5 +1,6 @@
 namespace ProductWebViewer.Models {
     public class SerialRecord {
+        // T_Serial テーブルの SQLite 物理 rowid（アプリケーション ID とは別）
         public long RowId { get; set; }
         public string? Serial { get; set; }
         public string? OLesSerial { get; set; }

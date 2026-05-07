@@ -4,6 +4,7 @@ using ProductWebViewer.Models;
 
 namespace ProductWebViewer.Data {
     public class SubstrateRecordRepository : RepositoryBase {
+        // クエリパラメータ名 → 実テーブルの列参照へのホワイトリスト（ORDER BY インジェクション対策）
         private static readonly Dictionary<string, string> _substrateSortCols = new(StringComparer.OrdinalIgnoreCase) {
             ["ID"]             = "s.ID",
             ["CategoryName"]   = "m.CategoryName",
@@ -20,6 +21,7 @@ namespace ProductWebViewer.Data {
             ["Comment"]        = "s.Comment",
         };
 
+        // 在庫一覧用ホワイトリスト（同上）
         private static readonly Dictionary<string, string> _stockSortCols = new(StringComparer.OrdinalIgnoreCase) {
             ["CategoryName"]   = "m.CategoryName",
             ["ProductName"]    = "m.ProductName",
@@ -119,6 +121,7 @@ namespace ProductWebViewer.Data {
                 """, param).AsList();
         }
 
+        // groupByModel=true: 型式単位で集計（ロット違いを合算）、false: ロット・注文番号単位で集計
         public int GetStockCount(
             string? listCategory      = null,
             string? listProductName   = null,
@@ -156,6 +159,7 @@ namespace ProductWebViewer.Data {
             var (where, param) = BuildStockWhere(listCategory, listProductName, listSubstrateName);
             var limitOffset = BuildLimitOffset(pageSize, page);
 
+            // Decrease・Defect は DB に負数で格納されているため、そのまま合算すると在庫数になる
             if (groupByModel) {
                 var orderBy = BuildOrderBy(_stockSortCols, sortCol, sortDir, "s.SubstrateModel ASC");
                 return con.Query<StockRecord>($"""
@@ -221,11 +225,13 @@ namespace ProductWebViewer.Data {
                 ListSubstrateName = listSubstrateName,
                 SubstrateName     = substrateName,
                 OrderNumber       = orderNumber,
+                // SQLite はテキスト型で日付を "yyyy/MM/dd" 形式で保存しているため変換する
                 RegDateFrom       = regDateFrom?.Replace('-', '/'),
                 RegDateTo         = regDateTo?.Replace('-', '/')
             });
         }
 
+        // 在庫は全期間の累積値のためレジストリ日付フィルターは持たない
         private static (string where, object param) BuildStockWhere(
             string? listCategory, string? listProductName, string? listSubstrateName) {
 

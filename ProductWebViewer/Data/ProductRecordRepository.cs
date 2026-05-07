@@ -4,6 +4,7 @@ using ProductWebViewer.Models;
 
 namespace ProductWebViewer.Data {
     public class ProductRecordRepository : RepositoryBase {
+        // クエリパラメータ名 → 実テーブルの列参照へのホワイトリスト（ORDER BY インジェクション対策）
         private static readonly Dictionary<string, string> _productSortCols = new(StringComparer.OrdinalIgnoreCase) {
             ["ID"]           = "v.ID",
             ["CategoryName"] = "p.CategoryName",
@@ -22,6 +23,7 @@ namespace ProductWebViewer.Data {
             ["Comment"]      = "v.Comment",
         };
 
+        // シリアル一覧用ホワイトリスト（同上）
         private static readonly Dictionary<string, string> _serialSortCols = new(StringComparer.OrdinalIgnoreCase) {
             ["RowId"]        = "s.rowid",
             ["Serial"]       = "s.Serial",
@@ -173,6 +175,7 @@ namespace ProductWebViewer.Data {
                 """, param).AsList();
         }
 
+        // UseID は V_Product.ID への外部キー（製品登録1件に紐づく使用基板を返す）
         public IReadOnlyList<UsedSubstrateRecord> GetUsedSubstrates(long id) {
             using var con = new SqliteConnection(_connectionString);
             return con.Query<UsedSubstrateRecord>("""
@@ -214,6 +217,8 @@ namespace ProductWebViewer.Data {
                 ListProductType = listProductType,
                 ProductName     = productName,
                 OrderNumber     = orderNumber,
+                // SQLite はテキスト型で日付を "yyyy/MM/dd" 形式で保存しているため、
+                // HTML date input の "yyyy-MM-dd" 形式から変換する
                 RegDateFrom     = regDateFrom?.Replace('-', '/'),
                 RegDateTo       = regDateTo?.Replace('-', '/')
             });
