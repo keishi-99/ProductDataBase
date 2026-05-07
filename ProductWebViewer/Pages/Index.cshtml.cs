@@ -113,13 +113,13 @@ public class IndexModel : PageModel {
             TotalCount = _productRepo.GetCount(
                 ListProductCategory, ListProductName, ListProductType,
                 FilterProductName, FilterProductOrderNumber,
-                FilterProductNumber, FilterSubstrateNumber,
+                FilterProductNumber,
                 FilterProductRegDateFrom, FilterProductRegDateTo);
             ClampPage();
             ProductRecords = _productRepo.GetAll(
                 ListProductCategory, ListProductName, ListProductType,
                 FilterProductName, FilterProductOrderNumber,
-                FilterProductNumber, FilterSubstrateNumber,
+                FilterProductNumber,
                 FilterProductRegDateFrom, FilterProductRegDateTo,
                 SortCol, SortDir, PageNum, PageSize);
         }
@@ -146,11 +146,13 @@ public class IndexModel : PageModel {
             TotalCount = _substrateRepo.GetCount(
                 ListSubCategory, ListSubProductName, ListSubstrateName,
                 FilterSubstrateName, FilterSubstrateOrderNumber,
+                FilterSubstrateNumber,
                 FilterSubstrateRegDateFrom, FilterSubstrateRegDateTo);
             ClampPage();
             SubstrateRecords = _substrateRepo.GetAll(
                 ListSubCategory, ListSubProductName, ListSubstrateName,
                 FilterSubstrateName, FilterSubstrateOrderNumber,
+                FilterSubstrateNumber,
                 FilterSubstrateRegDateFrom, FilterSubstrateRegDateTo,
                 SortCol, SortDir, PageNum, PageSize);
         }

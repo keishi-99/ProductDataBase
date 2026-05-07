@@ -72,12 +72,11 @@ namespace ProductWebViewer.Data {
             string? productName = null,
             string? orderNumber = null,
             string? productNumber = null,
-            string? substrateNumber = null,
             string? regDateFrom = null,
             string? regDateTo = null) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildProductWhere(listCategory, listProductName, listProductType, productName, orderNumber, productNumber, substrateNumber, regDateFrom, regDateTo);
+            var (where, param) = BuildProductWhere(listCategory, listProductName, listProductType, productName, orderNumber, productNumber, regDateFrom, regDateTo);
             return con.ExecuteScalar<int>($"""
                 SELECT COUNT(*)
                 FROM V_Product AS v
@@ -93,7 +92,6 @@ namespace ProductWebViewer.Data {
             string? productName = null,
             string? orderNumber = null,
             string? productNumber = null,
-            string? substrateNumber = null,
             string? regDateFrom = null,
             string? regDateTo = null,
             string sortCol = "",
@@ -102,7 +100,7 @@ namespace ProductWebViewer.Data {
             int pageSize = 100) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildProductWhere(listCategory, listProductName, listProductType, productName, orderNumber, productNumber, substrateNumber, regDateFrom, regDateTo);
+            var (where, param) = BuildProductWhere(listCategory, listProductName, listProductType, productName, orderNumber, productNumber, regDateFrom, regDateTo);
             var orderBy = BuildOrderBy(_productSortCols, sortCol, sortDir, "v.ID DESC");
             var limitOffset = BuildLimitOffset(pageSize, page);
 
@@ -199,7 +197,7 @@ namespace ProductWebViewer.Data {
 
         private static (string where, object param) BuildProductWhere(
             string? listCategory, string? listProductName, string? listProductType,
-            string? productName, string? orderNumber, string? productNumber, string? substrateNumber, string? regDateFrom, string? regDateTo) {
+            string? productName, string? orderNumber, string? productNumber, string? regDateFrom, string? regDateTo) {
 
             var conditions = new List<string> { "v.IsDeleted = 0" };
             if (!string.IsNullOrWhiteSpace(listCategory))
@@ -214,8 +212,6 @@ namespace ProductWebViewer.Data {
                 conditions.Add("v.OrderNumber LIKE '%' || @OrderNumber || '%'");
             if (!string.IsNullOrWhiteSpace(productNumber))
                 conditions.Add("v.ProductNumber LIKE '%' || @ProductNumber || '%'");
-            if (!string.IsNullOrWhiteSpace(substrateNumber))
-                conditions.Add("v.SubstrateNumber LIKE '%' || @SubstrateNumber || '%'");
             if (!string.IsNullOrWhiteSpace(regDateFrom))
                 conditions.Add("v.RegDate >= @RegDateFrom");
             if (!string.IsNullOrWhiteSpace(regDateTo))
@@ -228,7 +224,6 @@ namespace ProductWebViewer.Data {
                 ProductName = productName,
                 OrderNumber = orderNumber,
                 ProductNumber = productNumber,
-                SubstrateNumber = substrateNumber,
                 // SQLite はテキスト型で日付を "yyyy/MM/dd" 形式で保存しているため、
                 // HTML date input の "yyyy-MM-dd" 形式から変換する
                 RegDateFrom = regDateFrom?.Replace('-', '/'),

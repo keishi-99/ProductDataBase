@@ -67,11 +67,12 @@ namespace ProductWebViewer.Data {
             string? listSubstrateName = null,
             string? substrateName = null,
             string? orderNumber = null,
+            string? substrateNumber = null,
             string? regDateFrom = null,
             string? regDateTo = null) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildSubstrateWhere(listCategory, listProductName, listSubstrateName, substrateName, orderNumber, regDateFrom, regDateTo);
+            var (where, param) = BuildSubstrateWhere(listCategory, listProductName, listSubstrateName, substrateName, orderNumber, substrateNumber, regDateFrom, regDateTo);
             return con.ExecuteScalar<int>($"""
                 SELECT COUNT(*)
                 FROM V_Substrate AS s
@@ -86,6 +87,7 @@ namespace ProductWebViewer.Data {
             string? listSubstrateName = null,
             string? substrateName = null,
             string? orderNumber = null,
+            string? substrateNumber = null,
             string? regDateFrom = null,
             string? regDateTo = null,
             string sortCol = "",
@@ -94,7 +96,7 @@ namespace ProductWebViewer.Data {
             int pageSize = 100) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildSubstrateWhere(listCategory, listProductName, listSubstrateName, substrateName, orderNumber, regDateFrom, regDateTo);
+            var (where, param) = BuildSubstrateWhere(listCategory, listProductName, listSubstrateName, substrateName, orderNumber, substrateNumber, regDateFrom, regDateTo);
             var orderBy = BuildOrderBy(_substrateSortCols, sortCol, sortDir, "s.ID DESC");
             var limitOffset = BuildLimitOffset(pageSize, page);
 
@@ -204,7 +206,7 @@ namespace ProductWebViewer.Data {
 
         private static (string where, object param) BuildSubstrateWhere(
             string? listCategory, string? listProductName, string? listSubstrateName,
-            string? substrateName, string? orderNumber, string? regDateFrom, string? regDateTo) {
+            string? substrateName, string? orderNumber, string? substrateNumber, string? regDateFrom, string? regDateTo) {
 
             var conditions = new List<string> { "s.IsDeleted = 0" };
             if (!string.IsNullOrWhiteSpace(listCategory))
@@ -217,6 +219,8 @@ namespace ProductWebViewer.Data {
                 conditions.Add("s.SubstrateName LIKE '%' || @SubstrateName || '%'");
             if (!string.IsNullOrWhiteSpace(orderNumber))
                 conditions.Add("s.OrderNumber LIKE '%' || @OrderNumber || '%'");
+            if (!string.IsNullOrWhiteSpace(substrateNumber))
+                conditions.Add("s.SubstrateNumber LIKE '%' || @SubstrateNumber || '%'");
             if (!string.IsNullOrWhiteSpace(regDateFrom))
                 conditions.Add("s.RegDate >= @RegDateFrom");
             if (!string.IsNullOrWhiteSpace(regDateTo))
@@ -228,6 +232,7 @@ namespace ProductWebViewer.Data {
                 ListSubstrateName = listSubstrateName,
                 SubstrateName = substrateName,
                 OrderNumber = orderNumber,
+                SubstrateNumber = substrateNumber,
                 // SQLite はテキスト型で日付を "yyyy/MM/dd" 形式で保存しているため変換する
                 RegDateFrom = regDateFrom?.Replace('-', '/'),
                 RegDateTo = regDateTo?.Replace('-', '/')
