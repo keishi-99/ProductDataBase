@@ -23,10 +23,10 @@ public class IndexModel : PageModel {
     [BindProperty(SupportsGet = true)] public bool HasSearched { get; set; }
 
     // ページネーション・ソート
-    [BindProperty(SupportsGet = true)] public int    PageNum  { get; set; } = 1;
-    [BindProperty(SupportsGet = true)] public int    PageSize { get; set; } = 100;
-    [BindProperty(SupportsGet = true)] public string SortCol  { get; set; } = "";
-    [BindProperty(SupportsGet = true)] public string SortDir  { get; set; } = "desc";
+    [BindProperty(SupportsGet = true)] public int PageNum { get; set; } = 1;
+    [BindProperty(SupportsGet = true)] public int PageSize { get; set; } = 100;
+    [BindProperty(SupportsGet = true)] public string SortCol { get; set; } = "";
+    [BindProperty(SupportsGet = true)] public string SortDir { get; set; } = "desc";
 
     // 製品タブ リストボックス選択値
     [BindProperty(SupportsGet = true)] public string? ListProductCategory { get; set; }
@@ -36,6 +36,7 @@ public class IndexModel : PageModel {
     // 製品タブ テキストフィルター
     [BindProperty(SupportsGet = true)] public string? FilterProductName { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterProductOrderNumber { get; set; }
+    [BindProperty(SupportsGet = true)] public string? FilterProductNumber { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterProductRegDateFrom { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterProductRegDateTo { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterSerial { get; set; }
@@ -55,8 +56,10 @@ public class IndexModel : PageModel {
     // 基板タブ テキストフィルター
     [BindProperty(SupportsGet = true)] public string? FilterSubstrateName { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterSubstrateOrderNumber { get; set; }
+    [BindProperty(SupportsGet = true)] public string? FilterSubstrateNumber { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterSubstrateRegDateFrom { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterSubstrateRegDateTo { get; set; }
+    [BindProperty(SupportsGet = true)] public bool ExcludeZeroStock { get; set; }
 
     // 基板タブ データ
     public IReadOnlyList<string> SubCategoryList { get; private set; } = [];
@@ -82,7 +85,8 @@ public class IndexModel : PageModel {
         try {
             if (Tab == "substrate") {
                 LoadSubstrateData();
-            } else {
+            }
+            else {
                 LoadProductData();
             }
         } catch (Exception ex) {
@@ -93,57 +97,77 @@ public class IndexModel : PageModel {
 
     private void LoadProductData() {
         ProductCategoryList = _productRepo.GetCategoryList();
-        ProductNameList     = _productRepo.GetProductNameList(ListProductCategory);
-        ProductTypeList     = _productRepo.GetProductTypeList(ListProductCategory, ListProductName);
+        ProductNameList = _productRepo.GetProductNameList(ListProductCategory);
+        ProductTypeList = _productRepo.GetProductTypeList(ListProductCategory, ListProductName);
 
         if (!HasSearched) return;
 
         if (SubTab == "serial") {
             TotalCount = _productRepo.GetSerialCount(
-                ListProductName, ListProductType, FilterSerial);
+                ListProductCategory, ListProductName,
+                ListProductType, FilterProductName,
+                FilterProductOrderNumber, FilterProductNumber,
+                FilterProductRegDateFrom, FilterProductRegDateTo,
+                FilterSerial);
             ClampPage();
             SerialRecords = _productRepo.GetSerialHistory(
-                ListProductName, ListProductType, FilterSerial,
+                ListProductCategory, ListProductName,
+                ListProductType, FilterProductName,
+                FilterProductOrderNumber, FilterProductNumber,
+                FilterProductRegDateFrom, FilterProductRegDateTo,
+                FilterSerial,
                 SortCol, SortDir, PageNum, PageSize);
-        } else {
+        }
+        else {
             TotalCount = _productRepo.GetCount(
                 ListProductCategory, ListProductName, ListProductType,
                 FilterProductName, FilterProductOrderNumber,
+                FilterProductNumber,
                 FilterProductRegDateFrom, FilterProductRegDateTo);
             ClampPage();
             ProductRecords = _productRepo.GetAll(
                 ListProductCategory, ListProductName, ListProductType,
                 FilterProductName, FilterProductOrderNumber,
+                FilterProductNumber,
                 FilterProductRegDateFrom, FilterProductRegDateTo,
                 SortCol, SortDir, PageNum, PageSize);
         }
     }
 
     private void LoadSubstrateData() {
-        SubCategoryList    = _substrateRepo.GetCategoryList();
+        SubCategoryList = _substrateRepo.GetCategoryList();
         SubProductNameList = _substrateRepo.GetProductNameList(ListSubCategory);
-        SubstrateNameList  = _substrateRepo.GetSubstrateNameList(ListSubCategory, ListSubProductName);
+        SubstrateNameList = _substrateRepo.GetSubstrateNameList(ListSubCategory, ListSubProductName);
 
         if (!HasSearched) return;
 
         if (SubTab == "stock") {
             TotalCount = _substrateRepo.GetStockCount(
                 ListSubCategory, ListSubProductName, ListSubstrateName,
-                groupByModel: StockGroup != "detail");
+                groupByModel: StockGroup != "detail",
+                excludeZeroStock: ExcludeZeroStock,
+                orderNumber: FilterSubstrateOrderNumber,
+                substrateNumber: FilterSubstrateNumber);
             ClampPage();
             StockRecords = _substrateRepo.GetStock(
                 ListSubCategory, ListSubProductName, ListSubstrateName,
                 groupByModel: StockGroup != "detail",
+                excludeZeroStock: ExcludeZeroStock,
+                orderNumber: FilterSubstrateOrderNumber,
+                substrateNumber: FilterSubstrateNumber,
                 SortCol, SortDir, PageNum, PageSize);
-        } else {
+        }
+        else {
             TotalCount = _substrateRepo.GetCount(
                 ListSubCategory, ListSubProductName, ListSubstrateName,
                 FilterSubstrateName, FilterSubstrateOrderNumber,
+                FilterSubstrateNumber,
                 FilterSubstrateRegDateFrom, FilterSubstrateRegDateTo);
             ClampPage();
             SubstrateRecords = _substrateRepo.GetAll(
                 ListSubCategory, ListSubProductName, ListSubstrateName,
                 FilterSubstrateName, FilterSubstrateOrderNumber,
+                FilterSubstrateNumber,
                 FilterSubstrateRegDateFrom, FilterSubstrateRegDateTo,
                 SortCol, SortDir, PageNum, PageSize);
         }

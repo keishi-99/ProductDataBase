@@ -10,5 +10,6 @@ namespace ProductWebViewer.Models {
         public string? ProductType { get; set; }
         public string? ProductModel { get; set; }
         public string? RegDate { get; set; }
+        public string? CreatedAt { get; set; }
     }
 }
