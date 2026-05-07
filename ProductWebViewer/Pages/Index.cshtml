@@ -1,0 +1,854 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "登録実績";
+    var isProduct = Model.Tab != "substrate";
+    var isSerial  = Model.SubTab == "serial";
+    var isStock   = Model.SubTab == "stock";
+
+    string SortIcon(string col) => Model.SortCol == col
+        ? (Model.SortDir == "asc" ? "▲" : "▼") : "⇅";
+    string SortClass(string col) => Model.SortCol == col
+        ? $"sortable sort-{Model.SortDir}" : "sortable";
+
+    var pageNums  = Model.GetPageNumbers();
+    var lastPage  = Model.PageSize > 0 && Model.TotalCount > 0
+        ? (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize) : 1;
+    var dispStart = Model.PageSize > 0 && Model.TotalCount > 0
+        ? (Model.PageNum - 1) * Model.PageSize + 1 : 0;
+    var dispEnd   = Model.PageSize > 0
+        ? Math.Min(Model.PageNum * Model.PageSize, Model.TotalCount) : Model.TotalCount;
+}
+
+@section Styles {
+<style>
+    .resizable-table th {
+        position: relative;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    .resizable-table td {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    .col-resizer {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 5px;
+        height: 100%;
+        cursor: col-resize;
+        user-select: none;
+    }
+    .col-resizer:hover,
+    .col-resizer.resizing {
+        background-color: #0d6efd;
+        opacity: 0.5;
+    }
+    .list-box {
+        height: 150px;
+        overflow: hidden;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 4px;
+    }
+    .list-box select {
+        width: 100%;
+        height: 100%;
+        border: none;
+        font-size: 0.85rem;
+        background: transparent;
+    }
+    .list-box select:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    .btn-used-sub {
+        white-space: nowrap;
+        font-size: 0.75rem;
+        padding: 1px 6px;
+    }
+    .resizable-table.table-hover tbody tr:hover td {
+        background-color: rgba(13, 110, 253, 0.15) !important;
+    }
+    .resizable-table tbody tr.row-selected td {
+        background-color: rgba(13, 110, 253, 0.25) !important;
+    }
+    .resizable-table tbody tr {
+        cursor: pointer;
+    }
+    #rowDetailModal .modal-body {
+        overflow-x: auto;
+    }
+    .table-responsive {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: calc(100vh - 400px);
+    }
+    .resizable-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: var(--bs-tertiary-bg);
+    }
+    .resizable-table thead th.sortable {
+        cursor: pointer;
+        user-select: none;
+    }
+    .resizable-table thead th.sortable:hover {
+        background-color: var(--bs-secondary-bg);
+    }
+    .sort-icon {
+        font-size: 0.7em;
+        margin-left: 4px;
+        opacity: 0.35;
+        pointer-events: none;
+    }
+    th.sort-asc .sort-icon,
+    th.sort-desc .sort-icon {
+        opacity: 1;
+    }
+    #page-progress {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        z-index: 9999;
+        overflow: hidden;
+        background: rgba(13, 110, 253, 0.15);
+    }
+    #page-progress::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 45%;
+        background: linear-gradient(90deg, transparent, #0d6efd, transparent);
+        animation: page-progress-slide 1.1s ease-in-out infinite;
+    }
+    @@keyframes page-progress-slide {
+        0%   { left: -45%; }
+        100% { left: 100%; }
+    }
+</style>
+}
+
+@section Scripts {
+<script>
+function sortBy(col) {
+    var colInput  = document.getElementById('sortColInput');
+    var dirInput  = document.getElementById('sortDirInput');
+    var pageInput = document.getElementById('pageInput');
+    dirInput.value  = (colInput.value === col && dirInput.value === 'asc') ? 'desc' : 'asc';
+    colInput.value  = col;
+    pageInput.value = '1';
+    colInput.form.submit();
+}
+
+function goToPage(p) {
+    var input = document.getElementById('pageInput');
+    input.value = p;
+    input.form.submit();
+}
+
+function onPageSizeChange(sel) {
+    sel.form.querySelector('[name="PageNum"]').value = '1';
+    sel.form.submit();
+}
+
+function switchSubTab(subTab) {
+    var form = document.querySelector('form');
+    document.getElementById('subTabInput').value = subTab;
+    form.querySelector('[name="PageNum"]').value    = '1';
+    form.querySelector('[name="SortCol"]').value = '';
+    form.querySelector('[name="SortDir"]').value = 'desc';
+    form.submit();
+}
+
+function switchStockGroup(group) {
+    var form = document.querySelector('form');
+    document.getElementById('stockGroupInput').value = group;
+    document.getElementById('subTabInput').value     = 'stock';
+    form.querySelector('[name="PageNum"]').value        = '1';
+    form.querySelector('[name="SortCol"]').value     = '';
+    form.querySelector('[name="SortDir"]').value     = 'desc';
+    form.submit();
+}
+
+function showRowDetail(btn) {
+    var tr    = btn.closest('tr');
+    var table = tr.closest('table');
+    var ths   = Array.from(table.querySelectorAll('thead th'));
+    var tds   = Array.from(tr.querySelectorAll('td'));
+    var body  = document.getElementById('rowDetailBody');
+    body.innerHTML = '';
+    ths.forEach(function (th, i) {
+        var label = th.dataset.label !== undefined ? th.dataset.label : (th.textContent || '').replace(/[▲▼⇅]/g, '').trim();
+        if (!label) return;
+        var value  = tds[i] ? tds[i].textContent.trim() : '';
+        var row    = body.insertRow();
+        var header = document.createElement('th');
+        header.className = 'text-muted fw-normal small';
+        header.style.width = '20%';
+        header.textContent = label;
+        row.appendChild(header);
+        var cell = row.insertCell();
+        if (label !== 'コメント') cell.style.whiteSpace = 'nowrap';
+        cell.textContent = value;
+    });
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('rowDetailModal')).show();
+}
+
+function showUsedSubstrates(id) {
+    var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('usedSubModal'));
+    var tbody = document.getElementById('usedSubBody');
+    var title = document.getElementById('usedSubModalLabel');
+    title.textContent = '使用基板 (製品登録ID: ' + id + ')';
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">読み込み中...</td></tr>';
+    modal.show();
+    fetch('?handler=UsedSubstrates&id=' + id)
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+            if (data.error) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-danger">' + data.error + '</td></tr>';
+                return;
+            }
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">使用基板なし</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            data.forEach(function (r) {
+                var tr = tbody.insertRow();
+                tr.insertCell().textContent = r.id ?? '';
+                tr.insertCell().textContent = r.substrateName ?? '';
+                tr.insertCell().textContent = r.substrateModel ?? '';
+                tr.insertCell().textContent = r.substrateNumber ?? '';
+                tr.insertCell().textContent = r.decrease ?? '';
+            });
+        })
+        .catch(function () {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-danger">データ取得に失敗しました。</td></tr>';
+        });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    // 列幅の自動計算
+    document.querySelectorAll('.resizable-table').forEach(function (table) {
+        table.style.tableLayout = 'auto';
+        var ths = Array.from(table.querySelectorAll('thead th'));
+        var widths = ths.map(function (th) { return Math.ceil(th.getBoundingClientRect().width); });
+        ths.forEach(function (th, i) { th.style.width = widths[i] + 'px'; });
+        table.style.tableLayout = 'fixed';
+    });
+
+    // 列幅ドラッグハンドル
+    document.querySelectorAll('.resizable-table').forEach(function (table) {
+        table.querySelectorAll('th').forEach(function (th) {
+            var handle = document.createElement('div');
+            handle.className = 'col-resizer';
+            th.appendChild(handle);
+            var startX, startW;
+            handle.addEventListener('mousedown', function (e) {
+                startX = e.pageX;
+                startW = th.offsetWidth;
+                handle.classList.add('resizing');
+                function onMouseMove(e) {
+                    th.style.width = Math.max(40, startW + (e.pageX - startX)) + 'px';
+                }
+                function onMouseUp() {
+                    handle.classList.remove('resizing');
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                }
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+                e.preventDefault();
+            });
+        });
+    });
+
+    // 行クリックハイライト
+    document.querySelectorAll('.resizable-table tbody').forEach(function (tbody) {
+        tbody.addEventListener('click', function (e) {
+            if (e.target.closest('button')) return;
+            var tr = e.target.closest('tr');
+            if (!tr) return;
+            var isSelected = tr.classList.contains('row-selected');
+            tbody.querySelectorAll('tr').forEach(function (r) { r.classList.remove('row-selected'); });
+            if (!isSelected) tr.classList.add('row-selected');
+        });
+    });
+
+    // 製品タブ カスケードリストボックス
+    var listProductCategory = document.getElementById('listProductCategory');
+    var listProductName     = document.getElementById('listProductName');
+    var listProductType     = document.getElementById('listProductType');
+
+    if (listProductCategory) {
+        listProductCategory.addEventListener('change', function () {
+            listProductName.value = '';
+            listProductType.value = '';
+            this.form.querySelector('[name="PageNum"]').value = '1';
+            this.form.submit();
+        });
+        listProductName.addEventListener('change', function () {
+            listProductType.value = '';
+            this.form.querySelector('[name="PageNum"]').value = '1';
+            this.form.submit();
+        });
+        listProductType.addEventListener('change', function () {
+            this.form.querySelector('[name="PageNum"]').value = '1';
+            this.form.submit();
+        });
+    }
+
+    // 基板タブ カスケードリストボックス
+    var listSubCategory    = document.getElementById('listSubCategory');
+    var listSubProductName = document.getElementById('listSubProductName');
+    var listSubstrateName  = document.getElementById('listSubstrateName');
+
+    if (listSubCategory) {
+        listSubCategory.addEventListener('change', function () {
+            listSubProductName.value = '';
+            listSubstrateName.value  = '';
+            this.form.querySelector('[name="PageNum"]').value = '1';
+            this.form.submit();
+        });
+        listSubProductName.addEventListener('change', function () {
+            listSubstrateName.value = '';
+            this.form.querySelector('[name="PageNum"]').value = '1';
+            this.form.submit();
+        });
+        listSubstrateName.addEventListener('change', function () {
+            this.form.querySelector('[name="PageNum"]').value = '1';
+            this.form.submit();
+        });
+    }
+
+    // プログレスバー制御
+    var _progressBar = document.getElementById('page-progress');
+    function showProgressBar() {
+        if (_progressBar) _progressBar.style.display = 'block';
+    }
+    document.querySelectorAll('form').forEach(function (f) {
+        f.addEventListener('submit', showProgressBar);
+    });
+    document.querySelectorAll('a').forEach(function (a) {
+        var href = a.getAttribute('href');
+        if (href && !href.startsWith('#')) {
+            a.addEventListener('click', showProgressBar);
+        }
+    });
+    window.addEventListener('pageshow', function () {
+        if (_progressBar) _progressBar.style.display = 'none';
+    });
+});
+</script>
+}
+
+<div id="page-progress" aria-hidden="true"></div>
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link @(isProduct ? "active" : "")" href="?tab=product">製品登録実績</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(!isProduct ? "active" : "")" href="?tab=substrate">基板登録実績</a>
+    </li>
+</ul>
+
+@if (Model.ErrorMessage is not null) {
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+} else if (isProduct) {
+
+    <form method="get">
+        <input type="hidden" name="tab" value="product" />
+        <input type="hidden" id="subTabInput" name="SubTab" value="@Model.SubTab" />
+        <input type="hidden" name="HasSearched" value="true" />
+        <input type="hidden" id="pageInput"    name="PageNum"    value="@Model.PageNum" />
+        <input type="hidden" id="sortColInput" name="SortCol" value="@Model.SortCol" />
+        <input type="hidden" id="sortDirInput" name="SortDir" value="@Model.SortDir" />
+
+        <div class="row g-2 mb-2">
+            <div class="col-auto" style="width: 100px;">
+                <div class="fw-bold small mb-1">カテゴリ</div>
+                <div class="list-box">
+                    <select id="listProductCategory" name="ListProductCategory" size="10">
+                        <option value="">（すべて）</option>
+                        @foreach (var item in Model.ProductCategoryList) {
+                            if (Model.ListProductCategory == item) {
+                                <option value="@item" selected>@item</option>
+                            } else {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="col-auto" style="width: 250px;">
+                <div class="fw-bold small mb-1">製品名</div>
+                <div class="list-box">
+                    <select id="listProductName" name="ListProductName" size="10">
+                        <option value="">（すべて）</option>
+                        @foreach (var item in Model.ProductNameList) {
+                            if (Model.ListProductName == item) {
+                                <option value="@item" selected>@item</option>
+                            } else {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="col-auto" style="width: 350px;">
+                <div class="fw-bold small mb-1">種別</div>
+                <div class="list-box">
+                    <select id="listProductType" name="ListProductType" size="10">
+                        <option value="">（すべて）</option>
+                        @foreach (var item in Model.ProductTypeList) {
+                            if (Model.ListProductType == item) {
+                                <option value="@item" selected>@item</option>
+                            } else {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-2 mb-2 align-items-center">
+            <div class="col-auto">
+                <input type="text" class="form-control form-control-sm" name="FilterProductName"
+                       value="@Model.FilterProductName" placeholder="製品名（テキスト）" />
+            </div>
+            <div class="col-auto">
+                <input type="text" class="form-control form-control-sm" name="FilterProductOrderNumber"
+                       value="@Model.FilterProductOrderNumber" placeholder="注文番号" />
+            </div>
+            <div class="col-auto">
+                <input type="date" class="form-control form-control-sm" name="FilterProductRegDateFrom"
+                       value="@Model.FilterProductRegDateFrom" />
+            </div>
+            <div class="col-auto">
+                <input type="date" class="form-control form-control-sm" name="FilterProductRegDateTo"
+                       value="@Model.FilterProductRegDateTo" />
+            </div>
+            @if (isSerial) {
+                <div class="col-auto">
+                    <input type="text" class="form-control form-control-sm" name="FilterSerial"
+                           value="@Model.FilterSerial" placeholder="シリアル番号" />
+                </div>
+            }
+            <div class="col-auto">
+                <button type="submit" class="btn btn-sm btn-primary">検索</button>
+            </div>
+            <div class="col-auto">
+                <a href="?tab=product" class="btn btn-sm btn-secondary">リセット</a>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 mb-2">
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn @(!isSerial ? "btn-primary" : "btn-outline-secondary")"
+                        onclick="switchSubTab('records')">登録実績</button>
+                <button type="button" class="btn @(isSerial ? "btn-primary" : "btn-outline-secondary")"
+                        onclick="switchSubTab('serial')">シリアル履歴</button>
+            </div>
+            @if (Model.HasSearched) {
+                <span class="text-muted small">
+                    @Model.TotalCount 件
+                    @if (Model.PageSize > 0 && Model.TotalCount > 0) {
+                        <text>（@dispStart–@dispEnd）</text>
+                    }
+                </span>
+                <select name="PageSize" class="form-select form-select-sm" style="width: auto"
+                        onchange="onPageSizeChange(this)">
+                    <option value="100" selected="@(Model.PageSize == 100)">100件</option>
+                    <option value="500" selected="@(Model.PageSize == 500)">500件</option>
+                    <option value="0"   selected="@(Model.PageSize == 0)">全件</option>
+                </select>
+            }
+        </div>
+
+        @if (!Model.HasSearched) {
+            <div class="text-center text-muted py-5">カテゴリを選択してください</div>
+        } else {
+            <div class="table-responsive">
+                @if (!isSerial) {
+                    <table class="table table-bordered table-sm table-hover table-striped resizable-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th data-label=""></th>
+                                <th data-label="ID"         class="@SortClass("ID")"          onclick="sortBy('ID')">         ID          <span class="sort-icon">@SortIcon("ID")</span></th>
+                                <th data-label="カテゴリ"   class="@SortClass("CategoryName")" onclick="sortBy('CategoryName')">カテゴリ   <span class="sort-icon">@SortIcon("CategoryName")</span></th>
+                                <th data-label="製品名"     class="@SortClass("ProductName")"  onclick="sortBy('ProductName')"> 製品名     <span class="sort-icon">@SortIcon("ProductName")</span></th>
+                                <th data-label="型式"       class="@SortClass("ProductModel")" onclick="sortBy('ProductModel')">型式       <span class="sort-icon">@SortIcon("ProductModel")</span></th>
+                                <th data-label="種別"       class="@SortClass("ProductType")"  onclick="sortBy('ProductType')"> 種別       <span class="sort-icon">@SortIcon("ProductType")</span></th>
+                                <th data-label="注文番号"   class="@SortClass("OrderNumber")"  onclick="sortBy('OrderNumber')"> 注文番号   <span class="sort-icon">@SortIcon("OrderNumber")</span></th>
+                                <th data-label="製番"       class="@SortClass("ProductNumber")"onclick="sortBy('ProductNumber')">製番      <span class="sort-icon">@SortIcon("ProductNumber")</span></th>
+                                <th data-label="O-Les番号"  class="@SortClass("OLesNumber")"   onclick="sortBy('OLesNumber')">  O-Les番号 <span class="sort-icon">@SortIcon("OLesNumber")</span></th>
+                                <th data-label="数量"       class="@SortClass("Quantity")"     onclick="sortBy('Quantity')">    数量       <span class="sort-icon">@SortIcon("Quantity")</span></th>
+                                <th data-label="担当者"     class="@SortClass("Person")"       onclick="sortBy('Person')">      担当者     <span class="sort-icon">@SortIcon("Person")</span></th>
+                                <th data-label="登録日"     class="@SortClass("RegDate")"      onclick="sortBy('RegDate')">     登録日     <span class="sort-icon">@SortIcon("RegDate")</span></th>
+                                <th data-label="Revision"   class="@SortClass("Revision")"     onclick="sortBy('Revision')">    Revision   <span class="sort-icon">@SortIcon("Revision")</span></th>
+                                <th data-label="シリアル開始" class="@SortClass("SerialFirst")" onclick="sortBy('SerialFirst')">シリアル開始<span class="sort-icon">@SortIcon("SerialFirst")</span></th>
+                                <th data-label="シリアル終了" class="@SortClass("SerialLast")"  onclick="sortBy('SerialLast')"> シリアル終了<span class="sort-icon">@SortIcon("SerialLast")</span></th>
+                                <th data-label="コメント"   class="@SortClass("Comment")"      onclick="sortBy('Comment')">     コメント   <span class="sort-icon">@SortIcon("Comment")</span></th>
+                                <th data-label=""></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in Model.ProductRecords) {
+                                <tr>
+                                    <td><button type="button" class="btn btn-outline-info btn-used-sub" onclick="showRowDetail(this)">詳細</button></td>
+                                    <td>@r.Id</td>
+                                    <td>@r.CategoryName</td>
+                                    <td>@r.ProductName</td>
+                                    <td>@r.ProductModel</td>
+                                    <td>@r.ProductType</td>
+                                    <td>@r.OrderNumber</td>
+                                    <td>@r.ProductNumber</td>
+                                    <td>@r.OLesNumber</td>
+                                    <td>@r.Quantity</td>
+                                    <td>@r.Person</td>
+                                    <td>@r.RegDate</td>
+                                    <td>@r.Revision</td>
+                                    <td>@r.SerialFirst</td>
+                                    <td>@r.SerialLast</td>
+                                    <td>@r.Comment</td>
+                                    <td><button type="button" class="btn btn-outline-secondary btn-used-sub" onclick="showUsedSubstrates(@r.Id)">使用基板</button></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                } else {
+                    <table class="table table-bordered table-sm table-hover table-striped resizable-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th data-label=""></th>
+                                <th data-label="No."        class="@SortClass("RowId")"        onclick="sortBy('RowId')">       No.        <span class="sort-icon">@SortIcon("RowId")</span></th>
+                                <th data-label="シリアル番号" class="@SortClass("Serial")"      onclick="sortBy('Serial')">     シリアル番号<span class="sort-icon">@SortIcon("Serial")</span></th>
+                                <th data-label="O-Lesシリアル" class="@SortClass("OLesSerial")" onclick="sortBy('OLesSerial')">O-Lesシリアル<span class="sort-icon">@SortIcon("OLesSerial")</span></th>
+                                <th data-label="注文番号"   class="@SortClass("OrderNumber")"   onclick="sortBy('OrderNumber')"> 注文番号   <span class="sort-icon">@SortIcon("OrderNumber")</span></th>
+                                <th data-label="製番"       class="@SortClass("ProductNumber")" onclick="sortBy('ProductNumber')">製番      <span class="sort-icon">@SortIcon("ProductNumber")</span></th>
+                                <th data-label="製品名"     class="@SortClass("ProductName")"   onclick="sortBy('ProductName')"> 製品名     <span class="sort-icon">@SortIcon("ProductName")</span></th>
+                                <th data-label="種別"       class="@SortClass("ProductType")"   onclick="sortBy('ProductType')"> 種別       <span class="sort-icon">@SortIcon("ProductType")</span></th>
+                                <th data-label="型式"       class="@SortClass("ProductModel")"  onclick="sortBy('ProductModel')">型式       <span class="sort-icon">@SortIcon("ProductModel")</span></th>
+                                <th data-label="登録日"     class="@SortClass("RegDate")"       onclick="sortBy('RegDate')">     登録日     <span class="sort-icon">@SortIcon("RegDate")</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in Model.SerialRecords) {
+                                <tr>
+                                    <td><button type="button" class="btn btn-outline-info btn-used-sub" onclick="showRowDetail(this)">詳細</button></td>
+                                    <td>@r.RowId</td>
+                                    <td>@r.Serial</td>
+                                    <td>@r.OLesSerial</td>
+                                    <td>@r.OrderNumber</td>
+                                    <td>@r.ProductNumber</td>
+                                    <td>@r.ProductName</td>
+                                    <td>@r.ProductType</td>
+                                    <td>@r.ProductModel</td>
+                                    <td>@r.RegDate</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+            @if (pageNums.Any()) {
+                <nav class="d-flex justify-content-center mt-2">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.PageNum <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="#" onclick="goToPage(@(Model.PageNum - 1)); return false;">&#8249;</a>
+                        </li>
+                        @foreach (var p in pageNums) {
+                            if (p == null) {
+                                <li class="page-item disabled"><span class="page-link">…</span></li>
+                            } else {
+                                <li class="page-item @(p == Model.PageNum ? "active" : "")">
+                                    <a class="page-link" href="#" onclick="goToPage(@p); return false;">@p</a>
+                                </li>
+                            }
+                        }
+                        <li class="page-item @(Model.PageNum >= lastPage ? "disabled" : "")">
+                            <a class="page-link" href="#" onclick="goToPage(@(Model.PageNum + 1)); return false;">&#8250;</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        }
+    </form>
+
+    <div class="modal fade" id="usedSubModal" tabindex="-1" aria-labelledby="usedSubModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="usedSubModalLabel">使用基板</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+                </div>
+                <div class="modal-body p-2">
+                    <table class="table table-bordered table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>基板名</th>
+                                <th>基板型式</th>
+                                <th>基板製造番号</th>
+                                <th>使用数</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usedSubBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">閉じる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+} else {
+
+    <form method="get">
+        <input type="hidden" name="tab" value="substrate" />
+        <input type="hidden" id="subTabInput"    name="SubTab"      value="@Model.SubTab" />
+        <input type="hidden" id="stockGroupInput" name="StockGroup" value="@Model.StockGroup" />
+        <input type="hidden" name="HasSearched" value="true" />
+        <input type="hidden" id="pageInput"    name="PageNum"    value="@Model.PageNum" />
+        <input type="hidden" id="sortColInput" name="SortCol" value="@Model.SortCol" />
+        <input type="hidden" id="sortDirInput" name="SortDir" value="@Model.SortDir" />
+
+        <div class="row g-2 mb-2">
+            <div class="col-auto" style="width: 100px;">
+                <div class="fw-bold small mb-1">カテゴリ</div>
+                <div class="list-box">
+                    <select id="listSubCategory" name="ListSubCategory" size="10">
+                        <option value="">（すべて）</option>
+                        @foreach (var item in Model.SubCategoryList) {
+                            if (Model.ListSubCategory == item) {
+                                <option value="@item" selected>@item</option>
+                            } else {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="col-auto" style="width: 250px;">
+                <div class="fw-bold small mb-1">製品名</div>
+                <div class="list-box">
+                    <select id="listSubProductName" name="ListSubProductName" size="10">
+                        <option value="">（すべて）</option>
+                        @foreach (var item in Model.SubProductNameList) {
+                            if (Model.ListSubProductName == item) {
+                                <option value="@item" selected>@item</option>
+                            } else {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="col-auto" style="width: 350px;">
+                <div class="fw-bold small mb-1">基板名</div>
+                <div class="list-box">
+                    <select id="listSubstrateName" name="ListSubstrateName" size="10">
+                        <option value="">（すべて）</option>
+                        @foreach (var item in Model.SubstrateNameList) {
+                            if (Model.ListSubstrateName == item) {
+                                <option value="@item" selected>@item</option>
+                            } else {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-2 mb-2 align-items-center">
+            <div class="col-auto">
+                <input type="text" class="form-control form-control-sm" name="FilterSubstrateName"
+                       value="@Model.FilterSubstrateName" placeholder="基板名（テキスト）" />
+            </div>
+            <div class="col-auto">
+                <input type="text" class="form-control form-control-sm" name="FilterSubstrateOrderNumber"
+                       value="@Model.FilterSubstrateOrderNumber" placeholder="注文番号" />
+            </div>
+            <div class="col-auto">
+                <input type="date" class="form-control form-control-sm" name="FilterSubstrateRegDateFrom"
+                       value="@Model.FilterSubstrateRegDateFrom" />
+            </div>
+            <div class="col-auto">
+                <input type="date" class="form-control form-control-sm" name="FilterSubstrateRegDateTo"
+                       value="@Model.FilterSubstrateRegDateTo" />
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-sm btn-primary">検索</button>
+            </div>
+            <div class="col-auto">
+                <a href="?tab=substrate" class="btn btn-sm btn-secondary">リセット</a>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 mb-2">
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn @(!isStock ? "btn-primary" : "btn-outline-secondary")"
+                        onclick="switchSubTab('records')">登録実績</button>
+                <button type="button" class="btn @(isStock ? "btn-primary" : "btn-outline-secondary")"
+                        onclick="switchSubTab('stock')">在庫数</button>
+            </div>
+            @if (isStock) {
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn @(Model.StockGroup != "detail" ? "btn-info" : "btn-outline-info")"
+                            onclick="switchStockGroup('model')">基板単位</button>
+                    <button type="button" class="btn @(Model.StockGroup == "detail" ? "btn-info" : "btn-outline-info")"
+                            onclick="switchStockGroup('detail')">製造番号単位</button>
+                </div>
+            }
+            @if (Model.HasSearched) {
+                <span class="text-muted small">
+                    @Model.TotalCount 件
+                    @if (Model.PageSize > 0 && Model.TotalCount > 0) {
+                        <text>（@dispStart–@dispEnd）</text>
+                    }
+                </span>
+                <select name="PageSize" class="form-select form-select-sm" style="width: auto"
+                        onchange="onPageSizeChange(this)">
+                    <option value="100" selected="@(Model.PageSize == 100)">100件</option>
+                    <option value="500" selected="@(Model.PageSize == 500)">500件</option>
+                    <option value="0"   selected="@(Model.PageSize == 0)">全件</option>
+                </select>
+            }
+        </div>
+
+        @if (!Model.HasSearched) {
+            <div class="text-center text-muted py-5">カテゴリを選択してください</div>
+        } else {
+            <div class="table-responsive">
+                @if (!isStock) {
+                    <table class="table table-bordered table-sm table-hover table-striped resizable-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th data-label=""></th>
+                                <th data-label="ID"           class="@SortClass("ID")"            onclick="sortBy('ID')">           ID           <span class="sort-icon">@SortIcon("ID")</span></th>
+                                <th data-label="カテゴリ"     class="@SortClass("CategoryName")"   onclick="sortBy('CategoryName')">  カテゴリ     <span class="sort-icon">@SortIcon("CategoryName")</span></th>
+                                <th data-label="製品名"       class="@SortClass("ProductName")"    onclick="sortBy('ProductName')">   製品名       <span class="sort-icon">@SortIcon("ProductName")</span></th>
+                                <th data-label="基板名"       class="@SortClass("SubstrateName")"  onclick="sortBy('SubstrateName')"> 基板名       <span class="sort-icon">@SortIcon("SubstrateName")</span></th>
+                                <th data-label="基板型式"     class="@SortClass("SubstrateModel")" onclick="sortBy('SubstrateModel')">基板型式     <span class="sort-icon">@SortIcon("SubstrateModel")</span></th>
+                                <th data-label="注文番号"     class="@SortClass("OrderNumber")"    onclick="sortBy('OrderNumber')">   注文番号     <span class="sort-icon">@SortIcon("OrderNumber")</span></th>
+                                <th data-label="製造番号"     class="@SortClass("SubstrateNumber")"onclick="sortBy('SubstrateNumber')">製造番号    <span class="sort-icon">@SortIcon("SubstrateNumber")</span></th>
+                                <th data-label="入庫"         class="@SortClass("Increase")"       onclick="sortBy('Increase')">      入庫         <span class="sort-icon">@SortIcon("Increase")</span></th>
+                                <th data-label="出庫"         class="@SortClass("Decrease")"       onclick="sortBy('Decrease')">      出庫         <span class="sort-icon">@SortIcon("Decrease")</span></th>
+                                <th data-label="不良"         class="@SortClass("Defect")"         onclick="sortBy('Defect')">        不良         <span class="sort-icon">@SortIcon("Defect")</span></th>
+                                <th data-label="担当者"       class="@SortClass("Person")"         onclick="sortBy('Person')">        担当者       <span class="sort-icon">@SortIcon("Person")</span></th>
+                                <th data-label="登録日"       class="@SortClass("RegDate")"        onclick="sortBy('RegDate')">       登録日       <span class="sort-icon">@SortIcon("RegDate")</span></th>
+                                <th data-label="コメント"     class="@SortClass("Comment")"        onclick="sortBy('Comment')">       コメント     <span class="sort-icon">@SortIcon("Comment")</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in Model.SubstrateRecords) {
+                                <tr>
+                                    <td><button type="button" class="btn btn-outline-info btn-used-sub" onclick="showRowDetail(this)">詳細</button></td>
+                                    <td>@r.Id</td>
+                                    <td>@r.CategoryName</td>
+                                    <td>@r.ProductName</td>
+                                    <td>@r.SubstrateName</td>
+                                    <td>@r.SubstrateModel</td>
+                                    <td>@r.OrderNumber</td>
+                                    <td>@r.SubstrateNumber</td>
+                                    <td>@r.Increase</td>
+                                    <td>@r.Decrease</td>
+                                    <td>@r.Defect</td>
+                                    <td>@r.Person</td>
+                                    <td>@r.RegDate</td>
+                                    <td>@r.Comment</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                } else {
+                    <table class="table table-bordered table-sm table-hover table-striped resizable-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th data-label=""></th>
+                                <th data-label="カテゴリ"     class="@SortClass("CategoryName")"   onclick="sortBy('CategoryName')">  カテゴリ     <span class="sort-icon">@SortIcon("CategoryName")</span></th>
+                                <th data-label="製品名"       class="@SortClass("ProductName")"    onclick="sortBy('ProductName')">   製品名       <span class="sort-icon">@SortIcon("ProductName")</span></th>
+                                <th data-label="基板名"       class="@SortClass("SubstrateName")"  onclick="sortBy('SubstrateName')"> 基板名       <span class="sort-icon">@SortIcon("SubstrateName")</span></th>
+                                <th data-label="基板型式"     class="@SortClass("SubstrateModel")" onclick="sortBy('SubstrateModel')">基板型式     <span class="sort-icon">@SortIcon("SubstrateModel")</span></th>
+                                @if (Model.StockGroup == "detail") {
+                                    <th data-label="製造番号" class="@SortClass("SubstrateNumber")"onclick="sortBy('SubstrateNumber')">製造番号    <span class="sort-icon">@SortIcon("SubstrateNumber")</span></th>
+                                    <th data-label="注文番号" class="@SortClass("OrderNumber")"    onclick="sortBy('OrderNumber')">   注文番号     <span class="sort-icon">@SortIcon("OrderNumber")</span></th>
+                                }
+                                <th data-label="在庫数"       class="@SortClass("Stock")"          onclick="sortBy('Stock')">         在庫数       <span class="sort-icon">@SortIcon("Stock")</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in Model.StockRecords) {
+                                <tr>
+                                    <td><button type="button" class="btn btn-outline-info btn-used-sub" onclick="showRowDetail(this)">詳細</button></td>
+                                    <td>@r.CategoryName</td>
+                                    <td>@r.ProductName</td>
+                                    <td>@r.SubstrateName</td>
+                                    <td>@r.SubstrateModel</td>
+                                    @if (Model.StockGroup == "detail") {
+                                        <td>@r.SubstrateNumber</td>
+                                        <td>@r.OrderNumber</td>
+                                    }
+                                    <td>@r.Stock</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+            @if (pageNums.Any()) {
+                <nav class="d-flex justify-content-center mt-2">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.PageNum <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="#" onclick="goToPage(@(Model.PageNum - 1)); return false;">&#8249;</a>
+                        </li>
+                        @foreach (var p in pageNums) {
+                            if (p == null) {
+                                <li class="page-item disabled"><span class="page-link">…</span></li>
+                            } else {
+                                <li class="page-item @(p == Model.PageNum ? "active" : "")">
+                                    <a class="page-link" href="#" onclick="goToPage(@p); return false;">@p</a>
+                                </li>
+                            }
+                        }
+                        <li class="page-item @(Model.PageNum >= lastPage ? "disabled" : "")">
+                            <a class="page-link" href="#" onclick="goToPage(@(Model.PageNum + 1)); return false;">&#8250;</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        }
+    </form>
+}
+
+<div class="modal fade" id="rowDetailModal" tabindex="-1" aria-labelledby="rowDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rowDetailModalLabel">行詳細</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+            </div>
+            <div class="modal-body p-2">
+                <table class="table table-sm mb-0">
+                    <tbody id="rowDetailBody"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
