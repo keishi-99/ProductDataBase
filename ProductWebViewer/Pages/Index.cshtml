@@ -359,14 +359,21 @@ document.addEventListener('DOMContentLoaded', function () {
         f.addEventListener('submit', showLoading);
     });
     // リストボックス変更・ソート・ページネーション等のプログラム的 form.submit() を捕捉
+    // target="_blank" は別タブで開くため現在ページは遷移しない → スピナー表示しない
     var _origFormSubmit = HTMLFormElement.prototype.submit;
     HTMLFormElement.prototype.submit = function () {
-        showLoading();
+        if (this.getAttribute('target') !== '_blank') showLoading();
         _origFormSubmit.call(this);
     };
     document.querySelectorAll('a').forEach(function (a) {
-        var href = a.getAttribute('href');
-        if (href && !href.startsWith('#')) {
+        var href   = a.getAttribute('href');
+        var target = a.getAttribute('target');
+        if (href
+            && !href.startsWith('#')
+            && !href.startsWith('javascript:')
+            && !href.startsWith('mailto:')
+            && target !== '_blank'
+            && !a.hasAttribute('download')) {
             a.addEventListener('click', showLoading);
         }
     });
