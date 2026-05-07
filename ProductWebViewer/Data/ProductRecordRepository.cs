@@ -134,10 +134,16 @@ namespace ProductWebViewer.Data {
         public int GetSerialCount(
             string? listProductName = null,
             string? listProductType = null,
-            string? serial = null) {
+            string? productName = null,
+            string? orderNumber = null,
+            string? productNumber = null,
+            string? regDateFrom = null,
+            string? regDateTo = null,
+            string? serial = null
+            ) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildSerialWhere(listProductName, listProductType, serial);
+            var (where, param) = BuildSerialWhere(listProductName, listProductType, productName, orderNumber, productNumber, regDateFrom, regDateTo, serial);
             return con.ExecuteScalar<int>($"""
                 SELECT COUNT(*)
                 FROM T_Serial AS s
@@ -149,6 +155,11 @@ namespace ProductWebViewer.Data {
         public IReadOnlyList<SerialRecord> GetSerialHistory(
             string? listProductName = null,
             string? listProductType = null,
+            string? productName = null,
+            string? orderNumber = null,
+            string? productNumber = null,
+            string? regDateFrom = null,
+            string? regDateTo = null,
             string? serial = null,
             string sortCol = "",
             string sortDir = "desc",
@@ -156,7 +167,7 @@ namespace ProductWebViewer.Data {
             int pageSize = 100) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildSerialWhere(listProductName, listProductType, serial);
+            var (where, param) = BuildSerialWhere(listProductName, listProductType, productName, orderNumber, productNumber, regDateFrom, regDateTo, serial);
             var orderBy = BuildOrderBy(_serialSortCols, sortCol, sortDir, "s.rowid DESC");
             var limitOffset = BuildLimitOffset(pageSize, page);
 
@@ -232,19 +243,34 @@ namespace ProductWebViewer.Data {
         }
 
         private static (string where, object param) BuildSerialWhere(
-            string? listProductName, string? listProductType, string? serial) {
+            string? listProductName, string? listProductType, string? productName, string? orderNumber, string? productNumber, string? regDateFrom, string? regDateTo, string? serial) {
 
             var conditions = new List<string> { "1=1" };
             if (!string.IsNullOrWhiteSpace(listProductName))
-                conditions.Add("s.ProductName = @ListProductName");
+                conditions.Add("p.ProductName = @ListProductName");
             if (!string.IsNullOrWhiteSpace(listProductType))
                 conditions.Add("(p.ProductType = @ListProductType OR p.ProductType IS NULL)");
+            if (!string.IsNullOrWhiteSpace(productName))
+                conditions.Add("s.ProductName LIKE '%' || @ProductName || '%'");
+            if (!string.IsNullOrWhiteSpace(orderNumber))
+                conditions.Add("p.OrderNumber LIKE '%' || @OrderNumber || '%'");
+            if (!string.IsNullOrWhiteSpace(productNumber))
+                conditions.Add("p.ProductNumber LIKE '%' || @ProductNumber || '%'");
+            if (!string.IsNullOrWhiteSpace(regDateFrom))
+                conditions.Add("p.RegDate >= @RegDateFrom");
+            if (!string.IsNullOrWhiteSpace(regDateTo))
+                conditions.Add("p.RegDate <= @RegDateTo");
             if (!string.IsNullOrWhiteSpace(serial))
                 conditions.Add("s.Serial LIKE '%' || @Serial || '%'");
 
             return (string.Join(" AND ", conditions), new {
                 ListProductName = listProductName,
                 ListProductType = listProductType,
+                ProductName = productName,
+                OrderNumber = orderNumber,
+                ProductNumber = productNumber,
+                RegDateFrom = regDateFrom?.Replace('-', '/'),
+                RegDateTo = regDateTo?.Replace('-', '/'),
                 Serial = serial
             });
         }

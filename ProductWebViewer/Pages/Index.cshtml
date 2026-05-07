@@ -90,6 +90,7 @@
         top: 0;
         z-index: 1;
         background-color: var(--bs-tertiary-bg);
+        color: var(--bs-body-color);
     }
     .resizable-table thead th.sortable {
         cursor: pointer;
@@ -423,16 +424,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         <div class="row g-2 mb-2 align-items-center">
             <div class="col-auto">
-                <input type="text" class="form-control form-control-sm" name="FilterProductName"
-                       value="@Model.FilterProductName" placeholder="製品名（テキスト）" />
+                <input type="search" class="form-control form-control-sm" name="FilterProductName"
+                       style="width: 150px" value="@Model.FilterProductName" placeholder="製品名（テキスト）" />
             </div>
             <div class="col-auto">
-                <input type="text" class="form-control form-control-sm" name="FilterProductOrderNumber"
-                       value="@Model.FilterProductOrderNumber" placeholder="注文番号" />
+                <input type="search" class="form-control form-control-sm" name="FilterProductOrderNumber"
+                       style="width: 150px" value="@Model.FilterProductOrderNumber" placeholder="注文番号" />
             </div>
             <div class="col-auto">
-                <input type="text" class="form-control form-control-sm" name="FilterProductNumber"
-                       value="@Model.FilterProductNumber" placeholder="製造番号" />
+                <input type="search" class="form-control form-control-sm" name="FilterProductNumber"
+                       style="width: 150px" value="@Model.FilterProductNumber" placeholder="製造番号" />
             </div>
             <div class="col-auto">
                 <input type="date" class="form-control form-control-sm" name="FilterProductRegDateFrom"
@@ -444,8 +445,8 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
             @if (isSerial) {
                 <div class="col-auto">
-                    <input type="text" class="form-control form-control-sm" name="FilterSerial"
-                           value="@Model.FilterSerial" placeholder="シリアル番号" />
+                    <input type="search" class="form-control form-control-sm" name="FilterSerial"
+                           style="width: 150px" value="@Model.FilterSerial" placeholder="シリアル番号" />
                 </div>
             }
             <div class="col-auto">
@@ -485,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="table-responsive">
                 @if (!isSerial) {
                     <table class="table table-bordered table-sm table-hover table-striped resizable-table">
-                        <thead class="table-light">
+                        <thead>
                             <tr>
                                 <th data-label=""></th>
                                 <th data-label="ID"         class="@SortClass("ID")"          onclick="sortBy('ID')">         ID          <span class="sort-icon">@SortIcon("ID")</span></th>
@@ -534,7 +535,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </table>
                 } else {
                     <table class="table table-bordered table-sm table-hover table-striped resizable-table">
-                        <thead class="table-light">
+                        <thead>
                             <tr>
                                 <th data-label=""></th>
                                 <th data-label="No."        class="@SortClass("RowId")"        onclick="sortBy('RowId')">       No.        <span class="sort-icon">@SortIcon("RowId")</span></th>
@@ -600,7 +601,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <div class="modal-body p-2">
                     <table class="table table-bordered table-sm mb-0">
-                        <thead class="table-light">
+                        <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>基板名</th>
@@ -681,25 +682,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
         <div class="row g-2 mb-2 align-items-center">
             <div class="col-auto">
-                <input type="text" class="form-control form-control-sm" name="FilterSubstrateName"
+                <input type="search" class="form-control form-control-sm" name="FilterSubstrateName"
                        value="@Model.FilterSubstrateName" placeholder="基板名（テキスト）" />
             </div>
-            <div class="col-auto">
-                <input type="text" class="form-control form-control-sm" name="FilterSubstrateOrderNumber"
-                       value="@Model.FilterSubstrateOrderNumber" placeholder="注文番号" />
-            </div>
-            <div class="col-auto">
-                <input type="text" class="form-control form-control-sm" name="FilterSubstrateNumber"
-                       value="@Model.FilterSubstrateNumber" placeholder="製造番号" />
-            </div>
-            <div class="col-auto">
-                <input type="date" class="form-control form-control-sm" name="FilterSubstrateRegDateFrom"
-                       value="@Model.FilterSubstrateRegDateFrom" />
-            </div>
-            <div class="col-auto">
-                <input type="date" class="form-control form-control-sm" name="FilterSubstrateRegDateTo"
-                       value="@Model.FilterSubstrateRegDateTo" />
-            </div>
+            @if (!(isStock && Model.StockGroup != "detail")) {
+                <div class="col-auto">
+                    <input type="search" class="form-control form-control-sm" name="FilterSubstrateOrderNumber"
+                           value="@Model.FilterSubstrateOrderNumber" placeholder="注文番号" />
+                </div>
+                <div class="col-auto">
+                    <input type="search" class="form-control form-control-sm" name="FilterSubstrateNumber"
+                           value="@Model.FilterSubstrateNumber" placeholder="製造番号" />
+                </div>
+            }
+            @if (!isStock) {
+                <div class="col-auto">
+                    <input type="date" class="form-control form-control-sm" name="FilterSubstrateRegDateFrom"
+                           value="@Model.FilterSubstrateRegDateFrom" />
+                </div>
+                <div class="col-auto">
+                    <input type="date" class="form-control form-control-sm" name="FilterSubstrateRegDateTo"
+                           value="@Model.FilterSubstrateRegDateTo" />
+                </div>
+            }
             <div class="col-auto">
                 <button type="submit" class="btn btn-sm btn-primary">検索</button>
             </div>
@@ -721,6 +726,13 @@ document.addEventListener('DOMContentLoaded', function () {
                             onclick="switchStockGroup('model')">基板単位</button>
                     <button type="button" class="btn @(Model.StockGroup == "detail" ? "btn-info" : "btn-outline-info")"
                             onclick="switchStockGroup('detail')">製造番号単位</button>
+                </div>
+                <div class="form-check form-check-inline ms-2 mb-0">
+                    <input class="form-check-input" type="checkbox" id="excludeZeroStock"
+                           name="ExcludeZeroStock" value="true"
+                           @(Model.ExcludeZeroStock ? "checked" : "")
+                           onchange="this.form.submit()" />
+                    <label class="form-check-label small" for="excludeZeroStock">在庫0を除外</label>
                 </div>
             }
             @if (Model.HasSearched) {
@@ -745,7 +757,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="table-responsive">
                 @if (!isStock) {
                     <table class="table table-bordered table-sm table-hover table-striped resizable-table">
-                        <thead class="table-light">
+                        <thead>
                             <tr>
                                 <th data-label=""></th>
                                 <th data-label="ID"           class="@SortClass("ID")"            onclick="sortBy('ID')">           ID           <span class="sort-icon">@SortIcon("ID")</span></th>
@@ -788,7 +800,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </table>
                 } else {
                     <table class="table table-bordered table-sm table-hover table-striped resizable-table">
-                        <thead class="table-light">
+                        <thead>
                             <tr>
                                 <th data-label=""></th>
                                 <th data-label="カテゴリ"     class="@SortClass("CategoryName")"   onclick="sortBy('CategoryName')">  カテゴリ     <span class="sort-icon">@SortIcon("CategoryName")</span></th>

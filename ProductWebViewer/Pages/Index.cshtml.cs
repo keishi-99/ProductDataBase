@@ -59,6 +59,7 @@ public class IndexModel : PageModel {
     [BindProperty(SupportsGet = true)] public string? FilterSubstrateNumber { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterSubstrateRegDateFrom { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterSubstrateRegDateTo { get; set; }
+    [BindProperty(SupportsGet = true)] public bool ExcludeZeroStock { get; set; }
 
     // 基板タブ データ
     public IReadOnlyList<string> SubCategoryList { get; private set; } = [];
@@ -103,10 +104,16 @@ public class IndexModel : PageModel {
 
         if (SubTab == "serial") {
             TotalCount = _productRepo.GetSerialCount(
-                ListProductName, ListProductType, FilterSerial);
+                ListProductName, ListProductType, FilterProductName,
+                FilterProductOrderNumber, FilterProductNumber,
+                FilterProductRegDateFrom, FilterProductRegDateTo,
+                FilterSerial);
             ClampPage();
             SerialRecords = _productRepo.GetSerialHistory(
-                ListProductName, ListProductType, FilterSerial,
+                ListProductName, ListProductType, FilterProductName,
+                FilterProductOrderNumber, FilterProductNumber,
+                FilterProductRegDateFrom, FilterProductRegDateTo,
+                FilterSerial,
                 SortCol, SortDir, PageNum, PageSize);
         }
         else {
@@ -135,11 +142,17 @@ public class IndexModel : PageModel {
         if (SubTab == "stock") {
             TotalCount = _substrateRepo.GetStockCount(
                 ListSubCategory, ListSubProductName, ListSubstrateName,
-                groupByModel: StockGroup != "detail");
+                groupByModel: StockGroup != "detail",
+                excludeZeroStock: ExcludeZeroStock,
+                orderNumber: FilterSubstrateOrderNumber,
+                substrateNumber: FilterSubstrateNumber);
             ClampPage();
             StockRecords = _substrateRepo.GetStock(
                 ListSubCategory, ListSubProductName, ListSubstrateName,
                 groupByModel: StockGroup != "detail",
+                excludeZeroStock: ExcludeZeroStock,
+                orderNumber: FilterSubstrateOrderNumber,
+                substrateNumber: FilterSubstrateNumber,
                 SortCol, SortDir, PageNum, PageSize);
         }
         else {
