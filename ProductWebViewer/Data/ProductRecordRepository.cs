@@ -132,6 +132,7 @@ namespace ProductWebViewer.Data {
         }
 
         public int GetSerialCount(
+            string? listCategory = null,
             string? listProductName = null,
             string? listProductType = null,
             string? productName = null,
@@ -143,7 +144,7 @@ namespace ProductWebViewer.Data {
             ) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildSerialWhere(listProductName, listProductType, productName, orderNumber, productNumber, regDateFrom, regDateTo, serial);
+            var (where, param) = BuildSerialWhere(listCategory, listProductName, listProductType, productName, orderNumber, productNumber, regDateFrom, regDateTo, serial);
             return con.ExecuteScalar<int>($"""
                 SELECT COUNT(*)
                 FROM T_Serial AS s
@@ -153,6 +154,7 @@ namespace ProductWebViewer.Data {
         }
 
         public IReadOnlyList<SerialRecord> GetSerialHistory(
+            string? listCategory = null,
             string? listProductName = null,
             string? listProductType = null,
             string? productName = null,
@@ -167,7 +169,7 @@ namespace ProductWebViewer.Data {
             int pageSize = 100) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildSerialWhere(listProductName, listProductType, productName, orderNumber, productNumber, regDateFrom, regDateTo, serial);
+            var (where, param) = BuildSerialWhere(listCategory, listProductName, listProductType, productName, orderNumber, productNumber, regDateFrom, regDateTo, serial);
             var orderBy = BuildOrderBy(_serialSortCols, sortCol, sortDir, "s.rowid DESC");
             var limitOffset = BuildLimitOffset(pageSize, page);
 
@@ -243,13 +245,15 @@ namespace ProductWebViewer.Data {
         }
 
         private static (string where, object param) BuildSerialWhere(
-            string? listProductName, string? listProductType, string? productName, string? orderNumber, string? productNumber, string? regDateFrom, string? regDateTo, string? serial) {
+            string? listCategory, string? listProductName, string? listProductType, string? productName, string? orderNumber, string? productNumber, string? regDateFrom, string? regDateTo, string? serial) {
 
             var conditions = new List<string> { "1=1" };
+            if (!string.IsNullOrWhiteSpace(listCategory))
+                conditions.Add("p.CategoryName = @ListCategory");
             if (!string.IsNullOrWhiteSpace(listProductName))
                 conditions.Add("p.ProductName = @ListProductName");
             if (!string.IsNullOrWhiteSpace(listProductType))
-                conditions.Add("(p.ProductType = @ListProductType OR p.ProductType IS NULL)");
+                conditions.Add("p.ProductType = @ListProductType OR p.ProductType IS NULL)");
             if (!string.IsNullOrWhiteSpace(productName))
                 conditions.Add("s.ProductName LIKE '%' || @ProductName || '%'");
             if (!string.IsNullOrWhiteSpace(orderNumber))
@@ -264,6 +268,7 @@ namespace ProductWebViewer.Data {
                 conditions.Add("s.Serial LIKE '%' || @Serial || '%'");
 
             return (string.Join(" AND ", conditions), new {
+                ListCategory = listCategory,
                 ListProductName = listProductName,
                 ListProductType = listProductType,
                 ProductName = productName,

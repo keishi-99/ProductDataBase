@@ -104,13 +104,15 @@ public class IndexModel : PageModel {
 
         if (SubTab == "serial") {
             TotalCount = _productRepo.GetSerialCount(
-                ListProductName, ListProductType, FilterProductName,
+                ListProductCategory, ListProductName,
+                ListProductType, FilterProductName,
                 FilterProductOrderNumber, FilterProductNumber,
                 FilterProductRegDateFrom, FilterProductRegDateTo,
                 FilterSerial);
             ClampPage();
             SerialRecords = _productRepo.GetSerialHistory(
-                ListProductName, ListProductType, FilterProductName,
+                ListProductCategory, ListProductName,
+                ListProductType, FilterProductName,
                 FilterProductOrderNumber, FilterProductNumber,
                 FilterProductRegDateFrom, FilterProductRegDateTo,
                 FilterSerial,
