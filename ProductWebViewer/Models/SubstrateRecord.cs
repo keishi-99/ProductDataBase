@@ -15,5 +15,6 @@ namespace ProductWebViewer.Models {
         public string? Person { get; set; }
         public string? RegDate { get; set; }
         public string? Comment { get; set; }
+        public string? CreatedAt { get; set; }
     }
 }

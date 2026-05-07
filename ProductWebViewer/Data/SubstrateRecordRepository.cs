@@ -6,30 +6,31 @@ namespace ProductWebViewer.Data {
     public class SubstrateRecordRepository : RepositoryBase {
         // クエリパラメータ名 → 実テーブルの列参照へのホワイトリスト（ORDER BY インジェクション対策）
         private static readonly Dictionary<string, string> _substrateSortCols = new(StringComparer.OrdinalIgnoreCase) {
-            ["ID"]             = "s.ID",
-            ["CategoryName"]   = "m.CategoryName",
-            ["ProductName"]    = "m.ProductName",
-            ["SubstrateName"]  = "s.SubstrateName",
+            ["ID"] = "s.ID",
+            ["CategoryName"] = "m.CategoryName",
+            ["ProductName"] = "m.ProductName",
+            ["SubstrateName"] = "s.SubstrateName",
             ["SubstrateModel"] = "s.SubstrateModel",
-            ["OrderNumber"]    = "s.OrderNumber",
-            ["SubstrateNumber"]= "s.SubstrateNumber",
-            ["Increase"]       = "s.Increase",
-            ["Decrease"]       = "s.Decrease",
-            ["Defect"]         = "s.Defect",
-            ["Person"]         = "s.Person",
-            ["RegDate"]        = "s.RegDate",
-            ["Comment"]        = "s.Comment",
+            ["OrderNumber"] = "s.OrderNumber",
+            ["SubstrateNumber"] = "s.SubstrateNumber",
+            ["Increase"] = "s.Increase",
+            ["Decrease"] = "s.Decrease",
+            ["Defect"] = "s.Defect",
+            ["Person"] = "s.Person",
+            ["RegDate"] = "s.RegDate",
+            ["Comment"] = "s.Comment",
+            ["CreatedAt"] = "s.CreatedAt"
         };
 
         // 在庫一覧用ホワイトリスト（同上）
         private static readonly Dictionary<string, string> _stockSortCols = new(StringComparer.OrdinalIgnoreCase) {
-            ["CategoryName"]   = "m.CategoryName",
-            ["ProductName"]    = "m.ProductName",
-            ["SubstrateName"]  = "s.SubstrateName",
+            ["CategoryName"] = "m.CategoryName",
+            ["ProductName"] = "m.ProductName",
+            ["SubstrateName"] = "s.SubstrateName",
             ["SubstrateModel"] = "s.SubstrateModel",
-            ["SubstrateNumber"]= "s.SubstrateNumber",
-            ["OrderNumber"]    = "s.OrderNumber",
-            ["Stock"]          = "Stock",
+            ["SubstrateNumber"] = "s.SubstrateNumber",
+            ["OrderNumber"] = "s.OrderNumber",
+            ["Stock"] = "Stock",
         };
 
         public SubstrateRecordRepository(IConfiguration configuration) : base(configuration) { }
@@ -61,13 +62,13 @@ namespace ProductWebViewer.Data {
         }
 
         public int GetCount(
-            string? listCategory      = null,
-            string? listProductName   = null,
+            string? listCategory = null,
+            string? listProductName = null,
             string? listSubstrateName = null,
-            string? substrateName     = null,
-            string? orderNumber       = null,
-            string? regDateFrom       = null,
-            string? regDateTo         = null) {
+            string? substrateName = null,
+            string? orderNumber = null,
+            string? regDateFrom = null,
+            string? regDateTo = null) {
 
             using var con = new SqliteConnection(_connectionString);
             var (where, param) = BuildSubstrateWhere(listCategory, listProductName, listSubstrateName, substrateName, orderNumber, regDateFrom, regDateTo);
@@ -80,21 +81,21 @@ namespace ProductWebViewer.Data {
         }
 
         public IReadOnlyList<SubstrateRecord> GetAll(
-            string? listCategory      = null,
-            string? listProductName   = null,
+            string? listCategory = null,
+            string? listProductName = null,
             string? listSubstrateName = null,
-            string? substrateName     = null,
-            string? orderNumber       = null,
-            string? regDateFrom       = null,
-            string? regDateTo         = null,
-            string  sortCol  = "",
-            string  sortDir  = "desc",
-            int     page     = 1,
-            int     pageSize = 100) {
+            string? substrateName = null,
+            string? orderNumber = null,
+            string? regDateFrom = null,
+            string? regDateTo = null,
+            string sortCol = "",
+            string sortDir = "desc",
+            int page = 1,
+            int pageSize = 100) {
 
             using var con = new SqliteConnection(_connectionString);
             var (where, param) = BuildSubstrateWhere(listCategory, listProductName, listSubstrateName, substrateName, orderNumber, regDateFrom, regDateTo);
-            var orderBy     = BuildOrderBy(_substrateSortCols, sortCol, sortDir, "s.ID DESC");
+            var orderBy = BuildOrderBy(_substrateSortCols, sortCol, sortDir, "s.ID DESC");
             var limitOffset = BuildLimitOffset(pageSize, page);
 
             return con.Query<SubstrateRecord>($"""
@@ -112,7 +113,8 @@ namespace ProductWebViewer.Data {
                     s.Defect,
                     s.Person,
                     s.RegDate,
-                    s.Comment
+                    s.Comment,
+                    s.CreatedAt
                 FROM V_Substrate AS s
                 LEFT JOIN M_SubstrateDef AS m ON s.SubstrateID = m.SubstrateID
                 WHERE {where}
@@ -123,10 +125,10 @@ namespace ProductWebViewer.Data {
 
         // groupByModel=true: 型式単位で集計（ロット違いを合算）、false: ロット・注文番号単位で集計
         public int GetStockCount(
-            string? listCategory      = null,
-            string? listProductName   = null,
+            string? listCategory = null,
+            string? listProductName = null,
             string? listSubstrateName = null,
-            bool    groupByModel      = true) {
+            bool groupByModel = true) {
 
             using var con = new SqliteConnection(_connectionString);
             var (where, param) = BuildStockWhere(listCategory, listProductName, listSubstrateName);
@@ -146,14 +148,14 @@ namespace ProductWebViewer.Data {
         }
 
         public IReadOnlyList<StockRecord> GetStock(
-            string? listCategory      = null,
-            string? listProductName   = null,
+            string? listCategory = null,
+            string? listProductName = null,
             string? listSubstrateName = null,
-            bool    groupByModel      = true,
-            string  sortCol  = "",
-            string  sortDir  = "asc",
-            int     page     = 1,
-            int     pageSize = 100) {
+            bool groupByModel = true,
+            string sortCol = "",
+            string sortDir = "asc",
+            int page = 1,
+            int pageSize = 100) {
 
             using var con = new SqliteConnection(_connectionString);
             var (where, param) = BuildStockWhere(listCategory, listProductName, listSubstrateName);
@@ -177,7 +179,8 @@ namespace ProductWebViewer.Data {
                     ORDER BY {orderBy}
                     {limitOffset}
                     """, param).AsList();
-            } else {
+            }
+            else {
                 var orderBy = BuildOrderBy(_stockSortCols, sortCol, sortDir, "MIN(s.ID) DESC");
                 return con.Query<StockRecord>($"""
                     SELECT
@@ -220,14 +223,14 @@ namespace ProductWebViewer.Data {
                 conditions.Add("s.RegDate <= @RegDateTo");
 
             return (string.Join(" AND ", conditions), new {
-                ListCategory      = listCategory,
-                ListProductName   = listProductName,
+                ListCategory = listCategory,
+                ListProductName = listProductName,
                 ListSubstrateName = listSubstrateName,
-                SubstrateName     = substrateName,
-                OrderNumber       = orderNumber,
+                SubstrateName = substrateName,
+                OrderNumber = orderNumber,
                 // SQLite はテキスト型で日付を "yyyy/MM/dd" 形式で保存しているため変換する
-                RegDateFrom       = regDateFrom?.Replace('-', '/'),
-                RegDateTo         = regDateTo?.Replace('-', '/')
+                RegDateFrom = regDateFrom?.Replace('-', '/'),
+                RegDateTo = regDateTo?.Replace('-', '/')
             });
         }
 
@@ -244,8 +247,8 @@ namespace ProductWebViewer.Data {
                 conditions.Add("s.SubstrateName = @ListSubstrateName");
 
             return (string.Join(" AND ", conditions), new {
-                ListCategory      = listCategory,
-                ListProductName   = listProductName,
+                ListCategory = listCategory,
+                ListProductName = listProductName,
                 ListSubstrateName = listSubstrateName
             });
         }

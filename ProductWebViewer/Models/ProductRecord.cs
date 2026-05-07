@@ -16,5 +16,6 @@ namespace ProductWebViewer.Models {
         public string? SerialFirst { get; set; }
         public string? SerialLast { get; set; }
         public string? Comment { get; set; }
+        public string? CreatedAt { get; set; }
     }
 }

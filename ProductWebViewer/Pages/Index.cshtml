@@ -431,6 +431,10 @@ document.addEventListener('DOMContentLoaded', function () {
                        value="@Model.FilterProductOrderNumber" placeholder="注文番号" />
             </div>
             <div class="col-auto">
+                <input type="text" class="form-control form-control-sm" name="FilterProductNumber"
+                       value="@Model.FilterProductNumber" placeholder="製造番号" />
+            </div>
+            <div class="col-auto">
                 <input type="date" class="form-control form-control-sm" name="FilterProductRegDateFrom"
                        value="@Model.FilterProductRegDateFrom" />
             </div>
@@ -487,10 +491,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <th data-label="ID"         class="@SortClass("ID")"          onclick="sortBy('ID')">         ID          <span class="sort-icon">@SortIcon("ID")</span></th>
                                 <th data-label="カテゴリ"   class="@SortClass("CategoryName")" onclick="sortBy('CategoryName')">カテゴリ   <span class="sort-icon">@SortIcon("CategoryName")</span></th>
                                 <th data-label="製品名"     class="@SortClass("ProductName")"  onclick="sortBy('ProductName')"> 製品名     <span class="sort-icon">@SortIcon("ProductName")</span></th>
-                                <th data-label="型式"       class="@SortClass("ProductModel")" onclick="sortBy('ProductModel')">型式       <span class="sort-icon">@SortIcon("ProductModel")</span></th>
                                 <th data-label="種別"       class="@SortClass("ProductType")"  onclick="sortBy('ProductType')"> 種別       <span class="sort-icon">@SortIcon("ProductType")</span></th>
+                                <th data-label="型式"       class="@SortClass("ProductModel")" onclick="sortBy('ProductModel')">型式       <span class="sort-icon">@SortIcon("ProductModel")</span></th>
                                 <th data-label="注文番号"   class="@SortClass("OrderNumber")"  onclick="sortBy('OrderNumber')"> 注文番号   <span class="sort-icon">@SortIcon("OrderNumber")</span></th>
-                                <th data-label="製番"       class="@SortClass("ProductNumber")"onclick="sortBy('ProductNumber')">製番      <span class="sort-icon">@SortIcon("ProductNumber")</span></th>
+                                <th data-label="製造番号"   class="@SortClass("ProductNumber")"onclick="sortBy('ProductNumber')">製造番号   <span class="sort-icon">@SortIcon("ProductNumber")</span></th>
                                 <th data-label="O-Les番号"  class="@SortClass("OLesNumber")"   onclick="sortBy('OLesNumber')">  O-Les番号 <span class="sort-icon">@SortIcon("OLesNumber")</span></th>
                                 <th data-label="数量"       class="@SortClass("Quantity")"     onclick="sortBy('Quantity')">    数量       <span class="sort-icon">@SortIcon("Quantity")</span></th>
                                 <th data-label="担当者"     class="@SortClass("Person")"       onclick="sortBy('Person')">      担当者     <span class="sort-icon">@SortIcon("Person")</span></th>
@@ -499,6 +503,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <th data-label="シリアル開始" class="@SortClass("SerialFirst")" onclick="sortBy('SerialFirst')">シリアル開始<span class="sort-icon">@SortIcon("SerialFirst")</span></th>
                                 <th data-label="シリアル終了" class="@SortClass("SerialLast")"  onclick="sortBy('SerialLast')"> シリアル終了<span class="sort-icon">@SortIcon("SerialLast")</span></th>
                                 <th data-label="コメント"   class="@SortClass("Comment")"      onclick="sortBy('Comment')">     コメント   <span class="sort-icon">@SortIcon("Comment")</span></th>
+                                <th data-label="登録日時"   class="@SortClass("CreatedAt")"      onclick="sortBy('CreatedAt')">     登録日時   <span class="sort-icon">@SortIcon("CreatedAt")</span></th>
                                 <th data-label=""></th>
                             </tr>
                         </thead>
@@ -509,8 +514,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <td>@r.Id</td>
                                     <td>@r.CategoryName</td>
                                     <td>@r.ProductName</td>
-                                    <td>@r.ProductModel</td>
                                     <td>@r.ProductType</td>
+                                    <td>@r.ProductModel</td>
                                     <td>@r.OrderNumber</td>
                                     <td>@r.ProductNumber</td>
                                     <td>@r.OLesNumber</td>
@@ -521,6 +526,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <td>@r.SerialFirst</td>
                                     <td>@r.SerialLast</td>
                                     <td>@r.Comment</td>
+                                    <td>@r.CreatedAt</td>
                                     <td><button type="button" class="btn btn-outline-secondary btn-used-sub" onclick="showUsedSubstrates(@r.Id)">使用基板</button></td>
                                 </tr>
                             }
@@ -683,6 +689,10 @@ document.addEventListener('DOMContentLoaded', function () {
                        value="@Model.FilterSubstrateOrderNumber" placeholder="注文番号" />
             </div>
             <div class="col-auto">
+                <input type="text" class="form-control form-control-sm" name="FilterSubstrateNumber"
+                       value="@Model.FilterSubstrateNumber" placeholder="製造番号" />
+            </div>
+            <div class="col-auto">
                 <input type="date" class="form-control form-control-sm" name="FilterSubstrateRegDateFrom"
                        value="@Model.FilterSubstrateRegDateFrom" />
             </div>
@@ -751,6 +761,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <th data-label="担当者"       class="@SortClass("Person")"         onclick="sortBy('Person')">        担当者       <span class="sort-icon">@SortIcon("Person")</span></th>
                                 <th data-label="登録日"       class="@SortClass("RegDate")"        onclick="sortBy('RegDate')">       登録日       <span class="sort-icon">@SortIcon("RegDate")</span></th>
                                 <th data-label="コメント"     class="@SortClass("Comment")"        onclick="sortBy('Comment')">       コメント     <span class="sort-icon">@SortIcon("Comment")</span></th>
+                                <th data-label="登録日時"     class="@SortClass("CreatedAt")"      onclick="sortBy('CreatedAt')">     登録日時     <span class="sort-icon">@SortIcon("CreatedAt")</span></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -770,6 +781,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <td>@r.Person</td>
                                     <td>@r.RegDate</td>
                                     <td>@r.Comment</td>
+                                    <td>@r.CreatedAt</td>
                                 </tr>
                             }
                         </tbody>
