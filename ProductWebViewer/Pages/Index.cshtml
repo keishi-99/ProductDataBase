@@ -355,8 +355,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (_overlay) _overlay.classList.add('show');
     }
     // ボタンクリックによるネイティブ submit を捕捉
+    // HTML5 バリデーションでブロックされた場合はページ遷移しないのでスピナーを出さない
     document.querySelectorAll('form').forEach(function (f) {
-        f.addEventListener('submit', showLoading);
+        f.addEventListener('submit', function () {
+            if (f.checkValidity()) showLoading();
+        });
     });
     // リストボックス変更・ソート・ページネーション等のプログラム的 form.submit() を捕捉
     // target="_blank" は別タブで開くため現在ページは遷移しない → スピナー表示しない
