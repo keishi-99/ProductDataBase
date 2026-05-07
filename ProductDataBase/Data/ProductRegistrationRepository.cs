@@ -77,14 +77,16 @@ namespace ProductDatabase.Data {
                     Serial,
                     OLesSerial,
                     UsedID,
-                    ProductName
+                    ProductName,
+                    ProductID
                 )
                 VALUES
                 (
                     @Serial,
                     @OLesSerial,
                     @ProductRowId,
-                    @ProductName
+                    @ProductName,
+                    @ProductId
                 );
                 """;
             connection.Execute(commandText, serialData, transaction: transaction);
@@ -178,46 +180,46 @@ namespace ProductDatabase.Data {
             }
         }
 
-        // 指定シリアルリストのうちDB既存シリアルを返す
-        public static List<string> CheckSerialDuplication(IDbConnection connection, string productName, IList<string> serialList) {
+        // 指定シリアルリストのうちDB既存シリアルを返す（同製品名の全ProductIDを対象にチェック）
+        public static List<string> CheckSerialDuplication(IDbConnection connection, long productId, IList<string> serialList) {
             var sql =
                 $"""
                 SELECT
                     s.Serial
                 FROM
                     {Constants.TSerialTableName} AS s
-                LEFT JOIN
-                    {Constants.VProductTableName} AS p
-                ON
-                    s.UsedID = p.ID
+                INNER JOIN
+                    {Constants.ProductTableName} AS m ON s.ProductID = m.ProductID
                 WHERE
-                    s.ProductName = @ProductName
+                    m.ProductName = (SELECT ProductName FROM {Constants.ProductTableName} WHERE ProductID = @ProductID)
                 AND
                     s.Serial IN @SerialList;
                 """;
 
             return connection.Query<string>(sql, new {
-                ProductName = productName,
+                ProductID = productId,
                 SerialList = serialList.Select(x => x.Trim()).ToList()
             }).ToList();
         }
 
-        // 指定O-LesシリアルリストのうちDB既存シリアルを返す
-        public static List<string> CheckOlesSerialDuplication(IDbConnection connection, string productName, IList<string> olesList) {
+        // 指定O-LesシリアルリストのうちDB既存シリアルを返す（同製品名の全ProductIDを対象にチェック）
+        public static List<string> CheckOlesSerialDuplication(IDbConnection connection, long productId, IList<string> olesList) {
             var sql =
                 $"""
                 SELECT
                     s.OLesSerial
                 FROM
                     {Constants.TSerialTableName} AS s
+                INNER JOIN
+                    {Constants.ProductTableName} AS m ON s.ProductID = m.ProductID
                 WHERE
-                    s.ProductName = @ProductName
+                    m.ProductName = (SELECT ProductName FROM {Constants.ProductTableName} WHERE ProductID = @ProductID)
                 AND
                     s.OLesSerial IN @OlesList;
                 """;
 
             return connection.Query<string>(sql, new {
-                ProductName = productName,
+                ProductID = productId,
                 OlesList = olesList
             }).ToList();
         }
@@ -283,19 +285,19 @@ namespace ProductDatabase.Data {
             return connection.QueryFirstOrDefault<string>(sql, new { ProductName = productName, RevisionGroup = revisionGroup });
         }
 
-        // 製品名の最新SerialLastNumberを返す（なければnull）
-        public static int? GetLatestSerialLastNumber(IDbConnection connection, string productName) {
+        // 同製品名の最新SerialLastNumberを返す（なければnull）
+        public static int? GetLatestSerialLastNumber(IDbConnection connection, long productId) {
             var sql =
                 $"""
-                SELECT SerialLastNumber
-                FROM {Constants.VProductTableName}
-                WHERE ProductName = @ProductName
-                  AND IsDeleted = 0
-                  AND SerialLastNumber IS NOT NULL
-                ORDER BY ID DESC
+                SELECT tp.SerialLastNumber
+                FROM {Constants.VProductTableName} AS tp
+                WHERE tp.ProductName = (SELECT ProductName FROM {Constants.ProductTableName} WHERE ProductID = @ProductID)
+                  AND tp.IsDeleted = 0
+                  AND tp.SerialLastNumber IS NOT NULL
+                ORDER BY tp.ID DESC
                 LIMIT 1
                 """;
-            return connection.QueryFirstOrDefault<int?>(sql, new { ProductName = productName });
+            return connection.QueryFirstOrDefault<int?>(sql, new { ProductID = productId });
         }
 
         // Revision変更レコードをINSERTして生成されたROWIDを返す
@@ -347,5 +349,5 @@ namespace ProductDatabase.Data {
     }
 
     // シリアルINSERT用データレコード
-    public sealed record SerialInsertData(string Serial, string? OLesSerial, int ProductRowId, string ProductName);
+    public sealed record SerialInsertData(string Serial, string? OLesSerial, int ProductRowId, string ProductName, long ProductId);
 }

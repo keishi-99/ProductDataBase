@@ -165,6 +165,33 @@ namespace ProductDatabase.Data {
             });
         }
 
+        // T_Serial に ProductID カラムを追加し既存レコードを補完するマイグレーション
+        public static void MigrateSerialProductId() {
+            using var con = new SqliteConnection(GetConnectionRegistration());
+            con.Open();
+
+            var columns = con.Query<string>("SELECT name FROM pragma_table_info('T_Serial')").ToList();
+            if (columns.Contains("ProductID")) return;
+
+            using var tx = con.BeginTransaction();
+
+            con.Execute("ALTER TABLE T_Serial ADD COLUMN ProductID INTEGER", transaction: tx);
+
+            // 既存レコードは UsedID → T_Product.ID → T_Product.ProductID で補完
+            con.Execute(
+                $"""
+                UPDATE T_Serial
+                SET ProductID = (
+                    SELECT tp.ProductID
+                    FROM {Constants.TProductTableName} AS tp
+                    WHERE tp.ID = T_Serial.UsedID
+                )
+                WHERE ProductID IS NULL
+                """, transaction: tx);
+
+            tx.Commit();
+        }
+
         // 製品マスターを物理削除する（実績存在チェック・関連紐づけ削除を含む）
         public static void DeleteProduct(long productId) {
             using var con = new SqliteConnection(GetConnectionRegistration());

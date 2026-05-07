@@ -369,7 +369,8 @@ namespace ProductDatabase {
                 serial,
                 (olesSerialList != null && i < olesSerialList.Count) ? olesSerialList[i] : null,
                 _productRegisterWork.RowID,
-                _productMaster.ProductName
+                _productMaster.ProductName,
+                _productMaster.ProductID
             ));
 
             ProductRegistrationRepository.InsertSerials(connection, transaction, serialData);
@@ -534,7 +535,7 @@ namespace ProductDatabase {
                 return;
             }
 
-            var duplicatedSerials = ProductRegistrationRepository.CheckSerialDuplication(connection, _productMaster.ProductName, _serialList);
+            var duplicatedSerials = ProductRegistrationRepository.CheckSerialDuplication(connection, _productMaster.ProductID, _serialList);
 
             if (duplicatedSerials.Count > 0) {
                 var message = string.Join(Environment.NewLine, duplicatedSerials);
@@ -547,7 +548,7 @@ namespace ProductDatabase {
                     .Select(x => x.Trim())
                     .ToList();
 
-                var duplicatedOlesSerials = ProductRegistrationRepository.CheckOlesSerialDuplication(connection, _productMaster.ProductName, olesList);
+                var duplicatedOlesSerials = ProductRegistrationRepository.CheckOlesSerialDuplication(connection, _productMaster.ProductID, olesList);
 
                 if (duplicatedOlesSerials.Count > 0) {
                     var message = string.Join(Environment.NewLine, duplicatedOlesSerials);
