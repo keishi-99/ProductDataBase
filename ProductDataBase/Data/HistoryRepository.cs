@@ -144,36 +144,36 @@ namespace ProductDatabase.Data {
 
         // シリアル番号履歴を取得する
         public static DataTable QuerySerialHistory(ProductMaster productMaster, bool allProducts) {
-            var categoryFilter = !string.IsNullOrEmpty(productMaster.CategoryName) ? " AND (p.CategoryName = @CategoryName OR p.CategoryName IS NULL)" : string.Empty;
-            var productNameFilter = !string.IsNullOrEmpty(productMaster.ProductName) ? " AND s.ProductName = @ProductName" : string.Empty;
+            var categoryFilter = !string.IsNullOrEmpty(productMaster.CategoryName) ? " AND (v.CategoryName = @CategoryName OR v.CategoryName IS NULL)" : string.Empty;
+            var productNameFilter = !string.IsNullOrEmpty(productMaster.ProductName) ? " AND v.ProductName = @ProductName" : string.Empty;
             var productId = !allProducts ? productMaster.ProductID : 0;
-            var productIdFilter = (productId != 0) ? " AND ProductID = @ProductID" : string.Empty;
+            var productIdFilter = (productId != 0) ? " AND v.ProductID = @ProductID" : string.Empty;
 
             var query = $"""
                 SELECT
-                    s.rowid,
-                    s.Serial,
-                    s.OLesSerial,
+                    v.rowid,
+                    v.Serial,
+                    v.OLesSerial,
                     p.OrderNumber,
                     p.ProductNumber,
-                    s.ProductName,
+                    v.ProductName,
                     p.ProductType,
                     p.ProductModel,
                     p.RegDate,
-                    s.usedID
+                    v.UsedID
                 FROM
-                    {Constants.TSerialTableName} AS s
+                    {Constants.VSerialTableName} AS v
                 LEFT JOIN
                     {Constants.VProductTableName} AS p
                 ON
-                    s.UsedID = p.ID
+                    v.UsedID = p.ID
                 WHERE
                     1=1
                     {categoryFilter}
                     {productNameFilter}
                     {productIdFilter}
                 ORDER BY
-                    s.rowid DESC;
+                    v.rowid DESC;
                 """;
 
             var p = new DynamicParameters();
@@ -284,7 +284,7 @@ namespace ProductDatabase.Data {
                     ProductName,
                     Serial,
                     UsedID
-                FROM {Constants.TSerialTableName}
+                FROM {Constants.VSerialTableName}
                 WHERE UsedID = @ID;
                 """;
             return connection.Query(sql, new { ID = id }, transaction);

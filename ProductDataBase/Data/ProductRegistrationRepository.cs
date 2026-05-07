@@ -77,7 +77,6 @@ namespace ProductDatabase.Data {
                     Serial,
                     OLesSerial,
                     UsedID,
-                    ProductName,
                     ProductID
                 )
                 VALUES
@@ -85,7 +84,6 @@ namespace ProductDatabase.Data {
                     @Serial,
                     @OLesSerial,
                     @ProductRowId,
-                    @ProductName,
                     @ProductId
                 );
                 """;
@@ -349,5 +347,5 @@ namespace ProductDatabase.Data {
     }
 
     // シリアルINSERT用データレコード
-    public sealed record SerialInsertData(string Serial, string? OLesSerial, int ProductRowId, string ProductName, long ProductId);
+    public sealed record SerialInsertData(string Serial, string? OLesSerial, int ProductRowId, long ProductId);
 }

@@ -369,7 +369,6 @@ namespace ProductDatabase {
                 serial,
                 (olesSerialList != null && i < olesSerialList.Count) ? olesSerialList[i] : null,
                 _productRegisterWork.RowID,
-                _productMaster.ProductName,
                 _productMaster.ProductID
             ));
 
