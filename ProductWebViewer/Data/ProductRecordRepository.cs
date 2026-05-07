@@ -35,6 +35,7 @@ namespace ProductWebViewer.Data {
             ["ProductType"] = "p.ProductType",
             ["ProductModel"] = "p.ProductModel",
             ["RegDate"] = "p.RegDate",
+            ["CreatedAt"] = "p.CreatedAt",
         };
 
         public ProductRecordRepository(IConfiguration configuration) : base(configuration) { }
@@ -183,7 +184,8 @@ namespace ProductWebViewer.Data {
                     s.ProductName,
                     p.ProductType,
                     p.ProductModel,
-                    p.RegDate
+                    p.RegDate,
+                    p.CreatedAt
                 FROM T_Serial AS s
                 LEFT JOIN V_Product AS p ON s.UsedID = p.ID
                 WHERE {where}

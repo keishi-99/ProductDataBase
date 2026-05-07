@@ -504,7 +504,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <th data-label="シリアル開始" class="@SortClass("SerialFirst")" onclick="sortBy('SerialFirst')">シリアル開始<span class="sort-icon">@SortIcon("SerialFirst")</span></th>
                                 <th data-label="シリアル終了" class="@SortClass("SerialLast")"  onclick="sortBy('SerialLast')"> シリアル終了<span class="sort-icon">@SortIcon("SerialLast")</span></th>
                                 <th data-label="コメント"   class="@SortClass("Comment")"      onclick="sortBy('Comment')">     コメント   <span class="sort-icon">@SortIcon("Comment")</span></th>
-                                <th data-label="登録日時"   class="@SortClass("CreatedAt")"      onclick="sortBy('CreatedAt')">     登録日時   <span class="sort-icon">@SortIcon("CreatedAt")</span></th>
+                                <th data-label="登録日時"   class="@SortClass("CreatedAt")"      onclick="sortBy('CreatedAt')"> 登録日時   <span class="sort-icon">@SortIcon("CreatedAt")</span></th>
                                 <th data-label=""></th>
                             </tr>
                         </thead>
@@ -547,6 +547,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <th data-label="種別"       class="@SortClass("ProductType")"   onclick="sortBy('ProductType')"> 種別       <span class="sort-icon">@SortIcon("ProductType")</span></th>
                                 <th data-label="型式"       class="@SortClass("ProductModel")"  onclick="sortBy('ProductModel')">型式       <span class="sort-icon">@SortIcon("ProductModel")</span></th>
                                 <th data-label="登録日"     class="@SortClass("RegDate")"       onclick="sortBy('RegDate')">     登録日     <span class="sort-icon">@SortIcon("RegDate")</span></th>
+                                <th data-label="登録日時"     class="@SortClass("CreatedAt")"      onclick="sortBy('CreatedAt')">登録日時     <span class="sort-icon">@SortIcon("CreatedAt")</span></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -562,6 +563,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <td>@r.ProductType</td>
                                     <td>@r.ProductModel</td>
                                     <td>@r.RegDate</td>
+                                    <td>@r.CreatedAt</td>
                                 </tr>
                             }
                         </tbody>
