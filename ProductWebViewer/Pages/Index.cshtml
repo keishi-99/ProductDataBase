@@ -358,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // HTML5 バリデーションでブロックされた場合はページ遷移しないのでスピナーを出さない
     document.querySelectorAll('form').forEach(function (f) {
         f.addEventListener('submit', function () {
-            if (f.checkValidity()) showLoading();
+            if (f.checkValidity() && f.getAttribute('target') !== '_blank') showLoading();
         });
     });
     // リストボックス変更・ソート・ページネーション等のプログラム的 form.submit() を捕捉
@@ -377,7 +377,9 @@ document.addEventListener('DOMContentLoaded', function () {
             && !href.startsWith('mailto:')
             && target !== '_blank'
             && !a.hasAttribute('download')) {
-            a.addEventListener('click', showLoading);
+            a.addEventListener('click', function (e) {
+                if (e.button === 0 && !e.ctrlKey && !e.shiftKey && !e.metaKey && !e.altKey) showLoading();
+            });
         }
     });
     window.addEventListener('pageshow', function () {
