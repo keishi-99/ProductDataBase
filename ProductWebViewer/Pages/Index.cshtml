@@ -363,9 +363,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     // リストボックス変更・ソート・ページネーション等のプログラム的 form.submit() を捕捉
     // target="_blank" は別タブで開くため現在ページは遷移しない → スピナー表示しない
+    // Ctrl/Shift/Meta や中クリックの場合も新タブで開く → スピナー表示しない
+    var _clickHadModifier = false;
+    document.addEventListener('click', function (e) {
+        _clickHadModifier = e.ctrlKey || e.shiftKey || e.metaKey || e.button === 1;
+    }, true);
     var _origFormSubmit = HTMLFormElement.prototype.submit;
     HTMLFormElement.prototype.submit = function () {
-        if (this.getAttribute('target') !== '_blank') showLoading();
+        if (this.getAttribute('target') !== '_blank' && !_clickHadModifier) showLoading();
         _origFormSubmit.call(this);
     };
     document.querySelectorAll('a').forEach(function (a) {
