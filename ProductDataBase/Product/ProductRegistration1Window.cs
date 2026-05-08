@@ -78,7 +78,7 @@ namespace ProductDatabase {
                 RevisionTextBox.Text = revisionResult ?? "";
 
                 if (_productMaster.IsSerialGeneration) {
-                    var serialLastNum = ProductRegistrationRepository.GetLatestSerialLastNumber(con, _productMaster.ProductName)
+                    var serialLastNum = ProductRegistrationRepository.GetLatestSerialLastNumber(con, _productMaster.ProductID)
                         ?? throw new Exception("シリアル番号の取得に失敗しました。");
                     var nextSerialNumber = serialLastNum + 1;
 
@@ -238,7 +238,7 @@ namespace ProductDatabase {
             connection.Open();
             using var transaction = connection.BeginTransaction();
             try {
-                var serialLastNum = ProductRegistrationRepository.GetLatestSerialLastNumber(connection, _productMaster.ProductName) ?? 0;
+                var serialLastNum = ProductRegistrationRepository.GetLatestSerialLastNumber(connection, _productMaster.ProductID) ?? 0;
                 var id = ProductRegistrationRepository.InsertRevisionChangeRecord(connection, transaction, _productMaster, _productRegisterWork, serialLastNum);
 
                 transaction.Commit();

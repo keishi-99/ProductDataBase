@@ -354,18 +354,23 @@ document.addEventListener('DOMContentLoaded', function () {
         if (_progressBar) _progressBar.style.display = 'block';
         if (_overlay) _overlay.classList.add('show');
     }
+    // Ctrl/Shift/Meta キーや中クリック時は新タブで開くため現在ページは遷移しない
+    // → スピナーを出さないようキャプチャフェーズで修飾キー状態を記録する
+    var _clickHadModifier = false;
+    document.addEventListener('click', function (e) {
+        _clickHadModifier = e.ctrlKey || e.shiftKey || e.metaKey || e.button === 1;
+    }, true);
     // ボタンクリックによるネイティブ submit を捕捉
-    // HTML5 バリデーションでブロックされた場合はページ遷移しないのでスピナーを出さない
+    // HTML5 バリデーションでブロックされた場合・修飾キー押下時はページ遷移しないのでスピナーを出さない
     document.querySelectorAll('form').forEach(function (f) {
         f.addEventListener('submit', function () {
-            if (f.checkValidity()) showLoading();
+            if (f.checkValidity() && f.getAttribute('target') !== '_blank' && !_clickHadModifier) showLoading();
         });
     });
     // リストボックス変更・ソート・ページネーション等のプログラム的 form.submit() を捕捉
-    // target="_blank" は別タブで開くため現在ページは遷移しない → スピナー表示しない
     var _origFormSubmit = HTMLFormElement.prototype.submit;
     HTMLFormElement.prototype.submit = function () {
-        if (this.getAttribute('target') !== '_blank') showLoading();
+        if (this.getAttribute('target') !== '_blank' && !_clickHadModifier) showLoading();
         _origFormSubmit.call(this);
     };
     document.querySelectorAll('a').forEach(function (a) {
@@ -377,7 +382,9 @@ document.addEventListener('DOMContentLoaded', function () {
             && !href.startsWith('mailto:')
             && target !== '_blank'
             && !a.hasAttribute('download')) {
-            a.addEventListener('click', showLoading);
+            a.addEventListener('click', function (e) {
+                if (e.button === 0 && !e.ctrlKey && !e.shiftKey && !e.metaKey && !e.altKey) showLoading();
+            });
         }
     });
     window.addEventListener('pageshow', function () {

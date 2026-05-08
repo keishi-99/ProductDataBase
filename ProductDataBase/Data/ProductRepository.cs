@@ -165,6 +165,68 @@ namespace ProductDatabase.Data {
             });
         }
 
+        // T_Serial の ProductID 追加・ProductName 削除・V_Serial 作成を行うマイグレーション
+        public static void MigrateSerialProductId() {
+            using var con = new SqliteConnection(GetConnectionRegistration());
+            con.Open();
+
+            var columns = con.Query<string>("SELECT name FROM pragma_table_info('T_Serial')").ToList();
+
+            using var tx = con.BeginTransaction();
+
+            // ProductID カラム追加（未存在時のみ）
+            if (!columns.Contains("ProductID")) {
+                con.Execute("ALTER TABLE T_Serial ADD COLUMN ProductID INTEGER", transaction: tx);
+
+                // UsedID → T_Product → ProductID で補完
+                con.Execute(
+                    $"""
+                    UPDATE T_Serial
+                    SET ProductID = (
+                        SELECT tp.ProductID
+                        FROM {Constants.TProductTableName} AS tp
+                        WHERE tp.ID = T_Serial.UsedID
+                    )
+                    WHERE ProductID IS NULL
+                    """, transaction: tx);
+
+                // 残り NULL は ProductName から逆引き補完
+                con.Execute(
+                    $"""
+                    UPDATE T_Serial
+                    SET ProductID = (
+                        SELECT m.ProductID
+                        FROM {Constants.ProductTableName} AS m
+                        WHERE m.ProductName = T_Serial.ProductName
+                        LIMIT 1
+                    )
+                    WHERE ProductID IS NULL
+                    """, transaction: tx);
+            }
+
+            // ProductName 列を削除（存在する場合）
+            if (columns.Contains("ProductName"))
+                con.Execute("ALTER TABLE T_Serial DROP COLUMN ProductName", transaction: tx);
+
+            // V_Serial ビューを作成（存在しない場合）
+            con.Execute(
+                $"""
+                CREATE VIEW IF NOT EXISTS {Constants.VSerialTableName} AS
+                SELECT
+                    s.rowid,
+                    s.Serial,
+                    s.OLesSerial,
+                    s.UsedID,
+                    s.ProductID,
+                    m.ProductName,
+                    m.CategoryName
+                FROM {Constants.TSerialTableName} AS s
+                LEFT JOIN {Constants.ProductTableName} AS m ON s.ProductID = m.ProductID
+                """, transaction: tx);
+
+            tx.Commit();
+        }
+
         // 製品マスターを物理削除する（実績存在チェック・関連紐づけ削除を含む）
         public static void DeleteProduct(long productId) {
             using var con = new SqliteConnection(GetConnectionRegistration());

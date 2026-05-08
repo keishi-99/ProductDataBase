@@ -82,6 +82,7 @@ namespace ProductDatabase {
 
                 _barcodeService = new BarcodeService(generalSettings.DSN, generalSettings.UID, generalSettings.PWD);
 
+                ProductRepository.MigrateSerialProductId();
                 _productRepository.LoadAll();
 
                 this.Activate();
