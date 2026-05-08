@@ -146,6 +146,7 @@ public class IndexModel : PageModel {
                 ListSubCategory, ListSubProductName, ListSubstrateName,
                 groupByModel: StockGroup != "detail",
                 excludeZeroStock: ExcludeZeroStock,
+                substrateName: FilterSubstrateName,
                 orderNumber: FilterSubstrateOrderNumber,
                 substrateNumber: FilterSubstrateNumber);
             ClampPage();
@@ -153,6 +154,7 @@ public class IndexModel : PageModel {
                 ListSubCategory, ListSubProductName, ListSubstrateName,
                 groupByModel: StockGroup != "detail",
                 excludeZeroStock: ExcludeZeroStock,
+                substrateName: FilterSubstrateName,
                 orderNumber: FilterSubstrateOrderNumber,
                 substrateNumber: FilterSubstrateNumber,
                 SortCol, SortDir, PageNum, PageSize);

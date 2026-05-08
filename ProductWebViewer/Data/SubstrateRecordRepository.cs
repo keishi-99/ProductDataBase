@@ -132,11 +132,12 @@ namespace ProductWebViewer.Data {
             string? listSubstrateName = null,
             bool groupByModel = true,
             bool excludeZeroStock = false,
+            string? substrateName = null,
             string? orderNumber = null,
             string? substrateNumber = null) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildStockWhere(listCategory, listProductName, listSubstrateName, orderNumber, substrateNumber);
+            var (where, param) = BuildStockWhere(listCategory, listProductName, listSubstrateName, substrateName, orderNumber, substrateNumber);
             var groupBy = groupByModel
                 ? "s.SubstrateID, s.SubstrateName, s.SubstrateModel"
                 : "s.SubstrateID, s.SubstrateName, s.SubstrateModel, s.SubstrateNumber, s.OrderNumber";
@@ -162,6 +163,7 @@ namespace ProductWebViewer.Data {
             string? listSubstrateName = null,
             bool groupByModel = true,
             bool excludeZeroStock = false,
+            string? substrateName = null,
             string? orderNumber = null,
             string? substrateNumber = null,
             string sortCol = "",
@@ -170,7 +172,7 @@ namespace ProductWebViewer.Data {
             int pageSize = 100) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildStockWhere(listCategory, listProductName, listSubstrateName, orderNumber, substrateNumber);
+            var (where, param) = BuildStockWhere(listCategory, listProductName, listSubstrateName, substrateName, orderNumber, substrateNumber);
             var limitOffset = BuildLimitOffset(pageSize, page);
             var having = excludeZeroStock
                 ? "HAVING SUM(COALESCE(s.Increase,0) + COALESCE(s.Decrease,0) + COALESCE(s.Defect,0)) > 0"
@@ -257,7 +259,7 @@ namespace ProductWebViewer.Data {
         // 在庫は全期間の累積値のためレジストリ日付フィルターは持たない
         private static (string where, object param) BuildStockWhere(
             string? listCategory, string? listProductName, string? listSubstrateName,
-            string? orderNumber = null, string? substrateNumber = null) {
+            string? substrateName = null, string? orderNumber = null, string? substrateNumber = null) {
 
             var conditions = new List<string> { "s.IsDeleted = 0" };
             if (!string.IsNullOrWhiteSpace(listCategory))
@@ -266,6 +268,8 @@ namespace ProductWebViewer.Data {
                 conditions.Add("m.ProductName = @ListProductName");
             if (!string.IsNullOrWhiteSpace(listSubstrateName))
                 conditions.Add("s.SubstrateName = @ListSubstrateName");
+            if (!string.IsNullOrWhiteSpace(substrateName))
+                conditions.Add("s.SubstrateName LIKE '%' || @SubstrateName || '%'");
             if (!string.IsNullOrWhiteSpace(orderNumber))
                 conditions.Add("s.OrderNumber LIKE '%' || @OrderNumber || '%'");
             if (!string.IsNullOrWhiteSpace(substrateNumber))
@@ -275,6 +279,7 @@ namespace ProductWebViewer.Data {
                 ListCategory = listCategory,
                 ListProductName = listProductName,
                 ListSubstrateName = listSubstrateName,
+                SubstrateName = substrateName,
                 OrderNumber = orderNumber,
                 SubstrateNumber = substrateNumber,
             });
