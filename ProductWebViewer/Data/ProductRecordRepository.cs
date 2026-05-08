@@ -257,7 +257,7 @@ namespace ProductWebViewer.Data {
             if (!string.IsNullOrWhiteSpace(listProductType))
                 conditions.Add("p.ProductType = @ListProductType");
             if (!string.IsNullOrWhiteSpace(productName))
-                conditions.Add("s.ProductName LIKE '%' || @ProductName || '%'");
+                conditions.Add("p.ProductName LIKE '%' || @ProductName || '%'");
             if (!string.IsNullOrWhiteSpace(orderNumber))
                 conditions.Add("p.OrderNumber LIKE '%' || @OrderNumber || '%'");
             if (!string.IsNullOrWhiteSpace(productNumber))
