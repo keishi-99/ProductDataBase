@@ -398,7 +398,9 @@ document.addEventListener('DOMContentLoaded', function () {
     ['productListFilter', 'subListFilter'].forEach(function (id) {
         var el = document.getElementById(id);
         if (!el) return;
-        var input = el.closest('form').querySelector('input[name="ListCollapsed"]');
+        var form = el.closest('form');
+        if (!form) return;
+        var input = form.querySelector('input[name="ListCollapsed"]');
         el.addEventListener('hide.bs.collapse', function () { if (input) input.value = 'true'; });
         el.addEventListener('show.bs.collapse', function () { if (input) input.value = 'false'; });
     });
@@ -438,7 +440,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         <div class="d-flex align-items-center mb-1">
             <button type="button"
-                    class="btn btn-sm btn-outline-secondary py-0 px-2 me-2 filter-toggle-btn"
+                    class="btn btn-sm btn-outline-secondary py-0 px-2 me-2 filter-toggle-btn @(Model.ListCollapsed ? "collapsed" : "")"
                     data-bs-toggle="collapse"
                     data-bs-target="#productListFilter"
                     aria-controls="productListFilter"
@@ -711,7 +713,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         <div class="d-flex align-items-center mb-1">
             <button type="button"
-                    class="btn btn-sm btn-outline-secondary py-0 px-2 me-2 filter-toggle-btn"
+                    class="btn btn-sm btn-outline-secondary py-0 px-2 me-2 filter-toggle-btn @(Model.ListCollapsed ? "collapsed" : "")"
                     data-bs-toggle="collapse"
                     data-bs-target="#subListFilter"
                     aria-controls="subListFilter"
