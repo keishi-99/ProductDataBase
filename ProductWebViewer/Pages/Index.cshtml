@@ -83,7 +83,6 @@
     .table-responsive {
         overflow-x: auto;
         overflow-y: auto;
-        max-height: calc(100vh - 400px);
     }
     .resizable-table thead th {
         position: sticky;
@@ -402,7 +401,22 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!input) return;
         el.addEventListener('hide.bs.collapse', function () { input.value = 'true'; });
         el.addEventListener('show.bs.collapse', function () { input.value = 'false'; });
+        // アニメーション完了後にテーブル高さを再計算する
+        el.addEventListener('shown.bs.collapse', syncTableHeight);
+        el.addEventListener('hidden.bs.collapse', syncTableHeight);
     });
+
+    // テーブルの max-height をビューポートの残り高さに合わせて動的に設定する
+    function syncTableHeight() {
+        var table = document.querySelector('.table-responsive');
+        if (!table) return;
+        var top = table.getBoundingClientRect().top;
+        var nav = table.parentElement && table.parentElement.querySelector('nav.d-flex');
+        var bottomPad = nav ? nav.offsetHeight + 8 : 8;
+        table.style.maxHeight = Math.max(150, window.innerHeight - top - bottomPad) + 'px';
+    }
+    syncTableHeight();
+    window.addEventListener('resize', syncTableHeight);
 });
 </script>
 }
