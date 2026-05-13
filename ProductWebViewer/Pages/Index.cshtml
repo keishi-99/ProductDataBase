@@ -395,9 +395,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     // リストフィルターの折りたたみ状態を hidden input に同期する
     // hide/show（アニメーション開始時）を使用し、送信との競合を防ぐ
-    ['productListFilter', 'subListFilter'].forEach(function (id) {
-        var el = document.getElementById(id);
-        if (!el) return;
+    document.querySelectorAll('.sync-collapse-state').forEach(function (el) {
         var form = el.closest('form');
         if (!form) return;
         var input = form.querySelector('input[name="ListCollapsed"]');
@@ -449,7 +447,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     aria-expanded="@(!Model.ListCollapsed ? "true" : "false")"><span class="toggle-icon"></span></button>
             <hr class="flex-grow-1 ms-0 my-0 opacity-25" />
         </div>
-        <div id="productListFilter" class="collapse @(!Model.ListCollapsed ? "show" : "")">
+        <div id="productListFilter" class="collapse sync-collapse-state @(!Model.ListCollapsed ? "show" : "")">
             <div class="row g-2 mb-2">
                 <div class="col-auto" style="width: 100px;">
                     <div class="fw-bold small mb-1">カテゴリ</div>
@@ -722,7 +720,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     aria-expanded="@(!Model.ListCollapsed ? "true" : "false")"><span class="toggle-icon"></span></button>
             <hr class="flex-grow-1 ms-0 my-0 opacity-25" />
         </div>
-        <div id="subListFilter" class="collapse @(!Model.ListCollapsed ? "show" : "")">
+        <div id="subListFilter" class="collapse sync-collapse-state @(!Model.ListCollapsed ? "show" : "")">
             <div class="row g-2 mb-2">
                 <div class="col-auto" style="width: 100px;">
                     <div class="fw-bold small mb-1">カテゴリ</div>
