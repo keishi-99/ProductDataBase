@@ -150,6 +150,8 @@
     #usedSubModal thead th {
         background-color: var(--bs-tertiary-bg);
     }
+    .filter-toggle-btn .toggle-icon::before { content: "▼"; }
+    .filter-toggle-btn.collapsed .toggle-icon::before { content: "▶"; }
 </style>
 }
 
@@ -391,6 +393,16 @@ document.addEventListener('DOMContentLoaded', function () {
         if (_progressBar) _progressBar.style.display = 'none';
         if (_overlay) _overlay.classList.remove('show');
     });
+    // リストフィルターの折りたたみ状態を hidden input に同期する
+    // hide/show（アニメーション開始時）を使用し、送信との競合を防ぐ
+    document.querySelectorAll('.sync-collapse-state').forEach(function (el) {
+        var form = el.closest('form');
+        if (!form) return;
+        var input = form.querySelector('input[name="ListCollapsed"]');
+        if (!input) return;
+        el.addEventListener('hide.bs.collapse', function () { input.value = 'true'; });
+        el.addEventListener('show.bs.collapse', function () { input.value = 'false'; });
+    });
 });
 </script>
 }
@@ -423,51 +435,64 @@ document.addEventListener('DOMContentLoaded', function () {
         <input type="hidden" id="pageInput"    name="PageNum"    value="@Model.PageNum" />
         <input type="hidden" id="sortColInput" name="SortCol" value="@Model.SortCol" />
         <input type="hidden" id="sortDirInput" name="SortDir" value="@Model.SortDir" />
+        <input type="hidden" name="ListCollapsed" value="@(Model.ListCollapsed ? "true" : "false")" />
 
-        <div class="row g-2 mb-2">
-            <div class="col-auto" style="width: 100px;">
-                <div class="fw-bold small mb-1">カテゴリ</div>
-                <div class="list-box">
-                    <select id="listProductCategory" name="ListProductCategory" size="10">
-                        <option value="">（すべて）</option>
-                        @foreach (var item in Model.ProductCategoryList) {
-                            if (Model.ListProductCategory == item) {
-                                <option value="@item" selected>@item</option>
-                            } else {
-                                <option value="@item">@item</option>
+        <div class="d-flex align-items-center mb-1">
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary py-0 px-2 me-2 filter-toggle-btn @(Model.ListCollapsed ? "collapsed" : "")"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#productListFilter"
+                    aria-controls="productListFilter"
+                    aria-label="フィルターの表示切替"
+                    aria-expanded="@(!Model.ListCollapsed ? "true" : "false")"><span class="toggle-icon"></span></button>
+            <hr class="flex-grow-1 ms-0 my-0 opacity-25" />
+        </div>
+        <div id="productListFilter" class="collapse sync-collapse-state @(!Model.ListCollapsed ? "show" : "")">
+            <div class="row g-2 mb-2">
+                <div class="col-auto" style="width: 100px;">
+                    <div class="fw-bold small mb-1">カテゴリ</div>
+                    <div class="list-box">
+                        <select id="listProductCategory" name="ListProductCategory" size="10">
+                            <option value="">（すべて）</option>
+                            @foreach (var item in Model.ProductCategoryList) {
+                                if (Model.ListProductCategory == item) {
+                                    <option value="@item" selected>@item</option>
+                                } else {
+                                    <option value="@item">@item</option>
+                                }
                             }
-                        }
-                    </select>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div class="col-auto" style="width: 250px;">
-                <div class="fw-bold small mb-1">製品名</div>
-                <div class="list-box">
-                    <select id="listProductName" name="ListProductName" size="10">
-                        <option value="">（すべて）</option>
-                        @foreach (var item in Model.ProductNameList) {
-                            if (Model.ListProductName == item) {
-                                <option value="@item" selected>@item</option>
-                            } else {
-                                <option value="@item">@item</option>
+                <div class="col-auto" style="width: 250px;">
+                    <div class="fw-bold small mb-1">製品名</div>
+                    <div class="list-box">
+                        <select id="listProductName" name="ListProductName" size="10">
+                            <option value="">（すべて）</option>
+                            @foreach (var item in Model.ProductNameList) {
+                                if (Model.ListProductName == item) {
+                                    <option value="@item" selected>@item</option>
+                                } else {
+                                    <option value="@item">@item</option>
+                                }
                             }
-                        }
-                    </select>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div class="col-auto" style="width: 350px;">
-                <div class="fw-bold small mb-1">種別</div>
-                <div class="list-box">
-                    <select id="listProductType" name="ListProductType" size="10">
-                        <option value="">（すべて）</option>
-                        @foreach (var item in Model.ProductTypeList) {
-                            if (Model.ListProductType == item) {
-                                <option value="@item" selected>@item</option>
-                            } else {
-                                <option value="@item">@item</option>
+                <div class="col-auto" style="width: 350px;">
+                    <div class="fw-bold small mb-1">種別</div>
+                    <div class="list-box">
+                        <select id="listProductType" name="ListProductType" size="10">
+                            <option value="">（すべて）</option>
+                            @foreach (var item in Model.ProductTypeList) {
+                                if (Model.ListProductType == item) {
+                                    <option value="@item" selected>@item</option>
+                                } else {
+                                    <option value="@item">@item</option>
+                                }
                             }
-                        }
-                    </select>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -683,51 +708,64 @@ document.addEventListener('DOMContentLoaded', function () {
         <input type="hidden" id="pageInput"    name="PageNum"    value="@Model.PageNum" />
         <input type="hidden" id="sortColInput" name="SortCol" value="@Model.SortCol" />
         <input type="hidden" id="sortDirInput" name="SortDir" value="@Model.SortDir" />
+        <input type="hidden" name="ListCollapsed" value="@(Model.ListCollapsed ? "true" : "false")" />
 
-        <div class="row g-2 mb-2">
-            <div class="col-auto" style="width: 100px;">
-                <div class="fw-bold small mb-1">カテゴリ</div>
-                <div class="list-box">
-                    <select id="listSubCategory" name="ListSubCategory" size="10">
-                        <option value="">（すべて）</option>
-                        @foreach (var item in Model.SubCategoryList) {
-                            if (Model.ListSubCategory == item) {
-                                <option value="@item" selected>@item</option>
-                            } else {
-                                <option value="@item">@item</option>
+        <div class="d-flex align-items-center mb-1">
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary py-0 px-2 me-2 filter-toggle-btn @(Model.ListCollapsed ? "collapsed" : "")"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#subListFilter"
+                    aria-controls="subListFilter"
+                    aria-label="フィルターの表示切替"
+                    aria-expanded="@(!Model.ListCollapsed ? "true" : "false")"><span class="toggle-icon"></span></button>
+            <hr class="flex-grow-1 ms-0 my-0 opacity-25" />
+        </div>
+        <div id="subListFilter" class="collapse sync-collapse-state @(!Model.ListCollapsed ? "show" : "")">
+            <div class="row g-2 mb-2">
+                <div class="col-auto" style="width: 100px;">
+                    <div class="fw-bold small mb-1">カテゴリ</div>
+                    <div class="list-box">
+                        <select id="listSubCategory" name="ListSubCategory" size="10">
+                            <option value="">（すべて）</option>
+                            @foreach (var item in Model.SubCategoryList) {
+                                if (Model.ListSubCategory == item) {
+                                    <option value="@item" selected>@item</option>
+                                } else {
+                                    <option value="@item">@item</option>
+                                }
                             }
-                        }
-                    </select>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div class="col-auto" style="width: 250px;">
-                <div class="fw-bold small mb-1">製品名</div>
-                <div class="list-box">
-                    <select id="listSubProductName" name="ListSubProductName" size="10">
-                        <option value="">（すべて）</option>
-                        @foreach (var item in Model.SubProductNameList) {
-                            if (Model.ListSubProductName == item) {
-                                <option value="@item" selected>@item</option>
-                            } else {
-                                <option value="@item">@item</option>
+                <div class="col-auto" style="width: 250px;">
+                    <div class="fw-bold small mb-1">製品名</div>
+                    <div class="list-box">
+                        <select id="listSubProductName" name="ListSubProductName" size="10">
+                            <option value="">（すべて）</option>
+                            @foreach (var item in Model.SubProductNameList) {
+                                if (Model.ListSubProductName == item) {
+                                    <option value="@item" selected>@item</option>
+                                } else {
+                                    <option value="@item">@item</option>
+                                }
                             }
-                        }
-                    </select>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div class="col-auto" style="width: 350px;">
-                <div class="fw-bold small mb-1">基板名</div>
-                <div class="list-box">
-                    <select id="listSubstrateName" name="ListSubstrateName" size="10">
-                        <option value="">（すべて）</option>
-                        @foreach (var item in Model.SubstrateNameList) {
-                            if (Model.ListSubstrateName == item) {
-                                <option value="@item" selected>@item</option>
-                            } else {
-                                <option value="@item">@item</option>
+                <div class="col-auto" style="width: 350px;">
+                    <div class="fw-bold small mb-1">基板名</div>
+                    <div class="list-box">
+                        <select id="listSubstrateName" name="ListSubstrateName" size="10">
+                            <option value="">（すべて）</option>
+                            @foreach (var item in Model.SubstrateNameList) {
+                                if (Model.ListSubstrateName == item) {
+                                    <option value="@item" selected>@item</option>
+                                } else {
+                                    <option value="@item">@item</option>
+                                }
                             }
-                        }
-                    </select>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
