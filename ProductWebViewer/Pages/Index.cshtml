@@ -83,7 +83,6 @@
     .table-responsive {
         overflow-x: auto;
         overflow-y: auto;
-        max-height: calc(100vh - 400px);
     }
     .resizable-table thead th {
         position: sticky;
@@ -402,6 +401,29 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!input) return;
         el.addEventListener('hide.bs.collapse', function () { input.value = 'true'; });
         el.addEventListener('show.bs.collapse', function () { input.value = 'false'; });
+        // アニメーション完了後にテーブル高さを再計算する
+        el.addEventListener('shown.bs.collapse', syncTableHeight);
+        el.addEventListener('hidden.bs.collapse', syncTableHeight);
+    });
+
+    // テーブルの max-height をビューポートの残り高さに合わせて動的に設定する
+    function syncTableHeight() {
+        const bodyMargin = parseInt(getComputedStyle(document.body).marginBottom) || 0;
+        document.querySelectorAll('.table-responsive').forEach(table => {
+            // ビューポート相対の座標を使用して現在の表示領域における残り高さを計算する
+            const rect = table.getBoundingClientRect();
+            // フォーム内からページネーションを探索
+            const nav = table.closest('form')?.querySelector('nav.d-flex');
+            // main の pb-3 (16px)・body の margin-bottom・nav の mt-2 (8px) を考慮
+            const bottomPad = (nav ? nav.offsetHeight + 8 : 0) + 16 + bodyMargin;
+            table.style.maxHeight = Math.max(150, window.innerHeight - rect.top - bottomPad) + 'px';
+        });
+    }
+    syncTableHeight();
+    let _resizeTimer;
+    window.addEventListener('resize', function () {
+        clearTimeout(_resizeTimer);
+        _resizeTimer = setTimeout(syncTableHeight, 100);
     });
 });
 </script>
