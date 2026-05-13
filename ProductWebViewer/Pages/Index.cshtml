@@ -411,12 +411,11 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.table-responsive').forEach(table => {
             // スクロール位置に依存しないドキュメント相対の座標を取得
             const top = table.getBoundingClientRect().top + window.scrollY;
-            // ページネーションを探索（タブペイン内または親要素内）
-            const nav = table.closest('.tab-pane')?.querySelector('nav.d-flex') ||
-                        (table.parentElement && table.parentElement.querySelector('nav.d-flex'));
+            // フォーム内からページネーションを探索
+            const nav = table.closest('form')?.querySelector('nav.d-flex');
             // main の pb-3 (16px)・body の margin-bottom・nav の mt-2 (8px) を考慮
             const bodyMargin = parseInt(getComputedStyle(document.body).marginBottom) || 0;
-            const bottomPad = (nav ? nav.offsetHeight + 8 : 0) + 16 + bodyMargin + 8;
+            const bottomPad = (nav ? nav.offsetHeight + 8 : 0) + 16 + bodyMargin;
             table.style.maxHeight = Math.max(150, window.innerHeight - top - bottomPad) + 'px';
         });
     }
