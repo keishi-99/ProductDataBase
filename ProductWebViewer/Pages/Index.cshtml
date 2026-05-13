@@ -408,17 +408,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // テーブルの max-height をビューポートの残り高さに合わせて動的に設定する
     function syncTableHeight() {
-        var table = document.querySelector('.table-responsive');
+        const table = document.querySelector('.table-responsive');
         if (!table) return;
         // スクロール位置に依存しないドキュメント相対の座標を取得
-        var top = table.getBoundingClientRect().top + window.pageYOffset;
-        var nav = table.parentElement && table.parentElement.querySelector('nav.d-flex');
+        const top = table.getBoundingClientRect().top + window.scrollY;
+        const nav = table.parentElement && table.parentElement.querySelector('nav.d-flex');
         // nav の mt-2 (8px) と main の pb-3 (16px) を考慮したパディング
-        var bottomPad = (nav ? nav.offsetHeight + 8 : 0) + 16 + 8;
+        const bottomPad = (nav ? nav.offsetHeight + 8 : 0) + 16 + 8;
         table.style.maxHeight = Math.max(150, window.innerHeight - top - bottomPad) + 'px';
     }
     syncTableHeight();
-    var _resizeTimer;
+    let _resizeTimer;
     window.addEventListener('resize', function () {
         clearTimeout(_resizeTimer);
         _resizeTimer = setTimeout(syncTableHeight, 100);
