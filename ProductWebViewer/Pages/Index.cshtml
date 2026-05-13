@@ -408,15 +408,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // テーブルの max-height をビューポートの残り高さに合わせて動的に設定する
     function syncTableHeight() {
+        const bodyMargin = parseInt(getComputedStyle(document.body).marginBottom) || 0;
         document.querySelectorAll('.table-responsive').forEach(table => {
-            // スクロール位置に依存しないドキュメント相対の座標を取得
-            const top = table.getBoundingClientRect().top + window.scrollY;
+            // ビューポート相対の座標を使用して現在の表示領域における残り高さを計算する
+            const rect = table.getBoundingClientRect();
             // フォーム内からページネーションを探索
             const nav = table.closest('form')?.querySelector('nav.d-flex');
             // main の pb-3 (16px)・body の margin-bottom・nav の mt-2 (8px) を考慮
-            const bodyMargin = parseInt(getComputedStyle(document.body).marginBottom) || 0;
             const bottomPad = (nav ? nav.offsetHeight + 8 : 0) + 16 + bodyMargin;
-            table.style.maxHeight = Math.max(150, window.innerHeight - top - bottomPad) + 'px';
+            table.style.maxHeight = Math.max(150, window.innerHeight - rect.top - bottomPad) + 'px';
         });
     }
     syncTableHeight();
