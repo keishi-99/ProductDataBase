@@ -410,13 +410,19 @@ document.addEventListener('DOMContentLoaded', function () {
     function syncTableHeight() {
         var table = document.querySelector('.table-responsive');
         if (!table) return;
-        var top = table.getBoundingClientRect().top;
+        // スクロール位置に依存しないドキュメント相対の座標を取得
+        var top = table.getBoundingClientRect().top + window.pageYOffset;
         var nav = table.parentElement && table.parentElement.querySelector('nav.d-flex');
-        var bottomPad = nav ? nav.offsetHeight + 8 : 8;
+        // nav の mt-2 (8px) と main の pb-3 (16px) を考慮したパディング
+        var bottomPad = (nav ? nav.offsetHeight + 8 : 0) + 16 + 8;
         table.style.maxHeight = Math.max(150, window.innerHeight - top - bottomPad) + 'px';
     }
     syncTableHeight();
-    window.addEventListener('resize', syncTableHeight);
+    var _resizeTimer;
+    window.addEventListener('resize', function () {
+        clearTimeout(_resizeTimer);
+        _resizeTimer = setTimeout(syncTableHeight, 100);
+    });
 });
 </script>
 }
