@@ -21,6 +21,8 @@ public class IndexModel : PageModel {
     [BindProperty(SupportsGet = true)] public string StockGroup { get; set; } = "model";
     // 初回表示（未検索）と「0件ヒット」を区別するためのフラグ
     [BindProperty(SupportsGet = true)] public bool HasSearched { get; set; }
+    // リストフィルターの折りたたみ状態（サブタブ切替をまたいで維持）
+    [BindProperty(SupportsGet = true)] public bool ListCollapsed { get; set; }
 
     // ページネーション・ソート
     [BindProperty(SupportsGet = true)] public int PageNum { get; set; } = 1;

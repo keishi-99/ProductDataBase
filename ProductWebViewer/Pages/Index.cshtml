@@ -150,6 +150,8 @@
     #usedSubModal thead th {
         background-color: var(--bs-tertiary-bg);
     }
+    .filter-toggle-btn .toggle-icon::before { content: "▼"; }
+    .filter-toggle-btn.collapsed .toggle-icon::before { content: "▶"; }
 </style>
 }
 
@@ -391,6 +393,17 @@ document.addEventListener('DOMContentLoaded', function () {
         if (_progressBar) _progressBar.style.display = 'none';
         if (_overlay) _overlay.classList.remove('show');
     });
+    // リストフィルターの折りたたみ状態を hidden input に同期する
+    ['productListFilter', 'subListFilter'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('hidden.bs.collapse', function () {
+            document.querySelectorAll('input[name="ListCollapsed"]').forEach(function (i) { i.value = 'true'; });
+        });
+        el.addEventListener('shown.bs.collapse', function () {
+            document.querySelectorAll('input[name="ListCollapsed"]').forEach(function (i) { i.value = 'false'; });
+        });
+    });
 });
 </script>
 }
@@ -423,7 +436,17 @@ document.addEventListener('DOMContentLoaded', function () {
         <input type="hidden" id="pageInput"    name="PageNum"    value="@Model.PageNum" />
         <input type="hidden" id="sortColInput" name="SortCol" value="@Model.SortCol" />
         <input type="hidden" id="sortDirInput" name="SortDir" value="@Model.SortDir" />
+        <input type="hidden" name="ListCollapsed" value="@(Model.ListCollapsed ? "true" : "false")" />
 
+        <div class="d-flex align-items-center mb-1">
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary py-0 px-2 me-2 filter-toggle-btn"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#productListFilter"
+                    aria-expanded="@(!Model.ListCollapsed ? "true" : "false")"><span class="toggle-icon"></span></button>
+            <hr class="flex-grow-1 ms-0 my-0 opacity-25" />
+        </div>
+        <div id="productListFilter" class="collapse @(!Model.ListCollapsed ? "show" : "")">
         <div class="row g-2 mb-2">
             <div class="col-auto" style="width: 100px;">
                 <div class="fw-bold small mb-1">カテゴリ</div>
@@ -470,6 +493,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </select>
                 </div>
             </div>
+        </div>
         </div>
 
         <div class="row g-2 mb-2 align-items-center">
@@ -683,7 +707,17 @@ document.addEventListener('DOMContentLoaded', function () {
         <input type="hidden" id="pageInput"    name="PageNum"    value="@Model.PageNum" />
         <input type="hidden" id="sortColInput" name="SortCol" value="@Model.SortCol" />
         <input type="hidden" id="sortDirInput" name="SortDir" value="@Model.SortDir" />
+        <input type="hidden" name="ListCollapsed" value="@(Model.ListCollapsed ? "true" : "false")" />
 
+        <div class="d-flex align-items-center mb-1">
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary py-0 px-2 me-2 filter-toggle-btn"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#subListFilter"
+                    aria-expanded="@(!Model.ListCollapsed ? "true" : "false")"><span class="toggle-icon"></span></button>
+            <hr class="flex-grow-1 ms-0 my-0 opacity-25" />
+        </div>
+        <div id="subListFilter" class="collapse @(!Model.ListCollapsed ? "show" : "")">
         <div class="row g-2 mb-2">
             <div class="col-auto" style="width: 100px;">
                 <div class="fw-bold small mb-1">カテゴリ</div>
@@ -730,6 +764,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </select>
                 </div>
             </div>
+        </div>
         </div>
 
         <div class="row g-2 mb-2 align-items-center">
