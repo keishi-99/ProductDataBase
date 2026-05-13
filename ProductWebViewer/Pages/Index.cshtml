@@ -394,15 +394,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (_overlay) _overlay.classList.remove('show');
     });
     // リストフィルターの折りたたみ状態を hidden input に同期する
+    // hide/show（アニメーション開始時）を使用し、送信との競合を防ぐ
     ['productListFilter', 'subListFilter'].forEach(function (id) {
         var el = document.getElementById(id);
         if (!el) return;
-        el.addEventListener('hidden.bs.collapse', function () {
-            document.querySelectorAll('input[name="ListCollapsed"]').forEach(function (i) { i.value = 'true'; });
-        });
-        el.addEventListener('shown.bs.collapse', function () {
-            document.querySelectorAll('input[name="ListCollapsed"]').forEach(function (i) { i.value = 'false'; });
-        });
+        var input = el.closest('form').querySelector('input[name="ListCollapsed"]');
+        el.addEventListener('hide.bs.collapse', function () { if (input) input.value = 'true'; });
+        el.addEventListener('show.bs.collapse', function () { if (input) input.value = 'false'; });
     });
 });
 </script>
@@ -443,6 +441,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     class="btn btn-sm btn-outline-secondary py-0 px-2 me-2 filter-toggle-btn"
                     data-bs-toggle="collapse"
                     data-bs-target="#productListFilter"
+                    aria-controls="productListFilter"
+                    aria-label="フィルターの表示切替"
                     aria-expanded="@(!Model.ListCollapsed ? "true" : "false")"><span class="toggle-icon"></span></button>
             <hr class="flex-grow-1 ms-0 my-0 opacity-25" />
         </div>
@@ -714,6 +714,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     class="btn btn-sm btn-outline-secondary py-0 px-2 me-2 filter-toggle-btn"
                     data-bs-toggle="collapse"
                     data-bs-target="#subListFilter"
+                    aria-controls="subListFilter"
+                    aria-label="フィルターの表示切替"
                     aria-expanded="@(!Model.ListCollapsed ? "true" : "false")"><span class="toggle-icon"></span></button>
             <hr class="flex-grow-1 ms-0 my-0 opacity-25" />
         </div>
