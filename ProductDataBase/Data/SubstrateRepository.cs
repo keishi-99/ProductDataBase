@@ -105,6 +105,24 @@ namespace ProductDatabase.Data {
                 new { SubstrateId = substrateId }) > 0;
         }
 
+        // 既存の排他グループ一覧を取得する（GroupID → 基板名リスト）
+        public static Dictionary<int, List<string>> GetExclusiveGroups() {
+            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            var rows = con.Query(
+                "SELECT ExclusiveGroupID, SubstrateName FROM M_SubstrateDef WHERE ExclusiveGroupID IS NOT NULL ORDER BY ExclusiveGroupID, SubstrateName");
+            var result = new Dictionary<int, List<string>>();
+            foreach (var row in rows) {
+                int groupId = (int)(long)row.ExclusiveGroupID;
+                string name = row.SubstrateName?.ToString() ?? string.Empty;
+                if (!result.TryGetValue(groupId, out var list)) {
+                    list = [];
+                    result[groupId] = list;
+                }
+                list.Add(name);
+            }
+            return result;
+        }
+
         // SubstrateModelの重複を確認する（excludeIdは編集時に自身を除外するために使用）
         public static bool ExistsSubstrateModel(string substrateModel, long excludeId = 0) {
             using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());

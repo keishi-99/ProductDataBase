@@ -24,7 +24,7 @@ namespace ProductDatabase.MasterManagement {
             this.VisibleLabel = new Label();
             this.VisibleCheckBox = new CheckBox();
             this.ExclusiveGroupLabel = new Label();
-            this.ExclusiveGroupNumericUpDown = new NumericUpDown();
+            this.ExclusiveGroupComboBox = new ComboBox();
             this.SerialGroupBox = new GroupBox();
             this.RegTypeLabel = new Label();
             this.RegTypeComboBox = new ComboBox();
@@ -48,7 +48,6 @@ namespace ProductDatabase.MasterManagement {
             this.SerialGroupBox.SuspendLayout();
             this.PrintGroupBox.SuspendLayout();
             this.CheckBinGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)this.ExclusiveGroupNumericUpDown).BeginInit();
             this.SuspendLayout();
             // 
             // BasicInfoGroupBox
@@ -64,7 +63,7 @@ namespace ProductDatabase.MasterManagement {
             this.BasicInfoGroupBox.Controls.Add(this.VisibleLabel);
             this.BasicInfoGroupBox.Controls.Add(this.VisibleCheckBox);
             this.BasicInfoGroupBox.Controls.Add(this.ExclusiveGroupLabel);
-            this.BasicInfoGroupBox.Controls.Add(this.ExclusiveGroupNumericUpDown);
+            this.BasicInfoGroupBox.Controls.Add(this.ExclusiveGroupComboBox);
             this.BasicInfoGroupBox.Location = new Point(12, 12);
             this.BasicInfoGroupBox.Name = "BasicInfoGroupBox";
             this.BasicInfoGroupBox.Size = new Size(395, 230);
@@ -159,17 +158,15 @@ namespace ProductDatabase.MasterManagement {
             this.ExclusiveGroupLabel.Location = new Point(8, 196);
             this.ExclusiveGroupLabel.Name = "ExclusiveGroupLabel";
             this.ExclusiveGroupLabel.TabIndex = 5;
-            this.ExclusiveGroupLabel.Text = "排他グループ番号（0=なし）:";
+            this.ExclusiveGroupLabel.Text = "排他グループ:";
             //
-            // ExclusiveGroupNumericUpDown
+            // ExclusiveGroupComboBox
             //
-            this.ExclusiveGroupNumericUpDown.Location = new Point(200, 193);
-            this.ExclusiveGroupNumericUpDown.Maximum = new decimal(new int[] { 99, 0, 0, 0 });
-            this.ExclusiveGroupNumericUpDown.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            this.ExclusiveGroupNumericUpDown.Name = "ExclusiveGroupNumericUpDown";
-            this.ExclusiveGroupNumericUpDown.Size = new Size(60, 23);
-            this.ExclusiveGroupNumericUpDown.TabIndex = 5;
-            this.ExclusiveGroupNumericUpDown.Value = new decimal(new int[] { 0, 0, 0, 0 });
+            this.ExclusiveGroupComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.ExclusiveGroupComboBox.Location = new Point(130, 193);
+            this.ExclusiveGroupComboBox.Name = "ExclusiveGroupComboBox";
+            this.ExclusiveGroupComboBox.Size = new Size(250, 23);
+            this.ExclusiveGroupComboBox.TabIndex = 5;
             //
             // SerialGroupBox
             //
@@ -370,7 +367,6 @@ namespace ProductDatabase.MasterManagement {
             this.SerialGroupBox.PerformLayout();
             this.PrintGroupBox.ResumeLayout(false);
             this.CheckBinGroupBox.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)this.ExclusiveGroupNumericUpDown).EndInit();
             this.ResumeLayout(false);
         }
 
@@ -389,7 +385,7 @@ namespace ProductDatabase.MasterManagement {
         private Label VisibleLabel;
         private CheckBox VisibleCheckBox;
         private Label ExclusiveGroupLabel;
-        private NumericUpDown ExclusiveGroupNumericUpDown;
+        private ComboBox ExclusiveGroupComboBox;
 
         // セクション2
         private GroupBox SerialGroupBox;

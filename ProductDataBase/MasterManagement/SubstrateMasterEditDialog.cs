@@ -33,12 +33,31 @@ namespace ProductDatabase.MasterManagement {
             this.Text = _isNewRecord ? "基板マスター追加" : "基板マスター編集";
         }
 
-        // RegTypeのComboBoxに選択肢を設定する
+        // RegType / ExclusiveGroup の ComboBox に選択肢を設定する
         private void InitializeComboBoxes() {
             RegTypeComboBox.Items.Clear();
             RegTypeComboBox.Items.Add(new ComboItem(0, "0 - 登録無"));
             RegTypeComboBox.Items.Add(new ComboItem(1, "1 - 登録有"));
             RegTypeComboBox.SelectedIndex = 0;
+
+            InitExclusiveGroupComboBox();
+        }
+
+        // 排他グループ ComboBox を既存グループ一覧で初期化する
+        private void InitExclusiveGroupComboBox() {
+            ExclusiveGroupComboBox.Items.Clear();
+            ExclusiveGroupComboBox.Items.Add(new GroupComboItem(null, "（グループなし）"));
+
+            var groups = SubstrateRepository.GetExclusiveGroups();
+            int nextGroupId = groups.Count > 0 ? groups.Keys.Max() + 1 : 1;
+
+            foreach (var (groupId, names) in groups.OrderBy(g => g.Key)) {
+                var label = $"Gr.{groupId}: {string.Join(" / ", names)}";
+                ExclusiveGroupComboBox.Items.Add(new GroupComboItem(groupId, label));
+            }
+
+            ExclusiveGroupComboBox.Items.Add(new GroupComboItem(nextGroupId, $"新規グループ（Gr.{nextGroupId}）"));
+            ExclusiveGroupComboBox.SelectedIndex = 0;
         }
 
         // モデルの値をフォームコントロールに反映する
@@ -51,7 +70,18 @@ namespace ProductDatabase.MasterManagement {
 
             SelectComboByValue(RegTypeComboBox, _substrate.RegType);
 
-            ExclusiveGroupNumericUpDown.Value = _substrate.ExclusiveGroupID ?? 0;
+            // 現在の ExclusiveGroupID に一致する項目を選択
+            var selected = false;
+            if (_substrate.ExclusiveGroupID.HasValue) {
+                for (var i = 0; i < ExclusiveGroupComboBox.Items.Count; i++) {
+                    if (ExclusiveGroupComboBox.Items[i] is GroupComboItem gi && gi.Value == _substrate.ExclusiveGroupID) {
+                        ExclusiveGroupComboBox.SelectedIndex = i;
+                        selected = true;
+                        break;
+                    }
+                }
+            }
+            if (!selected) ExclusiveGroupComboBox.SelectedIndex = 0;
 
             // SerialPrintType チェックボックス
             var spf = (SerialPrintTypeFlags)_substrate.SerialPrintType;
@@ -159,8 +189,9 @@ namespace ProductDatabase.MasterManagement {
             _substrate.RegType = RegTypeComboBox.SelectedItem is ComboItem regItem ? regItem.Value : 0;
             _substrate.Visible = VisibleCheckBox.Checked;
 
-            var groupVal = (int)ExclusiveGroupNumericUpDown.Value;
-            _substrate.ExclusiveGroupID = groupVal > 0 ? groupVal : null;
+            _substrate.ExclusiveGroupID = ExclusiveGroupComboBox.SelectedItem is GroupComboItem groupItem
+                ? groupItem.Value
+                : null;
 
             // SerialPrintType（ビットフラグ）
             int spf = 0;
@@ -187,8 +218,13 @@ namespace ProductDatabase.MasterManagement {
         private sealed class ComboItem(int value, string label) {
             public int Value { get; } = value;
             public string Label { get; } = label;
-
             public override string ToString() => Label;
+        }
+
+        // 排他グループComboBoxのアイテムを保持する内部クラス
+        private sealed class GroupComboItem(int? value, string label) {
+            public int? Value { get; } = value;
+            public override string ToString() => label;
         }
     }
 }
