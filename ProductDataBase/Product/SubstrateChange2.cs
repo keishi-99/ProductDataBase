@@ -156,7 +156,7 @@ namespace ProductDatabase {
                 RegistrationDateTimePicker.Enabled = false;
                 PersonComboBox.Enabled = false;
                 RegisterButton.Enabled = false;
-                for (var i = 0; i <= 9; i++) {
+                for (var i = 0; i < _productMaster.UseSubstrates.Count; i++) {
                     var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
                     if (objCbx is not null) {
                         objCbx.Enabled = false;
@@ -202,12 +202,7 @@ namespace ProductDatabase {
                                         var useValue = int.TryParse(objDgv.Rows[j].Cells[3].Value?.ToString(), out var use1) ? use1 : 0;
 
                                         if (useValue < 0) {
-                                            throw new Exception("使用数が0以下になっています。");
-                                        }
-
-                                        // 使用数がマイナスの場合は確認ダイアログを表示
-                                        if (useValue < 0) {
-                                            throw new Exception("使用数が0未満になっています。");
+                                            throw new Exception("使用数が0未満の値は入力できません。");
                                         }
 
                                         if (stockValue + usedValue < useValue) {
@@ -266,7 +261,7 @@ namespace ProductDatabase {
 
                                     for (var j = 0; j <= dgvRowCnt - 1; j++) {
                                         var usedValue = int.TryParse(objDgv.Rows[j].Cells[2].Value?.ToString(), out var usd2) ? usd2 : 0;
-                                        var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[4].Value);
+                                        var boolCbx = objDgv.Rows[j].Cells[4].Value is not null && (bool)objDgv.Rows[j].Cells[4].Value;
                                         var useValue = boolCbx ? (int.TryParse(objDgv.Rows[j].Cells[3].Value?.ToString(), out var use2) ? use2 : 0) : 0;
 
                                         if (boolCbx) {
@@ -312,6 +307,21 @@ namespace ProductDatabase {
                                                 substrate.SubstrateID,
                                                 objDgv.Rows[j].Cells[0].Value?.ToString() ?? string.Empty,
                                                 _productRegisterWork.RowID);
+                                        }
+                                    }
+                                } else {
+                                    // チェックOFF（排他グループの自動OFF含む）の基板は既存の使用数をすべてクリアする
+                                    var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
+                                    if (objDgv is not null) {
+                                        for (var j = 0; j < objDgv.Rows.Count; j++) {
+                                            var usedValue = int.TryParse(objDgv.Rows[j].Cells[2].Value?.ToString(), out var usd) ? usd : 0;
+                                            if (usedValue != 0) {
+                                                SubstrateChangeRepository.ClearSubstrateDecrease(
+                                                    con, transaction,
+                                                    substrate.SubstrateID,
+                                                    objDgv.Rows[j].Cells[0].Value?.ToString() ?? string.Empty,
+                                                    _productRegisterWork.RowID);
+                                            }
                                         }
                                     }
                                 }
