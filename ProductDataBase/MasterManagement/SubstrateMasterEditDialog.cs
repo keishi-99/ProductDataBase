@@ -58,6 +58,15 @@ namespace ProductDatabase.MasterManagement {
 
             ExclusiveGroupComboBox.Items.Add(new GroupComboItem(nextGroupId, $"新規グループ（Gr.{nextGroupId}）"));
             ExclusiveGroupComboBox.SelectedIndex = 0;
+
+            // ドロップダウン幅をテキスト長に合わせて自動調整
+            var maxWidth = ExclusiveGroupComboBox.Items.Cast<object>()
+                .Select(item => TextRenderer.MeasureText(item.ToString(), ExclusiveGroupComboBox.Font).Width)
+                .DefaultIfEmpty(0)
+                .Max();
+            ExclusiveGroupComboBox.DropDownWidth = Math.Max(
+                ExclusiveGroupComboBox.Width,
+                maxWidth + SystemInformation.VerticalScrollBarWidth);
         }
 
         // モデルの値をフォームコントロールに反映する
