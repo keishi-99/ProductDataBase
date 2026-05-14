@@ -20,6 +20,9 @@ namespace ProductWebViewer.Data {
             ["RegDate"] = "s.RegDate",
             ["Comment"] = "s.Comment",
             ["CreatedAt"] = "s.CreatedAt",
+            ["UseProductName"]   = "p.ProductName",
+            ["UseOrderNumber"]   = "p.OrderNumber",
+            ["UseProductNumber"] = "p.ProductNumber",
         };
 
         // 在庫一覧用ホワイトリスト（同上）
@@ -68,11 +71,12 @@ namespace ProductWebViewer.Data {
             string? substrateName = null,
             string? orderNumber = null,
             string? substrateNumber = null,
-            string? regDateFrom = null,
-            string? regDateTo = null) {
+            string? dateType = null,
+            string? dateFrom = null,
+            string? dateTo = null) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildSubstrateWhere(listCategory, listProductName, listSubstrateName, substrateName, orderNumber, substrateNumber, regDateFrom, regDateTo);
+            var (where, param) = BuildSubstrateWhere(listCategory, listProductName, listSubstrateName, substrateName, orderNumber, substrateNumber, dateType, dateFrom, dateTo);
             return con.ExecuteScalar<int>($"""
                 SELECT COUNT(*)
                 FROM V_Substrate AS s
@@ -88,15 +92,16 @@ namespace ProductWebViewer.Data {
             string? substrateName = null,
             string? orderNumber = null,
             string? substrateNumber = null,
-            string? regDateFrom = null,
-            string? regDateTo = null,
+            string? dateType = null,
+            string? dateFrom = null,
+            string? dateTo = null,
             string sortCol = "",
             string sortDir = "desc",
             int page = 1,
             int pageSize = 100) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildSubstrateWhere(listCategory, listProductName, listSubstrateName, substrateName, orderNumber, substrateNumber, regDateFrom, regDateTo);
+            var (where, param) = BuildSubstrateWhere(listCategory, listProductName, listSubstrateName, substrateName, orderNumber, substrateNumber, dateType, dateFrom, dateTo);
             var orderBy = BuildOrderBy(_substrateSortCols, sortCol, sortDir, "s.ID DESC");
             var limitOffset = BuildLimitOffset(pageSize, page);
 
@@ -116,9 +121,14 @@ namespace ProductWebViewer.Data {
                     s.Person,
                     s.RegDate,
                     s.Comment,
-                    s.CreatedAt
+                    s.CreatedAt,
+                    s.UseID,
+                    p.ProductName AS UseProductName,
+                    p.OrderNumber AS UseOrderNumber,
+                    p.ProductNumber AS UseProductNumber
                 FROM V_Substrate AS s
                 LEFT JOIN M_SubstrateDef AS m ON s.SubstrateID = m.SubstrateID
+                LEFT JOIN V_Product AS p ON s.UseID = p.ID
                 WHERE {where}
                 ORDER BY {orderBy}
                 {limitOffset}
@@ -223,7 +233,8 @@ namespace ProductWebViewer.Data {
 
         private static (string where, object param) BuildSubstrateWhere(
             string? listCategory, string? listProductName, string? listSubstrateName,
-            string? substrateName, string? orderNumber, string? substrateNumber, string? regDateFrom, string? regDateTo) {
+            string? substrateName, string? orderNumber, string? substrateNumber,
+            string? dateType, string? dateFrom, string? dateTo) {
 
             var conditions = new List<string> { "s.IsDeleted = 0" };
             if (!string.IsNullOrWhiteSpace(listCategory))
@@ -238,10 +249,14 @@ namespace ProductWebViewer.Data {
                 conditions.Add("s.OrderNumber LIKE '%' || @OrderNumber || '%'");
             if (!string.IsNullOrWhiteSpace(substrateNumber))
                 conditions.Add("s.SubstrateNumber LIKE '%' || @SubstrateNumber || '%'");
-            if (!string.IsNullOrWhiteSpace(regDateFrom))
-                conditions.Add("s.RegDate >= @RegDateFrom");
-            if (!string.IsNullOrWhiteSpace(regDateTo))
-                conditions.Add("s.RegDate <= @RegDateTo");
+
+            // CreatedAt は "yyyy-MM-dd HH:mm:ss" 形式のためDATE()で日付部分を抽出して比較する
+            // RegDate は "yyyy/MM/dd" 形式のため "-" を "/" に変換して比較する
+            var useCreatedAt = dateType == "createdAt";
+            if (!string.IsNullOrWhiteSpace(dateFrom))
+                conditions.Add(useCreatedAt ? "DATE(s.CreatedAt) >= @DateFrom" : "s.RegDate >= @DateFrom");
+            if (!string.IsNullOrWhiteSpace(dateTo))
+                conditions.Add(useCreatedAt ? "DATE(s.CreatedAt) <= @DateTo" : "s.RegDate <= @DateTo");
 
             return (string.Join(" AND ", conditions), new {
                 ListCategory = listCategory,
@@ -250,9 +265,8 @@ namespace ProductWebViewer.Data {
                 SubstrateName = substrateName,
                 OrderNumber = orderNumber,
                 SubstrateNumber = substrateNumber,
-                // SQLite はテキスト型で日付を "yyyy/MM/dd" 形式で保存しているため変換する
-                RegDateFrom = regDateFrom?.Replace('-', '/'),
-                RegDateTo = regDateTo?.Replace('-', '/')
+                DateFrom = useCreatedAt ? dateFrom : dateFrom?.Replace('-', '/'),
+                DateTo   = useCreatedAt ? dateTo   : dateTo?.Replace('-', '/')
             });
         }
 

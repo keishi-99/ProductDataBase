@@ -73,11 +73,12 @@ namespace ProductWebViewer.Data {
             string? productName = null,
             string? orderNumber = null,
             string? productNumber = null,
-            string? regDateFrom = null,
-            string? regDateTo = null) {
+            string? dateType = null,
+            string? dateFrom = null,
+            string? dateTo = null) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildProductWhere(listCategory, listProductName, listProductType, productName, orderNumber, productNumber, regDateFrom, regDateTo);
+            var (where, param) = BuildProductWhere(listCategory, listProductName, listProductType, productName, orderNumber, productNumber, dateType, dateFrom, dateTo);
             return con.ExecuteScalar<int>($"""
                 SELECT COUNT(*)
                 FROM V_Product AS v
@@ -93,15 +94,16 @@ namespace ProductWebViewer.Data {
             string? productName = null,
             string? orderNumber = null,
             string? productNumber = null,
-            string? regDateFrom = null,
-            string? regDateTo = null,
+            string? dateType = null,
+            string? dateFrom = null,
+            string? dateTo = null,
             string sortCol = "",
             string sortDir = "desc",
             int page = 1,
             int pageSize = 100) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildProductWhere(listCategory, listProductName, listProductType, productName, orderNumber, productNumber, regDateFrom, regDateTo);
+            var (where, param) = BuildProductWhere(listCategory, listProductName, listProductType, productName, orderNumber, productNumber, dateType, dateFrom, dateTo);
             var orderBy = BuildOrderBy(_productSortCols, sortCol, sortDir, "v.ID DESC");
             var limitOffset = BuildLimitOffset(pageSize, page);
 
@@ -139,13 +141,13 @@ namespace ProductWebViewer.Data {
             string? productName = null,
             string? orderNumber = null,
             string? productNumber = null,
-            string? regDateFrom = null,
-            string? regDateTo = null,
-            string? serial = null
-            ) {
+            string? dateType = null,
+            string? dateFrom = null,
+            string? dateTo = null,
+            string? serial = null) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildSerialWhere(listCategory, listProductName, listProductType, productName, orderNumber, productNumber, regDateFrom, regDateTo, serial);
+            var (where, param) = BuildSerialWhere(listCategory, listProductName, listProductType, productName, orderNumber, productNumber, dateType, dateFrom, dateTo, serial);
             return con.ExecuteScalar<int>($"""
                 SELECT COUNT(*)
                 FROM T_Serial AS s
@@ -161,8 +163,9 @@ namespace ProductWebViewer.Data {
             string? productName = null,
             string? orderNumber = null,
             string? productNumber = null,
-            string? regDateFrom = null,
-            string? regDateTo = null,
+            string? dateType = null,
+            string? dateFrom = null,
+            string? dateTo = null,
             string? serial = null,
             string sortCol = "",
             string sortDir = "desc",
@@ -170,7 +173,7 @@ namespace ProductWebViewer.Data {
             int pageSize = 100) {
 
             using var con = new SqliteConnection(_connectionString);
-            var (where, param) = BuildSerialWhere(listCategory, listProductName, listProductType, productName, orderNumber, productNumber, regDateFrom, regDateTo, serial);
+            var (where, param) = BuildSerialWhere(listCategory, listProductName, listProductType, productName, orderNumber, productNumber, dateType, dateFrom, dateTo, serial);
             var orderBy = BuildOrderBy(_serialSortCols, sortCol, sortDir, "s.rowid DESC");
             var limitOffset = BuildLimitOffset(pageSize, page);
 
@@ -212,7 +215,8 @@ namespace ProductWebViewer.Data {
 
         private static (string where, object param) BuildProductWhere(
             string? listCategory, string? listProductName, string? listProductType,
-            string? productName, string? orderNumber, string? productNumber, string? regDateFrom, string? regDateTo) {
+            string? productName, string? orderNumber, string? productNumber,
+            string? dateType, string? dateFrom, string? dateTo) {
 
             var conditions = new List<string> { "v.IsDeleted = 0" };
             if (!string.IsNullOrWhiteSpace(listCategory))
@@ -227,10 +231,14 @@ namespace ProductWebViewer.Data {
                 conditions.Add("v.OrderNumber LIKE '%' || @OrderNumber || '%'");
             if (!string.IsNullOrWhiteSpace(productNumber))
                 conditions.Add("v.ProductNumber LIKE '%' || @ProductNumber || '%'");
-            if (!string.IsNullOrWhiteSpace(regDateFrom))
-                conditions.Add("v.RegDate >= @RegDateFrom");
-            if (!string.IsNullOrWhiteSpace(regDateTo))
-                conditions.Add("v.RegDate <= @RegDateTo");
+
+            // CreatedAt は "yyyy-MM-dd HH:mm:ss" 形式のためDATE()で日付部分を抽出して比較する
+            // RegDate は "yyyy/MM/dd" 形式のため "-" を "/" に変換して比較する
+            var useCreatedAt = dateType == "createdAt";
+            if (!string.IsNullOrWhiteSpace(dateFrom))
+                conditions.Add(useCreatedAt ? "DATE(v.CreatedAt) >= @DateFrom" : "v.RegDate >= @DateFrom");
+            if (!string.IsNullOrWhiteSpace(dateTo))
+                conditions.Add(useCreatedAt ? "DATE(v.CreatedAt) <= @DateTo" : "v.RegDate <= @DateTo");
 
             return (string.Join(" AND ", conditions), new {
                 ListCategory = listCategory,
@@ -239,15 +247,16 @@ namespace ProductWebViewer.Data {
                 ProductName = productName,
                 OrderNumber = orderNumber,
                 ProductNumber = productNumber,
-                // SQLite はテキスト型で日付を "yyyy/MM/dd" 形式で保存しているため、
-                // HTML date input の "yyyy-MM-dd" 形式から変換する
-                RegDateFrom = regDateFrom?.Replace('-', '/'),
-                RegDateTo = regDateTo?.Replace('-', '/')
+                DateFrom = useCreatedAt ? dateFrom : dateFrom?.Replace('-', '/'),
+                DateTo   = useCreatedAt ? dateTo   : dateTo?.Replace('-', '/')
             });
         }
 
         private static (string where, object param) BuildSerialWhere(
-            string? listCategory, string? listProductName, string? listProductType, string? productName, string? orderNumber, string? productNumber, string? regDateFrom, string? regDateTo, string? serial) {
+            string? listCategory, string? listProductName, string? listProductType,
+            string? productName, string? orderNumber, string? productNumber,
+            string? dateType, string? dateFrom, string? dateTo,
+            string? serial) {
 
             var conditions = new List<string> { "(p.IsDeleted = 0 OR p.IsDeleted IS NULL)" };
             if (!string.IsNullOrWhiteSpace(listCategory))
@@ -262,10 +271,14 @@ namespace ProductWebViewer.Data {
                 conditions.Add("p.OrderNumber LIKE '%' || @OrderNumber || '%'");
             if (!string.IsNullOrWhiteSpace(productNumber))
                 conditions.Add("p.ProductNumber LIKE '%' || @ProductNumber || '%'");
-            if (!string.IsNullOrWhiteSpace(regDateFrom))
-                conditions.Add("p.RegDate >= @RegDateFrom");
-            if (!string.IsNullOrWhiteSpace(regDateTo))
-                conditions.Add("p.RegDate <= @RegDateTo");
+
+            // CreatedAt は "yyyy-MM-dd HH:mm:ss" 形式のためDATE()で日付部分を抽出して比較する
+            // RegDate は "yyyy/MM/dd" 形式のため "-" を "/" に変換して比較する
+            var useCreatedAt = dateType == "createdAt";
+            if (!string.IsNullOrWhiteSpace(dateFrom))
+                conditions.Add(useCreatedAt ? "DATE(p.CreatedAt) >= @DateFrom" : "p.RegDate >= @DateFrom");
+            if (!string.IsNullOrWhiteSpace(dateTo))
+                conditions.Add(useCreatedAt ? "DATE(p.CreatedAt) <= @DateTo" : "p.RegDate <= @DateTo");
             if (!string.IsNullOrWhiteSpace(serial))
                 conditions.Add("s.Serial LIKE '%' || @Serial || '%'");
 
@@ -276,8 +289,8 @@ namespace ProductWebViewer.Data {
                 ProductName = productName,
                 OrderNumber = orderNumber,
                 ProductNumber = productNumber,
-                RegDateFrom = regDateFrom?.Replace('-', '/'),
-                RegDateTo = regDateTo?.Replace('-', '/'),
+                DateFrom = useCreatedAt ? dateFrom : dateFrom?.Replace('-', '/'),
+                DateTo   = useCreatedAt ? dateTo   : dateTo?.Replace('-', '/'),
                 Serial = serial
             });
         }

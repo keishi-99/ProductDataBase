@@ -39,8 +39,9 @@ public class IndexModel : PageModel {
     [BindProperty(SupportsGet = true)] public string? FilterProductName { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterProductOrderNumber { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterProductNumber { get; set; }
-    [BindProperty(SupportsGet = true)] public string? FilterProductRegDateFrom { get; set; }
-    [BindProperty(SupportsGet = true)] public string? FilterProductRegDateTo { get; set; }
+    [BindProperty(SupportsGet = true)] public string? FilterProductDateType { get; set; } = "regDate";
+    [BindProperty(SupportsGet = true)] public string? FilterProductDateFrom { get; set; }
+    [BindProperty(SupportsGet = true)] public string? FilterProductDateTo { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterSerial { get; set; }
 
     // 製品タブ データ
@@ -59,8 +60,9 @@ public class IndexModel : PageModel {
     [BindProperty(SupportsGet = true)] public string? FilterSubstrateName { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterSubstrateOrderNumber { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterSubstrateNumber { get; set; }
-    [BindProperty(SupportsGet = true)] public string? FilterSubstrateRegDateFrom { get; set; }
-    [BindProperty(SupportsGet = true)] public string? FilterSubstrateRegDateTo { get; set; }
+    [BindProperty(SupportsGet = true)] public string? FilterSubstrateDateType { get; set; } = "regDate";
+    [BindProperty(SupportsGet = true)] public string? FilterSubstrateDateFrom { get; set; }
+    [BindProperty(SupportsGet = true)] public string? FilterSubstrateDateTo { get; set; }
     [BindProperty(SupportsGet = true)] public bool ExcludeZeroStock { get; set; }
 
     // 基板タブ データ
@@ -109,14 +111,14 @@ public class IndexModel : PageModel {
                 ListProductCategory, ListProductName,
                 ListProductType, FilterProductName,
                 FilterProductOrderNumber, FilterProductNumber,
-                FilterProductRegDateFrom, FilterProductRegDateTo,
+                FilterProductDateType, FilterProductDateFrom, FilterProductDateTo,
                 FilterSerial);
             ClampPage();
             SerialRecords = _productRepo.GetSerialHistory(
                 ListProductCategory, ListProductName,
                 ListProductType, FilterProductName,
                 FilterProductOrderNumber, FilterProductNumber,
-                FilterProductRegDateFrom, FilterProductRegDateTo,
+                FilterProductDateType, FilterProductDateFrom, FilterProductDateTo,
                 FilterSerial,
                 SortCol, SortDir, PageNum, PageSize);
         }
@@ -125,13 +127,13 @@ public class IndexModel : PageModel {
                 ListProductCategory, ListProductName, ListProductType,
                 FilterProductName, FilterProductOrderNumber,
                 FilterProductNumber,
-                FilterProductRegDateFrom, FilterProductRegDateTo);
+                FilterProductDateType, FilterProductDateFrom, FilterProductDateTo);
             ClampPage();
             ProductRecords = _productRepo.GetAll(
                 ListProductCategory, ListProductName, ListProductType,
                 FilterProductName, FilterProductOrderNumber,
                 FilterProductNumber,
-                FilterProductRegDateFrom, FilterProductRegDateTo,
+                FilterProductDateType, FilterProductDateFrom, FilterProductDateTo,
                 SortCol, SortDir, PageNum, PageSize);
         }
     }
@@ -166,13 +168,13 @@ public class IndexModel : PageModel {
                 ListSubCategory, ListSubProductName, ListSubstrateName,
                 FilterSubstrateName, FilterSubstrateOrderNumber,
                 FilterSubstrateNumber,
-                FilterSubstrateRegDateFrom, FilterSubstrateRegDateTo);
+                FilterSubstrateDateType, FilterSubstrateDateFrom, FilterSubstrateDateTo);
             ClampPage();
             SubstrateRecords = _substrateRepo.GetAll(
                 ListSubCategory, ListSubProductName, ListSubstrateName,
                 FilterSubstrateName, FilterSubstrateOrderNumber,
                 FilterSubstrateNumber,
-                FilterSubstrateRegDateFrom, FilterSubstrateRegDateTo,
+                FilterSubstrateDateType, FilterSubstrateDateFrom, FilterSubstrateDateTo,
                 SortCol, SortDir, PageNum, PageSize);
         }
     }
