@@ -243,7 +243,7 @@ namespace ProductDatabase {
 
                             if (_productMaster.UseSubstrates is null) { throw new Exception("ArrUseSubstrateが nullです。"); }
                             for (var i = 0; i < _productMaster.UseSubstrates.Count; i++) {
-
+                                var substrate = _productMaster.UseSubstrates[i];
                                 var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox ?? throw new Exception("objCbxが nullです。");
 
                                 if (objCbx.Checked) {
@@ -256,11 +256,11 @@ namespace ProductDatabase {
                                         var useValue = boolCbx ? (int.TryParse(objDgv.Rows[j].Cells[3].Value?.ToString(), out var use2) ? use2 : 0) : 0;
 
                                         if (boolCbx) {
-                                            var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
+                                            var substrateNum = objDgv.Rows[j].Cells[0].Value?.ToString() ?? string.Empty;
 
                                             var info = SubstrateChangeRepository.GetSubstrateInfo(
                                                 con, transaction,
-                                                _productMaster.UseSubstrates[i].SubstrateID, substrateNum);
+                                                substrate.SubstrateID, substrateNum);
 
                                             var affectedRows = SubstrateChangeRepository.UpdateSubstrateDecrease(
                                                 con, transaction,
@@ -269,24 +269,25 @@ namespace ProductDatabase {
                                                 _productRegisterWork.RegDate,
                                                 _productRegisterWork.Comment,
                                                 substrateNum,
-                                                _productRegisterWork.RowID);
+                                                _productRegisterWork.RowID,
+                                                substrate.SubstrateID);
 
                                             // 更新できない場合は挿入
                                             if (affectedRows == 0) {
                                                 SubstrateChangeRepository.InsertSubstrateDecrease(
                                                     con, transaction,
-                                                    info?.SubstrateID ?? "",
-                                                    substrateNum,
-                                                    info?.OrderNumber ?? "",
                                                     useValue,
                                                     _productRegisterWork.Person,
                                                     _productRegisterWork.RegDate,
                                                     _productRegisterWork.Comment,
-                                                    _productRegisterWork.RowID);
+                                                    substrateNum,
+                                                    info?.OrderNumber ?? "",
+                                                    _productRegisterWork.RowID,
+                                                    substrate.SubstrateID);
                                             }
 
                                             if (_productMaster.IsListPrint) {
-                                                _listUsedSubstrate.Add(_productMaster.UseSubstrates[i].SubstrateName);
+                                                _listUsedSubstrate.Add(substrate.SubstrateName);
                                                 _listUsedProductNumber.Add(substrateNum);
                                                 _listUsedQuantity.Add(useValue);
                                             }
@@ -294,8 +295,8 @@ namespace ProductDatabase {
                                         else if (usedValue != useValue && useValue == 0) {
                                             SubstrateChangeRepository.ClearSubstrateDecrease(
                                                 con, transaction,
-                                                _productMaster.UseSubstrates[i].SubstrateID,
-                                                objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty,
+                                                substrate.SubstrateID,
+                                                objDgv.Rows[j].Cells[0].Value?.ToString() ?? string.Empty,
                                                 _productRegisterWork.RowID);
                                         }
                                     }
