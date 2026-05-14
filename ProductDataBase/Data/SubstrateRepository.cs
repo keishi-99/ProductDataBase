@@ -15,10 +15,10 @@ namespace ProductDatabase.Data {
                 $"""
                 INSERT INTO {Constants.SubstrateTableName}
                     (CategoryName, ProductName, SubstrateName, SubstrateModel,
-                     RegType, Checkbox, SerialPrintType, Visible)
+                     RegType, Checkbox, SerialPrintType, Visible, ExclusiveGroupID)
                 VALUES
                     (@CategoryName, @ProductName, @SubstrateName, @SubstrateModel,
-                     @RegType, @Checkbox, @SerialPrintType, @Visible);
+                     @RegType, @Checkbox, @SerialPrintType, @Visible, @ExclusiveGroupID);
                 SELECT last_insert_rowid();
                 """;
 
@@ -32,7 +32,8 @@ namespace ProductDatabase.Data {
                 substrate.RegType,
                 Checkbox = checkBin,
                 substrate.SerialPrintType,
-                Visible = substrate.Visible ? 1 : 0
+                Visible = substrate.Visible ? 1 : 0,
+                substrate.ExclusiveGroupID
             });
         }
 
@@ -50,7 +51,8 @@ namespace ProductDatabase.Data {
                     RegType         = @RegType,
                     Checkbox        = @Checkbox,
                     SerialPrintType = @SerialPrintType,
-                    Visible         = @Visible
+                    Visible         = @Visible,
+                    ExclusiveGroupID = @ExclusiveGroupID
                 WHERE SubstrateID = @SubstrateID
                 """;
 
@@ -65,6 +67,7 @@ namespace ProductDatabase.Data {
                 Checkbox = checkBin,
                 substrate.SerialPrintType,
                 Visible = substrate.Visible ? 1 : 0,
+                substrate.ExclusiveGroupID,
                 substrate.SubstrateID
             });
         }

@@ -18,9 +18,6 @@ namespace ProductDatabase.MasterManagement {
         // 基板チェック状態管理（フィルタリング時もチェック状態を保持するため辞書で管理）
         private Dictionary<long, bool> _substrateCheckState = [];
 
-        // 排他グループID管理（SubstrateID → ExclusiveGroupID、null=排他なし）
-        private Dictionary<long, int?> _substrateGroupState = [];
-
         // LoadSubstrateCheckedList実行中のItemCheck誤発火を防ぐフラグ
         private bool _isLoadingSubstrateList = false;
 
@@ -81,9 +78,6 @@ namespace ProductDatabase.MasterManagement {
             _substrateCheckState = _repository.SubstrateDataTable.AsEnumerable()
                 .ToDictionary(r => r.Field<long>("SubstrateID"), _ => false);
 
-            _substrateGroupState = _repository.SubstrateDataTable.AsEnumerable()
-                .ToDictionary(r => r.Field<long>("SubstrateID"), _ => (int?)null);
-
             if (!_isNewRecord && _sourceRow != null) {
                 var productId = _sourceRow.Field<long>("ProductID");
                 var linkedIds = new HashSet<long>(_repository.ProductUseSubstrate.AsEnumerable()
@@ -95,12 +89,6 @@ namespace ProductDatabase.MasterManagement {
                 foreach (var id in linkedIds)
                     if (_substrateCheckState.ContainsKey(id))
                         _substrateCheckState[id] = true;
-
-                // 排他グループIDをDBから取得して辞書に設定する
-                var groupMap = ProductRepository.GetSubstrateGroupMap(productId);
-                foreach (var (substrateId, groupId) in groupMap)
-                    if (_substrateGroupState.ContainsKey(substrateId))
-                        _substrateGroupState[substrateId] = groupId;
             }
         }
 
@@ -220,10 +208,11 @@ namespace ProductDatabase.MasterManagement {
                 }
 
                 // 使用基板の紐づけ更新（辞書から取得することでフィルター非表示のチェック済みも含める）
-                var substrateEntries = _substrateCheckState
+                var selectedSubstrateIds = _substrateCheckState
                     .Where(kvp => kvp.Value)
-                    .Select(kvp => (kvp.Key, _substrateGroupState.GetValueOrDefault(kvp.Key)));
-                ProductRepository.UpdateProductUseSubstrates(productId, substrateEntries);
+                    .Select(kvp => kvp.Key)
+                    .ToList();
+                ProductRepository.UpdateProductUseSubstrates(productId, selectedSubstrateIds);
 
                 this.DialogResult = DialogResult.OK;
                 this.Close();
@@ -321,20 +310,6 @@ namespace ProductDatabase.MasterManagement {
             if (_isLoadingSubstrateList) return;
             if (SubstrateCheckedListBox.Items[e.Index] is not ListItem<long> item) return;
             _substrateCheckState[item.Id] = (e.NewValue == CheckState.Checked);
-        }
-
-        // 選択した基板の排他グループ番号をNumericUpDownに表示する
-        private void SubstrateCheckedListBox_SelectedIndexChanged(object sender, EventArgs e) {
-            if (SubstrateCheckedListBox.SelectedItem is not ListItem<long> item) return;
-            var groupId = _substrateGroupState.GetValueOrDefault(item.Id);
-            ExclusiveGroupNumericUpDown.Value = groupId ?? 0;
-        }
-
-        // NumericUpDown の変更を排他グループ辞書に同期する
-        private void ExclusiveGroupNumericUpDown_ValueChanged(object sender, EventArgs e) {
-            if (SubstrateCheckedListBox.SelectedItem is not ListItem<long> item) return;
-            var val = (int)ExclusiveGroupNumericUpDown.Value;
-            _substrateGroupState[item.Id] = val > 0 ? val : null;
         }
 
         // Label チェック状態変化時に OLesSerial の有効・無効を切り替える

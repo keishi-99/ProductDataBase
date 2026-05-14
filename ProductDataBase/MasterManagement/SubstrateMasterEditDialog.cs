@@ -51,6 +51,8 @@ namespace ProductDatabase.MasterManagement {
 
             SelectComboByValue(RegTypeComboBox, _substrate.RegType);
 
+            ExclusiveGroupNumericUpDown.Value = _substrate.ExclusiveGroupID ?? 0;
+
             // SerialPrintType チェックボックス
             var spf = (SerialPrintTypeFlags)_substrate.SerialPrintType;
             LabelPrintCheckBox.Checked = spf.HasFlag(SerialPrintTypeFlags.Label);
@@ -154,6 +156,9 @@ namespace ProductDatabase.MasterManagement {
 
             _substrate.RegType = RegTypeComboBox.SelectedItem is ComboItem regItem ? regItem.Value : 0;
             _substrate.Visible = VisibleCheckBox.Checked;
+
+            var groupVal = (int)ExclusiveGroupNumericUpDown.Value;
+            _substrate.ExclusiveGroupID = groupVal > 0 ? groupVal : null;
 
             // SerialPrintType（ビットフラグ）
             int spf = 0;
