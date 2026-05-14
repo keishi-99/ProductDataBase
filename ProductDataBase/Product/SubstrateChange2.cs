@@ -256,7 +256,7 @@ namespace ProductDatabase {
                                         var useValue = boolCbx ? (int.TryParse(objDgv.Rows[j].Cells[3].Value?.ToString(), out var use2) ? use2 : 0) : 0;
 
                                         if (boolCbx) {
-                                            var substrateNum = objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty;
+                                            var substrateNum = objDgv.Rows[j].Cells[0].Value?.ToString() ?? string.Empty;
 
                                             var info = SubstrateChangeRepository.GetSubstrateInfo(
                                                 con, transaction,
@@ -296,7 +296,7 @@ namespace ProductDatabase {
                                             SubstrateChangeRepository.ClearSubstrateDecrease(
                                                 con, transaction,
                                                 substrate.SubstrateID,
-                                                objDgv.Rows[j].Cells[0].Value.ToString() ?? string.Empty,
+                                                objDgv.Rows[j].Cells[0].Value?.ToString() ?? string.Empty,
                                                 _productRegisterWork.RowID);
                                         }
                                     }
