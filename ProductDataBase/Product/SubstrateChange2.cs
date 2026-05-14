@@ -351,6 +351,23 @@ namespace ProductDatabase {
             dataGridView.Visible = checkBox.Checked;
             checkBox.ForeColor = checkBox.Checked ? Color.Black : Color.Red;
 
+            // 排他グループの他チェックボックスを自動OFF（チェックON時のみ）
+            if (checkBox.Checked) {
+                var idx = _checkBoxNames.IndexOf(checkBox.Name);
+                if (idx >= 0 && idx < _productMaster.UseSubstrates.Count) {
+                    var groupId = _productMaster.UseSubstrates[idx].ExclusiveGroupID;
+                    if (groupId.HasValue) {
+                        for (var i = 0; i < _productMaster.UseSubstrates.Count; i++) {
+                            if (i == idx) continue;
+                            if (_productMaster.UseSubstrates[i].ExclusiveGroupID == groupId) {
+                                if (MainPanel.Controls[_checkBoxNames[i]] is CheckBox otherCbx && otherCbx.Checked)
+                                    otherCbx.Checked = false;
+                            }
+                        }
+                    }
+                }
+            }
+
             if (!checkBox.Checked) {
                 MessageBox.Show("チェックがない場合在庫から引き落とされなくなります。", "",
                                MessageBoxButtons.OK, MessageBoxIcon.Exclamation);

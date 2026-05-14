@@ -63,6 +63,8 @@ namespace ProductDatabase.MasterManagement {
             this.SubstrateModelFilterLabel = new Label();
             this.SubstrateModelFilterTextBox = new TextBox();
             this.SubstrateCheckedListBox = new CheckedListBox();
+            this.ExclusiveGroupLabel = new Label();
+            this.ExclusiveGroupNumericUpDown = new NumericUpDown();
             this.SaveButton = new Button();
             this.DialogCancelButton = new Button();
             this.BasicInfoGroupBox.SuspendLayout();
@@ -71,6 +73,7 @@ namespace ProductDatabase.MasterManagement {
             this.PrintGroupBox.SuspendLayout();
             this.CheckBinGroupBox.SuspendLayout();
             this.UseSubstrateGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)this.ExclusiveGroupNumericUpDown).BeginInit();
             this.SuspendLayout();
             // 
             // BasicInfoGroupBox
@@ -511,6 +514,8 @@ namespace ProductDatabase.MasterManagement {
             this.UseSubstrateGroupBox.Controls.Add(this.SubstrateModelFilterLabel);
             this.UseSubstrateGroupBox.Controls.Add(this.SubstrateModelFilterTextBox);
             this.UseSubstrateGroupBox.Controls.Add(this.SubstrateCheckedListBox);
+            this.UseSubstrateGroupBox.Controls.Add(this.ExclusiveGroupLabel);
+            this.UseSubstrateGroupBox.Controls.Add(this.ExclusiveGroupNumericUpDown);
             this.UseSubstrateGroupBox.Location = new Point(444, 12);
             this.UseSubstrateGroupBox.Name = "UseSubstrateGroupBox";
             this.UseSubstrateGroupBox.Size = new Size(464, 614);
@@ -557,9 +562,30 @@ namespace ProductDatabase.MasterManagement {
             this.SubstrateCheckedListBox.CheckOnClick = true;
             this.SubstrateCheckedListBox.Location = new Point(6, 100);
             this.SubstrateCheckedListBox.Name = "SubstrateCheckedListBox";
-            this.SubstrateCheckedListBox.Size = new Size(452, 508);
+            this.SubstrateCheckedListBox.Size = new Size(452, 470);
             this.SubstrateCheckedListBox.TabIndex = 28;
             this.SubstrateCheckedListBox.ItemCheck += this.SubstrateCheckedListBox_ItemCheck;
+            this.SubstrateCheckedListBox.SelectedIndexChanged += this.SubstrateCheckedListBox_SelectedIndexChanged;
+            //
+            // ExclusiveGroupLabel
+            //
+            this.ExclusiveGroupLabel.AutoSize = true;
+            this.ExclusiveGroupLabel.Location = new Point(6, 578);
+            this.ExclusiveGroupLabel.Name = "ExclusiveGroupLabel";
+            this.ExclusiveGroupLabel.Size = new Size(150, 15);
+            this.ExclusiveGroupLabel.TabIndex = 29;
+            this.ExclusiveGroupLabel.Text = "排他グループ番号（0=なし）:";
+            //
+            // ExclusiveGroupNumericUpDown
+            //
+            this.ExclusiveGroupNumericUpDown.Location = new Point(200, 574);
+            this.ExclusiveGroupNumericUpDown.Maximum = new decimal(new int[] { 99, 0, 0, 0 });
+            this.ExclusiveGroupNumericUpDown.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            this.ExclusiveGroupNumericUpDown.Name = "ExclusiveGroupNumericUpDown";
+            this.ExclusiveGroupNumericUpDown.Size = new Size(60, 23);
+            this.ExclusiveGroupNumericUpDown.TabIndex = 30;
+            this.ExclusiveGroupNumericUpDown.Value = new decimal(new int[] { 0, 0, 0, 0 });
+            this.ExclusiveGroupNumericUpDown.ValueChanged += this.ExclusiveGroupNumericUpDown_ValueChanged;
             // 
             // SaveButton
             // 
@@ -612,6 +638,7 @@ namespace ProductDatabase.MasterManagement {
             this.CheckBinGroupBox.PerformLayout();
             this.UseSubstrateGroupBox.ResumeLayout(false);
             this.UseSubstrateGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)this.ExclusiveGroupNumericUpDown).EndInit();
             this.ResumeLayout(false);
         }
 
@@ -673,6 +700,8 @@ namespace ProductDatabase.MasterManagement {
         private Label           SubstrateModelFilterLabel;
         private TextBox         SubstrateModelFilterTextBox;
         private CheckedListBox  SubstrateCheckedListBox;
+        private Label           ExclusiveGroupLabel;
+        private NumericUpDown   ExclusiveGroupNumericUpDown;
 
         // ボタン
         private Button          SaveButton;

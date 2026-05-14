@@ -58,22 +58,34 @@ namespace ProductDatabase.Data {
                 ?? throw new InvalidOperationException($"製品ID [{id}] が見つかりません。");
         }
 
-        // 製品IDから使用基板リストを取得
+        // 製品IDから使用基板リストを取得（ExclusiveGroupID を含む）
         public static List<SubstrateInfo> GetUseSubstrates(long productKey) {
             using var con = new SqliteConnection(GetConnectionRegistration());
 
-            var sql =
-                $"""
-                SELECT
-                    S_SubstrateID as SubstrateID,
-                    SubstrateName,
-                    SubstrateModel
-                FROM {Constants.VProductUseSubstrate}
-                WHERE P_ProductID = @ProductKey
+            const string sql =
                 """
-                ;
+                SELECT
+                    pus.SubstrateID,
+                    s.SubstrateName,
+                    s.SubstrateModel,
+                    pus.ExclusiveGroupID
+                FROM M_ProductUseSubstrate pus
+                JOIN M_SubstrateDef s ON pus.SubstrateID = s.SubstrateID
+                WHERE pus.ProductID = @ProductKey
+                """;
 
             return [.. con.Query<SubstrateInfo>(sql, new { ProductKey = productKey })];
+        }
+
+        // 製品IDに紐づく SubstrateID → ExclusiveGroupID の辞書を取得する
+        public static Dictionary<long, int?> GetSubstrateGroupMap(long productId) {
+            using var con = new SqliteConnection(GetConnectionRegistration());
+            var rows = con.Query(
+                "SELECT SubstrateID, ExclusiveGroupID FROM M_ProductUseSubstrate WHERE ProductID = @ProductId",
+                new { ProductId = productId });
+            return rows.ToDictionary(
+                r => (long)r.SubstrateID,
+                r => r.ExclusiveGroupID == null ? (int?)null : (int)r.ExclusiveGroupID);
         }
 
         // キャッシュ済みの全DataTableをクリアする
@@ -314,8 +326,10 @@ namespace ProductDatabase.Data {
             return items;
         }
 
-        // 製品-基板紐づけを全削除してから指定リストで再登録する
-        public static void UpdateProductUseSubstrates(long productId, IEnumerable<long> substrateIds) {
+        // 製品-基板紐づけを全削除してから指定リストで再登録する（ExclusiveGroupID を含む）
+        public static void UpdateProductUseSubstrates(
+            long productId,
+            IEnumerable<(long SubstrateId, int? GroupId)> substrateEntries) {
             using var con = new SqliteConnection(GetConnectionRegistration());
             con.Open();
             using var tx = con.BeginTransaction();
@@ -324,11 +338,22 @@ namespace ProductDatabase.Data {
                 "DELETE FROM M_ProductUseSubstrate WHERE ProductID = @ProductId",
                 new { ProductId = productId }, tx);
 
-            var insertSql = "INSERT INTO M_ProductUseSubstrate (ProductID, SubstrateID) VALUES (@ProductId, @SubstrateId)";
-            var insertData = substrateIds.Select(id => new { ProductId = productId, SubstrateId = id });
+            const string insertSql =
+                "INSERT INTO M_ProductUseSubstrate (ProductID, SubstrateID, ExclusiveGroupID) VALUES (@ProductId, @SubstrateId, @GroupId)";
+            var insertData = substrateEntries.Select(e => new { ProductId = productId, SubstrateId = e.SubstrateId, GroupId = e.GroupId });
             con.Execute(insertSql, insertData, tx);
 
             tx.Commit();
+        }
+
+        // M_ProductUseSubstrate に ExclusiveGroupID 列を追加するマイグレーション
+        public static void MigrateExclusiveGroup() {
+            using var con = new SqliteConnection(GetConnectionRegistration());
+            con.Open();
+            var columns = con.Query<string>("SELECT name FROM pragma_table_info('M_ProductUseSubstrate')").ToList();
+            if (!columns.Contains("ExclusiveGroupID")) {
+                con.Execute("ALTER TABLE M_ProductUseSubstrate ADD COLUMN ExclusiveGroupID INTEGER");
+            }
         }
     }
 

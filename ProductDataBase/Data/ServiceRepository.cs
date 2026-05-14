@@ -1,6 +1,5 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
-using ProductDatabase.Common;
 using ProductDatabase.Models;
 using System.Data;
 
@@ -17,23 +16,9 @@ namespace ProductDatabase.Data {
             table.Load(reader);
         }
 
-        // 製品IDに紐づく使用基板情報をV_ProductUseSubstrateから取得してリストで返す
+        // 製品IDに紐づく使用基板情報を取得してリストで返す（ExclusiveGroupID を含む）
         public static List<SubstrateInfo> GetUseSubstrates(long productId) {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-            con.Open();
-
-            var query = $"SELECT * FROM {Constants.VProductUseSubstrate} WHERE P_ProductID = @ProductId AND S_SubstrateID IS NOT NULL;";
-            var table = new DataTable();
-            using (var reader = con.ExecuteReader(query, new { ProductId = productId })) {
-                table.Load(reader);
-            }
-
-            return [.. table.AsEnumerable()
-                .Select(r => new SubstrateInfo {
-                    SubstrateID   = r.Field<long>("S_SubstrateID"),
-                    SubstrateName = r["SubstrateName"]?.ToString() ?? "",
-                    SubstrateModel = r["SubstrateModel"]?.ToString() ?? ""
-                })];
+            return ProductRepository.GetUseSubstrates(productId);
         }
     }
 }
