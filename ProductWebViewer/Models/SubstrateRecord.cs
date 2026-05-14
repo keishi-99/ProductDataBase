@@ -16,5 +16,9 @@ namespace ProductWebViewer.Models {
         public string? RegDate { get; set; }
         public string? Comment { get; set; }
         public string? CreatedAt { get; set; }
+        public long? UseID { get; set; }
+        public string? UseProductName { get; set; }
+        public string? UseOrderNumber { get; set; }
+        public string? UseProductNumber { get; set; }
     }
 }

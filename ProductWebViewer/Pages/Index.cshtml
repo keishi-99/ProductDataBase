@@ -531,13 +531,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 <input type="search" class="form-control form-control-sm" name="FilterProductNumber"
                        style="width: 150px" value="@Model.FilterProductNumber" placeholder="製造番号" />
             </div>
-            <div class="col-auto">
-                <input type="date" class="form-control form-control-sm" name="FilterProductRegDateFrom"
-                       value="@Model.FilterProductRegDateFrom" />
-            </div>
-            <div class="col-auto">
-                <input type="date" class="form-control form-control-sm" name="FilterProductRegDateTo"
-                       value="@Model.FilterProductRegDateTo" />
+            <div class="col-auto d-flex align-items-center gap-1">
+                <select class="form-select form-select-sm" name="FilterProductDateType" style="width: auto">
+                    <option value="regDate"   selected="@(Model.FilterProductDateType != "createdAt")">登録日</option>
+                    <option value="createdAt" selected="@(Model.FilterProductDateType == "createdAt")">登録日時</option>
+                </select>
+                <input type="date" class="form-control form-control-sm" name="FilterProductDateFrom"
+                       value="@Model.FilterProductDateFrom" />
+                <span class="text-muted small">〜</span>
+                <input type="date" class="form-control form-control-sm" name="FilterProductDateTo"
+                       value="@Model.FilterProductDateTo" />
             </div>
             @if (isSerial) {
                 <div class="col-auto">
@@ -807,13 +810,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             }
             @if (!isStock) {
-                <div class="col-auto">
-                    <input type="date" class="form-control form-control-sm" name="FilterSubstrateRegDateFrom"
-                           value="@Model.FilterSubstrateRegDateFrom" />
-                </div>
-                <div class="col-auto">
-                    <input type="date" class="form-control form-control-sm" name="FilterSubstrateRegDateTo"
-                           value="@Model.FilterSubstrateRegDateTo" />
+                <div class="col-auto d-flex align-items-center gap-1">
+                    <select class="form-select form-select-sm" name="FilterSubstrateDateType" style="width: auto">
+                        <option value="regDate"   selected="@(Model.FilterSubstrateDateType != "createdAt")">登録日</option>
+                        <option value="createdAt" selected="@(Model.FilterSubstrateDateType == "createdAt")">登録日時</option>
+                    </select>
+                    <input type="date" class="form-control form-control-sm" name="FilterSubstrateDateFrom"
+                           value="@Model.FilterSubstrateDateFrom" />
+                    <span class="text-muted small">〜</span>
+                    <input type="date" class="form-control form-control-sm" name="FilterSubstrateDateTo"
+                           value="@Model.FilterSubstrateDateTo" />
                 </div>
             }
             <div class="col-auto">
@@ -880,8 +886,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <th data-label="製造番号"     class="@SortClass("SubstrateNumber")"onclick="sortBy('SubstrateNumber')">製造番号    <span class="sort-icon">@SortIcon("SubstrateNumber")</span></th>
                                 <th data-label="入庫"         class="@SortClass("Increase")"       onclick="sortBy('Increase')">      入庫         <span class="sort-icon">@SortIcon("Increase")</span></th>
                                 <th data-label="出庫"         class="@SortClass("Decrease")"       onclick="sortBy('Decrease')">      出庫         <span class="sort-icon">@SortIcon("Decrease")</span></th>
-                                <th data-label="不良"         class="@SortClass("Defect")"         onclick="sortBy('Defect')">        不良         <span class="sort-icon">@SortIcon("Defect")</span></th>
-                                <th data-label="担当者"       class="@SortClass("Person")"         onclick="sortBy('Person')">        担当者       <span class="sort-icon">@SortIcon("Person")</span></th>
+                                <th data-label="不良"         class="@SortClass("Defect")"           onclick="sortBy('Defect')">          不良         <span class="sort-icon">@SortIcon("Defect")</span></th>
+                                <th data-label="使用製品名"   class="@SortClass("UseProductName")"   onclick="sortBy('UseProductName')">  使用製品名   <span class="sort-icon">@SortIcon("UseProductName")</span></th>
+                                <th data-label="使用注文番号" class="@SortClass("UseOrderNumber")"   onclick="sortBy('UseOrderNumber')">  使用注文番号 <span class="sort-icon">@SortIcon("UseOrderNumber")</span></th>
+                                <th data-label="使用製造番号" class="@SortClass("UseProductNumber")" onclick="sortBy('UseProductNumber')">使用製造番号 <span class="sort-icon">@SortIcon("UseProductNumber")</span></th>
+                                <th data-label="担当者"       class="@SortClass("Person")"           onclick="sortBy('Person')">          担当者       <span class="sort-icon">@SortIcon("Person")</span></th>
                                 <th data-label="登録日"       class="@SortClass("RegDate")"        onclick="sortBy('RegDate')">       登録日       <span class="sort-icon">@SortIcon("RegDate")</span></th>
                                 <th data-label="コメント"     class="@SortClass("Comment")"        onclick="sortBy('Comment')">       コメント     <span class="sort-icon">@SortIcon("Comment")</span></th>
                                 <th data-label="登録日時"     class="@SortClass("CreatedAt")"      onclick="sortBy('CreatedAt')">     登録日時     <span class="sort-icon">@SortIcon("CreatedAt")</span></th>
@@ -901,6 +910,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <td>@r.Increase</td>
                                     <td>@r.Decrease</td>
                                     <td>@r.Defect</td>
+                                    <td>@r.UseProductName</td>
+                                    <td>@r.UseOrderNumber</td>
+                                    <td>@r.UseProductNumber</td>
                                     <td>@r.Person</td>
                                     <td>@r.RegDate</td>
                                     <td>@r.Comment</td>
