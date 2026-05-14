@@ -291,7 +291,7 @@ namespace ProductDatabase.Data {
 
         // 基板ID・注文番号の位置情報DTO
         public sealed class SubstrateLocationInfo {
-            public string SubstrateID { get; init; } = string.Empty;
+            public long SubstrateID { get; init; }
             public string OrderNumber { get; init; } = string.Empty;
         }
     }
