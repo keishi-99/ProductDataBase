@@ -88,6 +88,7 @@ namespace ProductDatabase {
                                 if (objCbx is not null) {
                                     objCbx.Enabled = true;
                                     objCbx.Checked = shouldBeChecked;
+                                    objCbx.ForeColor = shouldBeChecked ? Color.Black : Color.Red;
                                 }
 
                                 if (objDgv is not null) {
