@@ -104,7 +104,7 @@ namespace ProductDatabase.Data {
         public static int UpdateSubstrateDecrease(
             IDbConnection connection, IDbTransaction transaction,
             int decrease, string person, string regDate, string comment,
-            string substrateNumber, long useId) {
+            string substrateNumber, long useId, long substrateId) {
 
             var sql =
                 $"""
@@ -116,7 +116,8 @@ namespace ProductDatabase.Data {
                     RegDate = @RegDate,
                     Comment = @Comment
                 WHERE
-                    SubstrateNumber = @SubstrateNumber
+                    SubstrateID = @SubstrateID
+                    AND SubstrateNumber = @SubstrateNumber
                     AND IsDeleted = 0
                     AND UseID = @UseID
                 """;
@@ -127,14 +128,15 @@ namespace ProductDatabase.Data {
                 RegDate = regDate.NullIfWhiteSpace(),
                 Comment = comment.NullIfWhiteSpace(),
                 SubstrateNumber = substrateNumber,
-                UseID = useId
+                UseID = useId,
+                SubstrateID = substrateId
             }, transaction: transaction);
         }
 
         // 基板テーブルに使用数レコードを新規挿入する
         public static void InsertSubstrateDecrease(
             IDbConnection connection, IDbTransaction transaction,
-            string substrateId, string substrateNumber, string orderNumber,
+            long substrateId, string substrateNumber, string orderNumber,
             int decrease, string person, string regDate, string comment, long useId) {
 
             var sql =
@@ -164,7 +166,7 @@ namespace ProductDatabase.Data {
                 """;
 
             connection.Execute(sql, new {
-                SubstrateID = substrateId.NullIfWhiteSpace(),
+                SubstrateID = substrateId,
                 SubstrateNumber = substrateNumber.NullIfWhiteSpace(),
                 OrderNumber = orderNumber.NullIfWhiteSpace(),
                 Decrease = 0 - decrease,

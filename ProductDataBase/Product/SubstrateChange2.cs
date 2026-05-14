@@ -269,13 +269,14 @@ namespace ProductDatabase {
                                                 _productRegisterWork.RegDate,
                                                 _productRegisterWork.Comment,
                                                 substrateNum,
-                                                _productRegisterWork.RowID);
+                                                _productRegisterWork.RowID,
+                                                _productMaster.UseSubstrates[i].SubstrateID);
 
                                             // 更新できない場合は挿入
                                             if (affectedRows == 0) {
                                                 SubstrateChangeRepository.InsertSubstrateDecrease(
                                                     con, transaction,
-                                                    info?.SubstrateID ?? "",
+                                                    _productMaster.UseSubstrates[i].SubstrateID,
                                                     substrateNum,
                                                     info?.OrderNumber ?? "",
                                                     useValue,
