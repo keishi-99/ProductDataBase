@@ -134,14 +134,16 @@ namespace ProductDatabase.MasterManagement {
                 return false;
             }
 
-            // 基板型式の重複チェック
+            // 基板型式の重複チェック（同一型式でも SubstrateID が異なれば登録可）
             long excludeId = _isNewRecord ? 0 : _substrate.SubstrateID;
             if (SubstrateRepository.ExistsSubstrateModel(SubstrateModelTextBox.Text.Trim(), excludeId)) {
-                MessageBox.Show(
-                    $"基板型式 [{SubstrateModelTextBox.Text.Trim()}] は既に登録されています。",
-                    "重複エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                SubstrateModelTextBox.Focus();
-                return false;
+                var result = MessageBox.Show(
+                    $"基板型式 [{SubstrateModelTextBox.Text.Trim()}] は既に登録されています。続けて登録しますか？",
+                    "型式重複確認", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (result == DialogResult.No) {
+                    SubstrateModelTextBox.Focus();
+                    return false;
+                }
             }
 
             return true;
