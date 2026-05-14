@@ -136,8 +136,8 @@ namespace ProductDatabase.Data {
         // 基板テーブルに使用数レコードを新規挿入する
         public static void InsertSubstrateDecrease(
             IDbConnection connection, IDbTransaction transaction,
-            long substrateId, string substrateNumber, string orderNumber,
-            int decrease, string person, string regDate, string comment, long useId) {
+            int decrease, string person, string regDate, string comment,
+            string substrateNumber, string orderNumber, long useId, long substrateId) {
 
             var sql =
                 $"""
