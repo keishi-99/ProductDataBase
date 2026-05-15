@@ -42,6 +42,11 @@ namespace ProductDatabase {
 
         private readonly DbTransactionScope _dbScope = new();
 
+        // LoadSubstrateData中のCheckBox_CheckedChanged誤発火を防ぐフラグ
+        private bool _isLoadingEvents = false;
+        // 排他グループによる自動OFFで警告が出ないよう抑制するフラグ
+        private bool _suppressUncheckedWarning = false;
+
         public ProductRegistration2Window(ProductMaster productMaster, ProductRegisterWork productRegisterWork, AppSettings appSettings) {
             InitializeComponent();
             _productMaster = productMaster;
@@ -132,26 +137,37 @@ namespace ProductDatabase {
         }
         // 使用基板一覧をDBから取得してチェックボックスとDataGridViewに表示し在庫不足を警告する
         private void LoadSubstrateData(SqliteConnection connection, SqliteTransaction transaction) {
-            // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = _productMaster.RegType == 9;
-            var useSubstrates = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrates : _productMaster.UseSubstrates);
+            var useSubstrates = isServiceRegistration ? ServiceInfo.ServiceUseSubstrates : _productMaster.UseSubstrates;
 
             var shortageSubstrateName = string.Empty;
 
-            for (var i = 0; i < useSubstrates.Count; i++) {
-                var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
-                var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
+            _isLoadingEvents = true;
+            try {
+                var initializedGroups = new HashSet<int>();
 
-                var substrateID = useSubstrates[i].SubstrateID;
-                var substrateName = useSubstrates[i].SubstrateName;
-                var substrateModel = useSubstrates[i].SubstrateModel;
+                for (var i = 0; i < useSubstrates.Count; i++) {
+                    var substrate = useSubstrates[i];
+                    var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
+                    var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
 
-                SetupCheckBox(objCbx, substrateName, substrateModel);
-                SetupDataGridView(objDgv);
+                    // 排他グループ内で2番目以降の基板はOFFで開始
+                    var shouldBeChecked = true;
+                    if (substrate.ExclusiveGroupID.HasValue
+                        && !initializedGroups.Add(substrate.ExclusiveGroupID.Value)) {
+                        shouldBeChecked = false;
+                    }
 
-                if (FetchAndDisplaySubstrateData(connection, objDgv, substrateID, transaction)) {
-                    shortageSubstrateName += $"[{substrateName}]{Environment.NewLine}";
+                    SetupCheckBox(objCbx, substrate.SubstrateName, substrate.SubstrateModel, shouldBeChecked);
+                    SetupDataGridView(objDgv, shouldBeChecked);
+
+                    // 在庫データは全基板で読み込む（後から選択時に備えて）
+                    if (FetchAndDisplaySubstrateData(connection, objDgv, substrate.SubstrateID, transaction, shouldBeChecked)) {
+                        shortageSubstrateName += $"[{substrate.SubstrateName}]{Environment.NewLine}";
+                    }
                 }
+            } finally {
+                _isLoadingEvents = false;
             }
 
             if (!string.IsNullOrEmpty(shortageSubstrateName)) {
@@ -159,18 +175,21 @@ namespace ProductDatabase {
                 MessageBox.Show($"在庫が足りません。{Environment.NewLine}{shortageSubstrateName}", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
-        // チェックボックスを有効化してONにし基板名と型式を表示テキストにセットする
-        private static void SetupCheckBox(CheckBox? objCbx, string substrateName, string substrateModel) {
+        // チェックボックスを有効化し基板名と型式を表示テキストにセットする（排他グループ考慮）
+        private static void SetupCheckBox(CheckBox? objCbx, string substrateName, string substrateModel, bool shouldBeChecked = true) {
             if (objCbx is not null) {
                 objCbx.Enabled = true;
-                objCbx.Checked = true;
+                objCbx.Checked = shouldBeChecked;
+                objCbx.ForeColor = shouldBeChecked ? Color.Black : Color.Red;
                 var splitSubstrateName = substrateName.Split(':');
                 objCbx.Text = $"{splitSubstrateName.Last()} - {substrateModel}";
             }
         }
-        // DataGridViewのセル書式を設定しフォントサイズに合わせた列幅を適用する
-        private void SetupDataGridView(DataGridView? objDgv) {
+        // DataGridViewのセル書式を設定しフォントサイズに合わせた列幅を適用する（排他グループ考慮）
+        private void SetupDataGridView(DataGridView? objDgv, bool shouldBeChecked = true) {
             if (objDgv is not null) {
+                objDgv.Visible = shouldBeChecked;
+                objDgv.Enabled = shouldBeChecked;
                 objDgv.Columns[1].DefaultCellStyle.BackColor = Color.LightGray;
                 objDgv.Columns[2].ReadOnly = false;
                 objDgv.Columns[3].ReadOnly = false;
@@ -204,7 +223,8 @@ namespace ProductDatabase {
             }
         }
         // 基板IDの在庫データをDBから取得してDataGridViewに表示し在庫が0以下ならtrueを返す
-        private bool FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, long substrateID, SqliteTransaction transaction) {
+        // shouldBeChecked=false（排他グループで非選択）の基板はデータ読み込みのみ行い警告対象外とする
+        private bool FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, long substrateID, SqliteTransaction transaction, bool shouldBeChecked = true) {
             var intQuantity = _productRegisterWork.Quantity;
             var results = ProductRegistrationRepository.FetchSubstrateStock(connection, transaction, substrateID);
 
@@ -229,7 +249,7 @@ namespace ProductDatabase {
                     }
                 }
             }
-            return intQuantity > 0;
+            return shouldBeChecked && intQuantity > 0;
         }
 
         // 製品マスターの印刷フラグに応じて印刷ボタン・メニューの表示と有効状態を設定し印刷設定を読み込む
@@ -739,66 +759,50 @@ namespace ProductDatabase {
         // コミット前のみ次サフィックスをプレビューに反映する（コミット後はモデルが更新済みのため不要）
         private bool ShouldApplyNextOLesSuffix =>
             !_dbScope.IsCommitted && ShouldIncrementOLesSuffix;
+        // チェックボックス名から対応するDataGridViewを返す
+        private DataGridView? GetDataGridViewForCheckBox(string checkBoxName) {
+            var idx = _checkBoxNames.IndexOf(checkBoxName);
+            return idx >= 0 ? MainPanel.Controls[_dataGridViewNames[idx]] as DataGridView : null;
+        }
+
         // 基板チェックボックスのOn/Offに連動して対応DataGridViewの表示と有効状態を切り替える
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
-            var checkBox = (System.Windows.Forms.CheckBox)sender;
-            DataGridView dataGridView = new();
+            if (_isLoadingEvents) return;
 
-            switch (checkBox.Name) {
-                case "Substrate1CheckBox":
-                    dataGridView = Substrate1DataGridView;
-                    break;
-                case "Substrate2CheckBox":
-                    dataGridView = Substrate2DataGridView;
-                    break;
-                case "Substrate3CheckBox":
-                    dataGridView = Substrate3DataGridView;
-                    break;
-                case "Substrate4CheckBox":
-                    dataGridView = Substrate4DataGridView;
-                    break;
-                case "Substrate5CheckBox":
-                    dataGridView = Substrate5DataGridView;
-                    break;
-                case "Substrate6CheckBox":
-                    dataGridView = Substrate6DataGridView;
-                    break;
-                case "Substrate7CheckBox":
-                    dataGridView = Substrate7DataGridView;
-                    break;
-                case "Substrate8CheckBox":
-                    dataGridView = Substrate8DataGridView;
-                    break;
-                case "Substrate9CheckBox":
-                    dataGridView = Substrate9DataGridView;
-                    break;
-                case "Substrate10CheckBox":
-                    dataGridView = Substrate10DataGridView;
-                    break;
-                case "Substrate11CheckBox":
-                    dataGridView = Substrate11DataGridView;
-                    break;
-                case "Substrate12CheckBox":
-                    dataGridView = Substrate12DataGridView;
-                    break;
-                case "Substrate13CheckBox":
-                    dataGridView = Substrate13DataGridView;
-                    break;
-                case "Substrate14CheckBox":
-                    dataGridView = Substrate14DataGridView;
-                    break;
-                case "Substrate15CheckBox":
-                    dataGridView = Substrate15DataGridView;
-                    break;
-                default:
-                    break;
-            }
+            var checkBox = (System.Windows.Forms.CheckBox)sender;
+            var dataGridView = GetDataGridViewForCheckBox(checkBox.Name);
+            if (dataGridView is null) return;
 
             dataGridView.Enabled = checkBox.Checked;
             dataGridView.Visible = checkBox.Checked;
             checkBox.ForeColor = checkBox.Checked ? Color.Black : Color.Red;
 
-            if (!checkBox.Checked && !_productMaster.IsRegType9) {
+            // 排他グループの他チェックボックスを自動OFF（チェックON時のみ）
+            if (checkBox.Checked) {
+                var useSubstrates = _productMaster.RegType != 9
+                    ? _productMaster.UseSubstrates
+                    : ServiceInfo.ServiceUseSubstrates;
+                var idx = _checkBoxNames.IndexOf(checkBox.Name);
+                if (idx >= 0 && idx < useSubstrates.Count) {
+                    var groupId = useSubstrates[idx].ExclusiveGroupID;
+                    if (groupId.HasValue) {
+                        _suppressUncheckedWarning = true;
+                        try {
+                            for (var i = 0; i < useSubstrates.Count; i++) {
+                                if (i == idx) continue;
+                                if (useSubstrates[i].ExclusiveGroupID == groupId) {
+                                    if (MainPanel.Controls[_checkBoxNames[i]] is CheckBox otherCbx && otherCbx.Checked)
+                                        otherCbx.Checked = false;
+                                }
+                            }
+                        } finally {
+                            _suppressUncheckedWarning = false;
+                        }
+                    }
+                }
+            }
+
+            if (!checkBox.Checked && !_suppressUncheckedWarning && !_productMaster.IsRegType9) {
                 MessageBox.Show("チェックがない場合在庫から引き落とされなくなります。", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
