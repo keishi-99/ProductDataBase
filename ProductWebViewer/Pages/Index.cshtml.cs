@@ -255,8 +255,11 @@ public class IndexModel : PageModel {
     }
 
     // カンマ・ダブルクォート・改行を含むフィールドをエスケープする
+    // 数式インジェクション対策: =,+,-,@ 始まりの値にはシングルクォートを付加する
     private static string CsvField(string? value) {
-        if (value is null) return "";
+        if (string.IsNullOrEmpty(value)) return "";
+        if (value[0] is '=' or '+' or '-' or '@')
+            value = "'" + value;
         if (value.Contains(',') || value.Contains('"') || value.Contains('\n') || value.Contains('\r'))
             return $"\"{value.Replace("\"", "\"\"")}\"";
         return value;
