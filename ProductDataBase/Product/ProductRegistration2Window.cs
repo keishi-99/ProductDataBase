@@ -140,8 +140,6 @@ namespace ProductDatabase {
             var isServiceRegistration = _productMaster.RegType == 9;
             var useSubstrates = isServiceRegistration ? ServiceInfo.ServiceUseSubstrates : _productMaster.UseSubstrates;
 
-            var shortageSubstrateName = string.Empty;
-
             _isLoadingEvents = true;
             try {
                 var initializedGroups = new HashSet<int>();
@@ -162,17 +160,10 @@ namespace ProductDatabase {
                     SetupDataGridView(objDgv, shouldBeChecked);
 
                     // 在庫データは全基板で読み込む（後から選択時に備えて）
-                    if (FetchAndDisplaySubstrateData(connection, objDgv, substrate.SubstrateID, transaction, shouldBeChecked)) {
-                        shortageSubstrateName += $"[{substrate.SubstrateName}]{Environment.NewLine}";
-                    }
+                    FetchAndDisplaySubstrateData(connection, objDgv, substrate.SubstrateID, transaction, shouldBeChecked);
                 }
             } finally {
                 _isLoadingEvents = false;
-            }
-
-            if (!string.IsNullOrEmpty(shortageSubstrateName)) {
-                Activate();
-                MessageBox.Show($"在庫が足りません。{Environment.NewLine}{shortageSubstrateName}", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
         // チェックボックスを有効化し基板名と型式を表示テキストにセットする（排他グループ考慮）
@@ -222,9 +213,9 @@ namespace ProductDatabase {
                     break;
             }
         }
-        // 基板IDの在庫データをDBから取得してDataGridViewに表示し在庫が0以下ならtrueを返す
+        // 基板IDの在庫データをDBから取得してDataGridViewに表示
         // shouldBeChecked=false（排他グループで非選択）の基板はデータ読み込みのみ行い警告対象外とする
-        private bool FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, long substrateID, SqliteTransaction transaction, bool shouldBeChecked = true) {
+        private void FetchAndDisplaySubstrateData(SqliteConnection connection, DataGridView? objDgv, long substrateID, SqliteTransaction transaction, bool shouldBeChecked = true) {
             var intQuantity = _productRegisterWork.Quantity;
             var results = ProductRegistrationRepository.FetchSubstrateStock(connection, transaction, substrateID);
 
@@ -249,7 +240,6 @@ namespace ProductDatabase {
                     }
                 }
             }
-            return shouldBeChecked && intQuantity > 0;
         }
 
         // 製品マスターの印刷フラグに応じて印刷ボタン・メニューの表示と有効状態を設定し印刷設定を読み込む
