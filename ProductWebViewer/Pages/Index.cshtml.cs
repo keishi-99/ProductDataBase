@@ -83,45 +83,18 @@ public class IndexModel : PageModel {
 
             if (Tab == "substrate") {
                 if (SubTab == "stock") {
-                    var records = _substrateRepo.GetStock(
-                        ListSubCategory, ListSubProductName, ListSubstrateName,
-                        groupByModel: StockGroup != "detail",
-                        excludeZeroStock: ExcludeZeroStock,
-                        substrateName: FilterSubstrateName,
-                        orderNumber: FilterSubstrateOrderNumber,
-                        substrateNumber: FilterSubstrateNumber,
-                        SortCol, SortDir, 1, 0);
-                    bytes = BuildCsvBytes(BuildStockCsvLines(records, StockGroup != "detail"));
+                    bytes = BuildCsvBytes(BuildStockCsvLines(FetchStockRecords(1, 0), StockGroup != "detail"));
                     fileName = $"在庫数_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
                 } else {
-                    var records = _substrateRepo.GetAll(
-                        ListSubCategory, ListSubProductName, ListSubstrateName,
-                        FilterSubstrateName, FilterSubstrateOrderNumber,
-                        FilterSubstrateNumber,
-                        FilterSubstrateDateType, FilterSubstrateDateFrom, FilterSubstrateDateTo,
-                        SortCol, SortDir, 1, 0);
-                    bytes = BuildCsvBytes(BuildSubstrateCsvLines(records));
+                    bytes = BuildCsvBytes(BuildSubstrateCsvLines(FetchSubstrateRecords(1, 0)));
                     fileName = $"基板登録実績_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
                 }
             } else {
                 if (SubTab == "serial") {
-                    var records = _productRepo.GetSerialHistory(
-                        ListProductCategory, ListProductName,
-                        ListProductType, FilterProductName,
-                        FilterProductOrderNumber, FilterProductNumber,
-                        FilterProductDateType, FilterProductDateFrom, FilterProductDateTo,
-                        FilterSerial,
-                        SortCol, SortDir, 1, 0);
-                    bytes = BuildCsvBytes(BuildSerialCsvLines(records));
+                    bytes = BuildCsvBytes(BuildSerialCsvLines(FetchSerialRecords(1, 0)));
                     fileName = $"シリアル履歴_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
                 } else {
-                    var records = _productRepo.GetAll(
-                        ListProductCategory, ListProductName, ListProductType,
-                        FilterProductName, FilterProductOrderNumber,
-                        FilterProductNumber,
-                        FilterProductDateType, FilterProductDateFrom, FilterProductDateTo,
-                        SortCol, SortDir, 1, 0);
-                    bytes = BuildCsvBytes(BuildProductCsvLines(records));
+                    bytes = BuildCsvBytes(BuildProductCsvLines(FetchProductRecords(1, 0)));
                     fileName = $"製品登録実績_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
                 }
             }
@@ -166,34 +139,13 @@ public class IndexModel : PageModel {
         if (!HasSearched) return;
 
         if (SubTab == "serial") {
-            TotalCount = _productRepo.GetSerialCount(
-                ListProductCategory, ListProductName,
-                ListProductType, FilterProductName,
-                FilterProductOrderNumber, FilterProductNumber,
-                FilterProductDateType, FilterProductDateFrom, FilterProductDateTo,
-                FilterSerial);
+            TotalCount = CountSerialRecords();
             ClampPage();
-            SerialRecords = _productRepo.GetSerialHistory(
-                ListProductCategory, ListProductName,
-                ListProductType, FilterProductName,
-                FilterProductOrderNumber, FilterProductNumber,
-                FilterProductDateType, FilterProductDateFrom, FilterProductDateTo,
-                FilterSerial,
-                SortCol, SortDir, PageNum, PageSize);
-        }
-        else {
-            TotalCount = _productRepo.GetCount(
-                ListProductCategory, ListProductName, ListProductType,
-                FilterProductName, FilterProductOrderNumber,
-                FilterProductNumber,
-                FilterProductDateType, FilterProductDateFrom, FilterProductDateTo);
+            SerialRecords = FetchSerialRecords(PageNum, PageSize);
+        } else {
+            TotalCount = CountProductRecords();
             ClampPage();
-            ProductRecords = _productRepo.GetAll(
-                ListProductCategory, ListProductName, ListProductType,
-                FilterProductName, FilterProductOrderNumber,
-                FilterProductNumber,
-                FilterProductDateType, FilterProductDateFrom, FilterProductDateTo,
-                SortCol, SortDir, PageNum, PageSize);
+            ProductRecords = FetchProductRecords(PageNum, PageSize);
         }
     }
 
@@ -205,38 +157,74 @@ public class IndexModel : PageModel {
         if (!HasSearched) return;
 
         if (SubTab == "stock") {
-            TotalCount = _substrateRepo.GetStockCount(
-                ListSubCategory, ListSubProductName, ListSubstrateName,
-                groupByModel: StockGroup != "detail",
-                excludeZeroStock: ExcludeZeroStock,
-                substrateName: FilterSubstrateName,
-                orderNumber: FilterSubstrateOrderNumber,
-                substrateNumber: FilterSubstrateNumber);
+            TotalCount = CountStockRecords();
             ClampPage();
-            StockRecords = _substrateRepo.GetStock(
-                ListSubCategory, ListSubProductName, ListSubstrateName,
-                groupByModel: StockGroup != "detail",
-                excludeZeroStock: ExcludeZeroStock,
-                substrateName: FilterSubstrateName,
-                orderNumber: FilterSubstrateOrderNumber,
-                substrateNumber: FilterSubstrateNumber,
-                SortCol, SortDir, PageNum, PageSize);
-        }
-        else {
-            TotalCount = _substrateRepo.GetCount(
-                ListSubCategory, ListSubProductName, ListSubstrateName,
-                FilterSubstrateName, FilterSubstrateOrderNumber,
-                FilterSubstrateNumber,
-                FilterSubstrateDateType, FilterSubstrateDateFrom, FilterSubstrateDateTo);
+            StockRecords = FetchStockRecords(PageNum, PageSize);
+        } else {
+            TotalCount = CountSubstrateRecords();
             ClampPage();
-            SubstrateRecords = _substrateRepo.GetAll(
-                ListSubCategory, ListSubProductName, ListSubstrateName,
-                FilterSubstrateName, FilterSubstrateOrderNumber,
-                FilterSubstrateNumber,
-                FilterSubstrateDateType, FilterSubstrateDateFrom, FilterSubstrateDateTo,
-                SortCol, SortDir, PageNum, PageSize);
+            SubstrateRecords = FetchSubstrateRecords(PageNum, PageSize);
         }
     }
+
+    private int CountProductRecords() =>
+        _productRepo.GetCount(
+            ListProductCategory, ListProductName, ListProductType,
+            FilterProductName, FilterProductOrderNumber, FilterProductNumber,
+            FilterProductDateType, FilterProductDateFrom, FilterProductDateTo);
+
+    private IReadOnlyList<ProductRecord> FetchProductRecords(int page, int pageSize) =>
+        _productRepo.GetAll(
+            ListProductCategory, ListProductName, ListProductType,
+            FilterProductName, FilterProductOrderNumber, FilterProductNumber,
+            FilterProductDateType, FilterProductDateFrom, FilterProductDateTo,
+            SortCol, SortDir, page, pageSize);
+
+    private int CountSerialRecords() =>
+        _productRepo.GetSerialCount(
+            ListProductCategory, ListProductName, ListProductType,
+            FilterProductName, FilterProductOrderNumber, FilterProductNumber,
+            FilterProductDateType, FilterProductDateFrom, FilterProductDateTo,
+            FilterSerial);
+
+    private IReadOnlyList<SerialRecord> FetchSerialRecords(int page, int pageSize) =>
+        _productRepo.GetSerialHistory(
+            ListProductCategory, ListProductName, ListProductType,
+            FilterProductName, FilterProductOrderNumber, FilterProductNumber,
+            FilterProductDateType, FilterProductDateFrom, FilterProductDateTo,
+            FilterSerial, SortCol, SortDir, page, pageSize);
+
+    private int CountSubstrateRecords() =>
+        _substrateRepo.GetCount(
+            ListSubCategory, ListSubProductName, ListSubstrateName,
+            FilterSubstrateName, FilterSubstrateOrderNumber, FilterSubstrateNumber,
+            FilterSubstrateDateType, FilterSubstrateDateFrom, FilterSubstrateDateTo);
+
+    private IReadOnlyList<SubstrateRecord> FetchSubstrateRecords(int page, int pageSize) =>
+        _substrateRepo.GetAll(
+            ListSubCategory, ListSubProductName, ListSubstrateName,
+            FilterSubstrateName, FilterSubstrateOrderNumber, FilterSubstrateNumber,
+            FilterSubstrateDateType, FilterSubstrateDateFrom, FilterSubstrateDateTo,
+            SortCol, SortDir, page, pageSize);
+
+    private int CountStockRecords() =>
+        _substrateRepo.GetStockCount(
+            ListSubCategory, ListSubProductName, ListSubstrateName,
+            groupByModel: StockGroup != "detail",
+            excludeZeroStock: ExcludeZeroStock,
+            substrateName: FilterSubstrateName,
+            orderNumber: FilterSubstrateOrderNumber,
+            substrateNumber: FilterSubstrateNumber);
+
+    private IReadOnlyList<StockRecord> FetchStockRecords(int page, int pageSize) =>
+        _substrateRepo.GetStock(
+            ListSubCategory, ListSubProductName, ListSubstrateName,
+            groupByModel: StockGroup != "detail",
+            excludeZeroStock: ExcludeZeroStock,
+            substrateName: FilterSubstrateName,
+            orderNumber: FilterSubstrateOrderNumber,
+            substrateNumber: FilterSubstrateNumber,
+            SortCol, SortDir, page, pageSize);
 
     // ページネーション番号リストを生成する。
     // null はページ番号の間に表示する "..." (省略記号) を表す。
@@ -257,8 +245,13 @@ public class IndexModel : PageModel {
 
     // BOM付きUTF-8 バイト列を返す（Excelで日本語が文字化けしないようにするため）
     private static byte[] BuildCsvBytes(IEnumerable<string> lines) {
-        var csv = string.Join("\r\n", lines) + "\r\n";
-        return Encoding.UTF8.GetPreamble().Concat(Encoding.UTF8.GetBytes(csv)).ToArray();
+        using var ms = new MemoryStream();
+        using (var writer = new StreamWriter(ms, new UTF8Encoding(true))) {
+            writer.NewLine = "\r\n";
+            foreach (var line in lines)
+                writer.WriteLine(line);
+        }
+        return ms.ToArray();
     }
 
     // カンマ・ダブルクォート・改行を含むフィールドをエスケープする
