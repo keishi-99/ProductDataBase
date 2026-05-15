@@ -99,8 +99,7 @@ public class IndexModel : PageModel {
                 }
             }
 
-            Response.Headers["Content-Disposition"] = $"attachment; filename*=UTF-8''{Uri.EscapeDataString(fileName)}";
-            return File(bytes, "text/csv");
+            return File(bytes, "text/csv", fileName);
         } catch (Exception ex) {
             _logger.LogError(ex, "CSVエクスポート中にエラーが発生しました。");
             return StatusCode(500, "エクスポート中にエラーが発生しました。");

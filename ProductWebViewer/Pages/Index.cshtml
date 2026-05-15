@@ -161,7 +161,12 @@ function exportCsv() {
     var params = new URLSearchParams();
     new FormData(form).forEach(function(value, key) { params.append(key, value); });
     params.set('handler', 'ExportCsv');
-    window.open('?' + params.toString(), '_blank');
+    var a = document.createElement('a');
+    a.href = '?' + params.toString();
+    a.download = '';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 }
 
 function sortBy(col) {
