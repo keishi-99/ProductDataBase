@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProductWebViewer.Data;
@@ -74,6 +75,64 @@ public class IndexModel : PageModel {
 
     public int TotalCount { get; private set; }
     public string? ErrorMessage { get; private set; }
+
+    public IActionResult OnGetExportCsv() {
+        try {
+            byte[] bytes;
+            string fileName;
+
+            if (Tab == "substrate") {
+                if (SubTab == "stock") {
+                    var records = _substrateRepo.GetStock(
+                        ListSubCategory, ListSubProductName, ListSubstrateName,
+                        groupByModel: StockGroup != "detail",
+                        excludeZeroStock: ExcludeZeroStock,
+                        substrateName: FilterSubstrateName,
+                        orderNumber: FilterSubstrateOrderNumber,
+                        substrateNumber: FilterSubstrateNumber,
+                        SortCol, SortDir, 1, 0);
+                    bytes = BuildCsvBytes(BuildStockCsvLines(records, StockGroup != "detail"));
+                    fileName = $"在庫数_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                } else {
+                    var records = _substrateRepo.GetAll(
+                        ListSubCategory, ListSubProductName, ListSubstrateName,
+                        FilterSubstrateName, FilterSubstrateOrderNumber,
+                        FilterSubstrateNumber,
+                        FilterSubstrateDateType, FilterSubstrateDateFrom, FilterSubstrateDateTo,
+                        SortCol, SortDir, 1, 0);
+                    bytes = BuildCsvBytes(BuildSubstrateCsvLines(records));
+                    fileName = $"基板登録実績_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                }
+            } else {
+                if (SubTab == "serial") {
+                    var records = _productRepo.GetSerialHistory(
+                        ListProductCategory, ListProductName,
+                        ListProductType, FilterProductName,
+                        FilterProductOrderNumber, FilterProductNumber,
+                        FilterProductDateType, FilterProductDateFrom, FilterProductDateTo,
+                        FilterSerial,
+                        SortCol, SortDir, 1, 0);
+                    bytes = BuildCsvBytes(BuildSerialCsvLines(records));
+                    fileName = $"シリアル履歴_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                } else {
+                    var records = _productRepo.GetAll(
+                        ListProductCategory, ListProductName, ListProductType,
+                        FilterProductName, FilterProductOrderNumber,
+                        FilterProductNumber,
+                        FilterProductDateType, FilterProductDateFrom, FilterProductDateTo,
+                        SortCol, SortDir, 1, 0);
+                    bytes = BuildCsvBytes(BuildProductCsvLines(records));
+                    fileName = $"製品登録実績_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                }
+            }
+
+            Response.Headers["Content-Disposition"] = $"attachment; filename*=UTF-8''{Uri.EscapeDataString(fileName)}";
+            return File(bytes, "text/csv");
+        } catch (Exception ex) {
+            _logger.LogError(ex, "CSVエクスポート中にエラーが発生しました。");
+            return StatusCode(500, "エクスポート中にエラーが発生しました。");
+        }
+    }
 
     public IActionResult OnGetUsedSubstrates(long id) {
         try {
@@ -194,6 +253,69 @@ public class IndexModel : PageModel {
         if (PageNum < totalPages - 2) pages.Add(null);
         pages.Add(totalPages);
         return pages;
+    }
+
+    // BOM付きUTF-8 バイト列を返す（Excelで日本語が文字化けしないようにするため）
+    private static byte[] BuildCsvBytes(IEnumerable<string> lines) {
+        var csv = string.Join("\r\n", lines) + "\r\n";
+        return Encoding.UTF8.GetPreamble().Concat(Encoding.UTF8.GetBytes(csv)).ToArray();
+    }
+
+    // カンマ・ダブルクォート・改行を含むフィールドをエスケープする
+    private static string CsvField(string? value) {
+        if (value is null) return "";
+        if (value.Contains(',') || value.Contains('"') || value.Contains('\n') || value.Contains('\r'))
+            return $"\"{value.Replace("\"", "\"\"")}\"";
+        return value;
+    }
+
+    private static IEnumerable<string> BuildProductCsvLines(IReadOnlyList<ProductRecord> records) {
+        yield return "ID,カテゴリ,製品名,種別,型式,注文番号,製造番号,O-Les番号,数量,担当者,登録日,Revision,シリアル開始,シリアル終了,コメント,登録日時";
+        foreach (var r in records)
+            yield return string.Join(",",
+                CsvField(r.Id.ToString()), CsvField(r.CategoryName), CsvField(r.ProductName),
+                CsvField(r.ProductType), CsvField(r.ProductModel), CsvField(r.OrderNumber),
+                CsvField(r.ProductNumber), CsvField(r.OLesNumber), CsvField(r.Quantity?.ToString()),
+                CsvField(r.Person), CsvField(r.RegDate), CsvField(r.Revision),
+                CsvField(r.SerialFirst), CsvField(r.SerialLast), CsvField(r.Comment), CsvField(r.CreatedAt));
+    }
+
+    private static IEnumerable<string> BuildSerialCsvLines(IReadOnlyList<SerialRecord> records) {
+        yield return "No.,シリアル番号,O-Lesシリアル,注文番号,製番,製品名,種別,型式,登録日,登録日時";
+        foreach (var r in records)
+            yield return string.Join(",",
+                CsvField(r.RowId.ToString()), CsvField(r.Serial), CsvField(r.OLesSerial),
+                CsvField(r.OrderNumber), CsvField(r.ProductNumber), CsvField(r.ProductName),
+                CsvField(r.ProductType), CsvField(r.ProductModel), CsvField(r.RegDate), CsvField(r.CreatedAt));
+    }
+
+    private static IEnumerable<string> BuildSubstrateCsvLines(IReadOnlyList<SubstrateRecord> records) {
+        yield return "ID,カテゴリ,製品名,基板名,基板型式,注文番号,製造番号,入庫,出庫,不良,使用製品名,使用注文番号,使用製造番号,担当者,登録日,コメント,登録日時";
+        foreach (var r in records)
+            yield return string.Join(",",
+                CsvField(r.Id.ToString()), CsvField(r.CategoryName), CsvField(r.ProductName),
+                CsvField(r.SubstrateName), CsvField(r.SubstrateModel), CsvField(r.OrderNumber),
+                CsvField(r.SubstrateNumber), CsvField(r.Increase?.ToString()), CsvField(r.Decrease?.ToString()),
+                CsvField(r.Defect?.ToString()), CsvField(r.UseProductName), CsvField(r.UseOrderNumber),
+                CsvField(r.UseProductNumber), CsvField(r.Person), CsvField(r.RegDate),
+                CsvField(r.Comment), CsvField(r.CreatedAt));
+    }
+
+    private static IEnumerable<string> BuildStockCsvLines(IReadOnlyList<StockRecord> records, bool groupByModel) {
+        yield return groupByModel
+            ? "カテゴリ,製品名,基板名,基板型式,在庫数"
+            : "カテゴリ,製品名,基板名,基板型式,製造番号,注文番号,在庫数";
+        foreach (var r in records) {
+            if (groupByModel)
+                yield return string.Join(",",
+                    CsvField(r.CategoryName), CsvField(r.ProductName),
+                    CsvField(r.SubstrateName), CsvField(r.SubstrateModel), CsvField(r.Stock.ToString()));
+            else
+                yield return string.Join(",",
+                    CsvField(r.CategoryName), CsvField(r.ProductName),
+                    CsvField(r.SubstrateName), CsvField(r.SubstrateModel),
+                    CsvField(r.SubstrateNumber), CsvField(r.OrderNumber), CsvField(r.Stock.ToString()));
+        }
     }
 
     // フィルター変更などで総ページ数が減った場合に PageNum を有効範囲内に収める

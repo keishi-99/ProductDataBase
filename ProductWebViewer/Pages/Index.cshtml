@@ -156,6 +156,14 @@
 
 @section Scripts {
 <script>
+function exportCsv() {
+    var form = document.querySelector('form');
+    var params = new URLSearchParams();
+    new FormData(form).forEach(function(value, key) { params.append(key, value); });
+    params.set('handler', 'ExportCsv');
+    window.open('?' + params.toString(), '_blank');
+}
+
 function sortBy(col) {
     var colInput  = document.getElementById('sortColInput');
     var dirInput  = document.getElementById('sortDirInput');
@@ -554,6 +562,11 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="col-auto">
                 <a href="?tab=product" class="btn btn-sm btn-secondary">リセット</a>
             </div>
+            @if (Model.HasSearched) {
+                <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-outline-success" onclick="exportCsv()">CSVエクスポート</button>
+                </div>
+            }
         </div>
 
         <div class="d-flex align-items-center gap-3 mb-2">
@@ -828,6 +841,11 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="col-auto">
                 <a href="?tab=substrate" class="btn btn-sm btn-secondary">リセット</a>
             </div>
+            @if (Model.HasSearched) {
+                <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-outline-success" onclick="exportCsv()">CSVエクスポート</button>
+                </div>
+            }
         </div>
 
         <div class="d-flex align-items-center gap-3 mb-2">
