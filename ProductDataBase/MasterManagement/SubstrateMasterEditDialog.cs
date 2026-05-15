@@ -49,7 +49,8 @@ namespace ProductDatabase.MasterManagement {
             ExclusiveGroupComboBox.Items.Add(new GroupComboItem(null, "（グループなし）"));
 
             var groups = SubstrateRepository.GetExclusiveGroups();
-            int nextGroupId = groups.Count > 0 ? groups.Keys.Max() + 1 : 1;
+            // 非表示基板のグループIDとの衝突を防ぐため全基板の最大値から採番する
+            int nextGroupId = SubstrateRepository.GetMaxExclusiveGroupID() + 1;
 
             foreach (var (groupId, names) in groups.OrderBy(g => g.Key)) {
                 var label = $"Gr.{groupId}: {string.Join(" / ", names)}";

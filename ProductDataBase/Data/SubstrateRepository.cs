@@ -105,7 +105,13 @@ namespace ProductDatabase.Data {
                 new { SubstrateId = substrateId }) > 0;
         }
 
-        // 既存の排他グループ一覧を取得する（GroupID → 基板名リスト）
+        // 全基板（非表示含む）の ExclusiveGroupID 最大値を取得する（新規グループID採番用）
+        public static int GetMaxExclusiveGroupID() {
+            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            return con.ExecuteScalar<int>("SELECT COALESCE(MAX(ExclusiveGroupID), 0) FROM M_SubstrateDef");
+        }
+
+        // 既存の排他グループ一覧を取得する（GroupID → 基板名リスト、表示中の基板のみ）
         public static Dictionary<int, List<string>> GetExclusiveGroups() {
             using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
             var rows = con.Query(
