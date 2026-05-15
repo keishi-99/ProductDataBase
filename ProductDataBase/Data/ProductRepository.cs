@@ -77,7 +77,6 @@ namespace ProductDatabase.Data {
             return [.. con.Query<SubstrateInfo>(sql, new { ProductKey = productKey })];
         }
 
-
         // キャッシュ済みの全DataTableをクリアする
         public void Clear() {
             ProductDataTable.Clear();

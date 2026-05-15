@@ -109,7 +109,7 @@ namespace ProductDatabase.Data {
         public static Dictionary<int, List<string>> GetExclusiveGroups() {
             using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
             var rows = con.Query(
-                "SELECT ExclusiveGroupID, SubstrateName FROM M_SubstrateDef WHERE ExclusiveGroupID IS NOT NULL ORDER BY ExclusiveGroupID, SubstrateName");
+                "SELECT ExclusiveGroupID, SubstrateName FROM M_SubstrateDef WHERE ExclusiveGroupID IS NOT NULL AND Visible = 1 ORDER BY ExclusiveGroupID, SubstrateName");
             var result = new Dictionary<int, List<string>>();
             foreach (var row in rows) {
                 int groupId = (int)(long)row.ExclusiveGroupID;
