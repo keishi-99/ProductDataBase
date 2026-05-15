@@ -77,6 +77,7 @@ public class IndexModel : PageModel {
     public string? ErrorMessage { get; private set; }
 
     public IActionResult OnGetExportCsv() {
+        if (!HasSearched) return BadRequest("検索条件を指定してください。");
         try {
             byte[] bytes;
             string fileName;
