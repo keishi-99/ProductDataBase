@@ -156,6 +156,19 @@
 
 @section Scripts {
 <script>
+function exportCsv() {
+    var form = document.querySelector('form');
+    var params = new URLSearchParams();
+    new FormData(form).forEach(function(value, key) { params.append(key, value); });
+    params.set('handler', 'ExportCsv');
+    var a = document.createElement('a');
+    a.href = '?' + params.toString();
+    a.download = '';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
 function sortBy(col) {
     var colInput  = document.getElementById('sortColInput');
     var dirInput  = document.getElementById('sortDirInput');
@@ -255,6 +268,37 @@ function showUsedSubstrates(id) {
 
 document.addEventListener('DOMContentLoaded', function () {
 
+    // ===== 列表示切替 =====
+    var _colPrefix = 'wv_hcols_';
+    function _colKey() {
+        var tab    = (document.querySelector('input[name="tab"]')        || {}).value || 'product';
+        var subtab = (document.querySelector('input[name="SubTab"]')     || {}).value || 'records';
+        if (tab === 'substrate' && subtab === 'stock') {
+            var sg = (document.querySelector('input[name="StockGroup"]') || {}).value || 'model';
+            return _colPrefix + 'substrate_stock_' + sg;
+        }
+        return _colPrefix + tab + '_' + subtab;
+    }
+    function _loadHidden() {
+        try { return JSON.parse(localStorage.getItem(_colKey()) || '[]'); } catch (e) { return []; }
+    }
+    function _saveHidden(h) { localStorage.setItem(_colKey(), JSON.stringify(h)); }
+    function _applyColVis(table, hidden) {
+        Array.from(table.querySelectorAll('thead th')).forEach(function (th, i) {
+            if (!th.dataset.label) return;
+            var show = hidden.indexOf(th.dataset.label) === -1;
+            th.style.display = show ? '' : 'none';
+            table.querySelectorAll('tbody tr').forEach(function (tr) {
+                if (tr.cells[i]) tr.cells[i].style.display = show ? '' : 'none';
+            });
+        });
+    }
+    // 幅計算より前に実行して、非表示列が幅計算に影響しないようにする
+    var _hiddenCols = _loadHidden();
+    document.querySelectorAll('.resizable-table').forEach(function (table) {
+        _applyColVis(table, _hiddenCols);
+    });
+
     // 列幅の自動計算
     document.querySelectorAll('.resizable-table').forEach(function (table) {
         table.style.tableLayout = 'auto';
@@ -288,6 +332,61 @@ document.addEventListener('DOMContentLoaded', function () {
                 e.preventDefault();
             });
         });
+    });
+
+    // 列表示切替ドロップダウンを .table-responsive の直前に挿入する
+    document.querySelectorAll('.resizable-table').forEach(function (table) {
+        var container = table.closest('.table-responsive');
+        if (!container) return;
+        var labels = Array.from(table.querySelectorAll('thead th'))
+            .map(function (th) { return th.dataset.label; }).filter(Boolean);
+        if (!labels.length) return;
+
+        var wrapper = document.createElement('div');
+        wrapper.className = 'dropdown d-inline-block';
+
+        var toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'btn btn-sm btn-outline-secondary dropdown-toggle';
+        toggleBtn.setAttribute('data-bs-toggle', 'dropdown');
+        toggleBtn.setAttribute('data-bs-auto-close', 'outside');
+        toggleBtn.textContent = '列';
+        wrapper.appendChild(toggleBtn);
+
+        var menu = document.createElement('ul');
+        menu.className = 'dropdown-menu p-1';
+        menu.style.cssText = 'min-width:140px;max-height:400px;overflow-y:auto';
+
+        labels.forEach(function (label) {
+            var li  = document.createElement('li');
+            var lbl = document.createElement('label');
+            lbl.className = 'dropdown-item d-flex align-items-center gap-2 py-1';
+            lbl.style.cursor = 'pointer';
+            var chk = document.createElement('input');
+            chk.type = 'checkbox';
+            chk.checked = _hiddenCols.indexOf(label) === -1;
+            chk.addEventListener('change', function () {
+                var h = _loadHidden();
+                if (chk.checked) {
+                    h = h.filter(function (x) { return x !== label; });
+                } else {
+                    if (h.indexOf(label) === -1) h.push(label);
+                }
+                _saveHidden(h);
+                _applyColVis(table, h);
+            });
+            lbl.appendChild(chk);
+            lbl.appendChild(document.createTextNode(' ' + label));
+            li.appendChild(lbl);
+            menu.appendChild(li);
+        });
+
+        wrapper.appendChild(menu);
+
+        var bar = document.createElement('div');
+        bar.className = 'd-flex justify-content-end mb-1';
+        bar.appendChild(wrapper);
+        container.parentNode.insertBefore(bar, container);
     });
 
     // 行クリックハイライト
@@ -554,6 +653,11 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="col-auto">
                 <a href="?tab=product" class="btn btn-sm btn-secondary">リセット</a>
             </div>
+            @if (Model.HasSearched) {
+                <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-outline-success" onclick="exportCsv()">CSVエクスポート</button>
+                </div>
+            }
         </div>
 
         <div class="d-flex align-items-center gap-3 mb-2">
@@ -828,6 +932,11 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="col-auto">
                 <a href="?tab=substrate" class="btn btn-sm btn-secondary">リセット</a>
             </div>
+            @if (Model.HasSearched) {
+                <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-outline-success" onclick="exportCsv()">CSVエクスポート</button>
+                </div>
+            }
         </div>
 
         <div class="d-flex align-items-center gap-3 mb-2">
