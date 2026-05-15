@@ -16,6 +16,11 @@ namespace ProductDatabase {
         private readonly List<string> _listUsedSubstrate = [];
         private readonly List<string> _listUsedProductNumber = [];
         private readonly List<int> _listUsedQuantity = [];
+
+        // LoadEvents中のCheckBox_CheckedChanged誤発火を防ぐフラグ
+        private bool _isLoadingEvents = false;
+        // 排他グループによる自動OFFで警告が出ないよう抑制するフラグ
+        private bool _suppressUncheckedWarning = false;
         private readonly List<string> _checkBoxNames = [
                         "Substrate1CheckBox", "Substrate2CheckBox", "Substrate3CheckBox", "Substrate4CheckBox","Substrate5CheckBox",
                         "Substrate6CheckBox", "Substrate7CheckBox", "Substrate8CheckBox", "Substrate9CheckBox","Substrate10CheckBox",
@@ -57,59 +62,68 @@ namespace ProductDatabase {
                 switch (_productMaster.RegType) {
                     case 2:
                     case 3:
-                        for (var i = 0; i < _productMaster.UseSubstrates.Count; i++) {
-                            var substrateName = _productMaster.UseSubstrates[i].SubstrateName;
-                            var substrateModel = _productMaster.UseSubstrates[i].SubstrateModel;
-                            var substrateId = _productMaster.UseSubstrates[i].SubstrateID;
-                            var quantity = _productRegisterWork.Quantity;
-                            var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
-                            var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
+                        _isLoadingEvents = true;
+                        try {
+                            // 排他グループで先に選択された基板を管理するセット
+                            var initializedGroups = new HashSet<int>();
 
-                            // チェックボックスとDgvを有効に
-                            objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
-                            if (objCbx is not null) {
-                                objCbx.Enabled = true;
-                                objCbx.Checked = true;
-                            }
+                            for (var i = 0; i < _productMaster.UseSubstrates.Count; i++) {
+                                var substrate = _productMaster.UseSubstrates[i];
+                                var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
+                                var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
 
-                            objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
-                            if (objDgv is not null) {
-                                objDgv.Columns[1].DefaultCellStyle.BackColor = Color.LightGray;
-                                objDgv.Columns[2].DefaultCellStyle.BackColor = Color.LightGray;
-                                objDgv.Columns[2].ReadOnly = true;
-                                objDgv.Columns[3].ReadOnly = false;
-                                objDgv.Columns[4].ReadOnly = false;
-                                if (_layoutSettings.TryGetValue(Font.Size, out var layout)) {
-                                    objDgv.RowTemplate.Height = layout.RowHeight;
-                                    for (int z = 0; z < layout.ColumnWidths.Length; z++) {
-                                        objDgv.Columns[z].Width = layout.ColumnWidths[z];
-                                    }
+                                // ラベルは先に設定（在庫データがなくても表示されるように）
+                                if (objCbx is not null) {
+                                    var splitSubstrateName = substrate.SubstrateName.Split(':');
+                                    objCbx.Text = $"{splitSubstrateName.Last()} - {substrate.SubstrateModel}";
                                 }
-                            }
-                            var list = SubstrateChangeRepository.GetSubstrateStock(
-                                _productRegisterWork.RowID, substrateId);
 
-                            var j = 0;
-
-                            foreach (var row in list) {
+                                // 排他グループ内で2番目以降の基板はOFFで開始
+                                var shouldBeChecked = true;
+                                if (substrate.ExclusiveGroupID.HasValue
+                                    && !initializedGroups.Add(substrate.ExclusiveGroupID.Value)) {
+                                    shouldBeChecked = false;
+                                }
 
                                 if (objCbx is not null) {
-                                    var splitSubstrateName = substrateName.Split(':');
-                                    objCbx.Text = $"{splitSubstrateName.Last()} - {substrateModel}";
+                                    objCbx.Enabled = true;
+                                    objCbx.Checked = shouldBeChecked;
+                                    objCbx.ForeColor = shouldBeChecked ? Color.Black : Color.Red;
                                 }
 
-                                if (objDgv is null) break;
+                                if (objDgv is not null) {
+                                    objDgv.Visible = shouldBeChecked;
+                                    objDgv.Enabled = shouldBeChecked;
+                                    objDgv.Columns[1].DefaultCellStyle.BackColor = Color.LightGray;
+                                    objDgv.Columns[2].DefaultCellStyle.BackColor = Color.LightGray;
+                                    objDgv.Columns[2].ReadOnly = true;
+                                    objDgv.Columns[3].ReadOnly = false;
+                                    objDgv.Columns[4].ReadOnly = false;
+                                    if (_layoutSettings.TryGetValue(Font.Size, out var layout)) {
+                                        objDgv.RowTemplate.Height = layout.RowHeight;
+                                        for (int z = 0; z < layout.ColumnWidths.Length; z++) {
+                                            objDgv.Columns[z].Width = layout.ColumnWidths[z];
+                                        }
+                                    }
+                                }
 
-                                objDgv.Rows.Add();
-
-                                objDgv.Rows[j].Cells[0].Value = row.SubstrateNumber;
-                                objDgv.Rows[j].Cells[1].Value = row.Stock;
-                                objDgv.Rows[j].Cells[2].Value = row.UsedDecrease;
-                                objDgv.Rows[j].Cells[3].Value = row.UsedDecrease;
-                                objDgv.Rows[j].Cells[4].Value = row.UsedDecrease != 0;
-
-                                j++;
+                                // 在庫データは全基板で読み込む（後から選択された場合に備えて）
+                                var list = SubstrateChangeRepository.GetSubstrateStock(
+                                    _productRegisterWork.RowID, substrate.SubstrateID);
+                                var j = 0;
+                                foreach (var row in list) {
+                                    if (objDgv is null) break;
+                                    objDgv.Rows.Add();
+                                    objDgv.Rows[j].Cells[0].Value = row.SubstrateNumber;
+                                    objDgv.Rows[j].Cells[1].Value = row.Stock;
+                                    objDgv.Rows[j].Cells[2].Value = row.UsedDecrease;
+                                    objDgv.Rows[j].Cells[3].Value = row.UsedDecrease;
+                                    objDgv.Rows[j].Cells[4].Value = row.UsedDecrease != 0;
+                                    j++;
+                                }
                             }
+                        } finally {
+                            _isLoadingEvents = false;
                         }
                         break;
                 }
@@ -142,7 +156,7 @@ namespace ProductDatabase {
                 RegistrationDateTimePicker.Enabled = false;
                 PersonComboBox.Enabled = false;
                 RegisterButton.Enabled = false;
-                for (var i = 0; i <= 9; i++) {
+                for (var i = 0; i < _productMaster.UseSubstrates.Count; i++) {
                     var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
                     if (objCbx is not null) {
                         objCbx.Enabled = false;
@@ -188,12 +202,7 @@ namespace ProductDatabase {
                                         var useValue = int.TryParse(objDgv.Rows[j].Cells[3].Value?.ToString(), out var use1) ? use1 : 0;
 
                                         if (useValue < 0) {
-                                            throw new Exception("使用数が0以下になっています。");
-                                        }
-
-                                        // 使用数がマイナスの場合は確認ダイアログを表示
-                                        if (useValue < 0) {
-                                            throw new Exception("使用数が0未満になっています。");
+                                            throw new Exception("使用数が0未満の値は入力できません。");
                                         }
 
                                         if (stockValue + usedValue < useValue) {
@@ -252,7 +261,7 @@ namespace ProductDatabase {
 
                                     for (var j = 0; j <= dgvRowCnt - 1; j++) {
                                         var usedValue = int.TryParse(objDgv.Rows[j].Cells[2].Value?.ToString(), out var usd2) ? usd2 : 0;
-                                        var boolCbx = Convert.ToBoolean(objDgv.Rows[j].Cells[4].Value);
+                                        var boolCbx = objDgv.Rows[j].Cells[4].Value is not null && (bool)objDgv.Rows[j].Cells[4].Value;
                                         var useValue = boolCbx ? (int.TryParse(objDgv.Rows[j].Cells[3].Value?.ToString(), out var use2) ? use2 : 0) : 0;
 
                                         if (boolCbx) {
@@ -300,6 +309,21 @@ namespace ProductDatabase {
                                                 _productRegisterWork.RowID);
                                         }
                                     }
+                                } else {
+                                    // チェックOFF（排他グループの自動OFF含む）の基板は既存の使用数をすべてクリアする
+                                    var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
+                                    if (objDgv is not null) {
+                                        for (var j = 0; j < objDgv.Rows.Count; j++) {
+                                            var usedValue = int.TryParse(objDgv.Rows[j].Cells[2].Value?.ToString(), out var usd) ? usd : 0;
+                                            if (usedValue != 0) {
+                                                SubstrateChangeRepository.ClearSubstrateDecrease(
+                                                    con, transaction,
+                                                    substrate.SubstrateID,
+                                                    objDgv.Rows[j].Cells[0].Value?.ToString() ?? string.Empty,
+                                                    _productRegisterWork.RowID);
+                                            }
+                                        }
+                                    }
                                 }
                             }
 
@@ -342,6 +366,8 @@ namespace ProductDatabase {
 
         // チェックボックスのON/OFFに応じて対応するDataGridViewの表示・有効状態を切り替え未チェック時は警告を表示する
         private void CheckBox_CheckedChanged(object sender, EventArgs e) {
+            if (_isLoadingEvents) return;
+
             var checkBox = (CheckBox)sender;
             var dataGridView = GetDataGridViewForCheckBox(checkBox.Name);
 
@@ -351,7 +377,29 @@ namespace ProductDatabase {
             dataGridView.Visible = checkBox.Checked;
             checkBox.ForeColor = checkBox.Checked ? Color.Black : Color.Red;
 
-            if (!checkBox.Checked) {
+            // 排他グループの他チェックボックスを自動OFF（チェックON時のみ）
+            if (checkBox.Checked) {
+                var idx = _checkBoxNames.IndexOf(checkBox.Name);
+                if (idx >= 0 && idx < _productMaster.UseSubstrates.Count) {
+                    var groupId = _productMaster.UseSubstrates[idx].ExclusiveGroupID;
+                    if (groupId.HasValue) {
+                        _suppressUncheckedWarning = true;
+                        try {
+                            for (var i = 0; i < _productMaster.UseSubstrates.Count; i++) {
+                                if (i == idx) continue;
+                                if (_productMaster.UseSubstrates[i].ExclusiveGroupID == groupId) {
+                                    if (MainPanel.Controls[_checkBoxNames[i]] is CheckBox otherCbx && otherCbx.Checked)
+                                        otherCbx.Checked = false;
+                                }
+                            }
+                        } finally {
+                            _suppressUncheckedWarning = false;
+                        }
+                    }
+                }
+            }
+
+            if (!checkBox.Checked && !_suppressUncheckedWarning) {
                 MessageBox.Show("チェックがない場合在庫から引き落とされなくなります。", "",
                                MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }

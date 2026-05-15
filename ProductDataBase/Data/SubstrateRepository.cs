@@ -15,10 +15,10 @@ namespace ProductDatabase.Data {
                 $"""
                 INSERT INTO {Constants.SubstrateTableName}
                     (CategoryName, ProductName, SubstrateName, SubstrateModel,
-                     RegType, Checkbox, SerialPrintType, Visible)
+                     RegType, Checkbox, SerialPrintType, Visible, ExclusiveGroupID)
                 VALUES
                     (@CategoryName, @ProductName, @SubstrateName, @SubstrateModel,
-                     @RegType, @Checkbox, @SerialPrintType, @Visible);
+                     @RegType, @Checkbox, @SerialPrintType, @Visible, @ExclusiveGroupID);
                 SELECT last_insert_rowid();
                 """;
 
@@ -32,7 +32,8 @@ namespace ProductDatabase.Data {
                 substrate.RegType,
                 Checkbox = checkBin,
                 substrate.SerialPrintType,
-                Visible = substrate.Visible ? 1 : 0
+                Visible = substrate.Visible ? 1 : 0,
+                substrate.ExclusiveGroupID
             });
         }
 
@@ -50,7 +51,8 @@ namespace ProductDatabase.Data {
                     RegType         = @RegType,
                     Checkbox        = @Checkbox,
                     SerialPrintType = @SerialPrintType,
-                    Visible         = @Visible
+                    Visible         = @Visible,
+                    ExclusiveGroupID = @ExclusiveGroupID
                 WHERE SubstrateID = @SubstrateID
                 """;
 
@@ -65,6 +67,7 @@ namespace ProductDatabase.Data {
                 Checkbox = checkBin,
                 substrate.SerialPrintType,
                 Visible = substrate.Visible ? 1 : 0,
+                substrate.ExclusiveGroupID,
                 substrate.SubstrateID
             });
         }
@@ -100,6 +103,30 @@ namespace ProductDatabase.Data {
             return con.ExecuteScalar<int>(
                 $"SELECT COUNT(*) FROM {Constants.TSubstrateTableName} WHERE SubstrateID = @SubstrateId",
                 new { SubstrateId = substrateId }) > 0;
+        }
+
+        // 全基板（非表示含む）の ExclusiveGroupID 最大値を取得する（新規グループID採番用）
+        public static int GetMaxExclusiveGroupID() {
+            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            return con.ExecuteScalar<int>("SELECT COALESCE(MAX(ExclusiveGroupID), 0) FROM M_SubstrateDef");
+        }
+
+        // 既存の排他グループ一覧を取得する（GroupID → 基板名リスト、表示中の基板のみ）
+        public static Dictionary<int, List<string>> GetExclusiveGroups() {
+            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            var rows = con.Query(
+                "SELECT ExclusiveGroupID, SubstrateName FROM M_SubstrateDef WHERE ExclusiveGroupID IS NOT NULL AND Visible = 1 ORDER BY ExclusiveGroupID, SubstrateName");
+            var result = new Dictionary<int, List<string>>();
+            foreach (var row in rows) {
+                int groupId = (int)(long)row.ExclusiveGroupID;
+                string name = row.SubstrateName?.ToString() ?? string.Empty;
+                if (!result.TryGetValue(groupId, out var list)) {
+                    list = [];
+                    result[groupId] = list;
+                }
+                list.Add(name);
+            }
+            return result;
         }
 
         // SubstrateModelの重複を確認する（excludeIdは編集時に自身を除外するために使用）

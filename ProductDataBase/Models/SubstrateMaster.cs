@@ -9,6 +9,7 @@ namespace ProductDatabase.Models {
         public string SubstrateModel { get; set; } = string.Empty;
         public int CheckBin { get; set; }
         public bool Visible { get; set; } = true;
+        public int? ExclusiveGroupID { get; set; }
 
         // DataRowから基板マスターの各フィールドを読み込む
         public void LoadFrom(DataRow row) {
@@ -21,6 +22,8 @@ namespace ProductDatabase.Models {
             CheckBin = Convert.ToInt32(row["Checkbox"].ToString(), 2); // バイナリ文字列変換のため維持
             SerialPrintType = (int)row.Field<long>("SerialPrintType");
             Visible = row.Field<long?>("Visible") == 1;
+            var rawGroupId = row.Field<long?>("ExclusiveGroupID");
+            ExclusiveGroupID = rawGroupId.HasValue ? (int)rawGroupId.Value : null;
         }
 
         // 基板マスターデータを初期値にリセットする
@@ -34,6 +37,7 @@ namespace ProductDatabase.Models {
             CheckBin = 0;
             SerialPrintType = 0;
             Visible = true;
+            ExclusiveGroupID = null;
         }
     }
 }

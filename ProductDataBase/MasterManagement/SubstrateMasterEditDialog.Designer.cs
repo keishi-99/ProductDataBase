@@ -23,6 +23,8 @@ namespace ProductDatabase.MasterManagement {
             this.SubstrateModelTextBox = new TextBox();
             this.VisibleLabel = new Label();
             this.VisibleCheckBox = new CheckBox();
+            this.ExclusiveGroupLabel = new Label();
+            this.ExclusiveGroupComboBox = new ComboBox();
             this.SerialGroupBox = new GroupBox();
             this.RegTypeLabel = new Label();
             this.RegTypeComboBox = new ComboBox();
@@ -60,9 +62,11 @@ namespace ProductDatabase.MasterManagement {
             this.BasicInfoGroupBox.Controls.Add(this.SubstrateModelTextBox);
             this.BasicInfoGroupBox.Controls.Add(this.VisibleLabel);
             this.BasicInfoGroupBox.Controls.Add(this.VisibleCheckBox);
+            this.BasicInfoGroupBox.Controls.Add(this.ExclusiveGroupLabel);
+            this.BasicInfoGroupBox.Controls.Add(this.ExclusiveGroupComboBox);
             this.BasicInfoGroupBox.Location = new Point(12, 12);
             this.BasicInfoGroupBox.Name = "BasicInfoGroupBox";
-            this.BasicInfoGroupBox.Size = new Size(395, 195);
+            this.BasicInfoGroupBox.Size = new Size(395, 230);
             this.BasicInfoGroupBox.TabIndex = 0;
             this.BasicInfoGroupBox.TabStop = false;
             this.BasicInfoGroupBox.Text = "基本情報";
@@ -147,12 +151,28 @@ namespace ProductDatabase.MasterManagement {
             this.VisibleCheckBox.Size = new Size(120, 22);
             this.VisibleCheckBox.TabIndex = 4;
             this.VisibleCheckBox.Text = "表示する";
-            // 
+            //
+            // ExclusiveGroupLabel
+            //
+            this.ExclusiveGroupLabel.AutoSize = true;
+            this.ExclusiveGroupLabel.Location = new Point(8, 196);
+            this.ExclusiveGroupLabel.Name = "ExclusiveGroupLabel";
+            this.ExclusiveGroupLabel.TabIndex = 5;
+            this.ExclusiveGroupLabel.Text = "排他グループ:";
+            //
+            // ExclusiveGroupComboBox
+            //
+            this.ExclusiveGroupComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.ExclusiveGroupComboBox.Location = new Point(130, 193);
+            this.ExclusiveGroupComboBox.Name = "ExclusiveGroupComboBox";
+            this.ExclusiveGroupComboBox.Size = new Size(250, 23);
+            this.ExclusiveGroupComboBox.TabIndex = 5;
+            //
             // SerialGroupBox
-            // 
+            //
             this.SerialGroupBox.Controls.Add(this.RegTypeLabel);
             this.SerialGroupBox.Controls.Add(this.RegTypeComboBox);
-            this.SerialGroupBox.Location = new Point(12, 217);
+            this.SerialGroupBox.Location = new Point(12, 252);
             this.SerialGroupBox.Name = "SerialGroupBox";
             this.SerialGroupBox.Size = new Size(395, 62);
             this.SerialGroupBox.TabIndex = 1;
@@ -179,7 +199,7 @@ namespace ProductDatabase.MasterManagement {
             // PrintGroupBox
             // 
             this.PrintGroupBox.Controls.Add(this.LabelPrintCheckBox);
-            this.PrintGroupBox.Location = new Point(12, 289);
+            this.PrintGroupBox.Location = new Point(12, 324);
             this.PrintGroupBox.Name = "PrintGroupBox";
             this.PrintGroupBox.Size = new Size(395, 62);
             this.PrintGroupBox.TabIndex = 2;
@@ -207,7 +227,7 @@ namespace ProductDatabase.MasterManagement {
             this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox8);
             this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox9);
             this.CheckBinGroupBox.Controls.Add(this.CheckBinCheckBox10);
-            this.CheckBinGroupBox.Location = new Point(12, 361);
+            this.CheckBinGroupBox.Location = new Point(12, 396);
             this.CheckBinGroupBox.Name = "CheckBinGroupBox";
             this.CheckBinGroupBox.Size = new Size(395, 164);
             this.CheckBinGroupBox.TabIndex = 3;
@@ -304,7 +324,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             // SaveButton
             // 
-            this.SaveButton.Location = new Point(198, 531);
+            this.SaveButton.Location = new Point(198, 566);
             this.SaveButton.Name = "SaveButton";
             this.SaveButton.Size = new Size(100, 35);
             this.SaveButton.TabIndex = 21;
@@ -314,7 +334,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             // DialogCancelButton
             // 
-            this.DialogCancelButton.Location = new Point(308, 531);
+            this.DialogCancelButton.Location = new Point(308, 566);
             this.DialogCancelButton.Name = "DialogCancelButton";
             this.DialogCancelButton.Size = new Size(100, 35);
             this.DialogCancelButton.TabIndex = 22;
@@ -326,7 +346,7 @@ namespace ProductDatabase.MasterManagement {
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(420, 576);
+            this.ClientSize = new Size(420, 611);
             this.Controls.Add(this.BasicInfoGroupBox);
             this.Controls.Add(this.SerialGroupBox);
             this.Controls.Add(this.PrintGroupBox);
@@ -364,6 +384,8 @@ namespace ProductDatabase.MasterManagement {
         private TextBox SubstrateModelTextBox;
         private Label VisibleLabel;
         private CheckBox VisibleCheckBox;
+        private Label ExclusiveGroupLabel;
+        private ComboBox ExclusiveGroupComboBox;
 
         // セクション2
         private GroupBox SerialGroupBox;
