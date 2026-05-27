@@ -51,7 +51,9 @@ namespace ProductDatabase.Print {
             ProductRegisterWork = productRegisterWork;
             DocumentPrintSettings = productPrintSettings ?? throw new ArgumentNullException(nameof(productPrintSettings));
 
-            var copiesPerLabel = productPrintSettings.LabelPrintSettings?.CopiesPerLabel ?? 1;
+            var copiesPerLabel = productPrintSettings.LabelPrintSettings?.CopiesPerLabel
+                ?? productPrintSettings.BarcodePrintSettings?.CopiesPerLabel
+                ?? 1;
             var copiesPerOles = productPrintSettings.LabelPrintSettings?.CopiesPerOLesLabel ?? 0;
 
             if (olesLabelList != null && copiesPerOles > 0) {
