@@ -184,13 +184,17 @@ namespace ProductDatabase.Data {
         }
 
         // 再印刷履歴を取得する
-        public static DataTable QueryReprintHistory(string productModel) {
-            var productModelFilter = !string.IsNullOrEmpty(productModel) ? " AND ProductModel = @ProductModel" : string.Empty;
+        public static DataTable QueryReprintHistory(ProductMaster productMaster, bool allProducts) {
+            var productCategoryFilter = !string.IsNullOrEmpty(productMaster.CategoryName) ? " AND CategoryName = @CategoryName" : string.Empty;
+            var productNameFilter = !string.IsNullOrEmpty(productMaster.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
+            var productId = !allProducts ? productMaster.ProductID : 0;
+            var productIdFilter = (productId != 0) ? " AND ProductID = @ProductID" : string.Empty;
 
             var query = $"""
                 SELECT
                     ID,
                     SerialPrintType,
+                    CategoryName,
                     ProductName,
                     OrderNumber,
                     ProductNumber,
@@ -205,17 +209,47 @@ namespace ProductDatabase.Data {
                     Comment,
                     CreatedAt
                 FROM
-                    T_Reprint
+                    {Constants.VRePrintTableName}
                 WHERE
                     1=1
-                    {productModelFilter}
+                    {productCategoryFilter}
+                    {productNameFilter}
+                    {productIdFilter}
                 ORDER BY
                     ID DESC;
                 """;
 
             var p = new DynamicParameters();
-            p.Add("@ProductModel", productModel);
-            return ExecuteQuery(query, p);
+            p.Add("@CategoryName", productMaster.CategoryName);
+            p.Add("@ProductName", productMaster.ProductName);
+            p.Add("@ProductID", productMaster.ProductID);
+            var table = ExecuteQuery(query, p);
+
+            // SerialPrintType の整数値をフラグ名の文字列に変換する
+            var originalOrdinal = table.Columns["SerialPrintType"]!.Ordinal;
+            var textCol = table.Columns.Add("SerialPrintTypeText", typeof(string));
+            foreach (DataRow row in table.Rows) {
+                row["SerialPrintTypeText"] = SerialPrintTypeFlagsToText(row["SerialPrintType"]);
+            }
+            table.Columns.Remove("SerialPrintType");
+            textCol.ColumnName = "SerialPrintType";
+            textCol.SetOrdinal(originalOrdinal);
+
+            return table;
+        }
+
+        // SerialPrintTypeFlags の整数値をカンマ区切りの表示文字列に変換する
+        private static string SerialPrintTypeFlagsToText(object value) {
+            if (!long.TryParse(value?.ToString(), out var intVal)) return string.Empty;
+            var flags = (SerialPrintTypeFlags)intVal;
+            var parts = new List<string>();
+            if (flags.HasFlag(SerialPrintTypeFlags.Label)) parts.Add("ラベル");
+            if (flags.HasFlag(SerialPrintTypeFlags.Barcode)) parts.Add("バーコード");
+            if (flags.HasFlag(SerialPrintTypeFlags.Nameplate)) parts.Add("銘板");
+            if (flags.HasFlag(SerialPrintTypeFlags.Underline)) parts.Add("下線付きシリアル");
+            if (flags.HasFlag(SerialPrintTypeFlags.Last4Digits)) parts.Add("型式末尾4桁");
+            if (flags.HasFlag(SerialPrintTypeFlags.OLesSerial)) parts.Add("O-Lesシリアル");
+            return parts.Count > 0 ? string.Join(", ", parts) : "なし";
         }
 
         // 指定IDに紐づく使用基板一覧を取得する（使用基板サブウィンドウ用）

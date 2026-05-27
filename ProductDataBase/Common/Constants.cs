@@ -7,6 +7,7 @@
         public const string TSerialTableName = "T_Serial";
         public const string VSerialTableName = "V_Serial";
         public const string TRePrintTableName = "T_RePrint";
+        public const string VRePrintTableName = "V_RePrint";
         public const string VProductTableName = "V_Product";
         public const string VSubstrateTableName = "V_Substrate";
         public const string VProductUseSubstrate = "V_ProductUseSubstrate";
