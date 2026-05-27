@@ -258,9 +258,10 @@ public class IndexModel : PageModel {
     // 数式インジェクション対策: =,+,-,@ 始まりの値にはシングルクォートを付加する
     private static string CsvField(string? value) {
         if (string.IsNullOrEmpty(value)) return "";
+        value = value.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ");
         if (value[0] is '=' or '+' or '-' or '@')
             value = "'" + value;
-        if (value.Contains(',') || value.Contains('"') || value.Contains('\n') || value.Contains('\r'))
+        if (value.Contains(',') || value.Contains('"'))
             return $"\"{value.Replace("\"", "\"\"")}\"";
         return value;
     }
