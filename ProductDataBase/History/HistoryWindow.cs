@@ -106,6 +106,7 @@ namespace ProductDatabase.History {
                     {
                         { "ID", "ID" },
                         { "SerialPrintType", "印刷対象" },
+                        { "CategoryName", "カテゴリ" },
                         { "ProductName", "製品名" },
                         { "OrderNumber", "注文番号" },
                         { "ProductNumber", "製造番号" },
@@ -288,7 +289,7 @@ namespace ProductDatabase.History {
         // 製品型式でフィルタして再印刷履歴をDataGridViewに表示する
         private void ViewReprintLog() {
             LoadDataAndDisplay("Reprint",
-                HistoryRepository.QueryReprintHistory(_productMaster.ProductModel));
+                HistoryRepository.QueryReprintHistory(_productMaster, !CategoryRadioButton1.Checked));
         }
 
         // 選択行の製品履歴を編集ダイアログで編集してDBに保存する

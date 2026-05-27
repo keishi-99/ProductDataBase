@@ -16,9 +16,6 @@ namespace ProductDatabase.Data {
                 INSERT INTO {Constants.TRePrintTableName}
                 (
                     ProductID,
-                    ProductName,
-                    ProductType,
-                    ProductModel,
                     SerialPrintType,
                     OrderNumber,
                     ProductNumber,
@@ -35,9 +32,6 @@ namespace ProductDatabase.Data {
                 VALUES
                 (
                     @ProductID,
-                    @ProductName,
-                    @ProductType,
-                    @ProductModel,
                     @SerialPrintType,
                     @OrderNumber,
                     @ProductNumber,
