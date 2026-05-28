@@ -207,6 +207,11 @@ namespace ProductDatabase.History {
             DataBaseDataGridView.Columns.Clear();
             DataBaseDataGridView.DataSource = _historyTable;
 
+            // PersonID 列を非表示にする
+            if (DataBaseDataGridView.Columns.Contains("PersonID")) {
+                DataBaseDataGridView.Columns["PersonID"].Visible = false;
+            }
+
             _listColFilter.Clear();
             _listColFilter.Add("");
 
