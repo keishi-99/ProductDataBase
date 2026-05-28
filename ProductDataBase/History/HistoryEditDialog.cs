@@ -39,11 +39,21 @@ namespace ProductDatabase.History {
             var currentPersonIdText = GetCellText("PersonID");
             var currentPersonId = long.TryParse(currentPersonIdText, out var pid) ? pid : (long?)null;
 
-            // 現在の担当者が無効（IsActive == 0）の場合、一時的に追加
+            // 現在の担当者が無効（IsActive == 0）またはマスタから削除されている場合、一時的に追加
             if (currentPersonId.HasValue) {
                 var matchingPerson = allPersons.FirstOrDefault(p => p.PersonID == currentPersonId.Value);
-                if (matchingPerson != null && matchingPerson.IsActive == 0 && !displayPersons.Any(p => p.PersonID == matchingPerson.PersonID)) {
-                    displayPersons.Add(matchingPerson);
+                if (matchingPerson != null) {
+                    if (matchingPerson.IsActive == 0 && !displayPersons.Any(p => p.PersonID == matchingPerson.PersonID)) {
+                        displayPersons.Add(matchingPerson);
+                    }
+                }
+                else {
+                    // マスタから物理削除されている場合、ダミーを追加
+                    displayPersons.Add(new ProductDatabase.Models.PersonDef {
+                        PersonID = currentPersonId.Value,
+                        PersonName = "(不明)",
+                        IsActive = 0
+                    });
                 }
             }
 
