@@ -49,7 +49,7 @@ namespace ProductDatabase.History {
                     // マスタに存在しない担当者用のダミーを追加
                     displayPersons.Add(new ProductDatabase.Models.PersonDef {
                         PersonID = -1,
-                        PersonName = currentPersonInfo,
+                        PersonName = $"(不明) {currentPersonInfo}",
                         IsActive = 0
                     });
                 }
