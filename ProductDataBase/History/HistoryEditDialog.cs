@@ -5,6 +5,7 @@ namespace ProductDatabase.History {
         public string? OrderNumber { get; private set; }
         public string? ProductNumber { get; private set; }
         public string? OLesNumber { get; private set; }
+        public long? PersonID { get; private set; }
         public string? PersonInfo { get; private set; }
         public string? Comment { get; private set; }
 
@@ -31,19 +32,30 @@ namespace ProductDatabase.History {
             OLesNumberTextBox.Text = GetCellText("OLesNumber");
 
             // 担当者をコンボボックスにバインド
-            var persons = ProductDatabase.Data.PersonRepository.GetAll()
-                .Where(p => p.IsActive != 0)
-                .ToList();
-            PersonComboBox.DataSource = persons;
+            var allPersons = ProductDatabase.Data.PersonRepository.GetAll();
+            var displayPersons = allPersons.Where(p => p.IsActive != 0).ToList();
+            var currentPersonInfo = GetCellText("PersonInfo");
+
+            // 現在の担当者が無効（IsActive == 0）である場合、一時的に追加
+            if (!string.IsNullOrEmpty(currentPersonInfo)) {
+                var matchingPerson = allPersons.FirstOrDefault(p => p.PersonName == currentPersonInfo);
+                if (matchingPerson != null && matchingPerson.IsActive == 0) {
+                    displayPersons.Add(matchingPerson);
+                }
+            }
+
+            PersonComboBox.DataSource = displayPersons;
             PersonComboBox.DisplayMember = "DisplayName";
             PersonComboBox.ValueMember = "PersonID";
 
-            // 現在の担当者名から対応する PersonDef を選択
-            var currentPersonInfo = GetCellText("PersonInfo");
+            // 現在の担当者を選択
             if (!string.IsNullOrEmpty(currentPersonInfo)) {
-                var matchingPerson = persons.FirstOrDefault(p => p.PersonName == currentPersonInfo);
+                var matchingPerson = allPersons.FirstOrDefault(p => p.PersonName == currentPersonInfo);
                 if (matchingPerson != null) {
                     PersonComboBox.SelectedValue = matchingPerson.PersonID;
+                }
+                else {
+                    PersonComboBox.SelectedIndex = -1;
                 }
             }
             else {
@@ -72,9 +84,11 @@ namespace ProductDatabase.History {
 
             // 担当者をコンボボックスから取得
             if (PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
+                PersonID = (long)PersonComboBox.SelectedValue;
                 PersonInfo = selectedPerson.PersonName;
             }
             else {
+                PersonID = null;
                 PersonInfo = null;
             }
 

@@ -311,6 +311,7 @@ namespace ProductDatabase.History {
             row["OrderNumber"] = (object?)dialog.OrderNumber ?? DBNull.Value;
             row["ProductNumber"] = (object?)dialog.ProductNumber ?? DBNull.Value;
             row["OLesNumber"] = (object?)dialog.OLesNumber ?? DBNull.Value;
+            row["PersonID"] = (object?)dialog.PersonID ?? DBNull.Value;
             row["PersonInfo"] = (object?)dialog.PersonInfo ?? DBNull.Value;
             row["Comment"] = (object?)dialog.Comment ?? DBNull.Value;
             row.EndEdit();

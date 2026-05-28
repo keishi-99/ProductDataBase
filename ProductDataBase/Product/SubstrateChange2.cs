@@ -285,7 +285,7 @@ namespace ProductDatabase {
                                             var affectedRows = SubstrateChangeRepository.UpdateSubstrateDecrease(
                                                 con, transaction,
                                                 useValue,
-                                                _productRegisterWork.PersonName,
+                                                _productRegisterWork.PersonID,
                                                 _productRegisterWork.RegDate,
                                                 _productRegisterWork.Comment,
                                                 substrateNum,
@@ -297,7 +297,7 @@ namespace ProductDatabase {
                                                 SubstrateChangeRepository.InsertSubstrateDecrease(
                                                     con, transaction,
                                                     useValue,
-                                                    _productRegisterWork.PersonName,
+                                                    _productRegisterWork.PersonID,
                                                     _productRegisterWork.RegDate,
                                                     _productRegisterWork.Comment,
                                                     substrateNum,
