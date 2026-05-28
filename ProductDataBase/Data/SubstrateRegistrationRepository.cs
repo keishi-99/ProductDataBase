@@ -87,7 +87,7 @@ namespace ProductDatabase.Data {
             string orderNumber,
             int? increase,
             int? defect,
-            long personID,
+            long? personID,
             string regDate,
             string comment) {
 

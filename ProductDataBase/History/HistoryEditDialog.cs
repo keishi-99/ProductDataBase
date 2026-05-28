@@ -29,7 +29,7 @@ namespace ProductDatabase.History {
             OrderNumberTextBox.Text = GetCellText("OrderNumber");
             ProductNumberTextBox.Text = GetCellText("ProductNumber");
             OLesNumberTextBox.Text = GetCellText("OLesNumber");
-            PersonTextBox.Text = GetCellText("Person");
+            PersonTextBox.Text = GetCellText("PersonInfo");
             RegDateValueLabel.Text = GetCellText("RegDate");
             RevisionValueLabel.Text = GetCellText("Revision");
             RevisionGroupValueLabel.Text = GetCellText("RevisionGroup");
