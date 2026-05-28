@@ -69,6 +69,7 @@ namespace ProductDatabase {
                     generalSettings = initializer.LoadSettings();
                 } catch (Exception ex) {
                     MessageBox.Show($"設定ファイルの読み込みに失敗しました:\n{ex.Message}", "致命的エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
                     return;
                 }
 
@@ -83,6 +84,7 @@ namespace ProductDatabase {
                     _appSettings.IsAdministrator = appSettings.IsAdministrator;
                 } catch (Exception ex) {
                     MessageBox.Show($"アプリケーション設定に失敗しました:\n{ex.Message}", "致命的エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
                     return;
                 }
 
@@ -91,6 +93,7 @@ namespace ProductDatabase {
                     _barcodeService = initializer.CreateBarcodeService(generalSettings);
                 } catch (Exception ex) {
                     MessageBox.Show($"バーコード・QRサービスの初期化に失敗しました:\n{ex.Message}", "致命的エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
                     return;
                 }
 
@@ -99,6 +102,7 @@ namespace ProductDatabase {
                     initializer.LoadDatabase(_productRepository);
                 } catch (Exception ex) {
                     MessageBox.Show($"データベースの読み込みに失敗しました:\n{ex.Message}", "致命的エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
                     return;
                 }
 

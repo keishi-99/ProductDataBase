@@ -49,12 +49,11 @@ namespace ProductDatabase {
         // 認証・権限設定
         public AppSettings ConfigureAppSettings(GeneralSettings generalSettings) {
             try {
+                ArgumentNullException.ThrowIfNull(generalSettings);
                 var appSettings = new AppSettings {
-                    PersonList = [.. generalSettings.Persons],
-                    IsAuthorizedUser = generalSettings.AuthorizedUsers
-                        .Contains(Environment.UserName, StringComparer.OrdinalIgnoreCase),
-                    IsAdministrator = generalSettings.Administrators
-                        .Contains(Environment.UserName, StringComparer.OrdinalIgnoreCase)
+                    PersonList = generalSettings.Persons != null ? [.. generalSettings.Persons] : [],
+                    IsAuthorizedUser = generalSettings.AuthorizedUsers?.Contains(Environment.UserName, StringComparer.OrdinalIgnoreCase) ?? false,
+                    IsAdministrator = generalSettings.Administrators?.Contains(Environment.UserName, StringComparer.OrdinalIgnoreCase) ?? false
                 };
                 return appSettings;
             } catch (Exception ex) {

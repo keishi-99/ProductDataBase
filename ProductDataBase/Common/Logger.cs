@@ -48,14 +48,15 @@ namespace ProductDatabase.Common {
                         Directory.CreateDirectory(_logDirectory);
                     }
 
-                    var errorFileName = $"error_{DateTime.Now:yyyyMM}.csv";
+                    var now = DateTime.Now;
+                    var errorFileName = $"error_{now:yyyyMM}.csv";
                     var errorFilePath = Path.Combine(_logDirectory, errorFileName);
 
                     var errorMessage = exception.InnerException?.Message ?? exception.Message;
                     var stackTrace = exception.StackTrace?.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ") ?? "";
                     var info = additionalInfo?.Replace("\"", "\"\"").Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ") ?? "";
 
-                    var logEntry = $"\"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\",\"{methodName}\",\"{exception.GetType().Name}\",\"{errorMessage.Replace("\"", "\"\"")}\",\"{stackTrace}\",\"{info}\"";
+                    var logEntry = $"\"{now:yyyy-MM-dd HH:mm:ss}\",\"{methodName}\",\"{exception.GetType().Name}\",\"{errorMessage.Replace("\"", "\"\"")}\",\"{stackTrace}\",\"{info}\"";
 
                     File.AppendAllText(errorFilePath, logEntry + Environment.NewLine);
 

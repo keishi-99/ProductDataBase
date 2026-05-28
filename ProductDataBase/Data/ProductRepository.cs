@@ -11,7 +11,7 @@ namespace ProductDatabase.Data {
         public DataTable SubstrateDataTable { get; } = new();
         public DataTable ProductUseSubstrate { get; } = new();
 
-        // DBファイルのパスを検証しSQLite接続文字列を返す（DbConnectionHelper に委譲）
+        // DBファイルのパスを検証しSQLite接続文字列を返す（DbConnectionHelper に委譲・プーリング無効）
         public static string GetConnectionRegistration() {
             return DbConnectionHelper.GetConnectionString();
         }
