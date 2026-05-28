@@ -39,34 +39,36 @@ namespace ProductDatabase.Common {
         // 当日分のバックアップが未作成の場合のみDBをバックアップフォルダにコピーする
         public static void CreateDailyBackup() {
             try {
-                // フォルダ未設定
-                if (string.IsNullOrWhiteSpace(FileUtils.BackupPath)) {
-                    Logger.AppendErrorLog(nameof(CreateDailyBackup), new InvalidOperationException("バックアップフォルダが設定されていません"), "設定確認が必要");
-                    MessageBox.Show("フォルダが設定されていません。バックアップは保存されません。",
-                        string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
+                lock (_lockObject) {
+                    // フォルダ未設定
+                    if (string.IsNullOrWhiteSpace(FileUtils.BackupPath)) {
+                        Logger.AppendErrorLog(nameof(CreateDailyBackup), new InvalidOperationException("バックアップフォルダが設定されていません"), "設定確認が必要");
+                        MessageBox.Show("フォルダが設定されていません。バックアップは保存されません。",
+                            string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
 
-                // ネットワークフォルダが見つからない
-                if (!Directory.Exists(FileUtils.BackupPath)) {
-                    Logger.AppendErrorLog(nameof(CreateDailyBackup), new DirectoryNotFoundException($"バックアップフォルダが見つかりません: {FileUtils.BackupPath}"), null);
-                    MessageBox.Show($"'{FileUtils.BackupPath}'\nが見つかりません。バックアップは保存されません。",
-                        string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
+                    // ネットワークフォルダが見つからない
+                    if (!Directory.Exists(FileUtils.BackupPath)) {
+                        Logger.AppendErrorLog(nameof(CreateDailyBackup), new DirectoryNotFoundException($"バックアップフォルダが見つかりません: {FileUtils.BackupPath}"), null);
+                        MessageBox.Show($"'{FileUtils.BackupPath}'\nが見つかりません。バックアップは保存されません。",
+                            string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
 
-                var today = DateTime.Today;
-                var year = today.Year;
-                var month = today.Month;
-                var day = today.Day;
+                    var today = DateTime.Today;
+                    var year = today.Year;
+                    var month = today.Month;
+                    var day = today.Day;
 
-                var backupFolder = Path.Combine(FileUtils.BackupPath, "db", "backup", $"{year}", $"{month:00}");
-                var backupFile = Path.Combine(backupFolder, $"_bak_{year}-{month:00}-{day:00}.db");
-                var productRegistryFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db", "ProductRegistry.db");
+                    var backupFolder = Path.Combine(FileUtils.BackupPath, "db", "backup", $"{year}", $"{month:00}");
+                    var backupFile = Path.Combine(backupFolder, $"_bak_{year}-{month:00}-{day:00}.db");
+                    var productRegistryFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db", "ProductRegistry.db");
 
-                if (!File.Exists(backupFile)) {
-                    Directory.CreateDirectory(backupFolder);
-                    File.Copy(productRegistryFile, backupFile, overwrite: false);
+                    if (!File.Exists(backupFile)) {
+                        Directory.CreateDirectory(backupFolder);
+                        File.Copy(productRegistryFile, backupFile, overwrite: false);
+                    }
                 }
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(CreateDailyBackup), ex, "日次バックアップの作成に失敗しました");
