@@ -67,9 +67,8 @@ namespace ProductDatabase {
                 }
 
                 // ComboBoxへ担当者を追加
-                var persons = ProductDatabase.Data.PersonRepository.GetAll()
-                    .Where(p => p.IsActive != 0)
-                    .ToList();
+                var persons = ProductDatabase.Data.PersonRepository.GetActivePersons();
+                PersonComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
                 PersonComboBox.DataSource = persons;
                 PersonComboBox.DisplayMember = "DisplayName";
                 PersonComboBox.ValueMember = "PersonID";

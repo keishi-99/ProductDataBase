@@ -264,7 +264,8 @@ public class IndexModel : PageModel {
     private static string CsvField(string? value) {
         if (string.IsNullOrEmpty(value)) return "";
         value = value.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ");
-        if (value[0] is '=' or '+' or '-' or '@')
+        var trimmed = value.Trim();
+        if (trimmed.Length > 0 && (trimmed[0] is '=' or '+' or '-' or '@'))
             value = "'" + value;
         if (value.Contains(',') || value.Contains('"'))
             return $"\"{value.Replace("\"", "\"\"")}\"";

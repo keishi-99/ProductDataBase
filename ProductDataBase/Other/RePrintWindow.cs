@@ -74,9 +74,8 @@ namespace ProductDatabase {
                 }
 
                 // 担当者をコンボボックスにバインド
-                var persons = ProductDatabase.Data.PersonRepository.GetAll()
-                    .Where(p => p.IsActive != 0)
-                    .ToList();
+                var persons = ProductDatabase.Data.PersonRepository.GetActivePersons();
+                PersonComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
                 PersonComboBox.DataSource = persons;
                 PersonComboBox.DisplayMember = "DisplayName";
                 PersonComboBox.ValueMember = "PersonID";
@@ -128,9 +127,11 @@ namespace ProductDatabase {
                 if (result == DialogResult.Cancel) { return; }
 
                 if (PersonCheckBox.Checked && PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
+                    _productRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
                     _productRegisterWork.PersonName = selectedPerson.PersonName;
                 }
                 else {
+                    _productRegisterWork.PersonID = null;
                     _productRegisterWork.PersonName = string.Empty;
                 }
                 if (!Registration()) { throw new Exception("登録できませんでした。"); }
@@ -220,9 +221,11 @@ namespace ProductDatabase {
             _productRegisterWork.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
             _productRegisterWork.Quantity = quantity;
             if (PersonCheckBox.Checked && PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
+                _productRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
                 _productRegisterWork.PersonName = selectedPerson.PersonName;
             }
             else {
+                _productRegisterWork.PersonID = null;
                 _productRegisterWork.PersonName = string.Empty;
             }
             _productRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;

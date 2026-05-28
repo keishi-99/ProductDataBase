@@ -24,6 +24,15 @@ namespace ProductDatabase.Data {
                 .ToList();
         }
 
+        // 有効な担当者一覧を返す（ComboBox用）
+        public static List<PersonDef> GetActivePersons() {
+            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            con.Open();
+            return con.Query<PersonDef>(
+                "SELECT * FROM M_Person WHERE IsActive = 1 ORDER BY PersonID")
+                .ToList();
+        }
+
         public static void Insert(PersonDef personInfo) {
             using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
             con.Open();

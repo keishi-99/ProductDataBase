@@ -96,7 +96,8 @@ namespace ProductDatabase.History {
 
             // 担当者をコンボボックスから取得
             if (PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
-                PersonID = (long)PersonComboBox.SelectedValue;
+                var selectedId = (long)PersonComboBox.SelectedValue;
+                PersonID = selectedId == -1 ? null : (long?)selectedId;
                 PersonInfo = selectedPerson.PersonName;
             }
             else {
