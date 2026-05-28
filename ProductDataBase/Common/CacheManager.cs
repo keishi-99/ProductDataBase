@@ -16,7 +16,7 @@ namespace ProductDatabase.Common {
         // キャッシュが有効期限内かどうかを判定する
         public bool IsCacheValid() {
             lock (_lock) {
-                return _lastLoadTime.HasValue && DateTime.Now - _lastLoadTime.Value < _ttl;
+                return _lastLoadTime.HasValue && DateTime.UtcNow - _lastLoadTime.Value < _ttl;
             }
         }
 
@@ -34,7 +34,7 @@ namespace ProductDatabase.Common {
         public void SetCache(T data) {
             lock (_lock) {
                 _cachedData = data;
-                _lastLoadTime = DateTime.Now;
+                _lastLoadTime = DateTime.UtcNow;
             }
         }
 

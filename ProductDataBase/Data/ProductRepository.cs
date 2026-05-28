@@ -13,6 +13,7 @@ namespace ProductDatabase.Data {
 
         private readonly CacheManager<(DataTable, DataTable, DataTable)> _cacheManager
             = new(TimeSpan.FromMinutes(5));
+        private readonly object _loadLock = new();
 
         // DBファイルのパスを検証しSQLite接続文字列を返す（DbConnectionHelper に委譲・プーリング無効）
         public static string GetConnectionRegistration() {
@@ -21,35 +22,37 @@ namespace ProductDatabase.Data {
 
         // 製品・基板・使用基板の全マスターデータをDBから読み込む（TTL キャッシング機構付き）
         public void LoadAll() {
-            // キャッシュが有効な場合はキャッシュからデータを復元して終了
-            var cached = _cacheManager.GetCachedData();
-            if (cached != null) {
-                RestoreFromCache(cached);
-                return;
+            lock (_loadLock) {
+                // キャッシュが有効な場合はキャッシュからデータを復元して終了
+                var cached = _cacheManager.GetCachedData();
+                if (cached != null) {
+                    RestoreFromCache(cached);
+                    return;
+                }
+
+                // キャッシュが無効な場合は DB から読み込む
+                ProductDataTable.Clear();
+                SubstrateDataTable.Clear();
+                ProductUseSubstrate.Clear();
+
+                using var con = new SqliteConnection(GetConnectionRegistration());
+                con.Open();
+
+                using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.ProductTableName};")) {
+                    ProductDataTable.Load(reader);
+                }
+
+                using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.SubstrateTableName};")) {
+                    SubstrateDataTable.Load(reader);
+                }
+
+                using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.VProductUseSubstrate};")) {
+                    ProductUseSubstrate.Load(reader);
+                }
+
+                // 読み込んだデータをキャッシュに保存
+                _cacheManager.SetCache((ProductDataTable.Copy(), SubstrateDataTable.Copy(), ProductUseSubstrate.Copy()));
             }
-
-            // キャッシュが無効な場合は DB から読み込む
-            ProductDataTable.Clear();
-            SubstrateDataTable.Clear();
-            ProductUseSubstrate.Clear();
-
-            using var con = new SqliteConnection(GetConnectionRegistration());
-            con.Open();
-
-            using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.ProductTableName};")) {
-                ProductDataTable.Load(reader);
-            }
-
-            using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.SubstrateTableName};")) {
-                SubstrateDataTable.Load(reader);
-            }
-
-            using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.VProductUseSubstrate};")) {
-                ProductUseSubstrate.Load(reader);
-            }
-
-            // 読み込んだデータをキャッシュに保存
-            _cacheManager.SetCache((ProductDataTable.Copy(), SubstrateDataTable.Copy(), ProductUseSubstrate.Copy()));
         }
 
         // キャッシュからデータを現在の DataTable に復元する
@@ -58,17 +61,9 @@ namespace ProductDatabase.Data {
             SubstrateDataTable.Clear();
             ProductUseSubstrate.Clear();
 
-            foreach (DataRow row in cached.Item1.Rows) {
-                ProductDataTable.ImportRow(row);
-            }
-
-            foreach (DataRow row in cached.Item2.Rows) {
-                SubstrateDataTable.ImportRow(row);
-            }
-
-            foreach (DataRow row in cached.Item3.Rows) {
-                ProductUseSubstrate.ImportRow(row);
-            }
+            ProductDataTable.Merge(cached.Item1);
+            SubstrateDataTable.Merge(cached.Item2);
+            ProductUseSubstrate.Merge(cached.Item3);
         }
 
         // 基板IDに一致する行をSubstrateDataTableから取得する
