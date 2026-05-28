@@ -21,7 +21,6 @@ namespace ProductDatabase.MasterManagement {
             this.ButtonPanel = new Panel();
             this.AddButton = new Button();
             this.EditButton = new Button();
-            this.DeleteButton = new Button();
             this.CloseButton = new Button();
             ((System.ComponentModel.ISupportInitialize)(this.PersonDataGridView)).BeginInit();
             this.ButtonPanel.SuspendLayout();
@@ -73,7 +72,6 @@ namespace ProductDatabase.MasterManagement {
             //
             this.ButtonPanel.Controls.Add(this.AddButton);
             this.ButtonPanel.Controls.Add(this.EditButton);
-            this.ButtonPanel.Controls.Add(this.DeleteButton);
             this.ButtonPanel.Controls.Add(this.CloseButton);
             this.ButtonPanel.Dock = DockStyle.Bottom;
             this.ButtonPanel.Location = new Point(0, 311);
@@ -101,23 +99,13 @@ namespace ProductDatabase.MasterManagement {
             this.EditButton.UseVisualStyleBackColor = true;
             this.EditButton.Click += this.EditButton_Click;
             //
-            // DeleteButton
-            //
-            this.DeleteButton.Location = new Point(228, 10);
-            this.DeleteButton.Name = "DeleteButton";
-            this.DeleteButton.Size = new Size(100, 28);
-            this.DeleteButton.TabIndex = 2;
-            this.DeleteButton.Text = "削除";
-            this.DeleteButton.UseVisualStyleBackColor = true;
-            this.DeleteButton.Click += this.DeleteButton_Click;
-            //
             // CloseButton
             //
             this.CloseButton.DialogResult = DialogResult.Cancel;
-            this.CloseButton.Location = new Point(372, 10);
+            this.CloseButton.Location = new Point(228, 10);
             this.CloseButton.Name = "CloseButton";
             this.CloseButton.Size = new Size(100, 28);
-            this.CloseButton.TabIndex = 3;
+            this.CloseButton.TabIndex = 2;
             this.CloseButton.Text = "閉じる";
             this.CloseButton.UseVisualStyleBackColor = true;
             //
@@ -148,7 +136,6 @@ namespace ProductDatabase.MasterManagement {
         private Panel ButtonPanel;
         private Button AddButton;
         private Button EditButton;
-        private Button DeleteButton;
         private Button CloseButton;
     }
 }

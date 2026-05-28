@@ -63,34 +63,5 @@ namespace ProductDatabase.MasterManagement {
             }
         }
 
-        private void DeleteButton_Click(object sender, EventArgs e) {
-            if (PersonDataGridView.SelectedRows.Count == 0) {
-                MessageBox.Show("削除する担当者を選択してください。", "確認", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            var selectedRow = PersonDataGridView.SelectedRows[0];
-            var personName = selectedRow.Cells["NameColumn"].Value.ToString() ?? string.Empty;
-
-            if (MessageBox.Show(
-                $"担当者 [{personName}] を削除しますか？",
-                "削除確認", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-
-                try {
-                    var personId = (long)selectedRow.Cells["IdColumn"].Value;
-                    var person = new PersonDef {
-                        PersonID = personId,
-                        PersonName = personName,
-                        IsActive = 0
-                    };
-                    PersonRepository.Update(person);
-                    LoadPersonList();
-                    MessageBox.Show("無効化しました。", "完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                catch (Exception ex) {
-                    MessageBox.Show(ex.Message, "無効化エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
     }
 }

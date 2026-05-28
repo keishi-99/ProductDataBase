@@ -29,7 +29,7 @@ namespace ProductDatabase.Data {
                     p.ProductType,
                     p.ProductNumber,
                     p.OrderNumber,
-                    s.Person,
+                    s.PersonInfo,
                     s.RegDate,
                     s.Comment,
                     s.UseID,
@@ -120,7 +120,7 @@ namespace ProductDatabase.Data {
                     Revision,
                     RevisionGroup,
                     SerialLastNumber,
-                    Person,
+                    PersonInfo,
                     RegDate,
                     Comment,
                     CreatedAt
