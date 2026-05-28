@@ -70,8 +70,7 @@ namespace ProductDatabase.History {
             OLesNumber = string.IsNullOrWhiteSpace(OLesNumberTextBox.Text) ? null : OLesNumberTextBox.Text;
 
             // 担当者をコンボボックスから取得
-            if (PersonComboBox.SelectedValue != null) {
-                var selectedPerson = (ProductDatabase.Models.PersonDef)PersonComboBox.SelectedItem;
+            if (PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
                 Person = selectedPerson.PersonName;
             } else {
                 Person = null;
