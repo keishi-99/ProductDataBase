@@ -126,7 +126,12 @@ namespace ProductDatabase {
                 result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) { return; }
 
-                if (PersonCheckBox.Checked && PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
+                if (PersonCheckBox.Checked) {
+                    if (PersonComboBox.SelectedValue == null || !(PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson)) {
+                        MessageBox.Show("担当者を選択してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        PersonComboBox.Focus();
+                        return;
+                    }
                     _productRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
                     _productRegisterWork.PersonName = selectedPerson.PersonName;
                 }
@@ -220,7 +225,12 @@ namespace ProductDatabase {
             _productRegisterWork.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
             _productRegisterWork.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
             _productRegisterWork.Quantity = quantity;
-            if (PersonCheckBox.Checked && PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
+            if (PersonCheckBox.Checked) {
+                if (PersonComboBox.SelectedValue == null || !(PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson)) {
+                    MessageBox.Show("担当者を選択してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    PersonComboBox.Focus();
+                    return false;
+                }
                 _productRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
                 _productRegisterWork.PersonName = selectedPerson.PersonName;
             }

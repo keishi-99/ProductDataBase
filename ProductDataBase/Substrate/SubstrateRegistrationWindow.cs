@@ -245,7 +245,12 @@ namespace ProductDatabase {
             _substrateRegisterWork.AddQuantity = quantity;
             _substrateRegisterWork.DefectQuantity = defectQuantity;
 
-            if (PersonCheckBox.Checked && PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
+            if (PersonCheckBox.Checked) {
+                if (PersonComboBox.SelectedValue == null || !(PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson)) {
+                    MessageBox.Show("担当者を選択してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    PersonComboBox.Focus();
+                    return false;
+                }
                 _substrateRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
                 _substrateRegisterWork.PersonName = selectedPerson.PersonName;
             } else {

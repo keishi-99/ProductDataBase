@@ -200,7 +200,12 @@ namespace ProductDatabase {
                 _productRegisterWork.OLesNumber = OLesNumberCheckBox.Checked ? OLesNumberTextBox.Text : string.Empty;
                 _productRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
 
-                if (PersonCheckBox.Checked && PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
+                if (PersonCheckBox.Checked) {
+                    if (PersonComboBox.SelectedValue == null || !(PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson)) {
+                        MessageBox.Show("担当者を選択してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        PersonComboBox.Focus();
+                        return;
+                    }
                     _productRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
                     _productRegisterWork.PersonName = selectedPerson.PersonName;
                 } else {
