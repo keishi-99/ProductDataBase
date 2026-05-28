@@ -26,7 +26,7 @@ namespace ProductDatabase.Common {
                 if (IsCacheValid()) {
                     return _cachedData;
                 }
-                return null;
+                return default(T);
             }
         }
 
