@@ -122,7 +122,7 @@ namespace ProductDatabase {
                 result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) { return; }
 
-                _productRegisterWork.Person = PersonComboBox.Text;
+                _productRegisterWork.PersonName = PersonComboBox.Text;
                 if (!Registration()) { throw new Exception("登録できませんでした。"); }
             }
 
@@ -209,7 +209,7 @@ namespace ProductDatabase {
             _productRegisterWork.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
             _productRegisterWork.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
             _productRegisterWork.Quantity = quantity;
-            _productRegisterWork.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
+            _productRegisterWork.PersonName = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
             _productRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
             _productRegisterWork.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
             _productRegisterWork.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
@@ -397,7 +397,7 @@ namespace ProductDatabase {
                     {"Revision", $"{_productRegisterWork.Revision}"},
                     {"RegType", $"{_productMaster.RegType}"},
                     {"RegDate", $"{_productRegisterWork.RegDate}"},
-                    {"Person", $"{_productRegisterWork.Person}"},
+                    {"Person", $"{_productRegisterWork.PersonName}"},
                     {"Quantity", $"{_productRegisterWork.Quantity}"},
                     {"SerialFirstNumber", $"{_productRegisterWork.SerialFirstNumber}"},
                     {"SerialLastNumber", $"{_productRegisterWork.SerialLastNumber}"},

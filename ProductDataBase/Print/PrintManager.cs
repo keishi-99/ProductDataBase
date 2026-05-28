@@ -333,7 +333,7 @@ namespace ProductDatabase.Print {
                 ["{M}"] = ProductRegisterWork.ProductNumber,
                 ["{O}"] = ProductRegisterWork.OrderNumber,
                 ["{N}"] = ProductRegisterWork.Quantity.ToString(),
-                ["{U}"] = ProductRegisterWork.Person,
+                ["{U}"] = ProductRegisterWork.PersonName,
             };
         }
         // 基板マスター・作業データのプレースホルダーと実値のマッピング辞書を生成する
@@ -354,7 +354,7 @@ namespace ProductDatabase.Print {
                 ["{M}"] = SubstrateRegisterWork.ProductNumber,
                 ["{O}"] = SubstrateRegisterWork.OrderNumber,
                 ["{N}"] = SubstrateRegisterWork.AddQuantity.ToString(),
-                ["{U}"] = SubstrateRegisterWork.Person,
+                ["{U}"] = SubstrateRegisterWork.PersonName,
             };
         }
 

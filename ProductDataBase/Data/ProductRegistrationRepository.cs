@@ -22,7 +22,7 @@ namespace ProductDatabase.Data {
                     ProductNumber,
                     OLesNumber,
                     Quantity,
-                    Person,
+                    PersonID,
                     RegDate,
                     Revision,
                     RevisionGroup,
@@ -38,7 +38,7 @@ namespace ProductDatabase.Data {
                     @ProductNumber,
                     @OLesNumber,
                     @Quantity,
-                    @Person,
+                    @PersonID,
                     @RegDate,
                     @Revision,
                     @RevisionGroup,
@@ -55,7 +55,7 @@ namespace ProductDatabase.Data {
                 ProductNumber = productRegisterWork.ProductNumber.NullIfWhiteSpace(),
                 OLesNumber = productRegisterWork.OLesNumber.NullIfWhiteSpace(),
                 productRegisterWork.Quantity,
-                Person = productRegisterWork.Person.NullIfWhiteSpace(),
+                productRegisterWork.PersonID,
                 RegDate = productRegisterWork.RegDate.NullIfWhiteSpace(),
                 Revision = productRegisterWork.Revision.NullIfWhiteSpace(),
                 productMaster.RevisionGroup,
@@ -127,7 +127,7 @@ namespace ProductDatabase.Data {
         public static void InsertSubstrateUsage(
             IDbConnection connection, IDbTransaction transaction,
             long substrateID, string substrateNumber, string orderNumber,
-            long useValue, long? useID, string person, string regDate, string comment) {
+            long useValue, long? useID, long personID, string regDate, string comment) {
 
             var commandText =
                 $"""
@@ -137,7 +137,7 @@ namespace ProductDatabase.Data {
                     SubstrateNumber,
                     OrderNumber,
                     Decrease,
-                    Person,
+                    PersonID,
                     RegDate,
                     Comment,
                     UseID
@@ -148,7 +148,7 @@ namespace ProductDatabase.Data {
                     @SubstrateNumber,
                     @OrderNumber,
                     @Decrease,
-                    @Person,
+                    @PersonID,
                     @RegDate,
                     @Comment,
                     @UseID
@@ -160,7 +160,7 @@ namespace ProductDatabase.Data {
                 SubstrateNumber = substrateNumber.NullIfWhiteSpace(),
                 OrderNumber = orderNumber.NullIfWhiteSpace(),
                 Decrease = 0 - useValue,
-                Person = person.NullIfWhiteSpace(),
+                PersonID = personID,
                 RegDate = regDate.NullIfWhiteSpace(),
                 Comment = comment.NullIfWhiteSpace(),
                 UseID = useID

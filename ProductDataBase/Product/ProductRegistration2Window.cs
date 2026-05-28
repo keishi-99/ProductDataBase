@@ -421,7 +421,7 @@ namespace ProductDatabase {
                     var useValue = int.TryParse(row.Cells[2].Value?.ToString(), out var useVal) ? useVal : 0;
                     var orderNumber = ProductRegistrationRepository.GetSubstrateOrderNumber(connection, transaction, substrateID, substrateNumber);
                     ProductRegistrationRepository.InsertSubstrateUsage(connection, transaction, substrateID, substrateNumber, orderNumber, useValue, useID,
-                        _productRegisterWork.Person, _productRegisterWork.RegDate, _productRegisterWork.Comment);
+                        _productRegisterWork.PersonID, _productRegisterWork.RegDate, _productRegisterWork.Comment);
                 }
             }
         }
@@ -907,7 +907,7 @@ namespace ProductDatabase {
                     {"OLesNumber", $"{_productRegisterWork.OLesNumber}"},
                     {"Revision", $"{_productRegisterWork.Revision}"},
                     {"RegDate", $"{_productRegisterWork.RegDate}"},
-                    {"Person", $"{_productRegisterWork.Person}"},
+                    {"Person", $"{_productRegisterWork.PersonName}"},
                     {"Quantity", $"{_productRegisterWork.Quantity}"},
                     {"SerialFirstNumber", $"{_productRegisterWork.SerialFirstNumber}"},
                     {"SerialLastNumber", $"{_serialLastNumber}"},

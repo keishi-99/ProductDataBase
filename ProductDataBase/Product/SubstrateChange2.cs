@@ -57,7 +57,12 @@ namespace ProductDatabase {
                 CommentTextBox.Text = _productRegisterWork.Comment;
 
                 // ComboBoxへ担当者を追加
-                PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
+                var persons = ProductDatabase.Data.PersonRepository.GetAll()
+                    .Where(p => p.IsActive != 0)
+                    .ToList();
+                PersonComboBox.DataSource = persons;
+                PersonComboBox.DisplayMember = "DisplayName";
+                PersonComboBox.ValueMember = "PersonID";
 
                 switch (_productMaster.RegType) {
                     case 2:
@@ -239,9 +244,16 @@ namespace ProductDatabase {
         private void Registration() {
             try {
                 _productRegisterWork.RegDate = RegistrationDateTimePicker.Value.ToShortDateString();
-                _productRegisterWork.Person = PersonComboBox.Text;
+
+                if (PersonComboBox.SelectedValue != null) {
+                    _productRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
+                    var selectedPerson = (ProductDatabase.Models.PersonDef)PersonComboBox.SelectedItem;
+                    _productRegisterWork.PersonName = selectedPerson.PersonName;
+                } else {
+                    throw new Exception("担当者を選択してください。");
+                }
+
                 _productRegisterWork.Comment = CommentTextBox.Text;
-                if (string.IsNullOrEmpty(_productRegisterWork.Person)) { throw new Exception("担当者を選択してください。"); }
 
                 switch (_productMaster.RegType) {
                     case 2:
@@ -274,7 +286,7 @@ namespace ProductDatabase {
                                             var affectedRows = SubstrateChangeRepository.UpdateSubstrateDecrease(
                                                 con, transaction,
                                                 useValue,
-                                                _productRegisterWork.Person,
+                                                _productRegisterWork.PersonName,
                                                 _productRegisterWork.RegDate,
                                                 _productRegisterWork.Comment,
                                                 substrateNum,
@@ -286,7 +298,7 @@ namespace ProductDatabase {
                                                 SubstrateChangeRepository.InsertSubstrateDecrease(
                                                     con, transaction,
                                                     useValue,
-                                                    _productRegisterWork.Person,
+                                                    _productRegisterWork.PersonName,
                                                     _productRegisterWork.RegDate,
                                                     _productRegisterWork.Comment,
                                                     substrateNum,

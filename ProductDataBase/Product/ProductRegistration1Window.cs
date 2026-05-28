@@ -67,7 +67,12 @@ namespace ProductDatabase {
                 }
 
                 // ComboBoxへ担当者を追加
-                PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
+                var persons = ProductDatabase.Data.PersonRepository.GetAll()
+                    .Where(p => p.IsActive != 0)
+                    .ToList();
+                PersonComboBox.DataSource = persons;
+                PersonComboBox.DisplayMember = "DisplayName";
+                PersonComboBox.ValueMember = "PersonID";
 
                 // DBから最新リビジョンとシリアル番号を取得
                 using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
@@ -195,7 +200,16 @@ namespace ProductDatabase {
                 _productRegisterWork.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
                 _productRegisterWork.OLesNumber = OLesNumberCheckBox.Checked ? OLesNumberTextBox.Text : string.Empty;
                 _productRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
-                _productRegisterWork.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
+
+                if (PersonCheckBox.Checked && PersonComboBox.SelectedValue != null) {
+                    _productRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
+                    var selectedPerson = (ProductDatabase.Models.PersonDef)PersonComboBox.SelectedItem;
+                    _productRegisterWork.PersonName = selectedPerson.PersonName;
+                } else {
+                    _productRegisterWork.PersonID = null;
+                    _productRegisterWork.PersonName = string.Empty;
+                }
+
                 _productRegisterWork.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
                 _productRegisterWork.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
                 _productRegisterWork.Quantity = quantity;

@@ -57,7 +57,7 @@ namespace ProductDatabase.Data {
                 ProductNumber = productRegisterWork.ProductNumber.NullIfWhiteSpace(),
                 OLesNumber = productRegisterWork.OLesNumber.NullIfWhiteSpace(),
                 productRegisterWork.Quantity,
-                Person = productRegisterWork.Person.NullIfWhiteSpace(),
+                Person = productRegisterWork.PersonName.NullIfWhiteSpace(),
                 RegDate = productRegisterWork.RegDate.NullIfWhiteSpace(),
                 Revision = productRegisterWork.Revision.NullIfWhiteSpace(),
                 productMaster.RevisionGroup,

@@ -45,7 +45,7 @@ namespace ProductDatabase.Services {
                 $"シリアル末尾[{productRegisterWork.SerialLast}]",
                 $"Revision[{productRegisterWork.Revision}]",
                 $"登録日[{productRegisterWork.RegDate}]",
-                $"担当者[{productRegisterWork.Person}]",
+                $"担当者[{productRegisterWork.PersonName}]",
                 $"コメント[{productRegisterWork.Comment}]"
             ]);
         }
@@ -69,7 +69,7 @@ namespace ProductDatabase.Services {
                 $"減少数[{logDefectQuantity}]",
                 $"[]",
                 $"登録日[{substrateRegisterWork.RegDate}]",
-                $"担当者[{substrateRegisterWork.Person}]",
+                $"担当者[{substrateRegisterWork.PersonName}]",
                 $"コメント[{substrateRegisterWork.Comment}]"
             ]);
         }
@@ -91,7 +91,7 @@ namespace ProductDatabase.Services {
                 $"シリアル末尾[{productRegisterWork.SerialLast}]",
                 $"Revision[{productRegisterWork.Revision}]",
                 $"登録日[{productRegisterWork.RegDate}]",
-                $"担当者[{productRegisterWork.Person}]",
+                $"担当者[{productRegisterWork.PersonName}]",
                 $"コメント[{productRegisterWork.Comment}]"
             ]);
         }
@@ -113,7 +113,7 @@ namespace ProductDatabase.Services {
                 $"シリアル末尾[{productRegisterWork.SerialLast}]",
                 $"Revision[{productRegisterWork.Revision}]",
                 $"登録日[{productRegisterWork.RegDate}]",
-                $"担当者[{productRegisterWork.Person}]",
+                $"担当者[{productRegisterWork.PersonName}]",
                 $"コメント[{productRegisterWork.Comment}]"
             ]);
         }

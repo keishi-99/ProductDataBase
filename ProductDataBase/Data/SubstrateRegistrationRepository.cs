@@ -87,7 +87,7 @@ namespace ProductDatabase.Data {
             string orderNumber,
             int? increase,
             int? defect,
-            string person,
+            long personID,
             string regDate,
             string comment) {
 
@@ -100,7 +100,7 @@ namespace ProductDatabase.Data {
                     OrderNumber,
                     Increase,
                     Defect,
-                    Person,
+                    PersonID,
                     RegDate,
                     Comment
                 )
@@ -111,7 +111,7 @@ namespace ProductDatabase.Data {
                     @OrderNumber,
                     @Increase,
                     @Defect,
-                    @Person,
+                    @PersonID,
                     @RegDate,
                     @Comment
                 );
@@ -123,7 +123,7 @@ namespace ProductDatabase.Data {
                 OrderNumber = orderNumber.NullIfWhiteSpace(),
                 Increase = (object?)increase ?? DBNull.Value,
                 Defect = defect.HasValue ? (object?)-defect.Value : DBNull.Value,
-                Person = person.NullIfWhiteSpace(),
+                PersonID = personID,
                 RegDate = regDate.NullIfWhiteSpace(),
                 Comment = comment.NullIfWhiteSpace()
             }, transaction: transaction);
