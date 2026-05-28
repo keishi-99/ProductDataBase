@@ -16,7 +16,7 @@ namespace ProductDatabase.Data {
             var productRegistryPath = Path.Combine(AppContext.BaseDirectory, "db", "ProductRegistry.db");
             return !File.Exists(productRegistryPath)
                 ? throw new FileNotFoundException("ファイルが見つかりません。", productRegistryPath)
-                : new SqliteConnectionStringBuilder() { DataSource = productRegistryPath, Pooling = false }.ToString();
+                : new SqliteConnectionStringBuilder() { DataSource = productRegistryPath, Pooling = true }.ToString();
         }
 
         // 製品・基板・使用基板の全マスターデータをDBから読み込む
