@@ -15,7 +15,7 @@ namespace ProductWebViewer.Data {
             ["ProductNumber"] = "v.ProductNumber",
             ["OLesNumber"] = "v.OLesNumber",
             ["Quantity"] = "v.Quantity",
-            ["Person"] = "v.Person",
+            ["PersonInfo"] = "v.PersonInfo",
             ["RegDate"] = "v.RegDate",
             ["Revision"] = "v.Revision",
             ["SerialFirst"] = "v.SerialFirst",
@@ -119,7 +119,7 @@ namespace ProductWebViewer.Data {
                     v.ProductNumber,
                     v.OLesNumber,
                     v.Quantity,
-                    v.Person,
+                    v.PersonInfo,
                     v.RegDate,
                     v.Revision,
                     v.SerialFirst,
@@ -248,7 +248,7 @@ namespace ProductWebViewer.Data {
                 OrderNumber = orderNumber,
                 ProductNumber = productNumber,
                 DateFrom = useCreatedAt ? dateFrom : dateFrom?.Replace('-', '/'),
-                DateTo   = useCreatedAt ? dateTo   : dateTo?.Replace('-', '/')
+                DateTo = useCreatedAt ? dateTo : dateTo?.Replace('-', '/')
             });
         }
 
@@ -290,7 +290,7 @@ namespace ProductWebViewer.Data {
                 OrderNumber = orderNumber,
                 ProductNumber = productNumber,
                 DateFrom = useCreatedAt ? dateFrom : dateFrom?.Replace('-', '/'),
-                DateTo   = useCreatedAt ? dateTo   : dateTo?.Replace('-', '/'),
+                DateTo = useCreatedAt ? dateTo : dateTo?.Replace('-', '/'),
                 Serial = serial
             });
         }

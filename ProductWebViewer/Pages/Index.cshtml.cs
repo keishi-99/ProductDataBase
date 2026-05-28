@@ -86,15 +86,18 @@ public class IndexModel : PageModel {
                 if (SubTab == "stock") {
                     bytes = BuildCsvBytes(BuildStockCsvLines(FetchStockRecords(1, 0), StockGroup != "detail"));
                     fileName = $"在庫数_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
-                } else {
+                }
+                else {
                     bytes = BuildCsvBytes(BuildSubstrateCsvLines(FetchSubstrateRecords(1, 0)));
                     fileName = $"基板登録実績_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
                 }
-            } else {
+            }
+            else {
                 if (SubTab == "serial") {
                     bytes = BuildCsvBytes(BuildSerialCsvLines(FetchSerialRecords(1, 0)));
                     fileName = $"シリアル履歴_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
-                } else {
+                }
+                else {
                     bytes = BuildCsvBytes(BuildProductCsvLines(FetchProductRecords(1, 0)));
                     fileName = $"製品登録実績_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
                 }
@@ -142,7 +145,8 @@ public class IndexModel : PageModel {
             TotalCount = CountSerialRecords();
             ClampPage();
             SerialRecords = FetchSerialRecords(PageNum, PageSize);
-        } else {
+        }
+        else {
             TotalCount = CountProductRecords();
             ClampPage();
             ProductRecords = FetchProductRecords(PageNum, PageSize);
@@ -160,7 +164,8 @@ public class IndexModel : PageModel {
             TotalCount = CountStockRecords();
             ClampPage();
             StockRecords = FetchStockRecords(PageNum, PageSize);
-        } else {
+        }
+        else {
             TotalCount = CountSubstrateRecords();
             ClampPage();
             SubstrateRecords = FetchSubstrateRecords(PageNum, PageSize);
@@ -273,7 +278,7 @@ public class IndexModel : PageModel {
                 CsvField(r.Id.ToString()), CsvField(r.CategoryName), CsvField(r.ProductName),
                 CsvField(r.ProductType), CsvField(r.ProductModel), CsvField(r.OrderNumber),
                 CsvField(r.ProductNumber), CsvField(r.OLesNumber), CsvField(r.Quantity?.ToString()),
-                CsvField(r.Person), CsvField(r.RegDate), CsvField(r.Revision),
+                CsvField(r.PersonInfo), CsvField(r.RegDate), CsvField(r.Revision),
                 CsvField(r.SerialFirst), CsvField(r.SerialLast), CsvField(r.Comment), CsvField(r.CreatedAt));
     }
 
@@ -294,7 +299,7 @@ public class IndexModel : PageModel {
                 CsvField(r.SubstrateName), CsvField(r.SubstrateModel), CsvField(r.OrderNumber),
                 CsvField(r.SubstrateNumber), CsvField(r.Increase?.ToString()), CsvField(r.Decrease?.ToString()),
                 CsvField(r.Defect?.ToString()), CsvField(r.UseProductName), CsvField(r.UseOrderNumber),
-                CsvField(r.UseProductNumber), CsvField(r.Person), CsvField(r.RegDate),
+                CsvField(r.UseProductNumber), CsvField(r.PersonInfo), CsvField(r.RegDate),
                 CsvField(r.Comment), CsvField(r.CreatedAt));
     }
 

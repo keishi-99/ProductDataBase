@@ -16,12 +16,12 @@ namespace ProductWebViewer.Data {
             ["Increase"] = "s.Increase",
             ["Decrease"] = "s.Decrease",
             ["Defect"] = "s.Defect",
-            ["Person"] = "s.Person",
+            ["PersonInfo"] = "s.PersonInfo",
             ["RegDate"] = "s.RegDate",
             ["Comment"] = "s.Comment",
             ["CreatedAt"] = "s.CreatedAt",
-            ["UseProductName"]   = "p.ProductName",
-            ["UseOrderNumber"]   = "p.OrderNumber",
+            ["UseProductName"] = "p.ProductName",
+            ["UseOrderNumber"] = "p.OrderNumber",
             ["UseProductNumber"] = "p.ProductNumber",
         };
 
@@ -118,7 +118,7 @@ namespace ProductWebViewer.Data {
                     s.Increase,
                     s.Decrease,
                     s.Defect,
-                    s.Person,
+                    s.PersonInfo,
                     s.RegDate,
                     s.Comment,
                     s.CreatedAt,
@@ -266,7 +266,7 @@ namespace ProductWebViewer.Data {
                 OrderNumber = orderNumber,
                 SubstrateNumber = substrateNumber,
                 DateFrom = useCreatedAt ? dateFrom : dateFrom?.Replace('-', '/'),
-                DateTo   = useCreatedAt ? dateTo   : dateTo?.Replace('-', '/')
+                DateTo = useCreatedAt ? dateTo : dateTo?.Replace('-', '/')
             });
         }
 

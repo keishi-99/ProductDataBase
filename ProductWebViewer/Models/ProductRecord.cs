@@ -10,7 +10,7 @@ namespace ProductWebViewer.Models {
         public string? ProductNumber { get; set; }
         public string? OLesNumber { get; set; }
         public long? Quantity { get; set; }
-        public string? Person { get; set; }
+        public string? PersonInfo { get; set; }
         public string? RegDate { get; set; }
         public string? Revision { get; set; }
         public string? SerialFirst { get; set; }
