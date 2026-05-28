@@ -246,9 +246,8 @@ namespace ProductDatabase {
             _substrateRegisterWork.AddQuantity = quantity;
             _substrateRegisterWork.DefectQuantity = defectQuantity;
 
-            if (PersonCheckBox.Checked && PersonComboBox.SelectedValue != null) {
+            if (PersonCheckBox.Checked && PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
                 _substrateRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
-                var selectedPerson = (ProductDatabase.Models.PersonDef)PersonComboBox.SelectedItem;
                 _substrateRegisterWork.PersonName = selectedPerson.PersonName;
             } else {
                 _substrateRegisterWork.PersonID = null;

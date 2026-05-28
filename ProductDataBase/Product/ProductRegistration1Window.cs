@@ -201,9 +201,8 @@ namespace ProductDatabase {
                 _productRegisterWork.OLesNumber = OLesNumberCheckBox.Checked ? OLesNumberTextBox.Text : string.Empty;
                 _productRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
 
-                if (PersonCheckBox.Checked && PersonComboBox.SelectedValue != null) {
+                if (PersonCheckBox.Checked && PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
                     _productRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
-                    var selectedPerson = (ProductDatabase.Models.PersonDef)PersonComboBox.SelectedItem;
                     _productRegisterWork.PersonName = selectedPerson.PersonName;
                 } else {
                     _productRegisterWork.PersonID = null;

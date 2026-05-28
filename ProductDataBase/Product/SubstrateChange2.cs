@@ -245,9 +245,8 @@ namespace ProductDatabase {
             try {
                 _productRegisterWork.RegDate = RegistrationDateTimePicker.Value.ToShortDateString();
 
-                if (PersonComboBox.SelectedValue != null) {
+                if (PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
                     _productRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
-                    var selectedPerson = (ProductDatabase.Models.PersonDef)PersonComboBox.SelectedItem;
                     _productRegisterWork.PersonName = selectedPerson.PersonName;
                 } else {
                     throw new Exception("担当者を選択してください。");
