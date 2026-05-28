@@ -127,7 +127,7 @@ namespace ProductDatabase.Data {
         public static void InsertSubstrateUsage(
             IDbConnection connection, IDbTransaction transaction,
             long substrateID, string substrateNumber, string orderNumber,
-            long useValue, long? useID, long personID, string regDate, string comment) {
+            long useValue, long? useID, long? personID, string regDate, string comment) {
 
             var commandText =
                 $"""
