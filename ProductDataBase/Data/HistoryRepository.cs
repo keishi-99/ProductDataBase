@@ -1,5 +1,4 @@
 using Dapper;
-using Microsoft.Data.Sqlite;
 using ProductDatabase.Common;
 using ProductDatabase.Models;
 using System.Data;
@@ -279,7 +278,7 @@ namespace ProductDatabase.Data {
 
         // 基板IDで基板マスター情報を取得する（在庫調整画面用）
         public static dynamic? QuerySubstrateMasterById(long substrateId) {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            using var con = DbConnectionHelper.CreateAndOpenConnection();
             var query = $"""
                 SELECT
                     SubstrateID,
@@ -446,7 +445,7 @@ namespace ProductDatabase.Data {
 
         // クエリを実行してDataTableを返す共通ヘルパー
         private static DataTable ExecuteQuery(string query, DynamicParameters parameters) {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            using var con = DbConnectionHelper.CreateAndOpenConnection();
             using var reader = con.ExecuteReader(query, parameters);
             var table = new DataTable();
             table.Load(reader);

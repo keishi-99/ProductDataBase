@@ -1,4 +1,3 @@
-using Microsoft.Data.Sqlite;
 
 namespace ProductDatabase.Data {
     // SQLite接続とトランザクションのライフサイクルを管理するクラス
@@ -18,8 +17,7 @@ namespace ProductDatabase.Data {
 
         // 接続を開きトランザクションを開始する
         public void Begin() {
-            _connection = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-            _connection.Open();
+            _connection = DbConnectionHelper.CreateAndOpenConnection();
             _transaction = _connection.BeginTransaction();
             _committed = false;
         }
