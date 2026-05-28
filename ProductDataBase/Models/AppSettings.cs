@@ -1,4 +1,12 @@
 namespace ProductDatabase.Models {
+    public class PersonDef {
+        public long PersonID { get; set; }
+        public string PersonName { get; set; } = string.Empty;
+        public int IsActive { get; set; } = 1;
+
+        public string DisplayName => $"{PersonID:D2}.{PersonName}";
+    }
+
     public class QrSettings {
         public List<string> CategoryItemNumber { get; set; } = [];
         public List<string> CategoryProductName { get; set; } = [];

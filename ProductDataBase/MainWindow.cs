@@ -574,5 +574,14 @@ namespace ProductDatabase {
             }
         }
 
+        private void PersonManagementToolStripMenuItem_Click(object sender, EventArgs e) {
+            try {
+                using var window = new MasterManagement.PersonManagementWindow();
+                window.ShowDialog(this);
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
     }
 }
