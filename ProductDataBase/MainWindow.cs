@@ -60,42 +60,44 @@ namespace ProductDatabase {
                 CategoryListBox2.Items.Clear();
                 CategoryListBox3.Items.Clear();
 
+                // 初期化の実行
+                var initializer = new ApplicationInitializer(_jsonFilePath);
+
                 // 設定ファイル読み込み
                 GeneralSettings generalSettings;
                 try {
-                    generalSettings = SettingsLoader.Load(_jsonFilePath);
+                    generalSettings = initializer.LoadSettings();
                 } catch (Exception ex) {
-                    Logger.AppendErrorLog(nameof(LoadEvents), ex, "設定ファイル読み込み失敗");
                     MessageBox.Show($"設定ファイルの読み込みに失敗しました:\n{ex.Message}", "致命的エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                // バックアップパス取得
-                FileUtils.BackupPath = generalSettings.BackupFolderPath;
+                // バックアップ作成
+                initializer.CreateDailyBackup(generalSettings.BackupFolderPath);
 
-                // バックアップ作成（エラーは非致命的）
-                BackupManager.CreateDailyBackup();
+                // アプリ設定
+                try {
+                    var appSettings = initializer.ConfigureAppSettings(generalSettings);
+                    _appSettings.PersonList = appSettings.PersonList;
+                    _appSettings.IsAuthorizedUser = appSettings.IsAuthorizedUser;
+                    _appSettings.IsAdministrator = appSettings.IsAdministrator;
+                } catch (Exception ex) {
+                    MessageBox.Show($"アプリケーション設定に失敗しました:\n{ex.Message}", "致命的エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
-                // 担当者取得
-                _appSettings.PersonList = [.. generalSettings.Persons];
-
-                // 認証ユーザー名を取得
-                _appSettings.IsAuthorizedUser = generalSettings.AuthorizedUsers
-                    .Contains(Environment.UserName, StringComparer.OrdinalIgnoreCase);
-
-                // 管理者ユーザー名を取得
-                _appSettings.IsAdministrator = generalSettings.Administrators
-                    .Contains(Environment.UserName, StringComparer.OrdinalIgnoreCase);
-
-                _barcodeService = new BarcodeService(generalSettings.DSN, generalSettings.UID, generalSettings.PWD);
+                // バーコード・QRサービス
+                try {
+                    _barcodeService = initializer.CreateBarcodeService(generalSettings);
+                } catch (Exception ex) {
+                    MessageBox.Show($"バーコード・QRサービスの初期化に失敗しました:\n{ex.Message}", "致命的エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
                 // DB読み込み
                 try {
-                    ProductRepository.MigrateSerialProductId();
-                    ProductRepository.MigrateExclusiveGroup();
-                    _productRepository.LoadAll();
+                    initializer.LoadDatabase(_productRepository);
                 } catch (Exception ex) {
-                    Logger.AppendErrorLog(nameof(LoadEvents), ex, "DB読み込み失敗");
                     MessageBox.Show($"データベースの読み込みに失敗しました:\n{ex.Message}", "致命的エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
