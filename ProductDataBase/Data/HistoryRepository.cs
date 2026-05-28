@@ -29,6 +29,7 @@ namespace ProductDatabase.Data {
                     p.ProductType,
                     p.ProductNumber,
                     p.OrderNumber,
+                    t.PersonID,
                     s.PersonInfo,
                     s.RegDate,
                     s.Comment,
@@ -40,6 +41,10 @@ namespace ProductDatabase.Data {
                     {Constants.VProductTableName} AS p
                 ON
                     s.UseID = p.ID
+                LEFT JOIN
+                    {Constants.TSubstrateTableName} AS t
+                ON
+                    s.ID = t.ID
                 WHERE
                     s.IsDeleted = 0
                     {substrateCategoryFilter}
@@ -105,35 +110,37 @@ namespace ProductDatabase.Data {
 
             var query = $"""
                 SELECT
-                    ID,
-                    ProductID,
-                    CategoryName,
-                    ProductName,
-                    ProductType,
-                    ProductModel,
-                    OrderNumber,
-                    ProductNumber,
-                    OLesNumber,
-                    Quantity,
-                    SerialFirst,
-                    SerialLast,
-                    Revision,
-                    RevisionGroup,
-                    SerialLastNumber,
-                    PersonID,
-                    PersonInfo,
-                    RegDate,
-                    Comment,
-                    CreatedAt
+                    v.ID,
+                    v.ProductID,
+                    v.CategoryName,
+                    v.ProductName,
+                    v.ProductType,
+                    v.ProductModel,
+                    v.OrderNumber,
+                    v.ProductNumber,
+                    v.OLesNumber,
+                    v.Quantity,
+                    v.SerialFirst,
+                    v.SerialLast,
+                    v.Revision,
+                    v.RevisionGroup,
+                    v.SerialLastNumber,
+                    t.PersonID,
+                    v.PersonInfo,
+                    v.RegDate,
+                    v.Comment,
+                    v.CreatedAt
                 FROM
-                    {Constants.VProductTableName}
+                    {Constants.VProductTableName} v
+                LEFT JOIN
+                    {Constants.TProductTableName} t ON v.ID = t.ID
                 WHERE
-                    IsDeleted = 0
+                    v.IsDeleted = 0
                     {productCategoryFilter}
                     {productNameFilter}
                     {productIdFilter}
                 ORDER BY
-                    ID DESC;
+                    v.ID DESC;
                 """;
 
             var p = new DynamicParameters();
