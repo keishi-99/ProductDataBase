@@ -61,8 +61,8 @@ namespace ProductDatabase {
             SubstrateChangeDataGridView.Columns["ProductModel"].HeaderCell.Value = "製品型式";
             SubstrateChangeDataGridView.Columns["Quantity"].HeaderCell.Value = "数量";
             SubstrateChangeDataGridView.Columns["Quantity"].Width = 40;
-            SubstrateChangeDataGridView.Columns["Person"].HeaderCell.Value = "担当者";
-            SubstrateChangeDataGridView.Columns["Person"].Width = 70;
+            SubstrateChangeDataGridView.Columns["PersonInfo"].HeaderCell.Value = "担当者";
+            SubstrateChangeDataGridView.Columns["PersonInfo"].Width = 70;
             SubstrateChangeDataGridView.Columns["RegDate"].HeaderCell.Value = "登録日";
             SubstrateChangeDataGridView.Columns["RegDate"].Width = 80;
             SubstrateChangeDataGridView.Columns["Revision"].HeaderCell.Value = "Rev";

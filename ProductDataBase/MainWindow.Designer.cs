@@ -36,6 +36,7 @@
             this.ConfigCheckSheetToolStripMenuItem = new ToolStripMenuItem();
             this.ConfigSubstrateInformationToolStripMenuItem = new ToolStripMenuItem();
             this.MasterManagementToolStripMenuItem = new ToolStripMenuItem();
+            this.PersonManagementToolStripMenuItem = new ToolStripMenuItem();
             this.CategoryRadioButton1 = new RadioButton();
             this.CategoryRadioButton2 = new RadioButton();
             this.CategoryRadioButton3 = new RadioButton();
@@ -99,7 +100,7 @@
             // 
             // 設定ToolStripMenuItem
             // 
-            this.設定ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.ConfigReportToolStripMenuItem, this.ConfigListToolStripMenuItem, this.ConfigCheckSheetToolStripMenuItem, this.ConfigSubstrateInformationToolStripMenuItem, this.MasterManagementToolStripMenuItem });
+            this.設定ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { this.ConfigReportToolStripMenuItem, this.ConfigListToolStripMenuItem, this.ConfigCheckSheetToolStripMenuItem, this.ConfigSubstrateInformationToolStripMenuItem, this.MasterManagementToolStripMenuItem, this.PersonManagementToolStripMenuItem });
             this.設定ToolStripMenuItem.Name = "設定ToolStripMenuItem";
             this.設定ToolStripMenuItem.Size = new Size(43, 20);
             this.設定ToolStripMenuItem.Text = "設定";
@@ -138,6 +139,13 @@
             this.MasterManagementToolStripMenuItem.Size = new Size(180, 22);
             this.MasterManagementToolStripMenuItem.Text = "マスター管理";
             this.MasterManagementToolStripMenuItem.Click += this.MasterManagementToolStripMenuItem_Click;
+            //
+            // PersonManagementToolStripMenuItem
+            //
+            this.PersonManagementToolStripMenuItem.Name = "PersonManagementToolStripMenuItem";
+            this.PersonManagementToolStripMenuItem.Size = new Size(180, 22);
+            this.PersonManagementToolStripMenuItem.Text = "担当者管理";
+            this.PersonManagementToolStripMenuItem.Click += this.PersonManagementToolStripMenuItem_Click;
             //
             // ログToolStripMenuItem
             //
@@ -491,6 +499,7 @@
         private ToolStripMenuItem ConfigCheckSheetToolStripMenuItem;
         private ToolStripMenuItem ConfigSubstrateInformationToolStripMenuItem;
         private ToolStripMenuItem MasterManagementToolStripMenuItem;
+        private ToolStripMenuItem PersonManagementToolStripMenuItem;
         private ToolStripMenuItem ログToolStripMenuItem;
         private ToolStripMenuItem LogViewerToolStripMenuItem;
     }

@@ -67,7 +67,11 @@ namespace ProductDatabase {
                 }
 
                 // ComboBoxへ担当者を追加
-                PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
+                var persons = ProductDatabase.Data.PersonRepository.GetActivePersons();
+                PersonComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+                PersonComboBox.DataSource = persons;
+                PersonComboBox.DisplayMember = "DisplayName";
+                PersonComboBox.ValueMember = "PersonID";
 
                 // DBから最新リビジョンとシリアル番号を取得
                 using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
@@ -195,7 +199,20 @@ namespace ProductDatabase {
                 _productRegisterWork.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
                 _productRegisterWork.OLesNumber = OLesNumberCheckBox.Checked ? OLesNumberTextBox.Text : string.Empty;
                 _productRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
-                _productRegisterWork.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
+
+                if (PersonCheckBox.Checked) {
+                    if (PersonComboBox.SelectedValue == null || !(PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson)) {
+                        MessageBox.Show("担当者を選択してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        PersonComboBox.Focus();
+                        return;
+                    }
+                    _productRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
+                    _productRegisterWork.PersonName = selectedPerson.PersonName;
+                } else {
+                    _productRegisterWork.PersonID = null;
+                    _productRegisterWork.PersonName = string.Empty;
+                }
+
                 _productRegisterWork.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
                 _productRegisterWork.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
                 _productRegisterWork.Quantity = quantity;

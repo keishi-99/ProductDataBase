@@ -701,7 +701,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <th data-label="製造番号"   class="@SortClass("ProductNumber")"onclick="sortBy('ProductNumber')">製造番号   <span class="sort-icon">@SortIcon("ProductNumber")</span></th>
                                 <th data-label="O-Les番号"  class="@SortClass("OLesNumber")"   onclick="sortBy('OLesNumber')">  O-Les番号 <span class="sort-icon">@SortIcon("OLesNumber")</span></th>
                                 <th data-label="数量"       class="@SortClass("Quantity")"     onclick="sortBy('Quantity')">    数量       <span class="sort-icon">@SortIcon("Quantity")</span></th>
-                                <th data-label="担当者"     class="@SortClass("Person")"       onclick="sortBy('Person')">      担当者     <span class="sort-icon">@SortIcon("Person")</span></th>
+                                <th data-label="担当者"     class="@SortClass("PersonInfo")"   onclick="sortBy('PersonInfo')">  担当者     <span class="sort-icon">@SortIcon("PersonInfo")</span></th>
                                 <th data-label="登録日"     class="@SortClass("RegDate")"      onclick="sortBy('RegDate')">     登録日     <span class="sort-icon">@SortIcon("RegDate")</span></th>
                                 <th data-label="Revision"   class="@SortClass("Revision")"     onclick="sortBy('Revision')">    Revision   <span class="sort-icon">@SortIcon("Revision")</span></th>
                                 <th data-label="シリアル開始" class="@SortClass("SerialFirst")" onclick="sortBy('SerialFirst')">シリアル開始<span class="sort-icon">@SortIcon("SerialFirst")</span></th>
@@ -724,7 +724,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <td>@r.ProductNumber</td>
                                     <td>@r.OLesNumber</td>
                                     <td>@r.Quantity</td>
-                                    <td>@r.Person</td>
+                                    <td>@r.PersonInfo</td>
                                     <td>@r.RegDate</td>
                                     <td>@r.Revision</td>
                                     <td>@r.SerialFirst</td>
@@ -999,7 +999,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <th data-label="使用製品名"   class="@SortClass("UseProductName")"   onclick="sortBy('UseProductName')">  使用製品名   <span class="sort-icon">@SortIcon("UseProductName")</span></th>
                                 <th data-label="使用注文番号" class="@SortClass("UseOrderNumber")"   onclick="sortBy('UseOrderNumber')">  使用注文番号 <span class="sort-icon">@SortIcon("UseOrderNumber")</span></th>
                                 <th data-label="使用製造番号" class="@SortClass("UseProductNumber")" onclick="sortBy('UseProductNumber')">使用製造番号 <span class="sort-icon">@SortIcon("UseProductNumber")</span></th>
-                                <th data-label="担当者"       class="@SortClass("Person")"           onclick="sortBy('Person')">          担当者       <span class="sort-icon">@SortIcon("Person")</span></th>
+                                <th data-label="担当者"       class="@SortClass("PersonInfo")"     onclick="sortBy('PersonInfo')">     担当者       <span class="sort-icon">@SortIcon("PersonInfo")</span></th>
                                 <th data-label="登録日"       class="@SortClass("RegDate")"        onclick="sortBy('RegDate')">       登録日       <span class="sort-icon">@SortIcon("RegDate")</span></th>
                                 <th data-label="コメント"     class="@SortClass("Comment")"        onclick="sortBy('Comment')">       コメント     <span class="sort-icon">@SortIcon("Comment")</span></th>
                                 <th data-label="登録日時"     class="@SortClass("CreatedAt")"      onclick="sortBy('CreatedAt')">     登録日時     <span class="sort-icon">@SortIcon("CreatedAt")</span></th>
@@ -1022,7 +1022,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <td>@r.UseProductName</td>
                                     <td>@r.UseOrderNumber</td>
                                     <td>@r.UseProductNumber</td>
-                                    <td>@r.Person</td>
+                                    <td>@r.PersonInfo</td>
                                     <td>@r.RegDate</td>
                                     <td>@r.Comment</td>
                                     <td>@r.CreatedAt</td>

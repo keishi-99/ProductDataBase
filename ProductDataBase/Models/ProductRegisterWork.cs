@@ -9,7 +9,8 @@ namespace ProductDatabase.Models {
         public string SerialLast { get; set; } = string.Empty;
         public int Quantity { get; set; }
         public string RegDate { get; set; } = string.Empty;
-        public string Person { get; set; } = string.Empty;
+        public long? PersonID { get; set; }
+        public string PersonName { get; set; } = string.Empty;
         public string Revision { get; set; } = string.Empty;
         public string Comment { get; set; } = string.Empty;
 
@@ -27,7 +28,8 @@ namespace ProductDatabase.Models {
             SerialLast = string.Empty;
             Quantity = 0;
             RegDate = string.Empty;
-            Person = string.Empty;
+            PersonID = null;
+            PersonName = string.Empty;
             Revision = string.Empty;
             Comment = string.Empty;
             SerialFirstNumber = 0;

@@ -8,7 +8,8 @@ namespace ProductDatabase.Models {
         public int DefectQuantity { get; set; }
         public int UseQuantity { get; set; }
 
-        public string Person { get; set; } = string.Empty;
+        public long? PersonID { get; set; }
+        public string PersonName { get; set; } = string.Empty;
         public string RegDate { get; set; } = string.Empty;
         public string Comment { get; set; } = string.Empty;
 
@@ -20,7 +21,8 @@ namespace ProductDatabase.Models {
             AddQuantity = 0;
             DefectQuantity = 0;
             UseQuantity = 0;
-            Person = string.Empty;
+            PersonID = null;
+            PersonName = string.Empty;
             RegDate = string.Empty;
             Comment = string.Empty;
         }

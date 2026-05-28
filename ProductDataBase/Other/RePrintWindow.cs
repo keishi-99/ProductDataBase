@@ -73,8 +73,12 @@ namespace ProductDatabase {
                     }
                 }
 
-                // ComboBoxへ担当者を追加
-                PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
+                // 担当者をコンボボックスにバインド
+                var persons = ProductDatabase.Data.PersonRepository.GetActivePersons();
+                PersonComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+                PersonComboBox.DataSource = persons;
+                PersonComboBox.DisplayMember = "DisplayName";
+                PersonComboBox.ValueMember = "PersonID";
 
                 // DBから最新リビジョンを取得
                 using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
@@ -122,7 +126,19 @@ namespace ProductDatabase {
                 result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) { return; }
 
-                _productRegisterWork.Person = PersonComboBox.Text;
+                if (PersonCheckBox.Checked) {
+                    if (PersonComboBox.SelectedValue == null || !(PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson)) {
+                        MessageBox.Show("担当者を選択してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        PersonComboBox.Focus();
+                        return;
+                    }
+                    _productRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
+                    _productRegisterWork.PersonName = selectedPerson.PersonName;
+                }
+                else {
+                    _productRegisterWork.PersonID = null;
+                    _productRegisterWork.PersonName = string.Empty;
+                }
                 if (!Registration()) { throw new Exception("登録できませんでした。"); }
             }
 
@@ -209,7 +225,19 @@ namespace ProductDatabase {
             _productRegisterWork.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
             _productRegisterWork.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
             _productRegisterWork.Quantity = quantity;
-            _productRegisterWork.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
+            if (PersonCheckBox.Checked) {
+                if (PersonComboBox.SelectedValue == null || !(PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson)) {
+                    MessageBox.Show("担当者を選択してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    PersonComboBox.Focus();
+                    return false;
+                }
+                _productRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
+                _productRegisterWork.PersonName = selectedPerson.PersonName;
+            }
+            else {
+                _productRegisterWork.PersonID = null;
+                _productRegisterWork.PersonName = string.Empty;
+            }
             _productRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
             _productRegisterWork.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
             _productRegisterWork.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
@@ -397,7 +425,7 @@ namespace ProductDatabase {
                     {"Revision", $"{_productRegisterWork.Revision}"},
                     {"RegType", $"{_productMaster.RegType}"},
                     {"RegDate", $"{_productRegisterWork.RegDate}"},
-                    {"Person", $"{_productRegisterWork.Person}"},
+                    {"PersonInfo", $"{_productRegisterWork.PersonName}"},
                     {"Quantity", $"{_productRegisterWork.Quantity}"},
                     {"SerialFirstNumber", $"{_productRegisterWork.SerialFirstNumber}"},
                     {"SerialLastNumber", $"{_productRegisterWork.SerialLastNumber}"},

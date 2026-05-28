@@ -29,7 +29,8 @@ namespace ProductDatabase.Data {
                     p.ProductType,
                     p.ProductNumber,
                     p.OrderNumber,
-                    s.Person,
+                    t.PersonID,
+                    s.PersonInfo,
                     s.RegDate,
                     s.Comment,
                     s.UseID,
@@ -40,6 +41,10 @@ namespace ProductDatabase.Data {
                     {Constants.VProductTableName} AS p
                 ON
                     s.UseID = p.ID
+                LEFT JOIN
+                    {Constants.TSubstrateTableName} AS t
+                ON
+                    s.ID = t.ID
                 WHERE
                     s.IsDeleted = 0
                     {substrateCategoryFilter}
@@ -105,34 +110,37 @@ namespace ProductDatabase.Data {
 
             var query = $"""
                 SELECT
-                    ID,
-                    ProductID,
-                    CategoryName,
-                    ProductName,
-                    ProductType,
-                    ProductModel,
-                    OrderNumber,
-                    ProductNumber,
-                    OLesNumber,
-                    Quantity,
-                    SerialFirst,
-                    SerialLast,
-                    Revision,
-                    RevisionGroup,
-                    SerialLastNumber,
-                    Person,
-                    RegDate,
-                    Comment,
-                    CreatedAt
+                    v.ID,
+                    v.ProductID,
+                    v.CategoryName,
+                    v.ProductName,
+                    v.ProductType,
+                    v.ProductModel,
+                    v.OrderNumber,
+                    v.ProductNumber,
+                    v.OLesNumber,
+                    v.Quantity,
+                    v.SerialFirst,
+                    v.SerialLast,
+                    v.Revision,
+                    v.RevisionGroup,
+                    v.SerialLastNumber,
+                    t.PersonID,
+                    v.PersonInfo,
+                    v.RegDate,
+                    v.Comment,
+                    v.CreatedAt
                 FROM
-                    {Constants.VProductTableName}
+                    {Constants.VProductTableName} v
+                LEFT JOIN
+                    {Constants.TProductTableName} t ON v.ID = t.ID
                 WHERE
-                    IsDeleted = 0
+                    v.IsDeleted = 0
                     {productCategoryFilter}
                     {productNameFilter}
                     {productIdFilter}
                 ORDER BY
-                    ID DESC;
+                    v.ID DESC;
                 """;
 
             var p = new DynamicParameters();
@@ -201,7 +209,7 @@ namespace ProductDatabase.Data {
                     ProductType,
                     ProductModel,
                     Quantity,
-                    Person,
+                    PersonInfo,
                     RegDate,
                     Revision,
                     SerialFirst,
@@ -301,7 +309,7 @@ namespace ProductDatabase.Data {
                     Decrease,
                     Defect,
                     RegDate,
-                    Person,
+                    PersonInfo,
                     Comment,
                     UseID
                 FROM {Constants.VSubstrateTableName}
@@ -334,7 +342,7 @@ namespace ProductDatabase.Data {
                     Increase        = @Increase,
                     Decrease        = @Decrease,
                     Defect          = @Defect,
-                    Person          = @Person,
+                    PersonID        = @PersonID,
                     RegDate         = @RegDate,
                     Comment         = @Comment,
                     UseId           = @UseId
@@ -347,7 +355,7 @@ namespace ProductDatabase.Data {
                 Decrease = row["Decrease"],
                 Defect = row["Defect"],
                 RegDate = row["RegDate"],
-                Person = row["Person"],
+                PersonID = row["PersonID"],
                 Comment = row["Comment"],
                 UseId = row["UseId"],
                 ID = row["ID"]
@@ -374,7 +382,7 @@ namespace ProductDatabase.Data {
                     OrderNumber   = @OrderNumber,
                     ProductNumber = @ProductNumber,
                     OLesNumber    = @OLesNumber,
-                    Person        = @Person,
+                    PersonID      = @PersonID,
                     RegDate       = @RegDate,
                     Revision      = @Revision,
                     RevisionGroup = @RevisionGroup,
@@ -386,7 +394,7 @@ namespace ProductDatabase.Data {
                 OrderNumber = row["OrderNumber"],
                 ProductNumber = row["ProductNumber"],
                 OLesNumber = row["OLesNumber"],
-                Person = row["Person"],
+                PersonID = row["PersonID"],
                 RegDate = row["RegDate"],
                 Revision = row["Revision"],
                 RevisionGroup = row["RevisionGroup"],

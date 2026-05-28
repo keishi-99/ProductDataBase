@@ -43,7 +43,7 @@ namespace ProductDatabase.History {
                         { "ProductType", "使用製品名" },
                         { "ProductNumber", "使用製番" },
                         { "OrderNumber1", "使用注番" },
-                        { "Person", "担当者" },
+                        { "PersonInfo", "担当者" },
                         { "RegDate", "登録日" },
                         { "Comment", "コメント" },
                         { "usedID", "UsedID" },
@@ -75,7 +75,7 @@ namespace ProductDatabase.History {
                         { "ProductType", "タイプ" },
                         { "ProductModel", "製品型式" },
                         { "Quantity", "数量" },
-                        { "Person", "担当者" },
+                        { "PersonInfo", "担当者" },
                         { "RegDate", "登録日" },
                         { "Revision", "Rev" },
                         { "RevisionGroup", "Group" },
@@ -113,7 +113,7 @@ namespace ProductDatabase.History {
                         { "ProductType", "タイプ" },
                         { "ProductModel", "製品型式" },
                         { "Quantity", "数量" },
-                        { "Person", "担当者" },
+                        { "PersonInfo", "担当者" },
                         { "RegDate", "登録日" },
                         { "Revision", "Rev" },
                         { "SerialFirst", "シリアル先頭" },
@@ -206,6 +206,11 @@ namespace ProductDatabase.History {
 
             DataBaseDataGridView.Columns.Clear();
             DataBaseDataGridView.DataSource = _historyTable;
+
+            // PersonID 列を非表示にする
+            if (DataBaseDataGridView.Columns.Contains("PersonID")) {
+                DataBaseDataGridView.Columns["PersonID"].Visible = false;
+            }
 
             _listColFilter.Clear();
             _listColFilter.Add("");
@@ -311,7 +316,8 @@ namespace ProductDatabase.History {
             row["OrderNumber"] = (object?)dialog.OrderNumber ?? DBNull.Value;
             row["ProductNumber"] = (object?)dialog.ProductNumber ?? DBNull.Value;
             row["OLesNumber"] = (object?)dialog.OLesNumber ?? DBNull.Value;
-            row["Person"] = (object?)dialog.Person ?? DBNull.Value;
+            row["PersonID"] = (object?)dialog.PersonID ?? DBNull.Value;
+            row["PersonInfo"] = (object?)dialog.PersonInfo ?? DBNull.Value;
             row["Comment"] = (object?)dialog.Comment ?? DBNull.Value;
             row.EndEdit();
 

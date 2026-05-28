@@ -12,7 +12,7 @@ namespace ProductWebViewer.Models {
         // Decrease・Defect は DB に負数で格納されている（在庫計算は Increase + Decrease + Defect の合算）
         public long? Decrease { get; set; }
         public long? Defect { get; set; }
-        public string? Person { get; set; }
+        public string? PersonInfo { get; set; }
         public string? RegDate { get; set; }
         public string? Comment { get; set; }
         public string? CreatedAt { get; set; }
