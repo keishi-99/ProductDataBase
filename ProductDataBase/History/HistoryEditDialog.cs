@@ -29,7 +29,26 @@ namespace ProductDatabase.History {
             OrderNumberTextBox.Text = GetCellText("OrderNumber");
             ProductNumberTextBox.Text = GetCellText("ProductNumber");
             OLesNumberTextBox.Text = GetCellText("OLesNumber");
-            PersonTextBox.Text = GetCellText("PersonInfo");
+
+            // 担当者をコンボボックスにバインド
+            var persons = ProductDatabase.Data.PersonRepository.GetAll()
+                .Where(p => p.IsActive != 0)
+                .ToList();
+            PersonComboBox.DataSource = persons;
+            PersonComboBox.DisplayMember = "DisplayName";
+            PersonComboBox.ValueMember = "PersonID";
+
+            // 現在の担当者名から対応する PersonDef を選択
+            var currentPersonInfo = GetCellText("PersonInfo");
+            if (!string.IsNullOrEmpty(currentPersonInfo)) {
+                var matchingPerson = persons.FirstOrDefault(p => p.PersonName == currentPersonInfo);
+                if (matchingPerson != null) {
+                    PersonComboBox.SelectedValue = matchingPerson.PersonID;
+                }
+            } else {
+                PersonComboBox.SelectedIndex = -1;
+            }
+
             RegDateValueLabel.Text = GetCellText("RegDate");
             RevisionValueLabel.Text = GetCellText("Revision");
             RevisionGroupValueLabel.Text = GetCellText("RevisionGroup");
@@ -49,7 +68,15 @@ namespace ProductDatabase.History {
             OrderNumber = string.IsNullOrWhiteSpace(OrderNumberTextBox.Text) ? null : OrderNumberTextBox.Text;
             ProductNumber = string.IsNullOrWhiteSpace(ProductNumberTextBox.Text) ? null : ProductNumberTextBox.Text;
             OLesNumber = string.IsNullOrWhiteSpace(OLesNumberTextBox.Text) ? null : OLesNumberTextBox.Text;
-            Person = string.IsNullOrWhiteSpace(PersonTextBox.Text) ? null : PersonTextBox.Text;
+
+            // 担当者をコンボボックスから取得
+            if (PersonComboBox.SelectedValue != null) {
+                var selectedPerson = (ProductDatabase.Models.PersonDef)PersonComboBox.SelectedItem;
+                Person = selectedPerson.PersonName;
+            } else {
+                Person = null;
+            }
+
             Comment = string.IsNullOrWhiteSpace(CommentTextBox.Text) ? null : CommentTextBox.Text;
 
             this.DialogResult = DialogResult.OK;

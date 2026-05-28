@@ -35,7 +35,7 @@ namespace ProductDatabase.History {
             this.OLesNumberLabel = new Label();
             this.OLesNumberTextBox = new TextBox();
             this.PersonLabel = new Label();
-            this.PersonTextBox = new TextBox();
+            this.PersonComboBox = new ComboBox();
             this.CommentLabel = new Label();
             this.CommentTextBox = new TextBox();
             this.SaveButton = new Button();
@@ -202,7 +202,7 @@ namespace ProductDatabase.History {
             this.EditGroupBox.Controls.Add(this.OLesNumberLabel);
             this.EditGroupBox.Controls.Add(this.OLesNumberTextBox);
             this.EditGroupBox.Controls.Add(this.PersonLabel);
-            this.EditGroupBox.Controls.Add(this.PersonTextBox);
+            this.EditGroupBox.Controls.Add(this.PersonComboBox);
             this.EditGroupBox.Controls.Add(this.CommentLabel);
             this.EditGroupBox.Controls.Add(this.CommentTextBox);
             this.EditGroupBox.Location = new Point(12, 214);
@@ -272,13 +272,13 @@ namespace ProductDatabase.History {
             this.PersonLabel.TabIndex = 6;
             this.PersonLabel.Text = "担当者:";
             //
-            // PersonTextBox
+            // PersonComboBox
             //
-            this.PersonTextBox.Location = new Point(130, 112);
-            this.PersonTextBox.MaxLength = 50;
-            this.PersonTextBox.Name = "PersonTextBox";
-            this.PersonTextBox.Size = new Size(150, 23);
-            this.PersonTextBox.TabIndex = 3;
+            this.PersonComboBox.Location = new Point(130, 112);
+            this.PersonComboBox.Name = "PersonComboBox";
+            this.PersonComboBox.Size = new Size(150, 23);
+            this.PersonComboBox.TabIndex = 3;
+            this.PersonComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             //
             // CommentLabel
             //
@@ -371,7 +371,7 @@ namespace ProductDatabase.History {
         private Label OLesNumberLabel;
         private TextBox OLesNumberTextBox;
         private Label PersonLabel;
-        private TextBox PersonTextBox;
+        private ComboBox PersonComboBox;
         private Label CommentLabel;
         private TextBox CommentTextBox;
 
