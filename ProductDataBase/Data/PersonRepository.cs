@@ -1,5 +1,4 @@
 using Dapper;
-using Microsoft.Data.Sqlite;
 using ProductDatabase.Common;
 using ProductDatabase.Models;
 
@@ -9,8 +8,7 @@ namespace ProductDatabase.Data {
         // 有効な担当者一覧を "XX.名前" 形式で返す（IDは2桁ゼロパディング）
         public static List<string> GetActivePersonDisplayList() {
             try {
-                using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-                con.Open();
+                using var con = DbConnectionHelper.CreateAndOpenConnection();
                 return con.Query<PersonDef>(
                     "SELECT PersonID, PersonName FROM M_Person WHERE IsActive = 1 ORDER BY PersonID")
                     .Select(p => $"{p.PersonID:D2}.{p.PersonName}")
@@ -24,8 +22,7 @@ namespace ProductDatabase.Data {
         // 全担当者を返す（管理画面用）
         public static List<PersonDef> GetAll() {
             try {
-                using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-                con.Open();
+                using var con = DbConnectionHelper.CreateAndOpenConnection();
                 return con.Query<PersonDef>(
                     "SELECT * FROM M_Person ORDER BY PersonID")
                     .ToList();
@@ -38,8 +35,7 @@ namespace ProductDatabase.Data {
         // 有効な担当者一覧を返す（ComboBox用）
         public static List<PersonDef> GetActivePersons() {
             try {
-                using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-                con.Open();
+                using var con = DbConnectionHelper.CreateAndOpenConnection();
                 return con.Query<PersonDef>(
                     "SELECT * FROM M_Person WHERE IsActive = 1 ORDER BY PersonID")
                     .ToList();
@@ -51,8 +47,7 @@ namespace ProductDatabase.Data {
 
         public static void Insert(PersonDef personInfo) {
             try {
-                using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-                con.Open();
+                using var con = DbConnectionHelper.CreateAndOpenConnection();
                 con.Execute(
                     "INSERT INTO M_Person (PersonName, IsActive) VALUES (@PersonName, @IsActive)",
                     new { personInfo.PersonName, IsActive = personInfo.IsActive });
@@ -64,8 +59,7 @@ namespace ProductDatabase.Data {
 
         public static void Update(PersonDef personInfo) {
             try {
-                using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-                con.Open();
+                using var con = DbConnectionHelper.CreateAndOpenConnection();
                 con.Execute(
                     "UPDATE M_Person SET PersonName=@PersonName, IsActive=@IsActive WHERE PersonID=@PersonID",
                     new { personInfo.PersonName, IsActive = personInfo.IsActive, personInfo.PersonID });
@@ -79,8 +73,7 @@ namespace ProductDatabase.Data {
         public static bool ExistsName(string name, long excludeId = 0) {
             if (string.IsNullOrWhiteSpace(name)) { return false; }
             try {
-                using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-                con.Open();
+                using var con = DbConnectionHelper.CreateAndOpenConnection();
                 return con.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM M_Person WHERE PersonName=@Name AND PersonID != @ExcludeId",
                     new { Name = name.Trim(), ExcludeId = excludeId }) > 0;

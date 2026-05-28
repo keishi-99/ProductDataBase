@@ -11,12 +11,9 @@ namespace ProductDatabase.Data {
         public DataTable SubstrateDataTable { get; } = new();
         public DataTable ProductUseSubstrate { get; } = new();
 
-        // DBファイルのパスを検証しSQLite接続文字列を返す
+        // DBファイルのパスを検証しSQLite接続文字列を返す（DbConnectionHelper に委譲）
         public static string GetConnectionRegistration() {
-            var productRegistryPath = Path.Combine(AppContext.BaseDirectory, "db", "ProductRegistry.db");
-            return !File.Exists(productRegistryPath)
-                ? throw new FileNotFoundException("ファイルが見つかりません。", productRegistryPath)
-                : new SqliteConnectionStringBuilder() { DataSource = productRegistryPath, Pooling = true }.ToString();
+            return DbConnectionHelper.GetConnectionString();
         }
 
         // 製品・基板・使用基板の全マスターデータをDBから読み込む
