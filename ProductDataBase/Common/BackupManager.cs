@@ -31,38 +31,47 @@ namespace ProductDatabase.Common {
                     }
                 }
             } catch (Exception ex) {
-                MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Logger.AppendErrorLog(nameof(CreateBackup), ex, "バックアップ作成時にエラーが発生しました");
+                MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         // 当日分のバックアップが未作成の場合のみDBをバックアップフォルダにコピーする
         public static void CreateDailyBackup() {
-            // フォルダ未設定
-            if (string.IsNullOrWhiteSpace(FileUtils.BackupPath)) {
-                MessageBox.Show("フォルダが設定されていません。バックアップは保存されません。",
-                    string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+            try {
+                lock (_lockObject) {
+                    // フォルダ未設定
+                    if (string.IsNullOrWhiteSpace(FileUtils.BackupPath)) {
+                        Logger.AppendErrorLog(nameof(CreateDailyBackup), new InvalidOperationException("バックアップフォルダが設定されていません"), "設定確認が必要");
+                        MessageBox.Show("フォルダが設定されていません。バックアップは保存されません。",
+                            string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
 
-            // ネットワークフォルダが見つからない
-            if (!Directory.Exists(FileUtils.BackupPath)) {
-                MessageBox.Show($"'{FileUtils.BackupPath}'\nが見つかりません。バックアップは保存されません。",
-                    string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+                    // ネットワークフォルダが見つからない
+                    if (!Directory.Exists(FileUtils.BackupPath)) {
+                        Logger.AppendErrorLog(nameof(CreateDailyBackup), new DirectoryNotFoundException($"バックアップフォルダが見つかりません: {FileUtils.BackupPath}"), null);
+                        MessageBox.Show($"'{FileUtils.BackupPath}'\nが見つかりません。バックアップは保存されません。",
+                            string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
 
-            var today = DateTime.Today;
-            var year = today.Year;
-            var month = today.Month;
-            var day = today.Day;
+                    var today = DateTime.Today;
+                    var year = today.Year;
+                    var month = today.Month;
+                    var day = today.Day;
 
-            var backupFolder = Path.Combine(FileUtils.BackupPath, "db", "backup", $"{year}", $"{month:00}");
-            var backupFile = Path.Combine(backupFolder, $"_bak_{year}-{month:00}-{day:00}.db");
-            var productRegistryFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db", "ProductRegistry.db");
+                    var backupFolder = Path.Combine(FileUtils.BackupPath, "db", "backup", $"{year}", $"{month:00}");
+                    var backupFile = Path.Combine(backupFolder, $"_bak_{year}-{month:00}-{day:00}.db");
+                    var productRegistryFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db", "ProductRegistry.db");
 
-            if (!File.Exists(backupFile)) {
-                Directory.CreateDirectory(backupFolder);
-                File.Copy(productRegistryFile, backupFile, overwrite: false);
+                    if (!File.Exists(backupFile)) {
+                        Directory.CreateDirectory(backupFolder);
+                        File.Copy(productRegistryFile, backupFile, overwrite: false);
+                    }
+                }
+            } catch (Exception ex) {
+                Logger.AppendErrorLog(nameof(CreateDailyBackup), ex, "日次バックアップの作成に失敗しました");
             }
         }
 
@@ -81,7 +90,7 @@ namespace ProductDatabase.Common {
                     backupFiles.RemoveAt(0);
                 }
             } catch (Exception ex) {
-                MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Logger.AppendErrorLog(nameof(ManageBackupFiles), ex, $"古いバックアップファイルの削除に失敗しました");
             }
         }
     }

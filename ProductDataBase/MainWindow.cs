@@ -60,31 +60,51 @@ namespace ProductDatabase {
                 CategoryListBox2.Items.Clear();
                 CategoryListBox3.Items.Clear();
 
-                // 設定ファイル読み込み
-                var generalSettings = SettingsLoader.Load(_jsonFilePath);
+                // 初期化の実行
+                var initializer = new ApplicationInitializer(_jsonFilePath);
 
-                // バックアップパス取得
-                FileUtils.BackupPath = generalSettings.BackupFolderPath;
+                // 設定ファイル読み込み
+                GeneralSettings generalSettings;
+                try {
+                    generalSettings = initializer.LoadSettings();
+                } catch (Exception ex) {
+                    MessageBox.Show($"設定ファイルの読み込みに失敗しました:\n{ex.Message}", "致命的エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
+                    return;
+                }
 
                 // バックアップ作成
-                BackupManager.CreateDailyBackup();
+                initializer.CreateDailyBackup(generalSettings.BackupFolderPath);
 
-                // 担当者取得
-                _appSettings.PersonList = [.. generalSettings.Persons];
+                // アプリ設定
+                try {
+                    var appSettings = initializer.ConfigureAppSettings(generalSettings);
+                    _appSettings.PersonList = appSettings.PersonList;
+                    _appSettings.IsAuthorizedUser = appSettings.IsAuthorizedUser;
+                    _appSettings.IsAdministrator = appSettings.IsAdministrator;
+                } catch (Exception ex) {
+                    MessageBox.Show($"アプリケーション設定に失敗しました:\n{ex.Message}", "致命的エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
+                    return;
+                }
 
-                // 認証ユーザー名を取得
-                _appSettings.IsAuthorizedUser = generalSettings.AuthorizedUsers
-                    .Contains(Environment.UserName, StringComparer.OrdinalIgnoreCase);
+                // バーコード・QRサービス
+                try {
+                    _barcodeService = initializer.CreateBarcodeService(generalSettings);
+                } catch (Exception ex) {
+                    MessageBox.Show($"バーコード・QRサービスの初期化に失敗しました:\n{ex.Message}", "致命的エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
+                    return;
+                }
 
-                // 管理者ユーザー名を取得
-                _appSettings.IsAdministrator = generalSettings.Administrators
-                    .Contains(Environment.UserName, StringComparer.OrdinalIgnoreCase);
-
-                _barcodeService = new BarcodeService(generalSettings.DSN, generalSettings.UID, generalSettings.PWD);
-
-                ProductRepository.MigrateSerialProductId();
-                ProductRepository.MigrateExclusiveGroup();
-                _productRepository.LoadAll();
+                // DB読み込み
+                try {
+                    initializer.LoadDatabase(_productRepository);
+                } catch (Exception ex) {
+                    MessageBox.Show($"データベースの読み込みに失敗しました:\n{ex.Message}", "致命的エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
+                    return;
+                }
 
                 this.Activate();
                 QRCodePanel.Enabled = _appSettings.IsAuthorizedUser;
@@ -94,7 +114,8 @@ namespace ProductDatabase {
                 MasterManagementToolStripMenuItem.Enabled = true;
                 QRCodeTextBox.Select();
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Logger.AppendErrorLog(nameof(LoadEvents), ex, "予期しないエラーが発生しました");
+                MessageBox.Show($"予期しないエラーが発生しました:\n{ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         // 各マスター・作業データをリセットしDBを再読み込みする
@@ -114,8 +135,8 @@ namespace ProductDatabase {
             try {
                 string exePath = Application.ExecutablePath;
                 _lockStream = new FileStream(exePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            } catch {
-                // 失敗しても無視
+            } catch (Exception ex) {
+                Logger.AppendErrorLog(nameof(LockSelf), ex, "ファイルロック失敗。二重起動検出が機能しない可能性があります");
             }
         }
         // ラジオボタンのモードに応じて選択品目の基板登録・製品登録・再印刷・基板変更ウィンドウを開く
