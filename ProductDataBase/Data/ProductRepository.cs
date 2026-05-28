@@ -25,7 +25,7 @@ namespace ProductDatabase.Data {
             lock (_loadLock) {
                 // キャッシュが有効な場合はキャッシュからデータを復元して終了
                 var cached = _cacheManager.GetCachedData();
-                if (cached != null) {
+                if (cached is not null) {
                     RestoreFromCache(cached);
                     return;
                 }
