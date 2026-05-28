@@ -18,6 +18,9 @@ namespace ProductDatabase.Data {
 
         // 接続を開きトランザクションを開始する
         public void Begin() {
+            if (_connection != null) {
+                throw new InvalidOperationException("すでにトランザクションが開始されています。");
+            }
             _connection = DbConnectionHelper.CreateAndOpenConnection();
             _transaction = _connection.BeginTransaction();
             _committed = false;

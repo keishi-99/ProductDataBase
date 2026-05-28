@@ -274,7 +274,7 @@ namespace ProductDatabase.Data {
                 ;
                 """;
 
-            var result = con.ExecuteReader(sql, new { ProductID = productId });
+            using var result = con.ExecuteReader(sql, new { ProductID = productId });
             var table = new DataTable();
             table.Load(result);
             return table;
