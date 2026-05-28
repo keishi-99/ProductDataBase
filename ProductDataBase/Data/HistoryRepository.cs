@@ -103,10 +103,10 @@ namespace ProductDatabase.Data {
 
         // 製品登録履歴を取得する
         public static DataTable QueryProductHistory(ProductMaster productMaster, bool allProducts) {
-            var productCategoryFilter = !string.IsNullOrEmpty(productMaster.CategoryName) ? " AND CategoryName = @CategoryName" : string.Empty;
-            var productNameFilter = !string.IsNullOrEmpty(productMaster.ProductName) ? " AND ProductName = @ProductName" : string.Empty;
+            var productCategoryFilter = !string.IsNullOrEmpty(productMaster.CategoryName) ? " AND v.CategoryName = @CategoryName" : string.Empty;
+            var productNameFilter = !string.IsNullOrEmpty(productMaster.ProductName) ? " AND v.ProductName = @ProductName" : string.Empty;
             var productId = !allProducts ? productMaster.ProductID : 0;
-            var productIdFilter = (productId != 0) ? " AND ProductID = @ProductID" : string.Empty;
+            var productIdFilter = (productId != 0) ? " AND v.ProductID = @ProductID" : string.Empty;
 
             var query = $"""
                 SELECT
