@@ -36,11 +36,22 @@ namespace ProductDatabase.History {
             var displayPersons = allPersons.Where(p => p.IsActive != 0).ToList();
             var currentPersonInfo = GetCellText("PersonInfo");
 
-            // 現在の担当者が無効（IsActive == 0）である場合、一時的に追加
+            // 現在の担当者が無効（IsActive == 0）またはマスタに存在しない場合、一時的に追加
             if (!string.IsNullOrEmpty(currentPersonInfo)) {
                 var matchingPerson = allPersons.FirstOrDefault(p => p.PersonName == currentPersonInfo);
-                if (matchingPerson != null && matchingPerson.IsActive == 0) {
-                    displayPersons.Add(matchingPerson);
+                if (matchingPerson != null) {
+                    // 無効な担当者を追加
+                    if (matchingPerson.IsActive == 0) {
+                        displayPersons.Add(matchingPerson);
+                    }
+                }
+                else {
+                    // マスタに存在しない担当者用のダミーを追加
+                    displayPersons.Add(new ProductDatabase.Models.PersonDef {
+                        PersonID = -1,
+                        PersonName = currentPersonInfo,
+                        IsActive = 0
+                    });
                 }
             }
 
@@ -55,7 +66,8 @@ namespace ProductDatabase.History {
                     PersonComboBox.SelectedValue = matchingPerson.PersonID;
                 }
                 else {
-                    PersonComboBox.SelectedIndex = -1;
+                    // マスタに存在しない場合、ダミーの PersonID -1 を選択
+                    PersonComboBox.SelectedValue = (long)-1;
                 }
             }
             else {

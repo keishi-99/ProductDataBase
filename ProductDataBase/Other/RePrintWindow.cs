@@ -73,8 +73,13 @@ namespace ProductDatabase {
                     }
                 }
 
-                // ComboBoxへ担当者を追加
-                PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
+                // 担当者をコンボボックスにバインド
+                var persons = ProductDatabase.Data.PersonRepository.GetAll()
+                    .Where(p => p.IsActive != 0)
+                    .ToList();
+                PersonComboBox.DataSource = persons;
+                PersonComboBox.DisplayMember = "DisplayName";
+                PersonComboBox.ValueMember = "PersonID";
 
                 // DBから最新リビジョンを取得
                 using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
@@ -122,7 +127,12 @@ namespace ProductDatabase {
                 result = MessageBox.Show("同一のシリアルラベルが複数存在しないようにして下さい。", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) { return; }
 
-                _productRegisterWork.PersonName = PersonComboBox.Text;
+                if (PersonCheckBox.Checked && PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
+                    _productRegisterWork.PersonName = selectedPerson.PersonName;
+                }
+                else {
+                    _productRegisterWork.PersonName = string.Empty;
+                }
                 if (!Registration()) { throw new Exception("登録できませんでした。"); }
             }
 
@@ -209,7 +219,12 @@ namespace ProductDatabase {
             _productRegisterWork.OrderNumber = OrderNumberCheckBox.Checked ? OrderNumberTextBox.Text : string.Empty;
             _productRegisterWork.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
             _productRegisterWork.Quantity = quantity;
-            _productRegisterWork.PersonName = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
+            if (PersonCheckBox.Checked && PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
+                _productRegisterWork.PersonName = selectedPerson.PersonName;
+            }
+            else {
+                _productRegisterWork.PersonName = string.Empty;
+            }
             _productRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
             _productRegisterWork.Revision = RevisionCheckBox.Checked ? RevisionTextBox.Text : string.Empty;
             _productRegisterWork.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;

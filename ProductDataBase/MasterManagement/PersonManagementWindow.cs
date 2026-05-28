@@ -45,9 +45,9 @@ namespace ProductDatabase.MasterManagement {
             }
 
             var selectedRow = PersonDataGridView.SelectedRows[0];
-            var personId = (long)selectedRow.Cells["IdColumn"].Value;
+            var personId = selectedRow.Cells["IdColumn"].Value is long id ? id : 0;
             var personName = selectedRow.Cells["NameColumn"].Value?.ToString() ?? string.Empty;
-            var isActive = (bool)selectedRow.Cells["IsActiveColumn"].Value ? 1 : 0;
+            var isActive = (selectedRow.Cells["IsActiveColumn"].Value is bool active && active) ? 1 : 0;
 
             var personInfo = new PersonDef {
                 PersonID = personId,

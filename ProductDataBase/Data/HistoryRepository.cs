@@ -120,6 +120,7 @@ namespace ProductDatabase.Data {
                     Revision,
                     RevisionGroup,
                     SerialLastNumber,
+                    PersonID,
                     PersonInfo,
                     RegDate,
                     Comment,
