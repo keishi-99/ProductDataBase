@@ -40,13 +40,13 @@ namespace ProductDatabase.History {
             if (!string.IsNullOrEmpty(currentPersonInfo)) {
                 var matchingPerson = allPersons.FirstOrDefault(p => p.PersonName == currentPersonInfo);
                 if (matchingPerson != null) {
-                    // 無効な担当者を追加
-                    if (matchingPerson.IsActive == 0) {
+                    // 削除済みだが過去のデータに使用されている担当者を追加（重複チェック）
+                    if (matchingPerson.IsActive == 0 && !displayPersons.Any(p => p.PersonID == matchingPerson.PersonID)) {
                         displayPersons.Add(matchingPerson);
                     }
                 }
-                else {
-                    // マスタに存在しない担当者用のダミーを追加
+                else if (!displayPersons.Any(p => p.PersonName.Contains(currentPersonInfo))) {
+                    // マスタに存在しない担当者用のダミーを追加（有効なリストに同じ名前がない場合のみ）
                     displayPersons.Add(new ProductDatabase.Models.PersonDef {
                         PersonID = -1,
                         PersonName = $"(不明) {currentPersonInfo}",
