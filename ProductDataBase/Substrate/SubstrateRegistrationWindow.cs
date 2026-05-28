@@ -80,7 +80,12 @@ namespace ProductDatabase {
                 }
 
                 // ComboBoxへ担当者を追加
-                PersonComboBox.Items.AddRange([.. _appSettings.PersonList]);
+                var persons = ProductDatabase.Data.PersonRepository.GetAll()
+                    .Where(p => p.IsActive != 0)
+                    .ToList();
+                PersonComboBox.DataSource = persons;
+                PersonComboBox.DisplayMember = "DisplayName";
+                PersonComboBox.ValueMember = "PersonID";
 
                 // 印刷しない場合は関連コントロール非表示に
                 if (!_substrateMaster.IsLabelPrint) {
@@ -190,7 +195,7 @@ namespace ProductDatabase {
                     _substrateRegisterWork.OrderNumber,
                     QuantityCheckBox.Checked ? quantity : (int?)null,
                     DefectQuantityCheckBox.Checked ? defectQuantity : (int?)null,
-                    _substrateRegisterWork.Person,
+                    _substrateRegisterWork.PersonID,
                     _substrateRegisterWork.RegDate,
                     _substrateRegisterWork.Comment);
 
@@ -240,7 +245,16 @@ namespace ProductDatabase {
             _substrateRegisterWork.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
             _substrateRegisterWork.AddQuantity = quantity;
             _substrateRegisterWork.DefectQuantity = defectQuantity;
-            _substrateRegisterWork.Person = PersonCheckBox.Checked ? PersonComboBox.Text : string.Empty;
+
+            if (PersonCheckBox.Checked && PersonComboBox.SelectedValue != null) {
+                _substrateRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
+                var selectedPerson = (ProductDatabase.Models.PersonDef)PersonComboBox.SelectedItem;
+                _substrateRegisterWork.PersonName = selectedPerson.PersonName;
+            } else {
+                _substrateRegisterWork.PersonID = null;
+                _substrateRegisterWork.PersonName = string.Empty;
+            }
+
             _substrateRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
             _substrateRegisterWork.Comment = CommentCheckBox.Checked ? CommentTextBox.Text : string.Empty;
 
