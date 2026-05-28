@@ -34,31 +34,16 @@ namespace ProductDatabase.History {
             // 担当者をコンボボックスにバインド
             var allPersons = ProductDatabase.Data.PersonRepository.GetAll();
             var displayPersons = allPersons.Where(p => p.IsActive != 0).ToList();
-            var currentPersonInfo = GetCellText("PersonInfo");
 
-            // PersonInfo は "09.徳留" 形式なので、"徳留" だけを抽出
-            var personNameOnly = currentPersonInfo;
-            var dotIndex = currentPersonInfo.IndexOf('.');
-            if (dotIndex > 0 && dotIndex < currentPersonInfo.Length - 1) {
-                personNameOnly = currentPersonInfo.Substring(dotIndex + 1);
-            }
+            // レコードから PersonID を取得
+            var currentPersonIdText = GetCellText("PersonID");
+            var currentPersonId = long.TryParse(currentPersonIdText, out var pid) ? pid : (long?)null;
 
-            // 現在の担当者が無効（IsActive == 0）またはマスタに存在しない場合、一時的に追加
-            if (!string.IsNullOrEmpty(personNameOnly)) {
-                var matchingPerson = allPersons.FirstOrDefault(p => p.PersonName == personNameOnly);
-                if (matchingPerson != null) {
-                    // 削除済みだが過去のデータに使用されている担当者を追加（重複チェック）
-                    if (matchingPerson.IsActive == 0 && !displayPersons.Any(p => p.PersonID == matchingPerson.PersonID)) {
-                        displayPersons.Add(matchingPerson);
-                    }
-                }
-                else if (!displayPersons.Any(p => p.PersonName.Contains(personNameOnly))) {
-                    // マスタに存在しない担当者用のダミーを追加（有効なリストに同じ名前がない場合のみ）
-                    displayPersons.Add(new ProductDatabase.Models.PersonDef {
-                        PersonID = -1,
-                        PersonName = $"(不明) {personNameOnly}",
-                        IsActive = 0
-                    });
+            // 現在の担当者が無効（IsActive == 0）の場合、一時的に追加
+            if (currentPersonId.HasValue) {
+                var matchingPerson = allPersons.FirstOrDefault(p => p.PersonID == currentPersonId.Value);
+                if (matchingPerson != null && matchingPerson.IsActive == 0 && !displayPersons.Any(p => p.PersonID == matchingPerson.PersonID)) {
+                    displayPersons.Add(matchingPerson);
                 }
             }
 
@@ -67,15 +52,8 @@ namespace ProductDatabase.History {
             PersonComboBox.ValueMember = "PersonID";
 
             // 現在の担当者を選択
-            if (!string.IsNullOrEmpty(personNameOnly)) {
-                var matchingPerson = allPersons.FirstOrDefault(p => p.PersonName == personNameOnly);
-                if (matchingPerson != null) {
-                    PersonComboBox.SelectedValue = matchingPerson.PersonID;
-                }
-                else {
-                    // マスタに存在しない場合、ダミーの PersonID -1 を選択
-                    PersonComboBox.SelectedValue = (long)-1;
-                }
+            if (currentPersonId.HasValue) {
+                PersonComboBox.SelectedValue = currentPersonId.Value;
             }
             else {
                 PersonComboBox.SelectedIndex = -1;
