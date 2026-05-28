@@ -1,3 +1,4 @@
+using Microsoft.Data.Sqlite;
 
 namespace ProductDatabase.Data {
     // SQLite接続とトランザクションのライフサイクルを管理するクラス

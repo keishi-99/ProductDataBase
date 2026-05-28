@@ -1,4 +1,5 @@
 using Dapper;
+using Microsoft.Data.Sqlite;
 using ProductDatabase.Common;
 using ProductDatabase.Models;
 using System.Data;
