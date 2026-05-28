@@ -67,8 +67,6 @@ namespace ProductDatabase.MasterManagement {
             this.IsActiveColumn.HeaderText = "有効";
             this.IsActiveColumn.Name = "IsActiveColumn";
             this.IsActiveColumn.ReadOnly = true;
-            this.IsActiveColumn.Resizable = DataGridViewTristate.True;
-            this.IsActiveColumn.SortMode = DataGridViewColumnSortMode.Automatic;
             this.IsActiveColumn.Width = 60;
             //
             // ButtonPanel
