@@ -31,7 +31,43 @@ namespace ProductDatabase.Common {
                     }
                 }
             } catch (Exception ex) {
-                MessageBox.Show($"ログの書き込み中にエラーが発生しました: {ex.Message}", $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                System.Diagnostics.Debug.WriteLine($"ログの書き込み中にエラーが発生しました: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// エラーログを記録します。
+        /// </summary>
+        /// <param name="methodName">メソッド名</param>
+        /// <param name="exception">例外</param>
+        /// <param name="additionalInfo">追加情報（任意）</param>
+        public static void AppendErrorLog(string methodName, Exception exception, string? additionalInfo = null) {
+            try {
+                lock (_lockObject) {
+                    if (!Directory.Exists(_logDirectory)) {
+                        Directory.CreateDirectory(_logDirectory);
+                    }
+
+                    var errorFileName = $"error_{DateTime.Now:yyyyMM}.csv";
+                    var errorFilePath = Path.Combine(_logDirectory, errorFileName);
+
+                    var errorMessage = exception.InnerException?.Message ?? exception.Message;
+                    var stackTrace = exception.StackTrace?.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ") ?? "";
+                    var info = additionalInfo?.Replace("\"", "\"\"").Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ") ?? "";
+
+                    var logEntry = $"\"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\",\"{methodName}\",\"{exception.GetType().Name}\",\"{errorMessage.Replace("\"", "\"\"")}\",\"{stackTrace}\",\"{info}\"";
+
+                    File.AppendAllText(errorFilePath, logEntry + Environment.NewLine);
+
+                    if (!string.IsNullOrEmpty(FileUtils.BackupPath)) {
+                        var cloneFilePath = Path.Combine(FileUtils.BackupPath, "db", "logs", errorFileName);
+                        if (cloneFilePath != errorFilePath) {
+                            FileUtils.CopyWithRetry(errorFilePath, cloneFilePath, true);
+                        }
+                    }
+                }
+            } catch {
+                System.Diagnostics.Debug.WriteLine("エラーログの書き込み中に予期しないエラーが発生しました。");
             }
         }
     }
