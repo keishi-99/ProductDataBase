@@ -135,7 +135,7 @@ namespace ProductDatabase.Services {
                 $"減少数[{GetValue(row, "Defect", DataRowVersion.Original)}]",
                 $"[]",
                 $"登録日[{GetValue(row, "RegDate", DataRowVersion.Original)}]",
-                $"担当者[{GetValue(row, "Person", DataRowVersion.Original)}]",
+                $"担当者[{GetValue(row, "PersonInfo", DataRowVersion.Original)}]",
                 $"コメント[{GetValue(row, "Comment", DataRowVersion.Original)}]"
             ]);
 
@@ -154,7 +154,7 @@ namespace ProductDatabase.Services {
                 $"減少数[{GetValue(row, "Defect")}]",
                 $"[]",
                 $"登録日[{GetValue(row, "RegDate")}]",
-                $"担当者[{GetValue(row, "Person")}]",
+                $"担当者[{GetValue(row, "PersonInfo")}]",
                 $"コメント[{GetValue(row, "Comment")}]"
             ]);
         }
@@ -176,7 +176,7 @@ namespace ProductDatabase.Services {
                 $"減少数[{GetValue(row, "Defect")}]",
                 $"[]",
                 $"登録日[{GetValue(row, "RegDate")}]",
-                $"担当者[{GetValue(row, "Person")}]",
+                $"担当者[{GetValue(row, "PersonInfo")}]",
                 $"コメント[{GetValue(row, "Comment")}]"
             ]);
         }
@@ -198,7 +198,7 @@ namespace ProductDatabase.Services {
                 $"シリアル末尾[{row["SerialLast", DataRowVersion.Original]}]",
                 $"Revision[{row["Revision", DataRowVersion.Original]}]",
                 $"登録日[{row["RegDate", DataRowVersion.Original]}]",
-                $"担当者[{row["Person", DataRowVersion.Original]}]",
+                $"担当者[{row["PersonInfo", DataRowVersion.Original]}]",
                 $"コメント[{row["Comment", DataRowVersion.Original]}]"
             ]);
 
@@ -217,7 +217,7 @@ namespace ProductDatabase.Services {
                 $"シリアル末尾[{GetValue(row, "SerialLast")}]",
                 $"Revision[{GetValue(row, "Revision")}]",
                 $"登録日[{GetValue(row, "RegDate")}]",
-                $"担当者[{GetValue(row, "Person")}]",
+                $"担当者[{GetValue(row, "PersonInfo")}]",
                 $"コメント[{GetValue(row, "Comment")}]"
             ]);
         }
@@ -239,7 +239,7 @@ namespace ProductDatabase.Services {
                 $"シリアル末尾[{GetValue(row, "SerialLast")}]",
                 $"Revision[{GetValue(row, "Revision")}]",
                 $"登録日[{GetValue(row, "RegDate")}]",
-                $"担当者[{GetValue(row, "Person")}]",
+                $"担当者[{GetValue(row, "PersonInfo")}]",
                 $"コメント[{GetValue(row, "Comment")}]"
             ]);
         }
@@ -261,7 +261,7 @@ namespace ProductDatabase.Services {
                     $"使用数[{item.Decrease}]",
                     $"減少数[{item.Defect}]",
                     $"登録日[{item.RegDate}]",
-                    $"担当者[{item.Person}]",
+                    $"担当者[{item.PersonInfo}]",
                     $"コメント[{item.Comment}]",
                     $"UseID[{item.UseID}]",
                 ]);

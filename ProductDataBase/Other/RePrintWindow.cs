@@ -397,7 +397,7 @@ namespace ProductDatabase {
                     {"Revision", $"{_productRegisterWork.Revision}"},
                     {"RegType", $"{_productMaster.RegType}"},
                     {"RegDate", $"{_productRegisterWork.RegDate}"},
-                    {"Person", $"{_productRegisterWork.PersonName}"},
+                    {"PersonInfo", $"{_productRegisterWork.PersonName}"},
                     {"Quantity", $"{_productRegisterWork.Quantity}"},
                     {"SerialFirstNumber", $"{_productRegisterWork.SerialFirstNumber}"},
                     {"SerialLastNumber", $"{_productRegisterWork.SerialLastNumber}"},

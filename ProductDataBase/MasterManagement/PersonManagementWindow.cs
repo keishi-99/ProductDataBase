@@ -25,8 +25,7 @@ namespace ProductDatabase.MasterManagement {
                 if (PersonDataGridView.Rows.Count > 0) {
                     PersonDataGridView.Rows[0].Selected = true;
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "読み込みエラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -50,13 +49,13 @@ namespace ProductDatabase.MasterManagement {
             var personName = selectedRow.Cells["NameColumn"].Value.ToString() ?? string.Empty;
             var isActive = (bool)selectedRow.Cells["IsActiveColumn"].Value ? 1 : 0;
 
-            var person = new PersonDef {
+            var personInfo = new PersonDef {
                 PersonID = personId,
                 PersonName = personName,
                 IsActive = isActive
             };
 
-            using (var dialog = new PersonMasterEditDialog(person)) {
+            using (var dialog = new PersonMasterEditDialog(personInfo)) {
                 if (dialog.ShowDialog(this) == DialogResult.OK) {
                     LoadPersonList();
                 }

@@ -5,7 +5,7 @@ namespace ProductDatabase.History {
         public string? OrderNumber { get; private set; }
         public string? ProductNumber { get; private set; }
         public string? OLesNumber { get; private set; }
-        public string? Person { get; private set; }
+        public string? PersonInfo { get; private set; }
         public string? Comment { get; private set; }
 
         private readonly DataGridViewRow _sourceRow;
@@ -45,7 +45,8 @@ namespace ProductDatabase.History {
                 if (matchingPerson != null) {
                     PersonComboBox.SelectedValue = matchingPerson.PersonID;
                 }
-            } else {
+            }
+            else {
                 PersonComboBox.SelectedIndex = -1;
             }
 
@@ -71,9 +72,10 @@ namespace ProductDatabase.History {
 
             // 担当者をコンボボックスから取得
             if (PersonComboBox.SelectedValue != null && PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson) {
-                Person = selectedPerson.PersonName;
-            } else {
-                Person = null;
+                PersonInfo = selectedPerson.PersonName;
+            }
+            else {
+                PersonInfo = null;
             }
 
             Comment = string.IsNullOrWhiteSpace(CommentTextBox.Text) ? null : CommentTextBox.Text;

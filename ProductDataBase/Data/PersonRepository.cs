@@ -24,20 +24,20 @@ namespace ProductDatabase.Data {
                 .ToList();
         }
 
-        public static void Insert(PersonDef person) {
+        public static void Insert(PersonDef personInfo) {
             using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
             con.Open();
             con.Execute(
                 "INSERT INTO M_Person (PersonName, IsActive) VALUES (@PersonName, @IsActive)",
-                new { person.PersonName, IsActive = person.IsActive });
+                new { personInfo.PersonName, IsActive = personInfo.IsActive });
         }
 
-        public static void Update(PersonDef person) {
+        public static void Update(PersonDef personInfo) {
             using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
             con.Open();
             con.Execute(
                 "UPDATE M_Person SET PersonName=@PersonName, IsActive=@IsActive WHERE PersonID=@PersonID",
-                new { person.PersonName, IsActive = person.IsActive, person.PersonID });
+                new { personInfo.PersonName, IsActive = personInfo.IsActive, personInfo.PersonID });
         }
 
         // 同一名前が既存レコードに存在するか確認する（excludeId は編集時に自身を除外するために使用）

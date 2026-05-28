@@ -201,7 +201,7 @@ namespace ProductDatabase.Data {
                     ProductType,
                     ProductModel,
                     Quantity,
-                    Person,
+                    PersonInfo,
                     RegDate,
                     Revision,
                     SerialFirst,
@@ -301,7 +301,7 @@ namespace ProductDatabase.Data {
                     Decrease,
                     Defect,
                     RegDate,
-                    Person,
+                    PersonInfo,
                     Comment,
                     UseID
                 FROM {Constants.VSubstrateTableName}
@@ -334,7 +334,7 @@ namespace ProductDatabase.Data {
                     Increase        = @Increase,
                     Decrease        = @Decrease,
                     Defect          = @Defect,
-                    Person          = @Person,
+                    PersonInfo      = @PersonInfo,
                     RegDate         = @RegDate,
                     Comment         = @Comment,
                     UseId           = @UseId
@@ -347,7 +347,7 @@ namespace ProductDatabase.Data {
                 Decrease = row["Decrease"],
                 Defect = row["Defect"],
                 RegDate = row["RegDate"],
-                Person = row["Person"],
+                PersonInfo = row["PersonInfo"],
                 Comment = row["Comment"],
                 UseId = row["UseId"],
                 ID = row["ID"]
@@ -374,7 +374,7 @@ namespace ProductDatabase.Data {
                     OrderNumber   = @OrderNumber,
                     ProductNumber = @ProductNumber,
                     OLesNumber    = @OLesNumber,
-                    Person        = @Person,
+                    PersonInfo    = @PersonInfo,
                     RegDate       = @RegDate,
                     Revision      = @Revision,
                     RevisionGroup = @RevisionGroup,
@@ -386,7 +386,7 @@ namespace ProductDatabase.Data {
                 OrderNumber = row["OrderNumber"],
                 ProductNumber = row["ProductNumber"],
                 OLesNumber = row["OLesNumber"],
-                Person = row["Person"],
+                PersonInfo = row["PersonInfo"],
                 RegDate = row["RegDate"],
                 Revision = row["Revision"],
                 RevisionGroup = row["RevisionGroup"],

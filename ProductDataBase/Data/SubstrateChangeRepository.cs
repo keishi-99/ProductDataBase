@@ -103,7 +103,7 @@ namespace ProductDatabase.Data {
         // 基板テーブルの使用数を更新して更新件数を返す（0件なら INSERT が必要）
         public static int UpdateSubstrateDecrease(
             IDbConnection connection, IDbTransaction transaction,
-            int decrease, string person, string regDate, string comment,
+            int decrease, string personInfo, string regDate, string comment,
             string substrateNumber, long useId, long substrateId) {
 
             var sql =
@@ -112,7 +112,7 @@ namespace ProductDatabase.Data {
                     {Constants.TSubstrateTableName}
                 SET
                     Decrease = @Decrease,
-                    Person = @Person,
+                    PersonInfo = @PersonInfo,
                     RegDate = @RegDate,
                     Comment = @Comment
                 WHERE
@@ -124,7 +124,7 @@ namespace ProductDatabase.Data {
 
             return connection.Execute(sql, new {
                 Decrease = 0 - decrease,
-                Person = person.NullIfWhiteSpace(),
+                PersonInfo = personInfo.NullIfWhiteSpace(),
                 RegDate = regDate.NullIfWhiteSpace(),
                 Comment = comment.NullIfWhiteSpace(),
                 SubstrateNumber = substrateNumber,
@@ -136,7 +136,7 @@ namespace ProductDatabase.Data {
         // 基板テーブルに使用数レコードを新規挿入する
         public static void InsertSubstrateDecrease(
             IDbConnection connection, IDbTransaction transaction,
-            int decrease, string person, string regDate, string comment,
+            int decrease, string personInfo, string regDate, string comment,
             string substrateNumber, string orderNumber, long useId, long substrateId) {
 
             var sql =
@@ -147,7 +147,7 @@ namespace ProductDatabase.Data {
                         SubstrateNumber,
                         OrderNumber,
                         Decrease,
-                        Person,
+                        PersonInfo,
                         RegDate,
                         Comment,
                         UseID
@@ -158,7 +158,7 @@ namespace ProductDatabase.Data {
                         @SubstrateNumber,
                         @OrderNumber,
                         @Decrease,
-                        @Person,
+                        @PersonInfo,
                         @RegDate,
                         @Comment,
                         @UseID
@@ -170,7 +170,7 @@ namespace ProductDatabase.Data {
                 SubstrateNumber = substrateNumber.NullIfWhiteSpace(),
                 OrderNumber = orderNumber.NullIfWhiteSpace(),
                 Decrease = 0 - decrease,
-                Person = person.NullIfWhiteSpace(),
+                PersonInfo = personInfo.NullIfWhiteSpace(),
                 RegDate = regDate.NullIfWhiteSpace(),
                 Comment = comment.NullIfWhiteSpace(),
                 UseID = useId
@@ -214,7 +214,7 @@ namespace ProductDatabase.Data {
                     {Constants.TProductTableName}
                 SET
                     Quantity = @Quantity,
-                    Person = @Person,
+                    PersonInfo = @PersonInfo,
                     RegDate = @RegDate,
                     Revision = @Revision,
                     RevisionGroup = @RevisionGroup,
@@ -229,7 +229,7 @@ namespace ProductDatabase.Data {
 
             connection.Execute(sql, new {
                 work.Quantity,
-                Person = work.PersonName.NullIfWhiteSpace(),
+                PersonInfo = work.PersonName.NullIfWhiteSpace(),
                 RegDate = work.RegDate.NullIfWhiteSpace(),
                 Revision = work.Revision.NullIfWhiteSpace(),
                 RevisionGroup = revisionGroup,
@@ -260,7 +260,7 @@ namespace ProductDatabase.Data {
                     SerialLastNumber,
                     Revision,
                     RevisionGroup,
-                    Person,
+                    PersonInfo,
                     RegDate,
                     Comment,
                     CreatedAt
