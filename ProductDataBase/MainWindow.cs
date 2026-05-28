@@ -588,7 +588,8 @@ namespace ProductDatabase {
             try {
                 using var window = new MasterManagement.MasterManagementWindow(_productRepository, _appSettings);
                 window.ShowDialog(this);
-                // マスターデータが変更されている可能性があるためキャッシュを更新する
+                // マスターデータが変更されている可能性があるためキャッシュをクリアして再読み込みする
+                _productRepository.Clear();
                 _productRepository.LoadAll();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
