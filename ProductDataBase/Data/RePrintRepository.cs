@@ -9,7 +9,7 @@ namespace ProductDatabase.Data {
 
         // 再印刷テーブルにレコードをINSERTして生成されたROWIDを返す
         public static int InsertRePrintRecord(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            using var con = DbConnectionHelper.CreateAndOpenConnection();
 
             var sql =
                 $"""

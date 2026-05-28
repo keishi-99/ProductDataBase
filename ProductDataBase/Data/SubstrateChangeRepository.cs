@@ -10,7 +10,7 @@ namespace ProductDatabase.Data {
 
         // 基板在庫と使用済み数量を結合して返す（SubstrateChange2 LoadEvents用）
         public static IEnumerable<SubstrateStockRow> GetSubstrateStock(long rowId, long substrateId) {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            using var con = DbConnectionHelper.CreateAndOpenConnection();
 
             var sql =
                 $"""
@@ -243,7 +243,7 @@ namespace ProductDatabase.Data {
 
         // 複数台登録対象の製品履歴をDBから取得して返す（SubstrateChange1 LoadEvents用）
         public static DataTable GetProductHistory(long productId) {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            using var con = DbConnectionHelper.CreateAndOpenConnection();
 
             var sql =
                 $"""
@@ -274,7 +274,7 @@ namespace ProductDatabase.Data {
                 ;
                 """;
 
-            var result = con.ExecuteReader(sql, new { ProductID = productId });
+            using var result = con.ExecuteReader(sql, new { ProductID = productId });
             var table = new DataTable();
             table.Load(result);
             return table;

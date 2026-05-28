@@ -9,8 +9,7 @@ namespace ProductDatabase.Data {
 
         // M_ProductDefから表示対象製品を取得して既存DataTableに読み込む
         public static void LoadVisibleProducts(DataTable table) {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-            con.Open();
+            using var con = DbConnectionHelper.CreateAndOpenConnection();
 
             using var reader = con.ExecuteReader("SELECT * FROM M_ProductDef WHERE Visible = 1;");
             table.Load(reader);

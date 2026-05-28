@@ -18,8 +18,13 @@ namespace ProductDatabase.Data {
 
         // 接続を開きトランザクションを開始する
         public void Begin() {
-            _connection = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-            _connection.Open();
+            if (_disposed) {
+                throw new ObjectDisposedException(nameof(DbTransactionScope));
+            }
+            if (_connection != null) {
+                throw new InvalidOperationException("すでにトランザクションが開始されています。");
+            }
+            _connection = DbConnectionHelper.CreateAndOpenConnection();
             _transaction = _connection.BeginTransaction();
             _committed = false;
         }

@@ -9,7 +9,7 @@ namespace ProductDatabase.Data {
 
         // 基板マスターを新規登録し採番されたSubstrateIDを返す
         public static long InsertSubstrate(SubstrateMaster substrate) {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            using var con = DbConnectionHelper.CreateAndOpenConnection();
 
             var sql =
                 $"""
@@ -39,7 +39,7 @@ namespace ProductDatabase.Data {
 
         // 基板マスターを更新する
         public static void UpdateSubstrate(SubstrateMaster substrate) {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            using var con = DbConnectionHelper.CreateAndOpenConnection();
 
             var sql =
                 $"""
@@ -74,8 +74,7 @@ namespace ProductDatabase.Data {
 
         // 基板マスターを物理削除する（実績存在チェック・関連紐づけ削除を含む）
         public static void DeleteSubstrate(long substrateId) {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-            con.Open();
+            using var con = DbConnectionHelper.CreateAndOpenConnection();
             using var tx = con.BeginTransaction();
 
             var count = con.ExecuteScalar<int>(
@@ -99,7 +98,7 @@ namespace ProductDatabase.Data {
 
         // 指定SubstrateIDの基板実績が存在するか確認する
         public static bool ExistsSubstrateResult(long substrateId) {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            using var con = DbConnectionHelper.CreateAndOpenConnection();
             return con.ExecuteScalar<int>(
                 $"SELECT COUNT(*) FROM {Constants.TSubstrateTableName} WHERE SubstrateID = @SubstrateId",
                 new { SubstrateId = substrateId }) > 0;
@@ -107,13 +106,13 @@ namespace ProductDatabase.Data {
 
         // 全基板（非表示含む）の ExclusiveGroupID 最大値を取得する（新規グループID採番用）
         public static int GetMaxExclusiveGroupID() {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            using var con = DbConnectionHelper.CreateAndOpenConnection();
             return con.ExecuteScalar<int>("SELECT COALESCE(MAX(ExclusiveGroupID), 0) FROM M_SubstrateDef");
         }
 
         // 既存の排他グループ一覧を取得する（GroupID → 基板名リスト、表示中の基板のみ）
         public static Dictionary<int, List<string>> GetExclusiveGroups() {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            using var con = DbConnectionHelper.CreateAndOpenConnection();
             var rows = con.Query(
                 "SELECT ExclusiveGroupID, SubstrateName FROM M_SubstrateDef WHERE ExclusiveGroupID IS NOT NULL AND Visible = 1 ORDER BY ExclusiveGroupID, SubstrateName");
             var result = new Dictionary<int, List<string>>();
@@ -131,7 +130,7 @@ namespace ProductDatabase.Data {
 
         // SubstrateModelの重複を確認する（excludeIdは編集時に自身を除外するために使用）
         public static bool ExistsSubstrateModel(string substrateModel, long excludeId = 0) {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+            using var con = DbConnectionHelper.CreateAndOpenConnection();
             return con.ExecuteScalar<int>(
                 $"SELECT COUNT(*) FROM {Constants.SubstrateTableName} WHERE SubstrateModel = @SubstrateModel AND SubstrateID != @ExcludeId",
                 new { SubstrateModel = substrateModel, ExcludeId = excludeId }) > 0;
