@@ -34,22 +34,24 @@ namespace ProductDatabase.History {
             // 担当者をコンボボックスにバインド
             var allPersons = ProductDatabase.Data.PersonRepository.GetAll();
             var displayPersons = allPersons.Where(p => p.IsActive != 0).ToList();
-            var currentPersonInfo = GetCellText("PersonInfo");
 
-            // 現在の担当者が無効（IsActive == 0）またはマスタに存在しない場合、一時的に追加
-            if (!string.IsNullOrEmpty(currentPersonInfo)) {
-                var matchingPerson = allPersons.FirstOrDefault(p => p.PersonName == currentPersonInfo);
+            // レコードから PersonID を取得
+            var currentPersonIdText = GetCellText("PersonID");
+            var currentPersonId = long.TryParse(currentPersonIdText, out var pid) ? pid : (long?)null;
+
+            // 現在の担当者が無効（IsActive == 0）またはマスタから削除されている場合、一時的に追加
+            if (currentPersonId.HasValue) {
+                var matchingPerson = allPersons.FirstOrDefault(p => p.PersonID == currentPersonId.Value);
                 if (matchingPerson != null) {
-                    // 無効な担当者を追加
-                    if (matchingPerson.IsActive == 0) {
+                    if (matchingPerson.IsActive == 0 && !displayPersons.Any(p => p.PersonID == matchingPerson.PersonID)) {
                         displayPersons.Add(matchingPerson);
                     }
                 }
                 else {
-                    // マスタに存在しない担当者用のダミーを追加
+                    // マスタから物理削除されている場合、ダミーを追加
                     displayPersons.Add(new ProductDatabase.Models.PersonDef {
-                        PersonID = -1,
-                        PersonName = currentPersonInfo,
+                        PersonID = currentPersonId.Value,
+                        PersonName = "(不明)",
                         IsActive = 0
                     });
                 }
@@ -60,15 +62,8 @@ namespace ProductDatabase.History {
             PersonComboBox.ValueMember = "PersonID";
 
             // 現在の担当者を選択
-            if (!string.IsNullOrEmpty(currentPersonInfo)) {
-                var matchingPerson = allPersons.FirstOrDefault(p => p.PersonName == currentPersonInfo);
-                if (matchingPerson != null) {
-                    PersonComboBox.SelectedValue = matchingPerson.PersonID;
-                }
-                else {
-                    // マスタに存在しない場合、ダミーの PersonID -1 を選択
-                    PersonComboBox.SelectedValue = (long)-1;
-                }
+            if (currentPersonId.HasValue) {
+                PersonComboBox.SelectedValue = currentPersonId.Value;
             }
             else {
                 PersonComboBox.SelectedIndex = -1;
