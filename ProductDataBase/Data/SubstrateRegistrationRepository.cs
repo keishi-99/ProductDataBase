@@ -9,7 +9,8 @@ namespace ProductDatabase.Data {
 
         // 基板IDと製番に対応する既存登録を取得する（入荷重複確認用）
         public static async Task<SubstrateStockInfo?> FindPreviousRegistrationAsync(long substrateId, string substrateNumber) {
-            using var con = DbConnectionHelper.CreateAndOpenConnection();
+            using var con = new SqliteConnection(DbConnectionHelper.GetConnectionString());
+            await con.OpenAsync();
 
             var sql =
                 $"""
