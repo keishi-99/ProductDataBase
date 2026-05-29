@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace ProductDatabase.Common {
     // TTL（Time-To-Live）ベースのジェネリックキャッシング機構
     internal class CacheManager<T> {
@@ -25,16 +27,19 @@ namespace ProductDatabase.Common {
             }
         }
 
-        // キャッシュが有効な場合はデータを取得、無効な場合は null を返す（メモリ解放）
-        public T? GetCachedData() {
+        // キャッシュが有効な場合はデータを取得する（out パラメータで戻す）
+        // MaybeNullWhen(false) で「false を返す場合、cachedData が null の可能性」を示す
+        public bool TryGetCachedData([MaybeNullWhen(false)] out T cachedData) {
             lock (_lock) {
                 if (IsCacheValidInternal()) {
-                    return _cachedData;
+                    cachedData = _cachedData!;
+                    return true;
                 }
                 // キャッシュ無効時に明示的にメモリを解放
                 _cachedData = default;
                 _lastLoadTime = null;
-                return default;
+                cachedData = default;
+                return false;
             }
         }
 
