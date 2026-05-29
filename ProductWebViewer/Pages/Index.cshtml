@@ -322,19 +322,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 function onMouseMove(e) {
                     th.style.width = Math.max(40, startW + (e.pageX - startX)) + 'px';
                 }
+                // ドラッグ中にマウスが resizer 外に出た場合でも click イベント伝播を防止
+                function preventClick(evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                }
                 function onMouseUp() {
                     handle.classList.remove('resizing');
                     document.removeEventListener('mousemove', onMouseMove);
                     document.removeEventListener('mouseup', onMouseUp);
+                    // 次フレームで click リスナーを削除（ドラッグ終了直後の click を確実に捕捉）
+                    setTimeout(function () {
+                        document.removeEventListener('click', preventClick, true);
+                    }, 0);
                 }
+                // キャプチャリングフェーズで document レベルに click リスナーを登録
+                document.addEventListener('click', preventClick, true);
                 document.addEventListener('mousemove', onMouseMove);
                 document.addEventListener('mouseup', onMouseUp);
                 e.stopPropagation();
                 e.preventDefault();
-            });
-            // ドラッグ終了後の click イベント伝播を防止
-            handle.addEventListener('click', function (e) {
-                e.stopPropagation();
             });
         });
     });
