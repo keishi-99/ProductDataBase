@@ -55,10 +55,9 @@ namespace ProductDatabase.MasterManagement {
                 IsActive = isActive
             };
 
-            using (var dialog = new PersonMasterEditDialog(personInfo)) {
-                if (dialog.ShowDialog(this) == DialogResult.OK) {
-                    LoadPersonList();
-                }
+            using var dialog = new PersonMasterEditDialog(personInfo);
+            if (dialog.ShowDialog(this) == DialogResult.OK) {
+                LoadPersonList();
             }
         }
 

@@ -27,7 +27,7 @@ namespace ProductDatabase.Data {
                 if (_cacheManager.IsCacheValid()) {
                     var cached = _cacheManager.GetCachedData();
                     if (cached is not null) {
-                        RestoreFromCache(cached);
+                        RestoreFromCache(cached!);
                         return;
                     }
                 }
