@@ -329,6 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 document.addEventListener('mousemove', onMouseMove);
                 document.addEventListener('mouseup', onMouseUp);
+                e.stopPropagation();
                 e.preventDefault();
             });
         });
