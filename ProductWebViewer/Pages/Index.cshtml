@@ -332,6 +332,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 e.stopPropagation();
                 e.preventDefault();
             });
+            // ドラッグ終了後の click イベント伝播を防止
+            handle.addEventListener('click', function (e) {
+                e.stopPropagation();
+            });
         });
     });
 
