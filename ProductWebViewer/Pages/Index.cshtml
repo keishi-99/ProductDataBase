@@ -333,10 +333,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     handle.classList.remove('resizing');
                     document.removeEventListener('mousemove', onMouseMove);
                     document.removeEventListener('mouseup', onMouseUp);
-                    // 次フレームで click リスナーを削除（ドラッグ終了直後の click を確実に捕捉）
+                    // 50ms 後に click リスナーを削除（ドラッグ終了直後の click を確実に捕捉・競合状態を回避）
                     setTimeout(function () {
                         th.removeEventListener('click', preventClick, true);
-                    }, 0);
+                    }, 50);
                 }
                 // キャプチャリングフェーズで th レベルに click リスナーを登録（影響範囲を限定）
                 th.addEventListener('click', preventClick, true);
