@@ -13,17 +13,22 @@ namespace ProductDatabase.Common {
             _ttl = ttl ?? DefaultTtl;
         }
 
+        // キャッシュが有効期限内かどうかを判定する（ロックなしの内部用）
+        private bool IsCacheValidInternal() {
+            return _lastLoadTime.HasValue && DateTime.UtcNow - _lastLoadTime.Value < _ttl;
+        }
+
         // キャッシュが有効期限内かどうかを判定する
         public bool IsCacheValid() {
             lock (_lock) {
-                return _lastLoadTime.HasValue && DateTime.UtcNow - _lastLoadTime.Value < _ttl;
+                return IsCacheValidInternal();
             }
         }
 
         // キャッシュが有効な場合はデータを取得、無効な場合は null を返す（メモリ解放）
         public T? GetCachedData() {
             lock (_lock) {
-                if (IsCacheValid()) {
+                if (IsCacheValidInternal()) {
                     return _cachedData;
                 }
                 // キャッシュ無効時に明示的にメモリを解放
@@ -52,7 +57,7 @@ namespace ProductDatabase.Common {
         // デバッグ・テスト用：キャッシュ状態を取得する
         public (bool IsValid, DateTime? LastLoadTime, TimeSpan Ttl) GetCacheStatus() {
             lock (_lock) {
-                return (IsCacheValid(), _lastLoadTime, _ttl);
+                return (IsCacheValidInternal(), _lastLoadTime, _ttl);
             }
         }
     }
