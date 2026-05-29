@@ -24,10 +24,12 @@ namespace ProductDatabase.Data {
         public void LoadAll() {
             lock (_loadLock) {
                 // キャッシュが有効な場合はキャッシュからデータを復元して終了
-                var cached = _cacheManager.GetCachedData();
-                if (cached.HasValue) {
-                    RestoreFromCache(cached.Value);
-                    return;
+                if (_cacheManager.IsCacheValid()) {
+                    var cached = _cacheManager.GetCachedData();
+                    if (cached is not null) {
+                        RestoreFromCache(cached);
+                        return;
+                    }
                 }
 
                 // キャッシュが無効な場合は DB から読み込む
