@@ -11,7 +11,7 @@ namespace ProductDatabase.Data {
         public DataTable SubstrateDataTable { get; } = new();
         public DataTable ProductUseSubstrate { get; } = new();
 
-        private static readonly CacheManager<(DataTable, DataTable, DataTable)> _cacheManager
+        internal static readonly CacheManager<(DataTable, DataTable, DataTable)> _cacheManager
             = new(TimeSpan.FromMinutes(5));
         private static readonly object _loadLock = new();
 
@@ -55,15 +55,25 @@ namespace ProductDatabase.Data {
             }
         }
 
-        // キャッシュからデータを現在の DataTable に復元する
+        // キャッシュからデータを現在の DataTable に復元する（UI 制約無効化でパフォーマンス向上）
         private void RestoreFromCache((DataTable, DataTable, DataTable) cached) {
-            ProductDataTable.Clear();
-            SubstrateDataTable.Clear();
-            ProductUseSubstrate.Clear();
+            try {
+                ProductDataTable.BeginLoadData();
+                SubstrateDataTable.BeginLoadData();
+                ProductUseSubstrate.BeginLoadData();
 
-            ProductDataTable.Merge(cached.Item1);
-            SubstrateDataTable.Merge(cached.Item2);
-            ProductUseSubstrate.Merge(cached.Item3);
+                ProductDataTable.Clear();
+                SubstrateDataTable.Clear();
+                ProductUseSubstrate.Clear();
+
+                ProductDataTable.Merge(cached.Item1);
+                SubstrateDataTable.Merge(cached.Item2);
+                ProductUseSubstrate.Merge(cached.Item3);
+            } finally {
+                ProductDataTable.EndLoadData();
+                SubstrateDataTable.EndLoadData();
+                ProductUseSubstrate.EndLoadData();
+            }
         }
 
         // 基板IDに一致する行をSubstrateDataTableから取得する

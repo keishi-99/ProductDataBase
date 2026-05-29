@@ -20,12 +20,15 @@ namespace ProductDatabase.Common {
             }
         }
 
-        // キャッシュが有効な場合はデータを取得、無効な場合は null を返す
+        // キャッシュが有効な場合はデータを取得、無効な場合は null を返す（メモリ解放）
         public T? GetCachedData() {
             lock (_lock) {
                 if (IsCacheValid()) {
                     return _cachedData;
                 }
+                // キャッシュ無効時に明示的にメモリを解放
+                _cachedData = default;
+                _lastLoadTime = null;
                 return default;
             }
         }
