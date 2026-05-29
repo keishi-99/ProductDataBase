@@ -326,6 +326,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 function preventClick(evt) {
                     evt.stopPropagation();
                     evt.preventDefault();
+                    // preventClick 自身を削除（堅牢性向上：mouseup 失敗時も安全）
+                    th.removeEventListener('click', preventClick, true);
                 }
                 function onMouseUp() {
                     handle.classList.remove('resizing');
@@ -333,11 +335,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.removeEventListener('mouseup', onMouseUp);
                     // 次フレームで click リスナーを削除（ドラッグ終了直後の click を確実に捕捉）
                     setTimeout(function () {
-                        document.removeEventListener('click', preventClick, true);
+                        th.removeEventListener('click', preventClick, true);
                     }, 0);
                 }
-                // キャプチャリングフェーズで document レベルに click リスナーを登録
-                document.addEventListener('click', preventClick, true);
+                // キャプチャリングフェーズで th レベルに click リスナーを登録（影響範囲を限定）
+                th.addEventListener('click', preventClick, true);
                 document.addEventListener('mousemove', onMouseMove);
                 document.addEventListener('mouseup', onMouseUp);
                 e.stopPropagation();
