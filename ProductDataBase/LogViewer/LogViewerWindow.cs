@@ -16,6 +16,10 @@ namespace ProductDatabase.LogViewer {
             "シリアル末尾", "Revision", "登録日", "担当者", "コメント"
         ];
 
+        private static readonly string[] _errorColumnHeaders = [
+            "日時", "メソッド名", "例外タイプ", "エラーメッセージ", "スタックトレース", "追加情報"
+        ];
+
         [GeneratedRegex(@"\[([^\]]*)\]$")]
         private static partial Regex BracketRegex();
 
@@ -23,11 +27,17 @@ namespace ProductDatabase.LogViewer {
         private DataView _logView = new();
         private CancellationTokenSource? _loadCts;
 
+        private DataTable _errorLogTable = new();
+        private DataView _errorLogView = new();
+        private CancellationTokenSource? _errorLoadCts;
+
         public LogViewerWindow(AppSettings appSettings) {
             InitializeComponent();
             Font = new Font(appSettings.FontName, appSettings.FontSize);
             InitializeDataGridView();
             InitializeYearMonthComboBox();
+            InitializeErrorDataGridView();
+            InitializeErrorYearMonthComboBox();
         }
 
         private void InitializeDataGridView() {
@@ -261,6 +271,138 @@ namespace ProductDatabase.LogViewer {
 
         private void SearchTextBox_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Enter) ApplyFilter();
+        }
+
+        private void MainTabControl_SelectedIndexChanged(object sender, EventArgs e) {
+            CountLabel.Text = MainTabControl.SelectedTab == ErrorLogTabPage
+                ? $"{_errorLogView.Count} 件表示中"
+                : $"{_logView.Count} 件表示中";
+        }
+
+        private void InitializeErrorDataGridView() {
+            ErrorDataGridView.AllowUserToAddRows = false;
+            ErrorDataGridView.AllowUserToDeleteRows = false;
+            ErrorDataGridView.AllowUserToResizeRows = false;
+            ErrorDataGridView.ReadOnly = true;
+            ErrorDataGridView.ColumnHeadersDefaultCellStyle.Font = new Font(ErrorDataGridView.Font, FontStyle.Bold);
+            ErrorDataGridView.RowTemplate.DefaultCellStyle.Padding = new Padding(5);
+            ErrorDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+            ErrorDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            ErrorDataGridView.CellFormatting += ErrorDataGridView_CellFormatting;
+        }
+
+        private void InitializeErrorYearMonthComboBox() {
+            ErrorYearMonthComboBox.Items.Clear();
+
+            if (!Directory.Exists(LogDirectory)) return;
+
+            var errorFiles = Directory.GetFiles(LogDirectory, "error_*.csv")
+                .Select(f => Path.GetFileNameWithoutExtension(f).Replace("error_", ""))
+                .Where(s => s.Length == 6 && s.All(char.IsDigit))
+                .OrderByDescending(s => s)
+                .ToList();
+
+            foreach (var ym in errorFiles)
+                ErrorYearMonthComboBox.Items.Add(new YearMonthItem(ym, $"{ym[..4]}年{ym[4..]}月"));
+
+            if (ErrorYearMonthComboBox.Items.Count > 0)
+                ErrorYearMonthComboBox.SelectedIndex = 0;
+        }
+
+        private async Task LoadErrorSelectedMonth() {
+            if (ErrorYearMonthComboBox.SelectedItem is not YearMonthItem item) return;
+
+            _errorLoadCts?.Cancel();
+            _errorLoadCts = new CancellationTokenSource();
+            var cts = _errorLoadCts;
+
+            try {
+                var table = await Task.Run(() => LoadErrorLogFile(item.Value, cts.Token), cts.Token);
+                if (cts.IsCancellationRequested) return;
+
+                _errorLogTable = table;
+                _errorLogView = _errorLogTable.DefaultView;
+                ErrorDataGridView.DataSource = _errorLogView;
+
+                // スタックトレースは長いため幅を固定する
+                if (ErrorDataGridView.Columns.Contains("スタックトレース")) {
+                    var col = ErrorDataGridView.Columns["スタックトレース"];
+                    col.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+                    col.Width = 300;
+                }
+
+                ApplyErrorFilter();
+            } catch (OperationCanceledException) {
+            } catch (Exception ex) {
+                if (!cts.IsCancellationRequested) {
+                    MessageBox.Show(
+                        $"エラーログファイルの読み込み中にエラーが発生しました: {ex.Message}",
+                        "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private static DataTable LoadErrorLogFile(string yearMonth, CancellationToken token) {
+            var table = new DataTable();
+            foreach (var header in _errorColumnHeaders)
+                table.Columns.Add(header);
+
+            var filePath = Path.Combine(LogDirectory, $"error_{yearMonth}.csv");
+            if (!File.Exists(filePath)) return table;
+
+            using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var reader = new StreamReader(fs, Encoding.UTF8);
+            while (reader.ReadLine() is string line) {
+                token.ThrowIfCancellationRequested();
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                var fields = ParseCsvLine(line);
+                var row = table.NewRow();
+                for (int i = 0; i < _errorColumnHeaders.Length; i++)
+                    row[i] = i < fields.Length ? fields[i] : string.Empty;
+                table.Rows.Add(row);
+            }
+
+            return table;
+        }
+
+        private void ApplyErrorFilter() {
+            var keyword = ErrorSearchTextBox.Text.Trim();
+
+            if (string.IsNullOrEmpty(keyword)) {
+                _errorLogView.RowFilter = null;
+            } else {
+                var escaped = keyword
+                    .Replace("'", "''")
+                    .Replace("[", "[[]")
+                    .Replace("]", "[]]")
+                    .Replace("*", "[*]")
+                    .Replace("%", "[%]");
+                var colConditions = _errorColumnHeaders.Select(h => $"[{h}] LIKE '%{escaped}%'");
+                _errorLogView.RowFilter = string.Join(" OR ", colConditions);
+            }
+
+            CountLabel.Text = $"{_errorLogView.Count} 件表示中";
+        }
+
+        private void ErrorDataGridView_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e) {
+            if (e.RowIndex < 0 || e.CellStyle is null) return;
+            if (ErrorDataGridView.Rows[e.RowIndex].DataBoundItem is not DataRowView rowView) return;
+            var exType = rowView["例外タイプ"]?.ToString() ?? string.Empty;
+            // TODO(human): exType の値に応じて e.CellStyle.BackColor を設定する（2〜5行）
+            // 例外タイプ例: SqliteException, IOException, InvalidOperationException など
+            // 参考: GetRowColor() で使われている Color 定数（MistyRose, LightYellow 等）を活用する
+        }
+
+        private async void ErrorYearMonthComboBox_SelectedIndexChanged(object sender, EventArgs e) {
+            await LoadErrorSelectedMonth();
+        }
+
+        private void ErrorSearchButton_Click(object sender, EventArgs e) {
+            ApplyErrorFilter();
+        }
+
+        private void ErrorSearchTextBox_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Enter) ApplyErrorFilter();
         }
 
         private sealed record YearMonthItem(string Value, string Label) {

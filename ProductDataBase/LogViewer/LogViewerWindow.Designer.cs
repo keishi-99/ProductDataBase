@@ -6,11 +6,16 @@ namespace ProductDatabase.LogViewer {
             if (disposing) {
                 components?.Dispose();
                 _loadCts?.Dispose();
+                _errorLoadCts?.Dispose();
             }
             base.Dispose(disposing);
         }
 
         private void InitializeComponent() {
+            this.MainTabControl = new TabControl();
+            this.OperationLogTabPage = new TabPage();
+            this.ErrorLogTabPage = new TabPage();
+
             this.TopPanel = new Panel();
             this.YearMonthLabel = new Label();
             this.YearMonthComboBox = new ComboBox();
@@ -20,13 +25,51 @@ namespace ProductDatabase.LogViewer {
             this.SearchTextBox = new TextBox();
             this.SearchButton = new Button();
             this.LogDataGridView = new DataGridView();
+
+            this.ErrorTopPanel = new Panel();
+            this.ErrorYearMonthLabel = new Label();
+            this.ErrorYearMonthComboBox = new ComboBox();
+            this.ErrorSearchLabel = new Label();
+            this.ErrorSearchTextBox = new TextBox();
+            this.ErrorSearchButton = new Button();
+            this.ErrorDataGridView = new DataGridView();
+
             this.BottomStatusStrip = new StatusStrip();
             this.CountLabel = new ToolStripStatusLabel();
 
+            this.MainTabControl.SuspendLayout();
+            this.OperationLogTabPage.SuspendLayout();
+            this.ErrorLogTabPage.SuspendLayout();
             this.TopPanel.SuspendLayout();
+            this.ErrorTopPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.LogDataGridView).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)this.ErrorDataGridView).BeginInit();
             this.BottomStatusStrip.SuspendLayout();
             this.SuspendLayout();
+
+            // MainTabControl
+            this.MainTabControl.Controls.Add(this.OperationLogTabPage);
+            this.MainTabControl.Controls.Add(this.ErrorLogTabPage);
+            this.MainTabControl.Dock = DockStyle.Fill;
+            this.MainTabControl.Name = "MainTabControl";
+            this.MainTabControl.TabIndex = 0;
+            this.MainTabControl.SelectedIndexChanged += this.MainTabControl_SelectedIndexChanged;
+
+            // OperationLogTabPage
+            this.OperationLogTabPage.Controls.Add(this.LogDataGridView);
+            this.OperationLogTabPage.Controls.Add(this.TopPanel);
+            this.OperationLogTabPage.Name = "OperationLogTabPage";
+            this.OperationLogTabPage.Padding = new Padding(3);
+            this.OperationLogTabPage.TabIndex = 0;
+            this.OperationLogTabPage.Text = "操作ログ";
+
+            // ErrorLogTabPage
+            this.ErrorLogTabPage.Controls.Add(this.ErrorDataGridView);
+            this.ErrorLogTabPage.Controls.Add(this.ErrorTopPanel);
+            this.ErrorLogTabPage.Name = "ErrorLogTabPage";
+            this.ErrorLogTabPage.Padding = new Padding(3);
+            this.ErrorLogTabPage.TabIndex = 1;
+            this.ErrorLogTabPage.Text = "エラーログ";
 
             // TopPanel
             this.TopPanel.Controls.Add(this.YearMonthLabel);
@@ -99,6 +142,61 @@ namespace ProductDatabase.LogViewer {
             this.LogDataGridView.Name = "LogDataGridView";
             this.LogDataGridView.TabIndex = 5;
 
+            // ErrorTopPanel
+            this.ErrorTopPanel.Controls.Add(this.ErrorYearMonthLabel);
+            this.ErrorTopPanel.Controls.Add(this.ErrorYearMonthComboBox);
+            this.ErrorTopPanel.Controls.Add(this.ErrorSearchLabel);
+            this.ErrorTopPanel.Controls.Add(this.ErrorSearchTextBox);
+            this.ErrorTopPanel.Controls.Add(this.ErrorSearchButton);
+            this.ErrorTopPanel.Dock = DockStyle.Top;
+            this.ErrorTopPanel.Height = 40;
+            this.ErrorTopPanel.Name = "ErrorTopPanel";
+            this.ErrorTopPanel.TabIndex = 0;
+
+            // ErrorYearMonthLabel
+            this.ErrorYearMonthLabel.AutoSize = true;
+            this.ErrorYearMonthLabel.Location = new Point(10, 12);
+            this.ErrorYearMonthLabel.Name = "ErrorYearMonthLabel";
+            this.ErrorYearMonthLabel.Text = "年月：";
+
+            // ErrorYearMonthComboBox
+            this.ErrorYearMonthComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.ErrorYearMonthComboBox.Location = new Point(52, 8);
+            this.ErrorYearMonthComboBox.Name = "ErrorYearMonthComboBox";
+            this.ErrorYearMonthComboBox.Size = new Size(130, 23);
+            this.ErrorYearMonthComboBox.TabIndex = 1;
+            this.ErrorYearMonthComboBox.SelectedIndexChanged += this.ErrorYearMonthComboBox_SelectedIndexChanged;
+
+            // ErrorSearchLabel
+            this.ErrorSearchLabel.AutoSize = true;
+            this.ErrorSearchLabel.Location = new Point(200, 12);
+            this.ErrorSearchLabel.Name = "ErrorSearchLabel";
+            this.ErrorSearchLabel.Text = "検索：";
+
+            // ErrorSearchTextBox
+            this.ErrorSearchTextBox.Location = new Point(242, 8);
+            this.ErrorSearchTextBox.Name = "ErrorSearchTextBox";
+            this.ErrorSearchTextBox.Size = new Size(200, 23);
+            this.ErrorSearchTextBox.TabIndex = 2;
+            this.ErrorSearchTextBox.KeyDown += this.ErrorSearchTextBox_KeyDown;
+
+            // ErrorSearchButton
+            this.ErrorSearchButton.Location = new Point(450, 7);
+            this.ErrorSearchButton.Name = "ErrorSearchButton";
+            this.ErrorSearchButton.Size = new Size(60, 25);
+            this.ErrorSearchButton.TabIndex = 3;
+            this.ErrorSearchButton.Text = "検索";
+            this.ErrorSearchButton.UseVisualStyleBackColor = true;
+            this.ErrorSearchButton.Click += this.ErrorSearchButton_Click;
+
+            // ErrorDataGridView
+            this.ErrorDataGridView.BackgroundColor = Color.White;
+            this.ErrorDataGridView.BorderStyle = BorderStyle.None;
+            this.ErrorDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.ErrorDataGridView.Dock = DockStyle.Fill;
+            this.ErrorDataGridView.Name = "ErrorDataGridView";
+            this.ErrorDataGridView.TabIndex = 5;
+
             // BottomStatusStrip
             this.BottomStatusStrip.Items.AddRange(new ToolStripItem[] { this.CountLabel });
             this.BottomStatusStrip.Location = new Point(0, 628);
@@ -116,23 +214,31 @@ namespace ProductDatabase.LogViewer {
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(1150, 650);
-            this.Controls.Add(this.LogDataGridView);
+            this.Controls.Add(this.MainTabControl);
             this.Controls.Add(this.BottomStatusStrip);
-            this.Controls.Add(this.TopPanel);
             this.Font = new Font("Meiryo UI", 9F);
             this.Name = "LogViewerWindow";
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Text = "ログ閲覧";
 
+            this.MainTabControl.ResumeLayout(false);
+            this.OperationLogTabPage.ResumeLayout(false);
+            this.ErrorLogTabPage.ResumeLayout(false);
             this.TopPanel.ResumeLayout(false);
             this.TopPanel.PerformLayout();
+            this.ErrorTopPanel.ResumeLayout(false);
+            this.ErrorTopPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)this.LogDataGridView).EndInit();
+            ((System.ComponentModel.ISupportInitialize)this.ErrorDataGridView).EndInit();
             this.BottomStatusStrip.ResumeLayout(false);
             this.BottomStatusStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
 
+        private TabControl MainTabControl;
+        private TabPage OperationLogTabPage;
+        private TabPage ErrorLogTabPage;
         private Panel TopPanel;
         private Label YearMonthLabel;
         private ComboBox YearMonthComboBox;
@@ -142,6 +248,13 @@ namespace ProductDatabase.LogViewer {
         private TextBox SearchTextBox;
         private Button SearchButton;
         private DataGridView LogDataGridView;
+        private Panel ErrorTopPanel;
+        private Label ErrorYearMonthLabel;
+        private ComboBox ErrorYearMonthComboBox;
+        private Label ErrorSearchLabel;
+        private TextBox ErrorSearchTextBox;
+        private Button ErrorSearchButton;
+        private DataGridView ErrorDataGridView;
         private StatusStrip BottomStatusStrip;
         private ToolStripStatusLabel CountLabel;
     }
