@@ -11,31 +11,68 @@ namespace ProductDatabase.Data {
         public DataTable SubstrateDataTable { get; } = new();
         public DataTable ProductUseSubstrate { get; } = new();
 
+        internal static readonly CacheManager<(DataTable, DataTable, DataTable)> _cacheManager
+            = new(TimeSpan.FromMinutes(5));
+        private static readonly object _loadLock = new();
+
         // DBファイルのパスを検証しSQLite接続文字列を返す（DbConnectionHelper に委譲・プーリング無効）
         public static string GetConnectionRegistration() {
             return DbConnectionHelper.GetConnectionString();
         }
 
-        // 製品・基板・使用基板の全マスターデータをDBから読み込む
+        // 製品・基板・使用基板の全マスターデータをDBから読み込む（TTL キャッシング機構付き）
         public void LoadAll() {
+            lock (_loadLock) {
+                // キャッシュが有効な場合はキャッシュからデータを復元して終了
+                var cached = _cacheManager.GetCachedData();
+                if (cached.HasValue) {
+                    RestoreFromCache(cached.Value);
+                    return;
+                }
 
-            ProductDataTable.Clear();
-            SubstrateDataTable.Clear();
-            ProductUseSubstrate.Clear();
+                // キャッシュが無効な場合は DB から読み込む
+                ProductDataTable.Clear();
+                SubstrateDataTable.Clear();
+                ProductUseSubstrate.Clear();
 
-            using var con = new SqliteConnection(GetConnectionRegistration());
-            con.Open();
+                using var con = new SqliteConnection(GetConnectionRegistration());
+                con.Open();
 
-            using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.ProductTableName};")) {
-                ProductDataTable.Load(reader);
+                using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.ProductTableName};")) {
+                    ProductDataTable.Load(reader);
+                }
+
+                using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.SubstrateTableName};")) {
+                    SubstrateDataTable.Load(reader);
+                }
+
+                using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.VProductUseSubstrate};")) {
+                    ProductUseSubstrate.Load(reader);
+                }
+
+                // 読み込んだデータをキャッシュに保存
+                _cacheManager.SetCache((ProductDataTable.Copy(), SubstrateDataTable.Copy(), ProductUseSubstrate.Copy()));
             }
+        }
 
-            using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.SubstrateTableName};")) {
-                SubstrateDataTable.Load(reader);
-            }
+        // キャッシュからデータを現在の DataTable に復元する（UI 制約無効化でパフォーマンス向上）
+        private void RestoreFromCache((DataTable, DataTable, DataTable) cached) {
+            try {
+                ProductDataTable.BeginLoadData();
+                SubstrateDataTable.BeginLoadData();
+                ProductUseSubstrate.BeginLoadData();
 
-            using (var reader = con.ExecuteReader($"SELECT * FROM {Constants.VProductUseSubstrate};")) {
-                ProductUseSubstrate.Load(reader);
+                ProductDataTable.Clear();
+                SubstrateDataTable.Clear();
+                ProductUseSubstrate.Clear();
+
+                ProductDataTable.Merge(cached.Item1);
+                SubstrateDataTable.Merge(cached.Item2);
+                ProductUseSubstrate.Merge(cached.Item3);
+            } finally {
+                ProductDataTable.EndLoadData();
+                SubstrateDataTable.EndLoadData();
+                ProductUseSubstrate.EndLoadData();
             }
         }
 
@@ -79,6 +116,7 @@ namespace ProductDatabase.Data {
             ProductDataTable.Clear();
             SubstrateDataTable.Clear();
             ProductUseSubstrate.Clear();
+            _cacheManager.ClearCache();
         }
 
         // 製品マスターを新規登録し採番されたProductIDを返す
@@ -100,7 +138,7 @@ namespace ProductDatabase.Data {
 
             var checkBin = Convert.ToString(product.CheckBin, 2).PadLeft(11, '0');
 
-            return con.ExecuteScalar<long>(sql, new {
+            var result = con.ExecuteScalar<long>(sql, new {
                 product.CategoryName,
                 product.ProductName,
                 product.ProductType,
@@ -116,6 +154,11 @@ namespace ProductDatabase.Data {
                 product.SheetPrintType,
                 Visible = product.Visible ? 1 : 0
             });
+
+            // キャッシュをクリア（マスターデータが変更されたため）
+            _cacheManager.ClearCache();
+
+            return result;
         }
 
         // 製品マスターを更新する
@@ -161,6 +204,9 @@ namespace ProductDatabase.Data {
                 Visible = product.Visible ? 1 : 0,
                 product.ProductID
             });
+
+            // キャッシュをクリア（マスターデータが変更されたため）
+            _cacheManager.ClearCache();
         }
 
         // T_Serial の ProductID 追加・ProductName 削除・V_Serial 作成を行うマイグレーション
@@ -248,6 +294,9 @@ namespace ProductDatabase.Data {
                 new { ProductId = productId }, tx);
 
             tx.Commit();
+
+            // キャッシュをクリア（マスターデータが変更されたため）
+            _cacheManager.ClearCache();
         }
 
         // 指定ProductIDの製品実績が存在するか確認する
@@ -327,6 +376,9 @@ namespace ProductDatabase.Data {
             con.Execute(insertSql, insertData, tx);
 
             tx.Commit();
+
+            // キャッシュをクリア（マスターデータの関連が変更されたため）
+            _cacheManager.ClearCache();
         }
 
         // M_SubstrateDef に ExclusiveGroupID 列を追加するマイグレーション
@@ -337,6 +389,11 @@ namespace ProductDatabase.Data {
             if (!columns.Contains("ExclusiveGroupID")) {
                 con.Execute("ALTER TABLE M_SubstrateDef ADD COLUMN ExclusiveGroupID INTEGER");
             }
+        }
+
+        // キャッシュの状態を取得する（デバッグ・テスト用）
+        public (bool IsValid, DateTime? LastLoadTime, TimeSpan Ttl) GetCacheStatus() {
+            return _cacheManager.GetCacheStatus();
         }
     }
 

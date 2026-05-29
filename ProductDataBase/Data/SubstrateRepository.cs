@@ -24,7 +24,7 @@ namespace ProductDatabase.Data {
 
             var checkBin = Convert.ToString(substrate.CheckBin, 2).PadLeft(11, '0');
 
-            return con.ExecuteScalar<long>(sql, new {
+            var result = con.ExecuteScalar<long>(sql, new {
                 substrate.CategoryName,
                 substrate.ProductName,
                 substrate.SubstrateName,
@@ -35,6 +35,11 @@ namespace ProductDatabase.Data {
                 Visible = substrate.Visible ? 1 : 0,
                 substrate.ExclusiveGroupID
             });
+
+            // ProductRepository のキャッシュをクリア（基板マスター変更の影響を反映）
+            ProductRepository._cacheManager.ClearCache();
+
+            return result;
         }
 
         // 基板マスターを更新する
@@ -70,6 +75,9 @@ namespace ProductDatabase.Data {
                 substrate.ExclusiveGroupID,
                 substrate.SubstrateID
             });
+
+            // ProductRepository のキャッシュをクリア（基板マスター変更の影響を反映）
+            ProductRepository._cacheManager.ClearCache();
         }
 
         // 基板マスターを物理削除する（実績存在チェック・関連紐づけ削除を含む）
@@ -94,6 +102,9 @@ namespace ProductDatabase.Data {
                 new { SubstrateId = substrateId }, tx);
 
             tx.Commit();
+
+            // ProductRepository のキャッシュをクリア（基板マスター変更の影響を反映）
+            ProductRepository._cacheManager.ClearCache();
         }
 
         // 指定SubstrateIDの基板実績が存在するか確認する
