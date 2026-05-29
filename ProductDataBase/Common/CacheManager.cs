@@ -26,7 +26,7 @@ namespace ProductDatabase.Common {
                 if (IsCacheValid()) {
                     return _cachedData;
                 }
-                return default(T);
+                return default;
             }
         }
 
@@ -41,7 +41,7 @@ namespace ProductDatabase.Common {
         // キャッシュをクリアし、タイムスタンプをリセットする
         public void ClearCache() {
             lock (_lock) {
-                _cachedData = default(T);
+                _cachedData = default;
                 _lastLoadTime = null;
             }
         }

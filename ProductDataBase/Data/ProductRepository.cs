@@ -11,9 +11,9 @@ namespace ProductDatabase.Data {
         public DataTable SubstrateDataTable { get; } = new();
         public DataTable ProductUseSubstrate { get; } = new();
 
-        private readonly CacheManager<(DataTable, DataTable, DataTable)> _cacheManager
+        private static readonly CacheManager<(DataTable, DataTable, DataTable)> _cacheManager
             = new(TimeSpan.FromMinutes(5));
-        private readonly object _loadLock = new();
+        private static readonly object _loadLock = new();
 
         // DBファイルのパスを検証しSQLite接続文字列を返す（DbConnectionHelper に委譲・プーリング無効）
         public static string GetConnectionRegistration() {
@@ -24,9 +24,9 @@ namespace ProductDatabase.Data {
         public void LoadAll() {
             lock (_loadLock) {
                 // キャッシュが有効な場合はキャッシュからデータを復元して終了
-                if (_cacheManager.IsCacheValid()) {
-                    var cached = _cacheManager.GetCachedData();
-                    RestoreFromCache(cached);
+                var cached = _cacheManager.GetCachedData();
+                if (cached.HasValue) {
+                    RestoreFromCache(cached.Value);
                     return;
                 }
 
@@ -128,7 +128,7 @@ namespace ProductDatabase.Data {
 
             var checkBin = Convert.ToString(product.CheckBin, 2).PadLeft(11, '0');
 
-            return con.ExecuteScalar<long>(sql, new {
+            var result = con.ExecuteScalar<long>(sql, new {
                 product.CategoryName,
                 product.ProductName,
                 product.ProductType,
@@ -144,6 +144,11 @@ namespace ProductDatabase.Data {
                 product.SheetPrintType,
                 Visible = product.Visible ? 1 : 0
             });
+
+            // キャッシュをクリア（マスターデータが変更されたため）
+            _cacheManager.ClearCache();
+
+            return result;
         }
 
         // 製品マスターを更新する
@@ -189,6 +194,9 @@ namespace ProductDatabase.Data {
                 Visible = product.Visible ? 1 : 0,
                 product.ProductID
             });
+
+            // キャッシュをクリア（マスターデータが変更されたため）
+            _cacheManager.ClearCache();
         }
 
         // T_Serial の ProductID 追加・ProductName 削除・V_Serial 作成を行うマイグレーション
@@ -276,6 +284,9 @@ namespace ProductDatabase.Data {
                 new { ProductId = productId }, tx);
 
             tx.Commit();
+
+            // キャッシュをクリア（マスターデータが変更されたため）
+            _cacheManager.ClearCache();
         }
 
         // 指定ProductIDの製品実績が存在するか確認する
@@ -355,6 +366,9 @@ namespace ProductDatabase.Data {
             con.Execute(insertSql, insertData, tx);
 
             tx.Commit();
+
+            // キャッシュをクリア（マスターデータの関連が変更されたため）
+            _cacheManager.ClearCache();
         }
 
         // M_SubstrateDef に ExclusiveGroupID 列を追加するマイグレーション
