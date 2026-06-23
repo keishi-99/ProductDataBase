@@ -46,6 +46,8 @@ namespace ProductDatabase.History {
             this.EditContextMenuItem = new ToolStripMenuItem();
             this.EditContextMenuSeparator = new ToolStripSeparator();
             this.DeleteContextMenuItem = new ToolStripMenuItem();
+            this.ReprintContextMenuSeparator = new ToolStripSeparator();
+            this.ReprintContextMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)this.DataBaseDataGridView).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.EditContextMenuStrip.SuspendLayout();
@@ -258,7 +260,9 @@ namespace ProductDatabase.History {
             this.EditContextMenuStrip.Items.AddRange(new ToolStripItem[] {
                 this.EditContextMenuItem,
                 this.EditContextMenuSeparator,
-                this.DeleteContextMenuItem });
+                this.DeleteContextMenuItem,
+                this.ReprintContextMenuSeparator,
+                this.ReprintContextMenuItem });
             this.EditContextMenuStrip.Name = "EditContextMenuStrip";
             this.EditContextMenuStrip.Opening += this.EditContextMenuStrip_Opening;
             //
@@ -280,6 +284,18 @@ namespace ProductDatabase.History {
             this.DeleteContextMenuItem.Size = new Size(180, 22);
             this.DeleteContextMenuItem.Text = "削除";
             this.DeleteContextMenuItem.Click += this.DeleteContextMenuItem_Click;
+            //
+            // ReprintContextMenuSeparator
+            //
+            this.ReprintContextMenuSeparator.Name = "ReprintContextMenuSeparator";
+            this.ReprintContextMenuSeparator.Size = new Size(177, 6);
+            //
+            // ReprintContextMenuItem
+            //
+            this.ReprintContextMenuItem.Name = "ReprintContextMenuItem";
+            this.ReprintContextMenuItem.Size = new Size(180, 22);
+            this.ReprintContextMenuItem.Text = "再印刷";
+            this.ReprintContextMenuItem.Click += this.ReprintContextMenuItem_Click;
             //
             // HistoryWindow
             //
@@ -342,5 +358,7 @@ namespace ProductDatabase.History {
         private ToolStripMenuItem EditContextMenuItem;
         private ToolStripSeparator EditContextMenuSeparator;
         private ToolStripMenuItem DeleteContextMenuItem;
+        private ToolStripSeparator ReprintContextMenuSeparator;
+        private ToolStripMenuItem ReprintContextMenuItem;
     }
 }
