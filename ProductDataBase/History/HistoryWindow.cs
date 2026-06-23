@@ -365,6 +365,7 @@ namespace ProductDatabase.History {
 
         // 選択行のProductIDから製品マスターを再取得し、履歴の内容が入力された状態で再印刷ウィンドウを開く
         private void OpenRePrint() {
+            if (_tableName != "Product" && _tableName != "Reprint") { return; }
             if (DataBaseDataGridView.CurrentCell is null) { return; }
             var rowIndex = DataBaseDataGridView.CurrentCell.RowIndex;
             if (rowIndex < 0) { return; }
