@@ -17,6 +17,7 @@ namespace ProductDatabase.History {
         private readonly AppSettings _appSettings;
 
         private readonly int _radioButtonNumber = 0;
+        private bool _isEditMode;
 
         private System.Data.DataTable _historyTable = new();
 
@@ -151,6 +152,9 @@ namespace ProductDatabase.History {
             DataBaseDataGridView.RowTemplate.Height += 10;
             // 編集モード終了時に復元するために既定の背景色を記録する
             _originalGridBackColor = DataBaseDataGridView.BackgroundColor;
+
+            // 再印刷を右クリックメニューから開けるように、編集モードに関わらず常時割り当てる
+            DataBaseDataGridView.ContextMenuStrip = EditContextMenuStrip;
         }
 
         // ロード時に初期UIを設定しラジオボタンモードに応じた表示制御を行う
@@ -210,6 +214,11 @@ namespace ProductDatabase.History {
             // PersonID 列を非表示にする
             if (DataBaseDataGridView.Columns.Contains("PersonID")) {
                 DataBaseDataGridView.Columns["PersonID"].Visible = false;
+            }
+
+            // Reprint種別のProductIDは再印刷起動用の内部利用のみなので非表示にする
+            if (categoryName == "Reprint" && DataBaseDataGridView.Columns.Contains("ProductID")) {
+                DataBaseDataGridView.Columns["ProductID"].Visible = false;
             }
 
             _listColFilter.Clear();
@@ -293,6 +302,7 @@ namespace ProductDatabase.History {
 
         // 製品型式でフィルタして再印刷履歴をDataGridViewに表示する
         private void ViewReprintLog() {
+            _tableName = "Reprint";
             LoadDataAndDisplay("Reprint",
                 HistoryRepository.QueryReprintHistory(_productMaster, !CategoryRadioButton1.Checked));
         }
@@ -351,6 +361,38 @@ namespace ProductDatabase.History {
                 row.RejectChanges();
                 MessageBox.Show(ex.Message, "編集エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        // 選択行のProductIDから製品マスターを再取得し、履歴の内容が入力された状態で再印刷ウィンドウを開く
+        private void OpenRePrint() {
+            if (DataBaseDataGridView.CurrentCell is null) { return; }
+            var rowIndex = DataBaseDataGridView.CurrentCell.RowIndex;
+            if (rowIndex < 0) { return; }
+
+            var dgvRow = DataBaseDataGridView.Rows[rowIndex];
+            if (!long.TryParse(dgvRow.Cells["ProductID"].Value?.ToString(), out var productId)) {
+                MessageBox.Show("製品IDを取得できませんでした。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            var masterTable = HistoryRepository.QueryProductMasterById(productId);
+            if (masterTable.Rows.Count == 0) {
+                MessageBox.Show("製品マスターが見つかりません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            _productMaster.LoadFrom(masterTable.Rows[0]);
+            _productMaster.UseSubstrates = ProductRepository.GetUseSubstrates(_productMaster.ProductID);
+
+            _productRegisterWork.Reset();
+            _productRegisterWork.OrderNumber = dgvRow.Cells["OrderNumber"].Value?.ToString() ?? string.Empty;
+            _productRegisterWork.ProductNumber = dgvRow.Cells["ProductNumber"].Value?.ToString() ?? string.Empty;
+            _productRegisterWork.Quantity = int.TryParse(dgvRow.Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
+            _productRegisterWork.RegDate = dgvRow.Cells["RegDate"].Value?.ToString() ?? string.Empty;
+            _productRegisterWork.Revision = dgvRow.Cells["Revision"].Value?.ToString() ?? string.Empty;
+            _productRegisterWork.Comment = dgvRow.Cells["Comment"].Value?.ToString() ?? string.Empty;
+
+            using var window = new RePrintWindow(_productMaster, _productRegisterWork, _appSettings);
+            window.ShowDialog(this);
         }
 
         // 選択行をまとめて削除する（Substrate/Product/Serial対応、複数行選択可）
@@ -668,7 +710,7 @@ namespace ProductDatabase.History {
 
         // 編集モードを開始する：ContextMenuStrip を有効化して枠線を赤に変更する
         private void EnterEditMode() {
-            DataBaseDataGridView.ContextMenuStrip = EditContextMenuStrip;
+            _isEditMode = true;
             // DataGridView の背景色を変えて編集モード中であることを視覚的に示す
             DataBaseDataGridView.BackgroundColor = Color.MistyRose;
             DataBaseDataGridView.EnableHeadersVisualStyles = false;
@@ -678,9 +720,9 @@ namespace ProductDatabase.History {
             SetBottomControlsEnabled(false);
         }
 
-        // 編集モードを終了する：ContextMenuStrip を無効化して外観を元に戻す
+        // 編集モードを終了する：編集・削除メニューを無効化して外観を元に戻す
         private void ExitEditMode() {
-            DataBaseDataGridView.ContextMenuStrip = null;
+            _isEditMode = false;
             DataBaseDataGridView.BackgroundColor = _originalGridBackColor;
             DataBaseDataGridView.EnableHeadersVisualStyles = true;
             編集開始ToolStripMenuItem.Visible = true;
@@ -713,9 +755,10 @@ namespace ProductDatabase.History {
                 DataBaseDataGridView.CurrentCell = DataBaseDataGridView[0, hit.RowIndex];
             }
 
-            // テーブル種別に応じてメニュー項目の有効/無効を設定する
-            EditContextMenuItem.Enabled = (_tableName == "Product");
-            DeleteContextMenuItem.Enabled = (_tableName != string.Empty);
+            // テーブル種別・編集モードに応じてメニュー項目の有効/無効を設定する
+            EditContextMenuItem.Enabled = _isEditMode && (_tableName == "Product");
+            DeleteContextMenuItem.Enabled = _isEditMode && (_tableName != string.Empty);
+            ReprintContextMenuItem.Enabled = (_tableName == "Product" || _tableName == "Reprint");
         }
 
         private void HistoryWindow_Load(object sender, EventArgs e) { LoadEvents(); }
@@ -723,6 +766,7 @@ namespace ProductDatabase.History {
         private void 編集終了ToolStripMenuItem_Click(object sender, EventArgs e) { ExitEditMode(); }
         private async void EditContextMenuItem_Click(object sender, EventArgs e) { await EditProductRecord(); }
         private async void DeleteContextMenuItem_Click(object sender, EventArgs e) { await DeleteSelectedRows(); }
+        private void ReprintContextMenuItem_Click(object sender, EventArgs e) { OpenRePrint(); }
         private void 在庫調整ToolStripMenuItem_Click(object sender, EventArgs e) { InventoryAdjustment(); }
         private void ShowUsedSubstrateButton_Click(object sender, EventArgs e) { ShowUsedSubstrateDetails(); }
         private async void GenerateReportButton_Click(object sender, EventArgs e) { await GenerateReport(); }

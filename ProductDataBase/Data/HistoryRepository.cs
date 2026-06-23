@@ -201,6 +201,7 @@ namespace ProductDatabase.Data {
             var query = $"""
                 SELECT
                     ID,
+                    ProductID,
                     SerialPrintType,
                     CategoryName,
                     ProductName,
@@ -293,6 +294,33 @@ namespace ProductDatabase.Data {
                 WHERE SubstrateID = @SubstrateID;
                 """;
             return con.QueryFirstOrDefault(query, new { SubstrateID = substrateId });
+        }
+
+        // 製品IDで製品マスター情報を取得する（履歴からの再印刷画面用）
+        public static DataTable QueryProductMasterById(long productId) {
+            var query = $"""
+                SELECT
+                    ProductID,
+                    CategoryName,
+                    ProductName,
+                    ProductType,
+                    ProductModel,
+                    Initial,
+                    OLesInitial,
+                    OLesSerialSuffix,
+                    RevisionGroup,
+                    RegType,
+                    Checkbox,
+                    SerialType,
+                    SerialPrintType,
+                    SheetPrintType,
+                    Visible
+                FROM {Constants.ProductTableName}
+                WHERE ProductID = @ProductID;
+                """;
+            var p = new DynamicParameters();
+            p.Add("@ProductID", productId);
+            return ExecuteQuery(query, p);
         }
 
         // 製品削除時に連動削除する基板履歴一覧を取得する

@@ -86,11 +86,23 @@ namespace ProductDatabase {
                     con, _productMaster.ProductName, _productMaster.RevisionGroup.ToString());
                 RevisionTextBox.Text = revisionResult ?? "";
 
+                // 履歴から開いた場合は引き渡された作業データで各入力欄を上書きする
+                ApplyRegisterWorkToInputs();
+
                 ConfigurePrintSettings();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
             }
+        }
+        // 渡された作業データ（履歴の選択行）の値が入っている項目をテキストボックスへ反映する
+        private void ApplyRegisterWorkToInputs() {
+            if (OrderNumberCheckBox.Checked) { OrderNumberTextBox.Text = _productRegisterWork.OrderNumber; }
+            if (ManufacturingNumberCheckBox.Checked) { ManufacturingNumberMaskedTextBox.Text = _productRegisterWork.ProductNumber; }
+            if (QuantityCheckBox.Checked && _productRegisterWork.Quantity > 0) { QuantityTextBox.Text = _productRegisterWork.Quantity.ToString(); }
+            if (RevisionCheckBox.Checked && !string.IsNullOrEmpty(_productRegisterWork.Revision)) { RevisionTextBox.Text = _productRegisterWork.Revision; }
+            if (CommentCheckBox.Checked) { CommentTextBox.Text = _productRegisterWork.Comment; }
+            if (RegistrationDateCheckBox.Checked && DateTime.TryParse(_productRegisterWork.RegDate, out var regDate)) { RegistrationDateTimePicker.Value = regDate; }
         }
         // 製品マスターの印刷フラグに応じてメニューの有効無効を切り替え印刷設定を読み込む
         private void ConfigurePrintSettings() {
