@@ -380,18 +380,23 @@ namespace ProductDatabase.History {
                 MessageBox.Show("製品マスターが見つかりません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            _productMaster.LoadFrom(masterTable.Rows[0]);
-            _productMaster.UseSubstrates = ProductRepository.GetUseSubstrates(_productMaster.ProductID);
 
-            _productRegisterWork.Reset();
-            _productRegisterWork.OrderNumber = dgvRow.Cells["OrderNumber"].Value?.ToString() ?? string.Empty;
-            _productRegisterWork.ProductNumber = dgvRow.Cells["ProductNumber"].Value?.ToString() ?? string.Empty;
-            _productRegisterWork.Quantity = int.TryParse(dgvRow.Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0;
-            _productRegisterWork.RegDate = dgvRow.Cells["RegDate"].Value?.ToString() ?? string.Empty;
-            _productRegisterWork.Revision = dgvRow.Cells["Revision"].Value?.ToString() ?? string.Empty;
-            _productRegisterWork.Comment = dgvRow.Cells["Comment"].Value?.ToString() ?? string.Empty;
+            // 履歴画面のフィルタ条件として共有されている_productMaster/_productRegisterWorkを
+            // 書き換えてしまわないよう、再印刷専用の一時インスタンスを生成する
+            var tempProductMaster = new ProductMaster();
+            tempProductMaster.LoadFrom(masterTable.Rows[0]);
+            tempProductMaster.UseSubstrates = ProductRepository.GetUseSubstrates(tempProductMaster.ProductID);
 
-            using var window = new RePrintWindow(_productMaster, _productRegisterWork, _appSettings);
+            var tempProductRegisterWork = new ProductRegisterWork {
+                OrderNumber = dgvRow.Cells["OrderNumber"].Value?.ToString() ?? string.Empty,
+                ProductNumber = dgvRow.Cells["ProductNumber"].Value?.ToString() ?? string.Empty,
+                Quantity = int.TryParse(dgvRow.Cells["Quantity"].Value?.ToString(), out var quantity) ? quantity : 0,
+                RegDate = dgvRow.Cells["RegDate"].Value?.ToString() ?? string.Empty,
+                Revision = dgvRow.Cells["Revision"].Value?.ToString() ?? string.Empty,
+                Comment = dgvRow.Cells["Comment"].Value?.ToString() ?? string.Empty
+            };
+
+            using var window = new RePrintWindow(tempProductMaster, tempProductRegisterWork, _appSettings);
             window.ShowDialog(this);
         }
 
