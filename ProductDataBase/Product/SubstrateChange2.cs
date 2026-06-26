@@ -385,6 +385,10 @@ namespace ProductDatabase {
 
             dataGridView.Enabled = checkBox.Checked;
             dataGridView.Visible = checkBox.Checked;
+            if (checkBox.Checked) {
+                // 非表示中に行を追加されたDataGridViewはスクロール範囲の再計算が行われないため、表示時に強制する
+                dataGridView.PerformLayout();
+            }
             checkBox.ForeColor = checkBox.Checked ? Color.Black : Color.Red;
 
             // 排他グループの他チェックボックスを自動OFF（チェックON時のみ）
