@@ -34,6 +34,38 @@
 
 ---
 
+## システム構成図
+
+3つのプロジェクトはコード上の参照関係を持たず、SQLite ファイル（`ProductRegistry.db`）を介して疎結合しています。Launcher はプロセス起動（`Process.Start`）で ProductDataBase を呼び出すだけで、アセンブリ参照はありません。
+
+```mermaid
+graph TB
+    subgraph Client["クライアント PC"]
+        Launcher["Launcher<br/>(net10.0-windows / WinForms)"]
+        ProductDataBase["ProductDataBase<br/>(net8.0-windows / WinForms)"]
+        bPac["Brother bPac SDK (COM)"]
+        ExcelInterop["Microsoft.Office.Interop.Excel (COM)"]
+        Printer[["Brother P-touch<br/>ラベルプリンタ"]]
+        Excel[["Microsoft Excel"]]
+    end
+
+    subgraph Storage["共有ストレージ"]
+        DB[("SQLite<br/>ProductRegistry.db")]
+    end
+
+    subgraph WebHost["Web ホスト (port 5009)"]
+        ProductWebViewer["ProductWebViewer<br/>(ASP.NET Core / net10.0)"]
+    end
+
+    Launcher -- "Process.Start" --> ProductDataBase
+    ProductDataBase -- "Dapper 読み書き" --> DB
+    ProductDataBase --> bPac --> Printer
+    ProductDataBase --> ExcelInterop --> Excel
+    ProductWebViewer -- "Dapper 読み取り" --> DB
+```
+
+---
+
 ## 必要環境
 
 - Windows 10 / 11
@@ -71,13 +103,92 @@ SQLite ファイル（`db/ProductRegistry.db`）に以下のテーブル・ビ�
 | `M_ProductDef` | 製品マスター |
 | `M_SubstrateDef` | 基板マスター |
 | `M_ProductUseSubstrate` | 使用基板マスター |
+| `M_Person` | 担当者マスター |
 | `T_Product` | 製品登録実績 |
 | `T_Substrate` | 基板登録実績 |
 | `T_Serial` | シリアル番号記録 |
-| `T_RePrint` | 再印刷履歴 |
+| `T_Reprint` | 再印刷履歴 |
 | `V_Product` | 製品検索ビュー |
 | `V_Substrate` | 基板検索ビュー |
 | `V_ProductUseSubstrate` | 使用基板ビュー |
+| `V_Reprint` | 再印刷検索ビュー |
+| `V_Serial` | シリアル検索ビュー |
+
+### ER図
+
+外部キー制約があるのは `T_Product.ProductID` と `T_Substrate.SubstrateID` のみです。`PersonID` などその他の関連は View 側の JOIN でのみ結び付く論理的な関連であり、DB 上の制約はありません。
+
+```mermaid
+erDiagram
+    M_ProductDef ||--o{ T_Product : "ProductID"
+    M_ProductDef ||--o{ T_Reprint : "ProductID (制約なし)"
+    M_ProductDef ||--o{ T_Serial : "ProductID (制約なし)"
+    M_ProductDef ||--o{ M_ProductUseSubstrate : "ProductID (制約なし)"
+    M_SubstrateDef ||--o{ T_Substrate : "SubstrateID"
+    M_SubstrateDef ||--o{ M_ProductUseSubstrate : "SubstrateID (制約なし)"
+    M_Person ||--o{ T_Product : "PersonID (制約なし)"
+    M_Person ||--o{ T_Substrate : "PersonID (制約なし)"
+    M_Person ||--o{ T_Reprint : "PersonID (制約なし)"
+
+    M_ProductDef {
+        int ProductID PK
+        string CategoryName
+        string ProductName
+        string ProductModel
+        int RegType
+        int SerialType
+        int SerialPrintType
+        int SheetPrintType
+    }
+    M_SubstrateDef {
+        int SubstrateID PK
+        string CategoryName
+        string SubstrateName
+        string SubstrateModel
+        int ExclusiveGroupID
+    }
+    M_ProductUseSubstrate {
+        int ProductID FK
+        int SubstrateID FK
+    }
+    M_Person {
+        int PersonID PK
+        string PersonName
+        int IsActive
+    }
+    T_Product {
+        int ID PK
+        int ProductID FK
+        string OrderNumber
+        int Quantity
+        int PersonID FK
+        string SerialFirst
+        string SerialLast
+        int IsDeleted
+    }
+    T_Substrate {
+        int ID PK
+        int SubstrateID FK
+        string OrderNumber
+        int Increase
+        int Decrease
+        int Defect
+        int PersonID FK
+        int IsDeleted
+    }
+    T_Serial {
+        string Serial PK
+        int UsedID
+        int ProductID FK
+    }
+    T_Reprint {
+        int ID PK
+        int ProductID FK
+        int PersonID FK
+        string SerialFirst
+        string SerialLast
+    }
+```
 
 ---
 
