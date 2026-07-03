@@ -66,6 +66,21 @@ graph TB
 
 ---
 
+## 工夫した点
+
+- **3プロジェクトの疎結合構成** — Launcher / ProductDataBase / ProductWebViewer はアセンブリ参照を持たず、SQLite ファイルのみを介して連携。TFM が異なる（.NET 8 / .NET 10）プロジェクト間でも依存を持たずに済む構成
+- **ビットフラグ方式の印刷パターン設計** — `SerialPrintType` / `SheetPrintType` カラムを `SerialPrintTypeFlags` / `SheetPrintTypeFlags`（`[Flags]` enum）で解釈し、複数の印刷・付番パターンを1カラムで管理（詳細は `sql.md`）
+- **Excel 帳票の自動生成** — テンプレートベースで成績書・チェックシート・一覧表・基板情報を自動出力
+- **多重起動防止・自動バックアップ・操作ログ** — Mutex によるプロセス制御、起動時 DB バックアップ（最大20件）、月別 CSV 操作ログ
+
+## 技術選定理由
+
+- **SQLite** — 社内の製品管理用PC1台のみで運用するため採用
+- **Dapper** — SQL を直接書けるため採用
+- **Excel処理の使い分け（ClosedXML / EPPlus / NPOI）** — 各ライブラリごとに問題点があったため使い分け
+
+---
+
 ## 必要環境
 
 - Windows 10 / 11
