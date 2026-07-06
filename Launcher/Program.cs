@@ -22,6 +22,8 @@ namespace Launcher {
                     // すでにインスタンスが存在する場合
                     MessageBox.Show("このアプリケーションはすでに起動しています。", "重複起動の防止",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    _mutex?.Dispose();
+                    _mutex = null;
                     return;
                 }
 
