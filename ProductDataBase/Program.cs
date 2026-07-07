@@ -9,31 +9,31 @@ namespace ProductDatabase {
         private static void Main() {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
-            const string MutexName = "MyUniqueAppMutex"; // �A�v���P�[�V�����ŗL�̖��O���w��
+            const string MutexName = "MyUniqueAppMutex"; // アプリケーション固有の名前を指定
 
-            // �~���[�e�b�N�X���쐬
+            // ミューテックスを作成
             _mutex = new Mutex(true, MutexName, out var isNewInstance);
 
             if (!isNewInstance) {
-                // ���łɃC���X�^���X�����݂���ꍇ
-                MessageBox.Show("���̃A�v���P�[�V�����͂��łɋN�����Ă��܂��B", "�d���N���̖h�~",
+                // すでにインスタンスが存在する場合
+                MessageBox.Show("このアプリケーションはすでに起動しています。", "重複起動の防止",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // �A�v���P�[�V���������s
+            // アプリケーションを実行
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // UI�X���b�h��O
+            // UIスレッド例外
             Application.ThreadException += (s, e) => {
-                MessageBox.Show(e.Exception.ToString(), "UI��O");
+                MessageBox.Show(e.Exception.ToString(), "UI例外");
             };
 
-            // ��UI�X���b�h��O
+            // 非UIスレッド例外
             AppDomain.CurrentDomain.UnhandledException += (s, e) => {
                 if (e.ExceptionObject is Exception ex)
-                    MessageBox.Show(ex.ToString(), "��UI��O");
+                    MessageBox.Show(ex.ToString(), "非UI例外");
             };
 
             try {
