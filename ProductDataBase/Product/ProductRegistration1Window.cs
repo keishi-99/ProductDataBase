@@ -131,12 +131,12 @@ namespace ProductDatabase {
                     }
                 }
 
-                if (ManufacturingNumberCheckBox.Checked) {
+                if (ManufacturingNumberCheckBox.Checked && !OtherNumberCheckBox.Checked) {
                     string text = ManufacturingNumberMaskedTextBox.Text.Trim();
                     bool hasCorrectLength = text.Length == 15;
 
                     if (!hasCorrectLength) {
-                        MessageBox.Show(OtherNumberCheckBox.Checked ? "製番を15桁で入力して下さい。" : "製番を10桁+4桁で入力して下さい。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("製番を10桁+4桁で入力して下さい。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         ManufacturingNumberMaskedTextBox.Focus();
                         return;
                     }
@@ -291,10 +291,8 @@ namespace ProductDatabase {
                     OtherNumberCheckBox.Enabled = checkBox.Checked;
                     break;
                 case "OtherNumberCheckBox":
-                    ManufacturingNumberMaskedTextBox.Mask = checkBox.Checked ? "AAAAAAAAAAAAAAA" : ">LA00A00000-0000";
-                    if (checkBox.Checked) {
-                        ManufacturingNumberMaskedTextBox.Text = string.Empty;
-                    }
+                    ManufacturingNumberMaskedTextBox.Mask = checkBox.Checked ? "aaaaaaaaaaaaaaa" : ">LA00A00000-0000";
+                    ManufacturingNumberMaskedTextBox.Text = string.Empty;
                     break;
                 case "QuantityCheckBox":
                     QuantityTextBox.Enabled = checkBox.Checked;
@@ -522,10 +520,10 @@ namespace ProductDatabase {
             }
 
             string manufacturingNumber = ManufacturingNumberMaskedTextBox.Text.Trim();
-            if (ManufacturingNumberCheckBox.Checked) {
+            if (ManufacturingNumberCheckBox.Checked && !OtherNumberCheckBox.Checked) {
                 bool isValid = manufacturingNumber.Length == 15;
                 if (!isValid) {
-                    ShowError(OtherNumberCheckBox.Checked ? "製番を15桁で入力して下さい。" : "製番を10桁+4桁で入力して下さい。");
+                    ShowError("製番を10桁+4桁で入力して下さい。");
                     return;
                 }
             }
