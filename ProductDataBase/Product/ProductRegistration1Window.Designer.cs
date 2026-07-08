@@ -65,7 +65,7 @@
             this.textToUpperCheckBox = new CheckBox();
             this.RevisionChangeButton = new Button();
             this.RegistrationDateTimePicker = new DateTimePicker();
-            this.RNumberCheckBox = new CheckBox();
+            this.OtherNumberCheckBox = new CheckBox();
             this.MessageTextBox = new RichTextBox();
             this.ErrorMessageLabel = new Label();
             this.groupBox1 = new GroupBox();
@@ -530,16 +530,16 @@
             this.RegistrationDateTimePicker.Size = new Size(120, 23);
             this.RegistrationDateTimePicker.TabIndex = 18;
             // 
-            // RNumberCheckBox
+            // OtherNumberCheckBox
             // 
-            this.RNumberCheckBox.AutoSize = true;
-            this.RNumberCheckBox.Location = new Point(96, 168);
-            this.RNumberCheckBox.Name = "RNumberCheckBox";
-            this.RNumberCheckBox.Size = new Size(46, 19);
-            this.RNumberCheckBox.TabIndex = 3;
-            this.RNumberCheckBox.Text = "R番";
-            this.RNumberCheckBox.UseVisualStyleBackColor = true;
-            this.RNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
+            this.OtherNumberCheckBox.AutoSize = true;
+            this.OtherNumberCheckBox.Location = new Point(96, 168);
+            this.OtherNumberCheckBox.Name = "OtherNumberCheckBox";
+            this.OtherNumberCheckBox.Size = new Size(46, 19);
+            this.OtherNumberCheckBox.TabIndex = 3;
+            this.OtherNumberCheckBox.Text = "他";
+            this.OtherNumberCheckBox.UseVisualStyleBackColor = true;
+            this.OtherNumberCheckBox.CheckedChanged += this.CheckBoxChecked;
             // 
             // MessageTextBox
             // 
@@ -592,7 +592,7 @@
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.ErrorMessageLabel);
-            this.Controls.Add(this.RNumberCheckBox);
+            this.Controls.Add(this.OtherNumberCheckBox);
             this.Controls.Add(this.RegistrationDateTimePicker);
             this.Controls.Add(this.RevisionChangeButton);
             this.Controls.Add(this.ProductTypeLabel2);
@@ -691,7 +691,7 @@
         private CheckBox textToUpperCheckBox;
         private Button RevisionChangeButton;
         private DateTimePicker RegistrationDateTimePicker;
-        private CheckBox RNumberCheckBox;
+        private CheckBox OtherNumberCheckBox;
         private ToolStripMenuItem メッセージ設定ToolStripMenuItem;
         private RichTextBox MessageTextBox;
         private Label ErrorMessageLabel;

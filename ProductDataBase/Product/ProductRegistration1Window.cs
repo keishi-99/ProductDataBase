@@ -208,7 +208,8 @@ namespace ProductDatabase {
                     }
                     _productRegisterWork.PersonID = (long?)PersonComboBox.SelectedValue;
                     _productRegisterWork.PersonName = selectedPerson.PersonName;
-                } else {
+                }
+                else {
                     _productRegisterWork.PersonID = null;
                     _productRegisterWork.PersonName = string.Empty;
                 }
@@ -288,10 +289,10 @@ namespace ProductDatabase {
                     break;
                 case "ManufacturingNumberCheckBox":
                     ManufacturingNumberMaskedTextBox.Enabled = checkBox.Checked;
-                    RNumberCheckBox.Enabled = checkBox.Checked;
+                    OtherNumberCheckBox.Enabled = checkBox.Checked;
                     break;
-                case "RNumberCheckBox":
-                    ManufacturingNumberMaskedTextBox.Mask = checkBox.Checked ? "R00000000000000" : ">LA00A00000-0000";
+                case "OtherNumberCheckBox":
+                    ManufacturingNumberMaskedTextBox.Mask = checkBox.Checked ? "AAAAAAAAAAAAAAA" : ">LA00A00000-0000";
                     break;
                 case "QuantityCheckBox":
                     QuantityTextBox.Enabled = checkBox.Checked;
@@ -521,7 +522,7 @@ namespace ProductDatabase {
             string manufacturingNumber = ManufacturingNumberMaskedTextBox.Text.Trim();
             if (ManufacturingNumberCheckBox.Checked) {
                 bool isValid = manufacturingNumber.Length == 15;
-                if (!RNumberCheckBox.Checked && !isValid) {
+                if (!OtherNumberCheckBox.Checked && !isValid) {
                     ShowError("製番を10桁+4桁で入力して下さい。");
                     return;
                 }
