@@ -133,11 +133,10 @@ namespace ProductDatabase {
 
                 if (ManufacturingNumberCheckBox.Checked) {
                     string text = ManufacturingNumberMaskedTextBox.Text.Trim();
-                    bool startsWithR = text.StartsWith("R", StringComparison.OrdinalIgnoreCase);
                     bool hasCorrectLength = text.Length == 15;
 
-                    if (!startsWithR && !hasCorrectLength) {
-                        MessageBox.Show("製番を10桁+4桁で入力して下さい。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    if (!hasCorrectLength) {
+                        MessageBox.Show(OtherNumberCheckBox.Checked ? "製番を15桁で入力して下さい。" : "製番を10桁+4桁で入力して下さい。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         ManufacturingNumberMaskedTextBox.Focus();
                         return;
                     }
@@ -293,6 +292,9 @@ namespace ProductDatabase {
                     break;
                 case "OtherNumberCheckBox":
                     ManufacturingNumberMaskedTextBox.Mask = checkBox.Checked ? "AAAAAAAAAAAAAAA" : ">LA00A00000-0000";
+                    if (checkBox.Checked) {
+                        ManufacturingNumberMaskedTextBox.Text = string.Empty;
+                    }
                     break;
                 case "QuantityCheckBox":
                     QuantityTextBox.Enabled = checkBox.Checked;
@@ -522,8 +524,8 @@ namespace ProductDatabase {
             string manufacturingNumber = ManufacturingNumberMaskedTextBox.Text.Trim();
             if (ManufacturingNumberCheckBox.Checked) {
                 bool isValid = manufacturingNumber.Length == 15;
-                if (!OtherNumberCheckBox.Checked && !isValid) {
-                    ShowError("製番を10桁+4桁で入力して下さい。");
+                if (!isValid) {
+                    ShowError(OtherNumberCheckBox.Checked ? "製番を15桁で入力して下さい。" : "製番を10桁+4桁で入力して下さい。");
                     return;
                 }
             }
