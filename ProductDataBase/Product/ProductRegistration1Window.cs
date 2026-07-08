@@ -291,7 +291,7 @@ namespace ProductDatabase {
                     OtherNumberCheckBox.Enabled = checkBox.Checked;
                     break;
                 case "OtherNumberCheckBox":
-                    ManufacturingNumberMaskedTextBox.Mask = checkBox.Checked ? "aaaaaaaaaaaaaaa" : ">LA00A00000-0000";
+                    ManufacturingNumberMaskedTextBox.Mask = checkBox.Checked ? ">aaaaaaaaaaaaaaa" : ">LA00A00000-0000";
                     ManufacturingNumberMaskedTextBox.Text = checkBox.Checked ? string.Empty : "H";
                     break;
                 case "QuantityCheckBox":
