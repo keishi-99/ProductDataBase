@@ -70,8 +70,8 @@ namespace ProductDatabase.Data {
             var inStockFilter = inStock ? " AND Stock > 0" : string.Empty;
 
             var selectClause = groupByModel
-                ? "SubstrateID, ProductName, SubstrateName, SubstrateModel, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock"
-                : "SubstrateID, ProductName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock";
+                ? $"SubstrateID, ProductName, SubstrateName, SubstrateModel, {Constants.SubstrateStockSumExpression}"
+                : $"SubstrateID, ProductName, SubstrateName, SubstrateModel, SubstrateNumber, OrderNumber, {Constants.SubstrateStockSumExpression}";
 
             var groupByClause = groupByModel ? "SubstrateName, SubstrateID" : "SubstrateName, SubstrateID, SubstrateNumber, OrderNumber";
             var orderByClause = groupByModel ? "SubstrateModel" : "MIN(ID) DESC";

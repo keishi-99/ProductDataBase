@@ -11,5 +11,8 @@
         public const string VProductTableName = "V_Product";
         public const string VSubstrateTableName = "V_Substrate";
         public const string VProductUseSubstrate = "V_ProductUseSubstrate";
+
+        // 基板在庫数を求める集計式（Decrease・Defect はDBに負数で格納されているため単純合算で在庫数になる）
+        public const string SubstrateStockSumExpression = "SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock";
     }
 }
