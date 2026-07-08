@@ -289,6 +289,9 @@ namespace ProductDatabase {
                 case "ManufacturingNumberCheckBox":
                     ManufacturingNumberMaskedTextBox.Enabled = checkBox.Checked;
                     OtherNumberCheckBox.Enabled = checkBox.Checked;
+                    if (!checkBox.Checked) {
+                        OtherNumberCheckBox.Checked = false;
+                    }
                     break;
                 case "OtherNumberCheckBox":
                     ManufacturingNumberMaskedTextBox.Mask = checkBox.Checked ? ">aaaaaaaaaaaaaaa" : ">LA00A00000-0000";
