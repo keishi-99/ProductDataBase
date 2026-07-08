@@ -292,7 +292,7 @@ namespace ProductDatabase {
                     break;
                 case "OtherNumberCheckBox":
                     ManufacturingNumberMaskedTextBox.Mask = checkBox.Checked ? "aaaaaaaaaaaaaaa" : ">LA00A00000-0000";
-                    ManufacturingNumberMaskedTextBox.Text = string.Empty;
+                    ManufacturingNumberMaskedTextBox.Text = checkBox.Checked ? string.Empty : "H";
                     break;
                 case "QuantityCheckBox":
                     QuantityTextBox.Enabled = checkBox.Checked;
