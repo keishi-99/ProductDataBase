@@ -103,7 +103,7 @@ namespace ProductDatabase.Data {
                     SubstrateModel,
                     SubstrateNumber,
                     OrderNumber,
-                    SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                    {Constants.SubstrateStockSumExpression}
                 FROM
                     {Constants.VSubstrateTableName}
                 WHERE
@@ -237,7 +237,7 @@ namespace ProductDatabase.Data {
                 SELECT
                     SubstrateName,
                     SubstrateNumber,
-                    SUM(COALESCE(Increase, 0) + COALESCE(Decrease, 0) + COALESCE(Defect, 0)) AS Stock
+                    {Constants.SubstrateStockSumExpression}
                 FROM
                     {Constants.VSubstrateTableName}
                 WHERE
