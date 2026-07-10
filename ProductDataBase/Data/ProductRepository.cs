@@ -208,48 +208,12 @@ namespace ProductDatabase.Data {
             _cacheManager.ClearCache();
         }
 
-        // T_Serial の ProductID 追加・ProductName 削除・V_Serial 作成を行うマイグレーション
+        // V_Serial 作成を行うマイグレーション
         public static void MigrateSerialProductId() {
             using var con = new SqliteConnection(GetConnectionRegistration());
             con.Open();
 
-            var columns = con.Query<string>("SELECT name FROM pragma_table_info('T_Serial')").ToList();
-
             using var tx = con.BeginTransaction();
-
-            // ProductID カラム追加（未存在時のみ）
-            if (!columns.Contains("ProductID")) {
-                con.Execute("ALTER TABLE T_Serial ADD COLUMN ProductID INTEGER", transaction: tx);
-
-                // UsedID → T_Product → ProductID で補完
-                con.Execute(
-                    $"""
-                    UPDATE T_Serial
-                    SET ProductID = (
-                        SELECT tp.ProductID
-                        FROM {Constants.TProductTableName} AS tp
-                        WHERE tp.ID = T_Serial.UsedID
-                    )
-                    WHERE ProductID IS NULL
-                    """, transaction: tx);
-
-                // 残り NULL は ProductName から逆引き補完
-                con.Execute(
-                    $"""
-                    UPDATE T_Serial
-                    SET ProductID = (
-                        SELECT m.ProductID
-                        FROM {Constants.ProductTableName} AS m
-                        WHERE m.ProductName = T_Serial.ProductName
-                        LIMIT 1
-                    )
-                    WHERE ProductID IS NULL
-                    """, transaction: tx);
-            }
-
-            // ProductName 列を削除（存在する場合）
-            if (columns.Contains("ProductName"))
-                con.Execute("ALTER TABLE T_Serial DROP COLUMN ProductName", transaction: tx);
 
             // V_Serial ビューを作成（存在しない場合）
             con.Execute(
@@ -378,16 +342,6 @@ namespace ProductDatabase.Data {
 
             // キャッシュをクリア（マスターデータの関連が変更されたため）
             _cacheManager.ClearCache();
-        }
-
-        // M_SubstrateDef に ExclusiveGroupID 列を追加するマイグレーション
-        public static void MigrateExclusiveGroup() {
-            using var con = new SqliteConnection(GetConnectionRegistration());
-            con.Open();
-            var columns = con.Query<string>("SELECT name FROM pragma_table_info('M_SubstrateDef')").ToList();
-            if (!columns.Contains("ExclusiveGroupID")) {
-                con.Execute("ALTER TABLE M_SubstrateDef ADD COLUMN ExclusiveGroupID INTEGER");
-            }
         }
 
         // キャッシュの状態を取得する（デバッグ・テスト用）

@@ -38,7 +38,6 @@ namespace ProductDatabase {
         public void LoadDatabase(ProductRepository productRepository) {
             try {
                 ProductRepository.MigrateSerialProductId();
-                ProductRepository.MigrateExclusiveGroup();
                 productRepository.LoadAll();
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(LoadDatabase), ex, "DB読み込み失敗");
