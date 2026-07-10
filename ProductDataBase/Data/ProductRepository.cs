@@ -260,6 +260,7 @@ namespace ProductDatabase.Data {
                 FROM {Constants.TProductTableName} AS t
                 LEFT JOIN {Constants.ProductTableName} AS m ON t.ProductID = m.ProductID
                 LEFT JOIN {Constants.PersonTableName} AS p ON t.PersonID = p.PersonID
+                WHERE t.IsDeleted = 0
                 """, transaction: tx);
 
             con.Execute($"DROP VIEW IF EXISTS {Constants.VSubstrateTableName}", transaction: tx);
@@ -288,6 +289,7 @@ namespace ProductDatabase.Data {
                 FROM {Constants.TSubstrateTableName} AS t
                 LEFT JOIN {Constants.SubstrateTableName} AS m ON t.SubstrateID = m.SubstrateID
                 LEFT JOIN {Constants.PersonTableName} AS p ON t.PersonID = p.PersonID
+                WHERE t.IsDeleted = 0
                 """, transaction: tx);
 
             con.Execute($"DROP VIEW IF EXISTS {Constants.VProductUseSubstrate}", transaction: tx);
