@@ -94,7 +94,7 @@ namespace ProductDatabase.Data {
             }
 
             con.Execute(
-                "DELETE FROM M_ProductUseSubstrate WHERE SubstrateID = @SubstrateId",
+                $"DELETE FROM {Constants.ProductUseSubstrateTableName} WHERE SubstrateID = @SubstrateId",
                 new { SubstrateId = substrateId }, tx);
 
             con.Execute(

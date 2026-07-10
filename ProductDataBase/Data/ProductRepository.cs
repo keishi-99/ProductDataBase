@@ -95,15 +95,15 @@ namespace ProductDatabase.Data {
         public static List<SubstrateInfo> GetUseSubstrates(long productKey) {
             using var con = new SqliteConnection(GetConnectionRegistration());
 
-            const string sql =
-                """
+            var sql =
+                $"""
                 SELECT
                     pus.SubstrateID,
                     s.SubstrateName,
                     s.SubstrateModel,
                     s.ExclusiveGroupID
-                FROM M_ProductUseSubstrate pus
-                JOIN M_SubstrateDef s ON pus.SubstrateID = s.SubstrateID
+                FROM {Constants.ProductUseSubstrateTableName} pus
+                JOIN {Constants.SubstrateTableName} s ON pus.SubstrateID = s.SubstrateID
                 WHERE pus.ProductID = @ProductKey
                 """;
 
@@ -208,17 +208,17 @@ namespace ProductDatabase.Data {
             _cacheManager.ClearCache();
         }
 
-        // V_Serial 作成を行うマイグレーション
-        public static void MigrateSerialProductId() {
+        // 全ビューをコード上の定義で再作成する（DROP+CREATEのため起動のたびに最新定義へ同期される）
+        public static void RecreateViews() {
             using var con = new SqliteConnection(GetConnectionRegistration());
             con.Open();
 
             using var tx = con.BeginTransaction();
 
-            // V_Serial ビューを作成（存在しない場合）
+            con.Execute($"DROP VIEW IF EXISTS {Constants.VSerialTableName}", transaction: tx);
             con.Execute(
                 $"""
-                CREATE VIEW IF NOT EXISTS {Constants.VSerialTableName} AS
+                CREATE VIEW {Constants.VSerialTableName} AS
                 SELECT
                     s.rowid,
                     s.Serial,
@@ -229,6 +229,112 @@ namespace ProductDatabase.Data {
                     m.CategoryName
                 FROM {Constants.TSerialTableName} AS s
                 LEFT JOIN {Constants.ProductTableName} AS m ON s.ProductID = m.ProductID
+                """, transaction: tx);
+
+            con.Execute($"DROP VIEW IF EXISTS {Constants.VProductTableName}", transaction: tx);
+            con.Execute(
+                $"""
+                CREATE VIEW {Constants.VProductTableName} AS
+                SELECT
+                    t.ID,
+                    t.ProductID,
+                    m.CategoryName,
+                    m.ProductName,
+                    m.ProductType,
+                    m.ProductModel,
+                    t.OrderNumber,
+                    t.ProductNumber,
+                    t.OLesNumber,
+                    t.Quantity,
+                    t.SerialFirst,
+                    t.SerialLast,
+                    t.Revision,
+                    t.RevisionGroup,
+                    t.SerialLastNumber,
+                    t.PersonID || '.' || p.PersonName AS PersonInfo,
+                    t.RegDate,
+                    t.Comment,
+                    t.CreatedAt,
+                    t.IsDeleted,
+                    t.DeletedAt
+                FROM {Constants.TProductTableName} AS t
+                LEFT JOIN {Constants.ProductTableName} AS m ON t.ProductID = m.ProductID
+                LEFT JOIN {Constants.PersonTableName} AS p ON t.PersonID = p.PersonID
+                WHERE t.IsDeleted = 0
+                """, transaction: tx);
+
+            con.Execute($"DROP VIEW IF EXISTS {Constants.VSubstrateTableName}", transaction: tx);
+            con.Execute(
+                $"""
+                CREATE VIEW {Constants.VSubstrateTableName} AS
+                SELECT
+                    t.ID,
+                    t.SubstrateID,
+                    m.CategoryName,
+                    m.ProductName,
+                    m.SubstrateName,
+                    m.SubstrateModel,
+                    t.OrderNumber,
+                    t.SubstrateNumber,
+                    t.Increase,
+                    t.Decrease,
+                    t.Defect,
+                    t.PersonID || '.' || p.PersonName AS PersonInfo,
+                    t.RegDate,
+                    t.Comment,
+                    t.UseID,
+                    t.CreatedAt,
+                    t.IsDeleted,
+                    t.DeletedAt
+                FROM {Constants.TSubstrateTableName} AS t
+                LEFT JOIN {Constants.SubstrateTableName} AS m ON t.SubstrateID = m.SubstrateID
+                LEFT JOIN {Constants.PersonTableName} AS p ON t.PersonID = p.PersonID
+                WHERE t.IsDeleted = 0
+                """, transaction: tx);
+
+            con.Execute($"DROP VIEW IF EXISTS {Constants.VProductUseSubstrate}", transaction: tx);
+            con.Execute(
+                $"""
+                CREATE VIEW {Constants.VProductUseSubstrate} AS
+                SELECT
+                    p.ProductID AS P_ProductID,
+                    s.SubstrateID AS S_SubstrateID,
+                    p.ProductName,
+                    p.ProductType,
+                    s.SubstrateName,
+                    s.SubstrateModel
+                FROM {Constants.ProductUseSubstrateTableName} AS ps
+                JOIN {Constants.ProductTableName} AS p ON p.ProductID = ps.ProductID
+                JOIN {Constants.SubstrateTableName} AS s ON s.SubstrateID = ps.SubstrateID
+                """, transaction: tx);
+
+            con.Execute($"DROP VIEW IF EXISTS {Constants.VRePrintTableName}", transaction: tx);
+            con.Execute(
+                $"""
+                CREATE VIEW {Constants.VRePrintTableName} AS
+                SELECT
+                    t.ID,
+                    t.SerialPrintType,
+                    t.ProductID,
+                    m.CategoryName,
+                    m.ProductName,
+                    m.ProductType,
+                    m.ProductModel,
+                    t.OrderNumber,
+                    t.ProductNumber,
+                    t.OLesNumber,
+                    t.Quantity,
+                    t.SerialFirst,
+                    t.SerialLast,
+                    t.Revision,
+                    t.RevisionGroup,
+                    t.PersonID || '.' || p.PersonName AS PersonInfo,
+                    t.RegDate,
+                    t.Comment,
+                    t.CreatedAt
+                FROM {Constants.TRePrintTableName} AS t
+                LEFT JOIN {Constants.ProductTableName} AS m ON t.ProductID = m.ProductID
+                LEFT JOIN {Constants.PersonTableName} AS p ON t.PersonID = p.PersonID
                 """, transaction: tx);
 
             tx.Commit();
@@ -249,7 +355,7 @@ namespace ProductDatabase.Data {
             }
 
             con.Execute(
-                "DELETE FROM M_ProductUseSubstrate WHERE ProductID = @ProductId",
+                $"DELETE FROM {Constants.ProductUseSubstrateTableName} WHERE ProductID = @ProductId",
                 new { ProductId = productId }, tx);
 
             con.Execute(
@@ -331,10 +437,10 @@ namespace ProductDatabase.Data {
             using var tx = con.BeginTransaction();
 
             con.Execute(
-                "DELETE FROM M_ProductUseSubstrate WHERE ProductID = @ProductId",
+                $"DELETE FROM {Constants.ProductUseSubstrateTableName} WHERE ProductID = @ProductId",
                 new { ProductId = productId }, tx);
 
-            const string insertSql = "INSERT INTO M_ProductUseSubstrate (ProductID, SubstrateID) VALUES (@ProductId, @SubstrateId)";
+            var insertSql = $"INSERT INTO {Constants.ProductUseSubstrateTableName} (ProductID, SubstrateID) VALUES (@ProductId, @SubstrateId)";
             var insertData = substrateIds.Select(id => new { ProductId = productId, SubstrateId = id });
             con.Execute(insertSql, insertData, tx);
 

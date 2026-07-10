@@ -10,7 +10,7 @@ namespace ProductDatabase.Data {
             try {
                 using var con = DbConnectionHelper.CreateAndOpenConnection();
                 return con.Query<PersonDef>(
-                    "SELECT PersonID, PersonName FROM M_Person WHERE IsActive = 1 ORDER BY PersonID")
+                    $"SELECT PersonID, PersonName FROM {Constants.PersonTableName} WHERE IsActive = 1 ORDER BY PersonID")
                     .Select(p => $"{p.PersonID:D2}.{p.PersonName}")
                     .ToList();
             } catch (Exception ex) {
@@ -24,7 +24,7 @@ namespace ProductDatabase.Data {
             try {
                 using var con = DbConnectionHelper.CreateAndOpenConnection();
                 return con.Query<PersonDef>(
-                    "SELECT * FROM M_Person ORDER BY PersonID")
+                    $"SELECT * FROM {Constants.PersonTableName} ORDER BY PersonID")
                     .ToList();
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(GetAll), ex, null);
@@ -37,7 +37,7 @@ namespace ProductDatabase.Data {
             try {
                 using var con = DbConnectionHelper.CreateAndOpenConnection();
                 return con.Query<PersonDef>(
-                    "SELECT * FROM M_Person WHERE IsActive = 1 ORDER BY PersonID")
+                    $"SELECT * FROM {Constants.PersonTableName} WHERE IsActive = 1 ORDER BY PersonID")
                     .ToList();
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(GetActivePersons), ex, null);
@@ -49,7 +49,7 @@ namespace ProductDatabase.Data {
             try {
                 using var con = DbConnectionHelper.CreateAndOpenConnection();
                 con.Execute(
-                    "INSERT INTO M_Person (PersonName, IsActive) VALUES (@PersonName, @IsActive)",
+                    $"INSERT INTO {Constants.PersonTableName} (PersonName, IsActive) VALUES (@PersonName, @IsActive)",
                     new { personInfo.PersonName, IsActive = personInfo.IsActive });
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(Insert), ex, $"PersonName: {personInfo.PersonName}");
@@ -61,7 +61,7 @@ namespace ProductDatabase.Data {
             try {
                 using var con = DbConnectionHelper.CreateAndOpenConnection();
                 con.Execute(
-                    "UPDATE M_Person SET PersonName=@PersonName, IsActive=@IsActive WHERE PersonID=@PersonID",
+                    $"UPDATE {Constants.PersonTableName} SET PersonName=@PersonName, IsActive=@IsActive WHERE PersonID=@PersonID",
                     new { personInfo.PersonName, IsActive = personInfo.IsActive, personInfo.PersonID });
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(Update), ex, $"PersonID: {personInfo.PersonID}, PersonName: {personInfo.PersonName}");
@@ -75,7 +75,7 @@ namespace ProductDatabase.Data {
             try {
                 using var con = DbConnectionHelper.CreateAndOpenConnection();
                 return con.ExecuteScalar<int>(
-                    "SELECT COUNT(*) FROM M_Person WHERE PersonName=@Name AND PersonID != @ExcludeId",
+                    $"SELECT COUNT(*) FROM {Constants.PersonTableName} WHERE PersonName=@Name AND PersonID != @ExcludeId",
                     new { Name = name.Trim(), ExcludeId = excludeId }) > 0;
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(ExistsName), ex, $"PersonName: {name}");

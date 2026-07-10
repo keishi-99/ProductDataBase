@@ -2,6 +2,8 @@
     public static class Constants {
         public const string ProductTableName = "M_ProductDef";
         public const string SubstrateTableName = "M_SubstrateDef";
+        public const string PersonTableName = "M_Person";
+        public const string ProductUseSubstrateTableName = "M_ProductUseSubstrate";
         public const string TProductTableName = "T_Product";
         public const string TSubstrateTableName = "T_Substrate";
         public const string TSerialTableName = "T_Serial";
