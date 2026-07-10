@@ -269,6 +269,7 @@ namespace ProductDatabase.Data {
                 WHERE
                     ProductID = @ProductID
                     AND Quantity >= 1
+                    AND IsDeleted = 0
                 ORDER BY
                     ID DESC
                 ;
