@@ -297,8 +297,8 @@ namespace ProductDatabase.Data {
                 $"""
                 CREATE VIEW {Constants.VProductUseSubstrate} AS
                 SELECT
-                    p.ProductID As P_ProductID,
-                    s.SubstrateID As S_SubstrateID,
+                    p.ProductID AS P_ProductID,
+                    s.SubstrateID AS S_SubstrateID,
                     p.ProductName,
                     p.ProductType,
                     s.SubstrateName,
