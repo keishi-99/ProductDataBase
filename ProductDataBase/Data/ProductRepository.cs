@@ -208,7 +208,7 @@ namespace ProductDatabase.Data {
             _cacheManager.ClearCache();
         }
 
-        // T_Serial の ProductID 追加・ProductName 削除・V_Serial 作成を行うマイグレーション
+        // T_Serial の ProductID 追加・V_Serial 作成を行うマイグレーション
         public static void MigrateSerialProductId() {
             using var con = new SqliteConnection(GetConnectionRegistration());
             con.Open();
@@ -246,10 +246,6 @@ namespace ProductDatabase.Data {
                     WHERE ProductID IS NULL
                     """, transaction: tx);
             }
-
-            // ProductName 列を削除（存在する場合）
-            if (columns.Contains("ProductName"))
-                con.Execute("ALTER TABLE T_Serial DROP COLUMN ProductName", transaction: tx);
 
             // V_Serial ビューを作成（存在しない場合）
             con.Execute(
@@ -378,16 +374,6 @@ namespace ProductDatabase.Data {
 
             // キャッシュをクリア（マスターデータの関連が変更されたため）
             _cacheManager.ClearCache();
-        }
-
-        // M_SubstrateDef に ExclusiveGroupID 列を追加するマイグレーション
-        public static void MigrateExclusiveGroup() {
-            using var con = new SqliteConnection(GetConnectionRegistration());
-            con.Open();
-            var columns = con.Query<string>("SELECT name FROM pragma_table_info('M_SubstrateDef')").ToList();
-            if (!columns.Contains("ExclusiveGroupID")) {
-                con.Execute("ALTER TABLE M_SubstrateDef ADD COLUMN ExclusiveGroupID INTEGER");
-            }
         }
 
         // キャッシュの状態を取得する（デバッグ・テスト用）
