@@ -95,15 +95,15 @@ namespace ProductDatabase.Data {
         public static List<SubstrateInfo> GetUseSubstrates(long productKey) {
             using var con = new SqliteConnection(GetConnectionRegistration());
 
-            const string sql =
-                """
+            var sql =
+                $"""
                 SELECT
                     pus.SubstrateID,
                     s.SubstrateName,
                     s.SubstrateModel,
                     s.ExclusiveGroupID
-                FROM M_ProductUseSubstrate pus
-                JOIN M_SubstrateDef s ON pus.SubstrateID = s.SubstrateID
+                FROM {Constants.ProductUseSubstrateTableName} pus
+                JOIN {Constants.SubstrateTableName} s ON pus.SubstrateID = s.SubstrateID
                 WHERE pus.ProductID = @ProductKey
                 """;
 
@@ -259,7 +259,7 @@ namespace ProductDatabase.Data {
                     t.DeletedAt
                 FROM {Constants.TProductTableName} AS t
                 LEFT JOIN {Constants.ProductTableName} AS m ON t.ProductID = m.ProductID
-                LEFT JOIN M_Person AS p ON t.PersonID = p.PersonID
+                LEFT JOIN {Constants.PersonTableName} AS p ON t.PersonID = p.PersonID
                 """, transaction: tx);
 
             con.Execute($"DROP VIEW IF EXISTS {Constants.VSubstrateTableName}", transaction: tx);
@@ -287,7 +287,7 @@ namespace ProductDatabase.Data {
                     t.DeletedAt
                 FROM {Constants.TSubstrateTableName} AS t
                 LEFT JOIN {Constants.SubstrateTableName} AS m ON t.SubstrateID = m.SubstrateID
-                LEFT JOIN M_Person AS p ON t.PersonID = p.PersonID
+                LEFT JOIN {Constants.PersonTableName} AS p ON t.PersonID = p.PersonID
                 """, transaction: tx);
 
             con.Execute($"DROP VIEW IF EXISTS {Constants.VProductUseSubstrate}", transaction: tx);
@@ -301,7 +301,7 @@ namespace ProductDatabase.Data {
                     p.ProductType,
                     s.SubstrateName,
                     s.SubstrateModel
-                FROM M_ProductUseSubstrate AS ps
+                FROM {Constants.ProductUseSubstrateTableName} AS ps
                 JOIN {Constants.ProductTableName} AS p ON p.ProductID = ps.ProductID
                 JOIN {Constants.SubstrateTableName} AS s ON s.SubstrateID = ps.SubstrateID
                 """, transaction: tx);
@@ -332,7 +332,7 @@ namespace ProductDatabase.Data {
                     t.CreatedAt
                 FROM {Constants.TRePrintTableName} AS t
                 LEFT JOIN {Constants.ProductTableName} AS m ON t.ProductID = m.ProductID
-                LEFT JOIN M_Person AS p ON t.PersonID = p.PersonID
+                LEFT JOIN {Constants.PersonTableName} AS p ON t.PersonID = p.PersonID
                 """, transaction: tx);
 
             tx.Commit();
@@ -353,7 +353,7 @@ namespace ProductDatabase.Data {
             }
 
             con.Execute(
-                "DELETE FROM M_ProductUseSubstrate WHERE ProductID = @ProductId",
+                $"DELETE FROM {Constants.ProductUseSubstrateTableName} WHERE ProductID = @ProductId",
                 new { ProductId = productId }, tx);
 
             con.Execute(
@@ -435,10 +435,10 @@ namespace ProductDatabase.Data {
             using var tx = con.BeginTransaction();
 
             con.Execute(
-                "DELETE FROM M_ProductUseSubstrate WHERE ProductID = @ProductId",
+                $"DELETE FROM {Constants.ProductUseSubstrateTableName} WHERE ProductID = @ProductId",
                 new { ProductId = productId }, tx);
 
-            const string insertSql = "INSERT INTO M_ProductUseSubstrate (ProductID, SubstrateID) VALUES (@ProductId, @SubstrateId)";
+            var insertSql = $"INSERT INTO {Constants.ProductUseSubstrateTableName} (ProductID, SubstrateID) VALUES (@ProductId, @SubstrateId)";
             var insertData = substrateIds.Select(id => new { ProductId = productId, SubstrateId = id });
             con.Execute(insertSql, insertData, tx);
 
