@@ -236,30 +236,30 @@ namespace ProductDatabase.Data {
                 $"""
                 CREATE VIEW {Constants.VProductTableName} AS
                 SELECT
-                    T.ID,
-                    T.ProductID,
-                    M.CategoryName,
-                    M.ProductName,
-                    M.ProductType,
-                    M.ProductModel,
-                    T.OrderNumber,
-                    T.ProductNumber,
-                    T.OLesNumber,
-                    T.Quantity,
-                    T.SerialFirst,
-                    T.SerialLast,
-                    T.Revision,
-                    T.RevisionGroup,
-                    T.SerialLastNumber,
-                    CONCAT(T.PersonID, '.', P.PersonName) AS PersonInfo,
-                    T.RegDate,
-                    T.Comment,
-                    T.CreatedAt,
-                    T.IsDeleted,
-                    T.DeletedAt
-                FROM {Constants.TProductTableName} T
-                LEFT JOIN {Constants.ProductTableName} M ON T.ProductID = M.ProductID
-                LEFT JOIN M_Person P ON T.PersonID = P.PersonID
+                    t.ID,
+                    t.ProductID,
+                    m.CategoryName,
+                    m.ProductName,
+                    m.ProductType,
+                    m.ProductModel,
+                    t.OrderNumber,
+                    t.ProductNumber,
+                    t.OLesNumber,
+                    t.Quantity,
+                    t.SerialFirst,
+                    t.SerialLast,
+                    t.Revision,
+                    t.RevisionGroup,
+                    t.SerialLastNumber,
+                    CONCAT(t.PersonID, '.', p.PersonName) AS PersonInfo,
+                    t.RegDate,
+                    t.Comment,
+                    t.CreatedAt,
+                    t.IsDeleted,
+                    t.DeletedAt
+                FROM {Constants.TProductTableName} AS t
+                LEFT JOIN {Constants.ProductTableName} AS m ON t.ProductID = m.ProductID
+                LEFT JOIN M_Person AS p ON t.PersonID = p.PersonID
                 """, transaction: tx);
 
             con.Execute($"DROP VIEW IF EXISTS {Constants.VSubstrateTableName}", transaction: tx);
@@ -267,27 +267,27 @@ namespace ProductDatabase.Data {
                 $"""
                 CREATE VIEW {Constants.VSubstrateTableName} AS
                 SELECT
-                    T.ID,
-                    T.SubstrateID,
-                    M.CategoryName,
-                    M.ProductName,
-                    M.SubstrateName,
-                    M.SubstrateModel,
-                    T.OrderNumber,
-                    T.SubstrateNumber,
-                    T.Increase,
-                    T.Decrease,
-                    T.Defect,
-                    CONCAT(T.PersonID, '.', P.PersonName) AS PersonInfo,
-                    T.RegDate,
-                    T.Comment,
-                    T.UseID,
-                    T.CreatedAt,
-                    T.IsDeleted,
-                    T.DeletedAt
-                FROM {Constants.TSubstrateTableName} T
-                LEFT JOIN {Constants.SubstrateTableName} M ON T.SubstrateID = M.SubstrateID
-                LEFT JOIN M_Person P ON T.PersonID = P.PersonID
+                    t.ID,
+                    t.SubstrateID,
+                    m.CategoryName,
+                    m.ProductName,
+                    m.SubstrateName,
+                    m.SubstrateModel,
+                    t.OrderNumber,
+                    t.SubstrateNumber,
+                    t.Increase,
+                    t.Decrease,
+                    t.Defect,
+                    CONCAT(t.PersonID, '.', p.PersonName) AS PersonInfo,
+                    t.RegDate,
+                    t.Comment,
+                    t.UseID,
+                    t.CreatedAt,
+                    t.IsDeleted,
+                    t.DeletedAt
+                FROM {Constants.TSubstrateTableName} AS t
+                LEFT JOIN {Constants.SubstrateTableName} AS m ON t.SubstrateID = m.SubstrateID
+                LEFT JOIN M_Person AS p ON t.PersonID = p.PersonID
                 """, transaction: tx);
 
             con.Execute($"DROP VIEW IF EXISTS {Constants.VProductUseSubstrate}", transaction: tx);
@@ -295,15 +295,15 @@ namespace ProductDatabase.Data {
                 $"""
                 CREATE VIEW {Constants.VProductUseSubstrate} AS
                 SELECT
-                    P.ProductID As P_ProductID,
-                    S.SubstrateID As S_SubstrateID,
-                    P.ProductName,
-                    P.ProductType,
-                    S.SubstrateName,
-                    S.SubstrateModel
-                FROM M_ProductUseSubstrate PS
-                JOIN {Constants.ProductTableName} P ON P.ProductID = PS.ProductID
-                JOIN {Constants.SubstrateTableName} S ON S.SubstrateID = PS.SubstrateID
+                    p.ProductID As P_ProductID,
+                    s.SubstrateID As S_SubstrateID,
+                    p.ProductName,
+                    p.ProductType,
+                    s.SubstrateName,
+                    s.SubstrateModel
+                FROM M_ProductUseSubstrate AS ps
+                JOIN {Constants.ProductTableName} AS p ON p.ProductID = ps.ProductID
+                JOIN {Constants.SubstrateTableName} AS s ON s.SubstrateID = ps.SubstrateID
                 """, transaction: tx);
 
             con.Execute($"DROP VIEW IF EXISTS {Constants.VRePrintTableName}", transaction: tx);
@@ -311,28 +311,28 @@ namespace ProductDatabase.Data {
                 $"""
                 CREATE VIEW {Constants.VRePrintTableName} AS
                 SELECT
-                    T.ID,
-                    T.SerialPrintType,
-                    T.ProductID,
-                    M.CategoryName,
-                    M.ProductName,
-                    M.ProductType,
-                    M.ProductModel,
-                    T.OrderNumber,
-                    T.ProductNumber,
-                    T.OLesNumber,
-                    T.Quantity,
-                    T.SerialFirst,
-                    T.SerialLast,
-                    T.Revision,
-                    T.RevisionGroup,
-                    CONCAT(T.PersonID, '.', P.PersonName) AS PersonInfo,
-                    T.RegDate,
-                    T.Comment,
-                    T.CreatedAt
-                FROM {Constants.TRePrintTableName} T
-                LEFT JOIN {Constants.ProductTableName} M ON T.ProductID = M.ProductID
-                LEFT JOIN M_Person P ON T.PersonID = P.PersonID
+                    t.ID,
+                    t.SerialPrintType,
+                    t.ProductID,
+                    m.CategoryName,
+                    m.ProductName,
+                    m.ProductType,
+                    m.ProductModel,
+                    t.OrderNumber,
+                    t.ProductNumber,
+                    t.OLesNumber,
+                    t.Quantity,
+                    t.SerialFirst,
+                    t.SerialLast,
+                    t.Revision,
+                    t.RevisionGroup,
+                    CONCAT(t.PersonID, '.', p.PersonName) AS PersonInfo,
+                    t.RegDate,
+                    t.Comment,
+                    t.CreatedAt
+                FROM {Constants.TRePrintTableName} AS t
+                LEFT JOIN {Constants.ProductTableName} AS m ON t.ProductID = m.ProductID
+                LEFT JOIN M_Person AS p ON t.PersonID = p.PersonID
                 """, transaction: tx);
 
             tx.Commit();
