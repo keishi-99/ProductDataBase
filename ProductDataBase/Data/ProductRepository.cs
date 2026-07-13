@@ -208,7 +208,12 @@ namespace ProductDatabase.Data {
             _cacheManager.ClearCache();
         }
 
-        // このコードが前提とするビュー定義（DB側はこの内容で手動作成されている想定。DROP+CREATEによる自動同期は行わない）
+        // このコードが前提とするビュー定義。
+        // 以前は起動時にDROP+CREATEで自動同期していたが、ProductWebViewer等の別プロセスが
+        // 同じDBに同時アクセスした際に書き込みロックで競合しうるため廃止した。
+        // ビューの作成・変更は（テーブルのDDLと同様）DB側で直接手動で行う運用とし、
+        // ここではDB上の実際の定義とのズレをVerifyViewDefinitions()で検知するに留める。
+        private static readonly Dictionary<string, string> _expectedViewDefinitions = new() {
         private static readonly Dictionary<string, string> _expectedViewDefinitions = new() {
             [Constants.VSerialTableName] = $"""
                 CREATE VIEW {Constants.VSerialTableName} AS

@@ -4,9 +4,12 @@ using Dapper;
 using Microsoft.Data.Sqlite;
 
 namespace ProductWebViewer.Data {
-    // このアプリが依存しているビューが、DB上で想定通りの定義になっているかを検証する
-    // ProductDatabase側はビューを自分で作成せず（DB側の定義を直接手動管理する運用のため）、
-    // このWebViewer側の想定とズレていないかを起動時に確認する
+    // このアプリが依存しているビューが、DB上で想定通りの定義になっているかを検証する。
+    // ProductDatabase側は以前、起動時にDROP+CREATEでビューを自動同期していたが、
+    // このWebViewerを含む複数プロセスが同じDBに同時アクセスした際の書き込みロック競合を避けるため廃止し、
+    // ビューの作成・変更はDB側で直接手動管理する運用にした（テーブルのDDLと同様の方式）。
+    // そのため、このWebViewer側もDBの定義に一方的に依存するだけの存在になっており、
+    // DB変更に対してこちらのコードが追従し忘れていないかを起動時に検証する。
     internal static class ViewDefinitionVerifier {
         // ProductDatabase/Data/ProductRepository.cs の定義と一致させること
         private static readonly Dictionary<string, string> _expectedViewDefinitions = new() {
