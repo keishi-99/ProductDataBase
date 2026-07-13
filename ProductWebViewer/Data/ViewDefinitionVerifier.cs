@@ -90,7 +90,9 @@ namespace ProductWebViewer.Data {
         }
 
         private static string ComputeHash(string sql) {
-            var normalized = string.Join(' ', sql.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+            if (string.IsNullOrEmpty(sql)) { return string.Empty; }
+
+            var normalized = string.Join(' ', sql.ToUpperInvariant().Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
             var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(normalized));
             return Convert.ToHexString(bytes);
         }
