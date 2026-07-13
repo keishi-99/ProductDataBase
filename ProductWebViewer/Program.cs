@@ -9,6 +9,8 @@ builder.Services.AddRazorPages();
 // リポジトリはクエリごとに接続を開閉するステートレス設計のため Singleton で問題ない
 builder.Services.AddSingleton<ProductRecordRepository>();
 builder.Services.AddSingleton<SubstrateRecordRepository>();
+// リポジトリのDB疎通確認・ビュー定義検証をリクエスト処理開始前に実行する
+builder.Services.AddHostedService<ViewDefinitionStartupCheck>();
 
 var app = builder.Build();
 

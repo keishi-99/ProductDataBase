@@ -4,6 +4,9 @@ namespace ProductWebViewer.Data {
     public abstract class RepositoryBase {
         protected readonly string _connectionString;
 
+        // 起動時の初期化タスク（ビュー定義検証）から参照するための接続文字列
+        internal string ConnectionString => _connectionString;
+
         protected RepositoryBase(IConfiguration configuration) {
             var dbPath = configuration["DatabasePath"]
                 ?? throw new InvalidOperationException("DatabasePath が appsettings.json に設定されていません。");
