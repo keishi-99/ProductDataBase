@@ -12,6 +12,10 @@ builder.Services.AddSingleton<SubstrateRecordRepository>();
 
 var app = builder.Build();
 
+// リポジトリのコンストラクタでDB疎通・ビュー定義検証を行うため、ここで強制的に生成し起動時に失敗させる
+app.Services.GetRequiredService<ProductRecordRepository>();
+app.Services.GetRequiredService<SubstrateRecordRepository>();
+
 app.UseHttpsRedirection();
 
 // Configure the HTTP request pipeline.

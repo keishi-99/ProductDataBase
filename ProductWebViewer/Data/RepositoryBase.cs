@@ -27,6 +27,9 @@ namespace ProductWebViewer.Data {
             } catch (SqliteException ex) {
                 throw new FileNotFoundException($"DB ファイルが見つかりません: {fullPath}", ex);
             }
+
+            // DB側のビュー定義がこのアプリの想定と一致するか検証する
+            ViewDefinitionVerifier.Verify(_connectionString);
         }
 
         // ORDER BY 句はパラメータ化できないため、cols ホワイトリストで SQLインジェクションを防ぐ

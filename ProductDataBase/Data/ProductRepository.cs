@@ -208,16 +208,9 @@ namespace ProductDatabase.Data {
             _cacheManager.ClearCache();
         }
 
-        // 全ビューをコード上の定義で再作成する（DROP+CREATEのため起動のたびに最新定義へ同期される）
-        public static void RecreateViews() {
-            using var con = new SqliteConnection(GetConnectionRegistration());
-            con.Open();
-
-            using var tx = con.BeginTransaction();
-
-            con.Execute($"DROP VIEW IF EXISTS {Constants.VSerialTableName}", transaction: tx);
-            con.Execute(
-                $"""
+        // このコードが前提とするビュー定義（DB側はこの内容で手動作成されている想定。DROP+CREATEによる自動同期は行わない）
+        private static readonly Dictionary<string, string> _expectedViewDefinitions = new() {
+            [Constants.VSerialTableName] = $"""
                 CREATE VIEW {Constants.VSerialTableName} AS
                 SELECT
                     s.rowid,
@@ -229,11 +222,8 @@ namespace ProductDatabase.Data {
                     m.CategoryName
                 FROM {Constants.TSerialTableName} AS s
                 LEFT JOIN {Constants.ProductTableName} AS m ON s.ProductID = m.ProductID
-                """, transaction: tx);
-
-            con.Execute($"DROP VIEW IF EXISTS {Constants.VProductTableName}", transaction: tx);
-            con.Execute(
-                $"""
+                """,
+            [Constants.VProductTableName] = $"""
                 CREATE VIEW {Constants.VProductTableName} AS
                 SELECT
                     t.ID,
@@ -251,7 +241,7 @@ namespace ProductDatabase.Data {
                     t.Revision,
                     t.RevisionGroup,
                     t.SerialLastNumber,
-                    t.PersonID || '.' || p.PersonName AS PersonInfo,
+                    COALESCE(t.PersonID || '.' || p.PersonName, '') AS PersonInfo,
                     t.RegDate,
                     t.Comment,
                     t.CreatedAt,
@@ -261,11 +251,8 @@ namespace ProductDatabase.Data {
                 LEFT JOIN {Constants.ProductTableName} AS m ON t.ProductID = m.ProductID
                 LEFT JOIN {Constants.PersonTableName} AS p ON t.PersonID = p.PersonID
                 WHERE t.IsDeleted = 0
-                """, transaction: tx);
-
-            con.Execute($"DROP VIEW IF EXISTS {Constants.VSubstrateTableName}", transaction: tx);
-            con.Execute(
-                $"""
+                """,
+            [Constants.VSubstrateTableName] = $"""
                 CREATE VIEW {Constants.VSubstrateTableName} AS
                 SELECT
                     t.ID,
@@ -279,7 +266,7 @@ namespace ProductDatabase.Data {
                     t.Increase,
                     t.Decrease,
                     t.Defect,
-                    t.PersonID || '.' || p.PersonName AS PersonInfo,
+                    COALESCE(t.PersonID || '.' || p.PersonName, '') AS PersonInfo,
                     t.RegDate,
                     t.Comment,
                     t.UseID,
@@ -290,11 +277,8 @@ namespace ProductDatabase.Data {
                 LEFT JOIN {Constants.SubstrateTableName} AS m ON t.SubstrateID = m.SubstrateID
                 LEFT JOIN {Constants.PersonTableName} AS p ON t.PersonID = p.PersonID
                 WHERE t.IsDeleted = 0
-                """, transaction: tx);
-
-            con.Execute($"DROP VIEW IF EXISTS {Constants.VProductUseSubstrate}", transaction: tx);
-            con.Execute(
-                $"""
+                """,
+            [Constants.VProductUseSubstrate] = $"""
                 CREATE VIEW {Constants.VProductUseSubstrate} AS
                 SELECT
                     p.ProductID AS P_ProductID,
@@ -306,11 +290,8 @@ namespace ProductDatabase.Data {
                 FROM {Constants.ProductUseSubstrateTableName} AS ps
                 JOIN {Constants.ProductTableName} AS p ON p.ProductID = ps.ProductID
                 JOIN {Constants.SubstrateTableName} AS s ON s.SubstrateID = ps.SubstrateID
-                """, transaction: tx);
-
-            con.Execute($"DROP VIEW IF EXISTS {Constants.VRePrintTableName}", transaction: tx);
-            con.Execute(
-                $"""
+                """,
+            [Constants.VRePrintTableName] = $"""
                 CREATE VIEW {Constants.VRePrintTableName} AS
                 SELECT
                     t.ID,
@@ -328,16 +309,37 @@ namespace ProductDatabase.Data {
                     t.SerialLast,
                     t.Revision,
                     t.RevisionGroup,
-                    t.PersonID || '.' || p.PersonName AS PersonInfo,
+                    COALESCE(t.PersonID || '.' || p.PersonName, '') AS PersonInfo,
                     t.RegDate,
                     t.Comment,
                     t.CreatedAt
                 FROM {Constants.TRePrintTableName} AS t
                 LEFT JOIN {Constants.ProductTableName} AS m ON t.ProductID = m.ProductID
                 LEFT JOIN {Constants.PersonTableName} AS p ON t.PersonID = p.PersonID
-                """, transaction: tx);
+                """,
+        };
 
-            tx.Commit();
+        // DB上の実際のビュー定義が、コードが前提とする定義と一致するか検証する（不一致・不在なら例外を投げて起動を止める）
+        public static void VerifyViewDefinitions() {
+            using var con = new SqliteConnection(GetConnectionRegistration());
+            con.Open();
+
+            var mismatched = new List<string>();
+            foreach (var (viewName, expectedSql) in _expectedViewDefinitions) {
+                var actualSql = con.QuerySingleOrDefault<string>(
+                    "SELECT sql FROM sqlite_master WHERE type = 'view' AND name = @ViewName",
+                    new { ViewName = viewName });
+
+                if (actualSql is null || ViewDefinitionHash.Compute(actualSql) != ViewDefinitionHash.Compute(expectedSql)) {
+                    mismatched.Add(viewName);
+                }
+            }
+
+            if (mismatched.Count > 0) {
+                throw new InvalidOperationException(
+                    $"DB上のビュー定義がアプリの想定と異なります: {string.Join(", ", mismatched)}\n" +
+                    "DBの変更内容を確認し、アプリのコードを対応させてください。");
+            }
         }
 
         // 製品マスターを物理削除する（実績存在チェック・関連紐づけ削除を含む）

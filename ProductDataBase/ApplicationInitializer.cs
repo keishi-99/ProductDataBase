@@ -37,7 +37,7 @@ namespace ProductDatabase {
         // DB読み込み
         public void LoadDatabase(ProductRepository productRepository) {
             try {
-                ProductRepository.RecreateViews();
+                ProductRepository.VerifyViewDefinitions();
                 productRepository.LoadAll();
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(LoadDatabase), ex, "DB読み込み失敗");
