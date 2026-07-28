@@ -706,6 +706,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <thead>
                             <tr>
                                 <th data-label=""></th>
+                                <th data-label=""></th>
                                 <th data-label="ID"         class="@SortClass("ID")"          onclick="sortBy('ID')">         ID          <span class="sort-icon">@SortIcon("ID")</span></th>
                                 <th data-label="カテゴリ"   class="@SortClass("CategoryName")" onclick="sortBy('CategoryName')">カテゴリ   <span class="sort-icon">@SortIcon("CategoryName")</span></th>
                                 <th data-label="製品名"     class="@SortClass("ProductName")"  onclick="sortBy('ProductName')"> 製品名     <span class="sort-icon">@SortIcon("ProductName")</span></th>
@@ -728,6 +729,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         <tbody>
                             @foreach (var r in Model.ProductRecords) {
                                 <tr>
+                                    <td>
+                                        @if (User.Identity?.IsAuthenticated == true) {
+                                            <a href="/ProductEdit/@r.Id" class="btn btn-outline-warning btn-sm">編集</a>
+                                        }
+                                    </td>
                                     <td><button type="button" class="btn btn-outline-info btn-used-sub" onclick="showRowDetail(this)">詳細</button></td>
                                     <td>@r.Id</td>
                                     <td>@r.CategoryName</td>
@@ -1000,6 +1006,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <thead>
                             <tr>
                                 <th data-label=""></th>
+                                <th data-label=""></th>
                                 <th data-label="ID"           class="@SortClass("ID")"            onclick="sortBy('ID')">           ID           <span class="sort-icon">@SortIcon("ID")</span></th>
                                 <th data-label="カテゴリ"     class="@SortClass("CategoryName")"   onclick="sortBy('CategoryName')">  カテゴリ     <span class="sort-icon">@SortIcon("CategoryName")</span></th>
                                 <th data-label="製品名"       class="@SortClass("ProductName")"    onclick="sortBy('ProductName')">   製品名       <span class="sort-icon">@SortIcon("ProductName")</span></th>
@@ -1022,6 +1029,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         <tbody>
                             @foreach (var r in Model.SubstrateRecords) {
                                 <tr>
+                                    <td>
+                                        @if (User.Identity?.IsAuthenticated == true) {
+                                            <a href="/SubstrateDelete/@r.Id" class="btn btn-outline-danger btn-sm">削除</a>
+                                        }
+                                    </td>
                                     <td><button type="button" class="btn btn-outline-info btn-used-sub" onclick="showRowDetail(this)">詳細</button></td>
                                     <td>@r.Id</td>
                                     <td>@r.CategoryName</td>

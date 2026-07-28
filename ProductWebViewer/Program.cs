@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using ProductWebViewer.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,8 +10,21 @@ builder.Services.AddRazorPages();
 // リポジトリはクエリごとに接続を開閉するステートレス設計のため Singleton で問題ない
 builder.Services.AddSingleton<ProductRecordRepository>();
 builder.Services.AddSingleton<SubstrateRecordRepository>();
+builder.Services.AddSingleton<ProductWriteRepository>();
+builder.Services.AddSingleton<SubstrateWriteRepository>();
+builder.Services.AddSingleton<AuditLogger>();
 // リポジトリのDB疎通確認・ビュー定義検証をリクエスト処理開始前に実行する
 builder.Services.AddHostedService<ViewDefinitionStartupCheck>();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options => {
+        options.LoginPath = "/Login";
+        options.LogoutPath = "/Logout";
+        options.AccessDeniedPath = "/Login";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+    });
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -25,6 +39,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseStaticFiles();
