@@ -44,10 +44,12 @@ namespace ProductWebViewer.Data {
         }
 
         private void Append(string line) {
+            // Comment等の値に改行が含まれていると偽の行を追記できてしまうため無害化する
+            var safeLine = line.Replace("\r\n", "\\n").Replace("\r", "\\n").Replace("\n", "\\n");
             lock (_lockObject) {
                 if (!Directory.Exists(_logDirectory)) Directory.CreateDirectory(_logDirectory);
                 var logFile = Path.Combine(_logDirectory, $"webviewer_{DateTime.Now:yyyyMM}.log");
-                File.AppendAllText(logFile, line + Environment.NewLine);
+                File.AppendAllText(logFile, safeLine + Environment.NewLine);
             }
         }
     }

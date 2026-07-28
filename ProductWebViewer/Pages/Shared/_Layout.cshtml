@@ -20,7 +20,9 @@
     <div class="d-flex justify-content-end align-items-center gap-3 px-5 py-1 border-bottom">
         @if (User.Identity?.IsAuthenticated == true) {
             <span class="text-body-secondary small">管理者としてログイン中</span>
-            <a href="/Logout" class="small">ログアウト</a>
+            <form method="post" asp-page="/Logout" class="d-inline m-0">
+                <button type="submit" class="btn btn-link btn-sm p-0 small align-baseline">ログアウト</button>
+            </form>
         } else {
             <a href="/Login" class="small">管理者ログイン</a>
         }

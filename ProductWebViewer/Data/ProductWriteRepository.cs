@@ -15,6 +15,13 @@ namespace ProductWebViewer.Data {
                 ? dbPath
                 : Path.Combine(AppContext.BaseDirectory, dbPath);
 
+            // UNCパス(\\server\share\...)経由の書き込みはSQLiteのネットワークファイルロックが不完全なため許可しない
+            if (fullPath.StartsWith(@"\\", StringComparison.Ordinal)) {
+                throw new InvalidOperationException(
+                    $"DatabasePath がネットワーク共有パスを指しています: {fullPath}\n" +
+                    "WebViewerからの書き込みは、DBファイルが存在するPC上でローカルディスクに対して行ってください。");
+            }
+
             _connectionString = new SqliteConnectionStringBuilder {
                 DataSource = fullPath,
                 Mode = SqliteOpenMode.ReadWrite,
@@ -50,10 +57,11 @@ namespace ProductWebViewer.Data {
         }
 
         // 担当者(PersonID)は編集対象に含めない（変更不要のため現状維持）
-        public void UpdateProduct(long id, string? orderNumber, string? productNumber, string? oLesNumber, string? regDate, string? revision, string? comment) {
+        // 対象行が別操作で既に削除されている場合は false を返す（呼び出し側は競合として扱う）
+        public bool UpdateProduct(long id, string? orderNumber, string? productNumber, string? oLesNumber, string? regDate, string? revision, string? comment) {
             using var con = new SqliteConnection(_connectionString);
             con.Open();
-            con.Execute("""
+            var affected = con.Execute("""
                 UPDATE T_Product
                 SET
                     OrderNumber   = @OrderNumber,
@@ -62,21 +70,29 @@ namespace ProductWebViewer.Data {
                     RegDate       = @RegDate,
                     Revision      = @Revision,
                     Comment       = @Comment
-                WHERE ID = @Id
+                WHERE ID = @Id AND IsDeleted = 0
                 """, new { Id = id, OrderNumber = orderNumber, ProductNumber = productNumber, OLesNumber = oLesNumber, RegDate = regDate, Revision = revision, Comment = comment });
+            return affected > 0;
         }
 
         // 製品登録を論理削除し、連動する基板使用履歴を論理削除・シリアルを物理削除する
-        public void DeleteProduct(long id) {
+        // 対象行が既に削除されている場合は false を返し、関連データには一切触れない
+        public bool DeleteProduct(long id) {
             using var con = new SqliteConnection(_connectionString);
             con.Open();
             using var tx = con.BeginTransaction();
 
-            con.Execute("UPDATE T_Product SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE ID = @Id", new { Id = id }, tx);
+            var affected = con.Execute("UPDATE T_Product SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE ID = @Id AND IsDeleted = 0", new { Id = id }, tx);
+            if (affected == 0) {
+                tx.Rollback();
+                return false;
+            }
+
             con.Execute("UPDATE T_Substrate SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE UseID = @Id", new { Id = id }, tx);
             con.Execute("DELETE FROM T_Serial WHERE UsedID = @Id", new { Id = id }, tx);
 
             tx.Commit();
+            return true;
         }
     }
 }

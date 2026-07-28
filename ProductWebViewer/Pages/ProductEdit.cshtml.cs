@@ -10,10 +10,12 @@ namespace ProductWebViewer.Pages;
 public class ProductEditModel : PageModel {
     private readonly ProductWriteRepository _writeRepo;
     private readonly AuditLogger _auditLogger;
+    private readonly ILogger<ProductEditModel> _logger;
 
-    public ProductEditModel(ProductWriteRepository writeRepo, AuditLogger auditLogger) {
+    public ProductEditModel(ProductWriteRepository writeRepo, AuditLogger auditLogger, ILogger<ProductEditModel> logger) {
         _writeRepo = writeRepo;
         _auditLogger = auditLogger;
+        _logger = logger;
     }
 
     [BindProperty] public ProductRecord Record { get; set; } = new();
@@ -30,8 +32,14 @@ public class ProductEditModel : PageModel {
         var before = _writeRepo.GetById(id);
         if (before is null) return NotFound();
 
-        _writeRepo.UpdateProduct(id, Record.OrderNumber, Record.ProductNumber, Record.OLesNumber, Record.RegDate, Record.Revision, Record.Comment);
-        _auditLogger.LogProductEdit(User.Identity?.Name ?? "管理者", before, Record);
+        // 他の操作で既に削除されている場合は更新せず競合として扱う
+        if (!_writeRepo.UpdateProduct(id, Record.OrderNumber, Record.ProductNumber, Record.OLesNumber, Record.RegDate, Record.Revision, Record.Comment)) {
+            ErrorMessage = "この製品登録は他の操作で既に削除されているため、更新できませんでした。";
+            Record = before;
+            return Page();
+        }
+
+        TryLogAudit(() => _auditLogger.LogProductEdit(User.Identity?.Name ?? "管理者", before, Record));
 
         return RedirectToPage("/Index");
     }
@@ -40,9 +48,23 @@ public class ProductEditModel : PageModel {
         var before = _writeRepo.GetById(id);
         if (before is null) return NotFound();
 
-        _writeRepo.DeleteProduct(id);
-        _auditLogger.LogProductDelete(User.Identity?.Name ?? "管理者", before);
+        if (!_writeRepo.DeleteProduct(id)) {
+            ErrorMessage = "この製品登録は他の操作で既に削除されています。";
+            Record = before;
+            return Page();
+        }
+
+        TryLogAudit(() => _auditLogger.LogProductDelete(User.Identity?.Name ?? "管理者", before));
 
         return RedirectToPage("/Index");
+    }
+
+    // 監査ログの書き込み失敗（ディスク容量不足等）でDB更新自体が失敗扱いにならないようにする
+    private void TryLogAudit(Action logAction) {
+        try {
+            logAction();
+        } catch (Exception ex) {
+            _logger.LogError(ex, "監査ログの記録に失敗しました。");
+        }
     }
 }

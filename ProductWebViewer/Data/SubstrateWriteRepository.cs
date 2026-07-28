@@ -15,6 +15,13 @@ namespace ProductWebViewer.Data {
                 ? dbPath
                 : Path.Combine(AppContext.BaseDirectory, dbPath);
 
+            // UNCパス(\\server\share\...)経由の書き込みはSQLiteのネットワークファイルロックが不完全なため許可しない
+            if (fullPath.StartsWith(@"\\", StringComparison.Ordinal)) {
+                throw new InvalidOperationException(
+                    $"DatabasePath がネットワーク共有パスを指しています: {fullPath}\n" +
+                    "WebViewerからの書き込みは、DBファイルが存在するPC上でローカルディスクに対して行ってください。");
+            }
+
             _connectionString = new SqliteConnectionStringBuilder {
                 DataSource = fullPath,
                 Mode = SqliteOpenMode.ReadWrite,
@@ -53,10 +60,12 @@ namespace ProductWebViewer.Data {
         }
 
         // 基板登録履歴を論理削除する（在庫集計は IsDeleted=0 の行のみ合算するため、これだけで在庫数が戻る）
-        public void DeleteSubstrate(long id) {
+        // 対象行が既に削除されている場合は false を返す（呼び出し側は競合として扱う）
+        public bool DeleteSubstrate(long id) {
             using var con = new SqliteConnection(_connectionString);
             con.Open();
-            con.Execute("UPDATE T_Substrate SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE ID = @Id", new { Id = id });
+            var affected = con.Execute("UPDATE T_Substrate SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE ID = @Id AND IsDeleted = 0", new { Id = id });
+            return affected > 0;
         }
     }
 }
