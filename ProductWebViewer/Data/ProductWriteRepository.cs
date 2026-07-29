@@ -88,7 +88,7 @@ namespace ProductWebViewer.Data {
                 return false;
             }
 
-            con.Execute("UPDATE T_Substrate SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE UseID = @Id", new { Id = id }, tx);
+            con.Execute("UPDATE T_Substrate SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE UseID = @Id AND IsDeleted = 0", new { Id = id }, tx);
             con.Execute("DELETE FROM T_Serial WHERE UsedID = @Id", new { Id = id }, tx);
 
             tx.Commit();
