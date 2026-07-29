@@ -1,9 +1,10 @@
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ProductWebViewer.Auth;
 
 namespace ProductWebViewer.Pages;
 
@@ -20,8 +21,8 @@ public class LoginModel : PageModel {
     public void OnGet() { }
 
     public async Task<IActionResult> OnPostAsync(string? returnUrl) {
-        var storedHash = _configuration["Auth:AdminPasswordHash"];
-        if (string.IsNullOrEmpty(storedHash) || string.IsNullOrEmpty(Password) || !PasswordHasher.Verify(Password, storedHash)) {
+        var adminPassword = _configuration["Auth:AdminPassword"];
+        if (string.IsNullOrEmpty(adminPassword) || string.IsNullOrEmpty(Password) || !FixedTimeEquals(Password, adminPassword)) {
             ErrorMessage = "パスワードが正しくありません。";
             return Page();
         }
@@ -32,4 +33,8 @@ public class LoginModel : PageModel {
 
         return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl! : "/");
     }
+
+    // 平文比較でもタイミング攻撃を避けるため定数時間比較を使う
+    private static bool FixedTimeEquals(string a, string b) =>
+        CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(a), Encoding.UTF8.GetBytes(b));
 }
