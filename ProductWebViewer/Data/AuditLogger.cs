@@ -16,7 +16,9 @@ namespace ProductWebViewer.Data {
             _logDirectory = Path.Combine(Path.GetDirectoryName(dbFullPath) ?? AppContext.BaseDirectory, "logs");
         }
 
-        public void LogProductEdit(ProductRecord before, ProductRecord after) {
+        // 編集可能なのは注文番号・製造番号・OLes番号・コメントのみ（メインアプリのHistoryEditDialogに合わせている）。
+        // それ以外の項目はbeforeの値をそのまま「後」欄にも使う（変更されないため）
+        public void LogProductEdit(ProductRecord before, string? orderNumber, string? productNumber, string? oLesNumber, string? comment) {
             AppendLog([
                 "[製品履歴編集:前] (Web)",
                 $"[{before.CategoryName}]",
@@ -37,21 +39,21 @@ namespace ProductWebViewer.Data {
             ]);
             AppendLog([
                 "[製品履歴編集:後] (Web)",
-                $"[{after.CategoryName}]",
-                $"ID[{after.Id}]",
-                $"注文番号[{after.OrderNumber}]",
-                $"製造番号[{after.ProductNumber}]",
-                $"OLes番号[{after.OLesNumber}]",
-                $"製品名[{after.ProductName}]",
-                $"タイプ[{after.ProductType}]",
-                $"型式[{after.ProductModel}]",
-                $"数量[{after.Quantity}]",
-                $"シリアル先頭[{after.SerialFirst}]",
-                $"シリアル末尾[{after.SerialLast}]",
-                $"Revision[{after.Revision}]",
-                $"登録日[{after.RegDate}]",
-                $"担当者[{after.PersonInfo}]",
-                $"コメント[{after.Comment}]"
+                $"[{before.CategoryName}]",
+                $"ID[{before.Id}]",
+                $"注文番号[{orderNumber}]",
+                $"製造番号[{productNumber}]",
+                $"OLes番号[{oLesNumber}]",
+                $"製品名[{before.ProductName}]",
+                $"タイプ[{before.ProductType}]",
+                $"型式[{before.ProductModel}]",
+                $"数量[{before.Quantity}]",
+                $"シリアル先頭[{before.SerialFirst}]",
+                $"シリアル末尾[{before.SerialLast}]",
+                $"Revision[{before.Revision}]",
+                $"登録日[{before.RegDate}]",
+                $"担当者[{before.PersonInfo}]",
+                $"コメント[{comment}]"
             ]);
         }
 

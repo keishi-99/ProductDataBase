@@ -33,13 +33,13 @@ public class ProductEditModel : PageModel {
         if (before is null) return NotFound();
 
         // 他の操作で既に削除されている場合は更新せず競合として扱う
-        if (!_writeRepo.UpdateProduct(id, Record.OrderNumber, Record.ProductNumber, Record.OLesNumber, Record.RegDate, Record.Revision, Record.Comment)) {
+        if (!_writeRepo.UpdateProduct(id, Record.OrderNumber, Record.ProductNumber, Record.OLesNumber, Record.Comment)) {
             ErrorMessage = "この製品登録は他の操作で既に削除されているため、更新できませんでした。";
             Record = before;
             return Page();
         }
 
-        TryLogAudit(() => _auditLogger.LogProductEdit(before, Record));
+        TryLogAudit(() => _auditLogger.LogProductEdit(before, Record.OrderNumber, Record.ProductNumber, Record.OLesNumber, Record.Comment));
 
         return RedirectToPage("/Index");
     }

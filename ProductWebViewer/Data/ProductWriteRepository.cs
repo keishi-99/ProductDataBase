@@ -56,9 +56,10 @@ namespace ProductWebViewer.Data {
                 """, new { Id = id });
         }
 
-        // 担当者(PersonID)は編集対象に含めない（変更不要のため現状維持）
+        // 担当者(PersonID)・登録日(RegDate)・Revisionは編集対象に含めない
+        // （メインアプリのHistoryEditDialogでも同項目はラベル表示のみで編集不可のため、それに合わせている）
         // 対象行が別操作で既に削除されている場合は false を返す（呼び出し側は競合として扱う）
-        public bool UpdateProduct(long id, string? orderNumber, string? productNumber, string? oLesNumber, string? regDate, string? revision, string? comment) {
+        public bool UpdateProduct(long id, string? orderNumber, string? productNumber, string? oLesNumber, string? comment) {
             using var con = new SqliteConnection(_connectionString);
             con.Open();
             var affected = con.Execute("""
@@ -67,11 +68,9 @@ namespace ProductWebViewer.Data {
                     OrderNumber   = @OrderNumber,
                     ProductNumber = @ProductNumber,
                     OLesNumber    = @OLesNumber,
-                    RegDate       = @RegDate,
-                    Revision      = @Revision,
                     Comment       = @Comment
                 WHERE ID = @Id AND IsDeleted = 0
-                """, new { Id = id, OrderNumber = orderNumber, ProductNumber = productNumber, OLesNumber = oLesNumber, RegDate = regDate, Revision = revision, Comment = comment });
+                """, new { Id = id, OrderNumber = orderNumber, ProductNumber = productNumber, OLesNumber = oLesNumber, Comment = comment });
             return affected > 0;
         }
 
