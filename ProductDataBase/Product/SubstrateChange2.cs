@@ -161,13 +161,11 @@ namespace ProductDatabase {
                 PersonComboBox.Enabled = false;
                 RegisterButton.Enabled = false;
                 for (var i = 0; i < _productMaster.UseSubstrates.Count; i++) {
-                    var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
-                    if (objCbx is not null) {
+                    if (MainPanel.Controls[_checkBoxNames[i]] is CheckBox objCbx) {
                         objCbx.Enabled = false;
                     }
 
-                    var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
-                    if (objDgv is not null) {
+                    if (MainPanel.Controls[_dataGridViewNames[i]] is DataGridView objDgv) {
                         objDgv.Enabled = false;
                     }
                 }

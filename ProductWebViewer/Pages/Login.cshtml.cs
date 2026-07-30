@@ -8,12 +8,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ProductWebViewer.Pages;
 
-public class LoginModel : PageModel {
-    private readonly IConfiguration _configuration;
-
-    public LoginModel(IConfiguration configuration) {
-        _configuration = configuration;
-    }
+public class LoginModel(IConfiguration configuration) : PageModel {
+    private readonly IConfiguration _configuration = configuration;
 
     [BindProperty] public string? Password { get; set; }
     public string? ErrorMessage { get; private set; }

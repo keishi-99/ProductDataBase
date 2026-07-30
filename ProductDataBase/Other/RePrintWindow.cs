@@ -141,7 +141,7 @@ namespace ProductDatabase {
                 if (result == DialogResult.Cancel) { return; }
 
                 if (PersonCheckBox.Checked) {
-                    if (PersonComboBox.SelectedValue == null || !(PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson)) {
+                    if (PersonComboBox.SelectedValue == null || PersonComboBox.SelectedItem is not ProductDatabase.Models.PersonDef selectedPerson) {
                         MessageBox.Show("担当者を選択してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         PersonComboBox.Focus();
                         return;
@@ -240,7 +240,7 @@ namespace ProductDatabase {
             _productRegisterWork.ProductNumber = ManufacturingNumberCheckBox.Checked ? ManufacturingNumberMaskedTextBox.Text : string.Empty;
             _productRegisterWork.Quantity = quantity;
             if (PersonCheckBox.Checked) {
-                if (PersonComboBox.SelectedValue == null || !(PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson)) {
+                if (PersonComboBox.SelectedValue == null || PersonComboBox.SelectedItem is not ProductDatabase.Models.PersonDef selectedPerson) {
                     MessageBox.Show("担当者を選択してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     PersonComboBox.Focus();
                     return false;

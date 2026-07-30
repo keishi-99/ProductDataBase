@@ -5,12 +5,8 @@ using ProductWebViewer.Models;
 namespace ProductWebViewer.Data {
     // 製品登録内容の編集・削除（書き込み）を担当するリポジトリ
     // ReadOnlyのProductRecordRepositoryとは別に、書き込み可能な接続を独自に保持する
-    public class ProductWriteRepository {
-        private readonly string _connectionString;
-
-        public ProductWriteRepository(IConfiguration configuration) {
-            _connectionString = WritableConnectionStringFactory.Create(configuration);
-        }
+    public class ProductWriteRepository(IConfiguration configuration) {
+        private readonly string _connectionString = WritableConnectionStringFactory.Create(configuration);
 
         public ProductRecord? GetById(long id) {
             using var con = new SqliteConnection(_connectionString);

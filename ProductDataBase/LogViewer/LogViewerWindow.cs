@@ -411,9 +411,11 @@ namespace ProductDatabase.LogViewer {
             if (e.RowIndex < 0 || e.CellStyle is null) return;
             if (ErrorDataGridView.Rows[e.RowIndex].DataBoundItem is not DataRowView rowView) return;
             var exType = rowView["例外タイプ"]?.ToString() ?? string.Empty;
-            // TODO(human): exType の値に応じて e.CellStyle.BackColor を設定する（2〜5行）
-            // 例外タイプ例: SqliteException, IOException, InvalidOperationException など
-            // 参考: GetRowColor() で使われている Color 定数（MistyRose, LightYellow 等）を活用する
+            e.CellStyle.BackColor = exType switch {
+                "SqliteException" => Color.MistyRose,
+                "IOException" => Color.LightYellow,
+                _ => Color.White
+            };
         }
 
         private async void ErrorYearMonthComboBox_SelectedIndexChanged(object sender, EventArgs e) {

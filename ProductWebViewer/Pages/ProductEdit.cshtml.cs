@@ -7,16 +7,10 @@ using ProductWebViewer.Models;
 namespace ProductWebViewer.Pages;
 
 [Authorize]
-public class ProductEditModel : PageModel {
-    private readonly ProductWriteRepository _writeRepo;
-    private readonly AuditLogger _auditLogger;
-    private readonly ILogger<ProductEditModel> _logger;
-
-    public ProductEditModel(ProductWriteRepository writeRepo, AuditLogger auditLogger, ILogger<ProductEditModel> logger) {
-        _writeRepo = writeRepo;
-        _auditLogger = auditLogger;
-        _logger = logger;
-    }
+public class ProductEditModel(ProductWriteRepository writeRepo, AuditLogger auditLogger, ILogger<ProductEditModel> logger) : PageModel {
+    private readonly ProductWriteRepository _writeRepo = writeRepo;
+    private readonly AuditLogger _auditLogger = auditLogger;
+    private readonly ILogger<ProductEditModel> _logger = logger;
 
     [BindProperty] public ProductRecord Record { get; set; } = new();
     public string? ErrorMessage { get; private set; }

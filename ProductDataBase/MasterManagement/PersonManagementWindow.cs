@@ -31,10 +31,9 @@ namespace ProductDatabase.MasterManagement {
         }
 
         private void AddButton_Click(object sender, EventArgs e) {
-            using (var dialog = new PersonMasterEditDialog(null)) {
-                if (dialog.ShowDialog(this) == DialogResult.OK) {
-                    LoadPersonList();
-                }
+            using var dialog = new PersonMasterEditDialog(null);
+            if (dialog.ShowDialog(this) == DialogResult.OK) {
+                LoadPersonList();
             }
         }
 

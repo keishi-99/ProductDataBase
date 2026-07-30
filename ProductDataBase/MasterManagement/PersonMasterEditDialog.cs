@@ -5,7 +5,7 @@ namespace ProductDatabase.MasterManagement {
     public partial class PersonMasterEditDialog : Form {
 
         private readonly bool _isNewRecord;
-        private PersonDef _person;
+        private readonly PersonDef _person;
 
         public PersonMasterEditDialog(PersonDef? source) {
             InitializeComponent();

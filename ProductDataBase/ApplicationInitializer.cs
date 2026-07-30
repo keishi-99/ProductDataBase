@@ -5,13 +5,9 @@ using ProductDatabase.Services;
 
 namespace ProductDatabase {
     // アプリケーション起動時の初期化を担当するクラス
-    internal class ApplicationInitializer {
+    internal class ApplicationInitializer(string configPath) {
 
-        private readonly string _jsonFilePath;
-
-        public ApplicationInitializer(string configPath) {
-            _jsonFilePath = configPath;
-        }
+        private readonly string _jsonFilePath = configPath;
 
         // 設定ファイル読み込み
         public GeneralSettings LoadSettings() {

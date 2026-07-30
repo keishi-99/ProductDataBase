@@ -5,12 +5,8 @@ using ProductWebViewer.Models;
 namespace ProductWebViewer.Data {
     // 基板登録内容の削除（書き込み）を担当するリポジトリ
     // ReadOnlyのSubstrateRecordRepositoryとは別に、書き込み可能な接続を独自に保持する
-    public class SubstrateWriteRepository {
-        private readonly string _connectionString;
-
-        public SubstrateWriteRepository(IConfiguration configuration) {
-            _connectionString = WritableConnectionStringFactory.Create(configuration);
-        }
+    public class SubstrateWriteRepository(IConfiguration configuration) {
+        private readonly string _connectionString = WritableConnectionStringFactory.Create(configuration);
 
         public SubstrateRecord? GetById(long id) {
             using var con = new SqliteConnection(_connectionString);

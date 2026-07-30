@@ -5,12 +5,8 @@ using ProductWebViewer.Models;
 
 namespace ProductWebViewer.Pages;
 
-public class OperationLogModel : PageModel {
-    private readonly LogRecordRepository _logRepo;
-
-    public OperationLogModel(LogRecordRepository logRepo) {
-        _logRepo = logRepo;
-    }
+public class OperationLogModel(LogRecordRepository logRepo) : PageModel {
+    private readonly LogRecordRepository _logRepo = logRepo;
 
     [BindProperty(SupportsGet = true)] public string? YearMonth { get; set; }
     [BindProperty(SupportsGet = true)] public string? OperationType { get; set; }
@@ -23,7 +19,7 @@ public class OperationLogModel : PageModel {
     public void OnGet() {
         AvailableMonths = _logRepo.GetAvailableMonths();
         if (string.IsNullOrEmpty(YearMonth) || !AvailableMonths.Contains(YearMonth))
-            YearMonth = AvailableMonths.FirstOrDefault();
+            YearMonth = AvailableMonths.Count > 0 ? AvailableMonths[0] : null;
 
         if (YearMonth is null) return;
 

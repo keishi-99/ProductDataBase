@@ -2,18 +2,14 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ProductDatabase.Common {
     // TTL（Time-To-Live）ベースのジェネリックキャッシング機構
-    internal class CacheManager<T> {
+    internal class CacheManager<T>(TimeSpan? ttl = null) {
         private T? _cachedData;
         private DateTime? _lastLoadTime;
-        private readonly TimeSpan _ttl;
-        private readonly object _lock = new();
+        private readonly TimeSpan _ttl = ttl ?? _defaultTtl;
+        private readonly Lock _lock = new();
 
         // TTL のデフォルト値（5 分）
-        private static readonly TimeSpan DefaultTtl = TimeSpan.FromMinutes(5);
-
-        public CacheManager(TimeSpan? ttl = null) {
-            _ttl = ttl ?? DefaultTtl;
-        }
+        private static readonly TimeSpan _defaultTtl = TimeSpan.FromMinutes(5);
 
         // キャッシュが有効期限内かどうかを判定する（ロックなしの内部用）
         private bool IsCacheValidInternal() {

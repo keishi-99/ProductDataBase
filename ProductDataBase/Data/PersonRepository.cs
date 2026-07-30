@@ -50,7 +50,7 @@ namespace ProductDatabase.Data {
                 using var con = DbConnectionHelper.CreateAndOpenConnection();
                 con.Execute(
                     $"INSERT INTO {Constants.PersonTableName} (PersonName, IsActive) VALUES (@PersonName, @IsActive)",
-                    new { personInfo.PersonName, IsActive = personInfo.IsActive });
+                    new { personInfo.PersonName, personInfo.IsActive });
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(Insert), ex, $"PersonName: {personInfo.PersonName}");
                 throw;
@@ -62,7 +62,7 @@ namespace ProductDatabase.Data {
                 using var con = DbConnectionHelper.CreateAndOpenConnection();
                 con.Execute(
                     $"UPDATE {Constants.PersonTableName} SET PersonName=@PersonName, IsActive=@IsActive WHERE PersonID=@PersonID",
-                    new { personInfo.PersonName, IsActive = personInfo.IsActive, personInfo.PersonID });
+                    new { personInfo.PersonName, personInfo.IsActive, personInfo.PersonID });
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(Update), ex, $"PersonID: {personInfo.PersonID}, PersonName: {personInfo.PersonName}");
                 throw;

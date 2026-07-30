@@ -3,7 +3,7 @@ using Microsoft.Data.Sqlite;
 using ProductWebViewer.Models;
 
 namespace ProductWebViewer.Data {
-    public class SubstrateRecordRepository : RepositoryBase {
+    public class SubstrateRecordRepository(IConfiguration configuration) : RepositoryBase(configuration) {
         // クエリパラメータ名 → 実テーブルの列参照へのホワイトリスト（ORDER BY インジェクション対策）
         private static readonly Dictionary<string, string> _substrateSortCols = new(StringComparer.OrdinalIgnoreCase) {
             ["ID"] = "s.ID",
@@ -35,8 +35,6 @@ namespace ProductWebViewer.Data {
             ["OrderNumber"] = "s.OrderNumber",
             ["Stock"] = "Stock",
         };
-
-        public SubstrateRecordRepository(IConfiguration configuration) : base(configuration) { }
 
         public IReadOnlyList<string> GetCategoryList() {
             using var con = new SqliteConnection(_connectionString);

@@ -200,7 +200,7 @@ namespace ProductDatabase {
                 _productRegisterWork.RegDate = RegistrationDateCheckBox.Checked ? RegistrationDateTimePicker.Value.ToShortDateString() : string.Empty;
 
                 if (PersonCheckBox.Checked) {
-                    if (PersonComboBox.SelectedValue == null || !(PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson)) {
+                    if (PersonComboBox.SelectedValue == null || PersonComboBox.SelectedItem is not ProductDatabase.Models.PersonDef selectedPerson) {
                         MessageBox.Show("担当者を選択してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         PersonComboBox.Focus();
                         return;
@@ -413,7 +413,7 @@ namespace ProductDatabase {
             return dict?.GetValueOrDefault(productName);
         }
         // 入力ダイアログで編集した注意メッセージをJSONファイルに上書き保存する
-        private static readonly object _fileLock = new();
+        private static readonly Lock _fileLock = new();
         private static readonly System.Text.Json.JsonSerializerOptions _jsonOptions = new() {
             WriteIndented = true,
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All)
