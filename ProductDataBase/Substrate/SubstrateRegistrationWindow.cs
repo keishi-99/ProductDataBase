@@ -6,6 +6,7 @@ using ProductDatabase.Models;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
 using ProductDatabase.Services;
+using System.ComponentModel;
 using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
 
@@ -17,6 +18,7 @@ namespace ProductDatabase {
         private readonly SubstrateRegisterWork _substrateRegisterWork;
         private readonly AppSettings _appSettings;
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public DocumentPrintSettings SubstratePrintSettings { get; set; } = new DocumentPrintSettings();
         public LabelPrintSettings LabelPrintSettings => SubstratePrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
         public string PrintSettingPath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "Substrate", "SubstrateConfig.json");

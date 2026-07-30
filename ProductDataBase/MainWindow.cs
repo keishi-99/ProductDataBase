@@ -4,11 +4,13 @@ using ProductDatabase.History;
 using ProductDatabase.LogViewer;
 using ProductDatabase.Models;
 using ProductDatabase.Services;
+using System.ComponentModel;
 using System.Data;
 
 namespace ProductDatabase {
     public partial class MainWindow : Form {
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int RadioButtonNumber { get; set; }
         private float _fontSize = SystemFonts.DefaultFont.Size;
         private IEnumerable<DataRow> _currentTargetRows = [];

@@ -219,7 +219,7 @@ namespace ProductDatabase {
                 _productRegisterWork.SerialFirstNumber = _productMaster.IsSerialGeneration ? firstSerial : -1;
 
                 using ProductRegistration2Window window = new(_productMaster, _productRegisterWork, _appSettings);
-                window.Closed += (s, e) => this.Close();
+                window.FormClosed += (s, e) => this.Close();
                 window.ShowDialog(this);
 
             } catch (Exception ex) {

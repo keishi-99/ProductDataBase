@@ -349,7 +349,7 @@ namespace ProductDatabase.LogViewer {
 
                 // スタックトレースは長いため幅を固定する
                 if (ErrorDataGridView.Columns.Contains("スタックトレース")) {
-                    var col = ErrorDataGridView.Columns["スタックトレース"];
+                    var col = ErrorDataGridView.Columns["スタックトレース"]!;
                     col.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
                     col.Width = 300;
                 }

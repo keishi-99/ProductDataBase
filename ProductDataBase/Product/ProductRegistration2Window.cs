@@ -7,6 +7,7 @@ using ProductDatabase.Other;
 using ProductDatabase.Print;
 using ProductDatabase.Service;
 using ProductDatabase.Services;
+using System.ComponentModel;
 using System.Data;
 using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
@@ -15,11 +16,13 @@ namespace ProductDatabase {
 
     public partial class ProductRegistration2Window : Form {
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public DocumentPrintSettings ProductPrintSettings { get; set; } = new DocumentPrintSettings();
         public LabelPrintSettings LabelPrintSettings => ProductPrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
         public BarcodePrintSettings BarcodePrintSettings => ProductPrintSettings.BarcodePrintSettings ?? new BarcodePrintSettings();
         public NameplatePrintSettings NameplatePrintSettings => ProductPrintSettings.NameplatePrintSettings ?? new NameplatePrintSettings();
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string PrintSettingPath { get; set; } = string.Empty;
 
         private readonly PrintManager _printManager = new();
@@ -417,7 +420,7 @@ namespace ProductDatabase {
                         continue;
                     }
 
-                    var substrateNumber = row.Cells[0].Value.ToString() ?? string.Empty;
+                    var substrateNumber = row.Cells[0].Value?.ToString() ?? string.Empty;
                     var useValue = int.TryParse(row.Cells[2].Value?.ToString(), out var useVal) ? useVal : 0;
                     var orderNumber = ProductRegistrationRepository.GetSubstrateOrderNumber(connection, transaction, substrateID, substrateNumber);
                     ProductRegistrationRepository.InsertSubstrateUsage(connection, transaction, substrateID, substrateNumber, orderNumber, useValue, useID,
@@ -494,7 +497,7 @@ namespace ProductDatabase {
                                 var dgvRowCnt = objDgv.Rows.Count;
 
                                 for (var j = 0; j < dgvRowCnt; j++) {
-                                    var boolCbx = objDgv.Rows[j].Cells[3].Value is not null && (bool)objDgv.Rows[j].Cells[3].Value;
+                                    var boolCbx = objDgv.Rows[j].Cells[3].Value is not null && (bool)objDgv.Rows[j].Cells[3].Value!;
                                     if (boolCbx) {
                                         var stockValue = int.TryParse(objDgv.Rows[j].Cells[1].Value?.ToString(), out var sv) ? sv : 0;
                                         if (objDgv.Rows[j].Cells[2].Value is null) {
@@ -652,6 +655,7 @@ namespace ProductDatabase {
             public string ServiceProductModel { get; set; } = string.Empty;
             public List<SubstrateInfo> ServiceUseSubstrates { get; set; } = [];
         }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ServiceInformation ServiceInfo { get; set; } = new();
 
         // isPrintがtrueなら印刷ダイアログ経由で印刷しfalseならプレビューを表示する

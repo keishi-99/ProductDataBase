@@ -5,12 +5,14 @@ using ProductDatabase.Models;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
 using ProductDatabase.Services;
+using System.ComponentModel;
 using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
 
 namespace ProductDatabase {
     public partial class RePrintWindow : Form {
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public DocumentPrintSettings ProductPrintSettings { get; set; } = new DocumentPrintSettings();
         public LabelPrintSettings LabelPrintSettings => this.ProductPrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
         public BarcodePrintSettings BarcodePrintSettings => ProductPrintSettings.BarcodePrintSettings ?? new BarcodePrintSettings();
