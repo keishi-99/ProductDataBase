@@ -38,7 +38,10 @@
         <textarea asp-for="Record.Comment" class="form-control"></textarea>
     </div>
 
-    <button type="submit" class="btn btn-primary">保存</button>
+    <button type="submit" class="btn btn-primary"
+            onclick="return confirm('この内容で保存します。よろしいですか？');">
+        保存
+    </button>
     <a href="/" class="btn btn-secondary">キャンセル</a>
     <button type="submit" asp-page-handler="Delete" class="btn btn-outline-danger float-end"
             onclick="return confirm('この製品登録を削除します。よろしいですか？（関連するシリアル履歴も削除されます）');">
