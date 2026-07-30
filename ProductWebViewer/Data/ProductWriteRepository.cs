@@ -15,8 +15,8 @@ namespace ProductWebViewer.Data {
                 ? dbPath
                 : Path.Combine(AppContext.BaseDirectory, dbPath);
 
-            // UNCパス(\\server\share\...)経由の書き込みはSQLiteのネットワークファイルロックが不完全なため許可しない
-            if (fullPath.StartsWith(@"\\", StringComparison.Ordinal)) {
+            // UNCパス(\\server\share\... または //server/share/...)経由の書き込みはSQLiteのネットワークファイルロックが不完全なため許可しない
+            if (fullPath.StartsWith(@"\\", StringComparison.Ordinal) || fullPath.StartsWith("//", StringComparison.Ordinal)) {
                 throw new InvalidOperationException(
                     $"DatabasePath がネットワーク共有パスを指しています: {fullPath}\n" +
                     "WebViewerからの書き込みは、DBファイルが存在するPC上でローカルディスクに対して行ってください。");

@@ -30,6 +30,10 @@ namespace ProductWebViewer.Data {
 
         public IReadOnlyList<LogEntry> GetLogEntries(string yearMonth) {
             var entries = new List<LogEntry>();
+            // yearMonthがファイルパスの一部になるため、意図しないパス（ディレクトリ区切り等）を含まないことを確認する
+            if (string.IsNullOrEmpty(yearMonth) || yearMonth.Length != 6 || !yearMonth.All(char.IsAsciiDigit))
+                return entries;
+
             var filePath = Path.Combine(_logDirectory, $"log_{yearMonth}.csv");
             if (!File.Exists(filePath)) return entries;
 

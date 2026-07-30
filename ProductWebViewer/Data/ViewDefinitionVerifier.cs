@@ -68,6 +68,19 @@ namespace ProductWebViewer.Data {
                 LEFT JOIN M_Person AS p ON t.PersonID = p.PersonID
                 WHERE t.IsDeleted = 0
                 """,
+            ["V_Serial"] = """
+                CREATE VIEW V_Serial AS
+                SELECT
+                    s.rowid,
+                    s.Serial,
+                    s.OLesSerial,
+                    s.UsedID,
+                    s.ProductID,
+                    m.ProductName,
+                    m.CategoryName
+                FROM T_Serial AS s
+                LEFT JOIN M_ProductDef AS m ON s.ProductID = m.ProductID
+                """,
         };
 
         public static void Verify(string connectionString) {

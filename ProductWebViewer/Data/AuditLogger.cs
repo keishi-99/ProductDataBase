@@ -139,15 +139,23 @@ namespace ProductWebViewer.Data {
         }
 
         // メインアプリの Logger.AppendLog と同じ列構成・エスケープでCSV1行を追記する
+        // lockはWebViewerプロセス内のみの排他のため、メインアプリと同時書き込みが重なった場合に備えて
+        // 数回だけ短い間隔でリトライする（両アプリを跨ぐ完全な排他にはならないが、瞬間的な衝突は緩和できる）
         private void AppendLog(string[] message) {
+            var logEntry = $"\"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\",{string.Join(",", message.Select(CsvEscape))}";
+
             lock (_lockObject) {
                 if (!Directory.Exists(_logDirectory)) Directory.CreateDirectory(_logDirectory);
+                var logFilePath = Path.Combine(_logDirectory, $"log_{DateTime.Now:yyyyMM}.csv");
 
-                var logFileName = $"log_{DateTime.Now:yyyyMM}.csv";
-                var logFilePath = Path.Combine(_logDirectory, logFileName);
-
-                var logEntry = $"\"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\",{string.Join(",", message.Select(CsvEscape))}";
-                File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
+                for (var attempt = 1; attempt <= 3; attempt++) {
+                    try {
+                        File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
+                        return;
+                    } catch (IOException) when (attempt < 3) {
+                        Thread.Sleep(100);
+                    }
+                }
             }
         }
 
