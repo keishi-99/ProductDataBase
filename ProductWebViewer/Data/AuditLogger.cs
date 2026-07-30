@@ -1,9 +1,10 @@
 using ProductWebViewer.Models;
 
 namespace ProductWebViewer.Data {
-    // WebViewer経由での編集・削除操作を、メインアプリ(ProductDataBase)と共通の
-    // ログファイル(db/logs/log_yyyyMM.csv)に記録する。
-    // 列構成・エスケープ処理はメインアプリの Logger.AppendLog / HistoryAuditLogger に合わせてある
+    // WebViewer経由での編集・削除操作を db/logs/log_web_yyyyMM.csv に記録する。
+    // メインアプリの db/logs/log_yyyyMM.csv とはファイルを分けている（複数プロセスからの同時書き込みを避けるため）が、
+    // 列構成・エスケープ処理はメインアプリの Logger.AppendLog / HistoryAuditLogger に合わせてあり、
+    // 閲覧側（OperationLog・メインアプリのLogViewerWindow）で両ファイルをマージして表示する
     // （列見出し: 日時,操作種別,カテゴリ,ID,注文番号,製造番号,OLes番号,製品名,タイプ,型式,数量,シリアル先頭,シリアル末尾,Revision,登録日,担当者,コメント）
     public class AuditLogger {
         private readonly string _logDirectory;
@@ -140,24 +141,17 @@ namespace ProductWebViewer.Data {
             ]);
         }
 
-        // メインアプリの Logger.AppendLog と同じ列構成・エスケープでCSV1行を追記する
-        // lockはWebViewerプロセス内のみの排他のため、メインアプリと同時書き込みが重なった場合に備えて
-        // 数回だけ短い間隔でリトライする（両アプリを跨ぐ完全な排他にはならないが、瞬間的な衝突は緩和できる）
+        // メインアプリのLogger.AppendLogと同じ列構成・エスケープでCSV1行を追記する。
+        // ファイル名を log_web_*.csv とし、メインアプリの log_*.csv とは別ファイルに分けている
+        // （同じファイルに複数プロセスが書き込むとロック競合の懸念があるため）。
+        // 閲覧側（OperationLog / メインアプリのLogViewerWindow）で両ファイルをマージして表示する
         private void AppendLog(string[] message) {
             var logEntry = $"\"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\",{string.Join(",", message.Select(CsvEscape))}";
 
             lock (_lockObject) {
                 if (!Directory.Exists(_logDirectory)) Directory.CreateDirectory(_logDirectory);
-                var logFilePath = Path.Combine(_logDirectory, $"log_{DateTime.Now:yyyyMM}.csv");
-
-                for (var attempt = 1; attempt <= 3; attempt++) {
-                    try {
-                        File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
-                        return;
-                    } catch (IOException) when (attempt < 3) {
-                        Thread.Sleep(100);
-                    }
-                }
+                var logFilePath = Path.Combine(_logDirectory, $"log_web_{DateTime.Now:yyyyMM}.csv");
+                File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
             }
         }
 

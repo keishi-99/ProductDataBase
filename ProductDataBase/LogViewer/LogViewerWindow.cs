@@ -61,9 +61,10 @@ namespace ProductDatabase.LogViewer {
                 return;
             }
 
-            var logFiles = Directory.GetFiles(LogDirectory, "log_*.csv")
-                .Select(f => Path.GetFileNameWithoutExtension(f).Replace("log_", ""))
-                .Where(s => s.Length == 6 && s.All(char.IsDigit))
+            // メインアプリの log_*.csv と WebViewer の log_web_*.csv の両方から年月を集める
+            var logFiles = ExtractYearMonths("log_*.csv", "log_")
+                .Concat(ExtractYearMonths("log_web_*.csv", "log_web_"))
+                .Distinct()
                 .OrderByDescending(s => s)
                 .ToList();
 
@@ -100,6 +101,8 @@ namespace ProductDatabase.LogViewer {
 
                 _logTable = table;
                 _logView = _logTable.DefaultView;
+                // メインアプリ・WebViewer両ファイルを連結しているため、日時順に並べ直す
+                _logView.Sort = "[日時] ASC";
                 LogDataGridView.DataSource = _logView;
                 RefreshOperationTypeFilter(types);
                 ApplyFilter();
@@ -114,13 +117,26 @@ namespace ProductDatabase.LogViewer {
             }
         }
 
+        // メインアプリ(log_yyyyMM.csv)とWebViewer(log_web_yyyyMM.csv)の年月一覧を集める
+        private static IEnumerable<string> ExtractYearMonths(string searchPattern, string prefix) =>
+            Directory.GetFiles(LogDirectory, searchPattern)
+                .Select(f => Path.GetFileNameWithoutExtension(f).Replace(prefix, ""))
+                .Where(s => s.Length == 6 && s.All(char.IsDigit));
+
+        // 指定年月の操作ログを、メインアプリ・WebViewer両方のファイルから読み取りマージして返す
         private static DataTable LoadLogFile(string yearMonth, CancellationToken token) {
             var table = new DataTable();
             foreach (var header in _columnHeaders)
                 table.Columns.Add(header);
 
-            var filePath = Path.Combine(LogDirectory, $"log_{yearMonth}.csv");
-            if (!File.Exists(filePath)) return table;
+            AppendLogFile(table, Path.Combine(LogDirectory, $"log_{yearMonth}.csv"), token);
+            AppendLogFile(table, Path.Combine(LogDirectory, $"log_web_{yearMonth}.csv"), token);
+
+            return table;
+        }
+
+        private static void AppendLogFile(DataTable table, string filePath, CancellationToken token) {
+            if (!File.Exists(filePath)) return;
 
             using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using var reader = new StreamReader(fs, Encoding.UTF8);
@@ -136,8 +152,6 @@ namespace ProductDatabase.LogViewer {
                 }
                 table.Rows.Add(row);
             }
-
-            return table;
         }
 
         private static string ExtractValue(string raw) {
