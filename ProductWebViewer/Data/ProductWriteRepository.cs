@@ -9,24 +9,7 @@ namespace ProductWebViewer.Data {
         private readonly string _connectionString;
 
         public ProductWriteRepository(IConfiguration configuration) {
-            var dbPath = configuration["DatabasePath"]
-                ?? throw new InvalidOperationException("DatabasePath が appsettings.json に設定されていません。");
-            var fullPath = Path.IsPathRooted(dbPath)
-                ? dbPath
-                : Path.Combine(AppContext.BaseDirectory, dbPath);
-
-            // UNCパス(\\server\share\... または //server/share/...)経由の書き込みはSQLiteのネットワークファイルロックが不完全なため許可しない
-            if (fullPath.StartsWith(@"\\", StringComparison.Ordinal) || fullPath.StartsWith("//", StringComparison.Ordinal)) {
-                throw new InvalidOperationException(
-                    $"DatabasePath がネットワーク共有パスを指しています: {fullPath}\n" +
-                    "WebViewerからの書き込みは、DBファイルが存在するPC上でローカルディスクに対して行ってください。");
-            }
-
-            _connectionString = new SqliteConnectionStringBuilder {
-                DataSource = fullPath,
-                Mode = SqliteOpenMode.ReadWrite,
-                Pooling = false
-            }.ToString();
+            _connectionString = WritableConnectionStringFactory.Create(configuration);
         }
 
         public ProductRecord? GetById(long id) {
@@ -89,14 +72,14 @@ namespace ProductWebViewer.Data {
             }
 
             // 監査ログ用に、連動削除される直前の基板使用履歴・シリアルを取得しておく
-            var substrates = con.Query("""
+            var substrates = con.Query<CascadeSubstrateRow>("""
                 SELECT ID, OrderNumber, SubstrateNumber, ProductName, SubstrateName, SubstrateModel,
                        Increase, Decrease, Defect, RegDate, PersonInfo, Comment, UseID
                 FROM V_Substrate
                 WHERE UseID = @Id AND IsDeleted = 0
                 """, new { Id = id }, tx).ToList();
-            var serials = con.Query("""
-                SELECT rowid, ProductName, Serial, UsedID
+            var serials = con.Query<CascadeSerialRow>("""
+                SELECT rowid AS RowId, ProductName, Serial, UsedID
                 FROM V_Serial
                 WHERE UsedID = @Id
                 """, new { Id = id }, tx).ToList();
@@ -109,5 +92,12 @@ namespace ProductWebViewer.Data {
         }
     }
 
-    public record ProductDeleteResult(bool Success, IReadOnlyList<dynamic> DeletedSubstrates, IReadOnlyList<dynamic> DeletedSerials);
+    public record ProductDeleteResult(bool Success, IReadOnlyList<CascadeSubstrateRow> DeletedSubstrates, IReadOnlyList<CascadeSerialRow> DeletedSerials);
+
+    // 製品削除に連動して削除される基板使用履歴・シリアルのスナップショット（監査ログ記録用）
+    public record CascadeSubstrateRow(
+        long ID, string? OrderNumber, string? SubstrateNumber, string? ProductName, string? SubstrateName, string? SubstrateModel,
+        long? Increase, long? Decrease, long? Defect, string? RegDate, string? PersonInfo, string? Comment, long? UseID);
+
+    public record CascadeSerialRow(long RowId, string? ProductName, string? Serial, long? UsedID);
 }

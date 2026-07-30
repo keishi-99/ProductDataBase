@@ -5,7 +5,9 @@ using ProductWebViewer.Models;
 namespace ProductWebViewer.Data {
     // db/logs/log_yyyyMM.csv （メインアプリ）と db/logs/log_web_yyyyMM.csv （WebViewer）を
     // 読み取り専用でマージして参照する。両アプリは別ファイルに書き込むため、ここで統合して表示する。
-    // パース処理はメインアプリの LogViewerWindow と同じロジックを踏襲している
+    // パース処理はメインアプリの ProductDataBase/LogViewer/LogViewerWindow.cs と同じロジックを踏襲している。
+    // 【重要】書き込み側(ProductWebViewer/Data/AuditLogger.cs, ProductDataBase/Common/Logger.cs)の
+    // 列構成・エスケープ処理を変更した場合は、このパース処理も必ず追従させること
     public partial class LogRecordRepository {
         private readonly string _logDirectory;
 

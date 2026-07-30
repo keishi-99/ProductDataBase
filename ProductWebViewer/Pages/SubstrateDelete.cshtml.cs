@@ -38,12 +38,7 @@ public class SubstrateDeleteModel : PageModel {
             return Page();
         }
 
-        // 監査ログの書き込み失敗（ディスク容量不足等）で削除自体が失敗扱いにならないようにする
-        try {
-            _auditLogger.LogSubstrateDelete(before);
-        } catch (Exception ex) {
-            _logger.LogError(ex, "監査ログの記録に失敗しました。");
-        }
+        AuditLogging.TryLog(_logger, () => _auditLogger.LogSubstrateDelete(before));
 
         return RedirectToPage("/Index", new { tab = "substrate" });
     }

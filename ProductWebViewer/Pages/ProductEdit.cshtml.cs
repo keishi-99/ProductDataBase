@@ -39,7 +39,7 @@ public class ProductEditModel : PageModel {
             return Page();
         }
 
-        TryLogAudit(() => _auditLogger.LogProductEdit(before, Record.OrderNumber, Record.ProductNumber, Record.OLesNumber, Record.Comment));
+        AuditLogging.TryLog(_logger, () => _auditLogger.LogProductEdit(before, Record.OrderNumber, Record.ProductNumber, Record.OLesNumber, Record.Comment));
 
         return RedirectToPage("/Index");
     }
@@ -55,21 +55,12 @@ public class ProductEditModel : PageModel {
             return Page();
         }
 
-        TryLogAudit(() => {
+        AuditLogging.TryLog(_logger, () => {
             _auditLogger.LogProductDelete(before);
             _auditLogger.LogProductSubstrateDelete(result.DeletedSubstrates, before.CategoryName);
             _auditLogger.LogProductSerialDelete(result.DeletedSerials, before.CategoryName);
         });
 
         return RedirectToPage("/Index");
-    }
-
-    // 監査ログの書き込み失敗（ディスク容量不足等）でDB更新自体が失敗扱いにならないようにする
-    private void TryLogAudit(Action logAction) {
-        try {
-            logAction();
-        } catch (Exception ex) {
-            _logger.LogError(ex, "監査ログの記録に失敗しました。");
-        }
     }
 }

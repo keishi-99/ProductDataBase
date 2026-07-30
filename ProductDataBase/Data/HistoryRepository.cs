@@ -415,7 +415,7 @@ namespace ProductDatabase.Data {
                     Revision      = @Revision,
                     RevisionGroup = @RevisionGroup,
                     Comment       = @Comment
-                WHERE ID = @ID;
+                WHERE ID = @ID AND IsDeleted = 0;
                 """;
             connection.Execute(sql, new {
                 ID = row["ID"],
@@ -430,14 +430,14 @@ namespace ProductDatabase.Data {
             }, transaction);
         }
 
-        // 製品履歴を論理削除する
+        // 製品履歴を論理削除する（他操作で既に削除済みの行は対象外とする）
         public static void DeleteProductRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
             var sql = $"""
                 UPDATE {Constants.TProductTableName}
                 SET
                     IsDeleted = 1,
                     DeletedAt = datetime('now', 'localtime')
-                WHERE ID = @ID;
+                WHERE ID = @ID AND IsDeleted = 0;
                 """;
             connection.Execute(sql, new { ID = row["ID"] }, transaction);
         }
