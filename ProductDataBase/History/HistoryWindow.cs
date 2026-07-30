@@ -341,9 +341,13 @@ namespace ProductDatabase.History {
                         con.Open();
                         using var tx = con.BeginTransaction();
 
+                        // 他の操作で既に削除されている場合は競合として例外にする（tx未コミットのままcon/txが破棄されロールバックされる）
+                        if (HistoryRepository.UpdateProductRow(con, row, tx) == 0) {
+                            throw new InvalidOperationException("この製品登録は他の操作で既に削除されているため、更新できませんでした。");
+                        }
+
                         // Original=変更前, Current=変更後
                         HistoryAuditLogger.LogProductEdit(row, pendingLogs, _productMaster.CategoryName);
-                        HistoryRepository.UpdateProductRow(con, row, tx);
 
                         tx.Commit();
 
@@ -428,6 +432,8 @@ namespace ProductDatabase.History {
             // Task.Run でキャプチャするため変数をローカルにコピー
             var tableName = _tableName;
             List<string[]> pendingLogs = [];
+            // 削除しようとしたが他の操作で既に削除済みだった製品のID（"Product"のときのみ使用）
+            List<string> conflictedProductIds = [];
             using var overlay = new LoadingOverlay(this);
             try {
                 // DB操作をバックグラウンドスレッドで実行
@@ -447,12 +453,16 @@ namespace ProductDatabase.History {
                             case "Product":
                                 foreach (var row in rowsToDelete) {
                                     var id = Convert.ToInt64(row["ID"]);
+                                    // 他の操作で既に削除されている場合はこの行だけスキップする（他行の削除は継続する）
+                                    if (HistoryRepository.DeleteProductRow(con, row, tx) == 0) {
+                                        conflictedProductIds.Add(id.ToString());
+                                        continue;
+                                    }
                                     var substrates = HistoryRepository.GetSubstratesByUseId(con, id, tx);
                                     var serials = HistoryRepository.GetSerialsByUsedId(con, id, tx);
                                     HistoryAuditLogger.LogProductDelete(row, pendingLogs, _productMaster.CategoryName);
                                     HistoryAuditLogger.LogProductSubstrateDelete(substrates, pendingLogs, _substrateMaster.CategoryName);
                                     HistoryAuditLogger.LogProductSerialDelete(serials, pendingLogs, _productMaster.CategoryName);
-                                    HistoryRepository.DeleteProductRow(con, row, tx);
                                     HistoryRepository.DeleteProductSubstrateRow(con, row, tx);
                                     HistoryRepository.DeleteProductSerialRow(con, row, tx);
                                 }
@@ -475,6 +485,12 @@ namespace ProductDatabase.History {
                     BackupManager.CreateBackup();
                 });
                 RefreshCurrentView();
+
+                if (conflictedProductIds.Count > 0) {
+                    MessageBox.Show(
+                        $"以下のIDは他の操作で既に削除されていたため、削除をスキップしました:\n{string.Join(", ", conflictedProductIds)}",
+                        "一部スキップ", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "削除エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);

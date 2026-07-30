@@ -125,14 +125,16 @@ namespace ProductWebViewer.Data {
         // アンチウイルス・バックアップソフト等による一時的なファイルロックに備え、IOException時は
         // 数回だけ短い間隔でリトライする。
         private void AppendLog(IReadOnlyList<string[]> messages) {
-            var logEntries = messages
-                .Select(message => $"\"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\",{string.Join(",", message.Select(CsvEscape))}")
-                .ToList();
-            var content = string.Join(Environment.NewLine, logEntries) + Environment.NewLine;
-
             lock (_lockObject) {
+                // 行の日時とファイル名(年月)がずれないよう、同じ時刻を使い回す
+                var now = DateTime.Now;
+                var logEntries = messages
+                    .Select(message => $"\"{now:yyyy-MM-dd HH:mm:ss}\",{string.Join(",", message.Select(CsvEscape))}")
+                    .ToList();
+                var content = string.Join(Environment.NewLine, logEntries) + Environment.NewLine;
+
                 if (!Directory.Exists(_logDirectory)) Directory.CreateDirectory(_logDirectory);
-                var logFilePath = Path.Combine(_logDirectory, $"log_web_{DateTime.Now:yyyyMM}.csv");
+                var logFilePath = Path.Combine(_logDirectory, $"log_web_{now:yyyyMM}.csv");
 
                 for (var attempt = 1; attempt <= 3; attempt++) {
                     try {

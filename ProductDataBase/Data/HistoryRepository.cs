@@ -402,8 +402,8 @@ namespace ProductDatabase.Data {
             connection.Execute(sql, new { ID = row["ID"] }, transaction);
         }
 
-        // 製品履歴を更新する
-        public static void UpdateProductRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
+        // 製品履歴を更新する（他操作で既に削除済みの行は対象外とする）。呼び出し側は戻り値0を競合として扱うこと
+        public static int UpdateProductRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
             var sql = $"""
                 UPDATE {Constants.TProductTableName}
                 SET
@@ -417,7 +417,7 @@ namespace ProductDatabase.Data {
                     Comment       = @Comment
                 WHERE ID = @ID AND IsDeleted = 0;
                 """;
-            connection.Execute(sql, new {
+            return connection.Execute(sql, new {
                 ID = row["ID"],
                 OrderNumber = row["OrderNumber"],
                 ProductNumber = row["ProductNumber"],
@@ -430,8 +430,8 @@ namespace ProductDatabase.Data {
             }, transaction);
         }
 
-        // 製品履歴を論理削除する（他操作で既に削除済みの行は対象外とする）
-        public static void DeleteProductRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
+        // 製品履歴を論理削除する（他操作で既に削除済みの行は対象外とする）。呼び出し側は戻り値0を競合として扱うこと
+        public static int DeleteProductRow(IDbConnection connection, DataRow row, IDbTransaction transaction) {
             var sql = $"""
                 UPDATE {Constants.TProductTableName}
                 SET
@@ -439,7 +439,7 @@ namespace ProductDatabase.Data {
                     DeletedAt = datetime('now', 'localtime')
                 WHERE ID = @ID AND IsDeleted = 0;
                 """;
-            connection.Execute(sql, new { ID = row["ID"] }, transaction);
+            return connection.Execute(sql, new { ID = row["ID"] }, transaction);
         }
 
         // 製品削除に連動して基板履歴を論理削除する
