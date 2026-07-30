@@ -76,8 +76,9 @@ namespace ProductWebViewer.Data {
         }
 
         // 製品登録を論理削除し、連動する基板使用履歴を論理削除・シリアルを物理削除する
-        // 対象行が既に削除されている場合は false を返し、関連データには一切触れない
-        public bool DeleteProduct(long id) {
+        // 対象行が既に削除されている場合は Success=false を返し、関連データには一切触れない
+        // DeletedSubstrates/DeletedSerials は監査ログ記録用に、削除直前の状態を返す
+        public ProductDeleteResult DeleteProduct(long id) {
             using var con = new SqliteConnection(_connectionString);
             con.Open();
             using var tx = con.BeginTransaction();
@@ -85,14 +86,29 @@ namespace ProductWebViewer.Data {
             var affected = con.Execute("UPDATE T_Product SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE ID = @Id AND IsDeleted = 0", new { Id = id }, tx);
             if (affected == 0) {
                 tx.Rollback();
-                return false;
+                return new ProductDeleteResult(false, [], []);
             }
+
+            // 監査ログ用に、連動削除される直前の基板使用履歴・シリアルを取得しておく
+            var substrates = con.Query("""
+                SELECT ID, OrderNumber, SubstrateNumber, ProductName, SubstrateName, SubstrateModel,
+                       Increase, Decrease, Defect, RegDate, PersonInfo, Comment, UseID
+                FROM V_Substrate
+                WHERE UseID = @Id AND IsDeleted = 0
+                """, new { Id = id }, tx).ToList();
+            var serials = con.Query("""
+                SELECT rowid, ProductName, Serial, UsedID
+                FROM V_Serial
+                WHERE UsedID = @Id
+                """, new { Id = id }, tx).ToList();
 
             con.Execute("UPDATE T_Substrate SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE UseID = @Id AND IsDeleted = 0", new { Id = id }, tx);
             con.Execute("DELETE FROM T_Serial WHERE UsedID = @Id", new { Id = id }, tx);
 
             tx.Commit();
-            return true;
+            return new ProductDeleteResult(true, substrates, serials);
         }
     }
+
+    public record ProductDeleteResult(bool Success, IReadOnlyList<dynamic> DeletedSubstrates, IReadOnlyList<dynamic> DeletedSerials);
 }

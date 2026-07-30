@@ -1,8 +1,10 @@
 using ProductWebViewer.Models;
 
 namespace ProductWebViewer.Data {
-    // WebViewer経由での編集・削除操作を追跡するための監査ログ
-    // メインアプリのログ形式とは独立した、Web操作専用のシンプルなテキストログ
+    // WebViewer経由での編集・削除操作を、メインアプリ(ProductDataBase)と共通の
+    // ログファイル(db/logs/log_yyyyMM.csv)に記録する。
+    // 列構成・エスケープ処理はメインアプリの Logger.AppendLog / HistoryAuditLogger に合わせてある
+    // （列見出し: 日時,操作種別,カテゴリ,ID,注文番号,製造番号,OLes番号,製品名,タイプ,型式,数量,シリアル先頭,シリアル末尾,Revision,登録日,担当者,コメント）
     public class AuditLogger {
         private readonly string _logDirectory;
         private static readonly object _lockObject = new();
@@ -10,47 +12,147 @@ namespace ProductWebViewer.Data {
         public AuditLogger(IConfiguration configuration) {
             var dbPath = configuration["DatabasePath"] ?? "db/ProductRegistry.db";
             var dbFullPath = Path.IsPathRooted(dbPath) ? dbPath : Path.Combine(AppContext.BaseDirectory, dbPath);
-            _logDirectory = Path.Combine(Path.GetDirectoryName(dbFullPath) ?? AppContext.BaseDirectory, "auditlog");
+            // メインアプリの Logger._logDirectory ( {BaseDirectory}/db/logs ) と同じ場所を指す
+            _logDirectory = Path.Combine(Path.GetDirectoryName(dbFullPath) ?? AppContext.BaseDirectory, "logs");
         }
 
-        public void LogProductEdit(string operatorName, ProductRecord before, ProductRecord after) {
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            Append(
-                $"[{timestamp}] 編集 操作者[{operatorName}] ID[{after.Id}] 製品名[{after.ProductName}] " +
-                $"注文番号[{before.OrderNumber}]→[{after.OrderNumber}] " +
-                $"製造番号[{before.ProductNumber}]→[{after.ProductNumber}] " +
-                $"O-Les番号[{before.OLesNumber}]→[{after.OLesNumber}] " +
-                $"登録日[{before.RegDate}]→[{after.RegDate}] " +
-                $"Revision[{before.Revision}]→[{after.Revision}] " +
-                $"コメント[{before.Comment}]→[{after.Comment}]");
+        public void LogProductEdit(ProductRecord before, ProductRecord after) {
+            AppendLog([
+                "[製品履歴編集:前] (Web)",
+                $"[{before.CategoryName}]",
+                $"ID[{before.Id}]",
+                $"注文番号[{before.OrderNumber}]",
+                $"製造番号[{before.ProductNumber}]",
+                $"OLes番号[{before.OLesNumber}]",
+                $"製品名[{before.ProductName}]",
+                $"タイプ[{before.ProductType}]",
+                $"型式[{before.ProductModel}]",
+                $"数量[{before.Quantity}]",
+                $"シリアル先頭[{before.SerialFirst}]",
+                $"シリアル末尾[{before.SerialLast}]",
+                $"Revision[{before.Revision}]",
+                $"登録日[{before.RegDate}]",
+                $"担当者[{before.PersonInfo}]",
+                $"コメント[{before.Comment}]"
+            ]);
+            AppendLog([
+                "[製品履歴編集:後] (Web)",
+                $"[{after.CategoryName}]",
+                $"ID[{after.Id}]",
+                $"注文番号[{after.OrderNumber}]",
+                $"製造番号[{after.ProductNumber}]",
+                $"OLes番号[{after.OLesNumber}]",
+                $"製品名[{after.ProductName}]",
+                $"タイプ[{after.ProductType}]",
+                $"型式[{after.ProductModel}]",
+                $"数量[{after.Quantity}]",
+                $"シリアル先頭[{after.SerialFirst}]",
+                $"シリアル末尾[{after.SerialLast}]",
+                $"Revision[{after.Revision}]",
+                $"登録日[{after.RegDate}]",
+                $"担当者[{after.PersonInfo}]",
+                $"コメント[{after.Comment}]"
+            ]);
         }
 
-        public void LogProductDelete(string operatorName, ProductRecord record) {
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            Append(
-                $"[{timestamp}] 削除 操作者[{operatorName}] ID[{record.Id}] 製品名[{record.ProductName}] " +
-                $"注文番号[{record.OrderNumber}] 製造番号[{record.ProductNumber}] O-Les番号[{record.OLesNumber}] " +
-                $"登録日[{record.RegDate}] Revision[{record.Revision}] コメント[{record.Comment}]");
+        public void LogProductDelete(ProductRecord record) {
+            AppendLog([
+                "[製品履歴削除] (Web)",
+                $"[{record.CategoryName}]",
+                $"ID[{record.Id}]",
+                $"注文番号[{record.OrderNumber}]",
+                $"製造番号[{record.ProductNumber}]",
+                $"OLes番号[{record.OLesNumber}]",
+                $"製品名[{record.ProductName}]",
+                $"タイプ[{record.ProductType}]",
+                $"型式[{record.ProductModel}]",
+                $"数量[{record.Quantity}]",
+                $"シリアル先頭[{record.SerialFirst}]",
+                $"シリアル末尾[{record.SerialLast}]",
+                $"Revision[{record.Revision}]",
+                $"登録日[{record.RegDate}]",
+                $"担当者[{record.PersonInfo}]",
+                $"コメント[{record.Comment}]"
+            ]);
         }
 
-        public void LogSubstrateDelete(string operatorName, SubstrateRecord record) {
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            Append(
-                $"[{timestamp}] 削除(基板) 操作者[{operatorName}] ID[{record.Id}] 製品名[{record.ProductName}] " +
-                $"基板名[{record.SubstrateName}] 基板型式[{record.SubstrateModel}] " +
-                $"注文番号[{record.OrderNumber}] 製造番号[{record.SubstrateNumber}] " +
-                $"入庫[{record.Increase}] 出庫[{record.Decrease}] 不良[{record.Defect}] " +
-                $"登録日[{record.RegDate}] コメント[{record.Comment}]");
-        }
-
-        private void Append(string line) {
-            // Comment等の値に改行が含まれていると偽の行を追記できてしまうため無害化する
-            var safeLine = line.Replace("\r\n", "\\n").Replace("\r", "\\n").Replace("\n", "\\n");
-            lock (_lockObject) {
-                if (!Directory.Exists(_logDirectory)) Directory.CreateDirectory(_logDirectory);
-                var logFile = Path.Combine(_logDirectory, $"webviewer_{DateTime.Now:yyyyMM}.log");
-                File.AppendAllText(logFile, safeLine + Environment.NewLine);
+        // 製品削除に連動して削除された基板使用履歴1件ごとのログ（categoryNameは親製品のカテゴリを使用）
+        public void LogProductSubstrateDelete(IEnumerable<dynamic> substrates, string? categoryName) {
+            foreach (var item in substrates) {
+                AppendLog([
+                    "[製品削除に伴う基板削除] (Web)",
+                    $"[{categoryName}]",
+                    $"ID[{item.ID}]",
+                    $"注文番号[{item.OrderNumber}]",
+                    $"製造番号[{item.SubstrateNumber}]",
+                    "[]",
+                    $"製品名[{item.ProductName}]",
+                    $"基板名[{item.SubstrateName}]",
+                    $"型式[{item.SubstrateModel}]",
+                    $"追加数[{item.Increase}]",
+                    $"使用数[{item.Decrease}]",
+                    $"減少数[{item.Defect}]",
+                    $"登録日[{item.RegDate}]",
+                    $"担当者[{item.PersonInfo}]",
+                    $"コメント[{item.Comment}]",
+                    $"UseID[{item.UseID}]"
+                ]);
             }
         }
+
+        // 製品削除に連動して削除されたシリアル1件ごとのログ
+        public void LogProductSerialDelete(IEnumerable<dynamic> serials, string? categoryName) {
+            foreach (var item in serials) {
+                AppendLog([
+                    "[製品削除に伴うシリアル削除] (Web)",
+                    $"[{categoryName}]",
+                    $"ID[{item.rowid}]",
+                    $"製品名[{item.ProductName}]",
+                    $"Serial[{item.Serial}]",
+                    $"UsedID[{item.UsedID}]",
+                    "[]", "[]", "[]", "[]",
+                    "[]", "[]", "[]", "[]",
+                    "[]", "[]"
+                ]);
+            }
+        }
+
+        public void LogSubstrateDelete(SubstrateRecord record) {
+            AppendLog([
+                "[基板履歴削除] (Web)",
+                $"[{record.CategoryName}]",
+                $"ID[{record.Id}]",
+                $"注文番号[{record.OrderNumber}]",
+                $"製造番号[{record.SubstrateNumber}]",
+                "[]",
+                $"製品名[{record.ProductName}]",
+                $"基板名[{record.SubstrateName}]",
+                $"型式[{record.SubstrateModel}]",
+                $"追加数[{record.Increase}]",
+                $"使用数[{record.Decrease}]",
+                $"減少数[{record.Defect}]",
+                "[]",
+                $"登録日[{record.RegDate}]",
+                $"担当者[{record.PersonInfo}]",
+                $"コメント[{record.Comment}]"
+            ]);
+        }
+
+        // メインアプリの Logger.AppendLog と同じ列構成・エスケープでCSV1行を追記する
+        private void AppendLog(string[] message) {
+            lock (_lockObject) {
+                if (!Directory.Exists(_logDirectory)) Directory.CreateDirectory(_logDirectory);
+
+                var logFileName = $"log_{DateTime.Now:yyyyMM}.csv";
+                var logFilePath = Path.Combine(_logDirectory, logFileName);
+
+                var logEntry = $"\"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\",{string.Join(",", message.Select(CsvEscape))}";
+                File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
+            }
+        }
+
+        // ダブルクォートのエスケープと改行の除去（改行を残すとCSVの行構造が壊れ、偽の行を追記できてしまう）
+        private static string CsvEscape(string value) =>
+            $"\"{value.Replace("\"", "\"\"").Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ")}\"";
     }
 }

@@ -40,7 +40,7 @@ public class SubstrateDeleteModel : PageModel {
 
         // 監査ログの書き込み失敗（ディスク容量不足等）で削除自体が失敗扱いにならないようにする
         try {
-            _auditLogger.LogSubstrateDelete(User.Identity?.Name ?? "管理者", before);
+            _auditLogger.LogSubstrateDelete(before);
         } catch (Exception ex) {
             _logger.LogError(ex, "監査ログの記録に失敗しました。");
         }

@@ -18,6 +18,7 @@
 </head>
 <body>
     <div class="d-flex justify-content-end align-items-center gap-3 px-5 py-1 border-bottom">
+        <a href="/OperationLog" class="small">操作ログ</a>
         @if (User.Identity?.IsAuthenticated == true) {
             <span class="text-body-secondary small">管理者としてログイン中</span>
             <form method="post" asp-page="/Logout" class="d-inline m-0">

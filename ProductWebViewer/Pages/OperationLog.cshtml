@@ -1,0 +1,109 @@
+@page
+@model OperationLogModel
+@{
+    ViewData["Title"] = "操作ログ";
+}
+
+@section Styles {
+<style>
+    .log-table td, .log-table th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 300px;
+    }
+</style>
+}
+
+<h3 class="mb-3">操作ログ</h3>
+
+<form method="get" class="row g-2 mb-3 align-items-end">
+    <div class="col-auto">
+        <label class="form-label">対象月</label>
+        <select name="YearMonth" class="form-select" onchange="this.form.submit()">
+            @foreach (var ym in Model.AvailableMonths) {
+                if (ym == Model.YearMonth) {
+                    <option value="@ym" selected>@ym[..4]年@(ym[4..])月</option>
+                } else {
+                    <option value="@ym">@ym[..4]年@(ym[4..])月</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <label class="form-label">操作種別</label>
+        <select name="OperationType" class="form-select" onchange="this.form.submit()">
+            <option value="">（すべて）</option>
+            @foreach (var t in Model.OperationTypes) {
+                if (t == Model.OperationType) {
+                    <option value="@t" selected>@t</option>
+                } else {
+                    <option value="@t">@t</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <label class="form-label">キーワード</label>
+        <input type="text" name="Keyword" value="@Model.Keyword" class="form-control" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">検索</button>
+    </div>
+    <div class="col-auto ms-auto">
+        <span class="text-body-secondary">@Model.Entries.Count 件表示中</span>
+    </div>
+</form>
+
+@if (Model.AvailableMonths.Count == 0) {
+    <div class="text-center text-muted py-5">ログファイルがありません</div>
+} else {
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm table-hover log-table">
+            <thead>
+                <tr>
+                    <th>日時</th>
+                    <th>操作種別</th>
+                    <th>カテゴリ</th>
+                    <th>ID</th>
+                    <th>注文番号</th>
+                    <th>製造番号</th>
+                    <th>OLes番号</th>
+                    <th>製品名</th>
+                    <th>タイプ</th>
+                    <th>型式</th>
+                    <th>数量</th>
+                    <th>シリアル先頭</th>
+                    <th>シリアル末尾</th>
+                    <th>Revision</th>
+                    <th>登録日</th>
+                    <th>担当者</th>
+                    <th>コメント</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model.Entries) {
+                    <tr class="@OperationLogModel.RowCssClass(e.OperationType)">
+                        <td>@e.Timestamp</td>
+                        <td>@e.OperationType</td>
+                        <td>@e.Category</td>
+                        <td>@e.Id</td>
+                        <td>@e.OrderNumber</td>
+                        <td>@e.ProductNumber</td>
+                        <td>@e.OLesNumber</td>
+                        <td>@e.ProductName</td>
+                        <td>@e.ProductType</td>
+                        <td>@e.ProductModel</td>
+                        <td>@e.Quantity</td>
+                        <td>@e.SerialFirst</td>
+                        <td>@e.SerialLast</td>
+                        <td>@e.Revision</td>
+                        <td>@e.RegDate</td>
+                        <td>@e.PersonInfo</td>
+                        <td>@e.Comment</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

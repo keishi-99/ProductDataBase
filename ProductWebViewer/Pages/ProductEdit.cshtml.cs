@@ -39,7 +39,7 @@ public class ProductEditModel : PageModel {
             return Page();
         }
 
-        TryLogAudit(() => _auditLogger.LogProductEdit(User.Identity?.Name ?? "管理者", before, Record));
+        TryLogAudit(() => _auditLogger.LogProductEdit(before, Record));
 
         return RedirectToPage("/Index");
     }
@@ -48,13 +48,18 @@ public class ProductEditModel : PageModel {
         var before = _writeRepo.GetById(id);
         if (before is null) return NotFound();
 
-        if (!_writeRepo.DeleteProduct(id)) {
+        var result = _writeRepo.DeleteProduct(id);
+        if (!result.Success) {
             ErrorMessage = "この製品登録は他の操作で既に削除されています。";
             Record = before;
             return Page();
         }
 
-        TryLogAudit(() => _auditLogger.LogProductDelete(User.Identity?.Name ?? "管理者", before));
+        TryLogAudit(() => {
+            _auditLogger.LogProductDelete(before);
+            _auditLogger.LogProductSubstrateDelete(result.DeletedSubstrates, before.CategoryName);
+            _auditLogger.LogProductSerialDelete(result.DeletedSerials, before.CategoryName);
+        });
 
         return RedirectToPage("/Index");
     }

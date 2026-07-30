@@ -13,6 +13,7 @@ builder.Services.AddSingleton<SubstrateRecordRepository>();
 builder.Services.AddSingleton<ProductWriteRepository>();
 builder.Services.AddSingleton<SubstrateWriteRepository>();
 builder.Services.AddSingleton<AuditLogger>();
+builder.Services.AddSingleton<LogRecordRepository>();
 // リポジトリのDB疎通確認・ビュー定義検証をリクエスト処理開始前に実行する
 builder.Services.AddHostedService<ViewDefinitionStartupCheck>();
 
