@@ -497,7 +497,7 @@ namespace ProductDatabase {
                                 var dgvRowCnt = objDgv.Rows.Count;
 
                                 for (var j = 0; j < dgvRowCnt; j++) {
-                                    var boolCbx = objDgv.Rows[j].Cells[3].Value is not null && (bool)objDgv.Rows[j].Cells[3].Value!;
+                                    var boolCbx = objDgv.Rows[j].Cells[3].Value is true;
                                     if (boolCbx) {
                                         var stockValue = int.TryParse(objDgv.Rows[j].Cells[1].Value?.ToString(), out var sv) ? sv : 0;
                                         if (objDgv.Rows[j].Cells[2].Value is null) {
