@@ -1,5 +1,9 @@
 namespace ProductDatabase.Common {
     // 月次CSVログファイルへの追記と共有フォルダへのコピーを管理するクラス
+    // 【重要】WebViewer側(ProductWebViewer/Data/AuditLogger.cs)が同じ列構成・エスケープ処理で
+    // 別ファイル(log_web_yyyyMM.csv)に書き込み、閲覧側で両ファイルをマージしている。
+    // ここの列構成・エスケープ処理を変更する場合は、AuditLogger.cs・LogViewerWindow.cs・
+    // ProductWebViewer/Data/LogRecordRepository.cs も必ず追従させること
     internal static class Logger {
         // AppDomain.CurrentDomain.BaseDirectory を使用してファイルダイアログ等による CurrentDirectory の変化を回避する
         internal static readonly string _logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db", "logs");

@@ -9,6 +9,9 @@ namespace ProductDatabase.LogViewer {
         // Logger と同じパスを参照して書き込み先と読み込み先のズレを防ぐ
         private static string LogDirectory => Logger._logDirectory;
 
+        // 【重要】この列構成は ProductWebViewer/Data/AuditLogger.cs（書き込み側）・
+        // ProductWebViewer/Data/LogRecordRepository.cs（WebViewer閲覧側）と一致させる必要がある。
+        // ここを変更する場合はそれらも必ず追従させること
         private static readonly string[] _columnHeaders = [
             "日時", "操作種別", "カテゴリ", "ID",
             "注文番号", "製造番号", "OLes番号", "製品名",
@@ -61,11 +64,8 @@ namespace ProductDatabase.LogViewer {
                 return;
             }
 
-            var logFiles = Directory.GetFiles(LogDirectory, "log_*.csv")
-                .Select(f => Path.GetFileNameWithoutExtension(f).Replace("log_", ""))
-                .Where(s => s.Length == 6 && s.All(char.IsDigit))
-                .OrderByDescending(s => s)
-                .ToList();
+            // メインアプリの log_*.csv と WebViewer の log_web_*.csv の両方から年月を集める
+            var logFiles = ExtractYearMonths().OrderByDescending(s => s).ToList();
 
             foreach (var ym in logFiles)
                 YearMonthComboBox.Items.Add(new YearMonthItem(ym, $"{ym[..4]}年{ym[4..]}月"));
@@ -100,6 +100,8 @@ namespace ProductDatabase.LogViewer {
 
                 _logTable = table;
                 _logView = _logTable.DefaultView;
+                // メインアプリ・WebViewer両ファイルを連結しているため、日時順に並べ直す
+                _logView.Sort = "[日時] ASC";
                 LogDataGridView.DataSource = _logView;
                 RefreshOperationTypeFilter(types);
                 ApplyFilter();
@@ -114,13 +116,32 @@ namespace ProductDatabase.LogViewer {
             }
         }
 
+        // メインアプリ(log_yyyyMM.csv)とWebViewer(log_web_yyyyMM.csv)の年月一覧を、1回のディレクトリ列挙で集める
+        // ("log_*.csv" は "log_web_*.csv" にもマッチするため、両方をこの1回のスキャンでまとめて拾える)
+        private static IEnumerable<string> ExtractYearMonths() =>
+            Directory.GetFiles(LogDirectory, "log_*.csv")
+                .Select(f => {
+                    var name = Path.GetFileNameWithoutExtension(f);
+                    var prefix = name.StartsWith("log_web_", StringComparison.Ordinal) ? "log_web_" : "log_";
+                    return name[prefix.Length..];
+                })
+                .Where(s => s.Length == 6 && s.All(char.IsDigit))
+                .Distinct();
+
+        // 指定年月の操作ログを、メインアプリ・WebViewer両方のファイルから読み取りマージして返す
         private static DataTable LoadLogFile(string yearMonth, CancellationToken token) {
             var table = new DataTable();
             foreach (var header in _columnHeaders)
                 table.Columns.Add(header);
 
-            var filePath = Path.Combine(LogDirectory, $"log_{yearMonth}.csv");
-            if (!File.Exists(filePath)) return table;
+            AppendLogFile(table, Path.Combine(LogDirectory, $"log_{yearMonth}.csv"), token);
+            AppendLogFile(table, Path.Combine(LogDirectory, $"log_web_{yearMonth}.csv"), token);
+
+            return table;
+        }
+
+        private static void AppendLogFile(DataTable table, string filePath, CancellationToken token) {
+            if (!File.Exists(filePath)) return;
 
             using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using var reader = new StreamReader(fs, Encoding.UTF8);
@@ -136,8 +157,6 @@ namespace ProductDatabase.LogViewer {
                 }
                 table.Rows.Add(row);
             }
-
-            return table;
         }
 
         private static string ExtractValue(string raw) {
@@ -225,7 +244,11 @@ namespace ProductDatabase.LogViewer {
             CountLabel.Text = $"{_logView.Count} 件表示中";
         }
 
+        // WebViewer由来の行は操作種別に " (Web)" が付与されているため、色分け判定の前に取り除く
         private static Color GetRowColor(string operationType) {
+            if (operationType.EndsWith(" (Web)", StringComparison.Ordinal))
+                operationType = operationType[..^" (Web)".Length];
+
             if (operationType is LogOperationTypes.SubstrateHistoryDelete
                 or LogOperationTypes.ProductHistoryDelete
                 or LogOperationTypes.ProductRelatedSubstrateDelete
