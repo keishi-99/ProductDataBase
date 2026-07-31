@@ -24,7 +24,7 @@
 
 | カテゴリ | 技術 |
 |---|---|
-| 言語 | C# (.NET 8.0) |
+| 言語 | C# (.NET 10.0) |
 | UI フレームワーク | Windows Forms (WinForms) |
 | データベース | SQLite (Microsoft.Data.Sqlite + Dapper) |
 | Excel 処理 | ClosedXML, EPPlus, NPOI |
@@ -42,7 +42,7 @@
 graph TB
     subgraph Client["クライアント PC"]
         Launcher["Launcher<br/>(net10.0-windows / WinForms)"]
-        ProductDataBase["ProductDataBase<br/>(net8.0-windows / WinForms)"]
+        ProductDataBase["ProductDataBase<br/>(net10.0-windows / WinForms)"]
         bPac["Brother bPac SDK (COM)"]
         ExcelInterop["Microsoft.Office.Interop.Excel (COM)"]
         Printer[["Brother P-touch<br/>ラベルプリンタ"]]
@@ -84,7 +84,7 @@ graph TB
 ## 必要環境
 
 - Windows 10 / 11
-- .NET 8.0 Runtime 以上
+- .NET 10.0 Runtime 以上
 - Microsoft Excel（成績書を開く場合）
 - Brother P-touch ラベルプリンタ（シリアル印刷を使用する場合）
 - bPac SDK（Brother 製ラベル印刷 SDK）
