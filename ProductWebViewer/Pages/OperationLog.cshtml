@@ -12,7 +12,119 @@
         text-overflow: ellipsis;
         max-width: 300px;
     }
+    .log-table {
+        position: relative;
+    }
+    .log-table th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: var(--bs-tertiary-bg);
+        color: var(--bs-body-color);
+    }
+    .col-resizer {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 5px;
+        height: 100%;
+        cursor: col-resize;
+        user-select: none;
+    }
+    .col-resizer:hover,
+    .col-resizer.resizing {
+        background-color: #0d6efd;
+        opacity: 0.5;
+    }
+    .table-responsive {
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+    /* このBootstrapバージョンは .table-danger 等にダークテーマ用の色定義を持たないため、
+       alert・list-group等で使われている公式のdarkテーマ変数(-subtle/-text-emphasis)で明示的に上書きする */
+    [data-bs-theme="dark"] .log-table .table-danger {
+        --bs-table-bg: var(--bs-danger-bg-subtle);
+        --bs-table-color: var(--bs-danger-text-emphasis);
+        --bs-table-border-color: var(--bs-danger-border-subtle);
+    }
+    [data-bs-theme="dark"] .log-table .table-warning {
+        --bs-table-bg: var(--bs-warning-bg-subtle);
+        --bs-table-color: var(--bs-warning-text-emphasis);
+        --bs-table-border-color: var(--bs-warning-border-subtle);
+    }
+    [data-bs-theme="dark"] .log-table .table-info {
+        --bs-table-bg: var(--bs-info-bg-subtle);
+        --bs-table-color: var(--bs-info-text-emphasis);
+        --bs-table-border-color: var(--bs-info-border-subtle);
+    }
+    [data-bs-theme="dark"] .log-table .table-success {
+        --bs-table-bg: var(--bs-success-bg-subtle);
+        --bs-table-color: var(--bs-success-text-emphasis);
+        --bs-table-border-color: var(--bs-success-border-subtle);
+    }
 </style>
+}
+
+@section Scripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var table = document.querySelector('.log-table');
+    if (!table) return;
+
+    // 列幅の自動計算（内容に合わせた幅を一度計算してから固定レイアウトに切り替える）
+    table.style.tableLayout = 'auto';
+    var ths = Array.from(table.querySelectorAll('thead th'));
+    var widths = ths.map(function (th) { return Math.ceil(th.getBoundingClientRect().width); });
+    ths.forEach(function (th, i) { th.style.width = widths[i] + 'px'; });
+    table.style.tableLayout = 'fixed';
+
+    // 列幅ドラッグハンドル
+    ths.forEach(function (th) {
+        var handle = document.createElement('div');
+        handle.className = 'col-resizer';
+        th.appendChild(handle);
+        var startX, startW;
+        handle.addEventListener('mousedown', function (e) {
+            startX = e.pageX;
+            startW = th.offsetWidth;
+            handle.classList.add('resizing');
+            function onMouseMove(e) {
+                th.style.width = Math.max(40, startW + (e.pageX - startX)) + 'px';
+            }
+            function onMouseUp() {
+                handle.classList.remove('resizing');
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+            e.stopPropagation();
+            e.preventDefault();
+        });
+    });
+
+    // テーブルの高さをウィンドウの下から一定間隔になるよう動的に設定する
+    function syncTableHeight() {
+        var container = document.querySelector('.table-responsive');
+        if (!container) return;
+        var rect = container.getBoundingClientRect();
+
+        // 登録実績画面(Index.cshtml)の syncTableHeight と同じ計算式。
+        // OperationLog にはページネーション(nav)がないため bottomPad は main の pb-3 (16px) のみになる。
+        var nav = container.closest('form')?.querySelector('nav.d-flex');
+        var bottomPad = (nav ? nav.offsetHeight + 8 : 0) + 16;
+
+        container.style.maxHeight = Math.max(150, window.innerHeight - rect.top - bottomPad) + 'px';
+    }
+    syncTableHeight();
+
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(syncTableHeight, 100);
+    });
+});
+</script>
 }
 
 <h3 class="mb-3">操作ログ</h3>
