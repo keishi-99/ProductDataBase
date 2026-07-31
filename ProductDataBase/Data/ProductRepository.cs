@@ -13,7 +13,7 @@ namespace ProductDatabase.Data {
 
         internal static readonly CacheManager<(DataTable, DataTable, DataTable)> _cacheManager
             = new(TimeSpan.FromMinutes(5));
-        private static readonly object _loadLock = new();
+        private static readonly Lock _loadLock = new();
 
         // DBファイルのパスを検証しSQLite接続文字列を返す（DbConnectionHelper に委譲・プーリング無効）
         public static string GetConnectionRegistration() {
@@ -457,7 +457,7 @@ namespace ProductDatabase.Data {
         }
 
         // キャッシュの状態を取得する（デバッグ・テスト用）
-        public (bool IsValid, DateTime? LastLoadTime, TimeSpan Ttl) GetCacheStatus() {
+        public static (bool IsValid, DateTime? LastLoadTime, TimeSpan Ttl) GetCacheStatus() {
             return _cacheManager.GetCacheStatus();
         }
     }

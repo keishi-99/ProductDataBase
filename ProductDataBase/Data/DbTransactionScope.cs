@@ -18,9 +18,7 @@ namespace ProductDatabase.Data {
 
         // 接続を開きトランザクションを開始する
         public void Begin() {
-            if (_disposed) {
-                throw new ObjectDisposedException(nameof(DbTransactionScope));
-            }
+            ObjectDisposedException.ThrowIf(_disposed, this);
             if (_connection != null) {
                 throw new InvalidOperationException("すでにトランザクションが開始されています。");
             }

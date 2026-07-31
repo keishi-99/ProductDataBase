@@ -229,7 +229,7 @@ namespace ProductDatabase.Data {
 
             connection.Execute(sql, new {
                 work.Quantity,
-                PersonID = work.PersonID,
+                work.PersonID,
                 RegDate = work.RegDate.NullIfWhiteSpace(),
                 Revision = work.Revision.NullIfWhiteSpace(),
                 RevisionGroup = revisionGroup,

@@ -14,7 +14,7 @@ namespace ProductWebViewer.Data {
     // （列見出し: 日時,操作種別,カテゴリ,ID,注文番号,製造番号,OLes番号,製品名,タイプ,型式,数量,シリアル先頭,シリアル末尾,Revision,登録日,担当者,コメント）
     public class AuditLogger {
         private readonly string _logDirectory;
-        private static readonly object _lockObject = new();
+        private static readonly Lock _lockObject = new();
 
         public AuditLogger(IConfiguration configuration) {
             var dbPath = configuration["DatabasePath"] ?? "db/ProductRegistry.db";

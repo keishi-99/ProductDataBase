@@ -6,16 +6,10 @@ using ProductWebViewer.Models;
 
 namespace ProductWebViewer.Pages;
 
-public class IndexModel : PageModel {
-    private readonly ProductRecordRepository _productRepo;
-    private readonly SubstrateRecordRepository _substrateRepo;
-    private readonly ILogger<IndexModel> _logger;
-
-    public IndexModel(ProductRecordRepository productRepo, SubstrateRecordRepository substrateRepo, ILogger<IndexModel> logger) {
-        _productRepo = productRepo;
-        _substrateRepo = substrateRepo;
-        _logger = logger;
-    }
+public class IndexModel(ProductRecordRepository productRepo, SubstrateRecordRepository substrateRepo, ILogger<IndexModel> logger) : PageModel {
+    private readonly ProductRecordRepository _productRepo = productRepo;
+    private readonly SubstrateRecordRepository _substrateRepo = substrateRepo;
+    private readonly ILogger<IndexModel> _logger = logger;
 
     [BindProperty(SupportsGet = true)] public string Tab { get; set; } = "product";
     [BindProperty(SupportsGet = true)] public string SubTab { get; set; } = "records";

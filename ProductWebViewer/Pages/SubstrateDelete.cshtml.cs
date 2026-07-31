@@ -7,16 +7,10 @@ using ProductWebViewer.Models;
 namespace ProductWebViewer.Pages;
 
 [Authorize]
-public class SubstrateDeleteModel : PageModel {
-    private readonly SubstrateWriteRepository _writeRepo;
-    private readonly AuditLogger _auditLogger;
-    private readonly ILogger<SubstrateDeleteModel> _logger;
-
-    public SubstrateDeleteModel(SubstrateWriteRepository writeRepo, AuditLogger auditLogger, ILogger<SubstrateDeleteModel> logger) {
-        _writeRepo = writeRepo;
-        _auditLogger = auditLogger;
-        _logger = logger;
-    }
+public class SubstrateDeleteModel(SubstrateWriteRepository writeRepo, AuditLogger auditLogger, ILogger<SubstrateDeleteModel> logger) : PageModel {
+    private readonly SubstrateWriteRepository _writeRepo = writeRepo;
+    private readonly AuditLogger _auditLogger = auditLogger;
+    private readonly ILogger<SubstrateDeleteModel> _logger = logger;
 
     public SubstrateRecord Record { get; set; } = new();
     public string? ErrorMessage { get; private set; }

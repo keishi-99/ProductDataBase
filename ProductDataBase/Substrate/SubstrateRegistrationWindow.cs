@@ -6,6 +6,7 @@ using ProductDatabase.Models;
 using ProductDatabase.Other;
 using ProductDatabase.Print;
 using ProductDatabase.Services;
+using System.ComponentModel;
 using static ProductDatabase.Print.PrintManager;
 using static ProductDatabase.Print.PrintOptions;
 
@@ -17,6 +18,7 @@ namespace ProductDatabase {
         private readonly SubstrateRegisterWork _substrateRegisterWork;
         private readonly AppSettings _appSettings;
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public DocumentPrintSettings SubstratePrintSettings { get; set; } = new DocumentPrintSettings();
         public LabelPrintSettings LabelPrintSettings => SubstratePrintSettings.LabelPrintSettings ?? new LabelPrintSettings();
         public string PrintSettingPath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "Substrate", "SubstrateConfig.json");
@@ -246,7 +248,7 @@ namespace ProductDatabase {
             _substrateRegisterWork.DefectQuantity = defectQuantity;
 
             if (PersonCheckBox.Checked) {
-                if (PersonComboBox.SelectedValue == null || !(PersonComboBox.SelectedItem is ProductDatabase.Models.PersonDef selectedPerson)) {
+                if (PersonComboBox.SelectedValue == null || PersonComboBox.SelectedItem is not ProductDatabase.Models.PersonDef selectedPerson) {
                     MessageBox.Show("担当者を選択してください。", "入力エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     PersonComboBox.Focus();
                     return false;

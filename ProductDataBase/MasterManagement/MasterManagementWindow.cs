@@ -229,7 +229,7 @@ namespace ProductDatabase.MasterManagement {
                 return;
             }
 
-            var productId = (long)ProductDataGridView.SelectedRows[0].Cells["ProductID"].Value;
+            var productId = GetRowId(ProductDataGridView.SelectedRows[0], "ProductID");
             var row = _repository.ProductDataTable.AsEnumerable()
                 .FirstOrDefault(r => r.Field<long>("ProductID") == productId);
 
@@ -251,7 +251,7 @@ namespace ProductDatabase.MasterManagement {
                 return;
             }
 
-            var productId = (long)ProductDataGridView.SelectedRows[0].Cells["ProductID"].Value;
+            var productId = GetRowId(ProductDataGridView.SelectedRows[0], "ProductID");
             var productName = ProductDataGridView.SelectedRows[0].Cells["ProductName"].Value?.ToString() ?? string.Empty;
             var productModel = ProductDataGridView.SelectedRows[0].Cells["ProductModel"].Value?.ToString() ?? string.Empty;
 
@@ -289,7 +289,7 @@ namespace ProductDatabase.MasterManagement {
                 return;
             }
 
-            var substrateId = (long)SubstrateDataGridView.SelectedRows[0].Cells["SubstrateID"].Value;
+            var substrateId = GetRowId(SubstrateDataGridView.SelectedRows[0], "SubstrateID");
             var row = _repository.SubstrateDataTable.AsEnumerable()
                 .FirstOrDefault(r => r.Field<long>("SubstrateID") == substrateId);
 
@@ -311,7 +311,7 @@ namespace ProductDatabase.MasterManagement {
                 return;
             }
 
-            var substrateId = (long)SubstrateDataGridView.SelectedRows[0].Cells["SubstrateID"].Value;
+            var substrateId = GetRowId(SubstrateDataGridView.SelectedRows[0], "SubstrateID");
             var substrateName = SubstrateDataGridView.SelectedRows[0].Cells["SubstrateName"].Value?.ToString() ?? string.Empty;
             var substrateModel = SubstrateDataGridView.SelectedRows[0].Cells["SubstrateModel"].Value?.ToString() ?? string.Empty;
 
@@ -398,7 +398,7 @@ namespace ProductDatabase.MasterManagement {
             var categoryName = row.Cells["CategoryName"].Value?.ToString() ?? string.Empty;
             var productName = row.Cells["ProductName"].Value?.ToString() ?? string.Empty;
             var productModel = row.Cells["ProductModel"].Value?.ToString() ?? string.Empty;
-            var productId = (long)row.Cells["ProductID"].Value;
+            var productId = GetRowId(row, "ProductID");
 
             // DB保存済みの値からパスを生成するためUIの未保存変更に影響されない
             PrintSettingPath = Path.Combine(
@@ -452,5 +452,8 @@ namespace ProductDatabase.MasterManagement {
                     : SortOrder.None;
             }
         }
+
+        // 行から主キー列（ProductID/SubstrateID）の値を取得する
+        private static long GetRowId(DataGridViewRow row, string columnName) => (long)row.Cells[columnName].Value!;
     }
 }

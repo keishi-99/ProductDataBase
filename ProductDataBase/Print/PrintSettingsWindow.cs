@@ -1,6 +1,7 @@
 using ProductDatabase.MasterManagement;
 using ProductDatabase.Models;
 using ProductDatabase.Print;
+using System.ComponentModel;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -10,13 +11,16 @@ using static ProductDatabase.Print.PrintOptions;
 namespace ProductDatabase {
     public partial class PrintSettingsWindow : Form {
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public DocumentPrintSettings DocumentPrintSettings { get; set; } = new DocumentPrintSettings();
         private string _documentPrintSettingFilePath = string.Empty;
         private JsonSerializerOptions? _jsonSerializerOptions;
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public AppSettings AppSettings { get; set; } = new AppSettings();
 
         // 呼び出し元から設定するシリアルタイプ（PropertyGrid の表示対象を決定する）
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public PrintManager.SerialType CurrentSerialType { get; set; }
 
         public PrintSettingsWindow() {

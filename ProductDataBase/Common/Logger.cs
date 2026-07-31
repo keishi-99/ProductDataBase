@@ -7,7 +7,7 @@ namespace ProductDatabase.Common {
     internal static class Logger {
         // AppDomain.CurrentDomain.BaseDirectory を使用してファイルダイアログ等による CurrentDirectory の変化を回避する
         internal static readonly string _logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db", "logs");
-        private static readonly object _lockObject = new();
+        private static readonly Lock _lockObject = new();
 
         /// <summary>
         /// 作業ログを追記します。

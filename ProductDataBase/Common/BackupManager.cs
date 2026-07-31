@@ -4,7 +4,7 @@ namespace ProductDatabase.Common {
         private static readonly string _backupDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db", "backup");
         private static readonly string _originalFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db", "ProductRegistry.db");
         private static readonly int _maxBackupFiles = 20;
-        private static readonly object _lockObject = new();
+        private static readonly Lock _lockObject = new();
 
         /// <summary>
         /// バックアップを作成します。

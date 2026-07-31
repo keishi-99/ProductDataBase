@@ -161,13 +161,11 @@ namespace ProductDatabase {
                 PersonComboBox.Enabled = false;
                 RegisterButton.Enabled = false;
                 for (var i = 0; i < _productMaster.UseSubstrates.Count; i++) {
-                    var objCbx = MainPanel.Controls[_checkBoxNames[i]] as CheckBox;
-                    if (objCbx is not null) {
+                    if (MainPanel.Controls[_checkBoxNames[i]] is CheckBox objCbx) {
                         objCbx.Enabled = false;
                     }
 
-                    var objDgv = MainPanel.Controls[_dataGridViewNames[i]] as DataGridView;
-                    if (objDgv is not null) {
+                    if (MainPanel.Controls[_dataGridViewNames[i]] is DataGridView objDgv) {
                         objDgv.Enabled = false;
                     }
                 }
@@ -199,7 +197,7 @@ namespace ProductDatabase {
                                 var dgvRowCnt = objDgv.Rows.Count;
 
                                 for (var j = 0; j < dgvRowCnt; j++) {
-                                    var boolCbx = objDgv.Rows[j].Cells[4].Value is not null && (bool)objDgv.Rows[j].Cells[4].Value;
+                                    var boolCbx = objDgv.Rows[j].Cells[4].Value is true;
                                     if (boolCbx) {
                                         var stockValue = int.TryParse(objDgv.Rows[j].Cells[1].Value?.ToString(), out var sv1) ? sv1 : 0;
                                         var usedValue = int.TryParse(objDgv.Rows[j].Cells[2].Value?.ToString(), out var usd1) ? usd1 : 0;
@@ -271,7 +269,7 @@ namespace ProductDatabase {
 
                                     for (var j = 0; j <= dgvRowCnt - 1; j++) {
                                         var usedValue = int.TryParse(objDgv.Rows[j].Cells[2].Value?.ToString(), out var usd2) ? usd2 : 0;
-                                        var boolCbx = objDgv.Rows[j].Cells[4].Value is not null && (bool)objDgv.Rows[j].Cells[4].Value;
+                                        var boolCbx = objDgv.Rows[j].Cells[4].Value is true;
                                         var useValue = boolCbx ? (int.TryParse(objDgv.Rows[j].Cells[3].Value?.ToString(), out var use2) ? use2 : 0) : 0;
 
                                         if (boolCbx) {

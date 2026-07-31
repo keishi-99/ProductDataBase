@@ -213,12 +213,12 @@ namespace ProductDatabase.History {
 
             // PersonID 列を非表示にする
             if (DataBaseDataGridView.Columns.Contains("PersonID")) {
-                DataBaseDataGridView.Columns["PersonID"].Visible = false;
+                DataBaseDataGridView.Columns["PersonID"]!.Visible = false;
             }
 
             // Reprint種別のProductIDは再印刷起動用の内部利用のみなので非表示にする
             if (categoryName == "Reprint" && DataBaseDataGridView.Columns.Contains("ProductID")) {
-                DataBaseDataGridView.Columns["ProductID"].Visible = false;
+                DataBaseDataGridView.Columns["ProductID"]!.Visible = false;
             }
 
             _listColFilter.Clear();

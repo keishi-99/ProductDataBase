@@ -12,11 +12,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | プロジェクト | フレームワーク | 役割 |
 |---|---|---|
-| `ProductDataBase` | net8.0-windows | メインアプリ（WinForms） |
+| `ProductDataBase` | net10.0-windows | メインアプリ（WinForms） |
 | `Launcher` | net10.0-windows | 起動ランチャー（WinForms） |
 | `ProductWebViewer` | net10.0 | Web閲覧コンポーネント（ASP.NET Core） |
 
-**注意:** `ProductDataBase` は .NET 8、他2プロジェクトは .NET 10。API互換性に注意。
+全プロジェクトが .NET 10 に統一済み。
 
 ## ビルド・実行コマンド
 
@@ -74,4 +74,4 @@ dotnet run --project ProductWebViewer
 
 ## Windows 専用制約
 
-`net8.0-windows` / `net10.0-windows` のため、Linux/macOS では動作しない。WinForms・Windows API 依存のコードを追加する際は TFM を確認すること。
+`net10.0-windows` のため、Linux/macOS では動作しない。WinForms・Windows API 依存のコードを追加する際は TFM を確認すること。
