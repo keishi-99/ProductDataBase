@@ -251,6 +251,9 @@ namespace ProductDatabase {
 
                 _productRegisterWork.Comment = CommentTextBox.Text;
 
+                var usageLogs = new List<ProductSubstrateUsageLog>();
+                var cancelLogs = new List<ProductSubstrateUsageLog>();
+
                 switch (_productMaster.RegType) {
                     case 2:
                     case 3:
@@ -303,6 +306,11 @@ namespace ProductDatabase {
                                                     substrate.SubstrateID);
                                             }
 
+                                            usageLogs.Add(new ProductSubstrateUsageLog(
+                                                _productMaster.ProductName, substrate.SubstrateName, substrate.SubstrateModel,
+                                                substrateNum, info?.OrderNumber ?? "", useValue,
+                                                _productRegisterWork.RegDate, _productRegisterWork.PersonName, _productRegisterWork.Comment));
+
                                             if (_productMaster.IsListPrint) {
                                                 _listUsedSubstrate.Add(substrate.SubstrateName);
                                                 _listUsedProductNumber.Add(substrateNum);
@@ -310,11 +318,22 @@ namespace ProductDatabase {
                                             }
                                         }
                                         else if (usedValue != useValue && useValue == 0) {
+                                            var substrateNum = objDgv.Rows[j].Cells[0].Value?.ToString() ?? string.Empty;
+
+                                            var info = SubstrateChangeRepository.GetSubstrateInfo(
+                                                con, transaction,
+                                                substrate.SubstrateID, substrateNum);
+
                                             SubstrateChangeRepository.ClearSubstrateDecrease(
                                                 con, transaction,
                                                 substrate.SubstrateID,
-                                                objDgv.Rows[j].Cells[0].Value?.ToString() ?? string.Empty,
+                                                substrateNum,
                                                 _productRegisterWork.RowID);
+
+                                            cancelLogs.Add(new ProductSubstrateUsageLog(
+                                                _productMaster.ProductName, substrate.SubstrateName, substrate.SubstrateModel,
+                                                substrateNum, info?.OrderNumber ?? "", usedValue,
+                                                _productRegisterWork.RegDate, _productRegisterWork.PersonName, _productRegisterWork.Comment));
                                         }
                                     }
                                 } else {
@@ -324,11 +343,22 @@ namespace ProductDatabase {
                                         for (var j = 0; j < objDgv.Rows.Count; j++) {
                                             var usedValue = int.TryParse(objDgv.Rows[j].Cells[2].Value?.ToString(), out var usd) ? usd : 0;
                                             if (usedValue != 0) {
+                                                var substrateNum = objDgv.Rows[j].Cells[0].Value?.ToString() ?? string.Empty;
+
+                                                var info = SubstrateChangeRepository.GetSubstrateInfo(
+                                                    con, transaction,
+                                                    substrate.SubstrateID, substrateNum);
+
                                                 SubstrateChangeRepository.ClearSubstrateDecrease(
                                                     con, transaction,
                                                     substrate.SubstrateID,
-                                                    objDgv.Rows[j].Cells[0].Value?.ToString() ?? string.Empty,
+                                                    substrateNum,
                                                     _productRegisterWork.RowID);
+
+                                                cancelLogs.Add(new ProductSubstrateUsageLog(
+                                                    _productMaster.ProductName, substrate.SubstrateName, substrate.SubstrateModel,
+                                                    substrateNum, info?.OrderNumber ?? "", usedValue,
+                                                    _productRegisterWork.RegDate, _productRegisterWork.PersonName, _productRegisterWork.Comment));
                                             }
                                         }
                                     }
@@ -348,6 +378,12 @@ namespace ProductDatabase {
                 BackupManager.CreateBackup();
                 // ログ出力
                 HistoryAuditLogger.LogSubstrateChange(_productMaster, _productRegisterWork);
+                if (usageLogs.Count > 0) {
+                    HistoryAuditLogger.LogSubstrateChangeUsage(usageLogs, _productMaster.CategoryName);
+                }
+                if (cancelLogs.Count > 0) {
+                    HistoryAuditLogger.LogSubstrateChangeUsageCancel(cancelLogs, _productMaster.CategoryName);
+                }
             } catch (Exception) {
                 throw;
             }
