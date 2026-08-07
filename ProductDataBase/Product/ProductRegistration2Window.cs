@@ -308,9 +308,12 @@ namespace ProductDatabase {
 
                 using (var overlay = new LoadingOverlay(this)) {
                     await Task.Run(() => {
-                        Registration(_dbScope.Connection, _dbScope.Transaction);
+                        var usageLogs = Registration(_dbScope.Connection, _dbScope.Transaction);
 
                         HistoryAuditLogger.LogProductRegistration(_productMaster, _productRegisterWork);
+                        if (usageLogs.Count > 0) {
+                            HistoryAuditLogger.LogProductSubstrateUsage(usageLogs, _productMaster.CategoryName);
+                        }
                         BackupManager.CreateBackup();
 
                         // 登録チェック
@@ -332,8 +335,8 @@ namespace ProductDatabase {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        // RegTypeに応じて製品・シリアル・基板のINSERT処理を呼び出しトランザクションをコミットする
-        private void Registration(SqliteConnection connection, SqliteTransaction transaction) {
+        // RegTypeに応じて製品・シリアル・基板のINSERT処理を呼び出しトランザクションをコミットし、基板引き落とし分のログ情報を返す
+        private List<ProductSubstrateUsageLog> Registration(SqliteConnection connection, SqliteTransaction transaction) {
             try {
                 var comment = _productMaster.RegType switch {
                     9 => $"製品ID[{ServiceInfo.ServiceProductID}],製品名[{ServiceInfo.ServiceProductName}],製品型式[{ServiceInfo.ServiceProductModel}]\n{_productRegisterWork.Comment}",
@@ -342,6 +345,7 @@ namespace ProductDatabase {
                 _productRegisterWork.RowID = (int)ProductRegistrationRepository.InsertProductRecord(
                     connection, transaction, _productMaster, _productRegisterWork, comment, _serialLastNumber);
 
+                var usageLogs = new List<ProductSubstrateUsageLog>();
                 switch (_productMaster.RegType) {
                     case 0:
                         break;
@@ -357,7 +361,7 @@ namespace ProductDatabase {
                         if (_productMaster.IsSerialGeneration) {
                             InsertSerial(connection, transaction);
                         }
-                        RegisterSubstrate(connection, transaction);
+                        usageLogs = RegisterSubstrate(connection, transaction);
                         break;
                     default:
                         throw new Exception("RegType unknown");
@@ -374,6 +378,8 @@ namespace ProductDatabase {
                 if (nextSuffix != null) {
                     _productMaster.OLesSerialSuffix = nextSuffix;
                 }
+
+                return usageLogs;
 
             } catch (Exception) {
                 _dbScope.Rollback();
@@ -397,8 +403,10 @@ namespace ProductDatabase {
 
             ProductRegistrationRepository.InsertSerials(connection, transaction, serialData);
         }
-        // DataGridViewでチェックされた基板番号・使用数を読み取り基板履歴テーブルにINSERTする
-        private void RegisterSubstrate(SqliteConnection connection, SqliteTransaction transaction) {
+        // DataGridViewでチェックされた基板番号・使用数を読み取り基板履歴テーブルにINSERTし、引き落とし分のログ情報を返す
+        private List<ProductSubstrateUsageLog> RegisterSubstrate(SqliteConnection connection, SqliteTransaction transaction) {
+            var usageLogs = new List<ProductSubstrateUsageLog>();
+
             // サービス向け登録の場合は、サービス情報を使用する
             var isServiceRegistration = _productMaster.RegType == 9;
             var useSubstrates = (isServiceRegistration ? ServiceInfo.ServiceUseSubstrates : _productMaster.UseSubstrates);
@@ -413,7 +421,7 @@ namespace ProductDatabase {
                     throw new Exception("DataGridViewが nullです。");
                 }
 
-                var substrateID = useSubstrates[i].SubstrateID;
+                var substrate = useSubstrates[i];
 
                 foreach (DataGridViewRow row in objDgv.Rows) {
                     if (row.Cells[3].Value is not bool isChecked || !isChecked) {
@@ -422,11 +430,18 @@ namespace ProductDatabase {
 
                     var substrateNumber = row.Cells[0].Value?.ToString() ?? string.Empty;
                     var useValue = int.TryParse(row.Cells[2].Value?.ToString(), out var useVal) ? useVal : 0;
-                    var orderNumber = ProductRegistrationRepository.GetSubstrateOrderNumber(connection, transaction, substrateID, substrateNumber);
-                    ProductRegistrationRepository.InsertSubstrateUsage(connection, transaction, substrateID, substrateNumber, orderNumber, useValue, useID,
+                    var orderNumber = ProductRegistrationRepository.GetSubstrateOrderNumber(connection, transaction, substrate.SubstrateID, substrateNumber);
+                    ProductRegistrationRepository.InsertSubstrateUsage(connection, transaction, substrate.SubstrateID, substrateNumber, orderNumber, useValue, useID,
                         _productRegisterWork.PersonID, _productRegisterWork.RegDate, _productRegisterWork.Comment);
+
+                    usageLogs.Add(new ProductSubstrateUsageLog(
+                        _productMaster.ProductName, substrate.SubstrateName, substrate.SubstrateModel,
+                        substrateNumber, orderNumber, useValue,
+                        _productRegisterWork.RegDate, _productRegisterWork.PersonName, _productRegisterWork.Comment));
                 }
             }
+
+            return usageLogs;
         }
 
         // 製番と注文番号の重複登録をDBで確認しユーザーに続行可否を確認する

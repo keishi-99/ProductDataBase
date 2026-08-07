@@ -5,6 +5,9 @@ namespace ProductDatabase.Common {
         internal const string SubstrateRegistration = "[基板登録]";
         internal const string SubstrateChange = "[基板変更]";
         internal const string ProductRegistration = "[製品登録]";
+        internal const string ProductSubstrateUsage = "[基板引落(製品登録)]";
+        internal const string SubstrateChangeUsage = "[基板引落(基板変更)]";
+        internal const string SubstrateChangeUsageCancel = "[基板引落取消(基板変更)]";
         internal const string SubstrateHistoryEditBefore = "[基板履歴編集:前]";
         internal const string SubstrateHistoryEditAfter = "[基板履歴編集:後]";
         internal const string SubstrateHistoryDelete = "[基板履歴削除]";

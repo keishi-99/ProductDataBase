@@ -96,6 +96,42 @@ namespace ProductDatabase.Services {
             ]);
         }
 
+        // 製品登録に伴う基板引き落としの監査ログを基板1件ごとにファイルへ記録する
+        public static void LogProductSubstrateUsage(IEnumerable<ProductSubstrateUsageLog> usages, string categoryName) =>
+            WriteSubstrateUsageLogs(LogOperationTypes.ProductSubstrateUsage, usages, categoryName);
+
+        // 基板変更操作に伴う基板引き落としの監査ログを基板1件ごとにファイルへ記録する
+        public static void LogSubstrateChangeUsage(IEnumerable<ProductSubstrateUsageLog> usages, string categoryName) =>
+            WriteSubstrateUsageLogs(LogOperationTypes.SubstrateChangeUsage, usages, categoryName);
+
+        // 基板変更操作での使用数クリア（引き落とし取り消し）の監査ログを基板1件ごとにファイルへ記録する
+        public static void LogSubstrateChangeUsageCancel(IEnumerable<ProductSubstrateUsageLog> usages, string categoryName) =>
+            WriteSubstrateUsageLogs(LogOperationTypes.SubstrateChangeUsageCancel, usages, categoryName);
+
+        // 基板引き落とし系ログの共通書き込み処理（操作種別のみ差し替える）
+        private static void WriteSubstrateUsageLogs(string operationType, IEnumerable<ProductSubstrateUsageLog> usages, string categoryName) {
+            foreach (var item in usages) {
+                Logger.AppendLog([
+                    operationType,
+                    $"[{categoryName}]",
+                    $"[]",
+                    $"注文番号[{item.OrderNumber}]",
+                    $"製造番号[{item.SubstrateNumber}]",
+                    $"[]",
+                    $"製品名[{item.ProductName}]",
+                    $"基板名[{item.SubstrateName}]",
+                    $"型式[{item.SubstrateModel}]",
+                    $"[]",
+                    $"使用数[{item.UseValue}]",
+                    $"[]",
+                    $"[]",
+                    $"登録日[{item.RegDate}]",
+                    $"担当者[{item.PersonName}]",
+                    $"コメント[{item.Comment}]"
+                ]);
+            }
+        }
+
         // 製品登録操作の監査ログをファイルに記録する
         public static void LogProductRegistration(ProductMaster productMaster, ProductRegisterWork productRegisterWork) {
             Logger.AppendLog([

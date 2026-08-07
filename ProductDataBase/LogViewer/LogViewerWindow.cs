@@ -253,7 +253,8 @@ namespace ProductDatabase.LogViewer {
                 or LogOperationTypes.ProductHistoryDelete
                 or LogOperationTypes.ProductRelatedSubstrateDelete
                 or LogOperationTypes.ProductRelatedSerialDelete
-                or LogOperationTypes.SerialHistoryDelete)
+                or LogOperationTypes.SerialHistoryDelete
+                or LogOperationTypes.SubstrateChangeUsageCancel)
                 return Color.MistyRose;
 
             if (operationType is LogOperationTypes.SubstrateHistoryEditBefore
@@ -264,6 +265,8 @@ namespace ProductDatabase.LogViewer {
 
             return operationType switch {
                 LogOperationTypes.ProductRegistration => Color.LightSkyBlue,
+                LogOperationTypes.ProductSubstrateUsage => Color.LightCyan,
+                LogOperationTypes.SubstrateChangeUsage => Color.LightCyan,
                 LogOperationTypes.SubstrateRegistration => Color.LightGreen,
                 LogOperationTypes.SubstrateChange => Color.LightYellow,
                 LogOperationTypes.RePrint => Color.LightSalmon,
