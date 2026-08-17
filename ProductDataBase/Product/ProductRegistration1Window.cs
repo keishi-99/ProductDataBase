@@ -267,7 +267,7 @@ namespace ProductDatabase {
                 if (transaction.Connection is not null) {
                     transaction.Rollback();
                 }
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(SqliteBusyErrorHelper.GetUserMessage(ex), $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         // 選択されたテンプレートワードをコメントTextBoxに追記する

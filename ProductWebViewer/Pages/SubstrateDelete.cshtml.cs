@@ -26,7 +26,15 @@ public class SubstrateDeleteModel(SubstrateWriteRepository writeRepo, AuditLogge
         var before = _writeRepo.GetById(id);
         if (before is null) return NotFound();
 
-        if (!_writeRepo.DeleteSubstrate(id)) {
+        bool deleted;
+        try {
+            deleted = _writeRepo.DeleteSubstrate(id);
+        } catch (Exception ex) {
+            ErrorMessage = ex.Message;
+            Record = before;
+            return Page();
+        }
+        if (!deleted) {
             ErrorMessage = "この基板登録は他の操作で既に削除されています。";
             Record = before;
             return Page();
