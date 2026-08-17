@@ -24,22 +24,26 @@ namespace ProductDatabase.Data {
 
             var checkBin = Convert.ToString(substrate.CheckBin, 2).PadLeft(11, '0');
 
-            var result = con.ExecuteScalar<long>(sql, new {
-                substrate.CategoryName,
-                substrate.ProductName,
-                substrate.SubstrateName,
-                substrate.SubstrateModel,
-                substrate.RegType,
-                Checkbox = checkBin,
-                substrate.SerialPrintType,
-                Visible = substrate.Visible ? 1 : 0,
-                substrate.ExclusiveGroupID
-            });
+            try {
+                var result = con.ExecuteScalar<long>(sql, new {
+                    substrate.CategoryName,
+                    substrate.ProductName,
+                    substrate.SubstrateName,
+                    substrate.SubstrateModel,
+                    substrate.RegType,
+                    Checkbox = checkBin,
+                    substrate.SerialPrintType,
+                    Visible = substrate.Visible ? 1 : 0,
+                    substrate.ExclusiveGroupID
+                });
 
-            // ProductRepository のキャッシュをクリア（基板マスター変更の影響を反映）
-            ProductRepository._cacheManager.ClearCache();
+                // ProductRepository のキャッシュをクリア（基板マスター変更の影響を反映）
+                ProductRepository._cacheManager.ClearCache();
 
-            return result;
+                return result;
+            } catch (Exception ex) {
+                throw new Exception(SqliteBusyErrorHelper.GetUserMessage(ex), ex);
+            }
         }
 
         // 基板マスターを更新する
@@ -63,21 +67,25 @@ namespace ProductDatabase.Data {
 
             var checkBin = Convert.ToString(substrate.CheckBin, 2).PadLeft(11, '0');
 
-            con.Execute(sql, new {
-                substrate.CategoryName,
-                substrate.ProductName,
-                substrate.SubstrateName,
-                substrate.SubstrateModel,
-                substrate.RegType,
-                Checkbox = checkBin,
-                substrate.SerialPrintType,
-                Visible = substrate.Visible ? 1 : 0,
-                substrate.ExclusiveGroupID,
-                substrate.SubstrateID
-            });
+            try {
+                con.Execute(sql, new {
+                    substrate.CategoryName,
+                    substrate.ProductName,
+                    substrate.SubstrateName,
+                    substrate.SubstrateModel,
+                    substrate.RegType,
+                    Checkbox = checkBin,
+                    substrate.SerialPrintType,
+                    Visible = substrate.Visible ? 1 : 0,
+                    substrate.ExclusiveGroupID,
+                    substrate.SubstrateID
+                });
 
-            // ProductRepository のキャッシュをクリア（基板マスター変更の影響を反映）
-            ProductRepository._cacheManager.ClearCache();
+                // ProductRepository のキャッシュをクリア（基板マスター変更の影響を反映）
+                ProductRepository._cacheManager.ClearCache();
+            } catch (Exception ex) {
+                throw new Exception(SqliteBusyErrorHelper.GetUserMessage(ex), ex);
+            }
         }
 
         // 基板マスターを物理削除する（実績存在チェック・関連紐づけ削除を含む）
@@ -85,26 +93,32 @@ namespace ProductDatabase.Data {
             using var con = DbConnectionHelper.CreateAndOpenConnection();
             using var tx = con.BeginTransaction();
 
-            var count = con.ExecuteScalar<int>(
-                $"SELECT COUNT(*) FROM {Constants.TSubstrateTableName} WHERE SubstrateID = @SubstrateId",
-                new { SubstrateId = substrateId }, tx);
+            try {
+                var count = con.ExecuteScalar<int>(
+                    $"SELECT COUNT(*) FROM {Constants.TSubstrateTableName} WHERE SubstrateID = @SubstrateId",
+                    new { SubstrateId = substrateId }, tx);
 
-            if (count > 0) {
-                throw new InvalidOperationException("この基板には基板登録実績があるため削除できません。");
+                if (count > 0) {
+                    throw new InvalidOperationException("この基板には基板登録実績があるため削除できません。");
+                }
+
+                con.Execute(
+                    $"DELETE FROM {Constants.ProductUseSubstrateTableName} WHERE SubstrateID = @SubstrateId",
+                    new { SubstrateId = substrateId }, tx);
+
+                con.Execute(
+                    $"DELETE FROM {Constants.SubstrateTableName} WHERE SubstrateID = @SubstrateId",
+                    new { SubstrateId = substrateId }, tx);
+
+                tx.Commit();
+
+                // ProductRepository のキャッシュをクリア（基板マスター変更の影響を反映）
+                ProductRepository._cacheManager.ClearCache();
+            } catch (InvalidOperationException) {
+                throw;
+            } catch (Exception ex) {
+                throw new Exception(SqliteBusyErrorHelper.GetUserMessage(ex), ex);
             }
-
-            con.Execute(
-                $"DELETE FROM {Constants.ProductUseSubstrateTableName} WHERE SubstrateID = @SubstrateId",
-                new { SubstrateId = substrateId }, tx);
-
-            con.Execute(
-                $"DELETE FROM {Constants.SubstrateTableName} WHERE SubstrateID = @SubstrateId",
-                new { SubstrateId = substrateId }, tx);
-
-            tx.Commit();
-
-            // ProductRepository のキャッシュをクリア（基板マスター変更の影響を反映）
-            ProductRepository._cacheManager.ClearCache();
         }
 
         // 指定SubstrateIDの基板実績が存在するか確認する

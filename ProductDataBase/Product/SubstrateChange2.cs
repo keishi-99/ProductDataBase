@@ -173,7 +173,7 @@ namespace ProductDatabase {
                 if (_productMaster.IsListPrint) { SubstrateListPrintButton.Enabled = true; }
 
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(SqliteBusyErrorHelper.GetUserMessage(ex), $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         // 各基板のDgvで入力された使用数が在庫範囲内か・必要数と一致するかを検証しOK/NGを返す

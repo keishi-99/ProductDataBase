@@ -216,7 +216,7 @@ namespace ProductDatabase {
                 if (transaction.Connection is not null) { // 接続が開いているか確認する。
                     transaction.Rollback();
                 }
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(SqliteBusyErrorHelper.GetUserMessage(ex), $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 

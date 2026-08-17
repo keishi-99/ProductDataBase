@@ -137,27 +137,31 @@ namespace ProductDatabase.Data {
 
             var checkBin = Convert.ToString(product.CheckBin, 2).PadLeft(11, '0');
 
-            var result = con.ExecuteScalar<long>(sql, new {
-                product.CategoryName,
-                product.ProductName,
-                product.ProductType,
-                product.ProductModel,
-                product.Initial,
-                product.OLesInitial,
-                product.OLesSerialSuffix,
-                product.RevisionGroup,
-                product.RegType,
-                SerialType = product.SerialDigitType,
-                Checkbox = checkBin,
-                product.SerialPrintType,
-                product.SheetPrintType,
-                Visible = product.Visible ? 1 : 0
-            });
+            try {
+                var result = con.ExecuteScalar<long>(sql, new {
+                    product.CategoryName,
+                    product.ProductName,
+                    product.ProductType,
+                    product.ProductModel,
+                    product.Initial,
+                    product.OLesInitial,
+                    product.OLesSerialSuffix,
+                    product.RevisionGroup,
+                    product.RegType,
+                    SerialType = product.SerialDigitType,
+                    Checkbox = checkBin,
+                    product.SerialPrintType,
+                    product.SheetPrintType,
+                    Visible = product.Visible ? 1 : 0
+                });
 
-            // キャッシュをクリア（マスターデータが変更されたため）
-            _cacheManager.ClearCache();
+                // キャッシュをクリア（マスターデータが変更されたため）
+                _cacheManager.ClearCache();
 
-            return result;
+                return result;
+            } catch (Exception ex) {
+                throw new Exception(SqliteBusyErrorHelper.GetUserMessage(ex), ex);
+            }
         }
 
         // 製品マスターを更新する
@@ -186,23 +190,27 @@ namespace ProductDatabase.Data {
 
             var checkBin = Convert.ToString(product.CheckBin, 2).PadLeft(11, '0');
 
-            con.Execute(sql, new {
-                product.CategoryName,
-                product.ProductName,
-                product.ProductType,
-                product.ProductModel,
-                product.Initial,
-                product.OLesInitial,
-                product.OLesSerialSuffix,
-                product.RevisionGroup,
-                product.RegType,
-                SerialType = product.SerialDigitType,
-                Checkbox = checkBin,
-                product.SerialPrintType,
-                product.SheetPrintType,
-                Visible = product.Visible ? 1 : 0,
-                product.ProductID
-            });
+            try {
+                con.Execute(sql, new {
+                    product.CategoryName,
+                    product.ProductName,
+                    product.ProductType,
+                    product.ProductModel,
+                    product.Initial,
+                    product.OLesInitial,
+                    product.OLesSerialSuffix,
+                    product.RevisionGroup,
+                    product.RegType,
+                    SerialType = product.SerialDigitType,
+                    Checkbox = checkBin,
+                    product.SerialPrintType,
+                    product.SheetPrintType,
+                    Visible = product.Visible ? 1 : 0,
+                    product.ProductID
+                });
+            } catch (Exception ex) {
+                throw new Exception(SqliteBusyErrorHelper.GetUserMessage(ex), ex);
+            }
 
             // キャッシュをクリア（マスターデータが変更されたため）
             _cacheManager.ClearCache();

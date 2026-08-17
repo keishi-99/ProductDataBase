@@ -41,16 +41,20 @@ namespace ProductWebViewer.Data {
         public bool UpdateProduct(long id, string? orderNumber, string? productNumber, string? oLesNumber, string? comment) {
             using var con = new SqliteConnection(_connectionString);
             con.Open();
-            var affected = con.Execute("""
-                UPDATE T_Product
-                SET
-                    OrderNumber   = @OrderNumber,
-                    ProductNumber = @ProductNumber,
-                    OLesNumber    = @OLesNumber,
-                    Comment       = @Comment
-                WHERE ID = @Id AND IsDeleted = 0
-                """, new { Id = id, OrderNumber = orderNumber, ProductNumber = productNumber, OLesNumber = oLesNumber, Comment = comment });
-            return affected > 0;
+            try {
+                var affected = con.Execute("""
+                    UPDATE T_Product
+                    SET
+                        OrderNumber   = @OrderNumber,
+                        ProductNumber = @ProductNumber,
+                        OLesNumber    = @OLesNumber,
+                        Comment       = @Comment
+                    WHERE ID = @Id AND IsDeleted = 0
+                    """, new { Id = id, OrderNumber = orderNumber, ProductNumber = productNumber, OLesNumber = oLesNumber, Comment = comment });
+                return affected > 0;
+            } catch (Exception ex) {
+                throw new Exception(SqliteBusyErrorHelper.GetUserMessage(ex), ex);
+            }
         }
 
         // 製品登録を論理削除し、連動する基板使用履歴を論理削除・シリアルを物理削除する
@@ -61,30 +65,34 @@ namespace ProductWebViewer.Data {
             con.Open();
             using var tx = con.BeginTransaction();
 
-            var affected = con.Execute("UPDATE T_Product SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE ID = @Id AND IsDeleted = 0", new { Id = id }, tx);
-            if (affected == 0) {
-                tx.Rollback();
-                return new ProductDeleteResult(false, [], []);
+            try {
+                var affected = con.Execute("UPDATE T_Product SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE ID = @Id AND IsDeleted = 0", new { Id = id }, tx);
+                if (affected == 0) {
+                    tx.Rollback();
+                    return new ProductDeleteResult(false, [], []);
+                }
+
+                // 監査ログ用に、連動削除される直前の基板使用履歴・シリアルを取得しておく
+                var substrates = con.Query<CascadeSubstrateRow>("""
+                    SELECT ID, OrderNumber, SubstrateNumber, ProductName, SubstrateName, SubstrateModel,
+                           Increase, Decrease, Defect, RegDate, PersonInfo, Comment, UseID
+                    FROM V_Substrate
+                    WHERE UseID = @Id AND IsDeleted = 0
+                    """, new { Id = id }, tx).ToList();
+                var serials = con.Query<CascadeSerialRow>("""
+                    SELECT rowid AS RowId, ProductName, Serial, UsedID
+                    FROM V_Serial
+                    WHERE UsedID = @Id
+                    """, new { Id = id }, tx).ToList();
+
+                con.Execute("UPDATE T_Substrate SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE UseID = @Id AND IsDeleted = 0", new { Id = id }, tx);
+                con.Execute("DELETE FROM T_Serial WHERE UsedID = @Id", new { Id = id }, tx);
+
+                tx.Commit();
+                return new ProductDeleteResult(true, substrates, serials);
+            } catch (Exception ex) {
+                throw new Exception(SqliteBusyErrorHelper.GetUserMessage(ex), ex);
             }
-
-            // 監査ログ用に、連動削除される直前の基板使用履歴・シリアルを取得しておく
-            var substrates = con.Query<CascadeSubstrateRow>("""
-                SELECT ID, OrderNumber, SubstrateNumber, ProductName, SubstrateName, SubstrateModel,
-                       Increase, Decrease, Defect, RegDate, PersonInfo, Comment, UseID
-                FROM V_Substrate
-                WHERE UseID = @Id AND IsDeleted = 0
-                """, new { Id = id }, tx).ToList();
-            var serials = con.Query<CascadeSerialRow>("""
-                SELECT rowid AS RowId, ProductName, Serial, UsedID
-                FROM V_Serial
-                WHERE UsedID = @Id
-                """, new { Id = id }, tx).ToList();
-
-            con.Execute("UPDATE T_Substrate SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE UseID = @Id AND IsDeleted = 0", new { Id = id }, tx);
-            con.Execute("DELETE FROM T_Serial WHERE UsedID = @Id", new { Id = id }, tx);
-
-            tx.Commit();
-            return new ProductDeleteResult(true, substrates, serials);
         }
     }
 

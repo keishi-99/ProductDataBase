@@ -26,9 +26,15 @@ public class ProductEditModel(ProductWriteRepository writeRepo, AuditLogger audi
         var before = _writeRepo.GetById(id);
         if (before is null) return NotFound();
 
-        // 他の操作で既に削除されている場合は更新せず競合として扱う
-        if (!_writeRepo.UpdateProduct(id, Record.OrderNumber, Record.ProductNumber, Record.OLesNumber, Record.Comment)) {
-            ErrorMessage = "この製品登録は他の操作で既に削除されているため、更新できませんでした。";
+        try {
+            // 他の操作で既に削除されている場合は更新せず競合として扱う
+            if (!_writeRepo.UpdateProduct(id, Record.OrderNumber, Record.ProductNumber, Record.OLesNumber, Record.Comment)) {
+                ErrorMessage = "この製品登録は他の操作で既に削除されているため、更新できませんでした。";
+                Record = before;
+                return Page();
+            }
+        } catch (Exception ex) {
+            ErrorMessage = ex.Message;
             Record = before;
             return Page();
         }
@@ -42,7 +48,14 @@ public class ProductEditModel(ProductWriteRepository writeRepo, AuditLogger audi
         var before = _writeRepo.GetById(id);
         if (before is null) return NotFound();
 
-        var result = _writeRepo.DeleteProduct(id);
+        ProductDeleteResult result;
+        try {
+            result = _writeRepo.DeleteProduct(id);
+        } catch (Exception ex) {
+            ErrorMessage = ex.Message;
+            Record = before;
+            return Page();
+        }
         if (!result.Success) {
             ErrorMessage = "この製品登録は他の操作で既に削除されています。";
             Record = before;

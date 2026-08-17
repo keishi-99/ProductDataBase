@@ -43,8 +43,12 @@ namespace ProductWebViewer.Data {
         public bool DeleteSubstrate(long id) {
             using var con = new SqliteConnection(_connectionString);
             con.Open();
-            var affected = con.Execute("UPDATE T_Substrate SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE ID = @Id AND IsDeleted = 0", new { Id = id });
-            return affected > 0;
+            try {
+                var affected = con.Execute("UPDATE T_Substrate SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE ID = @Id AND IsDeleted = 0", new { Id = id });
+                return affected > 0;
+            } catch (Exception ex) {
+                throw new Exception(SqliteBusyErrorHelper.GetUserMessage(ex), ex);
+            }
         }
     }
 }

@@ -363,7 +363,7 @@ namespace ProductDatabase.History {
             } catch (Exception ex) {
                 // エラー時はDataRow変更を取り消す（UIスレッドで実施）
                 row.RejectChanges();
-                MessageBox.Show(ex.Message, "編集エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(SqliteBusyErrorHelper.GetUserMessage(ex), "編集エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -493,7 +493,7 @@ namespace ProductDatabase.History {
                 }
 
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "削除エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(SqliteBusyErrorHelper.GetUserMessage(ex), "削除エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
