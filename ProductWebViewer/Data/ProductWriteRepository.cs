@@ -39,9 +39,9 @@ namespace ProductWebViewer.Data {
         // （メインアプリのHistoryEditDialogでも同項目はラベル表示のみで編集不可のため、それに合わせている）
         // 対象行が別操作で既に削除されている場合は false を返す（呼び出し側は競合として扱う）
         public bool UpdateProduct(long id, string? orderNumber, string? productNumber, string? oLesNumber, string? comment) {
-            using var con = new SqliteConnection(_connectionString);
-            con.Open();
             try {
+                using var con = new SqliteConnection(_connectionString);
+                con.Open();
                 var affected = con.Execute("""
                     UPDATE T_Product
                     SET
@@ -61,11 +61,11 @@ namespace ProductWebViewer.Data {
         // 対象行が既に削除されている場合は Success=false を返し、関連データには一切触れない
         // DeletedSubstrates/DeletedSerials は監査ログ記録用に、削除直前の状態を返す
         public ProductDeleteResult DeleteProduct(long id) {
-            using var con = new SqliteConnection(_connectionString);
-            con.Open();
-            using var tx = con.BeginTransaction();
-
             try {
+                using var con = new SqliteConnection(_connectionString);
+                con.Open();
+                using var tx = con.BeginTransaction();
+
                 var affected = con.Execute("UPDATE T_Product SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE ID = @Id AND IsDeleted = 0", new { Id = id }, tx);
                 if (affected == 0) {
                     tx.Rollback();

@@ -9,8 +9,6 @@ namespace ProductDatabase.Data {
 
         // 基板マスターを新規登録し採番されたSubstrateIDを返す
         public static long InsertSubstrate(SubstrateMaster substrate) {
-            using var con = DbConnectionHelper.CreateAndOpenConnection();
-
             var sql =
                 $"""
                 INSERT INTO {Constants.SubstrateTableName}
@@ -25,6 +23,7 @@ namespace ProductDatabase.Data {
             var checkBin = Convert.ToString(substrate.CheckBin, 2).PadLeft(11, '0');
 
             try {
+                using var con = DbConnectionHelper.CreateAndOpenConnection();
                 var result = con.ExecuteScalar<long>(sql, new {
                     substrate.CategoryName,
                     substrate.ProductName,
@@ -48,8 +47,6 @@ namespace ProductDatabase.Data {
 
         // 基板マスターを更新する
         public static void UpdateSubstrate(SubstrateMaster substrate) {
-            using var con = DbConnectionHelper.CreateAndOpenConnection();
-
             var sql =
                 $"""
                 UPDATE {Constants.SubstrateTableName} SET
@@ -68,6 +65,7 @@ namespace ProductDatabase.Data {
             var checkBin = Convert.ToString(substrate.CheckBin, 2).PadLeft(11, '0');
 
             try {
+                using var con = DbConnectionHelper.CreateAndOpenConnection();
                 con.Execute(sql, new {
                     substrate.CategoryName,
                     substrate.ProductName,
@@ -90,10 +88,10 @@ namespace ProductDatabase.Data {
 
         // 基板マスターを物理削除する（実績存在チェック・関連紐づけ削除を含む）
         public static void DeleteSubstrate(long substrateId) {
-            using var con = DbConnectionHelper.CreateAndOpenConnection();
-            using var tx = con.BeginTransaction();
-
             try {
+                using var con = DbConnectionHelper.CreateAndOpenConnection();
+                using var tx = con.BeginTransaction();
+
                 var count = con.ExecuteScalar<int>(
                     $"SELECT COUNT(*) FROM {Constants.TSubstrateTableName} WHERE SubstrateID = @SubstrateId",
                     new { SubstrateId = substrateId }, tx);

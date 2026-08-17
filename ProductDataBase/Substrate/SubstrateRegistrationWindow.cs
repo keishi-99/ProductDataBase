@@ -167,11 +167,13 @@ namespace ProductDatabase {
         }
         // トランザクションで基板登録テーブルに入荷/不良レコードを挿入しログ記録とバックアップを行う
         private bool Registration() {
-            using var con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
-            con.Open();
-
-            using var transaction = con.BeginTransaction();
+            SqliteConnection? con = null;
+            SqliteTransaction? transaction = null;
             try {
+                con = new SqliteConnection(ProductRepository.GetConnectionRegistration());
+                con.Open();
+                transaction = con.BeginTransaction();
+
                 var substrateNumber = _substrateRegisterWork.ProductNumber;
                 var quantity = _substrateRegisterWork.AddQuantity;
                 var defectQuantity = int.TryParse(DefectQuantityTextBox.Text, out var dq) ? dq : 0;
@@ -213,11 +215,14 @@ namespace ProductDatabase {
 
                 return true;
             } catch (Exception ex) {
-                if (transaction.Connection is not null) { // 接続が開いているか確認する。
+                if (transaction?.Connection is not null) { // 接続が開いているか確認する。
                     transaction.Rollback();
                 }
                 MessageBox.Show(SqliteBusyErrorHelper.GetUserMessage(ex), $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
+            } finally {
+                transaction?.Dispose();
+                con?.Dispose();
             }
 
         }

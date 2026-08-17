@@ -96,6 +96,7 @@ namespace ProductDatabase {
 
             } catch (SqliteException ex) {
                 MessageBox.Show(SqliteBusyErrorHelper.GetUserMessage(ex), "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ClosingEvents(shouldCommit: false);
                 Close();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -383,8 +384,7 @@ namespace ProductDatabase {
 
             } catch (SqliteException ex) {
                 _dbScope.Rollback();
-                MessageBox.Show(SqliteBusyErrorHelper.GetUserMessage(ex), "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                throw;
+                throw new Exception(SqliteBusyErrorHelper.GetUserMessage(ex), ex);
             } catch (Exception) {
                 _dbScope.Rollback();
                 MessageBox.Show("登録に失敗しました。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
