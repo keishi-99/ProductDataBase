@@ -99,9 +99,25 @@ namespace ProductWebViewer.Data {
     public record ProductDeleteResult(bool Success, IReadOnlyList<CascadeSubstrateRow> DeletedSubstrates, IReadOnlyList<CascadeSerialRow> DeletedSerials);
 
     // 製品削除に連動して削除される基板使用履歴・シリアルのスナップショット（監査ログ記録用）
-    public record CascadeSubstrateRow(
-        long ID, string? OrderNumber, string? SubstrateNumber, string? ProductName, string? SubstrateName, string? SubstrateModel,
-        long? Increase, long? Decrease, long? Defect, string? RegDate, string? PersonInfo, string? Comment, long? UseID);
+    // PersonInfoはV_SubstrateビューでCOALESCE式から生成される列で宣言型を持たないため、
+    // 該当データが0件の場合にMicrosoft.Data.Sqliteがbyte[]型と誤判定することがある。
+    // positional recordだとDapperがコンストラクタの型完全一致を要求してしまうため、
+    // プロパティ方式（列ごとに代入）に変更してこの型不一致を回避している。
+    public record CascadeSubstrateRow {
+        public long ID { get; init; }
+        public string? OrderNumber { get; init; }
+        public string? SubstrateNumber { get; init; }
+        public string? ProductName { get; init; }
+        public string? SubstrateName { get; init; }
+        public string? SubstrateModel { get; init; }
+        public long? Increase { get; init; }
+        public long? Decrease { get; init; }
+        public long? Defect { get; init; }
+        public string? RegDate { get; init; }
+        public string? PersonInfo { get; init; }
+        public string? Comment { get; init; }
+        public long? UseID { get; init; }
+    }
 
     public record CascadeSerialRow(long RowId, string? ProductName, string? Serial, long? UsedID);
 }
