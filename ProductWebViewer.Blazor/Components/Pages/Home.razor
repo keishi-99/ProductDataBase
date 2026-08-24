@@ -131,7 +131,11 @@
                     <tbody>
                         @foreach (var r in _records) {
                             <tr>
-                                <td><a class="btn btn-sm btn-outline-warning" href="@($"/products/{r.Id}/edit")">編集</a></td>
+                                <td>
+                                    <AuthorizeView>
+                                        <a class="btn btn-sm btn-outline-warning" href="@($"/products/{r.Id}/edit")">編集</a>
+                                    </AuthorizeView>
+                                </td>
                                 <td><button type="button" class="btn btn-sm btn-outline-info" @onclick="() => ShowProductDetail(r)">詳細</button></td>
                                 @if (!_productHiddenCols.Contains("ID")) { <td>@r.Id</td> }
                                 @if (!_productHiddenCols.Contains("カテゴリ")) { <td>@r.CategoryName</td> }
@@ -320,7 +324,11 @@ else {
                     <tbody>
                         @foreach (var r in _substrateRecords) {
                             <tr>
-                                <td><a class="btn btn-sm btn-outline-danger" href="@($"/substrates/{r.Id}/delete")">削除</a></td>
+                                <td>
+                                    <AuthorizeView>
+                                        <a class="btn btn-sm btn-outline-danger" href="@($"/substrates/{r.Id}/delete")">削除</a>
+                                    </AuthorizeView>
+                                </td>
                                 <td><button type="button" class="btn btn-sm btn-outline-info" @onclick="() => ShowSubstrateDetail(r)">詳細</button></td>
                                 @if (!_substrateHiddenCols.Contains("ID")) { <td>@r.Id</td> }
                                 @if (!_substrateHiddenCols.Contains("カテゴリ")) { <td>@r.CategoryName</td> }
