@@ -30,14 +30,18 @@
             document.documentElement.setAttribute('data-bs-theme', theme);
             localStorage.setItem('theme', theme);
         }
-        function syncThemeToggle() {
+        // data-bs-theme はクライアントJSでしか設定されない属性のため、Blazorの Enhanced Navigation
+        // （ページ遷移時にサーバーからのHTML差分で<html>を書き換える仕組み）が実行されるたびに
+        // 消されてしまう。遷移完了イベントで毎回テーマを再適用する。
+        function applyTheme() {
+            var theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', theme);
             var toggle = document.getElementById('themeToggle');
-            if (toggle) toggle.checked = (localStorage.getItem('theme') || 'light') === 'dark';
+            if (toggle) toggle.checked = theme === 'dark';
         }
-        syncThemeToggle();
-        // Blazorがページ遷移・再接続でDOMを再構築した際にもチェック状態を同期する
-        document.addEventListener('DOMContentLoaded', syncThemeToggle);
-        window.Blazor?.addEventListener?.('enhancedload', syncThemeToggle);
+        applyTheme();
+        document.addEventListener('DOMContentLoaded', applyTheme);
+        window.Blazor?.addEventListener?.('enhancedload', applyTheme);
     </script>
 </body>
 
