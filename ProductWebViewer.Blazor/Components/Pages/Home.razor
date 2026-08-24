@@ -433,7 +433,9 @@ else {
                             </tr>
                         </thead>
                         <tbody>
-                            @if (_usedSubstrates.Count == 0) {
+                            @if (_usedSubstratesError) {
+                                <tr><td colspan="5" class="text-center text-danger">データの取得中にエラーが発生しました。</td></tr>
+                            } else if (_usedSubstrates.Count == 0) {
                                 <tr><td colspan="5" class="text-center text-muted">使用基板なし</td></tr>
                             } else {
                                 @foreach (var s in _usedSubstrates) {
@@ -579,6 +581,7 @@ else {
     private List<(string Label, string? Value)>? _detailFields;
     private long? _usedSubProductId;
     private IReadOnlyList<UsedSubstrateRecord> _usedSubstrates = [];
+    private bool _usedSubstratesError;
 
     // 列見出しクリックでの並び替え共通ロジック（同じ列を再クリックでasc/desc反転、別列なら常にasc）
     private static string NextSortDir(string sortCol, string sortDir, string col) =>
@@ -685,6 +688,9 @@ else {
             }
             _errorMessage = null;
         } catch (Exception) {
+            _records = [];
+            _serialRecords = [];
+            _totalCount = 0;
             _errorMessage = "データの取得中にエラーが発生しました。";
         }
         return Task.CompletedTask;
@@ -699,10 +705,12 @@ else {
 
     private void ShowUsedSubstrates(long id) {
         _usedSubProductId = id;
+        _usedSubstratesError = false;
         try {
             _usedSubstrates = ProductRepo.GetUsedSubstrates(id);
         } catch (Exception) {
             _usedSubstrates = [];
+            _usedSubstratesError = true;
         }
     }
     private void CloseUsedSubstrates() => _usedSubProductId = null;
@@ -801,6 +809,9 @@ else {
             }
             _subErrorMessage = null;
         } catch (Exception) {
+            _substrateRecords = [];
+            _stockRecords = [];
+            _subTotalCount = 0;
             _subErrorMessage = "データの取得中にエラーが発生しました。";
         }
         return Task.CompletedTask;

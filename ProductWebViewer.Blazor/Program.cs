@@ -63,7 +63,7 @@ app.MapPost("/auth/login", async (HttpContext context, IConfiguration configurat
     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
     await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
-    return Results.LocalRedirect(!string.IsNullOrEmpty(returnUrl) && returnUrl.StartsWith('/') ? returnUrl : "/");
+    return Results.LocalRedirect(IsLocalUrl(returnUrl) ? returnUrl! : "/");
 });
 
 app.MapPost("/auth/logout", async (HttpContext context) => {
@@ -117,3 +117,8 @@ app.Run();
 // 平文比較でもタイミング攻撃を避けるため定数時間比較を使う
 static bool FixedTimeEquals(string a, string b) =>
     CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(a), Encoding.UTF8.GetBytes(b));
+
+// アプリ内の相対パスのみを許可する（"//evil.com" や "/\evil.com" のようなprotocol-relative URLはブラウザに
+// 絶対URLとして解釈されうるため、Url.IsLocalUrl と同様の判定で除外する）
+static bool IsLocalUrl(string? url) =>
+    !string.IsNullOrEmpty(url) && url.StartsWith('/') && !url.StartsWith("//") && !url.StartsWith(@"/\");

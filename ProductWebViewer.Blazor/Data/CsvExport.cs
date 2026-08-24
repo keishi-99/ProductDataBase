@@ -20,7 +20,8 @@ namespace ProductWebViewer.Blazor.Data {
         public static string Field(string? value) {
             if (string.IsNullOrEmpty(value)) return "";
             value = value.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ");
-            if (value.Length > 0 && (value[0] is '=' or '+' or '-' or '@'))
+            var firstNonWhitespace = value.TrimStart(' ', '\t');
+            if (firstNonWhitespace.Length > 0 && (firstNonWhitespace[0] is '=' or '+' or '-' or '@'))
                 value = "'" + value;
             if (value.Contains(',') || value.Contains('"'))
                 return $"\"{value.Replace("\"", "\"\"")}\"";

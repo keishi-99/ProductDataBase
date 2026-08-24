@@ -25,10 +25,18 @@ namespace ProductWebViewer.Blazor.Data {
                 Mode = SqliteOpenMode.ReadWriteCreate,
             }.ToString());
             con.Open();
-            con.Execute("PRAGMA journal_mode=WAL;");
-            con.Execute(schemaSql);
 
-            SeedDummyData.Run(con);
+            try {
+                con.Execute("PRAGMA journal_mode=WAL;");
+                con.Execute(schemaSql);
+                SeedDummyData.Run(con);
+            } catch {
+                // 途中で失敗した場合、不完全なDBファイルを残すと次回起動時に「既に存在する」と判定されて
+                // 初期化がスキップされてしまうため、削除して次回やり直せるようにする
+                con.Close();
+                File.Delete(fullPath);
+                throw;
+            }
 
             logger.LogInformation("ダミーデータの投入が完了しました。");
             return Task.CompletedTask;

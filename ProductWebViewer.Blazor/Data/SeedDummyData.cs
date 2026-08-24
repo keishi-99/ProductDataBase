@@ -75,12 +75,14 @@ namespace ProductWebViewer.Blazor.Data {
             }
 
             // 製品登録実績（一部にシリアルと使用基板を紐づける）
+            // serialCursor はシリアル番号が重複しないよう quantity 分だけ毎回進める
+            var serialCursor = 2600000;
             for (var i = 0; i < 60; i++) {
                 var productDefId = productDefIds[random.Next(productDefIds.Count)];
                 var regDate = RandomDate(random);
                 var quantity = random.Next(1, 20);
-                var serialFirst = $"{2600000 + i * 10:D7}";
-                var serialLast = $"{2600000 + i * 10 + quantity - 1:D7}";
+                var serialFirst = $"{serialCursor:D7}";
+                var serialLast = $"{serialCursor + quantity - 1:D7}";
 
                 var productId = con.ExecuteScalar<long>("""
                     INSERT INTO T_Product (ProductID, PersonID, OrderNumber, ProductNumber, OLesNumber, Quantity, RegDate, Revision, SerialFirst, SerialLast, Comment)
@@ -107,9 +109,10 @@ namespace ProductWebViewer.Blazor.Data {
                         """, new {
                         ProductID = productDefId,
                         UsedID = productId,
-                        Serial = $"{2600000 + i * 10 + s:D7}"
+                        Serial = $"{serialCursor + s:D7}"
                     });
                 }
+                serialCursor += quantity;
 
                 // おおよそ半数の製品登録に、使用基板の実績（在庫減）を紐づける
                 if (i % 2 == 0 && substrateStockLots.Count > 0) {
@@ -131,8 +134,11 @@ namespace ProductWebViewer.Blazor.Data {
             }
         }
 
-        // yyyy/MM/dd 形式（直近180日以内のランダムな日付）
+        // yyyy/MM/dd 形式（固定の基準日から180日以内のランダムな日付）
+        // DateTime.Now を使わないのは、再生成のたびに日付が変わらないようにするため（再現性のため）
+        private static readonly DateTime _seedBaseDate = new(2026, 8, 24);
+
         private static string RandomDate(Random random) =>
-            DateTime.Now.AddDays(-random.Next(0, 180)).ToString("yyyy/MM/dd");
+            _seedBaseDate.AddDays(-random.Next(0, 180)).ToString("yyyy/MM/dd");
     }
 }

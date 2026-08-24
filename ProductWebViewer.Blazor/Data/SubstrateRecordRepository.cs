@@ -25,7 +25,7 @@ namespace ProductWebViewer.Blazor.Data {
             ["UseProductNumber"] = "p.ProductNumber",
         };
 
-        // 在庫一覧用ホワイトリスト（同上）
+        // 在庫一覧（製造番号単位）用ホワイトリスト（同上）
         private static readonly Dictionary<string, string> _stockSortCols = new(StringComparer.OrdinalIgnoreCase) {
             ["CategoryName"] = "m.CategoryName",
             ["ProductName"] = "m.ProductName",
@@ -33,6 +33,16 @@ namespace ProductWebViewer.Blazor.Data {
             ["SubstrateModel"] = "s.SubstrateModel",
             ["SubstrateNumber"] = "s.SubstrateNumber",
             ["OrderNumber"] = "s.OrderNumber",
+            ["Stock"] = "Stock",
+        };
+
+        // 在庫一覧（型式単位）用ホワイトリスト。SubstrateNumber/OrderNumberはGROUP BYキーに含まれないため、
+        // これらでソートすると集計されていない任意の1行の値が採用され並び順が不安定になる。集計キーとStockのみ許可する
+        private static readonly Dictionary<string, string> _stockSortColsByModel = new(StringComparer.OrdinalIgnoreCase) {
+            ["CategoryName"] = "m.CategoryName",
+            ["ProductName"] = "m.ProductName",
+            ["SubstrateName"] = "s.SubstrateName",
+            ["SubstrateModel"] = "s.SubstrateModel",
             ["Stock"] = "Stock",
         };
 
@@ -188,7 +198,7 @@ namespace ProductWebViewer.Blazor.Data {
 
             // Decrease・Defect は DB に負数で格納されているため、そのまま合算すると在庫数になる
             if (groupByModel) {
-                var orderBy = BuildOrderBy(_stockSortCols, sortCol, sortDir, "s.SubstrateModel ASC");
+                var orderBy = BuildOrderBy(_stockSortColsByModel, sortCol, sortDir, "s.SubstrateModel ASC");
                 return con.Query<StockRecord>($"""
                     SELECT
                         s.SubstrateID,

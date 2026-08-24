@@ -20,7 +20,7 @@
 }
 
 /* 本家 ProductWebViewer の resizable-table と同じく、セル内では折り返さず省略表示にする */
-table td, table th {
+.results-area table td, .results-area table th {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
