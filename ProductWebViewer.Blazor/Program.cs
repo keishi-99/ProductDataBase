@@ -8,6 +8,9 @@ using ProductWebViewer.Blazor.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// コンソールウィンドウなしで Windows サービスとして起動できるようにする
+builder.Host.UseWindowsService();
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
