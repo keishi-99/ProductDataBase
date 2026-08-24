@@ -70,9 +70,11 @@ app.MapPost("/logout", async (HttpContext context) => {
 app.MapGet("/export/products.csv", (
     ProductRecordRepository repo,
     string? listCategory, string? listProductName, string? listProductType,
-    string? filterProductName, string? filterOrderNumber, string? filterProductNumber) => {
+    string? filterProductName, string? filterOrderNumber, string? filterProductNumber,
+    string? dateType, string? dateFrom, string? dateTo) => {
     var records = repo.GetAll(listCategory, listProductName, listProductType,
-        filterProductName, filterOrderNumber, filterProductNumber, page: 1, pageSize: 0);
+        filterProductName, filterOrderNumber, filterProductNumber,
+        dateType, dateFrom, dateTo, page: 1, pageSize: 0);
     var bytes = CsvExport.BuildCsvBytes(CsvExport.BuildProductLines(records));
     return Results.File(bytes, "text/csv", $"製品登録実績_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
 });
@@ -80,9 +82,11 @@ app.MapGet("/export/products.csv", (
 app.MapGet("/export/substrates.csv", (
     SubstrateRecordRepository repo,
     string? listCategory, string? listProductName, string? listSubstrateName,
-    string? filterSubstrateName, string? filterOrderNumber, string? filterSubstrateNumber) => {
+    string? filterSubstrateName, string? filterOrderNumber, string? filterSubstrateNumber,
+    string? dateType, string? dateFrom, string? dateTo) => {
     var records = repo.GetAll(listCategory, listProductName, listSubstrateName,
-        filterSubstrateName, filterOrderNumber, filterSubstrateNumber, page: 1, pageSize: 0);
+        filterSubstrateName, filterOrderNumber, filterSubstrateNumber,
+        dateType, dateFrom, dateTo, page: 1, pageSize: 0);
     var bytes = CsvExport.BuildCsvBytes(CsvExport.BuildSubstrateLines(records));
     return Results.File(bytes, "text/csv", $"基板登録実績_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
 });

@@ -66,6 +66,17 @@
             <input type="search" class="form-control form-control-sm" style="width: 150px"
                    @bind="_filterProductNumber" @bind:event="oninput" placeholder="製造番号" />
         </div>
+        <div class="col-auto d-flex align-items-center gap-1">
+            <select class="form-select form-select-sm" style="width: auto" @bind="_filterProductDateType">
+                <option value="regDate">登録日</option>
+                <option value="createdAt">登録日時</option>
+            </select>
+            <input type="date" class="form-control form-control-sm" value="@_filterProductDateFrom"
+                   @onchange='e => _filterProductDateFrom = e.Value?.ToString() ?? ""' />
+            <span class="text-muted small">〜</span>
+            <input type="date" class="form-control form-control-sm" value="@_filterProductDateTo"
+                   @onchange='e => _filterProductDateTo = e.Value?.ToString() ?? ""' />
+        </div>
         <div class="col-auto">
             <button class="btn btn-sm btn-primary" @onclick="SearchAsync">検索</button>
         </div>
@@ -218,6 +229,19 @@ else {
             <div class="col-auto">
                 <input type="search" class="form-control form-control-sm" style="width: 150px"
                        @bind="_filterSubstrateNumber" @bind:event="oninput" placeholder="製造番号" />
+            </div>
+        }
+        @if (_subActiveTab != "stock") {
+            <div class="col-auto d-flex align-items-center gap-1">
+                <select class="form-select form-select-sm" style="width: auto" @bind="_filterSubDateType">
+                    <option value="regDate">登録日</option>
+                    <option value="createdAt">登録日時</option>
+                </select>
+                <input type="date" class="form-control form-control-sm" value="@_filterSubDateFrom"
+                       @onchange='e => _filterSubDateFrom = e.Value?.ToString() ?? ""' />
+                <span class="text-muted small">〜</span>
+                <input type="date" class="form-control form-control-sm" value="@_filterSubDateTo"
+                       @onchange='e => _filterSubDateTo = e.Value?.ToString() ?? ""' />
             </div>
         }
         <div class="col-auto">
@@ -404,6 +428,9 @@ else {
     private string _filterProductName = "";
     private string _filterOrderNumber = "";
     private string _filterProductNumber = "";
+    private string _filterProductDateType = "regDate";
+    private string _filterProductDateFrom = "";
+    private string _filterProductDateTo = "";
 
     private IReadOnlyList<ProductRecord> _records = [];
     private bool _hasSearched;
@@ -418,7 +445,8 @@ else {
     private string ProductCsvUrl =>
         $"/export/products.csv?listCategory={Uri.EscapeDataString(_listCategory)}&listProductName={Uri.EscapeDataString(_listProductName)}" +
         $"&listProductType={Uri.EscapeDataString(_listProductType)}&filterProductName={Uri.EscapeDataString(_filterProductName)}" +
-        $"&filterOrderNumber={Uri.EscapeDataString(_filterOrderNumber)}&filterProductNumber={Uri.EscapeDataString(_filterProductNumber)}";
+        $"&filterOrderNumber={Uri.EscapeDataString(_filterOrderNumber)}&filterProductNumber={Uri.EscapeDataString(_filterProductNumber)}" +
+        $"&dateType={Uri.EscapeDataString(_filterProductDateType)}&dateFrom={Uri.EscapeDataString(_filterProductDateFrom)}&dateTo={Uri.EscapeDataString(_filterProductDateTo)}";
 
     // ===== 基板タブ =====
     private IReadOnlyList<string> _subCategoryList = [];
@@ -431,6 +459,9 @@ else {
     private string _filterSubstrateName = "";
     private string _filterSubOrderNumber = "";
     private string _filterSubstrateNumber = "";
+    private string _filterSubDateType = "regDate";
+    private string _filterSubDateFrom = "";
+    private string _filterSubDateTo = "";
 
     private string _subActiveTab = "records";
     private bool _stockGroupByModel = true;
@@ -450,7 +481,8 @@ else {
     private string SubstrateCsvUrl =>
         $"/export/substrates.csv?listCategory={Uri.EscapeDataString(_listSubCategory)}&listProductName={Uri.EscapeDataString(_listSubProductName)}" +
         $"&listSubstrateName={Uri.EscapeDataString(_listSubstrateName)}&filterSubstrateName={Uri.EscapeDataString(_filterSubstrateName)}" +
-        $"&filterOrderNumber={Uri.EscapeDataString(_filterSubOrderNumber)}&filterSubstrateNumber={Uri.EscapeDataString(_filterSubstrateNumber)}";
+        $"&filterOrderNumber={Uri.EscapeDataString(_filterSubOrderNumber)}&filterSubstrateNumber={Uri.EscapeDataString(_filterSubstrateNumber)}" +
+        $"&dateType={Uri.EscapeDataString(_filterSubDateType)}&dateFrom={Uri.EscapeDataString(_filterSubDateFrom)}&dateTo={Uri.EscapeDataString(_filterSubDateTo)}";
 
     // ===== 行詳細・使用基板モーダル（製品・基板タブ共通） =====
     private List<(string Label, string? Value)>? _detailFields;
@@ -514,10 +546,12 @@ else {
         try {
             _totalCount = ProductRepo.GetCount(
                 _listCategory, _listProductName, _listProductType,
-                _filterProductName, _filterOrderNumber, _filterProductNumber);
+                _filterProductName, _filterOrderNumber, _filterProductNumber,
+                _filterProductDateType, _filterProductDateFrom, _filterProductDateTo);
             _records = ProductRepo.GetAll(
                 _listCategory, _listProductName, _listProductType,
                 _filterProductName, _filterOrderNumber, _filterProductNumber,
+                _filterProductDateType, _filterProductDateFrom, _filterProductDateTo,
                 page: _pageNum, pageSize: _pageSize);
             _errorMessage = null;
         } catch (Exception) {
@@ -613,10 +647,12 @@ else {
             } else {
                 _subTotalCount = SubstrateRepo.GetCount(
                     _listSubCategory, _listSubProductName, _listSubstrateName,
-                    _filterSubstrateName, _filterSubOrderNumber, _filterSubstrateNumber);
+                    _filterSubstrateName, _filterSubOrderNumber, _filterSubstrateNumber,
+                    _filterSubDateType, _filterSubDateFrom, _filterSubDateTo);
                 _substrateRecords = SubstrateRepo.GetAll(
                     _listSubCategory, _listSubProductName, _listSubstrateName,
                     _filterSubstrateName, _filterSubOrderNumber, _filterSubstrateNumber,
+                    _filterSubDateType, _filterSubDateFrom, _filterSubDateTo,
                     page: _subPageNum, pageSize: _subPageSize);
             }
             _subErrorMessage = null;
