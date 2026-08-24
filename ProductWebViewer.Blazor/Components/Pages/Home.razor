@@ -3,116 +3,393 @@
 @using ProductWebViewer.Blazor.Data
 @using ProductWebViewer.Blazor.Models
 @inject ProductRecordRepository ProductRepo
+@inject SubstrateRecordRepository SubstrateRepo
 
 <PageTitle>製品・基板データ閲覧</PageTitle>
 
-<h3 class="mb-3">製品登録実績</h3>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <button type="button" class="nav-link @(_activeTab == "product" ? "active" : "")" @onclick='() => _activeTab = "product"'>製品登録実績</button>
+    </li>
+    <li class="nav-item">
+        <button type="button" class="nav-link @(_activeTab == "substrate" ? "active" : "")" @onclick='() => _activeTab = "substrate"'>基板登録実績</button>
+    </li>
+</ul>
 
-<div class="card mb-3">
-    <div class="card-body">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">カテゴリ</label>
-                <select class="form-select" value="@_listCategory" @onchange="OnCategoryChangedAsync">
-                    <option value="">(すべて)</option>
+@if (_activeTab == "product") {
+    <div class="row g-2 mb-2">
+        <div class="col-auto" style="width: 100px;">
+            <div class="fw-bold small mb-1">カテゴリ</div>
+            <div class="list-box">
+                <select size="10" value="@_listCategory" @onchange="OnCategoryChangedAsync">
+                    <option value="">（すべて）</option>
                     @foreach (var c in _categoryList) {
                         <option value="@c">@c</option>
                     }
                 </select>
             </div>
-            <div class="col-md-4">
-                <label class="form-label">製品名</label>
-                <select class="form-select" @bind="_listProductName">
-                    <option value="">(すべて)</option>
+        </div>
+        <div class="col-auto" style="width: 250px;">
+            <div class="fw-bold small mb-1">製品名</div>
+            <div class="list-box">
+                <select size="10" value="@_listProductName" @onchange="OnProductNameChangedAsync">
+                    <option value="">（すべて）</option>
                     @foreach (var p in _productNameList) {
                         <option value="@p">@p</option>
                     }
                 </select>
             </div>
-            <div class="col-md-4">
-                <label class="form-label">種別</label>
-                <select class="form-select" @bind="_listProductType">
-                    <option value="">(すべて)</option>
+        </div>
+        <div class="col-auto" style="width: 350px;">
+            <div class="fw-bold small mb-1">種別</div>
+            <div class="list-box">
+                <select size="10" value="@_listProductType" @onchange="OnProductTypeChangedAsync">
+                    <option value="">（すべて）</option>
                     @foreach (var t in _productTypeList) {
                         <option value="@t">@t</option>
                     }
                 </select>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">製品名（部分一致）</label>
-                <input class="form-control" @bind="_filterProductName" @bind:event="oninput" />
+        </div>
+    </div>
+
+    <div class="row g-2 mb-2 align-items-center">
+        <div class="col-auto">
+            <input type="search" class="form-control form-control-sm" style="width: 150px"
+                   @bind="_filterProductName" @bind:event="oninput" placeholder="製品名（テキスト）" />
+        </div>
+        <div class="col-auto">
+            <input type="search" class="form-control form-control-sm" style="width: 150px"
+                   @bind="_filterOrderNumber" @bind:event="oninput" placeholder="注文番号" />
+        </div>
+        <div class="col-auto">
+            <input type="search" class="form-control form-control-sm" style="width: 150px"
+                   @bind="_filterProductNumber" @bind:event="oninput" placeholder="製造番号" />
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-sm btn-primary" @onclick="SearchAsync">検索</button>
+        </div>
+        @if (_hasSearched) {
+            <div class="col-auto">
+                <a class="btn btn-sm btn-outline-success" href="@ProductCsvUrl">CSVエクスポート</a>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">注文番号（部分一致）</label>
-                <input class="form-control" @bind="_filterOrderNumber" @bind:event="oninput" />
+        }
+    </div>
+
+    @if (_errorMessage is not null) {
+        <div class="alert alert-danger">@_errorMessage</div>
+    }
+
+    @if (_hasSearched) {
+        <p class="text-muted">@_totalCount 件中 @(_records.Count == 0 ? 0 : (_pageNum - 1) * _pageSize + 1)〜@((_pageNum - 1) * _pageSize + _records.Count) 件を表示</p>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle table-sm">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>ID</th>
+                        <th>カテゴリ</th>
+                        <th>製品名</th>
+                        <th>種別</th>
+                        <th>型式</th>
+                        <th>注文番号</th>
+                        <th>製造番号</th>
+                        <th>O-Les番号</th>
+                        <th>数量</th>
+                        <th>担当者</th>
+                        <th>登録日</th>
+                        <th>Revision</th>
+                        <th>シリアル開始</th>
+                        <th>シリアル終了</th>
+                        <th>コメント</th>
+                        <th>登録日時</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in _records) {
+                        <tr>
+                            <td><a class="btn btn-sm btn-outline-warning" href="@($"/products/{r.Id}/edit")">編集</a></td>
+                            <td><button type="button" class="btn btn-sm btn-outline-info" @onclick="() => ShowProductDetail(r)">詳細</button></td>
+                            <td>@r.Id</td>
+                            <td>@r.CategoryName</td>
+                            <td>@r.ProductName</td>
+                            <td>@r.ProductType</td>
+                            <td>@r.ProductModel</td>
+                            <td>@r.OrderNumber</td>
+                            <td>@r.ProductNumber</td>
+                            <td>@r.OLesNumber</td>
+                            <td>@r.Quantity</td>
+                            <td>@r.PersonInfo</td>
+                            <td>@r.RegDate</td>
+                            <td>@r.Revision</td>
+                            <td>@r.SerialFirst</td>
+                            <td>@r.SerialLast</td>
+                            <td>@r.Comment</td>
+                            <td>@r.CreatedAt</td>
+                            <td><button type="button" class="btn btn-sm btn-outline-secondary" @onclick="() => ShowUsedSubstrates(r.Id)">使用基板</button></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(_pageNum <= 1 ? "disabled" : "")">
+                    <button class="page-link" @onclick="() => GoToPageAsync(_pageNum - 1)">前へ</button>
+                </li>
+                <li class="page-item disabled"><span class="page-link">@_pageNum / @TotalPages</span></li>
+                <li class="page-item @(_pageNum >= TotalPages ? "disabled" : "")">
+                    <button class="page-link" @onclick="() => GoToPageAsync(_pageNum + 1)">次へ</button>
+                </li>
+            </ul>
+        </nav>
+    }
+}
+else {
+    <div class="row g-2 mb-2">
+        <div class="col-auto" style="width: 100px;">
+            <div class="fw-bold small mb-1">カテゴリ</div>
+            <div class="list-box">
+                <select size="10" value="@_listSubCategory" @onchange="OnSubCategoryChangedAsync">
+                    <option value="">（すべて）</option>
+                    @foreach (var c in _subCategoryList) {
+                        <option value="@c">@c</option>
+                    }
+                </select>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">製造番号（部分一致）</label>
-                <input class="form-control" @bind="_filterProductNumber" @bind:event="oninput" />
+        </div>
+        <div class="col-auto" style="width: 250px;">
+            <div class="fw-bold small mb-1">製品名</div>
+            <div class="list-box">
+                <select size="10" value="@_listSubProductName" @onchange="OnSubProductNameChangedAsync">
+                    <option value="">（すべて）</option>
+                    @foreach (var p in _subProductNameList) {
+                        <option value="@p">@p</option>
+                    }
+                </select>
             </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <button class="btn btn-primary w-100" @onclick="SearchAsync">検索</button>
+        </div>
+        <div class="col-auto" style="width: 350px;">
+            <div class="fw-bold small mb-1">基板名</div>
+            <div class="list-box">
+                <select size="10" value="@_listSubstrateName" @onchange="OnSubstrateNameChangedAsync">
+                    <option value="">（すべて）</option>
+                    @foreach (var s in _substrateNameList) {
+                        <option value="@s">@s</option>
+                    }
+                </select>
             </div>
         </div>
     </div>
-</div>
 
-@if (_errorMessage is not null) {
-    <div class="alert alert-danger">@_errorMessage</div>
-}
-
-@if (_hasSearched) {
-    <p class="text-muted">@_totalCount 件中 @(_records.Count == 0 ? 0 : (_pageNum - 1) * _pageSize + 1)〜@((_pageNum - 1) * _pageSize + _records.Count) 件を表示</p>
-
-    <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <thead>
-                <tr>
-                    <th>カテゴリ</th>
-                    <th>製品名</th>
-                    <th>種別</th>
-                    <th>型式</th>
-                    <th>注文番号</th>
-                    <th>製造番号</th>
-                    <th>数量</th>
-                    <th>担当者</th>
-                    <th>登録日</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var r in _records) {
-                    <tr>
-                        <td>@r.CategoryName</td>
-                        <td>@r.ProductName</td>
-                        <td>@r.ProductType</td>
-                        <td>@r.ProductModel</td>
-                        <td>@r.OrderNumber</td>
-                        <td>@r.ProductNumber</td>
-                        <td>@r.Quantity</td>
-                        <td>@r.PersonInfo</td>
-                        <td>@r.RegDate</td>
-                        <td><a class="btn btn-sm btn-outline-secondary" href="@($"/products/{r.Id}/edit")">編集</a></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div class="d-flex align-items-center gap-3 mb-2">
+        <div class="btn-group btn-group-sm">
+            <button type="button" class="btn @(_subActiveTab != "stock" ? "btn-primary" : "btn-outline-secondary")" @onclick='() => SwitchSubTabAsync("records")'>登録実績</button>
+            <button type="button" class="btn @(_subActiveTab == "stock" ? "btn-primary" : "btn-outline-secondary")" @onclick='() => SwitchSubTabAsync("stock")'>在庫数</button>
+        </div>
+        @if (_subActiveTab == "stock") {
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn @(_stockGroupByModel ? "btn-info" : "btn-outline-info")" @onclick="() => SwitchStockGroupAsync(true)">基板単位</button>
+                <button type="button" class="btn @(!_stockGroupByModel ? "btn-info" : "btn-outline-info")" @onclick="() => SwitchStockGroupAsync(false)">製造番号単位</button>
+            </div>
+            <div class="form-check form-check-inline mb-0">
+                <input class="form-check-input" type="checkbox" id="excludeZeroStock" @bind="_excludeZeroStock" @bind:after="SubSearchAsync" />
+                <label class="form-check-label small" for="excludeZeroStock">在庫0を除外</label>
+            </div>
+        }
     </div>
 
-    <nav>
-        <ul class="pagination">
-            <li class="page-item @(_pageNum <= 1 ? "disabled" : "")">
-                <button class="page-link" @onclick="() => GoToPageAsync(_pageNum - 1)">前へ</button>
-            </li>
-            <li class="page-item disabled"><span class="page-link">@_pageNum / @TotalPages</span></li>
-            <li class="page-item @(_pageNum >= TotalPages ? "disabled" : "")">
-                <button class="page-link" @onclick="() => GoToPageAsync(_pageNum + 1)">次へ</button>
-            </li>
-        </ul>
-    </nav>
+    <div class="row g-2 mb-2 align-items-center">
+        <div class="col-auto">
+            <input type="search" class="form-control form-control-sm" style="width: 150px"
+                   @bind="_filterSubstrateName" @bind:event="oninput" placeholder="基板名（テキスト）" />
+        </div>
+        @if (_subActiveTab != "stock" || !_stockGroupByModel) {
+            <div class="col-auto">
+                <input type="search" class="form-control form-control-sm" style="width: 150px"
+                       @bind="_filterSubOrderNumber" @bind:event="oninput" placeholder="注文番号" />
+            </div>
+            <div class="col-auto">
+                <input type="search" class="form-control form-control-sm" style="width: 150px"
+                       @bind="_filterSubstrateNumber" @bind:event="oninput" placeholder="製造番号" />
+            </div>
+        }
+        <div class="col-auto">
+            <button class="btn btn-sm btn-primary" @onclick="SubSearchAsync">検索</button>
+        </div>
+        @if (_subHasSearched && _subActiveTab != "stock") {
+            <div class="col-auto">
+                <a class="btn btn-sm btn-outline-success" href="@SubstrateCsvUrl">CSVエクスポート</a>
+            </div>
+        }
+    </div>
+
+    @if (_subErrorMessage is not null) {
+        <div class="alert alert-danger">@_subErrorMessage</div>
+    }
+
+    @if (_subHasSearched) {
+        <p class="text-muted">@_subTotalCount 件中 @(SubRecordCount == 0 ? 0 : (_subPageNum - 1) * _subPageSize + 1)〜@((_subPageNum - 1) * _subPageSize + SubRecordCount) 件を表示</p>
+
+        <div class="table-responsive">
+            @if (_subActiveTab != "stock") {
+                <table class="table table-striped table-hover align-middle table-sm">
+                    <thead>
+                        <tr>
+                            <th></th><th></th>
+                            <th>ID</th><th>カテゴリ</th><th>製品名</th><th>基板名</th><th>基板型式</th>
+                            <th>注文番号</th><th>製造番号</th><th>入庫</th><th>出庫</th><th>不良</th>
+                            <th>使用製品名</th><th>使用注文番号</th><th>使用製造番号</th>
+                            <th>担当者</th><th>登録日</th><th>コメント</th><th>登録日時</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in _substrateRecords) {
+                            <tr>
+                                <td><a class="btn btn-sm btn-outline-danger" href="@($"/substrates/{r.Id}/delete")">削除</a></td>
+                                <td><button type="button" class="btn btn-sm btn-outline-info" @onclick="() => ShowSubstrateDetail(r)">詳細</button></td>
+                                <td>@r.Id</td>
+                                <td>@r.CategoryName</td>
+                                <td>@r.ProductName</td>
+                                <td>@r.SubstrateName</td>
+                                <td>@r.SubstrateModel</td>
+                                <td>@r.OrderNumber</td>
+                                <td>@r.SubstrateNumber</td>
+                                <td>@r.Increase</td>
+                                <td>@r.Decrease</td>
+                                <td>@r.Defect</td>
+                                <td>@r.UseProductName</td>
+                                <td>@r.UseOrderNumber</td>
+                                <td>@r.UseProductNumber</td>
+                                <td>@r.PersonInfo</td>
+                                <td>@r.RegDate</td>
+                                <td>@r.Comment</td>
+                                <td>@r.CreatedAt</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            } else {
+                <table class="table table-striped table-hover align-middle table-sm">
+                    <thead>
+                        <tr>
+                            <th>カテゴリ</th><th>製品名</th><th>基板名</th><th>基板型式</th>
+                            @if (!_stockGroupByModel) {
+                                <th>製造番号</th><th>注文番号</th>
+                            }
+                            <th>在庫数</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in _stockRecords) {
+                            <tr>
+                                <td>@r.CategoryName</td>
+                                <td>@r.ProductName</td>
+                                <td>@r.SubstrateName</td>
+                                <td>@r.SubstrateModel</td>
+                                @if (!_stockGroupByModel) {
+                                    <td>@r.SubstrateNumber</td>
+                                    <td>@r.OrderNumber</td>
+                                }
+                                <td>@r.Stock</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(_subPageNum <= 1 ? "disabled" : "")">
+                    <button class="page-link" @onclick="() => SubGoToPageAsync(_subPageNum - 1)">前へ</button>
+                </li>
+                <li class="page-item disabled"><span class="page-link">@_subPageNum / @SubTotalPages</span></li>
+                <li class="page-item @(_subPageNum >= SubTotalPages ? "disabled" : "")">
+                    <button class="page-link" @onclick="() => SubGoToPageAsync(_subPageNum + 1)">次へ</button>
+                </li>
+            </ul>
+        </nav>
+    }
+}
+
+@if (_detailFields is not null) {
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.35);">
+        <div class="modal-dialog" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">行詳細</h5>
+                    <button type="button" class="btn-close" @onclick="CloseDetail"></button>
+                </div>
+                <div class="modal-body p-2">
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                            @foreach (var (label, value) in _detailFields) {
+                                <tr><th class="text-muted fw-normal small" style="width: 20%">@label</th><td>@value</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" @onclick="CloseDetail">閉じる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (_usedSubProductId is not null) {
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.35);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">使用基板 (製品登録ID: @_usedSubProductId)</h5>
+                    <button type="button" class="btn-close" @onclick="CloseUsedSubstrates"></button>
+                </div>
+                <div class="modal-body p-2">
+                    <table class="table table-bordered table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>基板名</th>
+                                <th>基板型式</th>
+                                <th>基板製造番号</th>
+                                <th>使用数</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (_usedSubstrates.Count == 0) {
+                                <tr><td colspan="5" class="text-center text-muted">使用基板なし</td></tr>
+                            } else {
+                                @foreach (var s in _usedSubstrates) {
+                                    <tr>
+                                        <td>@s.Id</td>
+                                        <td>@s.SubstrateName</td>
+                                        <td>@s.SubstrateModel</td>
+                                        <td>@s.SubstrateNumber</td>
+                                        <td>@Math.Abs(s.Decrease ?? 0)</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" @onclick="CloseUsedSubstrates">閉じる</button>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 @code {
+    private string _activeTab = "product";
+
+    // ===== 製品タブ =====
     private IReadOnlyList<string> _categoryList = [];
     private IReadOnlyList<string> _productNameList = [];
     private IReadOnlyList<string> _productTypeList = [];
@@ -134,14 +411,60 @@
 
     private int TotalPages => _pageSize > 0 ? Math.Max(1, (int)Math.Ceiling((double)_totalCount / _pageSize)) : 1;
 
+    private string ProductCsvUrl =>
+        $"/export/products.csv?listCategory={Uri.EscapeDataString(_listCategory)}&listProductName={Uri.EscapeDataString(_listProductName)}" +
+        $"&listProductType={Uri.EscapeDataString(_listProductType)}&filterProductName={Uri.EscapeDataString(_filterProductName)}" +
+        $"&filterOrderNumber={Uri.EscapeDataString(_filterOrderNumber)}&filterProductNumber={Uri.EscapeDataString(_filterProductNumber)}";
+
+    // ===== 基板タブ =====
+    private IReadOnlyList<string> _subCategoryList = [];
+    private IReadOnlyList<string> _subProductNameList = [];
+    private IReadOnlyList<string> _substrateNameList = [];
+
+    private string _listSubCategory = "";
+    private string _listSubProductName = "";
+    private string _listSubstrateName = "";
+    private string _filterSubstrateName = "";
+    private string _filterSubOrderNumber = "";
+    private string _filterSubstrateNumber = "";
+
+    private string _subActiveTab = "records";
+    private bool _stockGroupByModel = true;
+    private bool _excludeZeroStock;
+
+    private IReadOnlyList<SubstrateRecord> _substrateRecords = [];
+    private IReadOnlyList<StockRecord> _stockRecords = [];
+    private bool _subHasSearched;
+    private int _subPageNum = 1;
+    private int _subPageSize = PageSize;
+    private int _subTotalCount;
+    private string? _subErrorMessage;
+
+    private int SubRecordCount => _subActiveTab == "stock" ? _stockRecords.Count : _substrateRecords.Count;
+    private int SubTotalPages => _subPageSize > 0 ? Math.Max(1, (int)Math.Ceiling((double)_subTotalCount / _subPageSize)) : 1;
+
+    private string SubstrateCsvUrl =>
+        $"/export/substrates.csv?listCategory={Uri.EscapeDataString(_listSubCategory)}&listProductName={Uri.EscapeDataString(_listSubProductName)}" +
+        $"&listSubstrateName={Uri.EscapeDataString(_listSubstrateName)}&filterSubstrateName={Uri.EscapeDataString(_filterSubstrateName)}" +
+        $"&filterOrderNumber={Uri.EscapeDataString(_filterSubOrderNumber)}&filterSubstrateNumber={Uri.EscapeDataString(_filterSubstrateNumber)}";
+
+    // ===== 行詳細・使用基板モーダル（製品・基板タブ共通） =====
+    private List<(string Label, string? Value)>? _detailFields;
+    private long? _usedSubProductId;
+    private IReadOnlyList<UsedSubstrateRecord> _usedSubstrates = [];
+
     protected override void OnInitialized() {
         _categoryList = ProductRepo.GetCategoryList();
         _productNameList = ProductRepo.GetProductNameList(null);
         _productTypeList = ProductRepo.GetProductTypeList(null, null);
+
+        _subCategoryList = SubstrateRepo.GetCategoryList();
+        _subProductNameList = SubstrateRepo.GetProductNameList(null);
+        _substrateNameList = SubstrateRepo.GetSubstrateNameList(null, null);
     }
 
-    // カテゴリ変更時: 製品名・種別の候補を絞り込み、それまでの選択が新しい候補になければクリアする
-    // （候補に残っていれば維持する。別カテゴリでも同名の製品が存在しうるため）
+    // ----- 製品タブ: カスケードリストボックス -----
+    // 本家 ProductWebViewer と同様、リストボックスはどれを変更しても即座に検索結果へ反映される
     private Task OnCategoryChangedAsync(ChangeEventArgs e) {
         _listCategory = e.Value?.ToString() ?? "";
 
@@ -153,7 +476,22 @@
         if (!_productTypeList.Contains(_listProductType))
             _listProductType = "";
 
-        return Task.CompletedTask;
+        return SearchAsync();
+    }
+
+    private Task OnProductNameChangedAsync(ChangeEventArgs e) {
+        _listProductName = e.Value?.ToString() ?? "";
+
+        _productTypeList = ProductRepo.GetProductTypeList(_listCategory, _listProductName);
+        if (!_productTypeList.Contains(_listProductType))
+            _listProductType = "";
+
+        return SearchAsync();
+    }
+
+    private Task OnProductTypeChangedAsync(ChangeEventArgs e) {
+        _listProductType = e.Value?.ToString() ?? "";
+        return SearchAsync();
     }
 
     private Task SearchAsync() {
@@ -183,4 +521,112 @@
         }
         return Task.CompletedTask;
     }
+
+    private void ShowProductDetail(ProductRecord r) => _detailFields = [
+        ("ID", r.Id.ToString()), ("カテゴリ", r.CategoryName), ("製品名", r.ProductName), ("種別", r.ProductType),
+        ("型式", r.ProductModel), ("注文番号", r.OrderNumber), ("製造番号", r.ProductNumber), ("O-Les番号", r.OLesNumber),
+        ("数量", r.Quantity?.ToString()), ("担当者", r.PersonInfo), ("登録日", r.RegDate), ("Revision", r.Revision),
+        ("シリアル開始", r.SerialFirst), ("シリアル終了", r.SerialLast), ("コメント", r.Comment), ("登録日時", r.CreatedAt),
+    ];
+
+    private void ShowUsedSubstrates(long id) {
+        _usedSubProductId = id;
+        try {
+            _usedSubstrates = ProductRepo.GetUsedSubstrates(id);
+        } catch (Exception) {
+            _usedSubstrates = [];
+        }
+    }
+    private void CloseUsedSubstrates() => _usedSubProductId = null;
+    private void CloseDetail() => _detailFields = null;
+
+    // ----- 基板タブ: カスケードリストボックス -----
+    private Task OnSubCategoryChangedAsync(ChangeEventArgs e) {
+        _listSubCategory = e.Value?.ToString() ?? "";
+
+        _subProductNameList = SubstrateRepo.GetProductNameList(_listSubCategory);
+        if (!_subProductNameList.Contains(_listSubProductName))
+            _listSubProductName = "";
+
+        _substrateNameList = SubstrateRepo.GetSubstrateNameList(_listSubCategory, _listSubProductName);
+        if (!_substrateNameList.Contains(_listSubstrateName))
+            _listSubstrateName = "";
+
+        return SubSearchAsync();
+    }
+
+    private Task OnSubProductNameChangedAsync(ChangeEventArgs e) {
+        _listSubProductName = e.Value?.ToString() ?? "";
+
+        _substrateNameList = SubstrateRepo.GetSubstrateNameList(_listSubCategory, _listSubProductName);
+        if (!_substrateNameList.Contains(_listSubstrateName))
+            _listSubstrateName = "";
+
+        return SubSearchAsync();
+    }
+
+    private Task OnSubstrateNameChangedAsync(ChangeEventArgs e) {
+        _listSubstrateName = e.Value?.ToString() ?? "";
+        return SubSearchAsync();
+    }
+
+    private Task SwitchSubTabAsync(string tab) {
+        _subActiveTab = tab;
+        _subPageNum = 1;
+        return _subHasSearched ? RunSubSearchAsync() : Task.CompletedTask;
+    }
+
+    private Task SwitchStockGroupAsync(bool groupByModel) {
+        _stockGroupByModel = groupByModel;
+        _subPageNum = 1;
+        return _subHasSearched ? RunSubSearchAsync() : Task.CompletedTask;
+    }
+
+    private Task SubSearchAsync() {
+        _subPageNum = 1;
+        _subHasSearched = true;
+        return RunSubSearchAsync();
+    }
+
+    private Task SubGoToPageAsync(int page) {
+        if (page < 1 || page > SubTotalPages) return Task.CompletedTask;
+        _subPageNum = page;
+        return RunSubSearchAsync();
+    }
+
+    private Task RunSubSearchAsync() {
+        try {
+            if (_subActiveTab == "stock") {
+                _subTotalCount = SubstrateRepo.GetStockCount(
+                    _listSubCategory, _listSubProductName, _listSubstrateName,
+                    _stockGroupByModel, _excludeZeroStock,
+                    _filterSubstrateName, _filterSubOrderNumber, _filterSubstrateNumber);
+                _stockRecords = SubstrateRepo.GetStock(
+                    _listSubCategory, _listSubProductName, _listSubstrateName,
+                    _stockGroupByModel, _excludeZeroStock,
+                    _filterSubstrateName, _filterSubOrderNumber, _filterSubstrateNumber,
+                    page: _subPageNum, pageSize: _subPageSize);
+            } else {
+                _subTotalCount = SubstrateRepo.GetCount(
+                    _listSubCategory, _listSubProductName, _listSubstrateName,
+                    _filterSubstrateName, _filterSubOrderNumber, _filterSubstrateNumber);
+                _substrateRecords = SubstrateRepo.GetAll(
+                    _listSubCategory, _listSubProductName, _listSubstrateName,
+                    _filterSubstrateName, _filterSubOrderNumber, _filterSubstrateNumber,
+                    page: _subPageNum, pageSize: _subPageSize);
+            }
+            _subErrorMessage = null;
+        } catch (Exception) {
+            _subErrorMessage = "データの取得中にエラーが発生しました。";
+        }
+        return Task.CompletedTask;
+    }
+
+    private void ShowSubstrateDetail(SubstrateRecord r) => _detailFields = [
+        ("ID", r.Id.ToString()), ("カテゴリ", r.CategoryName), ("製品名", r.ProductName), ("基板名", r.SubstrateName),
+        ("基板型式", r.SubstrateModel), ("注文番号", r.OrderNumber), ("製造番号", r.SubstrateNumber),
+        ("入庫", r.Increase?.ToString()), ("出庫", r.Decrease?.ToString()), ("不良", r.Defect?.ToString()),
+        ("使用製品名", r.UseProductName), ("使用注文番号", r.UseOrderNumber), ("使用製造番号", r.UseProductNumber),
+        ("担当者", r.PersonInfo), ("登録日", r.RegDate), ("コメント", r.Comment), ("登録日時", r.CreatedAt),
+    ];
 }

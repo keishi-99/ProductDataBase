@@ -66,6 +66,27 @@ app.MapPost("/logout", async (HttpContext context) => {
     return Results.LocalRedirect("/");
 });
 
+// CSVエクスポートはBlazorコンポーネント外のファイルダウンロード応答が必要なため、通常のエンドポイントとして用意する
+app.MapGet("/export/products.csv", (
+    ProductRecordRepository repo,
+    string? listCategory, string? listProductName, string? listProductType,
+    string? filterProductName, string? filterOrderNumber, string? filterProductNumber) => {
+    var records = repo.GetAll(listCategory, listProductName, listProductType,
+        filterProductName, filterOrderNumber, filterProductNumber, page: 1, pageSize: 0);
+    var bytes = CsvExport.BuildCsvBytes(CsvExport.BuildProductLines(records));
+    return Results.File(bytes, "text/csv", $"製品登録実績_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+});
+
+app.MapGet("/export/substrates.csv", (
+    SubstrateRecordRepository repo,
+    string? listCategory, string? listProductName, string? listSubstrateName,
+    string? filterSubstrateName, string? filterOrderNumber, string? filterSubstrateNumber) => {
+    var records = repo.GetAll(listCategory, listProductName, listSubstrateName,
+        filterSubstrateName, filterOrderNumber, filterSubstrateNumber, page: 1, pageSize: 0);
+    var bytes = CsvExport.BuildCsvBytes(CsvExport.BuildSubstrateLines(records));
+    return Results.File(bytes, "text/csv", $"基板登録実績_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+});
+
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
