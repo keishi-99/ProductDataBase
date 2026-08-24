@@ -754,6 +754,10 @@ else {
 
     private Task SwitchStockGroupAsync(bool groupByModel) {
         _stockGroupByModel = groupByModel;
+        // 基板単位（グループ化）表示では製造番号・注文番号は集約されない列のため選択できない
+        if (groupByModel && !_stockColsByModel.Any(c => c.SortKey == _stockSortCol)) {
+            _stockSortCol = "";
+        }
         _subPageNum = 1;
         return _subHasSearched ? RunSubSearchAsync() : Task.CompletedTask;
     }
