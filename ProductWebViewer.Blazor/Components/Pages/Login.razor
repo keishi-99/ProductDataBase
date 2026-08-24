@@ -1,0 +1,32 @@
+@page "/login"
+@* インタラクティブにしない: HttpContext.SignInAsync が使えるのは通常のHTTPリクエスト応答の中だけのため、
+   このページはあえて静的レンダリング（フォームの素のPOST）のままにしている。 *@
+
+<PageTitle>ログイン</PageTitle>
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <h3 class="mb-3">管理者ログイン</h3>
+        <form method="post" action="/login">
+            <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+            @if (HasError) {
+                <div class="alert alert-danger">パスワードが正しくありません。</div>
+            }
+            <div class="mb-3">
+                <label class="form-label" for="password">パスワード</label>
+                <input class="form-control" type="password" id="password" name="Password" autofocus />
+            </div>
+            <button type="submit" class="btn btn-primary">ログイン</button>
+        </form>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
+
+    [SupplyParameterFromQuery(Name = "error")]
+    public string? Error { get; set; }
+
+    private bool HasError => Error == "1";
+}

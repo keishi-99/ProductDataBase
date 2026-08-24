@@ -1,0 +1,27 @@
+﻿@inherits LayoutComponentBase
+
+<nav class="navbar navbar-expand navbar-dark bg-dark mb-3">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">製品・基板データ閲覧（Blazor練習版）</a>
+        <AuthorizeView>
+            <Authorized>
+                <form method="post" action="/logout" class="d-flex">
+                    <button type="submit" class="btn btn-outline-light btn-sm">ログアウト</button>
+                </form>
+            </Authorized>
+            <NotAuthorized>
+                <a class="btn btn-outline-light btn-sm" href="/login">ログイン</a>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    @Body
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
