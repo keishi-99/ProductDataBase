@@ -4,6 +4,8 @@
 @using ProductWebViewer.Blazor.Data
 @using ProductWebViewer.Blazor.Models
 @inject SubstrateWriteRepository WriteRepo
+@inject AuditLogger AuditLogger
+@inject ILogger<SubstrateDelete> Logger
 @inject NavigationManager Navigation
 
 <PageTitle>基板登録の削除</PageTitle>
@@ -45,6 +47,7 @@
     }
 
     private void DeleteAsync() {
+        var before = _record!;
         try {
             if (!WriteRepo.DeleteSubstrate(Id)) {
                 _errorMessage = "この基板登録は他の操作で既に削除されています。";
@@ -54,6 +57,9 @@
             _errorMessage = ex.Message;
             return;
         }
+
+        AuditLogging.TryLog(Logger, () => AuditLogger.LogSubstrateDelete(before));
+
         Navigation.NavigateTo("/");
     }
 }

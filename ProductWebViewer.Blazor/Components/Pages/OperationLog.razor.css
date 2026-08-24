@@ -1,0 +1,7 @@
+/* Home.razor と同じく、セル内では折り返さず省略表示にする */
+table td, table th {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+}

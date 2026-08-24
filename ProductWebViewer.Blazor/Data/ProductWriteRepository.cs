@@ -56,6 +56,7 @@ namespace ProductWebViewer.Blazor.Data {
 
         // 製品登録を論理削除し、連動する基板使用履歴を論理削除・シリアルを物理削除する
         // 対象行が既に削除されている場合は Success=false を返し、関連データには一切触れない
+        // DeletedSubstrates/DeletedSerials は監査ログ記録用に、削除直前の状態を返す
         public ProductDeleteResult DeleteProduct(long id) {
             try {
                 using var con = new SqliteConnection(_connectionString);
@@ -65,19 +66,51 @@ namespace ProductWebViewer.Blazor.Data {
                 var affected = con.Execute("UPDATE T_Product SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE ID = @Id AND IsDeleted = 0", new { Id = id }, tx);
                 if (affected == 0) {
                     tx.Rollback();
-                    return new ProductDeleteResult(false, 0, 0);
+                    return new ProductDeleteResult(false, [], []);
                 }
 
-                var deletedSubstrates = con.Execute("UPDATE T_Substrate SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE UseID = @Id AND IsDeleted = 0", new { Id = id }, tx);
-                var deletedSerials = con.Execute("DELETE FROM T_Serial WHERE UsedID = @Id", new { Id = id }, tx);
+                // 監査ログ用に、連動削除される直前の基板使用履歴・シリアルを取得しておく
+                var substrates = con.Query<CascadeSubstrateRow>("""
+                    SELECT ID, OrderNumber, SubstrateNumber, ProductName, SubstrateName, SubstrateModel,
+                           Increase, Decrease, Defect, RegDate, PersonInfo, Comment, UseID
+                    FROM V_Substrate
+                    WHERE UseID = @Id AND IsDeleted = 0
+                    """, new { Id = id }, tx).ToList();
+                var serials = con.Query<CascadeSerialRow>("""
+                    SELECT rowid AS RowId, ProductName, Serial, UsedID
+                    FROM V_Serial
+                    WHERE UsedID = @Id
+                    """, new { Id = id }, tx).ToList();
+
+                con.Execute("UPDATE T_Substrate SET IsDeleted = 1, DeletedAt = datetime('now', 'localtime') WHERE UseID = @Id AND IsDeleted = 0", new { Id = id }, tx);
+                con.Execute("DELETE FROM T_Serial WHERE UsedID = @Id", new { Id = id }, tx);
 
                 tx.Commit();
-                return new ProductDeleteResult(true, deletedSubstrates, deletedSerials);
+                return new ProductDeleteResult(true, substrates, serials);
             } catch (Exception ex) {
                 throw new Exception(SqliteBusyErrorHelper.GetUserMessage(ex), ex);
             }
         }
     }
 
-    public record ProductDeleteResult(bool Success, int DeletedSubstrateCount, int DeletedSerialCount);
+    public record ProductDeleteResult(bool Success, IReadOnlyList<CascadeSubstrateRow> DeletedSubstrates, IReadOnlyList<CascadeSerialRow> DeletedSerials);
+
+    // 製品削除に連動して削除される基板使用履歴・シリアルのスナップショット（監査ログ記録用）
+    public record CascadeSubstrateRow {
+        public long ID { get; init; }
+        public string? OrderNumber { get; init; }
+        public string? SubstrateNumber { get; init; }
+        public string? ProductName { get; init; }
+        public string? SubstrateName { get; init; }
+        public string? SubstrateModel { get; init; }
+        public long? Increase { get; init; }
+        public long? Decrease { get; init; }
+        public long? Defect { get; init; }
+        public string? RegDate { get; init; }
+        public string? PersonInfo { get; init; }
+        public string? Comment { get; init; }
+        public long? UseID { get; init; }
+    }
+
+    public record CascadeSerialRow(long RowId, string? ProductName, string? Serial, long? UsedID);
 }

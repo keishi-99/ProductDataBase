@@ -5,6 +5,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
+    <script>
+        (function () {
+            var theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
     <ResourcePreloader />
     <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
@@ -18,6 +24,21 @@
     <ReconnectModal />
     <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script>
+        function toggleTheme(checkbox) {
+            var theme = checkbox.checked ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+        function syncThemeToggle() {
+            var toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = (localStorage.getItem('theme') || 'light') === 'dark';
+        }
+        syncThemeToggle();
+        // Blazorがページ遷移・再接続でDOMを再構築した際にもチェック状態を同期する
+        document.addEventListener('DOMContentLoaded', syncThemeToggle);
+        window.Blazor?.addEventListener?.('enhancedload', syncThemeToggle);
+    </script>
 </body>
 
 </html>

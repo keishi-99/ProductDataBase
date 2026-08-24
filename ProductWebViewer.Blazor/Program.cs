@@ -16,6 +16,8 @@ builder.Services.AddSingleton<ProductRecordRepository>();
 builder.Services.AddSingleton<SubstrateRecordRepository>();
 builder.Services.AddSingleton<ProductWriteRepository>();
 builder.Services.AddSingleton<SubstrateWriteRepository>();
+builder.Services.AddSingleton<AuditLogger>();
+builder.Services.AddSingleton<LogRecordRepository>();
 builder.Services.AddHostedService<DbInitializer>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -45,7 +47,10 @@ app.UseAntiforgery();
 
 // Blazorのインタラクティブコンポーネントは SignalR 経由で動作するため HttpContext.SignInAsync/SignOutAsync を直接呼べない。
 // そのため認証操作は通常の（非Blazorな）エンドポイントとして用意し、フォームPOSTで叩く方式にしている。
-app.MapPost("/login", async (HttpContext context, IConfiguration configuration, string? returnUrl) => {
+// パスは Login.razor の "/login" (@page) と衝突しないよう "/auth/login" にしている
+// （Blazor Web Appは @page のルートに対してPOSTハンドラーも自動登録するため、同じパスにMapPostすると
+//  AmbiguousMatchException になる）。
+app.MapPost("/auth/login", async (HttpContext context, IConfiguration configuration, string? returnUrl) => {
     var form = await context.Request.ReadFormAsync();
     var password = form["Password"].ToString();
     var adminPassword = configuration["Auth:AdminPassword"];
@@ -61,7 +66,7 @@ app.MapPost("/login", async (HttpContext context, IConfiguration configuration, 
     return Results.LocalRedirect(!string.IsNullOrEmpty(returnUrl) && returnUrl.StartsWith('/') ? returnUrl : "/");
 });
 
-app.MapPost("/logout", async (HttpContext context) => {
+app.MapPost("/auth/logout", async (HttpContext context) => {
     await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     return Results.LocalRedirect("/");
 });
