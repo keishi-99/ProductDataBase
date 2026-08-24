@@ -38,6 +38,15 @@ namespace ProductWebViewer.Blazor.Data {
                     Field(r.SerialFirst), Field(r.SerialLast), Field(r.Comment), Field(r.CreatedAt));
         }
 
+        public static IEnumerable<string> BuildSerialLines(IReadOnlyList<SerialRecord> records) {
+            yield return "No.,シリアル番号,O-Lesシリアル,注文番号,製番,製品名,種別,型式,登録日,登録日時";
+            foreach (var r in records)
+                yield return string.Join(",",
+                    Field(r.RowId.ToString()), Field(r.Serial), Field(r.OLesSerial),
+                    Field(r.OrderNumber), Field(r.ProductNumber), Field(r.ProductName),
+                    Field(r.ProductType), Field(r.ProductModel), Field(r.RegDate), Field(r.CreatedAt));
+        }
+
         public static IEnumerable<string> BuildSubstrateLines(IReadOnlyList<SubstrateRecord> records) {
             yield return "ID,カテゴリ,製品名,基板名,基板型式,注文番号,製造番号,入庫,出庫,不良,使用製品名,使用注文番号,使用製造番号,担当者,登録日,コメント,登録日時";
             foreach (var r in records)

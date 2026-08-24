@@ -45,3 +45,13 @@ table td, table th {
 .results-area nav {
     flex-shrink: 0;
 }
+
+/* 列見出しクリックでの並び替え（本家 Index.cshtml の sortable と同じ見た目） */
+th.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+th.sortable:hover {
+    background-color: var(--bs-secondary-bg);
+}

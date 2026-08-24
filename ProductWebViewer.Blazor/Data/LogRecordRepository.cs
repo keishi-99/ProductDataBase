@@ -3,8 +3,9 @@ using System.Text.RegularExpressions;
 using ProductWebViewer.Blazor.Models;
 
 namespace ProductWebViewer.Blazor.Data {
-    // db/logs/log_web_yyyyMM.csv を読み取り専用で参照する（このアプリはこのファイルにしか書き込まないため、
-    // 本家のように log_*.csv と log_web_*.csv をマージする必要はない）。
+    // db/logs/log_yyyyMM.csv（メインアプリ形式）と log_web_yyyyMM.csv（このアプリ）を
+    // 読み取り専用でマージして参照する。このアプリ自体はデスクトップアプリを持たないため log_*.csv は
+    // 通常存在しないが、本家との互換性のため統合ロジックは同じ形にしてある。
     public partial class LogRecordRepository {
         private readonly string _logDirectory;
 
@@ -17,25 +18,36 @@ namespace ProductWebViewer.Blazor.Data {
             _logDirectory = Path.Combine(Path.GetDirectoryName(dbFullPath) ?? AppContext.BaseDirectory, "logs");
         }
 
-        // 存在する年月（新しい順）を "yyyyMM" の形式で返す
+        // 存在する年月（新しい順）を "yyyyMM" の形式で返す（両ファイルの年月を統合）
         public IReadOnlyList<string> GetAvailableMonths() {
             if (!Directory.Exists(_logDirectory)) return [];
 
-            return Directory.GetFiles(_logDirectory, "log_web_*.csv")
-                .Select(f => Path.GetFileNameWithoutExtension(f).Replace("log_web_", ""))
-                .Where(s => s.Length == 6 && s.All(char.IsDigit))
+            var mainMonths = ExtractYearMonths("log_*.csv", "log_");
+            var webMonths = ExtractYearMonths("log_web_*.csv", "log_web_");
+
+            return mainMonths.Concat(webMonths)
                 .Distinct()
                 .OrderByDescending(s => s)
                 .ToList();
         }
 
-        // 指定年月の操作ログを返す
+        // "log_*.csv" は "log_web_*.csv" にもマッチするが、プレフィックス除去後に6桁の数字でなくなるため
+        // Where句で自然に除外される（本家 ProductWebViewer と同じロジック）
+        private IEnumerable<string> ExtractYearMonths(string searchPattern, string prefix) =>
+            Directory.GetFiles(_logDirectory, searchPattern)
+                .Select(f => Path.GetFileNameWithoutExtension(f).Replace(prefix, ""))
+                .Where(s => s.Length == 6 && s.All(char.IsDigit));
+
+        // 指定年月の操作ログを、メインアプリ・このアプリ両方のファイルから読み取りマージして返す
         public IReadOnlyList<LogEntry> GetLogEntries(string yearMonth) {
             // yearMonthがファイルパスの一部になるため、意図しないパス（ディレクトリ区切り等）を含まないことを確認する
             if (string.IsNullOrEmpty(yearMonth) || yearMonth.Length != 6 || !yearMonth.All(char.IsAsciiDigit))
                 return [];
 
-            return ReadEntriesFromFile(Path.Combine(_logDirectory, $"log_web_{yearMonth}.csv")).ToList();
+            var entries = new List<LogEntry>();
+            entries.AddRange(ReadEntriesFromFile(Path.Combine(_logDirectory, $"log_{yearMonth}.csv")));
+            entries.AddRange(ReadEntriesFromFile(Path.Combine(_logDirectory, $"log_web_{yearMonth}.csv")));
+            return entries;
         }
 
         private static IEnumerable<LogEntry> ReadEntriesFromFile(string filePath) {

@@ -84,6 +84,18 @@ app.MapGet("/export/products.csv", (
     return Results.File(bytes, "text/csv", $"製品登録実績_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
 });
 
+app.MapGet("/export/serials.csv", (
+    ProductRecordRepository repo,
+    string? listCategory, string? listProductName, string? listProductType,
+    string? filterProductName, string? filterOrderNumber, string? filterProductNumber,
+    string? dateType, string? dateFrom, string? dateTo, string? filterSerial) => {
+    var records = repo.GetSerialHistory(listCategory, listProductName, listProductType,
+        filterProductName, filterOrderNumber, filterProductNumber,
+        dateType, dateFrom, dateTo, filterSerial, page: 1, pageSize: 0);
+    var bytes = CsvExport.BuildCsvBytes(CsvExport.BuildSerialLines(records));
+    return Results.File(bytes, "text/csv", $"シリアル履歴_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+});
+
 app.MapGet("/export/substrates.csv", (
     SubstrateRecordRepository repo,
     string? listCategory, string? listProductName, string? listSubstrateName,
