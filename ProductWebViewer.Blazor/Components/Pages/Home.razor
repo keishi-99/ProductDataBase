@@ -81,6 +81,7 @@
     }
 
     @if (_hasSearched) {
+        <div class="results-area">
         <p class="text-muted">@_totalCount 件中 @(_records.Count == 0 ? 0 : (_pageNum - 1) * _pageSize + 1)〜@((_pageNum - 1) * _pageSize + _records.Count) 件を表示</p>
 
         <div class="table-responsive">
@@ -147,6 +148,7 @@
                 </li>
             </ul>
         </nav>
+        </div>
     }
 }
 else {
@@ -233,6 +235,7 @@ else {
     }
 
     @if (_subHasSearched) {
+        <div class="results-area">
         <p class="text-muted">@_subTotalCount 件中 @(SubRecordCount == 0 ? 0 : (_subPageNum - 1) * _subPageSize + 1)〜@((_subPageNum - 1) * _subPageSize + SubRecordCount) 件を表示</p>
 
         <div class="table-responsive">
@@ -314,6 +317,7 @@ else {
                 </li>
             </ul>
         </nav>
+        </div>
     }
 }
 

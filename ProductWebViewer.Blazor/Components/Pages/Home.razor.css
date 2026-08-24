@@ -26,3 +26,22 @@ table td, table th {
     text-overflow: ellipsis;
     max-width: 240px;
 }
+
+/* 検索結果エリア（件数表示・テーブル・ページネーション）をブラウザの表示領域に合わせて伸縮させる。
+   テーブル部分だけを内部スクロールにし、ページネーションは常に画面内に表示され続ける。 */
+.results-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.results-area .table-responsive {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 100px;
+}
+
+.results-area nav {
+    flex-shrink: 0;
+}
