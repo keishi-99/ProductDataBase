@@ -93,7 +93,7 @@ namespace ProductDatabase {
 
                 ConfigurePrintSettings();
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
                 Close();
             }
         }
@@ -183,7 +183,7 @@ namespace ProductDatabase {
                 HistoryAuditLogger.LogRePrint(_productMaster, _productRegisterWork);
                 return true;
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
                 return false;
             }
         }
@@ -310,7 +310,7 @@ namespace ProductDatabase {
                         return true;
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
                 return false;
             }
         }
@@ -424,7 +424,7 @@ namespace ProductDatabase {
                 QuantityTextBox.Text = arr[2];
                 OrderNumberTextBox.Text = arr[3];
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
             }
         }
         // 現在の製品・作業データのフィールド値をリスト形式のサブウィンドウで確認表示する

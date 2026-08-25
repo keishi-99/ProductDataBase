@@ -112,7 +112,7 @@ namespace ProductDatabase {
                 }
 
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
             }
         }
         // 入力値の最終検証を行い問題なければ製品登録2ウィンドウを開く
@@ -223,7 +223,7 @@ namespace ProductDatabase {
                 window.ShowDialog(this);
 
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
             } finally {
                 RegisterButton.Enabled = true;
             }
