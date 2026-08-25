@@ -626,7 +626,7 @@ namespace ProductDatabase.History {
                 prepared = ReportGeneratorClosedXml.PrepareReport(
                     _productMaster.ProductModel, _productRegisterWork.ProductNumber);
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{nameof(GenerateReport)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
                 return;
             }
             if (prepared is null) return; // キャンセル
@@ -648,7 +648,7 @@ namespace ProductDatabase.History {
 
             GenerateReportButton.Enabled = true;
             if (taskException is not null) {
-                MessageBox.Show(taskException.Message, $"[{nameof(GenerateReport)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(taskException);
             }
             else {
                 MessageBox.Show("成績書が正常に生成されました。", "完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -683,7 +683,7 @@ namespace ProductDatabase.History {
 
             GenerateListButton.Enabled = true;
             if (taskException is not null) {
-                MessageBox.Show(taskException.Message, $"[{nameof(GenerateList)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(taskException);
             }
         }
 
@@ -704,7 +704,7 @@ namespace ProductDatabase.History {
             try {
                 prepared = CheckSheetGeneratorClosedXml.PrepareCheckSheet(_productMaster);
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{nameof(GenerateCheckSheet)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
                 return;
             }
             if (prepared is null) return; // キャンセル
@@ -726,7 +726,7 @@ namespace ProductDatabase.History {
 
             GenerateCheckSheetButton.Enabled = true;
             if (taskException is not null) {
-                MessageBox.Show(taskException.Message, $"[{nameof(GenerateCheckSheet)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(taskException);
             }
         }
 

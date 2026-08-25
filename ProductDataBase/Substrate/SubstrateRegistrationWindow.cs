@@ -99,7 +99,7 @@ namespace ProductDatabase {
                 if (!File.Exists(PrintSettingPath)) { throw new Exception("印刷設定ファイルが見つかりませんでした"); }
                 LoadSettings(PrintSettingPath);
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
                 Close();
             }
         }
@@ -145,7 +145,7 @@ namespace ProductDatabase {
                 Close();
 
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
             } finally {
                 RegisterButton.Enabled = true;
             }
@@ -347,7 +347,7 @@ namespace ProductDatabase {
                         break;
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
             }
         }
 
@@ -581,7 +581,7 @@ namespace ProductDatabase {
                 await CommonUtils.RunOnStaThreadAsync(OpenSubstrateInformation);
             } catch (Exception ex) {
                 // UIスレッドで MessageBox を表示（スレッド安全）
-                MessageBox.Show(ex.Message, $"[{nameof(OpenSubstrateInformationButton_Click)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
             } finally {
                 OpenSubstrateInformationButton.Enabled = true;
             }

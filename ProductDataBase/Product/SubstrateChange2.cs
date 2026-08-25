@@ -133,7 +133,7 @@ namespace ProductDatabase {
                 }
 
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
             } finally {
             }
         }
@@ -233,7 +233,7 @@ namespace ProductDatabase {
                 }
                 return true;
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
                 return false;
             }
         }
@@ -404,7 +404,7 @@ namespace ProductDatabase {
 
             SubstrateListPrintButton.Enabled = true;
             if (taskException is not null) {
-                MessageBox.Show(taskException.Message, $"[{nameof(GenerateList)}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(taskException);
             }
         }
 

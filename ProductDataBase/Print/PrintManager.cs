@@ -1,4 +1,5 @@
 ﻿using bpac;
+using ProductDatabase.Common;
 using ProductDatabase.Models;
 using System.Drawing.Printing;
 using ZXing;
@@ -189,8 +190,7 @@ namespace ProductDatabase.Print {
 
                 return false;
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorMessageHelper.Show(ex);
                 return false;
             }
         }
