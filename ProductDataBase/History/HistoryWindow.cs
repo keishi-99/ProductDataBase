@@ -16,7 +16,10 @@ namespace ProductDatabase.History {
         private readonly SubstrateRegisterWork _substrateRegisterWork;
         private readonly AppSettings _appSettings;
 
-        private readonly int _radioButtonNumber = 0;
+        private readonly RadioButtonMode _radioButtonNumber;
+
+        // CategoryRadioButton1〜3のどれが操作されたかを表す（値の意味はモードごとに異なる）
+        private enum CategoryButtonSlot { First, Second, Third }
         private bool _isEditMode;
 
         private System.Data.DataTable _historyTable = new();
@@ -125,7 +128,7 @@ namespace ProductDatabase.History {
                 }
             };
 
-        public HistoryWindow(ProductMaster productMaster, ProductRegisterWork productRegisterWork, SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork, int radioButtonNumber, AppSettings appSettings) {
+        public HistoryWindow(ProductMaster productMaster, ProductRegisterWork productRegisterWork, SubstrateMaster substrateMaster, SubstrateRegisterWork substrateRegisterWork, RadioButtonMode radioButtonNumber, AppSettings appSettings) {
             InitializeComponent();
 
             _productMaster = productMaster;
@@ -168,7 +171,7 @@ namespace ProductDatabase.History {
             編集ToolStripMenuItem.Visible = _appSettings.IsAdministrator;
 
             switch (_radioButtonNumber) {
-                case 1:
+                case RadioButtonMode.Substrate:
                     CategoryRadioButton2.Text = "在庫";
                     CategoryRadioButton3.Visible = false;
                     StockCheckBox.Visible = false;
@@ -180,14 +183,14 @@ namespace ProductDatabase.History {
                     GenerateCheckSheetButton.Visible = _productMaster.IsCheckSheetPrint;
                     if (string.IsNullOrEmpty(_substrateMaster.SubstrateModel)) { AllSubstrateCheckBox.Checked = true; }
                     break;
-                case 2:
+                case RadioButtonMode.ProductRegister:
                     CategoryRadioButton2.Text = "全てのタイプ";
                     CategoryRadioButton3.Text = "シリアル";
                     StockCheckBox.Visible = false;
                     AllSubstrateCheckBox.Visible = false;
                     GroupModelCheckBox.Visible = false;
                     break;
-                case 3:
+                case RadioButtonMode.RePrint:
                     CategoryRadioButton1.Visible = false;
                     CategoryRadioButton2.Visible = false;
                     CategoryRadioButton3.Visible = false;
@@ -512,23 +515,19 @@ namespace ProductDatabase.History {
             }
         }
 
-        // ラジオボタンのTagとモード番号の組み合わせで表示する履歴の種類を切り替える
-        private void CategorySelect(object sender) {
-            var selectedRadioButton = (RadioButton)sender;
-            if (!selectedRadioButton.Checked) { return; }
-            var tag = selectedRadioButton.Tag?.ToString() ?? string.Empty;
-
-            var actionMap = new Dictionary<(int, string), System.Action>
+        // ラジオボタンの位置とモードの組み合わせで表示する履歴の種類を切り替える
+        private void CategorySelect(CategoryButtonSlot slot) {
+            var actionMap = new Dictionary<(RadioButtonMode, CategoryButtonSlot), System.Action>
             {
-                { (1, "1"), ViewSubstrateRegistrationLog },
-                { (1, "2"), ViewSubstrateRegistrationLog },
-                { (2, "1"), ViewProductRegistration },
-                { (2, "2"), ViewProductRegistration },
-                { (2, "3"), ViewSerialLog },
-                { (3, "1"), ViewReprintLog }
+                { (RadioButtonMode.Substrate, CategoryButtonSlot.First), ViewSubstrateRegistrationLog },
+                { (RadioButtonMode.Substrate, CategoryButtonSlot.Second), ViewSubstrateRegistrationLog },
+                { (RadioButtonMode.ProductRegister, CategoryButtonSlot.First), ViewProductRegistration },
+                { (RadioButtonMode.ProductRegister, CategoryButtonSlot.Second), ViewProductRegistration },
+                { (RadioButtonMode.ProductRegister, CategoryButtonSlot.Third), ViewSerialLog },
+                { (RadioButtonMode.RePrint, CategoryButtonSlot.First), ViewReprintLog }
             };
 
-            if (actionMap.TryGetValue((_radioButtonNumber, tag), out var action)) {
+            if (actionMap.TryGetValue((_radioButtonNumber, slot), out var action)) {
                 action();
             }
             else {
@@ -796,7 +795,9 @@ namespace ProductDatabase.History {
         private async void GenerateCheckSheetButton_Click(object sender, EventArgs e) { await GenerateCheckSheet(); }
         private void CategoryComboBox_SelectedIndexChanged(object sender, EventArgs e) { HistoryTableFilter(); }
         private void FilterStringTextBox_TextChanged(object sender, EventArgs e) { HistoryTableFilter(); }
-        private void CategoryRadioButton_CheckedChanged(object sender, EventArgs e) { CategorySelect(sender); }
+        private void CategoryRadioButton1_CheckedChanged(object sender, EventArgs e) { if (CategoryRadioButton1.Checked) { CategorySelect(CategoryButtonSlot.First); } }
+        private void CategoryRadioButton2_CheckedChanged(object sender, EventArgs e) { if (CategoryRadioButton2.Checked) { CategorySelect(CategoryButtonSlot.Second); } }
+        private void CategoryRadioButton3_CheckedChanged(object sender, EventArgs e) { if (CategoryRadioButton3.Checked) { CategorySelect(CategoryButtonSlot.Third); } }
         private void StockCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateRegistrationLog(); }
         private void AllSubstrateCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateRegistrationLog(); }
         private void GroupModelCheckBox_CheckedChanged(object sender, EventArgs e) { ViewSubstrateRegistrationLog(); }

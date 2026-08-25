@@ -92,11 +92,10 @@ namespace ProductDatabase.History {
             this.CategoryRadioButton1.Size = new Size(92, 25);
             this.CategoryRadioButton1.TabIndex = 3;
             this.CategoryRadioButton1.TabStop = true;
-            this.CategoryRadioButton1.Tag = "1";
             this.CategoryRadioButton1.Text = "登録履歴";
             this.CategoryRadioButton1.TextAlign = ContentAlignment.MiddleCenter;
             this.CategoryRadioButton1.UseVisualStyleBackColor = true;
-            this.CategoryRadioButton1.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
+            this.CategoryRadioButton1.CheckedChanged += this.CategoryRadioButton1_CheckedChanged;
             //
             // CategoryRadioButton2
             //
@@ -107,11 +106,10 @@ namespace ProductDatabase.History {
             this.CategoryRadioButton2.Size = new Size(92, 25);
             this.CategoryRadioButton2.TabIndex = 4;
             this.CategoryRadioButton2.TabStop = true;
-            this.CategoryRadioButton2.Tag = "2";
             this.CategoryRadioButton2.Text = "Button2";
             this.CategoryRadioButton2.TextAlign = ContentAlignment.MiddleCenter;
             this.CategoryRadioButton2.UseVisualStyleBackColor = true;
-            this.CategoryRadioButton2.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
+            this.CategoryRadioButton2.CheckedChanged += this.CategoryRadioButton2_CheckedChanged;
             //
             // StockCheckBox
             //
@@ -156,11 +154,10 @@ namespace ProductDatabase.History {
             this.CategoryRadioButton3.Size = new Size(92, 25);
             this.CategoryRadioButton3.TabIndex = 9;
             this.CategoryRadioButton3.TabStop = true;
-            this.CategoryRadioButton3.Tag = "3";
             this.CategoryRadioButton3.Text = "Button3";
             this.CategoryRadioButton3.TextAlign = ContentAlignment.MiddleCenter;
             this.CategoryRadioButton3.UseVisualStyleBackColor = true;
-            this.CategoryRadioButton3.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
+            this.CategoryRadioButton3.CheckedChanged += this.CategoryRadioButton3_CheckedChanged;
             //
             // GenerateCheckSheetButton
             //
