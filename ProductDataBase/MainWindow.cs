@@ -11,7 +11,7 @@ namespace ProductDatabase {
     public partial class MainWindow : Form {
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int RadioButtonNumber { get; set; }
+        public RadioButtonMode RadioButtonNumber { get; set; }
         private float _fontSize = SystemFonts.DefaultFont.Size;
         private IEnumerable<DataRow> _currentTargetRows = [];
 
@@ -148,19 +148,19 @@ namespace ProductDatabase {
             if (CategoryListBox3.SelectedItem is not ListItem<long> item) { return; }
 
             switch (RadioButtonNumber) {
-                case 1:
+                case RadioButtonMode.Substrate:
                     HandleSubstrateRegistration(item.Id);
                     break;
 
-                case 2:
+                case RadioButtonMode.ProductRegister:
                     HandleProductRegistration(item.Id, ProductOperationMode.Register);
                     break;
 
-                case 3:
+                case RadioButtonMode.RePrint:
                     HandleProductRegistration(item.Id, ProductOperationMode.RePrint);
                     break;
 
-                case 4:
+                case RadioButtonMode.SubstrateChange:
                     HandleProductRegistration(item.Id, ProductOperationMode.SubstrateChange);
                     break;
             }
@@ -230,11 +230,11 @@ namespace ProductDatabase {
         // 品目未選択時にカテゴリ名・製品名のみマスターにセットする
         private void LoadHistoryWithoutSelection() {
             switch (RadioButtonNumber) {
-                case 1:
+                case RadioButtonMode.Substrate:
                     _substrateMaster.CategoryName = CategoryListBox1.SelectedItem?.ToString() ?? string.Empty;
                     _substrateMaster.ProductName = CategoryListBox2.SelectedItem?.ToString() ?? string.Empty;
                     break;
-                case 2 or 3 or 4:
+                case RadioButtonMode.ProductRegister or RadioButtonMode.RePrint or RadioButtonMode.SubstrateChange:
                     _productMaster.CategoryName = CategoryListBox1.SelectedItem?.ToString() ?? string.Empty;
                     _productMaster.ProductName = CategoryListBox2.SelectedItem?.ToString() ?? string.Empty;
                     break;
@@ -243,10 +243,10 @@ namespace ProductDatabase {
         // 品目選択時に該当マスターデータをDBから読み込む
         private void LoadHistoryWithSelection(long itemId) {
             switch (RadioButtonNumber) {
-                case 1:
+                case RadioButtonMode.Substrate:
                     _substrateMaster.LoadFrom(_productRepository.GetSubstrateById(itemId));
                     break;
-                case 2 or 3 or 4:
+                case RadioButtonMode.ProductRegister or RadioButtonMode.RePrint or RadioButtonMode.SubstrateChange:
                     _productMaster.LoadFrom(_productRepository.GetProductById(itemId));
                     break;
                 default:
@@ -255,14 +255,14 @@ namespace ProductDatabase {
         }
 
         private record CategoryConfig(string OrderKey, string IdKey, string NameKey);
-        private readonly Dictionary<int, CategoryConfig> _categoryConfigs = new() {
-            { 1, new CategoryConfig("SubstrateName", "SubstrateID", "SubstrateName") }, // 基板登録
-            { 2, new CategoryConfig("ProductType",   "ProductID",   "ProductType")   }, // 製品登録
-            { 3, new CategoryConfig("ProductType",   "ProductID",   "ProductType")   }, // 再印刷
-            { 4, new CategoryConfig("ProductType",   "ProductID",   "ProductType")   }  // 基板変更
+        private readonly Dictionary<RadioButtonMode, CategoryConfig> _categoryConfigs = new() {
+            { RadioButtonMode.Substrate,        new CategoryConfig("SubstrateName", "SubstrateID", "SubstrateName") }, // 基板登録
+            { RadioButtonMode.ProductRegister,  new CategoryConfig("ProductType",   "ProductID",   "ProductType")   }, // 製品登録
+            { RadioButtonMode.RePrint,          new CategoryConfig("ProductType",   "ProductID",   "ProductType")   }, // 再印刷
+            { RadioButtonMode.SubstrateChange,  new CategoryConfig("ProductType",   "ProductID",   "ProductType")   }  // 基板変更
         };
         // ラジオボタン選択時にモードに応じたマスターデータをフィルタしてCategoryListBox1にカテゴリ一覧を表示する
-        private void CategorySelect(object sender) {
+        private void CategorySelect(RadioButtonMode mode) {
 
             RegisterButton.Enabled = false;
             HistoryButton.Enabled = false;
@@ -270,13 +270,7 @@ namespace ProductDatabase {
             CategoryListBox2.Items.Clear();
             CategoryListBox3.Items.Clear();
 
-            // RadioButton の Tag 取得
-            if (sender is not RadioButton rb ||
-                !int.TryParse(rb.Tag?.ToString(), out int number)) {
-                return;
-            }
-
-            RadioButtonNumber = number;
+            RadioButtonNumber = mode;
 
             // 未定義モード防止
             if (!_categoryConfigs.ContainsKey(RadioButtonNumber)) {
@@ -285,7 +279,7 @@ namespace ProductDatabase {
             }
 
             // データソース切替
-            bool isSubstrateMode = RadioButtonNumber == 1;
+            bool isSubstrateMode = RadioButtonNumber == RadioButtonMode.Substrate;
 
             var sourceTable = isSubstrateMode
                 ? _productRepository.SubstrateDataTable
@@ -296,10 +290,10 @@ namespace ProductDatabase {
                 .AsEnumerable()
                 .Where(r => r.Field<long?>("Visible") == 1)
                 .Where(r => RadioButtonNumber switch {
-                    1 => true,
-                    2 => true,
-                    3 => r.Field<long?>("SerialPrintType") is long spt && spt != 0,
-                    4 => r.Field<long?>("SheetPrintType") is long shp && (shp == 2 || shp == 3),
+                    RadioButtonMode.Substrate => true,
+                    RadioButtonMode.ProductRegister => true,
+                    RadioButtonMode.RePrint => r.Field<long?>("SerialPrintType") is long spt && spt != 0,
+                    RadioButtonMode.SubstrateChange => r.Field<long?>("SheetPrintType") is long shp && (shp == 2 || shp == 3),
                     _ => false
                 });
 
@@ -314,12 +308,12 @@ namespace ProductDatabase {
                 .ToList();
 
             CategoryListBox1.Items.AddRange([.. categoryNames]);
-            HistoryButton.Enabled = RadioButtonNumber != 4;
+            HistoryButton.Enabled = RadioButtonNumber != RadioButtonMode.SubstrateChange;
         }
         // カテゴリ選択時に一致する製品名またはSubstrateNameの一覧をListBox2に表示する
         private void CategoryListBox1Select() {
             RegisterButton.Enabled = false;
-            HistoryButton.Enabled = RadioButtonNumber != 4;
+            HistoryButton.Enabled = RadioButtonNumber != RadioButtonMode.SubstrateChange;
             CategoryListBox2.Items.Clear();
             CategoryListBox3.Items.Clear();
 
@@ -345,7 +339,7 @@ namespace ProductDatabase {
         // 製品名セレクト：カテゴリ・製品名に一致する品目一覧をListBox3に表示する
         private void CategoryListBox2Select() {
             RegisterButton.Enabled = false;
-            HistoryButton.Enabled = RadioButtonNumber != 4;
+            HistoryButton.Enabled = RadioButtonNumber != RadioButtonMode.SubstrateChange;
             CategoryListBox3.Items.Clear();
 
             if (CategoryListBox1.SelectedItem is null ||
@@ -567,7 +561,10 @@ namespace ProductDatabase {
         private void CategoryListBox1_SelectedIndexChanged(object sender, EventArgs e) { CategoryListBox1Select(); }
         private void CategoryListBox2_SelectedIndexChanged(object sender, EventArgs e) { CategoryListBox2Select(); }
         private void CategoryListBox3_SelectedIndexChanged(object sender, EventArgs e) { CategoryListBox3Select(); }
-        private void CategoryRadioButton_CheckedChanged(object sender, EventArgs e) { CategorySelect(sender); }
+        private void CategoryRadioButton1_CheckedChanged(object sender, EventArgs e) { if (CategoryRadioButton1.Checked) { CategorySelect(RadioButtonMode.Substrate); } }
+        private void CategoryRadioButton2_CheckedChanged(object sender, EventArgs e) { if (CategoryRadioButton2.Checked) { CategorySelect(RadioButtonMode.ProductRegister); } }
+        private void CategoryRadioButton3_CheckedChanged(object sender, EventArgs e) { if (CategoryRadioButton3.Checked) { CategorySelect(RadioButtonMode.RePrint); } }
+        private void CategoryRadioButton4_CheckedChanged(object sender, EventArgs e) { if (CategoryRadioButton4.Checked) { CategorySelect(RadioButtonMode.SubstrateChange); } }
         private void FontSize_CheckedChanged(object sender, EventArgs e) { FontChange(sender); }
         private void CategoryListBox3_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode != Keys.Enter) { return; }

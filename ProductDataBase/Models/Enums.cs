@@ -23,4 +23,12 @@ namespace ProductDatabase.Models {
         RePrint,
         SubstrateChange
     }
+
+    // MainWindowのCategoryRadioButton1〜4で選択するモード
+    public enum RadioButtonMode {
+        Substrate = 1,       // 基板登録
+        ProductRegister = 2, // 製品登録
+        RePrint = 3,          // 再印刷
+        SubstrateChange = 4   // 基板変更
+    }
 }

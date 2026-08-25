@@ -168,11 +168,10 @@
             this.CategoryRadioButton1.Name = "CategoryRadioButton1";
             this.CategoryRadioButton1.Size = new Size(70, 30);
             this.CategoryRadioButton1.TabIndex = 1;
-            this.CategoryRadioButton1.Tag = "1";
             this.CategoryRadioButton1.Text = "基板登録";
             this.CategoryRadioButton1.TextAlign = ContentAlignment.MiddleCenter;
             this.CategoryRadioButton1.UseVisualStyleBackColor = true;
-            this.CategoryRadioButton1.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
+            this.CategoryRadioButton1.CheckedChanged += this.CategoryRadioButton1_CheckedChanged;
             // 
             // CategoryRadioButton2
             // 
@@ -181,11 +180,10 @@
             this.CategoryRadioButton2.Name = "CategoryRadioButton2";
             this.CategoryRadioButton2.Size = new Size(70, 30);
             this.CategoryRadioButton2.TabIndex = 2;
-            this.CategoryRadioButton2.Tag = "2";
             this.CategoryRadioButton2.Text = "製品登録";
             this.CategoryRadioButton2.TextAlign = ContentAlignment.MiddleCenter;
             this.CategoryRadioButton2.UseVisualStyleBackColor = true;
-            this.CategoryRadioButton2.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
+            this.CategoryRadioButton2.CheckedChanged += this.CategoryRadioButton2_CheckedChanged;
             // 
             // CategoryRadioButton3
             // 
@@ -194,11 +192,10 @@
             this.CategoryRadioButton3.Name = "CategoryRadioButton3";
             this.CategoryRadioButton3.Size = new Size(70, 30);
             this.CategoryRadioButton3.TabIndex = 3;
-            this.CategoryRadioButton3.Tag = "3";
             this.CategoryRadioButton3.Text = "再印刷";
             this.CategoryRadioButton3.TextAlign = ContentAlignment.MiddleCenter;
             this.CategoryRadioButton3.UseVisualStyleBackColor = true;
-            this.CategoryRadioButton3.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
+            this.CategoryRadioButton3.CheckedChanged += this.CategoryRadioButton3_CheckedChanged;
             // 
             // CategoryRadioButton4
             // 
@@ -207,11 +204,10 @@
             this.CategoryRadioButton4.Name = "CategoryRadioButton4";
             this.CategoryRadioButton4.Size = new Size(70, 30);
             this.CategoryRadioButton4.TabIndex = 4;
-            this.CategoryRadioButton4.Tag = "4";
             this.CategoryRadioButton4.Text = "基板変更";
             this.CategoryRadioButton4.TextAlign = ContentAlignment.MiddleCenter;
             this.CategoryRadioButton4.UseVisualStyleBackColor = true;
-            this.CategoryRadioButton4.CheckedChanged += this.CategoryRadioButton_CheckedChanged;
+            this.CategoryRadioButton4.CheckedChanged += this.CategoryRadioButton4_CheckedChanged;
             // 
             // CategoryListBox1
             // 
