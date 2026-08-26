@@ -46,8 +46,6 @@ namespace ProductDatabase {
         // フォームロード時にUIを初期化しDBから在庫数取得・チェックボックス状態設定・印刷設定読み込みを行う
         private void LoadEvents() {
             try {
-                Font = new Font(_appSettings.FontName, _appSettings.FontSize);
-
                 var inputControls = new Control[] {
                     OrderNumberTextBox, ManufacturingNumberMaskedTextBox, QuantityTextBox, DefectQuantityTextBox, CommentTextBox
                 };
@@ -476,7 +474,7 @@ namespace ProductDatabase {
                 View = View.Details,
                 FullRowSelect = true,
                 GridLines = true,
-                Font = new Font("PlemolJP", _appSettings.FontSize), // 等幅フォント
+                Font = new Font("PlemolJP", 10F), // 等幅フォント
             };
 
             listView.Columns.Add("", 0);   // 値列の幅（調整可）

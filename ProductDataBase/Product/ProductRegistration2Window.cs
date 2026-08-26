@@ -62,7 +62,6 @@ namespace ProductDatabase {
             try {
                 _dbScope.Begin();
 
-                SetFont();
                 InitializeUIControls();
 
                 if (_productMaster.IsSerialGeneration) {
@@ -113,10 +112,6 @@ namespace ProductDatabase {
                 _dbScope.Rollback();
             }
             _dbScope.Dispose();
-        }
-        // 設定フォントをフォームに適用する
-        private void SetFont() {
-            Font = new Font(_appSettings.FontName, _appSettings.FontSize);
         }
         // 登録ボタンと成績書ボタンの初期有効状態を設定する
         private void InitializeUIControls() {
@@ -959,7 +954,7 @@ namespace ProductDatabase {
                 View = View.Details,
                 FullRowSelect = true,
                 GridLines = true,
-                Font = new Font("PlemolJP", _appSettings.FontSize),
+                Font = new Font("PlemolJP", 10F),
             };
 
             listView.Columns.Add("", 0);   // 値列の幅（調整可）

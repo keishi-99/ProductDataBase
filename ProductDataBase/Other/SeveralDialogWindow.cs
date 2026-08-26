@@ -17,7 +17,6 @@ namespace ProductDatabase {
         // ロード時に品目候補リストを重複除去してListBoxに表示し先頭を選択する
         private void LoadEvents() {
             SeveralListBox.Items.Clear();
-            Font = new Font(_appSettings.FontName, _appSettings.FontSize);
             var j = 0;
 
             foreach (var category in _qrSettings.CategoryItemNumber) {

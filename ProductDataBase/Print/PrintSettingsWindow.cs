@@ -29,7 +29,6 @@ namespace ProductDatabase {
 
         // 呼び出し元ウィンドウの種類に応じて印刷設定とパスを読み込みPropertyGridに反映する
         private void LoadSettings() {
-            Font = new System.Drawing.Font(AppSettings.FontName, AppSettings.FontSize);
             switch (Owner) {
                 case ProductRegistration2Window productWindow:
                     LoadSettingsFromWindow(productWindow.ProductPrintSettings, productWindow.PrintSettingPath);

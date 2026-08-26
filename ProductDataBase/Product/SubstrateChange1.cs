@@ -35,8 +35,6 @@ namespace ProductDatabase {
 
         // フォームロード時にDBから対象製品の複数台登録履歴を取得しDataGridViewに表示する
         private void LoadEvents() {
-            Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
-
             HistoryTable = SubstrateChangeRepository.GetProductHistory(_productMaster.ProductID);
 
             SubstrateChangeDataGridView.DataSource = HistoryTable;
