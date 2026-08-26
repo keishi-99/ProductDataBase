@@ -1,5 +1,4 @@
 using ProductDatabase.Common;
-using ProductDatabase.Models;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -34,9 +33,8 @@ namespace ProductDatabase.LogViewer {
         private DataView _errorLogView = new();
         private CancellationTokenSource? _errorLoadCts;
 
-        public LogViewerWindow(AppSettings appSettings) {
+        public LogViewerWindow() {
             InitializeComponent();
-            Font = new Font(appSettings.FontName, appSettings.FontSize);
             InitializeDataGridView();
             InitializeYearMonthComboBox();
             InitializeErrorDataGridView();

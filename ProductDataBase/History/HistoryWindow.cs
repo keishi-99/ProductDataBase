@@ -162,8 +162,6 @@ namespace ProductDatabase.History {
 
         // ロード時に初期UIを設定しラジオボタンモードに応じた表示制御を行う
         private void LoadEvents() {
-            Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
-
             CategoryRadioButton1.Checked = true;
             CategoryComboBox.SelectedIndex = 0;
 

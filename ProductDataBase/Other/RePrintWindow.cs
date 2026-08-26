@@ -45,8 +45,6 @@ namespace ProductDatabase {
         // フォームロード時に初期UI設定・DBからのリビジョン取得・印刷設定読み込みを行う
         private void LoadEvents() {
             try {
-                Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
-
                 var inputControls = new Control[] {
                     OrderNumberTextBox, ManufacturingNumberMaskedTextBox, QuantityTextBox, FirstSerialNumberTextBox, RevisionTextBox, CommentTextBox
                 };
@@ -466,7 +464,7 @@ namespace ProductDatabase {
                 View = View.Details,
                 FullRowSelect = true,
                 GridLines = true,
-                Font = new Font("PlemolJP", _appSettings.FontSize),
+                Font = new Font("PlemolJP", 10F),
             };
 
             listView.Columns.Add("", 0);

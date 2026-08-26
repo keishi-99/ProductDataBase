@@ -17,8 +17,6 @@ namespace ProductDatabase.Models {
 
     public class AppSettings {
         public List<string> PersonList { get; set; } = [];
-        public string FontName { get; set; } = "Meiryo UI";
-        public float FontSize { get; set; } = 9;
         public bool IsAdministrator { get; set; } = false;
         public bool IsAuthorizedUser { get; set; } = false;
     }

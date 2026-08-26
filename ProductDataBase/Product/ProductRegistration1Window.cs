@@ -32,8 +32,6 @@ namespace ProductDatabase {
         // フォームロード時にUI初期化・DBからのリビジョン/シリアル取得・機種別メッセージ表示を行う
         private void LoadEvents() {
             try {
-                Font = new Font(_appSettings.FontName, _appSettings.FontSize);
-
                 var inputControls = new Control[] {
                     OrderNumberTextBox, ManufacturingNumberMaskedTextBox, QuantityTextBox, FirstSerialNumberTextBox, RevisionTextBox, OLesNumberTextBox, CommentTextBox
                 };
@@ -385,7 +383,7 @@ namespace ProductDatabase {
                 View = View.Details,
                 FullRowSelect = true,
                 GridLines = true,
-                Font = new Font("PlemolJP", _appSettings.FontSize),
+                Font = new Font("PlemolJP", 10F),
             };
 
             listView.Columns.Add("", 0);

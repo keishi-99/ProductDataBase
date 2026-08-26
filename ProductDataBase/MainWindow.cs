@@ -12,7 +12,6 @@ namespace ProductDatabase {
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public RadioButtonMode RadioButtonNumber { get; set; }
-        private float _fontSize = SystemFonts.DefaultFont.Size;
         private IEnumerable<DataRow> _currentTargetRows = [];
 
         private BarcodeService? _barcodeService;
@@ -129,8 +128,6 @@ namespace ProductDatabase {
             _substrateRegisterWork.Reset();
 
             _productRepository.LoadAll();
-
-            _appSettings.FontSize = _fontSize;
         }
         // 実行中のEXEファイルをロックして二重起動を防止する
         private static void LockSelf() {
@@ -523,20 +520,6 @@ namespace ProductDatabase {
             QRCodeTextBox.Focus();
         }
 
-        // ラジオボタン選択に応じてアプリ全体のフォントサイズを変更する
-        private void FontChange(object sender) {
-            var radioButton = (RadioButton)sender;
-
-            _fontSize = radioButton.Name switch {
-                "FontSize9RadioButton" => 9,
-                "FontSize12RadioButton" => 12,
-                "FontSize14RadioButton" => 14,
-                _ => _fontSize
-            };
-
-            _appSettings.FontSize = _fontSize;
-            Font = new System.Drawing.Font(_appSettings.FontName, _appSettings.FontSize);
-        }
         private void MainWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void ReloadToolStripMenuItem_Click(object sender, EventArgs e) { LoadEvents(); }
         private void ConfigReportToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -565,7 +548,6 @@ namespace ProductDatabase {
         private void CategoryRadioButton2_CheckedChanged(object sender, EventArgs e) { if (CategoryRadioButton2.Checked) { CategorySelect(RadioButtonMode.ProductRegister); } }
         private void CategoryRadioButton3_CheckedChanged(object sender, EventArgs e) { if (CategoryRadioButton3.Checked) { CategorySelect(RadioButtonMode.RePrint); } }
         private void CategoryRadioButton4_CheckedChanged(object sender, EventArgs e) { if (CategoryRadioButton4.Checked) { CategorySelect(RadioButtonMode.SubstrateChange); } }
-        private void FontSize_CheckedChanged(object sender, EventArgs e) { FontChange(sender); }
         private void CategoryListBox3_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode != Keys.Enter) { return; }
             Registration();
@@ -578,7 +560,7 @@ namespace ProductDatabase {
         private void QRCodeTextBox_Enter(object sender, EventArgs e) { CommonUtils.Keyboard.CapsDisable(); }
 
         private void LogViewerToolStripMenuItem_Click(object sender, EventArgs e) {
-            using var window = new LogViewerWindow(_appSettings);
+            using var window = new LogViewerWindow();
             window.ShowDialog(this);
         }
 

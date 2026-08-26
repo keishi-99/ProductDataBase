@@ -43,7 +43,6 @@ namespace ProductDatabase {
         // フォームロード時にUIを初期化し対象製品の基板在庫・使用状況をDBから取得してDataGridViewに表示する
         private void LoadEvents() {
             try {
-                Font = new Font(_appSettings.FontName, _appSettings.FontSize);
                 CloseButton.Enabled = true;
 
                 PersonComboBox.SelectedIndexChanged += InputControls_TextChanged;
