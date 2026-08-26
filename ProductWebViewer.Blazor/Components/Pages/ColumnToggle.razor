@@ -1,0 +1,27 @@
+@* テーブルの列表示/非表示を切り替えるドロップダウン（本家 Index.cshtml の「列」ドロップダウンに相当） *@
+<div class="dropdown d-inline-block mb-1">
+    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">列</button>
+    <ul class="dropdown-menu p-1" style="max-height:400px;overflow-y:auto;min-width:160px;">
+        @foreach (var (label, _) in Columns) {
+            <li>
+                <label class="dropdown-item d-flex align-items-center gap-2 py-1" style="cursor:pointer">
+                    <input type="checkbox" checked="@(!Hidden.Contains(label))" @onchange="e => Toggle(label, (bool)e.Value!)" />
+                    @label
+                </label>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public (string Label, string SortKey)[] Columns { get; set; } = [];
+    [Parameter, EditorRequired] public HashSet<string> Hidden { get; set; } = [];
+    // Hiddenはミュータブルな参照型のためここでの変更は親のフィールドにも反映されるが、
+    // 親側の再描画は自動では起きないため、明示的に再描画をトリガーしてもらう
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private async Task Toggle(string label, bool visible) {
+        if (visible) Hidden.Remove(label); else Hidden.Add(label);
+        if (OnChanged.HasDelegate) await OnChanged.InvokeAsync();
+    }
+}

@@ -1,0 +1,159 @@
+@page "/operationlog"
+@rendermode InteractiveServer
+@using ProductWebViewer.Blazor.Data
+@using ProductWebViewer.Blazor.Models
+@inject LogRecordRepository LogRepo
+
+<PageTitle>操作ログ</PageTitle>
+
+<h3 class="mb-3">操作ログ</h3>
+
+@if (_availableMonths.Count == 0) {
+    <div class="text-center text-muted py-5">ログファイルがありません</div>
+} else {
+    <div class="row g-2 mb-3 align-items-end">
+        <div class="col-auto">
+            <label class="form-label">対象月</label>
+            <select class="form-select" value="@_yearMonth" @onchange="OnYearMonthChangedAsync">
+                @foreach (var ym in _availableMonths) {
+                    <option value="@ym">@ym[..4]年@(ym[4..])月</option>
+                }
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="form-label">操作種別</label>
+            <select class="form-select" value="@_operationType" @onchange="OnOperationTypeChangedAsync">
+                <option value="">（すべて）</option>
+                @foreach (var t in _operationTypes) {
+                    <option value="@t">@t</option>
+                }
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="form-label">キーワード</label>
+            <input type="text" class="form-control" @bind="_keyword" @bind:event="oninput" />
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-primary" @onclick="ApplyFilter">検索</button>
+        </div>
+        <div class="col-auto ms-auto">
+            <span class="text-body-secondary">@_entries.Count 件表示中</span>
+        </div>
+    </div>
+
+    <div class="results-area">
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>日時</th>
+                        <th>操作種別</th>
+                        <th>カテゴリ</th>
+                        <th>ID</th>
+                        <th>注文番号</th>
+                        <th>製造番号</th>
+                        <th>OLes番号</th>
+                        <th>製品名</th>
+                        <th>タイプ</th>
+                        <th>型式</th>
+                        <th>数量</th>
+                        <th>シリアル先頭</th>
+                        <th>シリアル末尾</th>
+                        <th>Revision</th>
+                        <th>登録日</th>
+                        <th>担当者</th>
+                        <th>コメント</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in _entries) {
+                        <tr class="@RowCssClass(e.OperationType)">
+                            <td>@e.Timestamp</td>
+                            <td>@e.OperationType</td>
+                            <td>@e.Category</td>
+                            <td>@e.Id</td>
+                            <td>@e.OrderNumber</td>
+                            <td>@e.ProductNumber</td>
+                            <td>@e.OLesNumber</td>
+                            <td>@e.ProductName</td>
+                            <td>@e.ProductType</td>
+                            <td>@e.ProductModel</td>
+                            <td>@e.Quantity</td>
+                            <td>@e.SerialFirst</td>
+                            <td>@e.SerialLast</td>
+                            <td>@e.Revision</td>
+                            <td>@e.RegDate</td>
+                            <td>@e.PersonInfo</td>
+                            <td>@e.Comment</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@code {
+    private IReadOnlyList<string> _availableMonths = [];
+    private IReadOnlyList<string> _operationTypes = [];
+    private IReadOnlyList<LogEntry> _monthEntries = [];
+    private IReadOnlyList<LogEntry> _entries = [];
+
+    private string _yearMonth = "";
+    private string _operationType = "";
+    private string _keyword = "";
+
+    protected override void OnInitialized() {
+        _availableMonths = LogRepo.GetAvailableMonths();
+        if (_availableMonths.Count > 0) {
+            _yearMonth = _availableMonths[0];
+            LoadMonth();
+        }
+    }
+
+    private void LoadMonth() {
+        _monthEntries = LogRepo.GetLogEntries(_yearMonth);
+        _operationTypes = _monthEntries.Select(e => e.OperationType).Distinct().OrderBy(s => s).ToList();
+        if (!_operationTypes.Contains(_operationType))
+            _operationType = "";
+        ApplyFilter();
+    }
+
+    private Task OnYearMonthChangedAsync(ChangeEventArgs e) {
+        _yearMonth = e.Value?.ToString() ?? "";
+        LoadMonth();
+        return Task.CompletedTask;
+    }
+
+    private Task OnOperationTypeChangedAsync(ChangeEventArgs e) {
+        _operationType = e.Value?.ToString() ?? "";
+        ApplyFilter();
+        return Task.CompletedTask;
+    }
+
+    private void ApplyFilter() {
+        IEnumerable<LogEntry> filtered = _monthEntries;
+        if (!string.IsNullOrEmpty(_operationType))
+            filtered = filtered.Where(e => e.OperationType == _operationType);
+        if (!string.IsNullOrWhiteSpace(_keyword)) {
+            var keyword = _keyword.Trim();
+            filtered = filtered.Where(e =>
+                e.OperationType.Contains(keyword) || e.Category.Contains(keyword) || e.Id.Contains(keyword) ||
+                e.OrderNumber.Contains(keyword) || e.ProductNumber.Contains(keyword) || e.OLesNumber.Contains(keyword) ||
+                e.ProductName.Contains(keyword) || e.ProductType.Contains(keyword) || e.ProductModel.Contains(keyword) ||
+                e.Quantity.Contains(keyword) || e.SerialFirst.Contains(keyword) || e.SerialLast.Contains(keyword) ||
+                e.Revision.Contains(keyword) || e.RegDate.Contains(keyword) || e.PersonInfo.Contains(keyword) ||
+                e.Comment.Contains(keyword));
+        }
+        _entries = filtered.OrderByDescending(e => e.Timestamp).ToList();
+    }
+
+    // 操作種別に応じた行の背景色クラスを返す（メインアプリのLogViewerWindow.GetRowColorに準拠）
+    private static string RowCssClass(string operationType) {
+        if (operationType.Contains("削除")) return "table-danger";
+        if (operationType.Contains("編集")) return "table-warning";
+        if (operationType.Contains("製品登録")) return "table-info";
+        if (operationType.Contains("基板登録")) return "table-success";
+        return string.Empty;
+    }
+}

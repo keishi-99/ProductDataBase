@@ -1,0 +1,57 @@
+/* 本家 ProductWebViewer の Index.cshtml と同じリストボックス表示（select size指定 + 固定高さでスクロール） */
+.list-box {
+    height: 150px;
+    overflow: hidden;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 4px;
+}
+
+.list-box select {
+    width: 100%;
+    height: 100%;
+    border: none;
+    font-size: 0.85rem;
+    background: transparent;
+}
+
+.list-box select:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* 本家 ProductWebViewer の resizable-table と同じく、セル内では折り返さず省略表示にする */
+.results-area table td, .results-area table th {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 240px;
+}
+
+/* 検索結果エリア（件数表示・テーブル・ページネーション）をブラウザの表示領域に合わせて伸縮させる。
+   テーブル部分だけを内部スクロールにし、ページネーションは常に画面内に表示され続ける。 */
+.results-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.results-area .table-responsive {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 100px;
+}
+
+.results-area nav {
+    flex-shrink: 0;
+}
+
+/* 列見出しクリックでの並び替え（本家 Index.cshtml の sortable と同じ見た目） */
+th.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+th.sortable:hover {
+    background-color: var(--bs-secondary-bg);
+}

@@ -1,0 +1,37 @@
+﻿@inherits LayoutComponentBase
+
+<div class="d-flex flex-column vh-100">
+    <nav class="navbar navbar-expand navbar-dark bg-dark flex-shrink-0">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">製品・基板データ閲覧（Blazor練習版）</a>
+            <div class="d-flex align-items-center gap-3">
+                <a class="small text-light" href="/">登録実績</a>
+                <a class="small text-light" href="/operationlog">操作ログ</a>
+                <AuthorizeView>
+                    <Authorized>
+                        <form method="post" action="/auth/logout" class="d-flex m-0">
+                            <button type="submit" class="btn btn-outline-light btn-sm">ログアウト</button>
+                        </form>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a class="btn btn-outline-light btn-sm" href="/login">ログイン</a>
+                    </NotAuthorized>
+                </AuthorizeView>
+                <div class="form-check form-switch mb-0 text-light">
+                    <input class="form-check-input" type="checkbox" id="themeToggle" onchange="toggleTheme(this)" />
+                    <label class="form-check-label small" for="themeToggle">ダークモード</label>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid flex-grow-1 d-flex flex-column overflow-auto py-3">
+        @Body
+    </div>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>

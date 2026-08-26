@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <script>
+        (function () {
+            var theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
+    <ResourcePreloader />
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="stylesheet" href="@Assets["ProductWebViewer.Blazor.styles.css"]" />
+    <ImportMap />
+    <HeadOutlet />
+</head>
+
+<body>
+    <Routes />
+    <ReconnectModal />
+    <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script>
+        function toggleTheme(checkbox) {
+            var theme = checkbox.checked ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+        // data-bs-theme はクライアントJSでしか設定されない属性のため、Blazorの Enhanced Navigation
+        // （ページ遷移時にサーバーからのHTML差分で<html>を書き換える仕組み）が実行されるたびに
+        // 消されてしまう。遷移完了イベントで毎回テーマを再適用する。
+        function applyTheme() {
+            var theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            var toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = theme === 'dark';
+        }
+        applyTheme();
+        document.addEventListener('DOMContentLoaded', applyTheme);
+        window.Blazor?.addEventListener?.('enhancedload', applyTheme);
+    </script>
+</body>
+
+</html>

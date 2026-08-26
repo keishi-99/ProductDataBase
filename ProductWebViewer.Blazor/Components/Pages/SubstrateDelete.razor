@@ -1,0 +1,65 @@
+@page "/substrates/{Id:long}/delete"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using ProductWebViewer.Blazor.Data
+@using ProductWebViewer.Blazor.Models
+@inject SubstrateWriteRepository WriteRepo
+@inject AuditLogger AuditLogger
+@inject ILogger<SubstrateDelete> Logger
+@inject NavigationManager Navigation
+
+<PageTitle>基板登録の削除</PageTitle>
+
+@if (_notFound) {
+    <div class="alert alert-warning">対象の基板登録が見つかりませんでした。</div>
+} else if (_record is not null) {
+    <h3 class="mb-3">基板登録の削除（ID: @_record.Id）</h3>
+
+    @if (_errorMessage is not null) {
+        <div class="alert alert-danger">@_errorMessage</div>
+    }
+
+    <dl class="row">
+        <dt class="col-sm-2">製品名</dt><dd class="col-sm-10">@_record.ProductName</dd>
+        <dt class="col-sm-2">基板名</dt><dd class="col-sm-10">@_record.SubstrateName</dd>
+        <dt class="col-sm-2">基板型式</dt><dd class="col-sm-10">@_record.SubstrateModel</dd>
+        <dt class="col-sm-2">注文番号</dt><dd class="col-sm-10">@_record.OrderNumber</dd>
+        <dt class="col-sm-2">製造番号</dt><dd class="col-sm-10">@_record.SubstrateNumber</dd>
+        <dt class="col-sm-2">入庫/出庫/不良</dt><dd class="col-sm-10">@_record.Increase / @_record.Decrease / @_record.Defect</dd>
+        <dt class="col-sm-2">登録日</dt><dd class="col-sm-10">@_record.RegDate</dd>
+        <dt class="col-sm-2">コメント</dt><dd class="col-sm-10">@_record.Comment</dd>
+    </dl>
+
+    <button type="button" class="btn btn-outline-danger" @onclick="DeleteAsync">削除する</button>
+    <a href="/" class="btn btn-secondary">キャンセル</a>
+}
+
+@code {
+    [Parameter] public long Id { get; set; }
+
+    private SubstrateRecord? _record;
+    private bool _notFound;
+    private string? _errorMessage;
+
+    protected override void OnInitialized() {
+        _record = WriteRepo.GetById(Id);
+        if (_record is null) _notFound = true;
+    }
+
+    private void DeleteAsync() {
+        var before = _record!;
+        try {
+            if (!WriteRepo.DeleteSubstrate(Id)) {
+                _errorMessage = "この基板登録は他の操作で既に削除されています。";
+                return;
+            }
+        } catch (Exception ex) {
+            _errorMessage = ex.Message;
+            return;
+        }
+
+        AuditLogging.TryLog(Logger, () => AuditLogger.LogSubstrateDelete(before));
+
+        Navigation.NavigateTo("/");
+    }
+}
