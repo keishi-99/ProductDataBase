@@ -382,14 +382,20 @@ namespace ProductDatabase.Print {
                     throw new Exception("テンプレートファイルが開けませんでした。");
                 }
 
-                doc.StartPrint("", PrintOptionConstants.bpoDefault);
+                if (!doc.StartPrint("", PrintOptionConstants.bpoDefault)) {
+                    throw new Exception("印刷を開始できませんでした。");
+                }
 
                 foreach (var serialNumber in serialList) {
                     doc.GetObject("SerialNo").Text = serialNumber;
-                    doc.PrintOut(copiesPerLabel, PrintOptionConstants.bpoDefault);
+                    if (!doc.PrintOut(copiesPerLabel, PrintOptionConstants.bpoDefault)) {
+                        throw new Exception("印刷に失敗しました。");
+                    }
                 }
 
-                doc.EndPrint();
+                if (!doc.EndPrint()) {
+                    throw new Exception("印刷の終了処理に失敗しました。");
+                }
             } finally {
                 if (doc != null) {
                     doc.Close();

@@ -21,6 +21,7 @@ namespace ProductDatabase {
         public string PrintSettingPath = string.Empty;
 
         private readonly PrintManager _printManager = new();
+        private bool _isPrintInProgress;
         private readonly ProductMaster _productMaster;
         private readonly ProductRegisterWork _productRegisterWork;
         private readonly AppSettings _appSettings;
@@ -492,9 +493,9 @@ namespace ProductDatabase {
         private void ValidateAllInputs() {
             ErrorMessageLabel.Text = "";
 
-            LabelPrintButton.Enabled = _productMaster.IsLabelPrint;
-            BarcodePrintButton.Enabled = _productMaster.IsBarcodePrint;
-            NameplatePrintButton.Enabled = _productMaster.IsNameplatePrint;
+            LabelPrintButton.Enabled = !_isPrintInProgress && _productMaster.IsLabelPrint;
+            BarcodePrintButton.Enabled = !_isPrintInProgress && _productMaster.IsBarcodePrint;
+            NameplatePrintButton.Enabled = !_isPrintInProgress && _productMaster.IsNameplatePrint;
 
             シリアルラベル印刷プレビューToolStripMenuItem.Enabled = _productMaster.IsLabelPrint;
             バーコード印刷プレビューToolStripMenuItem.Enabled = _productMaster.IsBarcodePrint;
@@ -594,29 +595,38 @@ namespace ProductDatabase {
         private void RePrintWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
         private async void LabelPrintButton_Click(object sender, EventArgs e) {
+            if (_isPrintInProgress) { return; }
             _printManager.CurrentSerialType = SerialType.Label;
+            _isPrintInProgress = true;
             SetPrintButtonsEnabled(false);
             try {
                 await RegisterCheck(true);
             } finally {
+                _isPrintInProgress = false;
                 ValidateAllInputs();
             }
         }
         private async void BarcodePrintButton_Click(object sender, EventArgs e) {
+            if (_isPrintInProgress) { return; }
             _printManager.CurrentSerialType = SerialType.Barcode;
+            _isPrintInProgress = true;
             SetPrintButtonsEnabled(false);
             try {
                 await RegisterCheck(true);
             } finally {
+                _isPrintInProgress = false;
                 ValidateAllInputs();
             }
         }
         private async void NamePlatePrintButton_Click(object sender, EventArgs e) {
+            if (_isPrintInProgress) { return; }
             _printManager.CurrentSerialType = SerialType.Nameplate;
+            _isPrintInProgress = true;
             SetPrintButtonsEnabled(false);
             try {
                 await RegisterCheck(true);
             } finally {
+                _isPrintInProgress = false;
                 ValidateAllInputs();
             }
         }
