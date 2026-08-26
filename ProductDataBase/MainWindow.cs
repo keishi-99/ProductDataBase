@@ -147,25 +147,48 @@ namespace ProductDatabase {
 
             if (CategoryListBox3.SelectedItem is not ListItem<long> item) { return; }
 
+            var productId = item.Id;
+
+            if (productId == AttributeDialogSentinelId) {
+                if (!TryResolveAttributeVariant(out productId)) { return; }
+            }
+
             switch (RadioButtonNumber) {
                 case RadioButtonMode.Substrate:
                     HandleSubstrateRegistration(item.Id);
                     break;
 
                 case RadioButtonMode.ProductRegister:
-                    HandleProductRegistration(item.Id, ProductOperationMode.Register);
+                    HandleProductRegistration(productId, ProductOperationMode.Register);
                     break;
 
                 case RadioButtonMode.RePrint:
-                    HandleProductRegistration(item.Id, ProductOperationMode.RePrint);
+                    HandleProductRegistration(productId, ProductOperationMode.RePrint);
                     break;
 
                 case RadioButtonMode.SubstrateChange:
-                    HandleProductRegistration(item.Id, ProductOperationMode.SubstrateChange);
+                    HandleProductRegistration(productId, ProductOperationMode.SubstrateChange);
                     break;
             }
 
             QRCodeTextBox.Text = string.Empty;
+        }
+        // 選択中のカテゴリ・製品名に一致する仕様違いの候補を集めて属性選択ダイアログを開き、
+        // 確定したProductIDを返す。キャンセル時はfalseを返す
+        private bool TryResolveAttributeVariant(out long productId) {
+            productId = 0;
+
+            var candidateRows = _currentTargetRows
+                .Where(r =>
+                    r["CategoryName"]?.ToString() == CategoryListBox1.SelectedItem?.ToString() &&
+                    r["ProductName"]?.ToString() == CategoryListBox2.SelectedItem?.ToString())
+                .ToArray();
+
+            using var window = new ProductAttributeSelectWindow(candidateRows);
+            if (window.ShowDialog(this) != DialogResult.OK) { return false; }
+
+            productId = window.SelectedProductId;
+            return true;
         }
         // 指定基板IDのマスターを読み込み基板登録ウィンドウを開く
         private void HandleSubstrateRegistration(long substrateId) {
@@ -214,7 +237,13 @@ namespace ProductDatabase {
                 LoadHistoryWithoutSelection();
             }
             else {
-                LoadHistoryWithSelection(item.Id);
+                var productId = item.Id;
+
+                if (productId == AttributeDialogSentinelId) {
+                    if (!TryResolveAttributeVariant(out productId)) { return; }
+                }
+
+                LoadHistoryWithSelection(productId);
             }
 
             using var window = new HistoryWindow(
@@ -253,6 +282,11 @@ namespace ProductDatabase {
                     throw new InvalidOperationException("不正なモードです");
             }
         }
+
+        // 仕様(ProductType)違いの組み合わせが多い製品名(ProductName)。CategoryListBox3の先頭に
+        // ProductAttributeSelectWindowへの入口(AttributeDialogSentinelId)を追加する
+        private static readonly HashSet<string> AttributeVariantProductNames = ["PA2K"];
+        private const long AttributeDialogSentinelId = -1;
 
         private record CategoryConfig(string OrderKey, string IdKey, string NameKey);
         private readonly Dictionary<RadioButtonMode, CategoryConfig> _categoryConfigs = new() {
@@ -367,6 +401,12 @@ namespace ProductDatabase {
                 .Select(g => g.First())
                 .OrderBy(x => x.Name)
                 .ToList();
+
+            // 属性組み合わせが多い製品名は「仕様選択」ダイアログへの入口を先頭に追加する
+            if (RadioButtonNumber != RadioButtonMode.Substrate &&
+                AttributeVariantProductNames.Contains(CategoryListBox2.SelectedItem?.ToString() ?? string.Empty)) {
+                items.Insert(0, new ListItem<long> { Id = AttributeDialogSentinelId, Name = "仕様選択" });
+            }
 
             CategoryListBox3.Items.AddRange([.. items.Cast<object>()]);
         }
