@@ -41,6 +41,7 @@
             this.SubstrateChangeDataGridView.ReadOnly = true;
             this.SubstrateChangeDataGridView.Size = new Size(1184, 300);
             this.SubstrateChangeDataGridView.TabIndex = 1;
+            this.SubstrateChangeDataGridView.SelectionChanged += this.SubstrateChangeDataGridView_SelectionChanged;
             // 
             // label1
             // 

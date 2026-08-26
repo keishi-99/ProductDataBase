@@ -47,6 +47,9 @@ namespace ProductDatabase {
 
         // LoadSubstrateData中のCheckBox_CheckedChanged誤発火を防ぐフラグ
         private bool _isLoadingEvents = false;
+
+        // _dbScopeの接続・トランザクションをバックグラウンドで操作中はtrue。この間はウィンドウを閉じさせない
+        private bool _isDbOperationInProgress;
         // 排他グループによる自動OFFで警告が出ないよう抑制するフラグ
         private bool _suppressUncheckedWarning = false;
 
@@ -302,19 +305,25 @@ namespace ProductDatabase {
 
                 DisableControls();
 
-                using (var overlay = new LoadingOverlay(this)) {
-                    await Task.Run(() => {
-                        var usageLogs = Registration(_dbScope.Connection, _dbScope.Transaction);
+                _isDbOperationInProgress = true;
+                try {
+                    using (var overlay = new LoadingOverlay(this)) {
+                        await Task.Run(() => {
+                            var usageLogs = Registration(_dbScope.Connection, _dbScope.Transaction);
 
-                        HistoryAuditLogger.LogProductRegistration(_productMaster, _productRegisterWork);
-                        if (usageLogs.Count > 0) {
-                            HistoryAuditLogger.LogProductSubstrateUsage(usageLogs, _productMaster.CategoryName);
-                        }
-                        BackupManager.CreateBackup();
+                            HistoryAuditLogger.LogProductRegistration(_productMaster, _productRegisterWork);
+                            if (usageLogs.Count > 0) {
+                                HistoryAuditLogger.LogProductSubstrateUsage(usageLogs, _productMaster.CategoryName);
+                            }
+                            BackupManager.CreateBackup();
 
-                        // 登録チェック
-                        ProductRegistrationRepository.CheckRegistrationExists(_dbScope.Connection, _productRegisterWork.RowID);
-                    });
+                            // 登録チェック
+                            ProductRegistrationRepository.CheckRegistrationExists(_dbScope.Connection, _productRegisterWork.RowID);
+                        });
+                    }
+                } finally {
+                    _isDbOperationInProgress = false;
+                    CloseButton.Enabled = true;
                 }
 
                 // 登録完了メッセージ
@@ -623,11 +632,12 @@ namespace ProductDatabase {
                 }
             }
         }
-        // 登録ボタンと印刷位置入力コントロールを無効化して二重登録を防止する
+        // 登録ボタン・印刷位置入力コントロール・閉じるボタンを無効化して二重登録とDB処理中のクローズを防止する
         private void DisableControls() {
             RegisterButton.Enabled = false;
             SerialPrintPositionNumericUpDown.Enabled = false;
             BarcodePrintPositionNumericUpDown.Enabled = false;
+            CloseButton.Enabled = false;
         }
         // 指定タイプのフォーマットでシリアルリストを生成して返す（_printManager.CurrentSerialType を変更しない）
         private List<string> GenerateSerialListForType(SerialType type) {
@@ -979,6 +989,10 @@ namespace ProductDatabase {
             LoadEvents();
         }
         private void ProductRegistration2Window_FormClosing(object sender, FormClosingEventArgs e) {
+            if (_isDbOperationInProgress) {
+                e.Cancel = true;
+                return;
+            }
             ClosingEvents();
         }
         private async void RegisterButton_Click(object sender, EventArgs e) {

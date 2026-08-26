@@ -74,6 +74,7 @@ namespace ProductDatabase {
                 if (width is not null) { column.Width = width.Value; }
             }
 
+            OKButton.Enabled = SubstrateChangeDataGridView.SelectedCells.Count > 0;
         }
 
         // DataGridViewで選択した行の製品情報をWorkに格納しSubstrateChange2フォームをダイアログで開く
@@ -97,5 +98,6 @@ namespace ProductDatabase {
 
         private void SubstrateChange1_Load(object sender, EventArgs e) { LoadEvents(); }
         private void OKButton_Click(object sender, EventArgs e) { OpenSubstrateChangeWindow(); }
+        private void SubstrateChangeDataGridView_SelectionChanged(object sender, EventArgs e) { OKButton.Enabled = SubstrateChangeDataGridView.SelectedCells.Count > 0; }
     }
 }
