@@ -623,11 +623,12 @@ namespace ProductDatabase {
                 }
             }
         }
-        // 登録ボタンと印刷位置入力コントロールを無効化して二重登録を防止する
+        // 登録ボタン・印刷位置入力コントロール・閉じるボタンを無効化して二重登録とDB処理中のクローズを防止する
         private void DisableControls() {
             RegisterButton.Enabled = false;
             SerialPrintPositionNumericUpDown.Enabled = false;
             BarcodePrintPositionNumericUpDown.Enabled = false;
+            CloseButton.Enabled = false;
         }
         // 指定タイプのフォーマットでシリアルリストを生成して返す（_printManager.CurrentSerialType を変更しない）
         private List<string> GenerateSerialListForType(SerialType type) {

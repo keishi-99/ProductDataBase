@@ -126,7 +126,7 @@ namespace ProductDatabase {
                 MessageBox.Show("設定ファイルの読み込みに失敗しました:\n" + ex.Message, $"[{System.Reflection.MethodBase.GetCurrentMethod()?.Name ?? "不明なメソッド"}]エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        // 入力チェック後に確認ダイアログを表示してDB登録と印刷処理を実行する
+        // 入力チェック後に確認ダイアログを表示し、印刷が成功した場合のみDB登録処理を実行する
         private async Task RegisterCheck(bool isPrint) {
             if (!DataCheck()) { return; }
 
@@ -151,7 +151,6 @@ namespace ProductDatabase {
                     _productRegisterWork.PersonID = null;
                     _productRegisterWork.PersonName = string.Empty;
                 }
-                if (!Registration()) { throw new Exception("登録できませんでした。"); }
             }
 
             switch (_printManager.CurrentSerialType) {
@@ -171,6 +170,10 @@ namespace ProductDatabase {
                         return;
                     }
                     break;
+            }
+
+            if (isPrint) {
+                if (!Registration()) { throw new Exception("登録できませんでした。"); }
             }
         }
         // 再印刷テーブルにレコードを挿入しバックアップとログ記録を行う
@@ -582,19 +585,40 @@ namespace ProductDatabase {
             ValidateAllInputs();
         }
 
+        // 印刷処理中の二重クリックによる多重登録・多重印刷を防止する
+        private void SetPrintButtonsEnabled(bool enabled) {
+            LabelPrintButton.Enabled = enabled;
+            BarcodePrintButton.Enabled = enabled;
+            NameplatePrintButton.Enabled = enabled;
+        }
         private void RePrintWindow_Load(object sender, EventArgs e) { LoadEvents(); }
         private void QrCodeButton_Click(object sender, EventArgs e) { QrInput(); }
         private async void LabelPrintButton_Click(object sender, EventArgs e) {
             _printManager.CurrentSerialType = SerialType.Label;
-            await RegisterCheck(true);
+            SetPrintButtonsEnabled(false);
+            try {
+                await RegisterCheck(true);
+            } finally {
+                ValidateAllInputs();
+            }
         }
         private async void BarcodePrintButton_Click(object sender, EventArgs e) {
             _printManager.CurrentSerialType = SerialType.Barcode;
-            await RegisterCheck(true);
+            SetPrintButtonsEnabled(false);
+            try {
+                await RegisterCheck(true);
+            } finally {
+                ValidateAllInputs();
+            }
         }
         private async void NamePlatePrintButton_Click(object sender, EventArgs e) {
             _printManager.CurrentSerialType = SerialType.Nameplate;
-            await RegisterCheck(true);
+            SetPrintButtonsEnabled(false);
+            try {
+                await RegisterCheck(true);
+            } finally {
+                ValidateAllInputs();
+            }
         }
         private void 取得情報ToolStripMenuItem_Click(object sender, EventArgs e) { ShowInfo(); }
         private async void シリアルラベル印刷プレビューToolStripMenuItem_Click(object sender, EventArgs e) {
