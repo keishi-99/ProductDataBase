@@ -1,121 +1,125 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { useEffect, useState } from 'react'
+import { fetchCategories, fetchProducts, login, logout } from './api'
+import type { Product } from './types'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<string[]>([])
+  const [category, setCategory] = useState('')
+  const [keyword, setKeyword] = useState('')
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [password, setPassword] = useState('')
+  const [loginError, setLoginError] = useState<string | null>(null)
+
+  const loadProducts = async (currentCategory: string, currentKeyword: string) => {
+    try {
+      const data = await fetchProducts(currentCategory, currentKeyword)
+      setProducts(data)
+      setErrorMessage(null)
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : String(err))
+    }
+  }
+
+  useEffect(() => {
+    fetchCategories().then(setCategories).catch(() => {})
+    loadProducts('', '')
+  }, [])
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    loadProducts(category, keyword)
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const success = await login(password)
+    if (success) {
+      setIsLoggedIn(true)
+      setLoginError(null)
+      setPassword('')
+    } else {
+      setLoginError('パスワードが正しくありません。')
+    }
+  }
+
+  const handleLogout = async () => {
+    await logout()
+    setIsLoggedIn(false)
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="page">
+      <header className="header">
+        <h1>ProductWebViewer (Spring)</h1>
+        {isLoggedIn ? (
+          <button type="button" onClick={handleLogout}>ログアウト</button>
+        ) : (
+          <form className="login-form" onSubmit={handleLogin}>
+            <input
+              type="password"
+              placeholder="管理者パスワード"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button type="submit">ログイン</button>
+            {loginError && <span className="error">{loginError}</span>}
+          </form>
+        )}
+      </header>
 
-      <div className="ticks"></div>
+      <form className="search-form" onSubmit={handleSearch}>
+        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <option value="">すべてのカテゴリ</option>
+          {categories.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+        <input
+          type="text"
+          placeholder="製品名・注文番号・製造番号で検索"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+        />
+        <button type="submit">検索</button>
+      </form>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      {errorMessage && <p className="error">{errorMessage}</p>}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      <table className="product-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>カテゴリ</th>
+            <th>製品名</th>
+            <th>型式</th>
+            <th>注文番号</th>
+            <th>製造番号</th>
+            <th>OLES番号</th>
+            <th>数量</th>
+            <th>コメント</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((p) => (
+            <tr key={p.id}>
+              <td>{p.id}</td>
+              <td>{p.categoryName}</td>
+              <td>{p.productName}</td>
+              <td>{p.productModel}</td>
+              <td>{p.orderNumber}</td>
+              <td>{p.productNumber}</td>
+              <td>{p.olesNumber}</td>
+              <td>{p.quantity}</td>
+              <td>{p.comment}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
