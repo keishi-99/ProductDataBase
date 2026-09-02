@@ -12,3 +12,12 @@ export interface Product {
   comment: string | null
   createdAt: string | null
 }
+
+export interface AuditLog {
+  id: number
+  action: string
+  productId: number
+  productName: string | null
+  detail: string | null
+  createdAt: string
+}

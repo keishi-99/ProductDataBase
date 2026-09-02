@@ -1,4 +1,4 @@
-import type { Product } from './types'
+import type { AuditLog, Product } from './types'
 
 const API_BASE = ''
 
@@ -55,4 +55,10 @@ export async function deleteProduct(id: number): Promise<boolean> {
     credentials: 'include',
   })
   return res.ok
+}
+
+export async function fetchAuditLogs(): Promise<AuditLog[]> {
+  const res = await fetch(`${API_BASE}/api/audit-logs`, { credentials: 'include' })
+  if (!res.ok) throw new Error('操作ログの取得に失敗しました。')
+  return res.json()
 }

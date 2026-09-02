@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { deleteProduct, fetchCategories, fetchProducts, login, logout, updateProduct } from './api'
+import { deleteProduct, fetchAuditLogs, fetchCategories, fetchProducts, login, logout, updateProduct } from './api'
 import type { ProductEditFields } from './api'
-import type { Product } from './types'
+import type { AuditLog, Product } from './types'
 import './App.css'
 
 const emptyEditForm: ProductEditFields = { orderNumber: '', productNumber: '', olesNumber: '', comment: '' }
@@ -19,6 +19,9 @@ function App() {
 
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editForm, setEditForm] = useState<ProductEditFields>(emptyEditForm)
+
+  const [showAuditLogs, setShowAuditLogs] = useState(false)
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
 
   const loadProducts = async (currentCategory: string, currentKeyword: string) => {
     try {
@@ -90,6 +93,18 @@ function App() {
     } else {
       setErrorMessage('削除に失敗しました。')
     }
+  }
+
+  const toggleAuditLogs = async () => {
+    if (!showAuditLogs) {
+      try {
+        setAuditLogs(await fetchAuditLogs())
+      } catch (err) {
+        setErrorMessage(err instanceof Error ? err.message : String(err))
+        return
+      }
+    }
+    setShowAuditLogs(!showAuditLogs)
   }
 
   return (
@@ -205,6 +220,33 @@ function App() {
           )}
         </tbody>
       </table>
+
+      <button type="button" className="audit-log-toggle" onClick={toggleAuditLogs}>
+        {showAuditLogs ? '操作ログを隠す' : '操作ログを表示'}
+      </button>
+
+      {showAuditLogs && (
+        <table className="product-table">
+          <thead>
+            <tr>
+              <th>日時</th>
+              <th>操作</th>
+              <th>製品名</th>
+              <th>詳細</th>
+            </tr>
+          </thead>
+          <tbody>
+            {auditLogs.map((log) => (
+              <tr key={log.id}>
+                <td>{log.createdAt}</td>
+                <td>{log.action === 'DELETE' ? '削除' : '編集'}</td>
+                <td>{log.productName}</td>
+                <td>{log.detail}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   )
 }
