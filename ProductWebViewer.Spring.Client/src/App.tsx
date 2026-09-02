@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
-import { fetchCategories, fetchProducts, login, logout } from './api'
+import { deleteProduct, fetchCategories, fetchProducts, login, logout, updateProduct } from './api'
+import type { ProductEditFields } from './api'
 import type { Product } from './types'
 import './App.css'
+
+const emptyEditForm: ProductEditFields = { orderNumber: '', productNumber: '', olesNumber: '', comment: '' }
 
 function App() {
   const [products, setProducts] = useState<Product[]>([])
@@ -13,6 +16,9 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState<string | null>(null)
+
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [editForm, setEditForm] = useState<ProductEditFields>(emptyEditForm)
 
   const loadProducts = async (currentCategory: string, currentKeyword: string) => {
     try {
@@ -49,6 +55,41 @@ function App() {
   const handleLogout = async () => {
     await logout()
     setIsLoggedIn(false)
+  }
+
+  const startEdit = (p: Product) => {
+    setEditingId(p.id)
+    setEditForm({
+      orderNumber: p.orderNumber ?? '',
+      productNumber: p.productNumber ?? '',
+      olesNumber: p.olesNumber ?? '',
+      comment: p.comment ?? '',
+    })
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setEditForm(emptyEditForm)
+  }
+
+  const saveEdit = async (id: number) => {
+    const success = await updateProduct(id, editForm)
+    if (success) {
+      cancelEdit()
+      loadProducts(category, keyword)
+    } else {
+      setErrorMessage('更新に失敗しました。')
+    }
+  }
+
+  const handleDelete = async (p: Product) => {
+    if (!window.confirm(`「${p.productName}」を削除しますか？`)) return
+    const success = await deleteProduct(p.id)
+    if (success) {
+      loadProducts(category, keyword)
+    } else {
+      setErrorMessage('削除に失敗しました。')
+    }
   }
 
   return (
@@ -101,22 +142,67 @@ function App() {
             <th>OLES番号</th>
             <th>数量</th>
             <th>コメント</th>
+            {isLoggedIn && <th>操作</th>}
           </tr>
         </thead>
         <tbody>
-          {products.map((p) => (
-            <tr key={p.id}>
-              <td>{p.id}</td>
-              <td>{p.categoryName}</td>
-              <td>{p.productName}</td>
-              <td>{p.productModel}</td>
-              <td>{p.orderNumber}</td>
-              <td>{p.productNumber}</td>
-              <td>{p.olesNumber}</td>
-              <td>{p.quantity}</td>
-              <td>{p.comment}</td>
-            </tr>
-          ))}
+          {products.map((p) =>
+            editingId === p.id ? (
+              <tr key={p.id}>
+                <td>{p.id}</td>
+                <td>{p.categoryName}</td>
+                <td>{p.productName}</td>
+                <td>{p.productModel}</td>
+                <td>
+                  <input
+                    value={editForm.orderNumber}
+                    onChange={(e) => setEditForm({ ...editForm, orderNumber: e.target.value })}
+                  />
+                </td>
+                <td>
+                  <input
+                    value={editForm.productNumber}
+                    onChange={(e) => setEditForm({ ...editForm, productNumber: e.target.value })}
+                  />
+                </td>
+                <td>
+                  <input
+                    value={editForm.olesNumber}
+                    onChange={(e) => setEditForm({ ...editForm, olesNumber: e.target.value })}
+                  />
+                </td>
+                <td>{p.quantity}</td>
+                <td>
+                  <input
+                    value={editForm.comment}
+                    onChange={(e) => setEditForm({ ...editForm, comment: e.target.value })}
+                  />
+                </td>
+                <td>
+                  <button type="button" onClick={() => saveEdit(p.id)}>保存</button>
+                  <button type="button" onClick={cancelEdit}>キャンセル</button>
+                </td>
+              </tr>
+            ) : (
+              <tr key={p.id}>
+                <td>{p.id}</td>
+                <td>{p.categoryName}</td>
+                <td>{p.productName}</td>
+                <td>{p.productModel}</td>
+                <td>{p.orderNumber}</td>
+                <td>{p.productNumber}</td>
+                <td>{p.olesNumber}</td>
+                <td>{p.quantity}</td>
+                <td>{p.comment}</td>
+                {isLoggedIn && (
+                  <td>
+                    <button type="button" onClick={() => startEdit(p)}>編集</button>
+                    <button type="button" onClick={() => handleDelete(p)}>削除</button>
+                  </td>
+                )}
+              </tr>
+            )
+          )}
         </tbody>
       </table>
     </div>

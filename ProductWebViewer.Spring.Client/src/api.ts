@@ -1,6 +1,6 @@
 import type { Product } from './types'
 
-const API_BASE = 'http://localhost:8080'
+const API_BASE = ''
 
 export async function fetchProducts(category: string, keyword: string): Promise<Product[]> {
   const params = new URLSearchParams()
@@ -30,4 +30,29 @@ export async function login(password: string): Promise<boolean> {
 
 export async function logout(): Promise<void> {
   await fetch(`${API_BASE}/api/auth/logout`, { method: 'POST', credentials: 'include' })
+}
+
+export interface ProductEditFields {
+  orderNumber: string
+  productNumber: string
+  olesNumber: string
+  comment: string
+}
+
+export async function updateProduct(id: number, data: ProductEditFields): Promise<boolean> {
+  const res = await fetch(`${API_BASE}/api/products/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(data),
+  })
+  return res.ok
+}
+
+export async function deleteProduct(id: number): Promise<boolean> {
+  const res = await fetch(`${API_BASE}/api/products/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  })
+  return res.ok
 }
