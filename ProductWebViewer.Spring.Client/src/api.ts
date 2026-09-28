@@ -84,9 +84,39 @@ export async function fetchAuditLogs(): Promise<AuditLog[]> {
   return res.json()
 }
 
-export async function fetchSubstrates(): Promise<Substrate[]> {
-  const res = await fetch(`${API_BASE}/api/substrates`, { credentials: 'include' })
+export async function fetchSubstrates(category: string, productName: string, substrateName: string): Promise<Substrate[]> {
+  const params = new URLSearchParams()
+  if (category) params.set('category', category)
+  if (productName) params.set('productName', productName)
+  if (substrateName) params.set('substrateName', substrateName)
+
+  const res = await fetch(`${API_BASE}/api/substrates?${params}`, { credentials: 'include' })
   if (!res.ok) throw new Error('基板一覧の取得に失敗しました。')
+  return res.json()
+}
+
+export async function fetchSubstrateCategories(): Promise<string[]> {
+  const res = await fetch(`${API_BASE}/api/substrates/categories`, { credentials: 'include' })
+  if (!res.ok) throw new Error('カテゴリ一覧の取得に失敗しました。')
+  return res.json()
+}
+
+// カスケードリストボックス用: カテゴリで絞った製品名一覧
+export async function fetchSubstrateProductNames(category: string): Promise<string[]> {
+  const params = new URLSearchParams()
+  if (category) params.set('category', category)
+  const res = await fetch(`${API_BASE}/api/substrates/names?${params}`, { credentials: 'include' })
+  if (!res.ok) throw new Error('製品名一覧の取得に失敗しました。')
+  return res.json()
+}
+
+// カスケードリストボックス用: カテゴリ・製品名で絞った基板名一覧
+export async function fetchSubstrateNames(category: string, productName: string): Promise<string[]> {
+  const params = new URLSearchParams()
+  if (category) params.set('category', category)
+  if (productName) params.set('productName', productName)
+  const res = await fetch(`${API_BASE}/api/substrates/substrate-names?${params}`, { credentials: 'include' })
+  if (!res.ok) throw new Error('基板名一覧の取得に失敗しました。')
   return res.json()
 }
 

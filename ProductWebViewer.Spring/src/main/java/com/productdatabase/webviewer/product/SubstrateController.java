@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,8 +23,30 @@ public class SubstrateController {
     }
 
     @GetMapping
-    public List<Substrate> list() {
-        return substrateRepository.findAll();
+    public List<Substrate> list(
+        @RequestParam(required = false) String category,
+        @RequestParam(required = false) String productName,
+        @RequestParam(required = false) String substrateName) {
+        return substrateRepository.findAll(category, productName, substrateName);
+    }
+
+    @GetMapping("/categories")
+    public List<String> categories() {
+        return substrateRepository.findCategories();
+    }
+
+    // カスケードリストボックス用: カテゴリで絞った製品名一覧
+    @GetMapping("/names")
+    public List<String> names(@RequestParam(required = false) String category) {
+        return substrateRepository.findProductNames(category);
+    }
+
+    // カスケードリストボックス用: カテゴリ・製品名で絞った基板名一覧
+    @GetMapping("/substrate-names")
+    public List<String> substrateNames(
+        @RequestParam(required = false) String category,
+        @RequestParam(required = false) String productName) {
+        return substrateRepository.findSubstrateNames(category, productName);
     }
 
     @GetMapping("/{id}")

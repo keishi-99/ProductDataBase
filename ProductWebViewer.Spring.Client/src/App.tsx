@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
-import { deleteProduct, deleteSubstrate, fetchAuditLogs, fetchCategories, fetchProductNames, fetchProducts, fetchProductTypes, fetchSubstrates, login, logout, updateProduct } from './api'
+import {
+  deleteProduct, deleteSubstrate, fetchAuditLogs, fetchCategories, fetchProductNames, fetchProducts, fetchProductTypes,
+  fetchSubstrateCategories, fetchSubstrateNames, fetchSubstrateProductNames, fetchSubstrates, login, logout, updateProduct,
+} from './api'
 import type { ProductEditFields } from './api'
 import type { AuditLog, Product, Substrate } from './types'
 import './App.css'
@@ -28,6 +31,12 @@ function App() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
 
   const [substrates, setSubstrates] = useState<Substrate[]>([])
+  const [subCategories, setSubCategories] = useState<string[]>([])
+  const [subCategory, setSubCategory] = useState('')
+  const [subProductNames, setSubProductNames] = useState<string[]>([])
+  const [subProductNameFilter, setSubProductNameFilter] = useState('')
+  const [substrateNames, setSubstrateNames] = useState<string[]>([])
+  const [substrateNameFilter, setSubstrateNameFilter] = useState('')
 
   const loadProducts = async (currentCategory: string, currentProductName: string, currentProductType: string, currentKeyword: string) => {
     try {
@@ -39,9 +48,9 @@ function App() {
     }
   }
 
-  const loadSubstrates = async () => {
+  const loadSubstrates = async (currentCategory: string, currentProductName: string, currentSubstrateName: string) => {
     try {
-      setSubstrates(await fetchSubstrates())
+      setSubstrates(await fetchSubstrates(currentCategory, currentProductName, currentSubstrateName))
       setErrorMessage(null)
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : String(err))
@@ -53,7 +62,11 @@ function App() {
     fetchProductNames('').then(setProductNames).catch(() => {})
     fetchProductTypes('', '').then(setProductTypes).catch(() => {})
     loadProducts('', '', '', '')
-    loadSubstrates()
+
+    fetchSubstrateCategories().then(setSubCategories).catch(() => {})
+    fetchSubstrateProductNames('').then(setSubProductNames).catch(() => {})
+    fetchSubstrateNames('', '').then(setSubstrateNames).catch(() => {})
+    loadSubstrates('', '', '')
   }, [])
 
   const handleSearch = (e: React.FormEvent) => {
@@ -91,6 +104,38 @@ function App() {
   const handleProductTypeChange = (value: string) => {
     setProductTypeFilter(value)
     loadProducts(category, productNameFilter, value, keyword)
+  }
+
+  // 基板タブ用カスケードリストボックス: カテゴリを選ぶと、製品名・基板名の候補を絞り込んで即座に検索する
+  const handleSubCategoryChange = async (value: string) => {
+    setSubCategory(value)
+    setSubProductNameFilter('')
+    setSubstrateNameFilter('')
+    try {
+      setSubProductNames(await fetchSubstrateProductNames(value))
+      setSubstrateNames(await fetchSubstrateNames(value, ''))
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : String(err))
+    }
+    loadSubstrates(value, '', '')
+  }
+
+  // 基板タブ用カスケードリストボックス: 製品名を選ぶと、基板名の候補を絞り込んで即座に検索する
+  const handleSubProductNameChange = async (value: string) => {
+    setSubProductNameFilter(value)
+    setSubstrateNameFilter('')
+    try {
+      setSubstrateNames(await fetchSubstrateNames(subCategory, value))
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : String(err))
+    }
+    loadSubstrates(subCategory, value, '')
+  }
+
+  // 基板タブ用カスケードリストボックス: 基板名を選ぶと即座に検索する
+  const handleSubstrateNameChange = (value: string) => {
+    setSubstrateNameFilter(value)
+    loadSubstrates(subCategory, subProductNameFilter, value)
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -149,7 +194,7 @@ function App() {
     if (!window.confirm(`「${s.substrateName}」を削除しますか？`)) return
     const success = await deleteSubstrate(s.id)
     if (success) {
-      loadSubstrates()
+      loadSubstrates(subCategory, subProductNameFilter, substrateNameFilter)
     } else {
       setErrorMessage('削除に失敗しました。')
     }
@@ -188,51 +233,6 @@ function App() {
         )}
       </header>
 
-      <form className="search-form-listbox" onSubmit={handleSearch}>
-        <div className="listbox-group">
-          <div className="listbox-label">カテゴリ</div>
-          <div className="list-box">
-            <select size={10} value={category} onChange={(e) => handleCategoryChange(e.target.value)}>
-              <option value="">（すべて）</option>
-              {categories.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="listbox-group">
-          <div className="listbox-label">製品名</div>
-          <div className="list-box">
-            <select size={10} value={productNameFilter} onChange={(e) => handleProductNameChange(e.target.value)}>
-              <option value="">（すべて）</option>
-              {productNames.map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="listbox-group">
-          <div className="listbox-label">種別</div>
-          <div className="list-box">
-            <select size={10} value={productTypeFilter} onChange={(e) => handleProductTypeChange(e.target.value)}>
-              <option value="">（すべて）</option>
-              {productTypes.map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="search-form">
-          <input
-            type="text"
-            placeholder="製品名・注文番号・製造番号で検索"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-          />
-          <button type="submit" className="btn btn-primary">検索</button>
-        </div>
-      </form>
-
       {errorMessage && <p className="error">{errorMessage}</p>}
 
       <ul className="nav nav-tabs">
@@ -249,6 +249,91 @@ function App() {
              href="#auditLog" onClick={(e) => { e.preventDefault(); switchTab('auditLog') }}>操作ログ</a>
         </li>
       </ul>
+
+      {activeTab === 'product' && (
+        <form className="search-form-listbox" onSubmit={handleSearch}>
+          <div className="listbox-group">
+            <div className="listbox-label">カテゴリ</div>
+            <div className="list-box">
+              <select size={10} value={category} onChange={(e) => handleCategoryChange(e.target.value)}>
+                <option value="">（すべて）</option>
+                {categories.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="listbox-group">
+            <div className="listbox-label">製品名</div>
+            <div className="list-box">
+              <select size={10} value={productNameFilter} onChange={(e) => handleProductNameChange(e.target.value)}>
+                <option value="">（すべて）</option>
+                {productNames.map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="listbox-group">
+            <div className="listbox-label">種別</div>
+            <div className="list-box">
+              <select size={10} value={productTypeFilter} onChange={(e) => handleProductTypeChange(e.target.value)}>
+                <option value="">（すべて）</option>
+                {productTypes.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="search-form">
+            <input
+              type="text"
+              placeholder="製品名・注文番号・製造番号で検索"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
+            <button type="submit" className="btn btn-primary">検索</button>
+          </div>
+        </form>
+      )}
+
+      {activeTab === 'substrate' && (
+        <div className="search-form-listbox">
+          <div className="listbox-group">
+            <div className="listbox-label">カテゴリ</div>
+            <div className="list-box">
+              <select size={10} value={subCategory} onChange={(e) => handleSubCategoryChange(e.target.value)}>
+                <option value="">（すべて）</option>
+                {subCategories.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="listbox-group">
+            <div className="listbox-label">製品名</div>
+            <div className="list-box">
+              <select size={10} value={subProductNameFilter} onChange={(e) => handleSubProductNameChange(e.target.value)}>
+                <option value="">（すべて）</option>
+                {subProductNames.map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="listbox-group">
+            <div className="listbox-label">基板名</div>
+            <div className="list-box">
+              <select size={10} value={substrateNameFilter} onChange={(e) => handleSubstrateNameChange(e.target.value)}>
+                <option value="">（すべて）</option>
+                {substrateNames.map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
 
       {activeTab === 'product' && (
         <table className="product-table">
