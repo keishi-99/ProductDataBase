@@ -27,13 +27,29 @@ public class ProductController {
     @GetMapping
     public List<Product> list(
         @RequestParam(required = false) String category,
+        @RequestParam(required = false) String productName,
+        @RequestParam(required = false) String productType,
         @RequestParam(required = false) String keyword) {
-        return productRepository.findAll(category, keyword);
+        return productRepository.findAll(category, productName, productType, keyword);
     }
 
     @GetMapping("/categories")
     public List<String> categories() {
         return productRepository.findCategories();
+    }
+
+    // カスケードリストボックス用: カテゴリで絞った製品名一覧
+    @GetMapping("/names")
+    public List<String> names(@RequestParam(required = false) String category) {
+        return productRepository.findProductNames(category);
+    }
+
+    // カスケードリストボックス用: カテゴリ・製品名で絞った種別一覧
+    @GetMapping("/types")
+    public List<String> types(
+        @RequestParam(required = false) String category,
+        @RequestParam(required = false) String productName) {
+        return productRepository.findProductTypes(category, productName);
     }
 
     @GetMapping("/{id}")

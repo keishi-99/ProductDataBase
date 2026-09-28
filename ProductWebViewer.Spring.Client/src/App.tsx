@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { deleteProduct, deleteSubstrate, fetchAuditLogs, fetchCategories, fetchProducts, fetchSubstrates, login, logout, updateProduct } from './api'
+import { deleteProduct, deleteSubstrate, fetchAuditLogs, fetchCategories, fetchProductNames, fetchProducts, fetchProductTypes, fetchSubstrates, login, logout, updateProduct } from './api'
 import type { ProductEditFields } from './api'
 import type { AuditLog, Product, Substrate } from './types'
 import './App.css'
@@ -10,6 +10,10 @@ function App() {
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<string[]>([])
   const [category, setCategory] = useState('')
+  const [productNames, setProductNames] = useState<string[]>([])
+  const [productNameFilter, setProductNameFilter] = useState('')
+  const [productTypes, setProductTypes] = useState<string[]>([])
+  const [productTypeFilter, setProductTypeFilter] = useState('')
   const [keyword, setKeyword] = useState('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -25,9 +29,9 @@ function App() {
 
   const [substrates, setSubstrates] = useState<Substrate[]>([])
 
-  const loadProducts = async (currentCategory: string, currentKeyword: string) => {
+  const loadProducts = async (currentCategory: string, currentProductName: string, currentProductType: string, currentKeyword: string) => {
     try {
-      const data = await fetchProducts(currentCategory, currentKeyword)
+      const data = await fetchProducts(currentCategory, currentProductName, currentProductType, currentKeyword)
       setProducts(data)
       setErrorMessage(null)
     } catch (err) {
@@ -46,13 +50,47 @@ function App() {
 
   useEffect(() => {
     fetchCategories().then(setCategories).catch(() => {})
-    loadProducts('', '')
+    fetchProductNames('').then(setProductNames).catch(() => {})
+    fetchProductTypes('', '').then(setProductTypes).catch(() => {})
+    loadProducts('', '', '', '')
     loadSubstrates()
   }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    loadProducts(category, keyword)
+    loadProducts(category, productNameFilter, productTypeFilter, keyword)
+  }
+
+  // カスケードリストボックス: カテゴリを選ぶと、製品名・種別の候補を絞り込んで即座に検索する
+  const handleCategoryChange = async (value: string) => {
+    setCategory(value)
+    setProductNameFilter('')
+    setProductTypeFilter('')
+    try {
+      setProductNames(await fetchProductNames(value))
+      setProductTypes(await fetchProductTypes(value, ''))
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : String(err))
+    }
+    loadProducts(value, '', '', keyword)
+  }
+
+  // カスケードリストボックス: 製品名を選ぶと、種別の候補を絞り込んで即座に検索する
+  const handleProductNameChange = async (value: string) => {
+    setProductNameFilter(value)
+    setProductTypeFilter('')
+    try {
+      setProductTypes(await fetchProductTypes(category, value))
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : String(err))
+    }
+    loadProducts(category, value, '', keyword)
+  }
+
+  // カスケードリストボックス: 種別を選ぶと即座に検索する
+  const handleProductTypeChange = (value: string) => {
+    setProductTypeFilter(value)
+    loadProducts(category, productNameFilter, value, keyword)
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -91,7 +129,7 @@ function App() {
     const success = await updateProduct(id, editForm)
     if (success) {
       cancelEdit()
-      loadProducts(category, keyword)
+      loadProducts(category, productNameFilter, productTypeFilter, keyword)
     } else {
       setErrorMessage('更新に失敗しました。')
     }
@@ -101,7 +139,7 @@ function App() {
     if (!window.confirm(`「${p.productName}」を削除しますか？`)) return
     const success = await deleteProduct(p.id)
     if (success) {
-      loadProducts(category, keyword)
+      loadProducts(category, productNameFilter, productTypeFilter, keyword)
     } else {
       setErrorMessage('削除に失敗しました。')
     }
@@ -150,20 +188,49 @@ function App() {
         )}
       </header>
 
-      <form className="search-form" onSubmit={handleSearch}>
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="">すべてのカテゴリ</option>
-          {categories.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
-        <input
-          type="text"
-          placeholder="製品名・注文番号・製造番号で検索"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-        />
-        <button type="submit" className="btn btn-primary">検索</button>
+      <form className="search-form-listbox" onSubmit={handleSearch}>
+        <div className="listbox-group">
+          <div className="listbox-label">カテゴリ</div>
+          <div className="list-box">
+            <select size={10} value={category} onChange={(e) => handleCategoryChange(e.target.value)}>
+              <option value="">（すべて）</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="listbox-group">
+          <div className="listbox-label">製品名</div>
+          <div className="list-box">
+            <select size={10} value={productNameFilter} onChange={(e) => handleProductNameChange(e.target.value)}>
+              <option value="">（すべて）</option>
+              {productNames.map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="listbox-group">
+          <div className="listbox-label">種別</div>
+          <div className="list-box">
+            <select size={10} value={productTypeFilter} onChange={(e) => handleProductTypeChange(e.target.value)}>
+              <option value="">（すべて）</option>
+              {productTypes.map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="search-form">
+          <input
+            type="text"
+            placeholder="製品名・注文番号・製造番号で検索"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+          />
+          <button type="submit" className="btn btn-primary">検索</button>
+        </div>
       </form>
 
       {errorMessage && <p className="error">{errorMessage}</p>}

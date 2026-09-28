@@ -2,9 +2,11 @@ import type { AuditLog, Product, Substrate } from './types'
 
 const API_BASE = ''
 
-export async function fetchProducts(category: string, keyword: string): Promise<Product[]> {
+export async function fetchProducts(category: string, productName: string, productType: string, keyword: string): Promise<Product[]> {
   const params = new URLSearchParams()
   if (category) params.set('category', category)
+  if (productName) params.set('productName', productName)
+  if (productType) params.set('productType', productType)
   if (keyword) params.set('keyword', keyword)
 
   const res = await fetch(`${API_BASE}/api/products?${params}`, { credentials: 'include' })
@@ -15,6 +17,25 @@ export async function fetchProducts(category: string, keyword: string): Promise<
 export async function fetchCategories(): Promise<string[]> {
   const res = await fetch(`${API_BASE}/api/products/categories`, { credentials: 'include' })
   if (!res.ok) throw new Error('カテゴリ一覧の取得に失敗しました。')
+  return res.json()
+}
+
+// カスケードリストボックス用: カテゴリで絞った製品名一覧
+export async function fetchProductNames(category: string): Promise<string[]> {
+  const params = new URLSearchParams()
+  if (category) params.set('category', category)
+  const res = await fetch(`${API_BASE}/api/products/names?${params}`, { credentials: 'include' })
+  if (!res.ok) throw new Error('製品名一覧の取得に失敗しました。')
+  return res.json()
+}
+
+// カスケードリストボックス用: カテゴリ・製品名で絞った種別一覧
+export async function fetchProductTypes(category: string, productName: string): Promise<string[]> {
+  const params = new URLSearchParams()
+  if (category) params.set('category', category)
+  if (productName) params.set('productName', productName)
+  const res = await fetch(`${API_BASE}/api/products/types?${params}`, { credentials: 'include' })
+  if (!res.ok) throw new Error('種別一覧の取得に失敗しました。')
   return res.json()
 }
 

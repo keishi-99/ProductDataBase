@@ -21,7 +21,7 @@ public class ProductRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<Product> findAll(String category, String keyword) {
+    public List<Product> findAll(String category, String productName, String productType, String keyword) {
         var conditions = new ArrayList<String>();
         var params = new ArrayList<Object>();
         conditions.add("is_deleted = 0");
@@ -29,6 +29,14 @@ public class ProductRepository {
         if (category != null && !category.isBlank()) {
             conditions.add("category_name = ?");
             params.add(category);
+        }
+        if (productName != null && !productName.isBlank()) {
+            conditions.add("product_name = ?");
+            params.add(productName);
+        }
+        if (productType != null && !productType.isBlank()) {
+            conditions.add("product_type = ?");
+            params.add(productType);
         }
         if (keyword != null && !keyword.isBlank()) {
             conditions.add("(product_name LIKE ? OR order_number LIKE ? OR product_number LIKE ?)");
@@ -40,6 +48,38 @@ public class ProductRepository {
 
         var sql = "SELECT " + SELECT_COLUMNS + " FROM products WHERE " + String.join(" AND ", conditions) + " ORDER BY id DESC";
         return jdbcTemplate.query(sql, ProductRepository::mapRow, params.toArray());
+    }
+
+    // カスケードリストボックス用: カテゴリで絞った製品名一覧(未指定なら全件)
+    public List<String> findProductNames(String category) {
+        var conditions = new ArrayList<String>();
+        var params = new ArrayList<Object>();
+        conditions.add("is_deleted = 0");
+        if (category != null && !category.isBlank()) {
+            conditions.add("category_name = ?");
+            params.add(category);
+        }
+        var sql = "SELECT DISTINCT product_name FROM products WHERE " + String.join(" AND ", conditions) + " ORDER BY product_name";
+        return jdbcTemplate.queryForList(sql, String.class, params.toArray());
+    }
+
+    // カスケードリストボックス用: カテゴリ・製品名で絞った種別一覧(未指定なら全件)
+    public List<String> findProductTypes(String category, String productName) {
+        var conditions = new ArrayList<String>();
+        var params = new ArrayList<Object>();
+        conditions.add("is_deleted = 0");
+        conditions.add("product_type IS NOT NULL");
+        conditions.add("product_type != ''");
+        if (category != null && !category.isBlank()) {
+            conditions.add("category_name = ?");
+            params.add(category);
+        }
+        if (productName != null && !productName.isBlank()) {
+            conditions.add("product_name = ?");
+            params.add(productName);
+        }
+        var sql = "SELECT DISTINCT product_type FROM products WHERE " + String.join(" AND ", conditions) + " ORDER BY product_type";
+        return jdbcTemplate.queryForList(sql, String.class, params.toArray());
     }
 
     public Product findById(long id) {

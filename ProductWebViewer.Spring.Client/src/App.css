@@ -42,6 +42,44 @@ body {
   margin-bottom: 1rem;
 }
 
+/* 本家のカスケードリストボックス(カテゴリ→製品名→種別)相当 */
+.search-form-listbox {
+  margin-bottom: 1rem;
+}
+
+.listbox-group {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.listbox-label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.list-box {
+  width: 200px;
+  height: 150px;
+  overflow: hidden;
+  border: 1px solid var(--wv-border);
+  border-radius: 4px;
+}
+
+.list-box select {
+  width: 100%;
+  height: 100%;
+  border: none;
+  font-size: 0.85rem;
+  background: transparent;
+}
+
+.list-box select:focus {
+  outline: none;
+}
+
 .error {
   color: var(--wv-danger);
 }
