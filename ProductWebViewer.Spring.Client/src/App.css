@@ -44,3 +44,8 @@
 .audit-log-toggle {
   margin: 1.5rem 0 0.75rem;
 }
+
+.section-title {
+  margin: 2rem 0 0.75rem;
+  font-size: 1.1rem;
+}

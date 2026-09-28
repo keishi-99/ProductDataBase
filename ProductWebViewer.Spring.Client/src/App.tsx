@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { deleteProduct, fetchAuditLogs, fetchCategories, fetchProducts, login, logout, updateProduct } from './api'
+import { deleteProduct, deleteSubstrate, fetchAuditLogs, fetchCategories, fetchProducts, fetchSubstrates, login, logout, updateProduct } from './api'
 import type { ProductEditFields } from './api'
-import type { AuditLog, Product } from './types'
+import type { AuditLog, Product, Substrate } from './types'
 import './App.css'
 
 const emptyEditForm: ProductEditFields = { orderNumber: '', productNumber: '', olesNumber: '', comment: '' }
@@ -23,6 +23,8 @@ function App() {
   const [showAuditLogs, setShowAuditLogs] = useState(false)
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
 
+  const [substrates, setSubstrates] = useState<Substrate[]>([])
+
   const loadProducts = async (currentCategory: string, currentKeyword: string) => {
     try {
       const data = await fetchProducts(currentCategory, currentKeyword)
@@ -33,9 +35,19 @@ function App() {
     }
   }
 
+  const loadSubstrates = async () => {
+    try {
+      setSubstrates(await fetchSubstrates())
+      setErrorMessage(null)
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : String(err))
+    }
+  }
+
   useEffect(() => {
     fetchCategories().then(setCategories).catch(() => {})
     loadProducts('', '')
+    loadSubstrates()
   }, [])
 
   const handleSearch = (e: React.FormEvent) => {
@@ -90,6 +102,16 @@ function App() {
     const success = await deleteProduct(p.id)
     if (success) {
       loadProducts(category, keyword)
+    } else {
+      setErrorMessage('削除に失敗しました。')
+    }
+  }
+
+  const handleDeleteSubstrate = async (s: Substrate) => {
+    if (!window.confirm(`「${s.substrateName}」を削除しますか？`)) return
+    const success = await deleteSubstrate(s.id)
+    if (success) {
+      loadSubstrates()
     } else {
       setErrorMessage('削除に失敗しました。')
     }
@@ -221,6 +243,44 @@ function App() {
         </tbody>
       </table>
 
+      <h2 className="section-title">基板一覧</h2>
+      <table className="product-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>カテゴリ</th>
+            <th>製品名</th>
+            <th>基板名</th>
+            <th>型式</th>
+            <th>注文番号</th>
+            <th>製造番号</th>
+            <th>入庫/出庫/不良</th>
+            <th>コメント</th>
+            {isLoggedIn && <th>操作</th>}
+          </tr>
+        </thead>
+        <tbody>
+          {substrates.map((s) => (
+            <tr key={s.id}>
+              <td>{s.id}</td>
+              <td>{s.categoryName}</td>
+              <td>{s.productName}</td>
+              <td>{s.substrateName}</td>
+              <td>{s.substrateModel}</td>
+              <td>{s.orderNumber}</td>
+              <td>{s.substrateNumber}</td>
+              <td>{s.increase} / {s.decrease} / {s.defect}</td>
+              <td>{s.comment}</td>
+              {isLoggedIn && (
+                <td>
+                  <button type="button" onClick={() => handleDeleteSubstrate(s)}>削除</button>
+                </td>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
       <button type="button" className="audit-log-toggle" onClick={toggleAuditLogs}>
         {showAuditLogs ? '操作ログを隠す' : '操作ログを表示'}
       </button>
@@ -230,8 +290,9 @@ function App() {
           <thead>
             <tr>
               <th>日時</th>
+              <th>種別</th>
               <th>操作</th>
-              <th>製品名</th>
+              <th>対象名</th>
               <th>詳細</th>
             </tr>
           </thead>
@@ -239,8 +300,9 @@ function App() {
             {auditLogs.map((log) => (
               <tr key={log.id}>
                 <td>{log.createdAt}</td>
+                <td>{log.targetType === 'SUBSTRATE' ? '基板' : '製品'}</td>
                 <td>{log.action === 'DELETE' ? '削除' : '編集'}</td>
-                <td>{log.productName}</td>
+                <td>{log.targetName}</td>
                 <td>{log.detail}</td>
               </tr>
             ))}

@@ -13,25 +13,31 @@ public class AuditLogRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void log(String action, long productId, String detail) {
+    // targetType は "PRODUCT" または "SUBSTRATE"
+    public void log(String action, String targetType, long targetId, String detail) {
         jdbcTemplate.update(
-            "INSERT INTO audit_logs (action, product_id, detail, created_at) VALUES (?, ?, ?, datetime('now', 'localtime'))",
-            action, productId, detail
+            "INSERT INTO audit_logs (action, target_type, target_id, detail, created_at) VALUES (?, ?, ?, ?, datetime('now', 'localtime'))",
+            action, targetType, targetId, detail
         );
     }
 
     public List<AuditLog> findAll() {
+        // target_typeに応じてproducts/substratesのどちらかとだけ一致するようJOIN条件で振り分ける
         var sql = """
-            SELECT a.id, a.action, a.product_id, p.product_name, a.detail, a.created_at
+            SELECT a.id, a.action, a.target_type, a.target_id,
+                   COALESCE(p.product_name, s.substrate_name) AS target_name,
+                   a.detail, a.created_at
             FROM audit_logs a
-            LEFT JOIN products p ON a.product_id = p.id
+            LEFT JOIN products p ON a.target_type = 'PRODUCT' AND a.target_id = p.id
+            LEFT JOIN substrates s ON a.target_type = 'SUBSTRATE' AND a.target_id = s.id
             ORDER BY a.created_at DESC
             """;
         return jdbcTemplate.query(sql, (rs, rowNum) -> new AuditLog(
             rs.getLong("id"),
             rs.getString("action"),
-            rs.getLong("product_id"),
-            rs.getString("product_name"),
+            rs.getString("target_type"),
+            rs.getLong("target_id"),
+            rs.getString("target_name"),
             rs.getString("detail"),
             rs.getString("created_at")
         ));

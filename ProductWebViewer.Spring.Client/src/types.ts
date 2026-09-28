@@ -13,11 +13,29 @@ export interface Product {
   createdAt: string | null
 }
 
+export interface Substrate {
+  id: number
+  categoryName: string | null
+  productName: string | null
+  substrateName: string | null
+  substrateModel: string | null
+  orderNumber: string | null
+  substrateNumber: string | null
+  increase: number | null
+  decrease: number | null
+  defect: number | null
+  personInfo: string | null
+  regDate: string | null
+  comment: string | null
+  createdAt: string | null
+}
+
 export interface AuditLog {
   id: number
   action: string
-  productId: number
-  productName: string | null
+  targetType: 'PRODUCT' | 'SUBSTRATE'
+  targetId: number
+  targetName: string | null
   detail: string | null
   createdAt: string
 }

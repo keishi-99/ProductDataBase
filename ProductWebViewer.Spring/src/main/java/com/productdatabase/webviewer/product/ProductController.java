@@ -51,7 +51,7 @@ public class ProductController {
         var updated = productRepository.update(id, request.orderNumber(), request.productNumber(), request.olesNumber(), request.comment());
         if (!updated) return ResponseEntity.status(HttpStatus.CONFLICT).build();
 
-        auditLogRepository.log("EDIT", id, "注文番号:%s→%s, 製造番号:%s→%s, OLES番号:%s→%s, コメント:%s→%s".formatted(
+        auditLogRepository.log("EDIT", "PRODUCT", id, "注文番号:%s→%s, 製造番号:%s→%s, OLES番号:%s→%s, コメント:%s→%s".formatted(
             before.orderNumber(), request.orderNumber(),
             before.productNumber(), request.productNumber(),
             before.olesNumber(), request.olesNumber(),
@@ -68,7 +68,7 @@ public class ProductController {
         var deleted = productRepository.softDelete(id);
         if (!deleted) return ResponseEntity.status(HttpStatus.CONFLICT).build();
 
-        auditLogRepository.log("DELETE", id, "製品削除: %s (%s)".formatted(before.productName(), before.orderNumber()));
+        auditLogRepository.log("DELETE", "PRODUCT", id, "製品削除: %s (%s)".formatted(before.productName(), before.orderNumber()));
         return ResponseEntity.ok().build();
     }
 
