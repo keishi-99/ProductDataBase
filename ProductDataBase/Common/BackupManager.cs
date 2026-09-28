@@ -22,13 +22,6 @@ namespace ProductDatabase.Common {
 
                     FileUtils.CopyWithRetry(_originalFilePath, backupFilePath, true);
                     ManageBackupFiles();
-
-                    if (!string.IsNullOrEmpty(FileUtils.BackupPath)) {
-                        var backupPath = Path.Combine(FileUtils.BackupPath, "db", "ProductRegistry.db");
-                        if (Environment.CurrentDirectory != FileUtils.BackupPath) {
-                            FileUtils.CopyWithRetry(_originalFilePath, backupPath, true);
-                        }
-                    }
                 }
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(CreateBackup), ex, "バックアップ作成時にエラーが発生しました");
