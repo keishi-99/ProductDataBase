@@ -20,7 +20,7 @@ function App() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editForm, setEditForm] = useState<ProductEditFields>(emptyEditForm)
 
-  const [showAuditLogs, setShowAuditLogs] = useState(false)
+  const [activeTab, setActiveTab] = useState<'product' | 'substrate' | 'auditLog'>('product')
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
 
   const [substrates, setSubstrates] = useState<Substrate[]>([])
@@ -117,8 +117,9 @@ function App() {
     }
   }
 
-  const toggleAuditLogs = async () => {
-    if (!showAuditLogs) {
+  const switchTab = async (tab: 'product' | 'substrate' | 'auditLog') => {
+    // タブを開くたびに最新化する（削除操作の直後でも古いログが見えないように）
+    if (tab === 'auditLog') {
       try {
         setAuditLogs(await fetchAuditLogs())
       } catch (err) {
@@ -126,7 +127,7 @@ function App() {
         return
       }
     }
-    setShowAuditLogs(!showAuditLogs)
+    setActiveTab(tab)
   }
 
   return (
@@ -134,7 +135,7 @@ function App() {
       <header className="header">
         <h1>ProductWebViewer (Spring)</h1>
         {isLoggedIn ? (
-          <button type="button" onClick={handleLogout}>ログアウト</button>
+          <button type="button" className="btn btn-secondary" onClick={handleLogout}>ログアウト</button>
         ) : (
           <form className="login-form" onSubmit={handleLogin}>
             <input
@@ -143,7 +144,7 @@ function App() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button type="submit">ログイン</button>
+            <button type="submit" className="btn btn-primary">ログイン</button>
             {loginError && <span className="error">{loginError}</span>}
           </form>
         )}
@@ -162,130 +163,144 @@ function App() {
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
         />
-        <button type="submit">検索</button>
+        <button type="submit" className="btn btn-primary">検索</button>
       </form>
 
       {errorMessage && <p className="error">{errorMessage}</p>}
 
-      <table className="product-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>カテゴリ</th>
-            <th>製品名</th>
-            <th>型式</th>
-            <th>注文番号</th>
-            <th>製造番号</th>
-            <th>OLES番号</th>
-            <th>数量</th>
-            <th>コメント</th>
-            {isLoggedIn && <th>操作</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((p) =>
-            editingId === p.id ? (
-              <tr key={p.id}>
-                <td>{p.id}</td>
-                <td>{p.categoryName}</td>
-                <td>{p.productName}</td>
-                <td>{p.productModel}</td>
-                <td>
-                  <input
-                    value={editForm.orderNumber}
-                    onChange={(e) => setEditForm({ ...editForm, orderNumber: e.target.value })}
-                  />
-                </td>
-                <td>
-                  <input
-                    value={editForm.productNumber}
-                    onChange={(e) => setEditForm({ ...editForm, productNumber: e.target.value })}
-                  />
-                </td>
-                <td>
-                  <input
-                    value={editForm.olesNumber}
-                    onChange={(e) => setEditForm({ ...editForm, olesNumber: e.target.value })}
-                  />
-                </td>
-                <td>{p.quantity}</td>
-                <td>
-                  <input
-                    value={editForm.comment}
-                    onChange={(e) => setEditForm({ ...editForm, comment: e.target.value })}
-                  />
-                </td>
-                <td>
-                  <button type="button" onClick={() => saveEdit(p.id)}>保存</button>
-                  <button type="button" onClick={cancelEdit}>キャンセル</button>
-                </td>
-              </tr>
-            ) : (
-              <tr key={p.id}>
-                <td>{p.id}</td>
-                <td>{p.categoryName}</td>
-                <td>{p.productName}</td>
-                <td>{p.productModel}</td>
-                <td>{p.orderNumber}</td>
-                <td>{p.productNumber}</td>
-                <td>{p.olesNumber}</td>
-                <td>{p.quantity}</td>
-                <td>{p.comment}</td>
+      <ul className="nav nav-tabs">
+        <li className="nav-item">
+          <a className={`nav-link ${activeTab === 'product' ? 'active' : ''}`}
+             href="#product" onClick={(e) => { e.preventDefault(); switchTab('product') }}>製品一覧</a>
+        </li>
+        <li className="nav-item">
+          <a className={`nav-link ${activeTab === 'substrate' ? 'active' : ''}`}
+             href="#substrate" onClick={(e) => { e.preventDefault(); switchTab('substrate') }}>基板一覧</a>
+        </li>
+        <li className="nav-item">
+          <a className={`nav-link ${activeTab === 'auditLog' ? 'active' : ''}`}
+             href="#auditLog" onClick={(e) => { e.preventDefault(); switchTab('auditLog') }}>操作ログ</a>
+        </li>
+      </ul>
+
+      {activeTab === 'product' && (
+        <table className="product-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>カテゴリ</th>
+              <th>製品名</th>
+              <th>型式</th>
+              <th>注文番号</th>
+              <th>製造番号</th>
+              <th>OLES番号</th>
+              <th>数量</th>
+              <th>コメント</th>
+              {isLoggedIn && <th>操作</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((p) =>
+              editingId === p.id ? (
+                <tr key={p.id}>
+                  <td>{p.id}</td>
+                  <td>{p.categoryName}</td>
+                  <td>{p.productName}</td>
+                  <td>{p.productModel}</td>
+                  <td>
+                    <input
+                      value={editForm.orderNumber}
+                      onChange={(e) => setEditForm({ ...editForm, orderNumber: e.target.value })}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      value={editForm.productNumber}
+                      onChange={(e) => setEditForm({ ...editForm, productNumber: e.target.value })}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      value={editForm.olesNumber}
+                      onChange={(e) => setEditForm({ ...editForm, olesNumber: e.target.value })}
+                    />
+                  </td>
+                  <td>{p.quantity}</td>
+                  <td>
+                    <input
+                      value={editForm.comment}
+                      onChange={(e) => setEditForm({ ...editForm, comment: e.target.value })}
+                    />
+                  </td>
+                  <td>
+                    <button type="button" className="btn btn-primary" onClick={() => saveEdit(p.id)}>保存</button>
+                    <button type="button" className="btn btn-secondary" onClick={cancelEdit}>キャンセル</button>
+                  </td>
+                </tr>
+              ) : (
+                <tr key={p.id}>
+                  <td>{p.id}</td>
+                  <td>{p.categoryName}</td>
+                  <td>{p.productName}</td>
+                  <td>{p.productModel}</td>
+                  <td>{p.orderNumber}</td>
+                  <td>{p.productNumber}</td>
+                  <td>{p.olesNumber}</td>
+                  <td>{p.quantity}</td>
+                  <td>{p.comment}</td>
+                  {isLoggedIn && (
+                    <td>
+                      <button type="button" className="btn btn-outline-warning" onClick={() => startEdit(p)}>編集</button>
+                      <button type="button" className="btn btn-outline-danger" onClick={() => handleDelete(p)}>削除</button>
+                    </td>
+                  )}
+                </tr>
+              )
+            )}
+          </tbody>
+        </table>
+      )}
+
+      {activeTab === 'substrate' && (
+        <table className="product-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>カテゴリ</th>
+              <th>製品名</th>
+              <th>基板名</th>
+              <th>型式</th>
+              <th>注文番号</th>
+              <th>製造番号</th>
+              <th>入庫/出庫/不良</th>
+              <th>コメント</th>
+              {isLoggedIn && <th>操作</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {substrates.map((s) => (
+              <tr key={s.id}>
+                <td>{s.id}</td>
+                <td>{s.categoryName}</td>
+                <td>{s.productName}</td>
+                <td>{s.substrateName}</td>
+                <td>{s.substrateModel}</td>
+                <td>{s.orderNumber}</td>
+                <td>{s.substrateNumber}</td>
+                <td>{s.increase} / {s.decrease} / {s.defect}</td>
+                <td>{s.comment}</td>
                 {isLoggedIn && (
                   <td>
-                    <button type="button" onClick={() => startEdit(p)}>編集</button>
-                    <button type="button" onClick={() => handleDelete(p)}>削除</button>
+                    <button type="button" className="btn btn-outline-danger" onClick={() => handleDeleteSubstrate(s)}>削除</button>
                   </td>
                 )}
               </tr>
-            )
-          )}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      )}
 
-      <h2 className="section-title">基板一覧</h2>
-      <table className="product-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>カテゴリ</th>
-            <th>製品名</th>
-            <th>基板名</th>
-            <th>型式</th>
-            <th>注文番号</th>
-            <th>製造番号</th>
-            <th>入庫/出庫/不良</th>
-            <th>コメント</th>
-            {isLoggedIn && <th>操作</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {substrates.map((s) => (
-            <tr key={s.id}>
-              <td>{s.id}</td>
-              <td>{s.categoryName}</td>
-              <td>{s.productName}</td>
-              <td>{s.substrateName}</td>
-              <td>{s.substrateModel}</td>
-              <td>{s.orderNumber}</td>
-              <td>{s.substrateNumber}</td>
-              <td>{s.increase} / {s.decrease} / {s.defect}</td>
-              <td>{s.comment}</td>
-              {isLoggedIn && (
-                <td>
-                  <button type="button" onClick={() => handleDeleteSubstrate(s)}>削除</button>
-                </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <button type="button" className="audit-log-toggle" onClick={toggleAuditLogs}>
-        {showAuditLogs ? '操作ログを隠す' : '操作ログを表示'}
-      </button>
-
-      {showAuditLogs && (
+      {activeTab === 'auditLog' && (
         <table className="product-table">
           <thead>
             <tr>
