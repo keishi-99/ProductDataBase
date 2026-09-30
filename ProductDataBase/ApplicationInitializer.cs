@@ -19,6 +19,33 @@ namespace ProductDatabase {
             }
         }
 
+        // バックアップ先にDBバックアップ用の親フォルダ(db/backup)がなければ確認の上で作成する。
+        // 年月ごとのサブフォルダ(db/backup/年/月)は月が変わるたびに増えるため対象にせず、今までどおり自動作成する。
+        // 作成しない場合は false を返し、呼び出し側で当日の日次バックアップをスキップする
+        public bool EnsureDbBackupFolder(string backupPath) {
+            try {
+                if (string.IsNullOrWhiteSpace(backupPath) || !Directory.Exists(backupPath)) {
+                    // バックアップ先自体が未設定・未検出の場合は CreateDailyBackup 側で警告済みのためここでは何もしない
+                    return true;
+                }
+
+                var dbBackupFolder = Path.Combine(backupPath, "db", "backup");
+                if (Directory.Exists(dbBackupFolder)) return true;
+
+                var result = MessageBox.Show(
+                    $"バックアップ先\n'{dbBackupFolder}'\nにDBバックアップ用フォルダがありません。作成しますか？\n作成しない場合、本日の日次バックアップは保存されません。",
+                    "確認", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result != DialogResult.Yes) return false;
+
+                Directory.CreateDirectory(dbBackupFolder);
+                return true;
+            } catch (Exception ex) {
+                Logger.AppendErrorLog(nameof(EnsureDbBackupFolder), ex, "DBバックアップ用フォルダの確認に失敗しました");
+                return false;
+            }
+        }
+
         // バックアップ作成（エラーは非致命的）
         public void CreateDailyBackup(string backupPath) {
             try {
@@ -27,6 +54,33 @@ namespace ProductDatabase {
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(CreateDailyBackup), ex, "日次バックアップ作成失敗");
                 // 非致命的エラーなので継続
+            }
+        }
+
+        // バックアップ先にログ用フォルダ(db/logs)がなければ確認の上で作成する。
+        // 未作成のまま登録を行うと、ログ追記のたびにコピー失敗→リトライ待ち（最大10秒）が発生するため、起動時に一度だけ確認する
+        public void EnsureLogBackupFolder(string backupPath) {
+            try {
+                if (string.IsNullOrWhiteSpace(backupPath) || !Directory.Exists(backupPath)) {
+                    // バックアップ先自体が未設定・未検出の場合は CreateDailyBackup 側で警告済みのためここでは何もしない
+                    return;
+                }
+
+                var logFolder = Path.Combine(backupPath, "db", "logs");
+                if (Directory.Exists(logFolder)) return;
+
+                var result = MessageBox.Show(
+                    $"バックアップ先\n'{logFolder}'\nにログ用フォルダがありません。作成しますか？\n作成しない場合、ログのバックアップコピーは行われません。",
+                    "確認", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes) {
+                    Directory.CreateDirectory(logFolder);
+                } else {
+                    FileUtils.LogBackupEnabled = false;
+                }
+            } catch (Exception ex) {
+                Logger.AppendErrorLog(nameof(EnsureLogBackupFolder), ex, "バックアップ用ログフォルダの確認に失敗しました");
+                FileUtils.LogBackupEnabled = false;
             }
         }
 

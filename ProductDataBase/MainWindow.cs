@@ -75,7 +75,10 @@ namespace ProductDatabase {
                 }
 
                 // バックアップ作成
-                initializer.CreateDailyBackup(generalSettings.BackupFolderPath);
+                if (initializer.EnsureDbBackupFolder(generalSettings.BackupFolderPath)) {
+                    initializer.CreateDailyBackup(generalSettings.BackupFolderPath);
+                }
+                initializer.EnsureLogBackupFolder(generalSettings.BackupFolderPath);
 
                 // アプリ設定
                 try {
