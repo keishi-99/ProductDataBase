@@ -21,9 +21,11 @@ namespace ProductDatabase {
 
         // バックアップ先にDBバックアップ用の親フォルダ(db/backup)がなければ確認の上で作成する。
         // 年月ごとのサブフォルダ(db/backup/年/月)は月が変わるたびに増えるため対象にせず、今までどおり自動作成する。
-        // 作成しない場合は false を返し、呼び出し側で当日の日次バックアップをスキップする
-        public bool EnsureDbBackupFolder(string backupPath) {
+        // 作成しない場合は false を返し、呼び出し側で当日の日次バックアップをスキップする。
+        // 呼び出し前に FileUtils.BackupPath が設定されている前提
+        public bool EnsureDbBackupFolder() {
             try {
+                var backupPath = FileUtils.BackupPath;
                 if (string.IsNullOrWhiteSpace(backupPath) || !Directory.Exists(backupPath)) {
                     // バックアップ先自体が未設定・未検出の場合は CreateDailyBackup 側で警告済みのためここでは何もしない
                     return true;
@@ -46,10 +48,9 @@ namespace ProductDatabase {
             }
         }
 
-        // バックアップ作成（エラーは非致命的）
-        public void CreateDailyBackup(string backupPath) {
+        // バックアップ作成（エラーは非致命的）。呼び出し前に FileUtils.BackupPath が設定されている前提
+        public void CreateDailyBackup() {
             try {
-                FileUtils.BackupPath = backupPath;
                 BackupManager.CreateDailyBackup();
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(CreateDailyBackup), ex, "日次バックアップ作成失敗");
@@ -60,10 +61,12 @@ namespace ProductDatabase {
         // バックアップ先にログ用フォルダ(db/logs)がなければ確認の上で作成する。
         // 未作成のまま登録を行うと、ログ追記のたびにコピー失敗→リトライ待ち（最大10秒）が発生するため、起動時に一度だけ確認する。
         // 呼び出しのたびに一旦無効化してから判定することで、バックアップ先が利用不可の場合や、
-        // 再読み込みで状態が変わった場合でも LogBackupEnabled が古い値のまま残らないようにする
-        public void EnsureLogBackupFolder(string backupPath) {
+        // 再読み込みで状態が変わった場合でも LogBackupEnabled が古い値のまま残らないようにする。
+        // 呼び出し前に FileUtils.BackupPath が設定されている前提
+        public void EnsureLogBackupFolder() {
             FileUtils.LogBackupEnabled = false;
             try {
+                var backupPath = FileUtils.BackupPath;
                 if (string.IsNullOrWhiteSpace(backupPath) || !Directory.Exists(backupPath)) {
                     // バックアップ先自体が未設定・未検出の場合は CreateDailyBackup 側で警告済みのためここでは何もしない
                     return;
