@@ -75,6 +75,8 @@ namespace ProductDatabase {
                 }
 
                 // バックアップ作成
+                // DBバックアップ用フォルダの作成可否に関わらず、ログ側の判定でも使うため先に設定しておく
+                FileUtils.BackupPath = generalSettings.BackupFolderPath;
                 if (initializer.EnsureDbBackupFolder(generalSettings.BackupFolderPath)) {
                     initializer.CreateDailyBackup(generalSettings.BackupFolderPath);
                 }
