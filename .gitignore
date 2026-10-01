@@ -372,3 +372,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# VS Code - 個人のエディタ設定
+.vscode/
