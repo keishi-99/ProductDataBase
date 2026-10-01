@@ -14,6 +14,8 @@ namespace ProductDatabase.Common {
         /// </summary>
         /// <param name="message">記録する作業内容</param>
         public static void AppendLog(string[] message) {
+            // コピー失敗時のメッセージ表示はロック解放後に行う（lock中にダイアログを出すと、応答待ちの間 他スレッドのログ書き込みも止まってしまうため）
+            string? copyFailureMessage = null;
             try {
                 lock (_lockObject) {
                     if (!Directory.Exists(_logDirectory)) {
@@ -27,15 +29,24 @@ namespace ProductDatabase.Common {
 
                     File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
 
-                    if (!string.IsNullOrEmpty(FileUtils.BackupPath)) {
+                    if (!string.IsNullOrEmpty(FileUtils.BackupPath) && FileUtils.LogBackupEnabled) {
                         var cloneFilePath = Path.Combine(FileUtils.BackupPath, "db", "logs", logFileName);
                         if (cloneFilePath != logFilePath) {
-                            FileUtils.CopyWithRetry(logFilePath, cloneFilePath, true);
+                            // ログ本体の追記は成功しているので、コピー失敗時はメッセージだけ記録し処理を継続する
+                            try {
+                                FileUtils.CopyWithRetry(logFilePath, cloneFilePath, true);
+                            } catch (Exception ex) {
+                                copyFailureMessage = $"ログのバックアップコピーに失敗しました:\n{ex.Message}";
+                            }
                         }
                     }
                 }
             } catch (Exception ex) {
                 System.Diagnostics.Debug.WriteLine($"ログの書き込み中にエラーが発生しました: {ex.Message}");
+            }
+
+            if (copyFailureMessage is not null) {
+                MessageBox.Show(copyFailureMessage, "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -46,6 +57,8 @@ namespace ProductDatabase.Common {
         /// <param name="exception">例外</param>
         /// <param name="additionalInfo">追加情報（任意）</param>
         public static void AppendErrorLog(string methodName, Exception exception, string? additionalInfo = null) {
+            // コピー失敗時のメッセージ表示はロック解放後に行う（lock中にダイアログを出すと、応答待ちの間 他スレッドのログ書き込みも止まってしまうため）
+            string? copyFailureMessage = null;
             try {
                 lock (_lockObject) {
                     if (!Directory.Exists(_logDirectory)) {
@@ -64,15 +77,24 @@ namespace ProductDatabase.Common {
 
                     File.AppendAllText(errorFilePath, logEntry + Environment.NewLine);
 
-                    if (!string.IsNullOrEmpty(FileUtils.BackupPath)) {
+                    if (!string.IsNullOrEmpty(FileUtils.BackupPath) && FileUtils.LogBackupEnabled) {
                         var cloneFilePath = Path.Combine(FileUtils.BackupPath, "db", "logs", errorFileName);
                         if (cloneFilePath != errorFilePath) {
-                            FileUtils.CopyWithRetry(errorFilePath, cloneFilePath, true);
+                            // ログ本体の追記は成功しているので、コピー失敗時はメッセージだけ記録し処理を継続する
+                            try {
+                                FileUtils.CopyWithRetry(errorFilePath, cloneFilePath, true);
+                            } catch (Exception ex) {
+                                copyFailureMessage = $"エラーログのバックアップコピーに失敗しました:\n{ex.Message}";
+                            }
                         }
                     }
                 }
             } catch {
                 System.Diagnostics.Debug.WriteLine("エラーログの書き込み中に予期しないエラーが発生しました。");
+            }
+
+            if (copyFailureMessage is not null) {
+                MessageBox.Show(copyFailureMessage, "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
     }

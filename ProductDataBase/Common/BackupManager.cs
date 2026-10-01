@@ -25,27 +25,28 @@ namespace ProductDatabase.Common {
                 }
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(CreateBackup), ex, "バックアップ作成時にエラーが発生しました");
+                // lockの外でダイアログを表示する（lock中に表示すると、応答待ちの間 他スレッドのバックアップ処理も止まってしまうため）
                 MessageBox.Show($"バックアップの作成中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         // 当日分のバックアップが未作成の場合のみDBをバックアップフォルダにコピーする
         public static void CreateDailyBackup() {
+            // lockの外でダイアログを表示する（lock中に表示すると、応答待ちの間 他スレッドのバックアップ処理も止まってしまうため）
+            string? infoMessage = null;
             try {
                 lock (_lockObject) {
                     // フォルダ未設定
                     if (string.IsNullOrWhiteSpace(FileUtils.BackupPath)) {
                         Logger.AppendErrorLog(nameof(CreateDailyBackup), new InvalidOperationException("バックアップフォルダが設定されていません"), "設定確認が必要");
-                        MessageBox.Show("フォルダが設定されていません。バックアップは保存されません。",
-                            string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        infoMessage = "フォルダが設定されていません。バックアップは保存されません。";
                         return;
                     }
 
                     // ネットワークフォルダが見つからない
                     if (!Directory.Exists(FileUtils.BackupPath)) {
                         Logger.AppendErrorLog(nameof(CreateDailyBackup), new DirectoryNotFoundException($"バックアップフォルダが見つかりません: {FileUtils.BackupPath}"), null);
-                        MessageBox.Show($"'{FileUtils.BackupPath}'\nが見つかりません。バックアップは保存されません。",
-                            string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        infoMessage = $"'{FileUtils.BackupPath}'\nが見つかりません。バックアップは保存されません。";
                         return;
                     }
 
@@ -59,12 +60,17 @@ namespace ProductDatabase.Common {
                     var productRegistryFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db", "ProductRegistry.db");
 
                     if (!File.Exists(backupFile)) {
+                        // 年月ごとのサブフォルダは、親フォルダ(db/backup)の存在が EnsureDbBackupFolder で確認済みの前提のため、ここでは確認なしで自動作成する
                         Directory.CreateDirectory(backupFolder);
                         File.Copy(productRegistryFile, backupFile, overwrite: false);
                     }
                 }
             } catch (Exception ex) {
                 Logger.AppendErrorLog(nameof(CreateDailyBackup), ex, "日次バックアップの作成に失敗しました");
+            } finally {
+                if (infoMessage is not null) {
+                    MessageBox.Show(infoMessage, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
 
