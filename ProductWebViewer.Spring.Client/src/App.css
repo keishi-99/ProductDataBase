@@ -1,0 +1,213 @@
+/* 本家(ProductWebViewer, ASP.NET Core版)のBootstrapベースの配色・トーンに合わせた配色トークン */
+:root {
+  --wv-primary: #0d6efd;
+  --wv-primary-hover: #0b5ed7;
+  --wv-secondary: #6c757d;
+  --wv-secondary-hover: #5c636a;
+  --wv-danger: #dc3545;
+  --wv-warning: #ffc107;
+  --wv-warning-text: #664d03;
+  --wv-border: #dee2e6;
+  --wv-stripe: rgba(0, 0, 0, 0.03);
+  --wv-hover: rgba(0, 0, 0, 0.06);
+  --wv-header-bg: #f8f9fa;
+}
+
+/* 本家(ASP.NET Core版)はBootstrapデフォルト(ライトテーマ固定)のため、OSのダークモード設定に関わらず合わせる */
+body {
+  background-color: #fff;
+  color: #212529;
+}
+
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #212529;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-form,
+.search-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* 本家のカスケードリストボックス(カテゴリ→製品名→種別)相当 */
+.search-form-listbox {
+  margin-bottom: 1rem;
+}
+
+.listbox-group {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.listbox-label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.list-box {
+  width: 200px;
+  height: 150px;
+  overflow: hidden;
+  border: 1px solid var(--wv-border);
+  border-radius: 4px;
+}
+
+.list-box select {
+  width: 100%;
+  height: 100%;
+  border: none;
+  font-size: 0.85rem;
+  background: transparent;
+}
+
+.list-box select:focus {
+  outline: none;
+}
+
+.error {
+  color: var(--wv-danger);
+}
+
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.product-table th,
+.product-table td {
+  border: 1px solid var(--wv-border);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.product-table th {
+  background: var(--wv-header-bg);
+}
+
+/* table-striped 相当: 偶数行に薄い背景 */
+.product-table tbody tr:nth-child(even) {
+  background-color: var(--wv-stripe);
+}
+
+/* table-hover 相当 */
+.product-table tbody tr:hover {
+  background-color: var(--wv-hover);
+}
+
+/* 本家のnav-tabs相当 */
+.nav-tabs {
+  display: flex;
+  list-style: none;
+  padding-left: 0;
+  margin: 0 0 1rem;
+  border-bottom: 1px solid var(--wv-border);
+}
+
+.nav-tabs .nav-item {
+  margin-bottom: -1px;
+}
+
+.nav-tabs .nav-link {
+  display: block;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  color: var(--wv-primary);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav-tabs .nav-link:hover {
+  border-color: var(--wv-header-bg) var(--wv-header-bg) var(--wv-border);
+}
+
+.nav-tabs .nav-link.active {
+  color: #212529;
+  background-color: #fff;
+  border-color: var(--wv-border) var(--wv-border) #fff;
+}
+
+/* ボタン共通(Bootstrapのbtnクラス相当) */
+.btn {
+  display: inline-block;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.25rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.btn + .btn {
+  margin-left: 0.35rem;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: var(--wv-primary);
+  border-color: var(--wv-primary);
+}
+.btn-primary:hover {
+  background-color: var(--wv-primary-hover);
+  border-color: var(--wv-primary-hover);
+}
+
+.btn-secondary {
+  color: #fff;
+  background-color: var(--wv-secondary);
+  border-color: var(--wv-secondary);
+}
+.btn-secondary:hover {
+  background-color: var(--wv-secondary-hover);
+  border-color: var(--wv-secondary-hover);
+}
+
+.btn-outline-secondary {
+  color: var(--wv-secondary);
+  background-color: transparent;
+  border-color: var(--wv-secondary);
+}
+.btn-outline-secondary:hover {
+  color: #fff;
+  background-color: var(--wv-secondary);
+}
+
+.btn-outline-warning {
+  color: var(--wv-warning-text);
+  background-color: transparent;
+  border-color: var(--wv-warning);
+}
+.btn-outline-warning:hover {
+  color: var(--wv-warning-text);
+  background-color: var(--wv-warning);
+}
+
+.btn-outline-danger {
+  color: var(--wv-danger);
+  background-color: transparent;
+  border-color: var(--wv-danger);
+}
+.btn-outline-danger:hover {
+  color: #fff;
+  background-color: var(--wv-danger);
+}

@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot バックエンド (ProductWebViewer.Spring)",
+            "request": "launch",
+            "mainClass": "com.productdatabase.webviewer.ProductWebViewerSpringApplication",
+            "projectName": "product-web-viewer-spring",
+            "cwd": "${workspaceFolder}/ProductWebViewer.Spring"
+        },
+        {
+            "type": "msedge",
+            "name": "React フロントエンドにアタッチ (Edge)",
+            "request": "launch",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}/ProductWebViewer.Spring.Client"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Spring Boot + React (両方起動)",
+            "configurations": [
+                "Spring Boot バックエンド (ProductWebViewer.Spring)",
+                "React フロントエンドにアタッチ (Edge)"
+            ],
+            "preLaunchTask": "npm: dev - ProductWebViewer.Spring.Client"
+        }
+    ]
+}
