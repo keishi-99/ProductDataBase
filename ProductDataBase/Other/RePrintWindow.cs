@@ -322,10 +322,8 @@ namespace ProductDatabase {
             var regDate = DateTime.TryParse(_productRegisterWork.RegDate, out var parsedDate)
                 ? parsedDate
                 : DateTime.Today;
-            var monthCode = CommonUtils.ToMonthCode(regDate);
-
             var resolvedType = type ?? _printManager.CurrentSerialType;
-            var outputCode = resolvedType switch {
+            var format = resolvedType switch {
                 SerialType.Label => LabelPrintSettings.LabelTextFormat ?? string.Empty,
                 SerialType.OLesLabel => LabelPrintSettings.OLesLabelTextFormat ?? string.Empty,
                 SerialType.Barcode => BarcodePrintSettings.LabelTextFormat ?? string.Empty,
@@ -333,22 +331,9 @@ namespace ProductDatabase {
                 _ => string.Empty
             };
 
-            var map = new Dictionary<string, string> {
-                ["{T}"] = _productMaster.Initial ?? string.Empty,
-                ["{OT}"] = _productMaster.OLesInitial ?? string.Empty,
-                ["{Y}"] = regDate.ToString("yy"),
-                ["{MM}"] = regDate.ToString("MM"),
-                ["{R}"] = _productRegisterWork.Revision,
-                ["{M}"] = monthCode[^1..],
-                ["{S}"] = serialCode.ToString($"D{_productMaster.SerialDigit}"),
-                ["{SA}"] = _productMaster.OLesSerialSuffix ?? string.Empty
-            };
-
-            foreach (var kv in map) {
-                outputCode = outputCode.Replace(kv.Key, kv.Value);
-            }
-
-            return outputCode;
+            return SerialCodeFormatter.Format(
+                format, _productMaster.Initial, _productMaster.OLesInitial, regDate,
+                _productRegisterWork.Revision, serialCode, _productMaster.SerialDigit, _productMaster.OLesSerialSuffix ?? string.Empty);
         }
         // 指定タイプのフォーマットでシリアルリストを生成して返す（_printManager.CurrentSerialType を変更しない）
         private List<string> GenerateSerialListForType(SerialType type) {
