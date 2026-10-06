@@ -38,6 +38,10 @@
 		<Content Include="database.ico" />
 	</ItemGroup>
 	<ItemGroup>
+		<!-- internal クラスをテストプロジェクトから参照できるようにする -->
+		<InternalsVisibleTo Include="ProductDataBase.Tests" />
+	</ItemGroup>
+	<ItemGroup>
 		<PackageReference Include="ClosedXML" Version="0.105.0" />
 		<PackageReference Include="Dapper" Version="2.1.66" />
 		<PackageReference Include="EPPlus" Version="4.5.3.3" />
