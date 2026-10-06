@@ -374,7 +374,7 @@ namespace ProductDatabase {
 
                 string? nextSuffix = null;
                 if (ShouldIncrementOLesSuffix) {
-                    nextSuffix = GetNextOLesSuffix(_productMaster.OLesSerialSuffix);
+                    nextSuffix = SerialCodeFormatter.GetNextOLesSuffix(_productMaster.OLesSerialSuffix);
                     ProductRegistrationRepository.UpdateOLesSerialSuffix(connection, transaction, _productMaster.ProductID, nextSuffix);
                 }
 
@@ -746,10 +746,8 @@ namespace ProductDatabase {
                 ? parsedDate
                 : DateTime.Today;
 
-            var monthCode = CommonUtils.ToMonthCode(regDate);
-
             var resolvedType = type ?? _printManager.CurrentSerialType;
-            var outputCode = resolvedType switch {
+            var format = resolvedType switch {
                 SerialType.Label => LabelPrintSettings.LabelTextFormat ?? string.Empty,
                 SerialType.Barcode => BarcodePrintSettings.LabelTextFormat ?? string.Empty,
                 SerialType.Nameplate => NameplatePrintSettings.NameplateTextFormat ?? string.Empty,
@@ -757,28 +755,13 @@ namespace ProductDatabase {
                 _ => string.Empty
             };
 
-            var map = new Dictionary<string, string> {
-                ["{T}"] = _productMaster.Initial ?? string.Empty,
-                ["{OT}"] = _productMaster.OLesInitial ?? string.Empty,
-                ["{Y}"] = regDate.ToString("yy"),
-                ["{MM}"] = regDate.ToString("MM"),
-                ["{R}"] = _productRegisterWork.Revision,
-                ["{M}"] = monthCode[^1..],
-                ["{S}"] = serialCode.ToString($"D{_productMaster.SerialDigit}"),
-                ["{SA}"] = ShouldApplyNextOLesSuffix ? GetNextOLesSuffix(_productMaster.OLesSerialSuffix) : (_productMaster.OLesSerialSuffix ?? string.Empty)
-            };
+            var oLesSuffix = ShouldApplyNextOLesSuffix
+                ? SerialCodeFormatter.GetNextOLesSuffix(_productMaster.OLesSerialSuffix)
+                : (_productMaster.OLesSerialSuffix ?? string.Empty);
 
-            foreach (var kv in map) {
-                outputCode = outputCode.Replace(kv.Key, kv.Value);
-            }
-
-            return outputCode;
-        }
-        private static string GetNextOLesSuffix(string? current) {
-            if (string.IsNullOrWhiteSpace(current)) return "A";
-            var c = char.ToUpperInvariant(current[0]);
-            if (c < 'A' || c >= 'Z') return "A";  // 'Z' は 'A' へ循環、範囲外文字も 'A' にフォールバック
-            return ((char)(c + 1)).ToString();
+            return SerialCodeFormatter.Format(
+                format, _productMaster.Initial, _productMaster.OLesInitial, regDate,
+                _productRegisterWork.Revision, serialCode, _productMaster.SerialDigit, oLesSuffix);
         }
         private bool ShouldIncrementOLesSuffix =>
             _productRegisterWork.IsOLesSerialSuffixIncrement
