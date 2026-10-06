@@ -77,6 +77,17 @@ namespace ProductDataBase.Tests {
             Assert.Equal("-", Format("{OT}-", oLesInitial: null));
         }
 
+        [Fact]
+        public void Format_置換後の値にプレースホルダー文字列を含む_再置換されない() {
+            Assert.Equal("{S}-007", Format("{T}-{S}", initial: "{S}"));
+            Assert.Equal("{SA}", Format("{R}", revision: "{SA}"));
+        }
+
+        [Fact]
+        public void Format_未知のプレースホルダー_そのまま残る() {
+            Assert.Equal("{X}-AB", Format("{X}-{T}"));
+        }
+
         // ===== GetNextOLesSuffix =====
 
         [Theory]

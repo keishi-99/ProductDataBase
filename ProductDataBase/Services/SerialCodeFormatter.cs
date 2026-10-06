@@ -1,7 +1,11 @@
 using ProductDatabase.Common;
+using System.Text.RegularExpressions;
 
 namespace ProductDatabase.Services {
-    internal static class SerialCodeFormatter {
+    internal static partial class SerialCodeFormatter {
+
+        [GeneratedRegex(@"\{(?:OT|SA|MM|T|Y|R|M|S)\}")]
+        private static partial Regex PlaceholderRegex();
 
         // 書式文字列のプレースホルダーを値に置換してラベル印字コードを生成する
         // {T}接頭 {OT}O-Les接頭 {Y}製造年(2桁) {MM}製造月(2桁) {R}リビジョン {M}月コード(1桁) {S}シリアル {SA}O-Les接尾
@@ -22,12 +26,8 @@ namespace ProductDatabase.Services {
                 ["{SA}"] = oLesSuffix
             };
 
-            var outputCode = format;
-            foreach (var kv in map) {
-                outputCode = outputCode.Replace(kv.Key, kv.Value);
-            }
-
-            return outputCode;
+            // 書式を1回だけ走査して置換する（置換後の値に含まれる文字列を再置換しないため）
+            return PlaceholderRegex().Replace(format, match => map[match.Value]);
         }
 
         // O-Lesシリアル接尾の次の文字を返す
