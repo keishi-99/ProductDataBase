@@ -178,6 +178,11 @@ namespace ProductDatabase.Print {
                                 return false;
                             }
 
+                            // 最後のシリアル以外で、同シリアルが2枚以上のときだけ、終了位置のラベル右隣に区切り線を描く（行末でも右余白に描く）
+                            if (entry.Copies > 1) {
+                                DrawSerialSeparator(e.Graphics, posX + labelWidthPx + (intervalXPx / 2), posY, labelHeightPx, dpiX);
+                            }
+
                             CopiesRemainingPerSerial = _serialEntries[PrintCount].Copies;
                         }
                     }
@@ -358,6 +363,12 @@ namespace ProductDatabase.Print {
             };
         }
 
+
+        // シリアルの区切りとして、指定X位置にラベル高さ分の縦線をグレーで描画する
+        private static void DrawSerialSeparator(Graphics graphics, float posX, float posY, float height, float dpiX) {
+            using var pen = new Pen(Color.Gray, ConvertMmToPixel(0.1, dpiX));
+            graphics.DrawLine(pen, posX, posY, posX, posY + height);
+        }
 
         // 最終シリアル印刷後に次の開始行番号をページ上に描画する
         private static void DrawFinalRowMark(Graphics graphics, int rowNumber, float posX, float posY, float width, float height, Font font) {
