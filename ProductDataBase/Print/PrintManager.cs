@@ -74,6 +74,8 @@ namespace ProductDatabase.Print {
 
             PageCount = 1;
             PrintCount = 0;
+            // ページをまたぐ場合に残り枚数がリセットされないよう、印刷開始時に1度だけ初期化する
+            CopiesRemainingPerSerial = _serialEntries.Count > 0 ? _serialEntries[0].Copies : 0;
             SerialPrintType = productMaster.SerialPrintType;
 
             _isUnderlinePrint = ProductMaster.IsUnderlinePrint;
@@ -89,6 +91,8 @@ namespace ProductDatabase.Print {
             _serialEntries = serialList.Select(s => new SerialEntry(s, copiesPerLabel, false)).ToList();
             PageCount = 1;
             PrintCount = 0;
+            // ページをまたぐ場合に残り枚数がリセットされないよう、印刷開始時に1度だけ初期化する
+            CopiesRemainingPerSerial = _serialEntries.Count > 0 ? _serialEntries[0].Copies : 0;
             SerialPrintType = substrateMaster.SerialPrintType;
         }
 
@@ -128,7 +132,6 @@ namespace ProductDatabase.Print {
                 var headerString = ConvertHeaderString(serialType, printSettings.HeaderTextFormat);
                 var headerFont = printSettings.HeaderFont;
 
-                CopiesRemainingPerSerial = _serialEntries[PrintCount].Copies;
                 if (labelCountX == 0 || labelCountY == 0 || printSettings.CopiesPerLabel == 0) {
                     throw new Exception("印刷設定が異常です。");
                 }
