@@ -1,4 +1,4 @@
-using ProductDatabase.Models;
+﻿using ProductDatabase.Models;
 using ProductDatabase.Print;
 using System.Drawing;
 using System.Drawing.Printing;
@@ -38,7 +38,7 @@ namespace ProductDataBase.Tests {
         }
 
         // プレビュー描画した1ページ分のBitmapから、枠線が描かれたセル数を数える
-        private static int PrintOnePageAndCountLabels(PrintManager manager, out bool hasMore) {
+        private static int PrintOnePageAndCountLabels(PrintManager manager, int startLine, out bool hasMore) {
             using var bitmap = new Bitmap(500, 300);
             bitmap.SetResolution(Dpi, Dpi);
             using var graphics = Graphics.FromImage(bitmap);
@@ -46,7 +46,7 @@ namespace ProductDataBase.Tests {
 
             var bounds = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
             var args = new PrintPageEventArgs(graphics, bounds, bounds, new PageSettings());
-            hasMore = manager.PrintSerialCommon(args, isPreview: true, startLine: 0, PrintManager.SerialType.Label);
+            hasMore = manager.PrintSerialCommon(args, isPreview: true, startLine, PrintManager.SerialType.Label);
 
             var count = 0;
             for (var y = 0; y < Rows; y++) {
@@ -69,11 +69,11 @@ namespace ProductDataBase.Tests {
             return false;
         }
 
-        private static List<int> PrintAllPages(PrintManager manager) {
+        private static List<int> PrintAllPages(PrintManager manager, int startLine = 0) {
             var labelsPerPage = new List<int>();
             bool hasMore;
             do {
-                labelsPerPage.Add(PrintOnePageAndCountLabels(manager, out hasMore));
+                labelsPerPage.Add(PrintOnePageAndCountLabels(manager, startLine, out hasMore));
             } while (hasMore && labelsPerPage.Count < 10);
             return labelsPerPage;
         }
@@ -94,6 +94,34 @@ namespace ProductDataBase.Tests {
             var labelsPerPage = PrintAllPages(manager);
 
             Assert.Equal([6], labelsPerPage);
+        }
+
+        [Theory]
+        [InlineData(1, 20, 0)]
+        [InlineData(2, 9, 0)]
+        [InlineData(3, 7, 0)]
+        [InlineData(4, 4, 0)]
+        [InlineData(5, 5, 0)]
+        [InlineData(9, 3, 0)]
+        [InlineData(3, 5, 1)]
+        [InlineData(5, 4, 1)]
+        public void PrintSerialCommon_発行枚数とシリアル数と開始行の組み合わせ_総枚数が一致する(int copies, int serialCount, int startLine) {
+            var serials = Enumerable.Range(1, serialCount).Select(i => $"S{i}").ToList();
+            var manager = CreateManager(copies, serials);
+
+            var labelsPerPage = PrintAllPages(manager, startLine);
+
+            Assert.Equal(copies * serialCount, labelsPerPage.Sum());
+            Assert.All(labelsPerPage, count => Assert.InRange(count, 1, Columns * Rows));
+        }
+
+        [Fact]
+        public void PrintSerialCommon_ちょうどページ末尾で終わる_空ページが出ない() {
+            var manager = CreateManager(copiesPerLabel: 4, ["S1", "S2"]);
+
+            var labelsPerPage = PrintAllPages(manager);
+
+            Assert.Equal([8], labelsPerPage);
         }
     }
 }
